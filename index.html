@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AIMS-OS — Prototype Hub</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',system-ui,sans-serif;background:#070e1c;color:#e2e8f0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+    .logo{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2B7FFF;margin-bottom:12px}
+    h1{font-size:28px;font-weight:700;color:#f1f5f9;margin-bottom:8px;text-align:center}
+    .sub{font-size:14px;color:#64748b;margin-bottom:48px;text-align:center}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;width:100%;max-width:860px}
+    .card{background:#0c1428;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s;display:flex;flex-direction:column;gap:10px}
+    .card:hover{border-color:rgba(43,127,255,.5);transform:translateY(-2px)}
+    .card-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+    .card-title{font-size:15px;font-weight:700;color:#f1f5f9}
+    .card-desc{font-size:12px;color:#64748b;line-height:1.6}
+    .card-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;width:fit-content}
+    .tag-blue{background:rgba(43,127,255,.12);color:#2B7FFF;border:1px solid rgba(43,127,255,.25)}
+    .tag-green{background:rgba(5,223,114,.1);color:#05DF72;border:1px solid rgba(5,223,114,.2)}
+    .tag-pur{background:rgba(167,139,250,.1);color:#A78BFA;border:1px solid rgba(167,139,250,.2)}
+    .tag-yellow{background:rgba(253,199,0,.1);color:#FDC700;border:1px solid rgba(253,199,0,.2)}
+    .ft{margin-top:48px;font-size:11px;color:#334155}
+  </style>
+</head>
+<body>
+  <div class="logo">AIMS-OS</div>
+  <h1>Prototype Hub</h1>
+  <p class="sub">Design prototypes — work in progress</p>
+
+  <div class="grid">
+
+    <a class="card" href="agentic-studio.html">
+      <div class="card-ico" style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.22)">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4.5" width="4" height="3" rx=".8" stroke="#A78BFA" stroke-width="1.2"/><rect x="6.5" y="1.5" width="4" height="3" rx=".8" stroke="#A78BFA" stroke-width="1.2"/><rect x="6.5" y="7.5" width="4" height="3" rx=".8" stroke="#A78BFA" stroke-width="1.2"/><path d="M5.5 6h1M5.5 3H6a.5.5 0 01.5.5v1" stroke="#A78BFA" stroke-width="1" stroke-linecap="round"/></svg>
+      </div>
+      <div class="card-title">Agentic Studio</div>
+      <div class="card-desc">Design and orchestrate Agent Networks. Visual canvas, Knowledge Packs, builder and test mode.</div>
+      <span class="card-tag tag-pur">Core product</span>
+    </a>
+
+    <a class="card" href="communication-hub.html">
+      <div class="card-ico" style="background:rgba(43,127,255,.12);border:1px solid rgba(43,127,255,.22)">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v8H9l-3 2V11H2V3z" stroke="#2B7FFF" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="card-title">Communication Hub</div>
+      <div class="card-desc">Configure channels — Voice, WhatsApp, Email and SMS. Phone numbers, routing rules and agent assignment.</div>
+      <span class="card-tag tag-blue">Channels</span>
+    </a>
+
+    <a class="card" href="governance-studio.html">
+      <div class="card-ico" style="background:rgba(5,223,114,.1);border:1px solid rgba(5,223,114,.2)">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4v4C2 11.5 4.5 14 8 14.5c3.5-.5 6-3 6-6.5V4L8 1.5z" stroke="#05DF72" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="card-title">Governance Studio</div>
+      <div class="card-desc">Manage Knowledge Packs, Truth Planes, approval workflows and knowledge versioning.</div>
+      <span class="card-tag tag-green">Governance</span>
+    </a>
+
+    <a class="card" href="voice-channel-ux.html">
+      <div class="card-ico" style="background:rgba(253,199,0,.1);border:1px solid rgba(253,199,0,.2)">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M13 10.5a1.5 1.5 0 01-1.5 1.5C5.5 12 4 6.5 4 4.5A1.5 1.5 0 015.5 3c.4 0 .7.2.9.5l1 2a1 1 0 01-.2 1.2l-.5.5C7 8 8 9 8.8 9.3l.5-.5a1 1 0 011.2-.2l2 1c.3.2.5.5.5.9z" stroke="#FDC700" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="card-title">Voice Channel UX</div>
+      <div class="card-desc">Voice interaction flows, call routing UI, human handoff and real-time call monitoring.</div>
+      <span class="card-tag tag-yellow">Voice</span>
+    </a>
+
+  </div>
+
+  <p class="ft">AIMS-OS · Internal prototype — not for public distribution</p>
+</body>
+</html>
