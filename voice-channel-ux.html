@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIMS-OS — Voice Channel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Tokens ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0b0d12;
+  --surface:   #12151e;
+  --surface2:  #191d29;
+  --surface3:  #1f2433;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --text:      #e8eaf2;
+  --muted:     #5d6380;
+  --muted2:    #8890b0;
+  --accent:    #6c63ff;
+  --accent2:   #5a52e0;
+  --green:     #22d388;
+  --amber:     #f5a623;
+  --red:       #f04e5e;
+  --blue:      #3b8beb;
+  --cyan:      #29c6e0;
+  --r:         8px;
+  --r2:        12px;
+  --r3:        16px;
+  --shadow:    0 24px 60px rgba(0,0,0,0.7);
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; -webkit-font-smoothing: antialiased; }
+
+/* ── App Shell ──────────────────────────────────────────────────────────── */
+.shell { display: flex; height: 100vh; }
+
+/* ── Sidebar (AIMS OS Design System) ─────────────────────────────────── */
+.sidebar{
+  width:64px;flex-shrink:0;background:#000;display:flex;flex-direction:column;
+  border-right:1px solid rgba(255,255,255,0.07);
+  transition:width .22s cubic-bezier(.4,0,.2,1);overflow:hidden;
+}
+.sidebar.sb-expanded{width:250px}
+.sb-brand{display:flex;align-items:center;gap:10px;height:52px;padding:0 18px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.05);overflow:hidden;white-space:nowrap}
+.sidebar:not(.sb-expanded) .sb-brand{justify-content:center;padding:0}
+.sb-brand-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0}
+.sb-brand-name{font-size:13px;font-weight:700;color:rgba(255,255,255,.9);opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap}
+.sidebar.sb-expanded .sb-brand-name{opacity:1}
+.sb-nav{flex:1;display:flex;flex-direction:column;padding:6px 8px;gap:2px;overflow:hidden}
+.sb-item{
+  display:flex;align-items:center;height:40px;border:none;border-radius:10px;
+  background:transparent;color:rgba(255,255,255,0.42);font-size:12px;font-weight:600;
+  cursor:pointer;width:100%;text-align:left;transition:background .15s,color .15s;
+  white-space:nowrap;overflow:hidden;flex-shrink:0;padding:0;
+}
+.sidebar:not(.sb-expanded) .sb-item{justify-content:center;gap:0}
+.sidebar.sb-expanded .sb-item{justify-content:flex-start;padding:0 12px;gap:10px}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,.80)}
+.sb-item.active{background:linear-gradient(135deg,rgba(21,93,252,0.55) 0%,rgba(0,194,194,0.35) 100%);color:#fff}
+.sb-item.active:hover{background:linear-gradient(135deg,rgba(21,93,252,0.65) 0%,rgba(0,194,194,0.45) 100%)}
+.sidebar:not(.sb-expanded) .sb-item.active{background:transparent}
+.sidebar:not(.sb-expanded) .sb-item.active .sb-item-icon{background:linear-gradient(135deg,#155DFC 0%,#00C2C2 100%);border-radius:10px;width:36px;height:36px;box-shadow:0 0 12px rgba(21,93,252,0.45)}
+.sb-item-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sb-item-icon svg{width:18px;height:18px}
+.sb-label{opacity:0;transition:opacity .12s;pointer-events:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar.sb-expanded .sb-label{opacity:1;pointer-events:auto}
+.sb-chevron{margin-left:auto;width:13px;height:13px;flex-shrink:0;opacity:0;color:rgba(255,255,255,.35)}
+.sidebar.sb-expanded .sb-chevron{opacity:1}
+.sb-divider{height:1px;background:rgba(255,255,255,0.06);margin:4px 0;flex-shrink:0}
+.sb-bottom{flex-shrink:0;border-top:1px solid rgba(255,255,255,0.05);padding:4px 8px 6px}
+.sb-toggle{
+  display:flex;align-items:center;height:40px;border:none;border-radius:10px;
+  background:transparent;color:rgba(128,175,255,0.55);font-size:12px;font-weight:600;
+  cursor:pointer;width:100%;white-space:nowrap;overflow:hidden;transition:background .12s,color .12s;
+}
+.sidebar:not(.sb-expanded) .sb-toggle{justify-content:center;gap:0;padding:0}
+.sidebar.sb-expanded .sb-toggle{justify-content:flex-start;padding:0 12px;gap:10px}
+.sb-toggle:hover{background:rgba(255,255,255,0.06);color:#80AFFF}
+.sb-toggle-icon{width:18px;height:18px;flex-shrink:0;transition:transform .22s cubic-bezier(.4,0,.2,1)}
+.sidebar.sb-expanded .sb-toggle-icon{transform:rotate(180deg)}
+.sb-toggle-label{opacity:0;transition:opacity .12s}
+.sidebar.sb-expanded .sb-toggle-label{opacity:1}
+.user-name { font-size: 12px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--muted); }
+
+/* ── Main Content ───────────────────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── Page Header ────────────────────────────────────────────────────────── */
+.page-header {
+  padding: 20px 28px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.page-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.page-title { font-family: var(--font-head); font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.page-title-icon { font-size: 20px; }
+.page-tabs { display: flex; gap: 2px; }
+
+.tab-btn {
+  padding: 9px 16px; background: none; border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted2); font-family: var(--font-body); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; margin-bottom: -1px;
+  display: flex; align-items: center; gap: 7px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+.tab-count {
+  font-size: 10px; background: var(--surface3);
+  padding: 1px 6px; border-radius: 10px; color: var(--muted2);
+}
+.tab-btn.active .tab-count { background: rgba(108,99,255,0.2); color: var(--accent); }
+
+/* ── Page Content ───────────────────────────────────────────────────────── */
+.page-content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+/* ── Filter Bar ─────────────────────────────────────────────────────────── */
+.filter-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 340px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; }
+.search-input {
+  width: 100%; padding: 7px 10px 7px 32px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text); font-family: var(--font-body); font-size: 13px;
+  outline: none; transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--muted); }
+
+.filter-chip {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border2); background: none;
+  color: var(--muted2); font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+}
+.filter-chip:hover { border-color: var(--border2); color: var(--text); }
+.filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.ml-auto { margin-left: auto; }
+
+.btn-primary {
+  padding: 7px 16px; background: var(--accent); border: none;
+  border-radius: var(--r); color: #fff; font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s; display: flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary {
+  padding: 7px 14px; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text); font-family: var(--font-body); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-secondary:hover { background: var(--surface3); }
+.btn-danger {
+  padding: 7px 14px; background: var(--red); border: none;
+  border-radius: var(--r); color: #fff; font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-danger:hover { background: #d03848; }
+.btn-ghost {
+  padding: 6px 12px; background: none; border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--muted2); font-family: var(--font-body); font-size: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
+
+/* ── Table ──────────────────────────────────────────────────────────────── */
+.table-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r2); overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead { position: sticky; top: 0; z-index: 1; }
+th {
+  padding: 10px 14px; text-align: left;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--muted); background: var(--surface2);
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr { cursor: pointer; transition: background 0.1s; }
+tbody tr:hover { background: var(--surface2); }
+tbody tr.selected { background: rgba(108,99,255,0.07); }
+tbody tr:last-child td { border-bottom: none; }
+
+.mono { font-family: var(--font-mono); font-size: 12px; }
+.dim { color: var(--muted2); }
+.right { text-align: right; }
+
+/* ── Badges ─────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+}
+.badge-green  { background: rgba(34,211,136,0.12); color: var(--green); }
+.badge-amber  { background: rgba(245,166,35,0.12);  color: var(--amber); }
+.badge-red    { background: rgba(240,78,94,0.12);   color: var(--red); }
+.badge-blue   { background: rgba(59,139,235,0.12);  color: var(--blue); }
+.badge-purple { background: rgba(108,99,255,0.12);  color: var(--accent); }
+.badge-gray   { background: rgba(93,99,128,0.15);   color: var(--muted2); }
+
+/* dot */
+.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-green  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dot-amber  { background: var(--amber); }
+.dot-gray   { background: var(--muted); }
+
+/* ── Avatar stack ───────────────────────────────────────────────────────── */
+.avatar-stack { display: flex; }
+.avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--surface);
+  margin-left: -7px; font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.avatar:first-child { margin-left: 0; }
+.avatar-overflow { background: var(--surface3); color: var(--muted2); font-size: 9px; }
+
+/* ── HiL shield ─────────────────────────────────────────────────────────── */
+.hil-icon { color: var(--accent); font-size: 13px; }
+.hil-none { color: var(--muted); font-size: 13px; }
+
+/* ── Overlay ────────────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(3px); z-index: 200;
+  display: flex; align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+.overlay-center { align-items: center; justify-content: center; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── Bottom Sheet ───────────────────────────────────────────────────────── */
+.sheet {
+  width: 100%; max-height: 92vh;
+  background: var(--surface); border-top: 1px solid var(--border2);
+  border-radius: 20px 20px 0 0;
+  display: flex; flex-direction: column;
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow: hidden;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.sheet-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 10px auto 0; flex-shrink: 0; }
+
+.sheet-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px 14px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-top-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.close-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1; transition: color 0.15s; }
+.close-btn:hover { color: var(--text); }
+
+.sheet-identity { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.sheet-number { font-family: var(--font-head); font-size: 30px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+.sheet-sub { font-size: 13px; color: var(--muted2); margin-bottom: 12px; }
+.sheet-badges { display: flex; gap: 8px; }
+
+.sheet-stats { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.sheet-stat { flex: 1; padding: 16px 24px; text-align: center; border-right: 1px solid var(--border); }
+.sheet-stat:last-child { border-right: none; }
+.sheet-stat-val { font-family: var(--font-head); font-size: 26px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 3px; }
+.sheet-stat-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+.sheet-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.sheet-tab { flex: 1; padding: 12px 8px; background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted2); font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; margin-bottom: -1px; }
+.sheet-tab:hover { color: var(--text); }
+.sheet-tab.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+
+.sheet-body { flex: 1; overflow-y: auto; padding: 0 24px 8px; }
+
+.sheet-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; flex-shrink: 0; background: var(--surface); }
+.sheet-btn-release { flex: 1; padding: 13px; border: 1.5px solid var(--red); background: transparent; border-radius: var(--r); color: var(--red); font-family: var(--font-body); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.sheet-btn-release:hover { background: rgba(240,78,94,0.08); }
+.sheet-btn-save { flex: 2; padding: 13px; background: var(--accent); border: none; border-radius: var(--r); color: #fff; font-family: var(--font-body); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+.sheet-btn-save:hover { background: var(--accent2); }
+
+/* ── Section in sheet ───────────────────────────────────────────────────── */
+.s-section { padding-top: 22px; }
+.s-section-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+.s-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.s-row:last-child { border-bottom: none; }
+.s-row-label { font-size: 13px; font-weight: 500; flex-shrink: 0; }
+.s-row-sub { font-size: 11px; color: var(--muted2); margin-top: 2px; }
+.s-row-val { flex: 1; text-align: right; color: var(--muted2); font-size: 13px; max-width: 260px; }
+.s-row-toggle { align-items: flex-start; }
+
+/* ── Toggle Switch ──────────────────────────────────────────────────────── */
+.toggle {
+  width: 36px; height: 20px; border-radius: 10px;
+  background: var(--surface3); border: none; cursor: pointer;
+  position: relative; flex-shrink: 0; transition: background 0.2s;
+}
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--muted); transition: transform 0.2s, background 0.2s;
+}
+.toggle.on { background: var(--accent); }
+.toggle.on::after { transform: translateX(16px); background: #fff; }
+.toggle:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Select / Input ─────────────────────────────────────────────────────── */
+.form-select, .form-input {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text);
+  font-family: var(--font-body); font-size: 13px;
+  padding: 6px 10px; outline: none;
+  transition: border-color 0.15s;
+}
+.form-select:focus, .form-input:focus { border-color: var(--accent); }
+.form-select { cursor: pointer; }
+
+/* ── Modal ──────────────────────────────────────────────────────────────── */
+.modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r3); width: 520px; max-height: 88vh;
+  box-shadow: var(--shadow); display: flex; flex-direction: column;
+  animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+@keyframes popIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+
+.modal-header { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.modal-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+.modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+.modal-footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+
+/* Stepper */
+.stepper { display: flex; align-items: center; gap: 0; margin-bottom: 22px; }
+.step { display: flex; align-items: center; gap: 8px; }
+.step-num { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); flex-shrink: 0; transition: all 0.2s; }
+.step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+.step.done .step-num { background: var(--green); border-color: var(--green); color: #fff; }
+.step-label { font-size: 12px; color: var(--muted); }
+.step.active .step-label { color: var(--text); font-weight: 600; }
+.step-line { flex: 1; height: 1px; background: var(--border2); min-width: 20px; }
+
+/* Form field */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px; }
+.field input, .field select {
+  width: 100%; padding: 8px 10px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text); font-family: var(--font-body); font-size: 13px;
+  outline: none; transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); }
+
+/* Number option card */
+.num-option {
+  padding: 12px 14px; border-radius: var(--r);
+  border: 1.5px solid var(--border2); margin-bottom: 8px;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+}
+.num-option:hover { border-color: var(--accent); background: rgba(108,99,255,0.04); }
+.num-option.selected { border-color: var(--accent); background: rgba(108,99,255,0.08); }
+.num-option-left { flex: 1; }
+.num-option-number { font-family: var(--font-mono); font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+.num-option-region { font-size: 11px; color: var(--muted2); }
+.num-option-caps { display: flex; gap: 4px; }
+.cap { padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; background: rgba(108,99,255,0.15); color: var(--accent); }
+.num-option-price { font-size: 13px; font-weight: 600; color: var(--green); white-space: nowrap; }
+
+/* Confirm card */
+.confirm-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; text-align: center; margin-bottom: 16px; }
+.confirm-num { font-family: var(--font-head); font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+.confirm-label { font-size: 13px; color: var(--muted2); }
+.confirm-price { font-size: 14px; font-weight: 600; color: var(--green); margin-top: 8px; }
+
+/* Alert banner */
+.alert { padding: 10px 14px; border-radius: var(--r); font-size: 13px; margin-bottom: 12px; }
+.alert-warn { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.25); color: var(--amber); }
+.alert-red  { background: rgba(240,78,94,0.1);  border: 1px solid rgba(240,78,94,0.25);  color: var(--red); }
+.alert-info { background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.25); color: var(--accent); }
+
+/* ── Agents tab ─────────────────────────────────────────────────────────── */
+.agents-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.agents-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+.agents-table td { padding: 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+.agents-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+.agent-cell { display: flex; align-items: center; gap: 10px; }
+.agent-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.agent-name { font-size: 13px; font-weight: 500; }
+.agent-email { font-size: 11px; color: var(--muted); }
+
+.status-pill { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+
+.remove-btn { padding: 4px 10px; background: none; border: 1px solid rgba(240,78,94,0.3); border-radius: var(--r); color: var(--red); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; opacity: 0; }
+tr:hover .remove-btn { opacity: 1; }
+.remove-btn:hover { background: rgba(240,78,94,0.1); }
+
+/* Distribution radio */
+.dist-options { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.dist-option { padding: 12px 14px; border-radius: var(--r); border: 1.5px solid var(--border2); cursor: pointer; transition: all 0.15s; display: flex; align-items: flex-start; gap: 12px; }
+.dist-option:hover { border-color: var(--border2); background: var(--surface2); }
+.dist-option.selected { border-color: var(--accent); background: rgba(108,99,255,0.06); }
+.dist-option input { margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+.dist-option-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.dist-option-desc { font-size: 12px; color: var(--muted2); }
+
+/* HiL section */
+.hil-block { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-top: 16px; }
+.hil-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.hil-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.hil-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(108,99,255,0.15); color: var(--accent); font-weight: 700; }
+
+.trigger-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.trigger-chip { padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border2); font-size: 11px; font-weight: 500; color: var(--muted2); cursor: pointer; transition: all 0.15s; }
+.trigger-chip.on { background: rgba(108,99,255,0.12); border-color: var(--accent); color: var(--accent); }
+
+.notif-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.notif-row:last-child { border-bottom: none; }
+.notif-label { font-size: 13px; display: flex; align-items: center; gap: 8px; }
+
+/* ── Call History tab ───────────────────────────────────────────────────── */
+.log-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; border-radius: var(--r); padding: 10px 8px; transition: background 0.1s; }
+.log-item:hover { background: rgba(255,255,255,0.03); }
+.log-dir { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.log-dir-in  { background: rgba(34,211,136,0.1); color: var(--green); }
+.log-dir-out { background: rgba(59,139,235,0.1); color: var(--blue); }
+.log-info { flex: 1; }
+.log-num { font-family: var(--font-mono); font-size: 12px; font-weight: 500; }
+.log-meta { font-size: 11px; color: var(--muted); }
+.log-dur { font-size: 12px; color: var(--muted2); font-family: var(--font-mono); }
+
+/* ── Call History page ──────────────────────────────────────────────────── */
+.logs-layout { display: flex; gap: 16px; }
+.logs-table-wrap { flex: 1; }
+.log-detail-panel { width: 400px; flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2); display: flex; flex-direction: column; overflow: hidden; max-height: calc(100vh - 160px); animation: slideRight 0.2s ease; }
+@keyframes slideRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+.detail-hdr { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; }
+.detail-num { font-family: var(--font-mono); font-size: 15px; font-weight: 500; }
+.detail-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.detail-chips { padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
+.detail-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.detail-tab { flex: 1; padding: 9px 8px; background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted2); font-family: var(--font-body); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; margin-bottom: -1px; }
+.detail-tab:hover { color: var(--text); }
+.detail-tab.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+.detail-body { flex: 1; overflow-y: auto; padding: 14px 16px; }
+
+/* Transcript bubbles */
+.bubble { max-width: 88%; padding: 8px 12px; border-radius: var(--r2); margin-bottom: 10px; }
+.bubble-caller { align-self: flex-end; background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.2); margin-left: auto; }
+.bubble-agent  { background: var(--surface2); border: 1px solid var(--border); }
+.bubble-human  { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); }
+.bubble-role { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 3px; }
+.bubble-text { font-size: 13px; line-height: 1.5; }
+.bubble-time { font-size: 10px; color: var(--muted); text-align: right; margin-top: 4px; }
+.hil-divider { border: none; border-top: 1px dashed rgba(245,166,35,0.3); margin: 12px 0; position: relative; }
+.hil-divider-label { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--surface); padding: 0 8px; font-size: 10px; color: var(--amber); white-space: nowrap; }
+
+/* Overview cards */
+.overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+.ov-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; }
+.ov-card-val { font-family: var(--font-head); font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+.ov-card-lbl { font-size: 11px; color: var(--muted); }
+
+/* Business hours grid */
+.hours-grid { display: flex; flex-direction: column; gap: 6px; }
+.hours-row { display: flex; align-items: center; gap: 14px; padding: 6px 0; }
+.hours-day { width: 32px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.hours-times { display: flex; align-items: center; gap: 8px; flex: 1; }
+.hours-input { width: 90px; padding: 5px 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--r); color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; }
+.hours-input:focus { border-color: var(--accent); }
+.hours-dash { color: var(--muted); }
+
+/* Release modal */
+.impact-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: var(--surface2); border-radius: var(--r); margin-bottom: 8px; font-size: 13px; }
+.impact-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.type-confirm { width: 100%; padding: 10px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--r); color: var(--text); font-family: var(--font-mono); font-size: 14px; text-align: center; outline: none; letter-spacing: 0.15em; transition: border-color 0.15s; margin-top: 4px; }
+.type-confirm:focus { border-color: var(--red); }
+.type-confirm.valid { border-color: var(--green); }
+
+/* Add agent modal */
+.agent-pick-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r); cursor: pointer; transition: background 0.1s; }
+.agent-pick-item:hover { background: var(--surface2); }
+.agent-pick-item.selected { background: rgba(108,99,255,0.08); }
+.agent-pick-check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--border2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all 0.15s; }
+.agent-pick-item.selected .agent-pick-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Toast */
+.toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; pointer-events: none; }
+.toast { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: var(--r2); min-width: 280px; max-width: 400px; pointer-events: all; animation: toastIn 0.25s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.toast-success { background: #0d2b1f; border: 1px solid rgba(34,211,136,0.3); }
+.toast-error   { background: #2a0f12; border: 1px solid rgba(240,78,94,0.3); }
+.toast-info    { background: var(--surface2); border: 1px solid var(--border2); }
+.toast-icon { font-size: 14px; flex-shrink: 0; }
+.toast-success .toast-icon { color: var(--green); }
+.toast-error   .toast-icon { color: var(--red); }
+.toast-msg { font-size: 13px; flex: 1; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+.empty-title { font-family: var(--font-head); font-size: 16px; color: var(--muted2); margin-bottom: 6px; }
+.empty-sub { font-size: 13px; margin-bottom: 20px; }
+
+/* Separator */
+.sep { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* row gap */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-4 { gap: 4px; }
+.mt-4 { margin-top: 4px; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.hidden { display: none !important; }
+/* ── PAGINATION ── */
+.pagination{height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;gap:24px}
+.pgn-rpp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2);white-space:nowrap}
+.pgn-rpp-wrap{position:relative}
+.pgn-rpp-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text);background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer;transition:border-color .15s,background .15s;white-space:nowrap}
+.pgn-rpp-btn:hover{background:rgba(255,255,255,0.07);border-color:var(--border2)}
+.pgn-rpp-menu{position:absolute;bottom:calc(100% + 4px);left:0;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:4px;min-width:72px;z-index:120;display:none;flex-direction:column;gap:1px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.pgn-rpp-menu.open{display:flex}
+.pgn-rpp-val{pointer-events:none}
+.pgn-rpp-opt{padding:7px 12px;font-size:12px;color:var(--text);border-radius:5px;cursor:pointer;background:none;border:none;text-align:left;width:100%;transition:background .1s}
+.pgn-rpp-opt:hover{background:rgba(255,255,255,0.06)}
+.pgn-rpp-opt.sel{color:var(--accent);background:rgba(108,99,255,0.12)}
+.pgn-range{font-size:12px;color:var(--text);white-space:nowrap}
+.pgn-nav{display:flex;align-items:center;gap:4px}
+.pgn-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,0.04);cursor:pointer;color:var(--text);transition:all .15s}
+.pgn-btn:hover:not(:disabled){border-color:var(--border2);background:rgba(255,255,255,0.08)}
+.pgn-btn:disabled{opacity:.3;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar" id="appSidebar" aria-label="Main navigation">
+
+    <div class="sb-brand">
+      <div class="sb-brand-logo">AS</div>
+      <span class="sb-brand-name">AIMS OS</span>
+    </div>
+
+    <div class="sb-nav">
+      <button class="sb-item" title="Home" aria-label="Home">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7.5L9 2l7 5.5V16h-4.5v-3.5h-5V16H2V7.5z"/></svg></span>
+        <span class="sb-label">Home</span>
+      </button>
+
+      <button class="sb-item" title="Agents" aria-label="Agents">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6" r="3"/><path d="M3 17c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></span>
+        <span class="sb-label">Agents</span>
+      </button>
+
+      <button class="sb-item" title="Automations" aria-label="Automations">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="10.5" y="10.5" width="5.5" height="5.5" rx="1.5"/><path d="M5 7.5v1.5A1.5 1.5 0 006.5 10.5H8"/></svg></span>
+        <span class="sb-label">Automations</span>
+      </button>
+
+      <div class="sb-divider"></div>
+
+      <!-- Contacts — ACTIVE (Voice channel lives here) -->
+      <button class="sb-item active" title="Contacts" aria-label="Contacts" aria-current="page">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6.5" r="2.5"/><path d="M3 16c0-2.76 2.686-5 6-5s6 2.24 6 5"/><path d="M14 3a2.5 2.5 0 010 5M15.5 14.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5"/></svg></span>
+        <span class="sb-label">Contacts</span>
+        <svg class="sb-chevron" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3.5 3.5L10 5"/></svg>
+      </button>
+
+      <div class="sb-divider"></div>
+
+      <button class="sb-item" title="Knowledge" aria-label="Knowledge">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2.5h12v13H3z"/><path d="M6.5 6h5M6.5 9h5M6.5 12h3"/></svg></span>
+        <span class="sb-label">Knowledge</span>
+      </button>
+
+      <button class="sb-item" title="Admin" aria-label="Admin">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M9 2l1.5 4h4l-3.5 2.5 1.5 4L9 10l-3.5 2.5 1.5-4L3.5 6h4z"/></svg></span>
+        <span class="sb-label">Admin</span>
+        <svg class="sb-chevron" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3.5 3.5L10 5"/></svg>
+      </button>
+
+      <button class="sb-item" title="Workspace" aria-label="Workspace">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="6" rx="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.5"/></svg></span>
+        <span class="sb-label">Workspace</span>
+      </button>
+    </div>
+
+    <div class="sb-bottom">
+      <button class="sb-toggle" id="sbToggleBtn" onclick="sbToggle()" title="Toggle sidebar" aria-label="Toggle sidebar" aria-expanded="false">
+        <svg class="sb-toggle-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4L6 9l5 5"/><line x1="3" y1="3" x2="3" y2="15"/>
+        </svg>
+        <span class="sb-toggle-label">Collapse</span>
+      </button>
+    </div>
+
+  </nav>
+
+  <!-- ── Main ── -->
+  <div class="main">
+    <div class="page-header">
+      <div class="page-title-row">
+        <div class="page-title">
+          <span class="page-title-icon">📞</span>
+          Voice Channel
+        </div>
+      </div>
+      <nav class="page-tabs">
+        <button class="tab-btn active" onclick="switchTab('numbers', this)">
+          Numbers <span class="tab-count" id="numbers-count">4</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('history', this)">
+          Call History <span class="tab-count">142</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('settings', this)">
+          Settings
+        </button>
+      </nav>
+    </div>
+
+    <div class="page-content" id="tab-numbers">
+      <!-- Filter row -->
+      <div class="filter-row">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" placeholder="Search by number, label, or agent…" oninput="filterNumbers(this.value)">
+        </div>
+        <button class="filter-chip active" onclick="toggleChip(this,'all')">All</button>
+        <button class="filter-chip" onclick="toggleChip(this,'active')">Active</button>
+        <button class="filter-chip" onclick="toggleChip(this,'suspended')">Suspended</button>
+        <div class="ml-auto">
+          <button class="btn-primary" onclick="openAcquire()">+ Acquire Number</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Label</th>
+              <th>Status</th>
+              <th>Agents</th>
+              <th>Distribution</th>
+              <th>HiL</th>
+              <th class="right">Calls 30d</th>
+              <th class="right">Cost MTD</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="numbers-body"></tbody>
+        </table>
+        <div class="pagination" id="numbers-pgn" data-total="0" data-rows="10" data-page="1">
+          <div class="pgn-rpp">Rows per page:
+            <div class="pgn-rpp-wrap">
+              <button class="pgn-rpp-btn" onclick="togglePgnMenu(this,event)"><span class="pgn-rpp-val">10</span><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <div class="pgn-rpp-menu">
+                <button class="pgn-rpp-opt sel" onclick="pgnSetRows(this,10)">10</button>
+                <button class="pgn-rpp-opt" onclick="pgnSetRows(this,25)">25</button>
+                <button class="pgn-rpp-opt" onclick="pgnSetRows(this,50)">50</button>
+                <button class="pgn-rpp-opt" onclick="pgnSetRows(this,100)">100</button>
+              </div>
+            </div>
+          </div>
+          <span class="pgn-range">1–10 of 0 items</span>
+          <div class="pgn-nav">
+            <button class="pgn-btn pgn-prev" onclick="pgnGo(this,-1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="pgn-btn pgn-next" onclick="pgnGo(this,1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6l-3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content hidden" id="tab-history">
+      <div class="filter-row">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" placeholder="Search transcripts…">
+        </div>
+        <button class="filter-chip active" onclick="toggleChip(this,'all-dir')">All</button>
+        <button class="filter-chip" onclick="toggleChip(this,'inbound')">Inbound</button>
+        <button class="filter-chip" onclick="toggleChip(this,'outbound')">Outbound</button>
+        <button class="filter-chip" onclick="toggleChip(this,'hil')">HiL only</button>
+        <select class="form-select" style="margin-left:4px">
+          <option>Last 7 days</option>
+          <option>Last 30 days</option>
+          <option>Today</option>
+        </select>
+      </div>
+
+      <div class="logs-layout">
+        <div class="logs-table-wrap">
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Number</th>
+                  <th>Dir</th>
+                  <th>Caller</th>
+                  <th>Agent</th>
+                  <th>Duration</th>
+                  <th>Sentiment</th>
+                  <th>HiL</th>
+                  <th class="right">Cost</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+            <div class="pagination" id="history-pgn" data-total="0" data-rows="10" data-page="1">
+              <div class="pgn-rpp">Rows per page:
+                <div class="pgn-rpp-wrap">
+                  <button class="pgn-rpp-btn" onclick="togglePgnMenu(this,event)"><span class="pgn-rpp-val">10</span><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                  <div class="pgn-rpp-menu">
+                    <button class="pgn-rpp-opt sel" onclick="pgnSetRows(this,10)">10</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,25)">25</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,50)">50</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,100)">100</button>
+                  </div>
+                </div>
+              </div>
+              <span class="pgn-range">1–10 of 0 items</span>
+              <div class="pgn-nav">
+                <button class="pgn-btn pgn-prev" onclick="pgnGo(this,-1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button class="pgn-btn pgn-next" onclick="pgnGo(this,1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6l-3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="call-detail-panel" class="hidden"></div>
+      </div>
+    </div>
+
+    <div class="page-content hidden" id="tab-settings">
+      <div class="table-card" style="padding:32px; max-width:500px">
+        <div style="font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:4px">Workspace Voice Defaults</div>
+        <div style="color:var(--muted2);font-size:13px;margin-bottom:24px">Applied to new numbers unless overridden</div>
+        <div class="field"><label>Default Distribution Mode</label><select><option>Round Robin</option><option>First Available</option><option>Least Load</option></select></div>
+        <div class="field"><label>Default Timezone</label><select><option>America/New_York</option><option>America/Los_Angeles</option><option>America/Chicago</option><option>UTC</option></select></div>
+        <div class="field"><label>Default Business Hours</label><select><option>Monday–Friday 9AM–6PM</option><option>24/7</option><option>Custom</option></select></div>
+        <div class="s-row">
+          <div><div class="s-row-label">Record all calls</div><div class="s-row-sub">Stored in S3, accessible in Call History</div></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Auto-transcribe</div><div class="s-row-sub">Deepgram Nova-3, 30+ languages</div></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">AI sentiment analysis</div></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div style="margin-top:20px">
+          <button class="btn-primary" onclick="showToast('success','Settings saved')">Save Defaults</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast container ── -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ── Number Detail Sheet ── -->
+<div class="overlay hidden" id="sheet-overlay" onclick="maybeCloseSheet(event)">
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-top">
+      <div class="sheet-top-label">⚙ PHONE NUMBER CONFIGURATION</div>
+      <button class="close-btn" onclick="closeSheet()">✕</button>
+    </div>
+    <div class="sheet-identity">
+      <div class="sheet-number" id="sheet-num">+1 (402) 555-0171</div>
+      <div class="sheet-sub" id="sheet-sub">Main Service Line · Local</div>
+      <div class="sheet-badges" id="sheet-badges"></div>
+    </div>
+    <div class="sheet-stats" id="sheet-stats"></div>
+    <div class="sheet-tabs">
+      <button class="sheet-tab active" onclick="switchSheetTab('overview',this)">Overview</button>
+      <button class="sheet-tab" onclick="switchSheetTab('agents',this)">Agents & Routing</button>
+      <button class="sheet-tab" onclick="switchSheetTab('hours',this)">Business Hours</button>
+      <button class="sheet-tab" onclick="switchSheetTab('calls',this)">Call History</button>
+    </div>
+    <div class="sheet-body" id="sheet-body"></div>
+    <div class="sheet-footer">
+      <button class="sheet-btn-release" onclick="openRelease()">Release Number</button>
+      <button class="sheet-btn-save" onclick="saveSheet()">Save Configuration</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Acquire Modal ── -->
+<div class="overlay overlay-center hidden" id="acquire-overlay" onclick="maybeCloseModal(event,'acquire-overlay')">
+  <div class="modal" id="acquire-modal">
+    <div class="modal-header">
+      <div class="modal-title">Acquire Phone Number</div>
+      <button class="close-btn" onclick="closeAcquire()">✕</button>
+    </div>
+    <div class="modal-body" id="acquire-body"></div>
+    <div class="modal-footer" id="acquire-footer"></div>
+  </div>
+</div>
+
+<!-- ── Release Modal ── -->
+<div class="overlay overlay-center hidden" id="release-overlay" onclick="maybeCloseModal(event,'release-overlay')">
+  <div class="modal" style="max-width:480px" id="release-modal">
+    <div class="modal-header">
+      <div class="modal-title" style="color:var(--red)">⚠ Release Number</div>
+      <button class="close-btn" onclick="closeRelease()">✕</button>
+    </div>
+    <div class="modal-body" id="release-body"></div>
+    <div class="modal-footer" id="release-footer"></div>
+  </div>
+</div>
+
+<!-- ── Add Agent Modal ── -->
+<div class="overlay overlay-center hidden" id="addagent-overlay" onclick="maybeCloseModal(event,'addagent-overlay')">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Add Agents</div>
+      <button class="close-btn" onclick="closeAddAgent()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><input placeholder="Search agents…" oninput="filterAgentPicker(this.value)" style="width:100%"></div>
+      <div id="agent-picker-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeAddAgent()">Cancel</button>
+      <button class="btn-primary" onclick="confirmAddAgents()" id="add-agents-btn">Add Selected (0)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Mock Data ────────────────────────────────────────────────────────────── */
+const COLORS = ['#6c63ff','#22d388','#f5a623','#3b8beb','#f04e5e','#29c6e0','#9b6bff','#ff6b9d'];
+const AGENTS = [
+  { id:'a1', name:'Sam Rivera',   email:'sam@acme.com',   initials:'SR', color:'#6c63ff', status:'online', role:'Primary', calls:48, sentiment:0.72 },
+  { id:'a2', name:'Jordan Kim',   email:'jordan@acme.com',initials:'JK', color:'#22d388', status:'busy',   role:'Backup',  calls:31, sentiment:0.65 },
+  { id:'a3', name:'Alex Chen',    email:'alex@acme.com',  initials:'AC', color:'#f5a623', status:'offline',role:'Overflow',calls:19, sentiment:0.58 },
+  { id:'a4', name:'Priya Nair',   email:'priya@acme.com', initials:'PN', color:'#3b8beb', status:'online', role:'Primary', calls:55, sentiment:0.81 },
+  { id:'a5', name:'Marcus Webb',  email:'marcus@acme.com',initials:'MW', color:'#f04e5e', status:'offline',role:'Backup',  calls:22, sentiment:0.61 },
+  { id:'a6', name:'Li Zhang',     email:'li@acme.com',    initials:'LZ', color:'#29c6e0', status:'online', role:'Primary', calls:67, sentiment:0.88 },
+];
+
+const NUMBERS = [
+  { id:'n1', number:'+1 (402) 555-0171', label:'Main Service Line',  type:'Local',     status:'active',    agents:['a1','a2','a3'], dist:'Round Robin',    hil:true,  calls:342, cost:18.40,  country:'🇺🇸', sentiment:'Neutral' },
+  { id:'n2', number:'+1 (800) 555-0192', label:'Support Toll-Free',  type:'Toll-Free', status:'active',    agents:['a4','a5'],      dist:'First Available',hil:true,  calls:891, cost:41.20,  country:'🇺🇸', sentiment:'Positive' },
+  { id:'n3', number:'+1 (415) 555-0138', label:'Sales West',          type:'Local',     status:'active',    agents:['a6'],           dist:'Least Load',     hil:false, calls:128, cost:7.80,   country:'🇺🇸', sentiment:'Positive' },
+  { id:'n4', number:'+1 (312) 555-0204', label:'',                    type:'Local',     status:'suspended', agents:[],               dist:'Round Robin',    hil:false, calls:0,   cost:3.50,   country:'🇺🇸', sentiment:null },
+];
+
+const CALLS = [
+  { id:'c1', numberId:'n2', direction:'inbound',  caller:'+1 (305) 891-2244', agent:'a4', duration:'4:32', sentiment:'negative',  hil:true,  cost:0.38, time:'2 min ago',    ts:'10:41 AM' },
+  { id:'c2', numberId:'n1', direction:'inbound',  caller:'+1 (718) 445-8821', agent:'a1', duration:'2:18', sentiment:'positive',  hil:false, cost:0.19, time:'14 min ago',   ts:'10:29 AM' },
+  { id:'c3', numberId:'n3', direction:'outbound', caller:'+1 (512) 334-9900', agent:'a6', duration:'6:55', sentiment:'positive',  hil:false, cost:0.57, time:'31 min ago',   ts:'10:12 AM' },
+  { id:'c4', numberId:'n2', direction:'inbound',  caller:'+1 (646) 221-7732', agent:'a5', duration:'1:05', sentiment:'neutral',   hil:false, cost:0.09, time:'1h ago',        ts:'9:43 AM'  },
+  { id:'c5', numberId:'n1', direction:'inbound',  caller:'+1 (917) 558-4401', agent:'a2', duration:'8:17', sentiment:'negative',  hil:true,  cost:0.69, time:'2h ago',        ts:'8:55 AM'  },
+  { id:'c6', numberId:'n3', direction:'outbound', caller:'+1 (214) 663-1120', agent:'a6', duration:'3:44', sentiment:'positive',  hil:false, cost:0.31, time:'3h ago',        ts:'7:44 AM'  },
+  { id:'c7', numberId:'n2', direction:'inbound',  caller:'+1 (404) 772-9988', agent:'a4', duration:'0:45', sentiment:'neutral',   hil:false, cost:0.06, time:'4h ago',        ts:'6:38 AM'  },
+  { id:'c8', numberId:'n1', direction:'inbound',  caller:'+1 (702) 881-3355', agent:'a3', duration:'5:20', sentiment:'positive',  hil:true,  cost:0.44, time:'Yesterday',     ts:'Yesterday'},
+];
+
+const TRANSCRIPT = [
+  { role:'agent',  text:'Thank you for calling AIMS Support. How can I help you today?', t:'0:00' },
+  { role:'caller', text:"Hi, I'm having trouble logging into my account. It keeps saying invalid credentials but I know my password is right.", t:'0:04' },
+  { role:'agent',  text:"I'm sorry to hear that. Let me pull up your account. Can I get your email address?", t:'0:11' },
+  { role:'caller', text:"Sure, it's maria.garcia@example.com", t:'0:16' },
+  { role:'agent',  text:"Thank you Maria. I can see your account. It looks like there were multiple failed login attempts which triggered a temporary lock. I can reset that for you now.", t:'0:20' },
+  { role:'caller', text:"Oh thank goodness. I've been locked out for an hour. This is really frustrating.", t:'0:29' },
+  { role:'agent',  text:"I completely understand and I apologize for the inconvenience. I'm resetting the lock now and sending a password reset link to your email as well, just as a precaution.", t:'0:35' },
+  { role:'caller', text:"Can I just talk to a real person? I need to sort this out quickly.", t:'0:48' },
+  { role:'hil',    text:'[Handoff to Jordan Kim — Negative sentiment + customer request]', t:'0:51', divider:true },
+  { role:'agent',  text:"Hi Maria, this is Jordan. I have full context from the AI. Your account is now unlocked and the reset email is on its way. Is there anything else I can help with?", t:'0:55' },
+  { role:'caller', text:"Oh that was fast! Yes, just to confirm — my account should work now?", t:'1:08' },
+  { role:'agent',  text:"Yes, absolutely. You can log in right now. And if you have any issues, don't hesitate to call back and ask for me directly.", t:'1:13' },
+  { role:'caller', text:"Thank you so much Jordan, that's really helpful.", t:'1:22' },
+];
+
+/* ── State ──────────────────────────────────────────────────────────────── */
+let currentNumberId = null;
+let currentSheetTab = 'overview';
+let acquireStep = 1;
+let selectedNumberOption = null;
+let selectedAgentIds = new Set();
+let confirmInput = '';
+let selectedCallId = null;
+
+/* ── Tab Switching ──────────────────────────────────────────────────────── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+  document.getElementById('tab-'+name).classList.remove('hidden');
+  if (name === 'numbers') renderNumbers();
+  if (name === 'history') renderHistory();
+}
+
+/* ── Numbers List ───────────────────────────────────────────────────────── */
+function renderNumbers(filter='') {
+  const tbody = document.getElementById('numbers-body');
+  const filtered = NUMBERS.filter(n =>
+    n.number.includes(filter) || n.label.toLowerCase().includes(filter.toLowerCase())
+  );
+  pgnSync('numbers-pgn', filtered.length);
+  tbody.innerHTML = filtered.map(n => {
+    const agents = n.agents.slice(0,3).map(id => {
+      const a = AGENTS.find(x=>x.id===id);
+      return `<div class="avatar" style="background:${a.color}">${a.initials}</div>`;
+    }).join('');
+    const overflow = n.agents.length > 3 ? `<div class="avatar avatar-overflow">+${n.agents.length-3}</div>` : '';
+    const statusBadge = n.status === 'active'
+      ? `<span class="badge badge-green"><span class="dot dot-green"></span>Active</span>`
+      : `<span class="badge badge-amber">Suspended</span>`;
+    const hilIcon = n.hil
+      ? `<span class="hil-icon" title="HiL configured">🛡</span>`
+      : `<span class="hil-none">—</span>`;
+    return `<tr class="${currentNumberId===n.id?'selected':''}" onclick="openSheet('${n.id}')">
+      <td class="mono">${n.number}</td>
+      <td>${n.label || '<span class="dim">—</span>'}</td>
+      <td>${statusBadge}</td>
+      <td>
+        <div class="avatar-stack">${agents}${overflow}</div>
+        ${n.agents.length===0?'<span class="dim" style="font-size:11px">Unassigned</span>':''}
+      </td>
+      <td class="dim">${n.dist}</td>
+      <td>${hilIcon}</td>
+      <td class="right dim">${n.calls.toLocaleString()}</td>
+      <td class="right dim">$${n.cost.toFixed(2)}</td>
+      <td><button class="btn-ghost" onclick="event.stopPropagation();openSheet('${n.id}')">View →</button></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📞</div><div class="empty-title">No numbers found</div></div></td></tr>`;
+}
+
+function filterNumbers(val) { renderNumbers(val); }
+function toggleChip(el, key) {
+  el.parentNode.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── Sheet ──────────────────────────────────────────────────────────────── */
+function openSheet(id) {
+  currentNumberId = id;
+  currentSheetTab = 'overview';
+  const n = NUMBERS.find(x=>x.id===id);
+
+  document.getElementById('sheet-num').textContent = n.number;
+  document.getElementById('sheet-sub').textContent = `${n.label || 'No label'} · ${n.type}`;
+
+  const statusBadge = n.status==='active'
+    ? `<span class="badge badge-green"><span class="dot dot-green"></span>Active</span>`
+    : `<span class="badge badge-amber">Suspended</span>`;
+  const dlc = n.type==='Toll-Free' ? '' : `<span class="badge badge-purple">10DLC: Approved</span>`;
+  document.getElementById('sheet-badges').innerHTML = statusBadge + dlc;
+
+  document.getElementById('sheet-stats').innerHTML = `
+    <div class="sheet-stat"><div class="sheet-stat-val">${n.calls.toLocaleString()}</div><div class="sheet-stat-lbl">Total Calls</div></div>
+    <div class="sheet-stat"><div class="sheet-stat-val">3:42</div><div class="sheet-stat-lbl">Avg Duration</div></div>
+    <div class="sheet-stat"><div class="sheet-stat-val">$${n.cost.toFixed(2)}</div><div class="sheet-stat-lbl">Cost MTD</div></div>
+  `;
+
+  document.querySelectorAll('.sheet-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sheet-tab')[0].classList.add('active');
+  renderSheetTab('overview');
+  document.getElementById('sheet-overlay').classList.remove('hidden');
+  renderNumbers();
+}
+
+function closeSheet() {
+  currentNumberId = null;
+  document.getElementById('sheet-overlay').classList.add('hidden');
+  renderNumbers();
+}
+
+function maybeCloseSheet(e) {
+  if (e.target === document.getElementById('sheet-overlay')) closeSheet();
+}
+
+function switchSheetTab(tab, btn) {
+  currentSheetTab = tab;
+  document.querySelectorAll('.sheet-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderSheetTab(tab);
+}
+
+function renderSheetTab(tab) {
+  const n = NUMBERS.find(x=>x.id===currentNumberId);
+  const body = document.getElementById('sheet-body');
+  if (tab==='overview') body.innerHTML = renderOverviewTab(n);
+  if (tab==='agents')   body.innerHTML = renderAgentsTab(n);
+  if (tab==='hours')    body.innerHTML = renderHoursTab(n);
+  if (tab==='calls')    body.innerHTML = renderCallsTab(n);
+}
+
+function renderOverviewTab(n) {
+  const agentNames = n.agents.map(id=>AGENTS.find(x=>x.id===id)?.name).join(', ') || 'None assigned';
+  return `
+    <div class="s-section">
+      <div class="s-section-title">Identity & Status</div>
+      <div class="s-row"><div class="s-row-label">Phone Number</div><div class="s-row-val"><span class="mono">${n.number}</span></div></div>
+      <div class="s-row"><div class="s-row-label">Label</div><div class="s-row-val"><input class="form-input" value="${n.label}" style="width:200px"></div></div>
+      <div class="s-row"><div class="s-row-label">Type</div><div class="s-row-val">${n.type}</div></div>
+      <div class="s-row"><div class="s-row-label">Status</div><div class="s-row-val">${n.status==='active'?'<span class="badge badge-green">Active</span>':'<span class="badge badge-amber">Suspended</span>'}</div></div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Inbound Settings</div>
+      <div class="s-row s-row-toggle">
+        <div><div class="s-row-label">Accept Inbound Calls</div><div class="s-row-sub">Allow this number to receive calls</div></div>
+        <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="s-row s-row-toggle">
+        <div><div class="s-row-label">Voicemail Enabled</div><div class="s-row-sub">Send unanswered calls to voicemail</div></div>
+        <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="s-row s-row-toggle">
+        <div><div class="s-row-label">Transcribe Voicemail</div></div>
+        <button class="toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="s-row"><div class="s-row-label">Forward To</div><div class="s-row-val"><input class="form-input" placeholder="(none)" style="width:160px"></div></div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Language</div>
+      <div class="s-row"><div class="s-row-label">Primary Language</div><div class="s-row-val"><select class="form-select"><option>English</option><option>Spanish</option><option>French</option><option>Portuguese</option></select></div></div>
+      <div class="s-row s-row-toggle">
+        <div><div class="s-row-label">Auto-detect Caller Language</div><div class="s-row-sub">Switch language mid-call based on caller</div></div>
+        <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Greeting & Recording</div>
+      <div class="s-row"><div class="s-row-label">Greeting</div><div class="s-row-val"><input class="form-input" value="Hello! How can I help you today?" style="width:240px"></div></div>
+      <div class="s-row"><div class="s-row-label">Recording Notice</div><div class="s-row-val"><input class="form-input" value="This call may be recorded." style="width:240px"></div></div>
+    </div>
+    <div style="height:20px"></div>
+  `;
+}
+
+function renderAgentsTab(n) {
+  const rows = n.agents.map(id => {
+    const a = AGENTS.find(x=>x.id===id);
+    const statusColor = a.status==='online'?'dot-green':a.status==='busy'?'dot-amber':'dot-gray';
+    const statusLabel = a.status.charAt(0).toUpperCase()+a.status.slice(1);
+    return `<tr>
+      <td>
+        <div class="agent-cell">
+          <div class="agent-avatar" style="background:${a.color}">${a.initials}</div>
+          <div><div class="agent-name">${a.name}</div><div class="agent-email">${a.email}</div></div>
+        </div>
+      </td>
+      <td><span class="badge badge-gray">${a.role}</span></td>
+      <td><div class="status-pill"><span class="dot ${statusColor}"></span>${statusLabel}</div></td>
+      <td class="dim">${a.calls}</td>
+      <td>${renderSentimentBar(a.sentiment)}</td>
+      <td><button class="remove-btn" onclick="removeAgent('${a.id}','${n.id}')">Remove</button></td>
+    </tr>`;
+  }).join('');
+
+  const empty = n.agents.length===0 ? `<div class="empty-state" style="padding:30px"><div class="empty-icon">👤</div><div class="empty-title">No agents assigned</div><div class="empty-sub">Calls will go unanswered until agents are added.</div></div>` : '';
+
+  const distOptions = ['Round Robin','First Available','Least Load'].map(d=>`
+    <div class="dist-option ${n.dist===d?'selected':''}" onclick="setDist('${n.id}','${d}',this)">
+      <input type="radio" name="dist_${n.id}" ${n.dist===d?'checked':''}>
+      <div>
+        <div class="dist-option-title">${d}</div>
+        <div class="dist-option-desc">${d==='Round Robin'?'Distribute calls evenly in rotation':d==='First Available'?'Route to first online, available agent':'Route to agent with fewest active calls'}</div>
+      </div>
+    </div>`).join('');
+
+  return `
+    <div class="s-section">
+      <div class="s-section-title" style="display:flex;align-items:center;justify-content:space-between">
+        Assigned Agents (${n.agents.length})
+        <button class="btn-primary" style="padding:4px 12px;font-size:12px" onclick="openAddAgent('${n.id}')">+ Add Agent</button>
+      </div>
+      ${empty}
+      ${n.agents.length>0?`<table class="agents-table"><thead><tr><th>Agent</th><th>Role</th><th>Status</th><th>Calls 30d</th><th>Sentiment</th><th></th></tr></thead><tbody>${rows}</tbody></table>`:''}
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Distribution Mode</div>
+      <div class="dist-options">${distOptions}</div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Human in the Loop (HiL)</div>
+      <div class="hil-block">
+        <div class="hil-header">
+          <div class="hil-title">🛡 HiL Handoff ${n.hil?'<span class="hil-badge">ACTIVE</span>':''}</div>
+          <button class="toggle ${n.hil?'on':''}" onclick="toggleHil('${n.id}',this)"></button>
+        </div>
+        ${n.hil?`
+        <div style="margin-bottom:10px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Trigger Conditions</div>
+          <div class="trigger-chips">
+            <span class="trigger-chip on" onclick="this.classList.toggle('on')">Negative sentiment</span>
+            <span class="trigger-chip on" onclick="this.classList.toggle('on')">Customer requests human</span>
+            <span class="trigger-chip" onclick="this.classList.toggle('on')">Low AI confidence</span>
+            <span class="trigger-chip" onclick="this.classList.toggle('on')">Keyword detected</span>
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Routing Target</div>
+          <select class="form-select" style="width:100%"><option>Specific Users</option><option>Role</option><option>Department</option></select>
+        </div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Notifications (simultaneous)</div>
+          <div class="notif-row"><div class="notif-label">✉️ Email</div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="notif-row"><div class="notif-label">🔔 In-app</div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="notif-row"><div class="notif-label">📞 Phone call to agent</div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Fallback if No Agent Available</div>
+          <select class="form-select" style="width:100%"><option>Voicemail</option><option>Transfer to number</option><option>End call with message</option></select>
+        </div>
+        `:`<div style="color:var(--muted2);font-size:13px;padding:8px 0">Enable HiL to configure human handoff routing.</div>`}
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  `;
+}
+
+function renderSentimentBar(val) {
+  const pct = Math.round(val*100);
+  const color = val>0.7?'var(--green)':val>0.45?'var(--amber)':'var(--red)';
+  return `<div style="display:flex;align-items:center;gap:8px">
+    <div style="width:60px;height:4px;background:var(--surface3);border-radius:2px;overflow:hidden">
+      <div style="width:${pct}%;height:100%;background:${color};border-radius:2px"></div>
+    </div>
+    <span style="font-size:11px;color:var(--muted2)">${pct}%</span>
+  </div>`;
+}
+
+function renderHoursTab(n) {
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const defaultOpen = [false,true,true,true,true,true,false];
+  const rows = days.map((d,i)=>`
+    <div class="hours-row">
+      <div class="hours-day">${d}</div>
+      <button class="toggle ${defaultOpen[i]?'on':''}" onclick="this.classList.toggle('on')"></button>
+      <div class="hours-times">
+        <input type="time" class="hours-input" value="${defaultOpen[i]?'09:00':'--:--'}" ${!defaultOpen[i]?'disabled':''}>
+        <span class="hours-dash">–</span>
+        <input type="time" class="hours-input" value="${defaultOpen[i]?'18:00':'--:--'}" ${!defaultOpen[i]?'disabled':''}>
+      </div>
+    </div>`).join('');
+  return `
+    <div class="s-section">
+      <div class="s-section-title">Timezone</div>
+      <select class="form-select" style="width:100%">
+        <option>America/New_York (EST)</option><option>America/Los_Angeles (PST)</option><option>America/Chicago (CST)</option><option>UTC</option><option>Europe/London</option><option>America/Bogota</option>
+      </select>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">Weekly Schedule</div>
+      <div class="hours-grid">${rows}</div>
+    </div>
+    <div class="s-section">
+      <div class="s-section-title">After-Hours Behavior</div>
+      <select class="form-select" style="width:100%">
+        <option>Send to voicemail</option><option>Play custom message</option><option>Route to HiL queue</option><option>Forward to after-hours number</option>
+      </select>
+    </div>
+    <div style="height:20px"></div>
+  `;
+}
+
+function renderCallsTab(n) {
+  const calls = CALLS.filter(c=>c.numberId===n.id);
+  if (!calls.length) return `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No calls yet</div></div>`;
+  return `
+    <div class="s-section">
+      <div class="s-section-title">Recent Calls</div>
+      ${calls.map(c=>{
+        const dir = c.direction==='inbound'?'↙':'↗';
+        const dirCls = c.direction==='inbound'?'log-dir-in':'log-dir-out';
+        const sColor = c.sentiment==='positive'?'badge-green':c.sentiment==='negative'?'badge-red':'badge-gray';
+        const agName = AGENTS.find(x=>x.id===c.agent)?.name||'';
+        return `<div class="log-item">
+          <div class="log-dir ${dirCls}">${dir}</div>
+          <div class="log-info">
+            <div class="log-num">${c.caller}</div>
+            <div class="log-meta">${agName} · ${c.time}</div>
+          </div>
+          ${c.hil?`<span class="badge badge-purple" style="font-size:10px">HiL</span>`:''}
+          <span class="badge ${sColor}" style="font-size:10px">${c.sentiment}</span>
+          <div class="log-dur">${c.duration}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+/* ── Sheet actions ──────────────────────────────────────────────────────── */
+function setDist(numId, dist, el) {
+  const n = NUMBERS.find(x=>x.id===numId);
+  n.dist = dist;
+  el.parentNode.querySelectorAll('.dist-option').forEach(d=>d.classList.remove('selected'));
+  el.classList.add('selected');
+  showToast('success', `Distribution set to ${dist}`);
+}
+
+function toggleHil(numId, btn) {
+  const n = NUMBERS.find(x=>x.id===numId);
+  n.hil = !n.hil;
+  btn.classList.toggle('on');
+  renderSheetTab('agents');
+  showToast('info', `HiL ${n.hil?'enabled':'disabled'} for ${n.number}`);
+}
+
+function removeAgent(agentId, numId) {
+  if (!confirm(`Remove this agent from the number?`)) return;
+  const n = NUMBERS.find(x=>x.id===numId);
+  n.agents = n.agents.filter(id=>id!==agentId);
+  const a = AGENTS.find(x=>x.id===agentId);
+  renderSheetTab('agents');
+  showToast('success', `${a.name} removed`);
+}
+
+function saveSheet() {
+  showToast('success', '✓ Configuration saved');
+}
+
+/* ── Add Agent ──────────────────────────────────────────────────────────── */
+let addAgentNumId = null;
+
+function openAddAgent(numId) {
+  addAgentNumId = numId;
+  selectedAgentIds = new Set();
+  renderAgentPicker('');
+  document.getElementById('addagent-overlay').classList.remove('hidden');
+}
+function closeAddAgent() {
+  document.getElementById('addagent-overlay').classList.add('hidden');
+}
+function renderAgentPicker(filter) {
+  const n = NUMBERS.find(x=>x.id===addAgentNumId);
+  const list = document.getElementById('agent-picker-list');
+  const avail = AGENTS.filter(a=>a.name.toLowerCase().includes(filter.toLowerCase()));
+  list.innerHTML = avail.map(a=>{
+    const assigned = n.agents.includes(a.id);
+    const sel = selectedAgentIds.has(a.id);
+    return `<div class="agent-pick-item ${sel?'selected':''} ${assigned?'':'clickable'}" onclick="${assigned?'':'selectAgentPick(\''+a.id+'\')'}">
+      <div class="agent-pick-check">${sel?'✓':''}</div>
+      <div class="agent-avatar" style="background:${a.color};width:28px;height:28px;font-size:10px">${a.initials}</div>
+      <div><div class="agent-name">${a.name}</div><div class="agent-email">${assigned?'Already assigned':a.email}</div></div>
+    </div>`;
+  }).join('');
+}
+function selectAgentPick(id) {
+  if (selectedAgentIds.has(id)) selectedAgentIds.delete(id);
+  else selectedAgentIds.add(id);
+  renderAgentPicker('');
+  document.getElementById('add-agents-btn').textContent = `Add Selected (${selectedAgentIds.size})`;
+}
+function filterAgentPicker(val) { renderAgentPicker(val); }
+function confirmAddAgents() {
+  if (!selectedAgentIds.size) return;
+  const n = NUMBERS.find(x=>x.id===addAgentNumId);
+  selectedAgentIds.forEach(id=>{ if(!n.agents.includes(id)) n.agents.push(id); });
+  closeAddAgent();
+  renderSheetTab('agents');
+  showToast('success', `${selectedAgentIds.size} agent${selectedAgentIds.size>1?'s':''} added`);
+}
+
+/* ── Acquire Modal ──────────────────────────────────────────────────────── */
+const AVAILABLE_NUMBERS = [
+  { number:'+1 (718) 555-0141', region:'New York, NY', country:'US', caps:['Voice','SMS','MMS'], price:'$1.15/mo' },
+  { number:'+1 (213) 555-0199', region:'Los Angeles, CA', country:'US', caps:['Voice','SMS'], price:'$1.15/mo' },
+  { number:'+1 (312) 555-0177', region:'Chicago, IL', country:'US', caps:['Voice','SMS','MMS'], price:'$1.15/mo' },
+  { number:'+1 (305) 555-0122', region:'Miami, FL', country:'US', caps:['Voice','SMS'], price:'$1.15/mo' },
+  { number:'+1 (415) 555-0133', region:'San Francisco, CA', country:'US', caps:['Voice','SMS','MMS'], price:'$1.15/mo' },
+];
+
+function openAcquire() {
+  acquireStep = 1; selectedNumberOption = null;
+  document.getElementById('acquire-overlay').classList.remove('hidden');
+  renderAcquireStep();
+}
+function closeAcquire() {
+  document.getElementById('acquire-overlay').classList.add('hidden');
+}
+
+function renderAcquireStep() {
+  const body = document.getElementById('acquire-body');
+  const footer = document.getElementById('acquire-footer');
+
+  const stepperHtml = `<div class="stepper">
+    <div class="step ${acquireStep>=1?'active':''} ${acquireStep>1?'done':''}"><div class="step-num">${acquireStep>1?'✓':'1'}</div><div class="step-label">Country & Type</div></div>
+    <div class="step-line"></div>
+    <div class="step ${acquireStep>=2?'active':''} ${acquireStep>2?'done':''}"><div class="step-num">${acquireStep>2?'✓':'2'}</div><div class="step-label">Choose Number</div></div>
+    <div class="step-line"></div>
+    <div class="step ${acquireStep>=3?'active':''}"><div class="step-num">3</div><div class="step-label">Configure</div></div>
+    <div class="step-line"></div>
+    <div class="step ${acquireStep>=4?'active':''}"><div class="step-num">4</div><div class="step-label">Confirm</div></div>
+  </div>`;
+
+  if (acquireStep===1) {
+    body.innerHTML = stepperHtml + `
+      <div class="field"><label>Country</label><select><option>🇺🇸 United States</option><option>🇨🇦 Canada</option><option>🇬🇧 United Kingdom</option><option>🇲🇽 Mexico</option><option>🇨🇴 Colombia</option></select></div>
+      <div class="field"><label>Number Type</label>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <label style="flex:1;cursor:pointer"><input type="radio" name="ntype" value="local" checked style="margin-right:6px;accent-color:var(--accent)">Local</label>
+          <label style="flex:1;cursor:pointer"><input type="radio" name="ntype" value="tollfree" style="margin-right:6px;accent-color:var(--accent)">Toll-Free</label>
+          <label style="flex:1;cursor:pointer"><input type="radio" name="ntype" value="mobile" style="margin-right:6px;accent-color:var(--accent)">Mobile</label>
+        </div>
+      </div>
+      <div class="field"><label>Area Code (optional)</label><input placeholder="e.g. 415" maxlength="3" style="width:100%"></div>
+    `;
+    footer.innerHTML = `<button class="btn-secondary" onclick="closeAcquire()">Cancel</button><button class="btn-primary" onclick="acquireNext()">Search Numbers →</button>`;
+  }
+  else if (acquireStep===2) {
+    const opts = AVAILABLE_NUMBERS.map((n,i)=>`
+      <div class="num-option ${selectedNumberOption===i?'selected':''}" onclick="selectNumOption(${i})">
+        <div class="num-option-left">
+          <div class="num-option-number">${n.number}</div>
+          <div class="num-option-region">${n.region}</div>
+        </div>
+        <div class="num-option-caps">${n.caps.map(c=>`<span class="cap">${c}</span>`).join('')}</div>
+        <div class="num-option-price">${n.price}</div>
+      </div>`).join('');
+    body.innerHTML = stepperHtml + `
+      <div style="font-size:12px;color:var(--muted2);margin-bottom:10px">5 numbers available — select one to continue</div>
+      ${opts}
+    `;
+    footer.innerHTML = `<button class="btn-secondary" onclick="acquirePrev()">← Back</button><button class="btn-primary" onclick="acquireNext()" ${selectedNumberOption===null?'disabled':''}>Continue →</button>`;
+  }
+  else if (acquireStep===3) {
+    const sel = AVAILABLE_NUMBERS[selectedNumberOption];
+    body.innerHTML = stepperHtml + `
+      <div class="confirm-card">
+        <div class="confirm-num">${sel.number}</div>
+        <div class="confirm-label">${sel.region}</div>
+        <div class="confirm-price">${sel.price}</div>
+      </div>
+      <div class="field"><label>Label (required)</label><input id="acq-label" placeholder="e.g. Sales Line, Support West" style="width:100%"></div>
+      <div class="field"><label>Distribution Mode</label><select><option>Round Robin</option><option>First Available</option><option>Least Load</option></select></div>
+      <div class="field"><label>Timezone</label><select><option>America/New_York (EST)</option><option>America/Los_Angeles (PST)</option><option>America/Chicago (CST)</option><option>UTC</option></select></div>
+    `;
+    footer.innerHTML = `<button class="btn-secondary" onclick="acquirePrev()">← Back</button><button class="btn-primary" onclick="acquireNext()">Acquire Number</button>`;
+  }
+  else if (acquireStep===4) {
+    const sel = AVAILABLE_NUMBERS[selectedNumberOption];
+    const lbl = document.getElementById('acq-label')?.value || 'New Line';
+    body.innerHTML = stepperHtml + `
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:40px;margin-bottom:12px">✅</div>
+        <div style="font-family:var(--font-head);font-size:22px;font-weight:700;margin-bottom:4px">${sel.number}</div>
+        <div style="color:var(--muted2);margin-bottom:16px">${lbl} · Local · ${sel.region}</div>
+        <div class="alert alert-info" style="text-align:left">
+          🎉 Your number is now active. Add agents to start handling calls.
+        </div>
+      </div>
+    `;
+    footer.innerHTML = `<button class="btn-secondary" onclick="closeAcquire()">Done</button><button class="btn-primary" onclick="closeAcquire();showToast('info','Go to the number to add agents')">View Number →</button>`;
+    // Actually add the number to the list
+    const newNum = { id:'n'+Date.now(), number:sel.number, label:lbl, type:'Local', status:'active', agents:[], dist:'Round Robin', hil:false, calls:0, cost:0, country:'🇺🇸', sentiment:null };
+    NUMBERS.push(newNum);
+    document.getElementById('numbers-count').textContent = NUMBERS.length;
+    renderNumbers();
+  }
+}
+
+function acquireNext() {
+  if (acquireStep===2 && selectedNumberOption===null) return;
+  acquireStep++;
+  renderAcquireStep();
+}
+function acquirePrev() { acquireStep--; renderAcquireStep(); }
+function selectNumOption(i) {
+  selectedNumberOption = i;
+  renderAcquireStep();
+}
+function maybeCloseModal(e, id) {
+  if (e.target === document.getElementById(id)) {
+    if (id==='acquire-overlay') closeAcquire();
+    if (id==='release-overlay') closeRelease();
+    if (id==='addagent-overlay') closeAddAgent();
+  }
+}
+
+/* ── Release Modal ──────────────────────────────────────────────────────── */
+function openRelease() {
+  const n = NUMBERS.find(x=>x.id===currentNumberId);
+  const body = document.getElementById('release-body');
+  const footer = document.getElementById('release-footer');
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-family:var(--font-mono);font-size:22px;font-weight:700">${n.number}</div>
+      <div style="color:var(--muted2);font-size:13px">${n.label||'No label'}</div>
+    </div>
+    <div class="impact-item"><span class="impact-icon">👤</span><span>${n.agents.length} agents will be unassigned</span></div>
+    <div class="impact-item"><span class="impact-icon">📞</span><span>${n.calls.toLocaleString()} calls handled in the last 30 days</span></div>
+    <div class="impact-item"><span class="impact-icon">🛡</span><span>HiL configuration will be permanently deleted</span></div>
+    <div class="impact-item"><span class="impact-icon">💰</span><span>Monthly savings: $${n.cost.toFixed(2)}/mo</span></div>
+    <div class="alert alert-red" style="margin-top:14px">
+      ⚠ This action is <strong>irreversible</strong>. The number will return to the public pool immediately.
+    </div>
+    <div style="margin-top:14px">
+      <div style="font-size:12px;color:var(--muted2);margin-bottom:6px">Type the last 4 digits of the number to confirm:</div>
+      <input class="type-confirm" id="release-confirm" placeholder="_ _ _ _" maxlength="4" oninput="checkRelease(this,'${n.number.slice(-4)}')">
+    </div>
+  `;
+  footer.innerHTML = `
+    <button class="btn-secondary" onclick="closeRelease()">Cancel</button>
+    <button class="btn-danger" id="confirm-release-btn" disabled onclick="doRelease('${n.id}')">Release Number</button>
+  `;
+  document.getElementById('release-overlay').classList.remove('hidden');
+}
+function closeRelease() {
+  document.getElementById('release-overlay').classList.add('hidden');
+}
+function checkRelease(el, last4) {
+  const match = el.value === last4;
+  el.classList.toggle('valid', match);
+  document.getElementById('confirm-release-btn').disabled = !match;
+}
+function doRelease(numId) {
+  const idx = NUMBERS.findIndex(x=>x.id===numId);
+  NUMBERS.splice(idx,1);
+  closeRelease();
+  closeSheet();
+  document.getElementById('numbers-count').textContent = NUMBERS.length;
+  renderNumbers();
+  showToast('success','Number released. Billing will stop next cycle.');
+}
+
+/* ── Call History ───────────────────────────────────────────────────────── */
+function renderHistory() {
+  const tbody = document.getElementById('history-body');
+  pgnSync('history-pgn', CALLS.length);
+  tbody.innerHTML = CALLS.map(c=>{
+    const n = NUMBERS.find(x=>x.id===c.numberId);
+    const agent = AGENTS.find(x=>x.id===c.agent);
+    const dirIcon = c.direction==='inbound'?'↙':'↗';
+    const dirCls = c.direction==='inbound'?'badge-green':'badge-blue';
+    const sentCls = c.sentiment==='positive'?'badge-green':c.sentiment==='negative'?'badge-red':'badge-gray';
+    return `<tr class="${selectedCallId===c.id?'selected':''}" onclick="openCallDetail('${c.id}')">
+      <td class="dim" style="white-space:nowrap">${c.time}</td>
+      <td><div class="mono" style="font-size:12px">${n?.number||''}</div><div style="font-size:11px;color:var(--muted)">${n?.label||''}</div></td>
+      <td><span class="badge ${dirCls}">${dirIcon} ${c.direction}</span></td>
+      <td class="mono" style="font-size:12px">${c.caller}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="avatar" style="background:${agent?.color};width:22px;height:22px;font-size:9px;border:none">${agent?.initials}</div>
+          <span style="font-size:12px">${agent?.name||''}</span>
+        </div>
+      </td>
+      <td class="mono dim">${c.duration}</td>
+      <td><span class="badge ${sentCls}">${c.sentiment}</span></td>
+      <td>${c.hil?'<span class="badge badge-purple" style="font-size:10px">HiL</span>':'<span class="dim">—</span>'}</td>
+      <td class="right dim">$${c.cost.toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openCallDetail(callId) {
+  selectedCallId = callId;
+  renderHistory();
+  const c = CALLS.find(x=>x.id===callId);
+  const n = NUMBERS.find(x=>x.id===c.numberId);
+  const agent = AGENTS.find(x=>x.id===c.agent);
+  const panel = document.getElementById('call-detail-panel');
+  panel.classList.remove('hidden');
+  const sentCls = c.sentiment==='positive'?'badge-green':c.sentiment==='negative'?'badge-red':'badge-gray';
+  panel.innerHTML = `
+    <div class="detail-hdr">
+      <div>
+        <div class="detail-num">${c.caller}</div>
+        <div class="detail-meta">${n?.number} · ${c.ts} · ${c.duration}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn-ghost" style="font-size:11px">⬇ Export</button>
+        <button class="close-btn" onclick="closeCallDetail()">✕</button>
+      </div>
+    </div>
+    <div class="detail-chips">
+      <span class="badge ${c.direction==='inbound'?'badge-green':'badge-blue'}">${c.direction==='inbound'?'↙ Inbound':'↗ Outbound'}</span>
+      <span class="badge badge-gray">Ended</span>
+      ${c.hil?'<span class="badge badge-purple">HiL Handoff</span>':''}
+      <span class="badge ${sentCls}">${c.sentiment}</span>
+      <span class="badge badge-gray">$${c.cost.toFixed(2)}</span>
+    </div>
+    <div class="detail-tabs">
+      <button class="detail-tab active" onclick="switchDetailTab('transcript',this)">Transcript</button>
+      <button class="detail-tab" onclick="switchDetailTab('summary',this)">AI Summary</button>
+      <button class="detail-tab" onclick="switchDetailTab('metrics',this)">Metrics</button>
+    </div>
+    <div class="detail-body" id="detail-body-inner">
+      ${renderTranscript()}
+    </div>
+  `;
+}
+
+function closeCallDetail() {
+  selectedCallId = null;
+  document.getElementById('call-detail-panel').classList.add('hidden');
+  renderHistory();
+}
+
+function switchDetailTab(tab, btn) {
+  btn.parentNode.querySelectorAll('.detail-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const body = document.getElementById('detail-body-inner');
+  if (tab==='transcript') body.innerHTML = renderTranscript();
+  if (tab==='summary') body.innerHTML = renderSummary();
+  if (tab==='metrics') body.innerHTML = renderMetrics();
+}
+
+function renderTranscript() {
+  return TRANSCRIPT.map(t=>{
+    if (t.divider) return `<hr class="hil-divider"><span class="hil-divider-label">🛡 ${t.text}</span>`;
+    const cls = t.role==='caller'?'bubble-caller':t.role==='hil'?'bubble-human':'bubble-agent';
+    const roleLabel = t.role==='caller'?'CALLER':t.role==='agent'?'AI AGENT':'AGENT (Jordan Kim)';
+    return `<div class="bubble ${cls}"><div class="bubble-role">${roleLabel}</div><div class="bubble-text">${t.text}</div><div class="bubble-time">${t.t}</div></div>`;
+  }).join('');
+}
+
+function renderSummary() {
+  return `
+    <div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Summary</div>
+    <div style="font-size:13px;line-height:1.6">Customer Maria Garcia called regarding an account lockout due to repeated failed login attempts. The AI agent diagnosed the issue and initiated an account unlock, but the customer requested human assistance. Agent Jordan Kim resolved the issue and sent a password reset link.</div></div>
+    <div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Key Topics</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="trigger-chip on">Account lockout</span><span class="trigger-chip on">Login issue</span><span class="trigger-chip on">Password reset</span></div></div>
+    <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Action Items</div>
+    <div style="font-size:13px;color:var(--muted2)">• Verify Maria's account security settings<br>• Follow up if login issue persists within 24h</div></div>
+  `;
+}
+
+function renderMetrics() {
+  return `
+    <div class="overview-grid">
+      <div class="ov-card"><div class="ov-card-val">4:32</div><div class="ov-card-lbl">Duration</div></div>
+      <div class="ov-card"><div class="ov-card-val" style="color:var(--red)">0.31</div><div class="ov-card-lbl">Sentiment</div></div>
+      <div class="ov-card"><div class="ov-card-val">$0.38</div><div class="ov-card-lbl">Cost</div></div>
+    </div>
+    <div class="s-row"><div class="s-row-label">HiL Triggered</div><div class="s-row-val"><span class="badge badge-purple">Yes — 0:51</span></div></div>
+    <div class="s-row"><div class="s-row-label">HiL Trigger Reason</div><div class="s-row-val">Negative sentiment + customer request</div></div>
+    <div class="s-row"><div class="s-row-label">Assigned Agent</div><div class="s-row-val">Jordan Kim</div></div>
+    <div class="s-row"><div class="s-row-label">Time to Handoff</div><div class="s-row-val">12 seconds</div></div>
+    <div class="s-row"><div class="s-row-label">AI Turns</div><div class="s-row-val">8</div></div>
+    <div class="s-row"><div class="s-row-label">Human Turns</div><div class="s-row-val">4</div></div>
+    <div class="s-row"><div class="s-row-label">Resolution</div><div class="s-row-val"><span class="badge badge-green">Resolved</span></div></div>
+  `;
+}
+
+/* ── Toast ──────────────────────────────────────────────────────────────── */
+function showToast(type, msg) {
+  const wrap = document.getElementById('toast-wrap');
+  const icon = type==='success'?'✓':type==='error'?'✕':'ℹ';
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(20px)'; el.style.transition='all 0.3s'; setTimeout(()=>el.remove(),300); }, 3500);
+}
+
+/* ── Pagination engine ── */
+function pgnGo(btn,dir){const p=btn.closest('.pagination');const total=+p.dataset.total;const rows=+p.dataset.rows;let page=+p.dataset.page;const totalPages=Math.ceil(total/rows);page=Math.max(1,Math.min(page+dir,totalPages));p.dataset.page=page;pgnUpdate(p);}
+function pgnSetRows(btn,rows){const p=btn.closest('.pagination');p.dataset.rows=rows;p.dataset.page=1;p.querySelectorAll('.pgn-rpp-opt').forEach(o=>o.classList.remove('sel'));btn.classList.add('sel');btn.closest('.pgn-rpp-menu').classList.remove('open');p.querySelector('.pgn-rpp-val').textContent=rows;pgnUpdate(p);}
+function pgnUpdate(p){const total=+p.dataset.total;const rows=+p.dataset.rows;const page=+p.dataset.page;const totalPages=Math.ceil(total/rows)||1;const start=(page-1)*rows+1;const end=Math.min(page*rows,total);p.querySelector('.pgn-range').textContent=start.toLocaleString()+'–'+end.toLocaleString()+' of '+total.toLocaleString()+' items';p.querySelector('.pgn-prev').disabled=page<=1;p.querySelector('.pgn-next').disabled=page>=totalPages;}
+function togglePgnMenu(btn,e){e.stopPropagation();btn.nextElementSibling.classList.toggle('open');}
+document.addEventListener('click',()=>{document.querySelectorAll('.pgn-rpp-menu.open').forEach(m=>m.classList.remove('open'));});
+function pgnSync(pgnId,total){const p=document.getElementById(pgnId);if(!p)return;p.dataset.total=total;p.dataset.page=1;pgnUpdate(p);}
+
+/* ── Init ── */
+renderNumbers();
+
+/* ── Sidebar toggle ── */
+function sbToggle(){
+  const sb=document.getElementById('appSidebar');
+  const btn=document.getElementById('sbToggleBtn');
+  const expanded=sb.classList.toggle('sb-expanded');
+  btn.setAttribute('aria-expanded',expanded);
+  btn.querySelector('.sb-toggle-label').textContent=expanded?'Collapse':'Expand';
+  try{localStorage.setItem('sb_vc_expanded',expanded?'1':'0');}catch(e){}
+}
+(function(){
+  try{
+    if(localStorage.getItem('sb_vc_expanded')==='1'){
+      const sb=document.getElementById('appSidebar');
+      const btn=document.getElementById('sbToggleBtn');
+      if(sb){sb.classList.add('sb-expanded');}
+      if(btn){btn.setAttribute('aria-expanded','true');btn.querySelector('.sb-toggle-label').textContent='Collapse';}
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

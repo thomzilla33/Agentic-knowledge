@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agentic Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--sb:#10151e;--card:rgba(255,255,255,.028);
+  --tp:#f1f5f9;--ts:#94a3b8;--tm:#475569;
+  --t1:#f1f5f9;--t2:#94a3b8;
+  --br:rgba(255,255,255,.06);--brm:rgba(255,255,255,.09);--bd:rgba(255,255,255,.07);
+  --grad:linear-gradient(135deg,#7c5cfc,#3b82f6);
+  --act:#a78bfa;--act-bg:rgba(124,92,252,.14);--act-br:rgba(124,92,252,.4);
+  --blue:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--orange:#f97316;
+  --purple:#7c5cfc;--teal:#06b6d4;--indigo:#6366f1;
+  --pri:#2B7FFF;--ok:#05DF72;--warn:#FDC700;--err:#FF6467;
+}
+html.light{
+  --bg:#f8fafc;--sb:#ffffff;--card:rgba(0,0,0,.028);
+  --tp:#0f172a;--ts:#475569;--tm:#94a3b8;
+  --br:rgba(0,0,0,.06);--brm:rgba(0,0,0,.09);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tp);min-height:100vh;font-size:14px;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,textarea,select{font-family:inherit;outline:none}
+a{text-decoration:none;color:inherit}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* ── SIDEBAR (AIMS OS Design System) ── */
+.sidebar{
+  width:64px;flex-shrink:0;background:#000;display:flex;flex-direction:column;
+  border-right:1px solid rgba(255,255,255,0.07);
+  transition:width .22s cubic-bezier(.4,0,.2,1);overflow:hidden;
+}
+.sidebar.sb-expanded{width:250px}
+.sb-brand{display:flex;align-items:center;gap:10px;height:52px;padding:0 18px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.05);overflow:hidden;white-space:nowrap}
+.sidebar:not(.sb-expanded) .sb-brand{justify-content:center;padding:0}
+.sb-brand-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0}
+.sb-brand-name{font-size:13px;font-weight:700;color:rgba(255,255,255,.9);opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap}
+.sidebar.sb-expanded .sb-brand-name{opacity:1}
+.sb-nav{flex:1;display:flex;flex-direction:column;padding:6px 8px;gap:2px;overflow:hidden}
+.sb-item{
+  display:flex;align-items:center;height:40px;border:none;border-radius:10px;
+  background:transparent;color:rgba(255,255,255,0.42);font-size:12px;font-weight:600;
+  cursor:pointer;width:100%;text-align:left;transition:background .15s,color .15s;
+  white-space:nowrap;overflow:hidden;flex-shrink:0;padding:0;
+}
+.sidebar:not(.sb-expanded) .sb-item{justify-content:center;gap:0}
+.sidebar.sb-expanded .sb-item{justify-content:flex-start;padding:0 12px;gap:10px}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,.80)}
+.sb-item.active{background:linear-gradient(135deg,rgba(21,93,252,0.55) 0%,rgba(0,194,194,0.35) 100%);color:#fff}
+.sb-item.active:hover{background:linear-gradient(135deg,rgba(21,93,252,0.65) 0%,rgba(0,194,194,0.45) 100%)}
+.sidebar:not(.sb-expanded) .sb-item.active{background:transparent}
+.sidebar:not(.sb-expanded) .sb-item.active .sb-item-icon{background:linear-gradient(135deg,#155DFC 0%,#00C2C2 100%);border-radius:10px;width:36px;height:36px;box-shadow:0 0 12px rgba(21,93,252,0.45)}
+.sb-item-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sb-item-icon svg{width:18px;height:18px}
+.sb-label{opacity:0;transition:opacity .12s;pointer-events:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar.sb-expanded .sb-label{opacity:1;pointer-events:auto}
+.sb-chevron{margin-left:auto;width:13px;height:13px;flex-shrink:0;opacity:0;color:rgba(255,255,255,.35)}
+.sidebar.sb-expanded .sb-chevron{opacity:1}
+.sb-divider{height:1px;background:rgba(255,255,255,0.06);margin:4px 0;flex-shrink:0}
+
+/* Governance sub-nav (under Admin) */
+.gov-subnav{display:flex;flex-direction:column;gap:1px;padding:0 0 4px 0}
+.sidebar:not(.sb-expanded) .gov-subnav{display:none}
+.gov-nav-item{
+  display:flex;align-items:center;gap:8px;height:32px;padding:0 12px 0 42px;
+  border:none;background:transparent;color:rgba(255,255,255,0.45);font-size:11px;font-weight:600;
+  cursor:pointer;width:100%;text-align:left;border-radius:8px;transition:background .1s,color .1s;
+}
+.gov-nav-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,.75)}
+.gov-nav-item.active{color:rgba(255,255,255,.9)}
+
+/* Bottom toggle */
+.sb-bottom{flex-shrink:0;border-top:1px solid rgba(255,255,255,0.05);padding:4px 8px 6px}
+.sb-toggle{
+  display:flex;align-items:center;height:40px;border:none;border-radius:10px;
+  background:transparent;color:rgba(128,175,255,0.55);font-size:12px;font-weight:600;
+  cursor:pointer;width:100%;white-space:nowrap;overflow:hidden;transition:background .12s,color .12s;
+}
+.sidebar:not(.sb-expanded) .sb-toggle{justify-content:center;gap:0;padding:0}
+.sidebar.sb-expanded .sb-toggle{justify-content:flex-start;padding:0 12px;gap:10px}
+.sb-toggle:hover{background:rgba(255,255,255,0.06);color:#80AFFF}
+.sb-toggle-icon{width:18px;height:18px;flex-shrink:0;transition:transform .22s cubic-bezier(.4,0,.2,1)}
+.sidebar.sb-expanded .sb-toggle-icon{transform:rotate(180deg)}
+.sb-toggle-label{opacity:0;transition:opacity .12s}
+.sidebar.sb-expanded .sb-toggle-label{opacity:1}
+
+/* theme toggle (keep for dark/light mode) */
+.theme-btn{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;background:none;border:none;transition:all .15s;width:100%}
+.theme-btn:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8)}
+
+/* ── TOPBAR ── */
+.tb-title{font-weight:600;font-size:15px;flex:1}
+.tb-badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.badge-active{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.badge-draft{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.28)}
+.badge-paused{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.28)}
+.tb-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:7px;font-size:13px;font-weight:500;transition:all .15s}
+.tb-btn-ghost{background:none;border:1px solid var(--br);color:var(--ts)}
+.tb-btn-ghost:hover{background:var(--card);border-color:var(--brm);color:var(--tp)}
+.tb-btn-primary{background:var(--grad);color:#fff;border:none;box-shadow:0 2px 8px rgba(124,92,252,.35)}
+.tb-btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+
+/* ── CARDS & TABLES ── */
+.card{background:var(--card);border:1px solid var(--br);border-radius:10px;overflow:hidden}
+.card-p{padding:16px}
+.stat-row{display:flex;gap:10px;margin-bottom:20px}
+.stat-card{flex:1;background:var(--card);border:1px solid var(--br);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:2px}
+.stat-value{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--tp);letter-spacing:-.5px;line-height:1.1}
+.stat-label{font-size:11px;color:var(--ts);margin-top:4px;font-weight:500;letter-spacing:.02em}
+.stat-delta{font-size:11px;margin-top:3px}
+.delta-up{color:#10b981}
+.delta-down{color:#ef4444}
+
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:600;color:var(--tm);text-align:left;padding:10px 16px;border-bottom:1px solid var(--br);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--br);font-size:13px;color:var(--ts);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.018)}
+.td-name{color:var(--tp);font-weight:600;font-size:13px}
+.td-link{color:var(--tp);cursor:pointer;font-weight:600;font-size:13px;transition:color .12s}
+.td-link:hover{color:var(--act)}
+.td-sub{font-size:11px;color:var(--tm);margin-top:2px;font-weight:400}
+.row-actions{display:flex;gap:2px;opacity:0;transition:opacity .12s;justify-content:flex-end}
+tr:hover .row-actions{opacity:1}
+.icon-btn{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:none;border:1px solid transparent;color:var(--tm);cursor:pointer;transition:all .12s;flex-shrink:0}
+.icon-btn:hover{background:var(--act-bg);border-color:var(--act-br);color:var(--act)}
+.icon-btn.danger:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:#f87171}
+.row-avatar{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── FILTER BAR ── */
+.list-filter{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--sb);border:1px solid var(--br);border-radius:8px;padding:7px 12px;flex:1;min-width:0}
+.search-box input{background:none;border:none;color:var(--tp);font-size:13px;width:100%}
+.search-box input::placeholder{color:var(--tm)}
+.filter-btn{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid var(--br);background:none;color:var(--ts);white-space:nowrap}
+.filter-btn:hover:not(.active){background:var(--card);color:var(--tp)}
+.filter-btn.active{background:var(--act-bg);border-color:var(--act-br);color:var(--act)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--br);margin-bottom:20px}
+.tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--ts);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab:hover{color:var(--tp)}
+.tab.active{color:var(--act);border-bottom-color:var(--act)}
+
+/* ── PILLS / CHIPS ── */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px}
+.pill-purple{background:rgba(124,92,252,.14);color:#a78bfa;border:1px solid rgba(124,92,252,.28)}
+.pill-blue{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
+.pill-green{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.pill-amber{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.pill-red{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.pill-gray{background:rgba(148,163,184,.08);color:var(--ts);border:1px solid var(--br)}
+
+/* ── SEARCH / FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.search-input{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--br);border-radius:8px;padding:6px 10px;flex:1}
+.search-input input{background:none;border:none;color:var(--tp);font-size:13px;width:100%}
+.search-input input::placeholder{color:var(--tm)}
+
+/* ── NETWORK BUILDER (full-screen) ── */
+.builder{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;z-index:100}
+.builder-topbar{height:52px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:12px;padding:0 16px;flex-shrink:0;background:var(--sb)}
+.builder-body{flex:1;display:flex;overflow:hidden}
+.catalog-panel{width:220px;min-width:220px;border-right:1px solid var(--br);display:flex;flex-direction:column;background:var(--sb)}
+.catalog-header{padding:12px 12px 8px;border-bottom:1px solid var(--br)}
+.catalog-search{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--br);border-radius:7px;padding:5px 8px}
+.catalog-search input{background:none;border:none;color:var(--tp);font-size:12px;width:100%}
+.catalog-search input::placeholder{color:var(--tm)}
+.catalog-scroll{flex:1;overflow-y:auto;padding:8px}
+.catalog-section{margin-bottom:8px}
+.catalog-section-title{font-size:10px;font-weight:600;color:var(--tm);letter-spacing:.07em;text-transform:uppercase;padding:6px 6px 4px}
+.catalog-node{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;cursor:grab;border:1px solid transparent;transition:all .15s;font-size:12px;color:var(--ts);font-weight:500}
+.catalog-node:hover{background:var(--act-bg);border-color:var(--act-br);color:var(--tp)}
+.catalog-node-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:#080c14}
+.canvas-dots{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);background-size:24px 24px}
+.canvas-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.canvas-nodes{position:absolute;inset:0}
+.canvas-toolbar{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:var(--sb);border:1px solid var(--br);border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.ctool-btn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:7px;background:none;border:1px solid transparent;color:var(--ts);cursor:pointer;transition:all .12s}
+.ctool-btn:hover{background:var(--card);border-color:var(--brm);color:var(--tp)}
+.ctool-sep{width:1px;background:var(--br);margin:2px 2px}
+
+/* ── CANVAS NODES ── */
+.cnode{position:absolute;width:168px;border-radius:10px;border:1.5px solid;cursor:default;user-select:none;transition:box-shadow .15s}
+.cnode:hover,.cnode.selected{box-shadow:0 0 0 2.5px var(--act);border-color:var(--act)!important}
+.cnode-header{display:flex;align-items:center;gap:7px;padding:9px 10px 7px;border-bottom:1px solid rgba(255,255,255,.07)}
+.cnode-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cnode-label{font-size:11px;font-weight:600;color:var(--tp);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cnode-body{padding:7px 10px 9px}
+.cnode-type{font-size:10px;color:var(--ts);margin-bottom:4px}
+.cnode-port-row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.cnode-port{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ts)}
+.port-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid;flex-shrink:0}
+.port-in .port-dot{margin-right:0}
+.port-out .port-dot{margin-left:0}
+
+/* node type themes */
+.cnode-contract{background:rgba(124,92,252,.1);border-color:rgba(124,92,252,.4)}.cnode-contract .cnode-icon{background:rgba(124,92,252,.25)}
+.cnode-http{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.35)}.cnode-http .cnode-icon{background:rgba(59,130,246,.2)}
+.cnode-llm{background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.35)}.cnode-llm .cnode-icon{background:rgba(99,102,241,.2)}
+.cnode-branch{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.35)}.cnode-branch .cnode-icon{background:rgba(245,158,11,.2)}
+.cnode-code{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.35)}.cnode-code .cnode-icon{background:rgba(16,185,129,.2)}
+.cnode-wait{background:rgba(249,115,22,.08);border-color:rgba(249,115,22,.35)}.cnode-wait .cnode-icon{background:rgba(249,115,22,.2)}
+.cnode-worker{background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.35)}.cnode-worker .cnode-icon{background:rgba(6,182,212,.2)}
+
+/* ── INSPECTOR PANEL ── */
+.inspector-panel{width:280px;min-width:280px;border-left:1px solid var(--br);display:flex;flex-direction:column;background:var(--sb);overflow-y:auto}
+.inspector-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;color:var(--ts)}
+.inspector-empty p{font-size:12px;text-align:center;color:var(--tm);line-height:1.6}
+.inspector-header{padding:14px 14px 10px;border-bottom:1px solid var(--br)}
+.inspector-tabs{display:flex;gap:0;border-bottom:1px solid var(--br)}
+.inspector-tab{flex:1;padding:8px;font-size:12px;font-weight:500;color:var(--ts);cursor:pointer;text-align:center;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.inspector-tab.active{color:var(--act);border-bottom-color:var(--act)}
+.inspector-body{padding:14px;flex:1;display:flex;flex-direction:column;gap:12px}
+.field-group{display:flex;flex-direction:column;gap:4px}
+.field-label{font-size:11px;font-weight:600;color:var(--ts);letter-spacing:.04em;text-transform:uppercase}
+.field-input{background:var(--bg);border:1px solid var(--br);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tp);width:100%}
+.field-input:focus{border-color:var(--act-br)}
+.field-select{appearance:none;background:var(--bg);border:1px solid var(--br);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tp);width:100%;cursor:pointer}
+.field-textarea{background:var(--bg);border:1px solid var(--br);border-radius:7px;padding:7px 10px;font-size:12px;color:var(--tp);width:100%;resize:vertical;font-family:'JetBrains Mono',monospace;min-height:80px}
+.var-map-row{display:flex;align-items:center;gap:6px;padding:7px;background:var(--bg);border:1px solid var(--br);border-radius:7px;font-size:11px}
+.var-map-source{flex:1;color:var(--ts);font-family:'JetBrains Mono',monospace}
+.var-map-arrow{color:var(--tm);flex-shrink:0}
+.var-map-target{flex:1;color:var(--act);font-family:'JetBrains Mono',monospace}
+.inspector-footer{padding:12px 14px;border-top:1px solid var(--br);display:flex;gap:8px}
+.btn-full{flex:1;padding:8px;border-radius:7px;font-size:13px;font-weight:500;text-align:center}
+.btn-primary{background:var(--grad);color:#fff;border:none}
+.btn-danger{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+
+/* ── MISC ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:16px;font-weight:600;color:var(--tp)}
+.section-sub{font-size:13px;color:var(--ts);margin-top:2px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.detail-item{background:var(--card);border:1px solid var(--br);border-radius:8px;padding:12px 14px}
+.detail-item-label{font-size:11px;color:var(--ts);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.detail-item-value{font-size:14px;font-weight:600;color:var(--tp)}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;gap:12px;text-align:center}
+.empty-state p{font-size:13px;color:var(--tm);max-width:280px;line-height:1.6}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-green{background:#10b981}
+.dot-amber{background:#f59e0b}
+.dot-red{background:#ef4444}
+.dot-gray{background:#475569}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12px}
+.text-sm{font-size:12px}
+.text-xs{font-size:11px}
+.text-ts{color:var(--ts)}
+.text-tm{color:var(--tm)}
+.text-act{color:var(--act)}
+.flex{display:flex}
+.items-center{align-items:center}
+.gap-6{gap:6px}
+.gap-8{gap:8px}
+.gap-12{gap:12px}
+.mb-8{margin-bottom:8px}
+.mb-12{margin-bottom:12px}
+.mb-16{margin-bottom:16px}
+.mt-4{margin-top:4px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
+.modal-card{background:var(--sb);border:1px solid var(--br);border-radius:14px;width:100%;max-width:520px;box-shadow:0 24px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;max-height:90vh;overflow:hidden}
+.modal-header{padding:20px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.modal-title{font-size:16px;font-weight:600}
+.modal-sub{font-size:13px;color:var(--ts);margin-top:3px}
+.modal-close{width:28px;height:28px;border-radius:6px;background:none;border:1px solid var(--br);color:var(--ts);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:-2px}
+.modal-close:hover{background:var(--card);color:var(--tp)}
+.modal-stepper{display:flex;align-items:center;gap:0;padding:20px 24px 0;flex-shrink:0}
+.modal-step{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500}
+.step-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;transition:all .2s}
+.step-dot.done{background:var(--act);border-color:var(--act);color:#fff}
+.step-dot.active{background:var(--act-bg);border-color:var(--act-br);color:var(--act)}
+.step-dot.pending{background:transparent;border-color:var(--br);color:var(--tm)}
+.step-label.done{color:var(--ts)}
+.step-label.active{color:var(--act);font-weight:600}
+.step-label.pending{color:var(--tm)}
+.step-line{flex:1;height:1px;background:var(--br);margin:0 8px;min-width:20px}
+.step-line.done{background:var(--act)}
+.modal-body{padding:20px 24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--br);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--brm);border-radius:4px}
+
+/* toast */
+.toast{position:fixed;bottom:20px;right:20px;background:#1e2536;border:1px solid var(--br);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--tp);z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px;animation:slideUp .2s ease;max-width:300px}
+@keyframes slideUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* ── PAGINATION ── */
+.pagination{height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;border-top:1px solid var(--br);background:var(--card);flex-shrink:0;gap:24px}
+.pgn-rpp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ts);white-space:nowrap}
+.pgn-rpp-wrap{position:relative}
+.pgn-rpp-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--tp);background:rgba(255,255,255,0.04);border:1px solid var(--br);border-radius:6px;padding:3px 8px;cursor:pointer;transition:border-color .15s,background .15s;white-space:nowrap}
+.pgn-rpp-btn:hover{background:rgba(255,255,255,0.07);border-color:var(--brm)}
+.pgn-rpp-menu{position:absolute;bottom:calc(100% + 4px);left:0;background:var(--sb);border:1px solid var(--brm);border-radius:8px;padding:4px;min-width:72px;z-index:120;display:none;flex-direction:column;gap:1px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.pgn-rpp-menu.open{display:flex}
+.pgn-rpp-val{pointer-events:none}
+.pgn-rpp-opt{padding:7px 12px;font-size:12px;color:var(--tp);border-radius:5px;cursor:pointer;background:none;border:none;text-align:left;width:100%;transition:background .1s}
+.pgn-rpp-opt:hover{background:rgba(255,255,255,0.06)}
+.pgn-rpp-opt.sel{color:var(--act);background:var(--act-bg)}
+.pgn-range{font-size:12px;color:var(--tp);white-space:nowrap}
+.pgn-nav{display:flex;align-items:center;gap:4px}
+.pgn-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--br);background:rgba(255,255,255,0.04);cursor:pointer;color:var(--tp);transition:all .15s}
+.pgn-btn:hover:not(:disabled){border-color:var(--brm);background:rgba(255,255,255,0.08)}
+.pgn-btn:disabled{opacity:.3;cursor:not-allowed}
+/* ── Knowledge / TruthPacks ── */
+.input{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--br);border-radius:8px;color:var(--tp);font-size:13px;font-family:inherit;padding:8px 12px;outline:none;transition:border-color .15s}
+.input:focus{border-color:var(--pri)}
+textarea.input{resize:vertical;line-height:1.5}
+.danger-zone{border:1px solid rgba(255,100,103,0.25);border-radius:10px;overflow:hidden;margin-top:8px}
+.dz-title{font-size:11px;font-weight:700;color:var(--err);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;background:rgba(255,100,103,0.06);border-bottom:1px solid rgba(255,100,103,0.15)}
+.dz-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.dz-row:last-child{border-bottom:none}
+.dz-row strong{font-size:13px;font-weight:600;color:var(--t1);display:block;margin-bottom:2px}
+.dz-row p{font-size:11px;color:var(--tm);margin:0}
+.dz-btn{height:28px;padding:0 12px;border-radius:7px;border:1px solid var(--br);background:transparent;color:var(--tp);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.dz-btn:hover{background:rgba(255,255,255,0.06)}
+.dz-btn.danger{border-color:rgba(255,100,103,0.4);color:var(--err)}
+.dz-btn.danger:hover{background:rgba(255,100,103,0.1)}
+/* ── Mini toggle (same as agentic-studio) ── */
+.mini-tog{display:inline-flex;align-items:center;cursor:pointer}
+.mini-tog input{display:none}
+.mini-track{width:30px;height:17px;border-radius:20px;background:rgba(255,255,255,0.12);position:relative;transition:background .18s;--tog-on:var(--ok)}
+.mini-tog input:checked+.mini-track{background:var(--tog-on)}
+.mini-thumb{position:absolute;top:2.5px;left:2.5px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.mini-tog input:checked+.mini-track .mini-thumb{transform:translateX(13px)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ─────────────────── ICONS ───────────────────
+const ICONS = {
+  wrench:`<path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l5.653-4.655m3.588-3.588l-2.276.688a2.649 2.649 0 00-1.036.87L6.72 7.8m5.25 5.25l-.688 2.276a2.649 2.649 0 01-.87 1.036L7.8 17.28m0 0l-3.586-3.586M7.8 17.28l4.5-4.5"/>`,
+  star:`<path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/>`,
+  bookOpen:`<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>`,
+  gitBranch:`<path stroke-linecap="round" stroke-linejoin="round" d="M6 3v12M18 9a3 3 0 100-6 3 3 0 000 6zM6 21a3 3 0 100-6 3 3 0 000 6zm0-9a9 9 0 009 9"/>`,
+  shield:`<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>`,
+  plus:`<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>`,
+  search:`<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>`,
+  play:`<path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>`,
+  pause:`<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5"/>`,
+  edit:`<path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>`,
+  trash:`<path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>`,
+  copy:`<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"/>`,
+  eye:`<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>`,
+  chevronRight:`<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>`,
+  x:`<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>`,
+  check:`<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>`,
+  info:`<path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>`,
+  clock:`<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>`,
+  zap:`<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>`,
+  code:`<path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/>`,
+  globe:`<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/>`,
+  share2:`<path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/>`,
+  gitMerge:`<circle cx="18" cy="6" r="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 15V9a9 9 0 009 9" stroke-linecap="round" stroke-linejoin="round"/>`,
+  cpuChip:`<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25zm.75-12h9v9h-9v-9z"/>`,
+  funnel:`<path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"/>`,
+  timer:`<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z"/>`,
+  user:`<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>`,
+  robot:`<path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v10m0 0H5m4 0h10M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6M5 13h14"/><circle cx="9" cy="17" r="1"/><circle cx="15" cy="17" r="1"/>`,
+  sun:`<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>`,
+  moon:`<path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>`,
+  network:`<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918"/>`,
+  arrowRight:`<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>`,
+  minus:`<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15"/>`,
+  zoomIn:`<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6"/>`,
+  zoomOut:`<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6"/>`,
+  maximize:`<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>`,
+  listBullet:`<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>`,
+  lock:`<path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>`,
+  download:`<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>`,
+  edit2:`<path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"/>`,
+};
+
+function IC(name, size=16, color='currentColor'){
+  const d = ICONS[name]||'';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8">${d}</svg>`;
+}
+
+// ─────────────────── DATA ───────────────────
+const PLAYBOOKS = [
+  {
+    id:'PB-001',name:'Customer Escalation Handler',version:'2.1.0',status:'active',type:'Reactive',runs:8420,success:97.2,lastRun:'12 min ago',owner:'Thomas G.',
+    description:'Routes escalated support tickets through multi-step validation, sentiment analysis, and agent assignment based on severity score.',
+    trigger:{type:'Webhook',url:'https://api.aims.ai/hooks/pb-001',secret:'••••••••'},
+    steps:['Receive escalation payload via webhook','Run sentiment analysis on transcript (LLM Call)','Score severity (0–10) using Support Agent v2','If severity ≥ 7 → assign to Senior Agent queue','If severity < 7 → auto-resolve with canned response','Send confirmation email to customer','Log result to CRM'],
+    logs:[
+      {id:'run-8420',status:'success',started:'12 min ago',duration:'3.2s',trigger:'Webhook'},
+      {id:'run-8419',status:'success',started:'31 min ago',duration:'2.8s',trigger:'Webhook'},
+      {id:'run-8418',status:'failed',started:'1 hr ago',duration:'0.4s',trigger:'Webhook'},
+      {id:'run-8417',status:'success',started:'2 hr ago',duration:'3.1s',trigger:'Webhook'},
+      {id:'run-8416',status:'success',started:'3 hr ago',duration:'4.0s',trigger:'Webhook'},
+    ],
+  },
+  {
+    id:'PB-002',name:'Compliance Review Trigger',version:'1.4.2',status:'active',type:'Scheduled',runs:3105,success:99.8,lastRun:'1 hr ago',owner:'Thomas G.',
+    description:'Scans all interactions from the past 24h and flags those requiring compliance review, then schedules callbacks.',
+    trigger:{type:'Scheduled',schedule:'Every day at 02:00 UTC',timezone:'UTC'},
+    steps:['Pull all interactions from the last 24h via API','Filter for interactions with compliance-sensitive keywords','For each flagged interaction — run Compliance Reviewer agent','If violation found → create review task in ticketing system','Send digest email to Compliance team','Archive flagged transcripts to S3'],
+    logs:[
+      {id:'run-3105',status:'success',started:'1 hr ago',duration:'42.1s',trigger:'Schedule'},
+      {id:'run-3104',status:'success',started:'25 hr ago',duration:'38.6s',trigger:'Schedule'},
+      {id:'run-3103',status:'success',started:'49 hr ago',duration:'41.0s',trigger:'Schedule'},
+    ],
+  },
+  {
+    id:'PB-003',name:'Onboarding Sequence v3',version:'3.0.0',status:'draft',type:'Event-driven',runs:0,success:0,lastRun:'—',owner:'Thomas G.',
+    description:'Multi-step onboarding flow triggered on new account creation. Sends personalized messages across voice, email, and chat.',
+    trigger:{type:'Event',event:'account.created',source:'Auth Service'},
+    steps:['Receive account.created event','Fetch user profile from CRM','Send welcome email (personalized by plan tier)','Schedule voice call via Voice Widget (T+1 day)','Send in-app chat greeting (T+0)','After 7 days — send feature tips email'],
+    logs:[],
+  },
+  {
+    id:'PB-004',name:'Retention Outreach',version:'1.0.1',status:'paused',type:'Scheduled',runs:512,success:88.4,lastRun:'3 days ago',owner:'Thomas G.',
+    description:'Proactively contacts at-risk customers identified by churn model. Offers targeted retention incentives.',
+    trigger:{type:'Scheduled',schedule:'Every Monday at 09:00 UTC',timezone:'UTC'},
+    steps:['Pull at-risk customers from churn model (score > 0.7)','Segment by plan tier and engagement level','For each customer — generate personalized outreach (LLM Call)','Send outreach via preferred channel (email or SMS)','Log outreach event to CRM','If no response in 3 days → escalate to Account Manager'],
+    logs:[
+      {id:'run-512',status:'success',started:'3 days ago',duration:'28.4s',trigger:'Schedule'},
+      {id:'run-511',status:'failed',started:'10 days ago',duration:'5.1s',trigger:'Schedule'},
+      {id:'run-510',status:'success',started:'17 days ago',duration:'31.2s',trigger:'Schedule'},
+    ],
+  },
+];
+
+const NETWORKS = [
+  {id:'NET-001',name:'Document Processing Pipeline',description:'Fetches, classifies, and extracts fields from incoming documents. Supports PDF, Word, and image formats with OCR fallback.',status:'active',version:'1.2.0',trigger:'API POST /networks/NET-001/executions',createdAt:'2024-11-15',runs:1247,success:94.2,avgDuration:'8.3s',nodes:7,edges:8,instances:2},
+  {id:'NET-002',name:'Customer Onboarding Flow',description:'Orchestrates personalized onboarding sequences including identity verification, welcome messaging, and initial product setup.',status:'draft',version:'0.3.0',trigger:'API POST /networks/NET-002/executions',createdAt:'2025-01-08',runs:0,success:0,avgDuration:'—',nodes:5,edges:4,instances:1},
+  {id:'NET-003',name:'Compliance Audit Workflow',description:'Scans conversation transcripts against regulatory policies, flags violations, and routes findings to the appropriate review team.',status:'paused',version:'2.0.1',trigger:'Scheduled — daily 02:00 UTC',createdAt:'2024-09-22',runs:312,success:99.1,avgDuration:'42.1s',nodes:9,edges:11,instances:3},
+  {id:'NET-004',name:'Invoice Extraction & Approval',description:'Extracts line items from invoices, validates against PO records, routes for manager approval if delta > threshold.',status:'active',version:'1.0.0',trigger:'API POST /networks/NET-004/executions',createdAt:'2025-02-14',runs:88,success:96.6,avgDuration:'5.7s',nodes:6,edges:7,instances:1},
+];
+
+// Document Processing Pipeline — node canvas data
+const NET001_NODES = [
+  {id:'n-start',type:'contract',label:'Input Contract',subtype:'Input',x:40,y:210,ports:{out:['document_url','doc_type','metadata']}},
+  {id:'n-fetch',type:'http',label:'Fetch Document',subtype:'HTTP Request',x:270,y:90,ports:{in:['url'],out:['raw_content','status_code','headers']}},
+  {id:'n-llm',type:'llm',label:'Classify Document',subtype:'LLM Call',x:270,y:300,ports:{in:['content'],out:['classification','confidence','reasoning']}},
+  {id:'n-branch',type:'branch',label:'Confidence Gate',subtype:'Conditional Branch',x:510,y:195,ports:{in:['confidence'],out:['true','false']}},
+  {id:'n-code',type:'code',label:'Extract Fields',subtype:'Code Execution',x:740,y:85,ports:{in:['raw_content','classification'],out:['fields','schema_version']}},
+  {id:'n-wait',type:'wait',label:'Manual Review',subtype:'Wait for Event',x:740,y:315,ports:{in:['raw_content','classification'],out:['reviewed_fields','reviewer_id','decision']}},
+  {id:'n-end',type:'contract',label:'Output Contract',subtype:'Output',x:970,y:200,ports:{in:['fields','source']}},
+];
+
+const NET001_EDGES = [
+  {id:'e1',src:'n-start',dst:'n-fetch',sp:'out',tp:'in'},
+  {id:'e2',src:'n-start',dst:'n-llm',sp:'out',tp:'in'},
+  {id:'e3',src:'n-fetch',dst:'n-branch',sp:'out',tp:'in'},
+  {id:'e4',src:'n-llm',dst:'n-branch',sp:'out',tp:'in'},
+  {id:'e5',src:'n-branch',dst:'n-code',sp:'true',tp:'in'},
+  {id:'e6',src:'n-branch',dst:'n-wait',sp:'false',tp:'in'},
+  {id:'e7',src:'n-code',dst:'n-end',sp:'out',tp:'in'},
+  {id:'e8',src:'n-wait',dst:'n-end',sp:'out',tp:'in'},
+];
+
+const VARIABLE_MAPPINGS = [
+  {src:'n-start.document_url',dst:'n-fetch.url',transform:'passthrough'},
+  {src:'n-fetch.raw_content',dst:'n-llm.content',transform:'passthrough'},
+  {src:'n-llm.confidence',dst:'n-branch.confidence',transform:'passthrough'},
+  {src:'n-fetch.raw_content',dst:'n-code.raw_content',transform:'passthrough'},
+  {src:'n-llm.classification',dst:'n-code.classification',transform:'passthrough'},
+  {src:'n-code.fields',dst:'n-end.fields',transform:'passthrough'},
+  {src:'n-wait.reviewed_fields',dst:'n-end.fields',transform:'passthrough'},
+];
+
+const CATALOG_NODES = {
+  native:[
+    {type:'llm',label:'LLM Call',icon:'cpuChip',color:'#7c5cfc',desc:'Send a prompt to a language model'},
+    {type:'http',label:'HTTP Request',icon:'globe',color:'#3b82f6',desc:'Make an outbound API call'},
+    {type:'code',label:'Code Execution',icon:'code',color:'#10b981',desc:'Run sandboxed JavaScript/Python'},
+    {type:'transform',label:'Text Transform',icon:'funnel',color:'#06b6d4',desc:'Reshape or format a string value'},
+    {type:'extract',label:'JSON Extract',icon:'share2',color:'#8b5cf6',desc:'Extract fields from a JSON payload'},
+  ],
+  control:[
+    {type:'branch',label:'Conditional Branch',icon:'gitBranch',color:'#f59e0b',desc:'Route execution based on a condition'},
+    {type:'wait',label:'Wait for Event',icon:'timer',color:'#f97316',desc:'Pause until an external event arrives'},
+  ],
+  workers:[
+    {type:'worker',label:'Support Agent v2',icon:'robot',color:'#06b6d4',desc:'Worker · claude-sonnet-4'},
+    {type:'worker',label:'Sales Agent v1',icon:'robot',color:'#06b6d4',desc:'Worker · claude-haiku-4'},
+  ],
+  agents:[
+    {type:'agent',label:'Compliance Reviewer',icon:'user',color:'#6366f1',desc:'Multi-step reasoning agent'},
+  ],
+};
+
+// ─────────────────── STATE ───────────────────
+const S = {
+  theme:'dark',
+  nav:'networks',
+  // playbook state
+  pbScreen:'list',
+  selectedPbId:'PB-001',
+  pbTab:'overview',
+  // network state
+  netScreen:'list',
+  selectedNetId:'NET-001',
+  netTab:'overview',
+  builderNodeId:null,
+  builderInspTab:'config',
+  catalogSearch:'',
+  netFilter:'all',
+  pbFilter:'all',
+  // worker state
+  wkScreen:'list',
+  selectedWkId:null,
+  wkTab:'overview',
+  // knowledge state
+  knScreen:'list',
+  selectedTpId:null,
+  knTab:'truth',
+  knFilter:'all',
+  // modal state
+  modal:null,       // null | 'newWorker' | 'newNetwork' | 'newTruthPack'
+  modalStep:1,
+  // sidebar state
+  _sbExpanded: (()=>{ try{return localStorage.getItem('sb_gs_expanded')==='1';}catch(e){return false;} })(),
+};
+
+function setState(patch){Object.assign(S,patch);render();}
+
+function sbToggle(){
+  S._sbExpanded = !S._sbExpanded;
+  try{localStorage.setItem('sb_gs_expanded', S._sbExpanded?'1':'0');}catch(e){}
+  const sb = document.getElementById('appSidebar');
+  if(sb){
+    sb.classList.toggle('sb-expanded', S._sbExpanded);
+    const btn = document.getElementById('sbToggleBtn');
+    if(btn){
+      btn.setAttribute('aria-expanded', S._sbExpanded);
+      const lbl = btn.querySelector('.sb-toggle-label');
+      if(lbl) lbl.textContent = S._sbExpanded ? 'Collapse' : 'Expand';
+    }
+  }
+}
+
+// ─────────────────── HELPERS ───────────────────
+function statusBadge(st){
+  const map={active:'badge-active',draft:'badge-draft',paused:'badge-paused'};
+  return `<span class="tb-badge ${map[st]||'badge-draft'}">${IC('dot')}${st.charAt(0).toUpperCase()+st.slice(1)}</span>`;
+}
+function statusPill(st){
+  const map={active:'pill-green',draft:'pill-amber',paused:'pill-red'};
+  return `<span class="pill ${map[st]||'pill-gray'}">${st.charAt(0).toUpperCase()+st.slice(1)}</span>`;
+}
+function dotColor(st){return st==='active'?'dot-green':st==='draft'?'dot-amber':'dot-red';}
+function rateColor(n){return n>95?'#10b981':n>80?'#f59e0b':'#ef4444';}
+function rowAvatar(icon,color){return `<div class="row-avatar" style="background:${color}18">${IC(icon,13,color)}</div>`;}
+function filterBtns(options,current,key){return options.map(f=>`<button class="filter-btn${current===f?' active':''}" onclick="setState({${key}:'${f}'})">${f.charAt(0).toUpperCase()+f.slice(1)}</button>`).join('');}
+
+// compute port absolute positions (node w=168, h≈72)
+const NW=168, NH=72;
+function portPos(nodeId, portSide, portName){
+  const n=NET001_NODES.find(x=>x.id===nodeId);
+  if(!n)return{x:0,y:0};
+  if(portSide==='out'){
+    if(portName==='true') return{x:n.x+NW,y:n.y+NH*0.35};
+    if(portName==='false') return{x:n.x+NW,y:n.y+NH*0.65};
+    return{x:n.x+NW,y:n.y+NH/2};
+  }
+  return{x:n.x,y:n.y+NH/2};
+}
+
+function makeBezier(sx,sy,tx,ty){
+  const cx=Math.abs(tx-sx)*0.5;
+  return `M ${sx},${sy} C ${sx+cx},${sy} ${tx-cx},${ty} ${tx},${ty}`;
+}
+
+// ─────────────────── RENDER FUNCTIONS ───────────────────
+function renderSidebar(){
+  const govItems=[
+    {id:'playbooks',label:'Playbooks'},
+    {id:'networks',label:'Agentic Networks'},
+    {id:'workers',label:'Workers'},
+    {id:'knowledge',label:'Knowledge'},
+  ];
+  return `
+  <!-- Brand -->
+  <div class="sb-brand">
+    <div class="sb-brand-logo">GS</div>
+    <span class="sb-brand-name">AIMS OS</span>
+  </div>
+  <!-- Nav -->
+  <div class="sb-nav">
+    <button class="sb-item" title="Home" aria-label="Home">
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7.5L9 2l7 5.5V16h-4.5v-3.5h-5V16H2V7.5z"/></svg></span>
+      <span class="sb-label">Home</span>
+    </button>
+    <button class="sb-item" title="Agents" aria-label="Agents">
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6" r="3"/><path d="M3 17c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></span>
+      <span class="sb-label">Agents</span>
+    </button>
+    <button class="sb-item" title="Automations" aria-label="Automations">
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="10.5" y="10.5" width="5.5" height="5.5" rx="1.5"/><path d="M5 7.5v1.5A1.5 1.5 0 006.5 10.5H8"/></svg></span>
+      <span class="sb-label">Automations</span>
+    </button>
+    <div class="sb-divider"></div>
+    <button class="sb-item" title="Knowledge" aria-label="Knowledge">
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2.5h12v13H3z"/><path d="M6.5 6h5M6.5 9h5M6.5 12h3"/></svg></span>
+      <span class="sb-label">Knowledge</span>
+    </button>
+    <button class="sb-item" title="Contacts" aria-label="Contacts">
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6.5" r="2.5"/><path d="M3 16c0-2.76 2.686-5 6-5s6 2.24 6 5"/></svg></span>
+      <span class="sb-label">Contacts</span>
+    </button>
+    <div class="sb-divider"></div>
+    <!-- Admin — ACTIVE (Governance lives here) -->
+    <button class="sb-item active" title="Admin" aria-label="Admin" aria-current="page">
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M9 2l1.5 4h4l-3.5 2.5 1.5 4L9 10l-3.5 2.5 1.5-4L3.5 6h4z"/></svg></span>
+      <span class="sb-label">Admin</span>
+      <svg class="sb-chevron" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3.5 3.5L10 5"/></svg>
+    </button>
+    <!-- Governance sub-nav -->
+    <div class="gov-subnav">
+      ${govItems.map(n=>`
+      <button class="gov-nav-item${S.nav===n.id?' active':''}"
+        onclick="setState({nav:'${n.id}',netScreen:S.netScreen==='builder'&&'${n.id}'!=='networks'?'list':S.netScreen})">
+        ${n.label}
+      </button>`).join('')}
+    </div>
+    <button class="sb-item" title="Workspace" aria-label="Workspace">
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="6" rx="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.5"/></svg></span>
+      <span class="sb-label">Workspace</span>
+    </button>
+  </div>
+  <!-- Toggle -->
+  <div class="sb-bottom">
+    <button class="sb-toggle" id="sbToggleBtn" onclick="sbToggle()" title="Toggle sidebar" aria-expanded="false">
+      <svg class="sb-toggle-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4L6 9l5 5"/><line x1="3" y1="3" x2="3" y2="15"/>
+      </svg>
+      <span class="sb-toggle-label">Collapse</span>
+    </button>
+  </div>`;
+}
+
+// ─── PLAYBOOKS ───
+function renderPlaybooks(){
+  if(S.pbScreen==='detail') return renderPlaybookDetail();
+  const filtered=PLAYBOOKS.filter(p=>S.pbFilter==='all'||p.status===S.pbFilter);
+  return `
+  <div class="topbar">
+    <span class="tb-title">Playbooks</span>
+    <button class="tb-btn tb-btn-primary" onclick="showToast('New Playbook — coming soon')">${IC('plus',14)} New Playbook</button>
+  </div>
+  <div class="content">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-value">${PLAYBOOKS.filter(p=>p.status==='active').length}</div><div class="stat-label">Active Playbooks</div></div>
+      <div class="stat-card"><div class="stat-value">11,525</div><div class="stat-label">Total Runs (30d)</div></div>
+      <div class="stat-card"><div class="stat-value">97.1%</div><div class="stat-label">Avg Success Rate</div><div class="stat-delta delta-up">↑ 1.3% vs last month</div></div>
+      <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Drafts</div></div>
+    </div>
+    <div class="card">
+      <div class="list-filter" style="padding:12px 12px 0">
+        <div class="search-box">${IC('search',14,'var(--tm)')}<input type="text" placeholder="Search playbooks…"></div>
+        ${filterBtns(['all','active','draft','paused'],S.pbFilter,'pbFilter')}
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Status</th><th>Type</th><th>Runs (30d)</th><th>Success</th><th>Last run</th><th></th></tr></thead>
+        <tbody>
+        ${filtered.map(p=>`
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                ${rowAvatar('bookOpen','#7c5cfc')}
+                <div>
+                  <div class="td-link" onclick="setState({pbScreen:'detail',selectedPbId:'${p.id}',pbTab:'overview'})">${p.name}</div>
+                  <div class="td-sub">v${p.version} · ${p.type}</div>
+                </div>
+              </div>
+            </td>
+            <td>${statusPill(p.status)}</td>
+            <td><span class="text-sm text-ts">${p.type}</span></td>
+            <td class="mono">${p.runs.toLocaleString()}</td>
+            <td><span class="mono text-sm" style="color:${rateColor(p.success)}">${p.success||'—'}${p.success?'%':''}</span></td>
+            <td class="text-sm text-ts">${p.lastRun}</td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn" title="Edit" onclick="showToast('Edit Playbook — coming soon')">${IC('edit',13)}</button>
+                <button class="icon-btn" title="Duplicate" onclick="showToast('Duplicated!')">${IC('copy',13)}</button>
+                <button class="icon-btn danger" title="Delete" onclick="showToast('Deleted!')">${IC('trash',13)}</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      ${pgnBar(filtered.length)}
+    </div>
+  </div>`;
+}
+
+function renderPlaybookDetail(){
+  const pb=PLAYBOOKS.find(p=>p.id===S.selectedPbId)||PLAYBOOKS[0];
+  return `
+  <div class="topbar">
+    <button class="tb-btn tb-btn-ghost" onclick="setState({pbScreen:'list'})" style="gap:4px">‹ Playbooks</button>
+    <span style="color:var(--tm)">›</span>
+    <span class="tb-title">${pb.name}</span>
+    ${statusBadge(pb.status)}
+    <div style="flex:1"></div>
+    <button class="tb-btn tb-btn-ghost" onclick="showToast('Edit Playbook — coming soon')">${IC('edit',14)} Edit</button>
+    <button class="tb-btn tb-btn-primary" onclick="showToast('Playbook triggered!')">${IC('play',14)} Run Now</button>
+  </div>
+  <div class="content">
+    <div class="tabs">
+      ${['overview','logs','settings'].map(t=>`<div class="tab${S.pbTab===t?' active':''}" onclick="setState({pbTab:'${t}'})">${t.charAt(0).toUpperCase()+t.slice(1)}</div>`).join('')}
+    </div>
+    ${S.pbTab==='overview'?renderPbOverview(pb):''}
+    ${S.pbTab==='logs'?renderPbLogs(pb):''}
+    ${S.pbTab==='settings'?renderPbSettings(pb):''}
+  </div>`;
+}
+
+function renderPbOverview(pb){
+  return `
+  <div class="detail-grid">
+    <div class="detail-item"><div class="detail-item-label">Version</div><div class="detail-item-value">v${pb.version}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Trigger Type</div><div class="detail-item-value">${pb.type}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Total Runs</div><div class="detail-item-value">${pb.runs.toLocaleString()}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Success Rate</div><div class="detail-item-value" style="color:${pb.success>95?'#10b981':pb.success>80?'#f59e0b':'#ef4444'}">${pb.success?pb.success+'%':'—'}</div></div>
+  </div>
+  <div class="card card-p mb-16">
+    <div class="text-sm text-ts mb-12">${pb.description}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="pill pill-gray">${IC('user',11)} ${pb.owner}</span>
+      <span class="pill pill-gray">${IC('clock',11)} Last run: ${pb.lastRun}</span>
+    </div>
+  </div>
+  <div class="section-header mb-12"><span class="section-title" style="font-size:14px">Steps</span></div>
+  <div class="card card-p">
+    <ol style="display:flex;flex-direction:column;gap:8px;padding-left:20px">
+      ${pb.steps.map(s=>`<li style="font-size:13px;color:var(--ts);line-height:1.5">${s}</li>`).join('')}
+    </ol>
+  </div>`;
+}
+
+function renderPbLogs(pb){
+  if(!pb.logs||!pb.logs.length) return `
+  <div class="empty-state">
+    ${IC('listBullet',36,'var(--tm)')}
+    <div style="font-size:14px;font-weight:600">No runs yet</div>
+    <p>This playbook hasn't been executed yet. Run it manually or wait for the trigger to fire.</p>
+    <button class="tb-btn tb-btn-primary" onclick="showToast('Playbook triggered!')">${IC('play',13)} Run Now</button>
+  </div>`;
+
+  return `
+  <div class="card">
+    <table>
+      <thead><tr><th>Run ID</th><th>Status</th><th>Started</th><th>Duration</th><th>Trigger</th><th></th></tr></thead>
+      <tbody>
+      ${pb.logs.map(r=>`
+        <tr>
+          <td class="mono td-name">${r.id}</td>
+          <td><span class="pill ${r.status==='success'?'pill-green':r.status==='failed'?'pill-red':'pill-amber'}">${r.status}</span></td>
+          <td class="text-sm text-ts">${r.started}</td>
+          <td class="mono">${r.duration}</td>
+          <td><span class="pill pill-gray text-xs">${r.trigger}</span></td>
+          <td><button class="icon-btn" title="View log" onclick="showToast('Log viewer — coming soon')">${IC('eye',13)}</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderPbSettings(pb){
+  const isScheduled=pb.trigger.type==='Scheduled';
+  const isWebhook=pb.trigger.type==='Webhook';
+  const isEvent=pb.trigger.type==='Event';
+  return `
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
+    <div class="card card-p">
+      <div class="text-sm" style="font-weight:600;margin-bottom:12px">Trigger Configuration</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="field-group">
+          <div class="field-label">Trigger Type</div>
+          <select class="field-select">
+            <option ${isWebhook?'selected':''}>Webhook</option>
+            <option ${isScheduled?'selected':''}>Scheduled</option>
+            <option ${isEvent?'selected':''}>Event-driven</option>
+          </select>
+        </div>
+        ${isWebhook?`
+          <div class="field-group">
+            <div class="field-label">Webhook URL</div>
+            <div style="display:flex;gap:6px">
+              <input class="field-input" value="${pb.trigger.url}" readonly style="flex:1;font-family:'JetBrains Mono',monospace;font-size:11px">
+              <button class="icon-btn" onclick="showToast('Copied!')" style="width:34px;height:34px;border:1px solid var(--br)">${IC('copy',13)}</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Signing Secret</div>
+            <input class="field-input" value="${pb.trigger.secret}" style="font-family:'JetBrains Mono',monospace">
+          </div>
+        `:''}
+        ${isScheduled?`
+          <div class="field-group">
+            <div class="field-label">Schedule</div>
+            <input class="field-input" value="${pb.trigger.schedule}">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Timezone</div>
+            <select class="field-select"><option>${pb.trigger.timezone}</option><option>America/New_York</option><option>Europe/London</option></select>
+          </div>
+        `:''}
+        ${isEvent?`
+          <div class="field-group">
+            <div class="field-label">Event Name</div>
+            <input class="field-input" value="${pb.trigger.event}" style="font-family:'JetBrains Mono',monospace">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Source Service</div>
+            <input class="field-input" value="${pb.trigger.source}">
+          </div>
+        `:''}
+      </div>
+    </div>
+
+    <div class="card card-p">
+      <div class="text-sm" style="font-weight:600;margin-bottom:12px">Notifications</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="text-sm">On failure</div>
+            <div class="text-xs text-tm">Send alert when a run fails</div>
+          </div>
+          <div style="width:36px;height:20px;border-radius:10px;background:var(--act);cursor:pointer;position:relative">
+            <div style="position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff"></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="text-sm">Weekly digest</div>
+            <div class="text-xs text-tm">Summary of run statistics</div>
+          </div>
+          <div style="width:36px;height:20px;border-radius:10px;background:var(--brm);cursor:pointer;position:relative">
+            <div style="position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--ts)"></div>
+          </div>
+        </div>
+        <div class="field-group" style="margin-top:4px">
+          <div class="field-label">Notify Email</div>
+          <input class="field-input" value="thomas.gonzalez284@gmail.com">
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button class="tb-btn tb-btn-primary" onclick="showToast('Settings saved!')">${IC('check',14)} Save Changes</button>
+    </div>
+
+    <div class="card card-p" style="border-color:rgba(239,68,68,.2)">
+      <div class="text-sm" style="font-weight:600;color:#f87171;margin-bottom:8px">Danger Zone</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${pb.status==='paused'
+          ?`<button class="tb-btn" style="background:rgba(16,185,129,.1);color:#34d399;border:1px solid rgba(16,185,129,.25)" onclick="showToast('Playbook resumed!')">${IC('play',13)} Resume Playbook</button>`
+          :`<button class="tb-btn" style="background:rgba(245,158,11,.08);color:#fbbf24;border:1px solid rgba(245,158,11,.2)" onclick="showToast('Playbook paused!')">${IC('pause',13)} Pause Playbook</button>`
+        }
+        <button class="tb-btn" style="background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.2)" onclick="showToast('Are you sure? This cannot be undone.')">${IC('trash',13)} Delete Playbook</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── WORKERS ───
+const WORKERS=[
+  {
+    id:'WRK-001',name:'Support Agent',version:'v2.1',model:'claude-sonnet-4-6',status:'active',mode:'Auto',uses:14,
+    confidence:0.82,maxTurns:12,createdAt:'2024-09-10',
+    desc:'Handles tier-1 customer support inquiries with escalation logic and sentiment-based routing.',
+    systemPrompt:`You are a customer support agent for AIMS. Your role is to resolve tier-1 support inquiries with empathy and efficiency.\n\nGuidelines:\n- Always greet the customer by name if available\n- Confirm the issue before attempting resolution\n- If severity score ≥ 7, escalate immediately to the Senior Agent queue\n- Provide clear, jargon-free responses\n- Close every interaction by asking if there's anything else you can help with`,
+    tools:['search_knowledge_base','create_ticket','escalate_to_agent','send_email'],
+    deployments:[
+      {network:'Customer Escalation Handler',netId:'NET-001',instance:'Production',since:'Oct 2024'},
+      {network:'Onboarding Flow',netId:'NET-002',instance:'Staging',since:'Jan 2025'},
+    ],
+  },
+  {
+    id:'WRK-002',name:'Sales Agent',version:'v1.0',model:'claude-haiku-4-5',status:'active',mode:'Review',uses:6,
+    confidence:0.75,maxTurns:8,createdAt:'2024-11-22',
+    desc:'Qualifies inbound leads, identifies buying intent, and schedules follow-up calls with Account Executives.',
+    systemPrompt:`You are a sales qualification agent for AIMS. Your goal is to identify high-quality leads and schedule discovery calls.\n\nQualification criteria (BANT):\n- Budget: Ask about current tooling spend\n- Authority: Confirm the contact is a decision-maker\n- Need: Understand pain points around AI governance\n- Timeline: Ask about expected implementation timeline\n\nAlways end with a concrete next step (call booking or demo link).`,
+    tools:['search_crm','create_lead','book_meeting','send_email'],
+    deployments:[
+      {network:'Invoice Extraction & Approval',netId:'NET-004',instance:'Production',since:'Feb 2025'},
+    ],
+  },
+  {
+    id:'WRK-003',name:'Compliance Reviewer',version:'v3.0',model:'claude-opus-4-7',status:'draft',mode:'Review',uses:0,
+    confidence:0.90,maxTurns:20,createdAt:'2025-01-14',
+    desc:'Audits conversation transcripts against regulatory policies and flags potential violations for human review.',
+    systemPrompt:`You are a compliance auditing agent. Review conversation transcripts and identify any violations of the following policies:\n\n1. GDPR — no unauthorized PII collection or sharing\n2. TCPA — no unsolicited contact outside opt-in windows\n3. FINRA — no unlicensed financial advice\n4. Internal policy — no promises of refunds without manager approval\n\nFor each violation found, return: policy_violated, severity (low/medium/high), transcript_excerpt, and recommended_action.`,
+    tools:['search_policy_db','flag_violation','create_review_task'],
+    deployments:[],
+  },
+  {
+    id:'WRK-004',name:'Onboarding Guide',version:'v1.2',model:'claude-sonnet-4-6',status:'active',mode:'Auto',uses:9,
+    confidence:0.80,maxTurns:15,createdAt:'2024-10-05',
+    desc:'Walks new users through account setup, product features, and first steps in a personalized, conversational way.',
+    systemPrompt:`You are a friendly onboarding guide for AIMS. Your goal is to help new users get up and running quickly.\n\nOnboarding flow:\n1. Welcome and confirm account details\n2. Ask about the user's primary use case\n3. Walk through initial configuration based on their use case\n4. Introduce the 3 most relevant features\n5. Schedule a check-in call for Day 7\n\nTone: warm, encouraging, never overwhelming. Keep messages concise.`,
+    tools:['get_user_profile','update_onboarding_status','send_email','book_meeting'],
+    deployments:[
+      {network:'Customer Onboarding Flow',netId:'NET-002',instance:'Production',since:'Oct 2024'},
+      {network:'Customer Escalation Handler',netId:'NET-001',instance:'Production',since:'Nov 2024'},
+    ],
+  },
+];
+
+function renderWorkers(){
+  if(S.wkScreen==='detail') return renderWorkerDetail();
+  const filteredWk=WORKERS.filter(w=>(S.wkFilter||'all')==='all'||w.status===(S.wkFilter||'all'));
+  return `
+  <div class="topbar">
+    <span class="tb-title">Workers</span>
+    <button class="tb-btn tb-btn-ghost">${IC('info',14)} Docs</button>
+    <button class="tb-btn tb-btn-primary" onclick="setState({modal:'newWorker',modalStep:1})">${IC('plus',14)} New Worker</button>
+  </div>
+  <div class="content">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-value">${WORKERS.filter(w=>w.status==='active').length}</div><div class="stat-label">Active Workers</div></div>
+      <div class="stat-card"><div class="stat-value">${WORKERS.reduce((a,w)=>a+w.uses,0)}</div><div class="stat-label">Network deployments</div></div>
+      <div class="stat-card"><div class="stat-value">${WORKERS.filter(w=>w.mode==='Auto').length}</div><div class="stat-label">Auto mode</div></div>
+      <div class="stat-card"><div class="stat-value">${WORKERS.filter(w=>w.status==='draft').length}</div><div class="stat-label">Drafts</div></div>
+    </div>
+    <div class="card">
+      <div class="list-filter" style="padding:12px 12px 0">
+        <div class="search-box">${IC('search',14,'var(--tm)')}<input type="text" placeholder="Search workers…"></div>
+        ${filterBtns(['all','active','draft'],S.wkFilter||'all','wkFilter')}
+      </div>
+      <table>
+        <thead><tr><th>Worker</th><th>Status</th><th>Model</th><th>Mode</th><th>Confidence</th><th>Used in</th><th></th></tr></thead>
+        <tbody>
+        ${filteredWk.map(w=>`
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                ${rowAvatar('cpuChip','#06b6d4')}
+                <div>
+                  <div class="td-link" onclick="setState({wkScreen:'detail',selectedWkId:'${w.id}',wkTab:'overview'})">${w.name}</div>
+                  <div class="td-sub">${w.version} · ${w.desc.slice(0,42)}…</div>
+                </div>
+              </div>
+            </td>
+            <td>${statusPill(w.status)}</td>
+            <td><span class="mono text-sm text-ts">${w.model}</span></td>
+            <td><span class="pill ${w.mode==='Auto'?'pill-green':'pill-amber'}">${w.mode}</span></td>
+            <td><span class="mono text-sm" style="color:${rateColor(w.confidence*100)}">${(w.confidence*100).toFixed(0)}%</span></td>
+            <td><span class="text-sm text-ts">${w.uses} network${w.uses!==1?'s':''}</span></td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn" title="Open" onclick="setState({wkScreen:'detail',selectedWkId:'${w.id}',wkTab:'overview'})">${IC('eye',13)}</button>
+                <button class="icon-btn" title="Duplicate" onclick="showToast('Worker duplicated!')">${IC('copy',13)}</button>
+                <button class="icon-btn danger" title="Delete" onclick="showToast('Worker deleted!')">${IC('trash',13)}</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      ${pgnBar(filteredWk.length)}
+    </div>
+  </div>`;
+}
+
+function renderWorkerDetail(){
+  const w=WORKERS.find(x=>x.id===S.selectedWkId)||WORKERS[0];
+  return `
+  <div class="topbar">
+    <button class="tb-btn tb-btn-ghost" onclick="setState({wkScreen:'list'})">‹ Workers</button>
+    <span style="color:var(--tm)">›</span>
+    <span class="tb-title">${w.name}</span>
+    ${statusBadge(w.status)}
+    <div style="flex:1"></div>
+    <button class="tb-btn tb-btn-ghost" onclick="showToast('Worker duplicated!')">${IC('copy',14)} Duplicate</button>
+    <button class="tb-btn tb-btn-primary" onclick="showToast('Changes saved!')">${IC('check',14)} Save</button>
+  </div>
+  <div class="content">
+    <div class="tabs">
+      ${['overview','instructions','deployments'].map(t=>`<div class="tab${S.wkTab===t?' active':''}" onclick="setState({wkTab:'${t}'})">${t.charAt(0).toUpperCase()+t.slice(1)}</div>`).join('')}
+    </div>
+    ${S.wkTab==='overview'?renderWkOverview(w):''}
+    ${S.wkTab==='instructions'?renderWkInstructions(w):''}
+    ${S.wkTab==='deployments'?renderWkDeployments(w):''}
+  </div>`;
+}
+
+function renderWkOverview(w){
+  return `
+  <div class="detail-grid">
+    <div class="detail-item"><div class="detail-item-label">Version</div><div class="detail-item-value">${w.version}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Base Model</div><div class="detail-item-value mono" style="font-size:13px">${w.model}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Mode</div><div class="detail-item-value">${w.mode}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Confidence Threshold</div><div class="detail-item-value" style="color:${w.confidence>=0.85?'#10b981':'#f59e0b'}">${(w.confidence*100).toFixed(0)}%</div></div>
+    <div class="detail-item"><div class="detail-item-label">Max Turns</div><div class="detail-item-value">${w.maxTurns}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Created</div><div class="detail-item-value">${w.createdAt}</div></div>
+  </div>
+  <div class="card card-p mb-16">
+    <div class="text-sm text-ts">${w.desc}</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
+    <div class="card card-p">
+      <div class="text-sm" style="font-weight:600;margin-bottom:12px">Identity</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="field-group"><div class="field-label">Name</div><input class="field-input" value="${w.name}"></div>
+        <div class="field-group"><div class="field-label">Version</div><input class="field-input" value="${w.version}"></div>
+        <div class="field-group"><div class="field-label">Description</div><textarea class="field-textarea" rows="2">${w.desc}</textarea></div>
+        <div class="field-group"><div class="field-label">Base Model</div>
+          <select class="field-select">
+            ${['claude-haiku-4-5','claude-sonnet-4-6','claude-opus-4-7'].map(m=>`<option ${m===w.model?'selected':''}>${m}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card card-p">
+      <div class="text-sm" style="font-weight:600;margin-bottom:12px">Response Mode</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div onclick="showToast('Mode set to Auto')" style="padding:12px;border-radius:8px;border:1.5px solid ${w.mode==='Auto'?'var(--act-br)':'var(--br)'};background:${w.mode==='Auto'?'var(--act-bg)':'var(--card)'};cursor:pointer">
+          <div style="font-size:12px;font-weight:600;color:${w.mode==='Auto'?'var(--act)':'var(--tp)'};margin-bottom:4px">${IC('zap',13,w.mode==='Auto'?'var(--act)':'var(--ts)')} Auto</div>
+          <div class="text-xs text-tm">Agent responds immediately without human review</div>
+        </div>
+        <div onclick="showToast('Mode set to Review')" style="padding:12px;border-radius:8px;border:1.5px solid ${w.mode==='Review'?'var(--act-br)':'var(--br)'};background:${w.mode==='Review'?'var(--act-bg)':'var(--card)'};cursor:pointer">
+          <div style="font-size:12px;font-weight:600;color:${w.mode==='Review'?'var(--act)':'var(--tp)'};margin-bottom:4px">${IC('eye',13,w.mode==='Review'?'var(--act)':'var(--ts)')} Review</div>
+          <div class="text-xs text-tm">All responses queue for human approval before sending</div>
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:12px">
+        <div class="field-label">Confidence Threshold</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="range" min="50" max="99" value="${w.confidence*100}" style="flex:1;accent-color:var(--act)">
+          <span class="mono text-sm" style="color:var(--act);min-width:32px">${(w.confidence*100).toFixed(0)}%</span>
+        </div>
+        <div class="text-xs text-tm" style="margin-top:4px">Responses below this threshold are routed for human review regardless of mode</div>
+      </div>
+      <div class="field-group" style="margin-top:10px">
+        <div class="field-label">Max Turns</div>
+        <input class="field-input" type="number" value="${w.maxTurns}" min="1" max="50">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="tb-btn tb-btn-primary" onclick="showToast('Changes saved!')">${IC('check',14)} Save Changes</button>
+    </div>
+    <div class="card card-p" style="border-color:rgba(239,68,68,.2)">
+      <div class="text-sm" style="font-weight:600;color:#f87171;margin-bottom:8px">Danger Zone</div>
+      <div style="display:flex;gap:8px">
+        ${w.status==='draft'
+          ?`<button class="tb-btn" style="background:rgba(16,185,129,.1);color:#34d399;border:1px solid rgba(16,185,129,.25)" onclick="showToast('Worker published!')">${IC('play',13)} Publish Worker</button>`
+          :`<button class="tb-btn" style="background:rgba(245,158,11,.08);color:#fbbf24;border:1px solid rgba(245,158,11,.2)" onclick="showToast('Worker paused!')">${IC('pause',13)} Pause Worker</button>`}
+        <button class="tb-btn" style="background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.2)" onclick="showToast('Worker deleted!')">${IC('trash',13)} Delete Worker</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderWkInstructions(w){
+  return `
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:720px">
+    <div class="card card-p">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="text-sm" style="font-weight:600">System Prompt</div>
+        <span class="pill pill-gray text-xs">${w.systemPrompt.length} chars</span>
+      </div>
+      <textarea class="field-textarea" rows="12" style="min-height:220px;line-height:1.65">${w.systemPrompt}</textarea>
+    </div>
+    <div class="card card-p">
+      <div class="text-sm" style="font-weight:600;margin-bottom:12px">Tools & Capabilities</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${w.tools.map(t=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--bg);border:1px solid var(--br);border-radius:7px">
+          <div style="display:flex;align-items:center;gap:8px">
+            ${IC('zap',13,'var(--act)')}
+            <span class="mono text-sm">${t}</span>
+          </div>
+          <button class="icon-btn" style="color:#ef4444" onclick="showToast('Tool removed!')">${IC('x',12)}</button>
+        </div>`).join('')}
+        <button class="tb-btn tb-btn-ghost" style="font-size:12px;align-self:flex-start;margin-top:4px" onclick="showToast('Add tool — coming soon')">${IC('plus',12)} Add Tool</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="tb-btn tb-btn-primary" onclick="showToast('Instructions saved!')">${IC('check',14)} Save Instructions</button>
+      <button class="tb-btn tb-btn-ghost" onclick="showToast('Test panel — coming soon')">${IC('play',14)} Test Worker</button>
+    </div>
+  </div>`;
+}
+
+function renderWkDeployments(w){
+  if(!w.deployments||!w.deployments.length) return `
+  <div class="empty-state">
+    ${IC('gitBranch',36,'var(--tm)')}
+    <div style="font-size:14px;font-weight:600">Not deployed yet</div>
+    <p>This worker hasn't been added to any Agentic Network. Open the Network Builder and drag this worker onto the canvas to deploy it.</p>
+    <button class="tb-btn tb-btn-primary" onclick="setState({nav:'networks',netScreen:'list'})">${IC('gitBranch',13)} Go to Agentic Networks</button>
+  </div>`;
+
+  return `
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:640px">
+    <div style="font-size:13px;color:var(--ts);margin-bottom:4px">This worker is used as a node in <strong style="color:var(--tp)">${w.deployments.length}</strong> network${w.deployments.length!==1?'s':''}.</div>
+    ${w.deployments.map(d=>`
+    <div class="card card-p" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        ${IC('gitBranch',16,'var(--act)')}
+        <div>
+          <div class="td-name">${d.network}</div>
+          <div class="text-xs text-tm">Instance: ${d.instance} · Since ${d.since}</div>
+        </div>
+      </div>
+      <button class="tb-btn tb-btn-ghost" style="font-size:12px;flex-shrink:0" onclick="openBuilder('${d.netId}')">${IC('maximize',12)} Open Builder</button>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ─── NETWORK LIST ───
+function renderNetworkList(){
+  const filtered=NETWORKS.filter(n=>S.netFilter==='all'||n.status===S.netFilter);
+  return `
+  <div class="topbar">
+    <span class="tb-title">Agentic Networks</span>
+    <button class="tb-btn tb-btn-ghost">${IC('info',14)} Docs</button>
+    <button class="tb-btn tb-btn-primary" onclick="setState({modal:'newNetwork'})">${IC('plus',14)} New Network</button>
+  </div>
+  <div class="content">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-value">${NETWORKS.filter(n=>n.status==='active').length}</div><div class="stat-label">Active Networks</div></div>
+      <div class="stat-card"><div class="stat-value">1,647</div><div class="stat-label">Total Executions (30d)</div></div>
+      <div class="stat-card"><div class="stat-value">96.0%</div><div class="stat-label">Avg Success Rate</div><div class="stat-delta delta-up">↑ 2.1% vs last month</div></div>
+      <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Paused</div></div>
+    </div>
+    <div class="card">
+      <div class="list-filter" style="padding:12px 12px 0">
+        <div class="search-box">${IC('search',14,'var(--tm)')}<input type="text" placeholder="Search networks…"></div>
+        ${filterBtns(['all','active','draft','paused'],S.netFilter,'netFilter')}
+      </div>
+      <table>
+        <thead><tr><th>Network</th><th>Status</th><th>Trigger</th><th>Nodes</th><th>Runs (30d)</th><th>Success</th><th>Avg Duration</th><th></th></tr></thead>
+        <tbody>
+        ${filtered.map(n=>`
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                ${rowAvatar('gitBranch','#3b82f6')}
+                <div>
+                  <div class="td-link" onclick="setState({netScreen:'detail',selectedNetId:'${n.id}',netTab:'overview'})">${n.name}</div>
+                  <div class="td-sub">v${n.version} · ${n.instances} instance${n.instances!==1?'s':''}</div>
+                </div>
+              </div>
+            </td>
+            <td>${statusPill(n.status)}</td>
+            <td><span class="pill pill-blue" style="font-size:10px">${IC('zap',10)} API</span></td>
+            <td class="mono">${n.nodes}</td>
+            <td class="mono">${n.runs.toLocaleString()}</td>
+            <td><span class="mono text-sm" style="color:${rateColor(n.success)}">${n.success||'—'}${n.success?'%':''}</span></td>
+            <td class="mono text-ts">${n.avgDuration}</td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn" title="Open Builder" onclick="openBuilder('${n.id}')">${IC('maximize',13)}</button>
+                <button class="icon-btn" title="Duplicate" onclick="showToast('Network duplicated!')">${IC('copy',13)}</button>
+                <button class="icon-btn danger" title="Delete" onclick="showToast('Network deleted!')">${IC('trash',13)}</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      ${pgnBar(filtered.length)}
+    </div>
+  </div>`;
+}
+
+// ─── NETWORK DETAIL ───
+function renderNetworkDetail(){
+  const net=NETWORKS.find(n=>n.id===S.selectedNetId)||NETWORKS[0];
+  return `
+  <div class="topbar">
+    <button class="tb-btn tb-btn-ghost" onclick="setState({netScreen:'list'})" style="gap:4px">‹ Agentic Networks</button>
+    <span style="color:var(--tm)">›</span>
+    <span class="tb-title">${net.name}</span>
+    ${statusBadge(net.status)}
+    <button class="tb-btn tb-btn-ghost" onclick="openBuilder('${net.id}')">${IC('maximize',14)} Open Builder</button>
+    <button class="tb-btn tb-btn-primary" onclick="showToast('Execution triggered!')">${IC('play',14)} Run</button>
+  </div>
+  <div class="content">
+    <div class="tabs">
+      ${['overview','executions','instances'].map(t=>`<div class="tab${S.netTab===t?' active':''}" onclick="setState({netTab:'${t}'})">${t.charAt(0).toUpperCase()+t.slice(1)}</div>`).join('')}
+    </div>
+    ${S.netTab==='overview'?renderNetOverview(net):''}
+    ${S.netTab==='executions'?renderNetExecutions(net):''}
+    ${S.netTab==='instances'?renderNetInstances(net):''}
+  </div>`;
+}
+
+function renderNetOverview(net){
+  return `
+  <div class="detail-grid">
+    <div class="detail-item"><div class="detail-item-label">Version</div><div class="detail-item-value">v${net.version}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Status</div><div class="detail-item-value">${statusPill(net.status)}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Total Runs</div><div class="detail-item-value">${net.runs.toLocaleString()}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Success Rate</div><div class="detail-item-value" style="color:#10b981">${net.success}%</div></div>
+    <div class="detail-item"><div class="detail-item-label">Avg Duration</div><div class="detail-item-value mono">${net.avgDuration}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Nodes</div><div class="detail-item-value">${net.nodes} nodes · ${net.edges} edges</div></div>
+  </div>
+  <div class="card card-p mb-16">
+    <div class="text-sm text-ts mb-12">${net.description}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="pill pill-blue">${IC('zap',11)} API Trigger</span>
+      <span class="pill pill-gray mono" style="font-size:10px">POST /networks/${net.id}/executions</span>
+    </div>
+  </div>
+  <div class="section-header"><span class="section-title" style="font-size:14px">Input / Output Contract</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+    <div class="card card-p">
+      <div class="text-xs text-tm mb-8" style="font-weight:600;letter-spacing:.06em;text-transform:uppercase">Input Schema</div>
+      <pre style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ts);line-height:1.6">${JSON.stringify({document_url:{type:'string',description:'Presigned URL of the document to process'},doc_type:{type:'string',enum:['pdf','docx','image']},metadata:{type:'object',optional:true}},null,2)}</pre>
+    </div>
+    <div class="card card-p">
+      <div class="text-xs text-tm mb-8" style="font-weight:600;letter-spacing:.06em;text-transform:uppercase">Output Schema</div>
+      <pre style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ts);line-height:1.6">${JSON.stringify({fields:{type:'object',description:'Extracted document fields'},classification:{type:'string'},confidence:{type:'number'},source:{type:'string',enum:['auto','manual']}},null,2)}</pre>
+    </div>
+  </div>`;
+}
+
+function renderNetExecutions(net){
+  const rows=[
+    {id:'exec-0142',status:'success',started:'2 min ago',duration:'7.8s',trigger:'API'},
+    {id:'exec-0141',status:'success',started:'18 min ago',duration:'9.1s',trigger:'API'},
+    {id:'exec-0140',status:'failed',started:'1 hr ago',duration:'2.3s',trigger:'API'},
+    {id:'exec-0139',status:'success',started:'2 hr ago',duration:'8.5s',trigger:'API'},
+    {id:'exec-0138',status:'waiting',started:'3 hr ago',duration:'—',trigger:'API'},
+  ];
+  return `
+  <div class="card">
+    <table>
+      <thead><tr><th>Execution ID</th><th>Status</th><th>Started</th><th>Duration</th><th>Trigger</th><th></th></tr></thead>
+      <tbody>
+      ${rows.map(r=>{
+        const sc={success:'pill-green',failed:'pill-red',waiting:'pill-amber'}[r.status]||'pill-gray';
+        return `<tr>
+          <td class="mono td-name">${r.id}</td>
+          <td><span class="pill ${sc}">${r.status}</span></td>
+          <td class="text-sm text-ts">${r.started}</td>
+          <td class="mono">${r.duration}</td>
+          <td><span class="pill pill-blue" style="font-size:10px">${r.trigger}</span></td>
+          <td><button class="icon-btn" onclick="showToast('Execution log opened')">${IC('eye',13)}</button></td>
+        </tr>`;
+      }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderNetInstances(net){
+  const insts=[
+    {id:'inst-prod',name:'Production',config:'threshold: 0.85, model: claude-sonnet-4',status:'active',runs:1100,lastRun:'2 min ago'},
+    {id:'inst-stg',name:'Staging',config:'threshold: 0.70, model: claude-haiku-4',status:'active',runs:147,lastRun:'1 hr ago'},
+  ];
+  return `
+  <div style="display:flex;flex-direction:column;gap:12px">
+    ${insts.map(i=>`
+    <div class="card card-p">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="td-name">${i.name}</span>
+          ${statusPill(i.status)}
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="icon-btn" onclick="showToast('Edit instance')">${IC('edit',13)}</button>
+          <button class="icon-btn" onclick="showToast('Run instance!')">${IC('play',13)}</button>
+        </div>
+      </div>
+      <div class="mono text-ts" style="font-size:11px;margin-bottom:6px">${i.config}</div>
+      <div style="display:flex;gap:12px" class="text-xs text-tm">
+        <span>${i.runs.toLocaleString()} runs</span>
+        <span>Last run: ${i.lastRun}</span>
+      </div>
+    </div>`).join('')}
+    <button class="tb-btn tb-btn-ghost" style="align-self:flex-start" onclick="showToast('Add instance — coming soon')">${IC('plus',14)} Add Instance</button>
+  </div>`;
+}
+
+// ─── NETWORK BUILDER (full-screen) ───
+function renderNetworkBuilder(){
+  const net=NETWORKS.find(n=>n.id===S.selectedNetId)||NETWORKS[0];
+  const selectedNode=S.builderNodeId?NET001_NODES.find(n=>n.id===S.builderNodeId):null;
+
+  // Build SVG edges
+  const svgEdges=NET001_EDGES.map(e=>{
+    const sp=portPos(e.src,e.sp==='true'||e.sp==='false'||e.sp==='out'?'out':'in',e.sp);
+    const tp=portPos(e.dst,'in',e.tp);
+    const d=makeBezier(sp.x,sp.y,tp.x,tp.y);
+    const isActive=S.builderNodeId===e.src||S.builderNodeId===e.dst;
+    return `<path d="${d}" stroke="${isActive?'#a78bfa':'rgba(99,102,241,.45)'}" stroke-width="${isActive?2:1.5}" fill="none" stroke-dasharray="${isActive?'none':'none'}">
+      <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite" begin="${e.id}.mouseenter"/>
+    </path>
+    <circle cx="${tp.x}" cy="${tp.y}" r="3" fill="${isActive?'#a78bfa':'rgba(99,102,241,.6)'}"/>`;
+  }).join('');
+
+  // Build canvas nodes
+  const nodeThemeMap={contract:'cnode-contract',http:'cnode-http',llm:'cnode-llm',branch:'cnode-branch',code:'cnode-code',wait:'cnode-wait',worker:'cnode-worker'};
+  const nodeIconMap={contract:'share2',http:'globe',llm:'cpuChip',branch:'gitBranch',code:'code',wait:'timer',worker:'robot'};
+  const nodeColorMap={contract:'#7c5cfc',http:'#3b82f6',llm:'#6366f1',branch:'#f59e0b',code:'#10b981',wait:'#f97316',worker:'#06b6d4'};
+
+  const canvasNodes=NET001_NODES.map(n=>{
+    const theme=nodeThemeMap[n.type]||'cnode-contract';
+    const icon=nodeIconMap[n.type]||'share2';
+    const clr=nodeColorMap[n.type]||'#7c5cfc';
+    const isSel=S.builderNodeId===n.id;
+    const portOut=n.ports?.out?.slice(0,2).join(', ')||'';
+    const portIn=n.ports?.in?.slice(0,2).join(', ')||'';
+    return `
+    <div class="cnode ${theme}${isSel?' selected':''}" style="left:${n.x}px;top:${n.y}px" onclick="setState({builderNodeId:'${n.id}'})">
+      <div class="cnode-header">
+        <div class="cnode-icon">${IC(icon,12,clr)}</div>
+        <div class="cnode-label">${n.label}</div>
+      </div>
+      <div class="cnode-body">
+        <div class="cnode-type">${n.subtype}</div>
+        ${portIn?`<div class="cnode-port port-in" style="font-size:9px;color:var(--tm)">${IC('arrowRight',9)} ${portIn.length>22?portIn.slice(0,22)+'…':portIn}</div>`:''}
+        ${portOut?`<div class="cnode-port port-out" style="font-size:9px;color:var(--tm);text-align:right;justify-content:flex-end">${portOut.length>22?portOut.slice(0,22)+'…':portOut} ${IC('arrowRight',9)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Inspector content
+  const inspectorContent=selectedNode?`
+    <div class="inspector-header">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <div class="cnode-icon" style="background:${nodeColorMap[selectedNode.type]+'20'}">${IC(nodeIconMap[selectedNode.type]||'share2',14,nodeColorMap[selectedNode.type]||'#7c5cfc')}</div>
+        <div>
+          <div style="font-size:13px;font-weight:600">${selectedNode.label}</div>
+          <div class="text-xs text-ts">${selectedNode.subtype}</div>
+        </div>
+      </div>
+    </div>
+    <div class="inspector-tabs">
+      <div class="inspector-tab${S.builderInspTab==='config'?' active':''}" onclick="setState({builderInspTab:'config'})">Config</div>
+      <div class="inspector-tab${S.builderInspTab==='mapping'?' active':''}" onclick="setState({builderInspTab:'mapping'})">Variables</div>
+    </div>
+    <div class="inspector-body">
+    ${S.builderInspTab==='config'?`
+      <div class="field-group">
+        <div class="field-label">Node ID</div>
+        <input class="field-input" value="${selectedNode.id}" readonly style="color:var(--ts);font-family:'JetBrains Mono',monospace;font-size:12px">
+      </div>
+      ${selectedNode.type==='llm'?`
+        <div class="field-group">
+          <div class="field-label">Model</div>
+          <select class="field-select"><option>claude-sonnet-4-6</option><option>claude-haiku-4-5</option><option>claude-opus-4-7</option></select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">System Prompt</div>
+          <textarea class="field-textarea" rows="4">You are a document classification expert. Analyze the provided document content and classify it into one of the following categories: invoice, contract, report, correspondence, form. Return a JSON object with fields: classification, confidence (0–1), reasoning.</textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Temperature</div>
+          <input class="field-input" type="number" value="0.1" min="0" max="1" step="0.1">
+        </div>
+      `:''}
+      ${selectedNode.type==='http'?`
+        <div class="field-group">
+          <div class="field-label">Method</div>
+          <select class="field-select"><option>GET</option><option>POST</option><option>PUT</option></select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">URL</div>
+          <input class="field-input" value="{{n-start.document_url}}" placeholder="https://…">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Auth Header</div>
+          <input class="field-input" value="Bearer {{secrets.STORAGE_TOKEN}}" placeholder="Bearer …">
+        </div>
+      `:''}
+      ${selectedNode.type==='branch'?`
+        <div class="field-group">
+          <div class="field-label">Condition</div>
+          <textarea class="field-textarea" rows="2">{{n-llm.confidence}} >= 0.85</textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">True path →</div>
+          <input class="field-input" value="n-code (Extract Fields)" readonly style="color:var(--ts)">
+        </div>
+        <div class="field-group">
+          <div class="field-label">False path →</div>
+          <input class="field-input" value="n-wait (Manual Review)" readonly style="color:var(--ts)">
+        </div>
+      `:''}
+      ${selectedNode.type==='wait'?`
+        <div class="field-group">
+          <div class="field-label">Event Name</div>
+          <input class="field-input" value="manual_review_complete">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Timeout</div>
+          <input class="field-input" value="72h" placeholder="e.g. 24h, 7d">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Timeout Action</div>
+          <select class="field-select"><option>Fail execution</option><option>Auto-approve</option><option>Escalate</option></select>
+        </div>
+        <div class="text-xs text-ts" style="padding:8px;background:var(--act-bg);border:1px solid var(--act-br);border-radius:6px;line-height:1.6">
+          Resume via: <span class="mono" style="color:var(--act)">POST /networks/executions/:id/events</span>
+        </div>
+      `:''}
+      ${selectedNode.type==='code'?`
+        <div class="field-group">
+          <div class="field-label">Runtime</div>
+          <select class="field-select"><option>JavaScript (Node 20)</option><option>Python 3.11</option></select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Code</div>
+          <textarea class="field-textarea" rows="6" style="min-height:120px">const content = inputs.raw_content;
+const cls = inputs.classification;
+const fields = extractFields(content, cls);
+return { fields, schema_version: '1.0' };
+
+function extractFields(content, type) {
+  // extraction logic
+  return {};
+}</textarea>
+        </div>
+      `:''}
+      ${selectedNode.type==='contract'?`
+        <div class="text-xs text-ts" style="line-height:1.6;padding:8px;background:var(--card);border:1px solid var(--br);border-radius:6px">
+          ${selectedNode.subtype==='Input'?'Declares the required inputs for this network. All fields are validated at trigger time.':'Declares the expected outputs. Downstream callers can rely on these fields being present after execution completes.'}
+        </div>
+        <div class="field-group">
+          <div class="field-label">Schema (JSON Schema)</div>
+          <textarea class="field-textarea" rows="6" style="min-height:120px">${JSON.stringify(selectedNode.subtype==='Input'?{document_url:{type:'string'},doc_type:{type:'string',enum:['pdf','docx','image']},metadata:{type:'object',optional:true}}:{fields:{type:'object'},classification:{type:'string'},source:{type:'string'}},null,2)}</textarea>
+        </div>
+      `:''}
+    `:`
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${VARIABLE_MAPPINGS.filter(m=>m.dst.startsWith(selectedNode.id)||m.src.startsWith(selectedNode.id)).map(m=>`
+          <div class="var-map-row">
+            <span class="var-map-source">${m.src}</span>
+            <span class="var-map-arrow">→</span>
+            <span class="var-map-target">${m.dst}</span>
+          </div>`).join('')||`<div class="text-xs text-tm" style="text-align:center;padding:16px">No variable mappings for this node</div>`}
+        <button class="tb-btn tb-btn-ghost" style="font-size:12px;margin-top:4px" onclick="showToast('Add mapping — coming soon')">${IC('plus',12)} Add Mapping</button>
+      </div>
+    `}
+    </div>
+    <div class="inspector-footer">
+      <button class="btn-full btn-danger" onclick="showToast('Node removed!')">${IC('trash',13)} Remove</button>
+      <button class="btn-full btn-primary" onclick="showToast('Node saved!')">${IC('check',13)} Save</button>
+    </div>
+  `:`
+    <div class="inspector-empty">
+      ${IC('gitBranch',32,'var(--tm)')}
+      <p>Select a node on the canvas to configure it, or drag a node from the catalog to add it to the network.</p>
+    </div>
+  `;
+
+  return `
+  <div class="builder">
+    <div class="builder-topbar">
+      <button class="tb-btn tb-btn-ghost" onclick="setState({netScreen:'detail'})" style="gap:4px">‹ ${net.name}</button>
+      <div style="width:1px;height:20px;background:var(--br);margin:0 4px"></div>
+      <span style="font-size:13px;font-weight:600;color:var(--tp)">${net.name}</span>
+      ${statusBadge(net.status)}
+      <div style="flex:1"></div>
+      <button class="tb-btn tb-btn-ghost" onclick="showToast('History — coming soon')">${IC('clock',14)} History</button>
+      <button class="tb-btn tb-btn-ghost" onclick="showToast('Draft saved!')">${IC('check',14)} Save Draft</button>
+      <button class="tb-btn tb-btn-primary" onclick="showToast('Network published!')">${IC('play',14)} Publish</button>
+    </div>
+    <div class="builder-body">
+
+      <!-- Catalog Panel -->
+      <div class="catalog-panel">
+        <div class="catalog-header">
+          <div style="font-size:12px;font-weight:600;color:var(--ts);margin-bottom:8px">Node Catalog</div>
+          <div class="catalog-search">${IC('search',12)}<input type="text" placeholder="Search nodes…" oninput="setState({catalogSearch:this.value})"></div>
+        </div>
+        <div class="catalog-scroll">
+          ${renderCatalogSection('Native Nodes','native')}
+          ${renderCatalogSection('Control Flow','control')}
+          ${renderCatalogSection('Workers','workers')}
+          ${renderCatalogSection('Agents','agents')}
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <div class="canvas-wrap" onclick="if(event.target.classList.contains('canvas-wrap')||event.target.classList.contains('canvas-dots')||event.target===this)setState({builderNodeId:null})">
+        <div class="canvas-dots"></div>
+        <svg class="canvas-svg" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="rgba(99,102,241,.7)"/>
+            </marker>
+          </defs>
+          ${svgEdges}
+        </svg>
+        <div class="canvas-nodes">
+          ${canvasNodes}
+        </div>
+        <div class="canvas-toolbar">
+          <button class="ctool-btn" title="Zoom in" onclick="showToast('Zoom in')">${IC('zoomIn',14)}</button>
+          <button class="ctool-btn" title="Zoom out" onclick="showToast('Zoom out')">${IC('zoomOut',14)}</button>
+          <div class="ctool-sep"></div>
+          <button class="ctool-btn" title="Fit to screen" onclick="showToast('Fit canvas')">${IC('maximize',14)}</button>
+          <div class="ctool-sep"></div>
+          <button class="ctool-btn" title="Add node" onclick="showToast('Drag from catalog to add nodes')">${IC('plus',14)}</button>
+        </div>
+      </div>
+
+      <!-- Inspector Panel -->
+      <div class="inspector-panel">
+        ${inspectorContent}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderCatalogSection(title, key){
+  const nodes=CATALOG_NODES[key]||[];
+  const q=(S.catalogSearch||'').toLowerCase();
+  const filtered=q?nodes.filter(n=>n.label.toLowerCase().includes(q)||n.desc.toLowerCase().includes(q)):nodes;
+  if(!filtered.length)return '';
+  return `
+  <div class="catalog-section">
+    <div class="catalog-section-title">${title}</div>
+    ${filtered.map(n=>`
+    <div class="catalog-node" draggable="true" title="${n.desc}" onclick="showToast('Drag \'${n.label}\' onto the canvas to add it')">
+      <div class="catalog-node-icon" style="background:${n.color}20">${IC(n.icon,12,n.color)}</div>
+      <div>
+        <div style="font-size:12px;color:var(--tp)">${n.label}</div>
+        <div style="font-size:10px;color:var(--tm)">${n.desc.slice(0,32)}${n.desc.length>32?'…':''}</div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderNewTruthPackModal(){
+  const step = S.modalStep || 1;
+  const steps = ['Details','Planes','Items'];
+  const stepper = steps.map((s,i)=>`<div style="display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:50%;border:1.5px solid ${i+1<=step?'var(--pri)':'var(--bd)'};background:${i+1<step?'var(--pri)':i+1===step?'rgba(43,127,255,0.15)':'transparent'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${i+1<=step?'var(--pri)':'var(--tm)'}">${i+1<step?'✓':(i+1)}</div><span style="font-size:12px;font-weight:${i+1===step?'700':'500'};color:${i+1===step?'var(--t1)':'var(--tm)'}">${s}</span></div>${i<steps.length-1?`<div style="width:20px;height:1px;background:${i+1<step?'var(--pri)':'var(--bd)'}"></div>`:''}`).join('');
+
+  const bodyMap = {
+    1: `<div style="display:flex;flex-direction:column;gap:14px">
+      <div><label style="font-size:11px;font-weight:700;color:var(--tm);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Pack Name *</label><input class="input" id="ntpName" placeholder="e.g. Support Playbook Q3" style="width:100%"></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--tm);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Category</label><input class="input" id="ntpTag" placeholder="e.g. Customer Service, Finance, HR" style="width:100%"></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--tm);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Description</label><textarea class="input" id="ntpDesc" placeholder="What is this TruthPack for? Who should use it?" style="width:100%;height:72px;resize:vertical"></textarea></div>
+    </div>`,
+    2: `<div style="display:flex;flex-direction:column;gap:0">
+      <div style="font-size:12px;color:var(--tm);margin-bottom:14px;line-height:1.5">Choose which knowledge planes this pack will have. Networks can only turn off enabled planes — they cannot turn on disabled ones.</div>
+      ${['truth','sandbox','sources'].map((key,i)=>{
+        const cfg = {truth:{lbl:'Truth Plane',sub:'Verified facts & FAQs — treated as ground truth (100% confidence)',color:'var(--ok)'},sandbox:{lbl:'Sandbox Claims',sub:'Tentative statements pending review (~80% confidence)',color:'var(--warn)'},sources:{lbl:'Source Documents',sub:'Reference files for retrieval-augmented responses (~60% confidence)',color:'var(--pri)'}};
+        const c = cfg[key];
+        return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;${i<2?'border-bottom:1px solid var(--bd)':''}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:${c.color};flex-shrink:0;margin-top:3px"></div>
+            <div><div style="font-size:13px;font-weight:600;color:var(--t1)">${c.lbl}</div><div style="font-size:11px;color:var(--tm);margin-top:2px">${c.sub}</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-left:16px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tm);cursor:pointer"><input type="checkbox" id="ntp-en-${key}" ${key==='truth'?'checked':''} style="accent-color:var(--pri)"> Enable</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tm);cursor:pointer"><input type="checkbox" id="ntp-on-${key}" ${key==='truth'?'checked':''} style="accent-color:var(--ok)"> Default ON</label>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`,
+    3: `<div style="display:flex;flex-direction:column;gap:12px">
+      <div style="padding:12px 14px;background:rgba(5,223,114,0.05);border:1px solid rgba(5,223,114,0.15);border-radius:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--ok);margin-bottom:8px">Truth Plane — First Fact</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <input class="input" placeholder="Question / Statement" style="width:100%">
+          <textarea class="input" placeholder="Answer" style="width:100%;height:56px;resize:vertical"></textarea>
+        </div>
+      </div>
+      <div style="padding:10px 14px;background:rgba(255,255,255,0.03);border:1px dashed var(--bd);border-radius:10px;text-align:center">
+        <div style="font-size:12px;color:var(--tm)">You can add more facts, claims, and documents after creating the pack.</div>
+      </div>
+    </div>`,
+  };
+
+  return `<div class="modal-overlay" onclick="if(event.target===this)setState({modal:null})">
+    <div class="modal-card" style="max-width:520px">
+      <div class="modal-header">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--t1)">New TruthPack</div>
+          <div style="font-size:12px;color:var(--tm);margin-top:2px">Step ${step} of ${steps.length}</div>
+        </div>
+        <button class="modal-close" onclick="setState({modal:null})">×</button>
+      </div>
+      <div style="padding:8px 20px 0;display:flex;align-items:center;gap:8px">${stepper}</div>
+      <div class="modal-body">${bodyMap[step]||''}</div>
+      <div class="modal-footer">
+        ${step>1?`<button class="tb-btn tb-btn-ghost" onclick="setState({modalStep:${step-1}})">← Back</button>`:'<button class="tb-btn tb-btn-ghost" onclick="setState({modal:null})">Cancel</button>'}
+        ${step<steps.length?`<button class="tb-btn tb-btn-primary" onclick="setState({modalStep:${step+1}})">Next →</button>`:`<button class="tb-btn tb-btn-primary" onclick="setState({modal:null,nav:'knowledge',knScreen:'list'});showToast('TruthPack created!')">Create TruthPack</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─────────────────── MODALS ──────────────────
+function renderModal(){
+  if(!S.modal) return '';
+  if(S.modal==='newWorker') return renderNewWorkerModal();
+  if(S.modal==='newNetwork') return renderNewNetworkModal();
+  if(S.modal==='newTruthPack') return renderNewTruthPackModal();
+  return '';
+}
+
+function stepDot(n){
+  const s=S.modalStep>n?'done':S.modalStep===n?'active':'pending';
+  return `<div class="modal-step">
+    <div class="step-dot ${s}">${S.modalStep>n?IC('check',10,'#fff'):n}</div>
+    <span class="step-label ${s}">${['Identity','Instructions','Mode'][n-1]}</span>
+  </div>${n<3?`<div class="step-line ${S.modalStep>n?'done':''}"></div>`:''}`;
+}
+
+function renderNewWorkerModal(){
+  const titles=['Define your Worker\'s identity','Write the system prompt','Choose the response mode'];
+  return `
+  <div class="modal-overlay" onclick="if(event.target===this)setState({modal:null})">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">New Worker</div>
+          <div class="modal-sub">${titles[S.modalStep-1]}</div>
+        </div>
+        <button class="modal-close" onclick="setState({modal:null})">${IC('x',14)}</button>
+      </div>
+      <div class="modal-stepper">${[1,2,3].map(stepDot).join('')}</div>
+      <div class="modal-body">
+        ${S.modalStep===1?`
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="field-group"><div class="field-label">Name <span style="color:#ef4444">*</span></div><input class="field-input" id="wk-name" placeholder="e.g. Billing Support Agent" autofocus></div>
+            <div class="field-group"><div class="field-label">Version</div><input class="field-input" id="wk-ver" value="v1.0" placeholder="v1.0"></div>
+            <div class="field-group"><div class="field-label">Description</div><textarea class="field-textarea" id="wk-desc" rows="3" placeholder="What does this worker do?"></textarea></div>
+            <div class="field-group"><div class="field-label">Base Model <span style="color:#ef4444">*</span></div>
+              <select class="field-select" id="wk-model">
+                <option value="">— Select model —</option>
+                <option value="claude-haiku-4-5">claude-haiku-4-5 · Fastest, cost-efficient</option>
+                <option value="claude-sonnet-4-6" selected>claude-sonnet-4-6 · Best for most tasks</option>
+                <option value="claude-opus-4-7">claude-opus-4-7 · Maximum reasoning</option>
+              </select>
+            </div>
+          </div>
+        `:''}
+        ${S.modalStep===2?`
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="field-group">
+              <div class="field-label">System Prompt <span style="color:#ef4444">*</span></div>
+              <div class="text-xs text-tm" style="margin-bottom:6px">Describe your worker's role, behavior, tone, and rules. Be specific.</div>
+              <textarea class="field-textarea" id="wk-prompt" rows="10" style="min-height:180px" placeholder="You are a [role] for [company]. Your goal is to…\n\nGuidelines:\n- Always…\n- Never…\n- If X happens, then…"></textarea>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Tools</div>
+              <div class="text-xs text-tm" style="margin-bottom:6px">Select the tools this worker can use</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                ${['search_knowledge_base','create_ticket','send_email','escalate_to_agent','book_meeting','search_crm'].map(t=>`
+                  <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--br);border-radius:7px;cursor:pointer;font-size:12px;color:var(--ts)">
+                    <input type="checkbox" style="accent-color:var(--act)"> <span class="mono">${t}</span>
+                  </label>`).join('')}
+              </div>
+            </div>
+          </div>
+        `:''}
+        ${S.modalStep===3?`
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="field-group">
+              <div class="field-label">Response Mode</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+                <div id="mode-auto" onclick="document.getElementById('mode-auto').style.borderColor='var(--act-br)';document.getElementById('mode-auto').style.background='var(--act-bg)';document.getElementById('mode-review').style.borderColor='var(--br)';document.getElementById('mode-review').style.background='var(--card)'" style="padding:14px;border-radius:8px;border:1.5px solid var(--act-br);background:var(--act-bg);cursor:pointer">
+                  <div style="font-size:13px;font-weight:600;color:var(--act);margin-bottom:6px">${IC('zap',13,'var(--act)')} Auto</div>
+                  <div class="text-xs text-tm">Worker responds immediately without review. Best for high-confidence, low-risk use cases.</div>
+                </div>
+                <div id="mode-review" onclick="document.getElementById('mode-review').style.borderColor='var(--act-br)';document.getElementById('mode-review').style.background='var(--act-bg)';document.getElementById('mode-auto').style.borderColor='var(--br)';document.getElementById('mode-auto').style.background='var(--card)'" style="padding:14px;border-radius:8px;border:1.5px solid var(--br);background:var(--card);cursor:pointer">
+                  <div style="font-size:13px;font-weight:600;color:var(--tp);margin-bottom:6px">${IC('eye',13,'var(--ts)')} Review</div>
+                  <div class="text-xs text-tm">All responses require human approval before sending. Adds a human-in-the-loop checkpoint.</div>
+                </div>
+              </div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Confidence Threshold</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+                <input type="range" min="50" max="99" value="82" style="flex:1;accent-color:var(--act)" oninput="this.nextElementSibling.textContent=this.value+'%'">
+                <span class="mono text-sm" style="color:var(--act);min-width:36px">82%</span>
+              </div>
+              <div class="text-xs text-tm" style="margin-top:4px">Responses below this confidence score are always routed for review, regardless of mode.</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Max Turns</div>
+              <input class="field-input" type="number" value="10" min="1" max="50" placeholder="10">
+              <div class="text-xs text-tm" style="margin-top:4px">Maximum number of conversation turns before the worker hands off.</div>
+            </div>
+          </div>
+        `:''}
+      </div>
+      <div class="modal-footer">
+        <button class="tb-btn tb-btn-ghost" onclick="${S.modalStep>1?`setState({modalStep:${S.modalStep-1}})`:`setState({modal:null})`}">
+          ${S.modalStep>1?'← Back':'Cancel'}
+        </button>
+        <button class="tb-btn tb-btn-primary" onclick="${S.modalStep<3?`setState({modalStep:${S.modalStep+1}})`:`createWorker()`}">
+          ${S.modalStep<3?`Next →`:`${IC('check',13,'#fff')} Create Worker`}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderNewNetworkModal(){
+  const step1Labels=['Name','Description','Trigger Type'];
+  return `
+  <div class="modal-overlay" onclick="if(event.target===this)setState({modal:null})">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">New Agentic Network</div>
+          <div class="modal-sub">Set up your network's identity and trigger</div>
+        </div>
+        <button class="modal-close" onclick="setState({modal:null})">${IC('x',14)}</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="field-group"><div class="field-label">Name <span style="color:#ef4444">*</span></div><input class="field-input" placeholder="e.g. Invoice Processing Pipeline" autofocus></div>
+          <div class="field-group"><div class="field-label">Description</div><textarea class="field-textarea" rows="3" placeholder="What does this network do? What problem does it solve?"></textarea></div>
+          <div class="field-group">
+            <div class="field-label">Trigger Type <span style="color:#ef4444">*</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+              ${[
+                {val:'api',label:'API',icon:'zap',desc:'Triggered via POST /networks/:id/executions — best for programmatic, event-driven use'},
+                {val:'scheduled',label:'Scheduled',icon:'clock',desc:'Runs on a cron schedule — best for recurring batch jobs'},
+                {val:'event',label:'Event-driven',icon:'share2',desc:'Triggered by internal platform events like account.created'},
+              ].map((t,i)=>`
+              <label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid ${i===0?'var(--act-br)':'var(--br)'};background:${i===0?'var(--act-bg)':'var(--card)'};border-radius:8px;cursor:pointer">
+                <input type="radio" name="trigger" value="${t.val}" ${i===0?'checked':''} style="accent-color:var(--act);margin-top:2px">
+                <div>
+                  <div style="font-size:13px;font-weight:500;color:var(--tp);display:flex;align-items:center;gap:6px">${IC(t.icon,13,'var(--ts)')} ${t.label}</div>
+                  <div class="text-xs text-tm" style="margin-top:3px">${t.desc}</div>
+                </div>
+              </label>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="tb-btn tb-btn-ghost" onclick="setState({modal:null})">Cancel</button>
+        <button class="tb-btn tb-btn-primary" onclick="createNetwork()">${IC('gitBranch',13,'#fff')} Create Network</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─────────────────── KNOWLEDGE / TRUTHPACKS ───────────────────
+
+const TP_DATA = [
+  {
+    id:'finance-2024', name:'Finance Playbook 2024', tag:'Finance',
+    tagColor:'#FDC700', tagBg:'rgba(253,199,0,0.15)',
+    desc:'Covers pricing rules, billing exceptions, refund policies and financial escalation paths for the support and sales teams.',
+    deployments:8, updated:'Apr 22 2026', created:'Jan 10 2026',
+    planes:{
+      truth:{enabled:true,on:true},
+      sandbox:{enabled:true,on:false},
+      sources:{enabled:false,on:false}
+    },
+    facts:[
+      {id:'f1',q:'What is the standard refund window?',a:'Customers may request a full refund within 30 days of purchase, no questions asked.'},
+      {id:'f2',q:'What are the accepted payment methods?',a:'We accept Visa, Mastercard, Amex, ACH transfer, and wire transfer for enterprise accounts.'},
+      {id:'f3',q:'Is there a discount for annual plans?',a:'Annual plans receive a 20% discount compared to monthly billing.'},
+      {id:'f4',q:'Who approves billing exceptions above $5,000?',a:'Billing exceptions above $5,000 require approval from the Finance Director.'},
+      {id:'f5',q:'What happens when a payment fails?',a:'After 3 failed payment attempts over 7 days, the account is suspended with a 14-day grace period.'},
+    ],
+    claims:[
+      {id:'c1',text:'Refund window may be extended to 60 days for enterprise accounts at CSM discretion.',status:'sandbox'},
+      {id:'c2',text:'ACH payments can be processed same-day for accounts over $50k ARR.',status:'sandbox'},
+    ],
+    docs:[
+      {id:'d1',name:'Billing & Refund Policy v3.2.pdf',size:'1.1 MB',updated:'Apr 10 2026'},
+      {id:'d2',name:'Payment Processing SOP.docx',size:'430 KB',updated:'Mar 28 2026'},
+      {id:'d3',name:'Financial Escalation Matrix.xlsx',size:'215 KB',updated:'Feb 5 2026'},
+      {id:'d4',name:'Enterprise Billing Addendum.pdf',size:'880 KB',updated:'Jan 20 2026'},
+      {id:'d5',name:'Discount Schedule Q1 2026.pdf',size:'320 KB',updated:'Jan 10 2026'},
+    ]
+  },
+  {
+    id:'support-q2', name:'Support Playbook Q2', tag:'Customer Service',
+    tagColor:'#2B7FFF', tagBg:'rgba(43,127,255,0.18)',
+    desc:'Defines support tier routing, SLA commitments, escalation triggers, and approved resolution scripts for the frontline team.',
+    deployments:14, updated:'Apr 25 2026', created:'Mar 1 2026',
+    planes:{
+      truth:{enabled:true,on:true},
+      sandbox:{enabled:true,on:true},
+      sources:{enabled:false,on:false}
+    },
+    facts:[
+      {id:'f1',q:'What are the SLA response times by tier?',a:'Tier 1 (4h), Tier 2 (8h), Tier 3 (24h). Critical issues receive a 1h callback guarantee.'},
+      {id:'f2',q:'When should a ticket be escalated to Tier 3?',a:'Escalate when the issue involves data loss, security risk, or 3+ failed resolution attempts.'},
+      {id:'f3',q:'What is the CSAT target?',a:'Our CSAT target is ≥4.5 / 5.0. Scores below 3.0 trigger an automatic manager review.'},
+      {id:'f4',q:'Can agents offer courtesy credits?',a:'Agents may offer up to $25 in account credit without approval. Above $25 requires a team lead.'},
+    ],
+    claims:[
+      {id:'c1',text:'SLA for Tier 1 may be reduced to 2h for accounts on the Premium Support add-on.',status:'sandbox'},
+      {id:'c2',text:'Courtesy credit ceiling will increase to $50 in Q3 2026 pending policy update.',status:'sandbox'},
+      {id:'c3',text:'Chat-first routing for mobile users is under evaluation for Q3.',status:'sandbox'},
+    ],
+    docs:[
+      {id:'d1',name:'Support SLA Agreement v2.pdf',size:'780 KB',updated:'Apr 1 2026'},
+      {id:'d2',name:'Escalation Decision Tree.pdf',size:'340 KB',updated:'Mar 15 2026'},
+      {id:'d3',name:'Approved Resolution Scripts.docx',size:'1.4 MB',updated:'Mar 5 2026'},
+    ]
+  },
+  {
+    id:'pricing-2024', name:'Pricing 2024', tag:'Sales & Revenue',
+    tagColor:'#05DF72', tagBg:'rgba(5,223,114,0.15)',
+    desc:'Current pricing tiers, discount thresholds, competitive pricing rules, and deal desk approval requirements.',
+    deployments:6, updated:'Apr 18 2026', created:'Dec 15 2025',
+    planes:{
+      truth:{enabled:true,on:true},
+      sandbox:{enabled:false,on:false},
+      sources:{enabled:true,on:true}
+    },
+    facts:[
+      {id:'f1',q:'What are the standard plan prices?',a:'Starter: $49/mo, Growth: $149/mo, Business: $399/mo, Enterprise: custom pricing.'},
+      {id:'f2',q:'What is the maximum discount a rep can offer?',a:'Sales reps can offer up to 15% discount. Deals above 15% require Deal Desk approval.'},
+      {id:'f3',q:'Is there a free trial?',a:'All plans include a 14-day free trial, no credit card required.'},
+    ],
+    claims:[],
+    docs:[
+      {id:'d1',name:'Pricing Sheet Q1 2026.pdf',size:'920 KB',updated:'Jan 8 2026'},
+      {id:'d2',name:'Competitive Pricing Guide.pdf',size:'1.7 MB',updated:'Mar 20 2026'},
+      {id:'d3',name:'Deal Desk Approval Process.docx',size:'280 KB',updated:'Feb 12 2026'},
+      {id:'d4',name:'Discount Authorization Matrix.xlsx',size:'190 KB',updated:'Apr 18 2026'},
+    ]
+  },
+  {
+    id:'hr-policy', name:'HR Policies 2026', tag:'HR',
+    tagColor:'#A78BFA', tagBg:'rgba(167,139,250,0.15)',
+    desc:'Employee handbook excerpts, PTO policy, hiring guidelines, performance review process, and benefits overview.',
+    deployments:3, updated:'Apr 2 2026', created:'Jan 2 2026',
+    planes:{
+      truth:{enabled:true,on:true},
+      sandbox:{enabled:false,on:false},
+      sources:{enabled:true,on:false}
+    },
+    facts:[
+      {id:'f1',q:'How many PTO days do employees get?',a:'Full-time employees receive 20 days PTO per year, accruing at 1.67 days/month.'},
+      {id:'f2',q:'What is the parental leave policy?',a:'Primary caregivers receive 16 weeks paid leave. Secondary caregivers receive 6 weeks.'},
+      {id:'f3',q:'How often are performance reviews conducted?',a:'Formal reviews are conducted bi-annually (June and December) with monthly 1:1 check-ins.'},
+      {id:'f4',q:'What is the probation period for new hires?',a:'New employees have a 90-day probation period with weekly check-ins.'},
+      {id:'f5',q:'What is the remote work policy?',a:'Employees may work remotely up to 3 days per week with manager approval.'},
+      {id:'f6',q:'Is there a referral bonus?',a:'Employees receive a $2,000 referral bonus for successful hires that complete 90 days.'},
+    ],
+    claims:[],
+    docs:[
+      {id:'d1',name:'Employee Handbook 2026.pdf',size:'3.2 MB',updated:'Jan 5 2026'},
+      {id:'d2',name:'PTO & Leave Policy.pdf',size:'540 KB',updated:'Jan 2 2026'},
+      {id:'d3',name:'Performance Review Guide.docx',size:'680 KB',updated:'Dec 20 2025'},
+      {id:'d4',name:'Benefits Overview 2026.pdf',size:'1.1 MB',updated:'Jan 2 2026'},
+      {id:'d5',name:'Remote Work Agreement Template.docx',size:'210 KB',updated:'Mar 10 2026'},
+      {id:'d6',name:'Onboarding Checklist.pdf',size:'390 KB',updated:'Feb 15 2026'},
+      {id:'d7',name:'Code of Conduct.pdf',size:'760 KB',updated:'Jan 2 2026'},
+      {id:'d8',name:'Compensation Bands FY26.xlsx',size:'280 KB',updated:'Jan 15 2026'},
+    ]
+  },
+  {
+    id:'legal-terms', name:'Legal & Compliance', tag:'Legal',
+    tagColor:'#FF6467', tagBg:'rgba(255,100,103,0.15)',
+    desc:'Terms of service, data processing agreements, privacy policy key points, and compliance obligations for agents handling legal inquiries.',
+    deployments:11, updated:'Apr 28 2026', created:'Nov 1 2025',
+    planes:{
+      truth:{enabled:true,on:true},
+      sandbox:{enabled:true,on:true},
+      sources:{enabled:true,on:true}
+    },
+    facts:[
+      {id:'f1',q:'What data does AIMS OS collect?',a:'We collect usage data, account information, and conversation metadata. No conversation content is stored beyond 30 days unless opted in.'},
+      {id:'f2',q:'Is AIMS OS GDPR compliant?',a:'Yes. AIMS OS is fully GDPR compliant. Data Processing Agreements (DPAs) are available for EU customers.'},
+      {id:'f3',q:'What is the data retention period?',a:'Logs are retained 90 days. Customer data is retained for the contract duration plus 30 days.'},
+    ],
+    claims:[
+      {id:'c1',text:'Extended 1-year data retention available as an add-on for compliance-heavy industries.',status:'sandbox'},
+      {id:'c2',text:'SOC 2 Type II certification expected Q3 2026.',status:'sandbox'},
+      {id:'c3',text:'HIPAA BAA available for healthcare customers, pending legal review.',status:'sandbox'},
+    ],
+    docs:[
+      {id:'d1',name:'Terms of Service v4.pdf',size:'1.8 MB',updated:'Apr 1 2026'},
+      {id:'d2',name:'Privacy Policy v3.pdf',size:'1.2 MB',updated:'Mar 15 2026'},
+      {id:'d3',name:'DPA Template EU.pdf',size:'920 KB',updated:'Feb 20 2026'},
+      {id:'d4',name:'GDPR Compliance Summary.pdf',size:'680 KB',updated:'Jan 30 2026'},
+      {id:'d5',name:'Security & Trust Overview.pdf',size:'2.1 MB',updated:'Apr 5 2026'},
+      {id:'d6',name:'Data Retention Policy.docx',size:'310 KB',updated:'Mar 28 2026'},
+    ]
+  },
+];
+
+function tpPlaneLabel(key){ return {truth:'Truth Plane',sandbox:'Sandbox Claims',sources:'Sources'}[key]; }
+function tpPlaneColor(key){ return {truth:'var(--ok)',sandbox:'var(--warn)',sources:'var(--pri)'}[key]; }
+
+function renderKnowledge(){
+  const total = TP_DATA.length;
+  const totalFacts = TP_DATA.reduce((a,t)=>a+t.facts.length,0);
+  const totalClaims = TP_DATA.reduce((a,t)=>a+t.claims.length,0);
+  const totalDocs = TP_DATA.reduce((a,t)=>a+t.docs.length,0);
+  const totalDeploys = TP_DATA.reduce((a,t)=>a+t.deployments,0);
+  const filtered = S.knFilter==='all' ? TP_DATA : TP_DATA.filter(t=>t.tag.toLowerCase()===S.knFilter);
+  const tags = [...new Set(TP_DATA.map(t=>t.tag))];
+
+  return `
+  <div class="topbar">
+    <span class="tb-title">Knowledge</span>
+    <button class="tb-btn tb-btn-ghost">${IC('info',14)} Docs</button>
+    <button class="tb-btn tb-btn-primary" onclick="setState({modal:'newTruthPack',modalStep:1})">${IC('plus',14)} New TruthPack</button>
+  </div>
+  <div class="content">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">TruthPacks</div></div>
+      <div class="stat-card"><div class="stat-value">${totalFacts}</div><div class="stat-label">Total Facts</div></div>
+      <div class="stat-card"><div class="stat-value">${totalClaims}</div><div class="stat-label">Sandbox Claims</div></div>
+      <div class="stat-card"><div class="stat-value">${totalDeploys}</div><div class="stat-label">Active Deployments</div></div>
+    </div>
+
+    <!-- Info banner -->
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(43,127,255,0.07);border:1px solid rgba(43,127,255,0.18);border-radius:10px;margin-bottom:4px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#2B7FFF" stroke-width="1.3"/><path d="M8 7v4M8 5.5v.5" stroke="#2B7FFF" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <div>
+        <strong style="font-size:12px;font-weight:700;color:var(--t1);display:block;margin-bottom:2px">TruthPacks are managed exclusively here</strong>
+        <span style="font-size:11px;color:var(--tm)">Create and curate knowledge packs here. From Agentic Studio, teams can assign packs to networks and toggle planes on/off.</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:4px">
+      <div class="list-filter" style="padding:12px 12px 0;gap:8px;flex-wrap:wrap">
+        <div class="search-box">${IC('search',14,'var(--tm)')}<input type="text" placeholder="Search packs…" oninput="setState({knFilter:this.value||'all'})"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${['all',...tags].map(t=>`<button class="filter-btn${(S.knFilter||'all')===t?' active':''}" onclick="setState({knFilter:'${t}'})">${t==='all'?'All':t}</button>`).join('')}
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>TruthPack</th><th>Category</th><th>Planes</th><th>Facts</th><th>Claims</th><th>Sources</th><th>Deployments</th><th>Updated</th><th></th></tr></thead>
+        <tbody>
+        ${filtered.map(tp=>`
+          <tr style="cursor:pointer" onclick="setState({knScreen:'detail',selectedTpId:'${tp.id}',knTab:'truth'})">
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:${tp.tagBg};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 1.5h8.5L12.5 4v9H2V1.5z" stroke="${tp.tagColor}" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 1.5V4h2.5" stroke="${tp.tagColor}" stroke-width="1.2"/><path d="M4.5 6h5M4.5 8h5M4.5 10h3" stroke="${tp.tagColor}" stroke-width="1.1" stroke-linecap="round"/></svg>
+                </div>
+                <div>
+                  <div class="td-link">${tp.name}</div>
+                  <div class="td-sub" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${tp.desc}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="pill" style="background:${tp.tagBg};color:${tp.tagColor}">${tp.tag}</span></td>
+            <td>
+              <div style="display:flex;gap:4px">
+                ${Object.entries(tp.planes).map(([k,v])=>`
+                  <span title="${tpPlaneLabel(k)}" style="width:7px;height:7px;border-radius:50%;background:${v.enabled?tpPlaneColor(k):'rgba(255,255,255,0.12)'};display:inline-block"></span>
+                `).join('')}
+              </div>
+            </td>
+            <td><span class="mono text-sm" style="color:var(--ok)">${tp.facts.length}</span></td>
+            <td><span class="mono text-sm" style="color:var(--warn)">${tp.claims.length}</span></td>
+            <td><span class="mono text-sm" style="color:var(--pri)">${tp.docs.length}</span></td>
+            <td><span class="text-sm text-ts">${tp.deployments} network${tp.deployments!==1?'s':''}</span></td>
+            <td><span class="text-sm text-ts">${tp.updated}</span></td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn" title="Open" onclick="event.stopPropagation();setState({knScreen:'detail',selectedTpId:'${tp.id}',knTab:'truth'})">${IC('eye',13)}</button>
+                <button class="icon-btn" title="Duplicate" onclick="event.stopPropagation();showToast('TruthPack duplicated!')">${IC('copy',13)}</button>
+                <button class="icon-btn danger" title="Delete" onclick="event.stopPropagation();showToast('TruthPack deleted!')">${IC('trash',13)}</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      ${pgnBar(filtered.length)}
+    </div>
+  </div>`;
+}
+
+function renderTpDetail(){
+  const tp = TP_DATA.find(x=>x.id===S.selectedTpId) || TP_DATA[0];
+  const tabs = ['truth','sandbox','sources','settings'];
+  const tabLabels = {truth:'Truth Plane',sandbox:'Sandbox Claims',sources:'Sources',settings:'Settings'};
+
+  const contentMap = {
+    truth: ()=>{
+      if(!tp.planes.truth.enabled) return `<div class="empty-state">${IC('lock',30,'var(--tm)')}<div style="font-size:14px;font-weight:600">Truth Plane Disabled</div><p>This plane is not enabled for this TruthPack.</p></div>`;
+      return `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--t1)">${tp.facts.length} Facts / FAQs</div>
+          <div style="font-size:11px;color:var(--tm);margin-top:2px">Verified facts that agents treat as ground truth (100% confidence)</div>
+        </div>
+        <button class="tb-btn tb-btn-primary" onclick="showToast('Add Fact — coming soon')">${IC('plus',13)} Add Fact</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${tp.facts.map((f,i)=>`
+          <div style="padding:12px 14px;background:rgba(5,223,114,0.05);border:1px solid rgba(5,223,114,0.15);border-radius:10px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:4px">Q: ${f.q}</div>
+                <div style="font-size:12px;color:var(--tm);line-height:1.5">A: ${f.a}</div>
+              </div>
+              <div style="display:flex;gap:4px;flex-shrink:0">
+                <button class="icon-btn" title="Edit" onclick="showToast('Edit Fact — coming soon')">${IC('edit2',12)}</button>
+                <button class="icon-btn danger" title="Delete" onclick="showToast('Fact deleted!')">${IC('trash',12)}</button>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    },
+    sandbox: ()=>{
+      if(!tp.planes.sandbox.enabled) return `<div class="empty-state">${IC('lock',30,'var(--tm)')}<div style="font-size:14px;font-weight:600">Sandbox Plane Disabled</div><p>The creator has not enabled the Sandbox plane for this TruthPack.</p></div>`;
+      if(!tp.claims.length) return `<div class="empty-state">${IC('edit2',30,'var(--tm)')}<div style="font-size:14px;font-weight:600">No Sandbox Claims Yet</div><p>Add claims that are under review before becoming facts.</p><button class="tb-btn tb-btn-primary" onclick="showToast('Add Claim — coming soon')" style="margin-top:8px">${IC('plus',13)} Add Claim</button></div>`;
+      return `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--t1)">${tp.claims.length} Sandbox Claims</div>
+          <div style="font-size:11px;color:var(--tm);margin-top:2px">Tentative statements pending validation — treated at ~80% confidence by agents</div>
+        </div>
+        <button class="tb-btn tb-btn-primary" onclick="showToast('Add Claim — coming soon')">${IC('plus',13)} Add Claim</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${tp.claims.map(c=>`
+          <div style="padding:12px 14px;background:rgba(253,199,0,0.05);border:1px solid rgba(253,199,0,0.18);border-radius:10px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+                  <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(253,199,0,0.18);color:#FDC700">SANDBOX</span>
+                  <span style="font-size:10px;color:var(--tm)">Pending review</span>
+                </div>
+                <div style="font-size:12px;color:var(--t1);line-height:1.5">${c.text}</div>
+              </div>
+              <div style="display:flex;gap:4px;flex-shrink:0">
+                <button class="icon-btn" title="Promote to Fact" onclick="showToast('Claim promoted to fact!')" style="color:var(--ok)">${IC('check',12)}</button>
+                <button class="icon-btn" title="Edit" onclick="showToast('Edit Claim — coming soon')">${IC('edit2',12)}</button>
+                <button class="icon-btn danger" title="Reject" onclick="showToast('Claim rejected!')">${IC('x',12)}</button>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    },
+    sources: ()=>{
+      if(!tp.planes.sources.enabled) return `<div class="empty-state">${IC('lock',30,'var(--tm)')}<div style="font-size:14px;font-weight:600">Sources Plane Disabled</div><p>The creator has not enabled the Sources plane for this TruthPack.</p></div>`;
+      return `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--t1)">${tp.docs.length} Source Documents</div>
+          <div style="font-size:11px;color:var(--tm);margin-top:2px">Reference documents — agents use these as supporting sources (~60% confidence)</div>
+        </div>
+        <button class="tb-btn tb-btn-primary" onclick="showToast('Upload document — coming soon')">${IC('plus',13)} Add Document</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${tp.docs.map(d=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(43,127,255,0.05);border:1px solid rgba(43,127,255,0.15);border-radius:10px;cursor:pointer" onclick="showToast('Open document — coming soon')">
+            <div style="width:30px;height:30px;border-radius:7px;background:rgba(43,127,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 1h6.2L11 3.2V12H2.5V1z" stroke="var(--pri)" stroke-width="1.1" stroke-linejoin="round"/><path d="M8.5 1V3.5H11" stroke="var(--pri)" stroke-width="1.1"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</div>
+              <div style="font-size:11px;color:var(--tm);margin-top:1px">${d.size} · Updated ${d.updated}</div>
+            </div>
+            <div style="display:flex;gap:4px">
+              <button class="icon-btn" title="Download" onclick="event.stopPropagation();showToast('Download — coming soon')">${IC('download',12)}</button>
+              <button class="icon-btn danger" title="Remove" onclick="event.stopPropagation();showToast('Document removed!')">${IC('trash',12)}</button>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    },
+    settings: ()=>`
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
+        <div class="card" style="padding:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:12px">Pack Details</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div><label style="font-size:11px;font-weight:700;color:var(--tm);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Name</label><input class="input" value="${tp.name}" style="width:100%" oninput="showToast('Changes unsaved')"></div>
+            <div><label style="font-size:11px;font-weight:700;color:var(--tm);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Category</label><input class="input" value="${tp.tag}" style="width:100%" oninput="showToast('Changes unsaved')"></div>
+            <div><label style="font-size:11px;font-weight:700;color:var(--tm);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Description</label><textarea class="input" style="width:100%;height:72px;resize:vertical" oninput="showToast('Changes unsaved')">${tp.desc}</textarea></div>
+          </div>
+        </div>
+        <div class="card" style="padding:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">Plane Configuration</div>
+          <div style="font-size:11px;color:var(--tm);margin-bottom:14px">Define which planes exist in this pack and their default state when assigned to a network. Networks can only turn off enabled planes — they cannot enable disabled ones.</div>
+          ${Object.entries(tp.planes).map(([key,v])=>`
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bd)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:8px;height:8px;border-radius:50%;background:${v.enabled?tpPlaneColor(key):'rgba(255,255,255,0.15)'}"></div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--t1)">${tpPlaneLabel(key)}</div>
+                  <div style="font-size:11px;color:var(--tm)">${{truth:'Ground truth — 100% confidence',sandbox:'Under review — ~80% confidence',sources:'Reference docs — ~60% confidence'}[key]}</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="font-size:11px;color:var(--tm)">Default: <span style="font-weight:700;color:${v.on?'var(--ok)':'var(--tm)'}">${v.on?'ON':'OFF'}</span></div>
+                <label class="mini-tog"><input type="checkbox" ${v.enabled?'checked':''} onchange="showToast('Plane config updated!')"><div class="mini-track" style="--tog-on:${tpPlaneColor(key)}"><div class="mini-thumb"></div></div></label>
+              </div>
+            </div>`).join('')}
+        </div>
+        <div class="card" style="padding:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">Auto-Assignment Rules</div>
+          <div style="font-size:11px;color:var(--tm);margin-bottom:12px">Automatically include matching knowledge items when they are created or updated in the Truth Plane.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--bd);border-radius:8px">
+              <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px">Include items tagged with</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+                <span style="font-size:11px;padding:2px 9px;border-radius:20px;background:${tp.tagBg};color:${tp.tagColor};font-weight:700">${tp.tag}</span>
+                <button style="font-size:11px;padding:2px 9px;border-radius:20px;border:1px dashed var(--bds);background:transparent;color:var(--tm);cursor:pointer" onclick="showToast('Add rule — coming soon')">+ Add tag</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="danger-zone">
+          <div class="dz-title">Danger Zone</div>
+          <div class="dz-row"><div><strong>Archive TruthPack</strong><p>Remove from all networks. Facts and documents are preserved.</p></div><button class="dz-btn" onclick="showToast('Archive — confirm in real app')">Archive</button></div>
+          <div class="dz-row"><div><strong>Delete TruthPack</strong><p>Permanently deletes this pack and removes it from all ${tp.deployments} active deployments.</p></div><button class="dz-btn danger" onclick="showToast('Delete — confirm in real app')">Delete</button></div>
+        </div>
+      </div>`,
+  };
+
+  return `
+  <div class="topbar">
+    <button class="tb-btn tb-btn-ghost" onclick="setState({knScreen:'list'})">‹ Knowledge</button>
+    <span style="color:var(--tm)">›</span>
+    <span class="tb-title">${tp.name}</span>
+    <span class="pill" style="background:${tp.tagBg};color:${tp.tagColor}">${tp.tag}</span>
+    <div style="flex:1"></div>
+    <span class="text-sm text-ts" style="margin-right:4px">${tp.deployments} deployment${tp.deployments!==1?'s':''}</span>
+    <button class="tb-btn tb-btn-ghost" onclick="showToast('Duplicated!')">${IC('copy',14)} Duplicate</button>
+    <button class="tb-btn tb-btn-primary" onclick="showToast('Changes saved!')">${IC('check',14)} Save</button>
+  </div>
+  <div class="content">
+    <div class="tabs">
+      ${tabs.map(t=>`<div class="tab${S.knTab===t?' active':''}" onclick="setState({knTab:'${t}'})">${tabLabels[t]}${t==='truth'?` <span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;background:rgba(5,223,114,0.15);color:var(--ok);margin-left:4px">${tp.facts.length}</span>`:t==='sandbox'&&tp.planes.sandbox.enabled?` <span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;background:rgba(253,199,0,0.15);color:var(--warn);margin-left:4px">${tp.claims.length}</span>`:''}</div>`).join('')}
+    </div>
+    ${contentMap[S.knTab]?.() || ''}
+  </div>`;
+}
+
+// ─────────────────── MAIN RENDER ───────────────────
+function renderApp(){
+  // Full-screen builder — no sidebar (only when actively on networks)
+  if(S.nav==='networks' && S.netScreen==='builder'){
+    return renderNetworkBuilder() + renderModal();
+  }
+
+  const mainContent=()=>{
+    if(S.nav==='playbooks') return S.pbScreen==='detail'?renderPlaybookDetail():renderPlaybooks();
+    if(S.nav==='networks'){
+      if(S.netScreen==='detail') return renderNetworkDetail();
+      return renderNetworkList();
+    }
+    if(S.nav==='workers') return renderWorkers();
+    if(S.nav==='knowledge') return S.knScreen==='detail' ? renderTpDetail() : renderKnowledge();
+    return `
+    <div class="topbar"><span class="tb-title">Agentic Studio</span></div>
+    <div class="content">
+      <div class="empty-state">
+        ${IC('zap',40,'var(--tm)')}
+        <div style="font-size:15px;font-weight:600">Select a section</div>
+        <p>Choose Playbooks, Agentic Networks, or Workers from the sidebar to get started.</p>
+      </div>
+    </div>`;
+  };
+
+  return `
+  <div class="app">
+    <nav class="sidebar${S._sbExpanded?' sb-expanded':''}" id="appSidebar" aria-label="Main navigation">${renderSidebar()}</nav>
+    <div class="main">${mainContent()}</div>
+  </div>
+  ${renderModal()}`;
+}
+
+// ─────────────────── ACTIONS ───────────────────
+function openBuilder(netId){
+  setState({selectedNetId:netId,netScreen:'builder',builderNodeId:null});
+}
+
+function createWorker(){
+  setState({modal:null,nav:'workers',wkScreen:'list'});
+  showToast('Worker created successfully!','success');
+}
+
+function createNetwork(){
+  setState({modal:null,nav:'networks',netScreen:'list'});
+  showToast('Network created — open the Builder to add nodes.','success');
+}
+
+function toggleTheme(){
+  const next=S.theme==='dark'?'light':'dark';
+  document.documentElement.className=next==='light'?'light':'';
+  setState({theme:next});
+}
+
+let toastTimer=null;
+function showToast(msg,type='info'){
+  const existing=document.querySelector('.toast');
+  if(existing)existing.remove();
+  if(toastTimer)clearTimeout(toastTimer);
+  const icons={info:'info',success:'check',error:'x'};
+  const colors={info:'var(--act)',success:'#10b981',error:'#ef4444'};
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`${IC(icons[type]||'info',16,colors[type]||'var(--act)')}<span>${msg}</span>`;
+  document.body.appendChild(t);
+  toastTimer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='all .2s';setTimeout(()=>t.remove(),200);},2800);
+}
+
+// ─────────────────── PAGINATION ───────────────────
+function pgnBar(total,defaultRows=10){
+  const end=Math.min(defaultRows,total);
+  const opts=[10,25,50,100].map(r=>`<button class="pgn-rpp-opt${r===defaultRows?' sel':''}" onclick="pgnSetRows(this,${r})">${r}</button>`).join('');
+  return `<div class="pagination" data-total="${total}" data-rows="${defaultRows}" data-page="1">
+    <div class="pgn-rpp">Rows per page:
+      <div class="pgn-rpp-wrap">
+        <button class="pgn-rpp-btn" onclick="togglePgnMenu(this,event)"><span class="pgn-rpp-val">${defaultRows}</span><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="pgn-rpp-menu">${opts}</div>
+      </div>
+    </div>
+    <span class="pgn-range">1–${end} of ${total.toLocaleString()} items</span>
+    <div class="pgn-nav">
+      <button class="pgn-btn pgn-prev" onclick="pgnGo(this,-1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="pgn-btn pgn-next" onclick="pgnGo(this,1)"${total<=defaultRows?' disabled':''}><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6l-3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>`;
+}
+function pgnGo(btn,dir){const p=btn.closest('.pagination');const total=+p.dataset.total;const rows=+p.dataset.rows;let page=+p.dataset.page;const totalPages=Math.ceil(total/rows);page=Math.max(1,Math.min(page+dir,totalPages));p.dataset.page=page;pgnUpdate(p);}
+function pgnSetRows(btn,rows){const p=btn.closest('.pagination');p.dataset.rows=rows;p.dataset.page=1;p.querySelectorAll('.pgn-rpp-opt').forEach(o=>o.classList.remove('sel'));btn.classList.add('sel');btn.closest('.pgn-rpp-menu').classList.remove('open');p.querySelector('.pgn-rpp-val').textContent=rows;pgnUpdate(p);}
+function pgnUpdate(p){const total=+p.dataset.total;const rows=+p.dataset.rows;const page=+p.dataset.page;const totalPages=Math.ceil(total/rows);const start=(page-1)*rows+1;const end=Math.min(page*rows,total);p.querySelector('.pgn-range').textContent=start.toLocaleString()+'–'+end.toLocaleString()+' of '+total.toLocaleString()+' items';p.querySelector('.pgn-prev').disabled=page<=1;p.querySelector('.pgn-next').disabled=page>=totalPages;}
+function togglePgnMenu(btn,e){e.stopPropagation();btn.nextElementSibling.classList.toggle('open');}
+document.addEventListener('click',()=>{document.querySelectorAll('.pgn-rpp-menu.open').forEach(m=>m.classList.remove('open'));});
+
+// ─────────────────── INIT ───────────────────
+function render(){
+  const app=document.getElementById('app');
+  if(!app)return;
+  app.innerHTML=renderApp();
+}
+
+render();
+</script>
+</body>
+</html>

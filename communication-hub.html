@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIMS OS — Communication Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-font-smoothing: antialiased; }
+
+    /* ── TOKENS (matches design-system/prototype-template.html) ── */
+    :root {
+      --app-bg:              #0f172e;
+      --sidebar-bg:          rgba(255,255,255,0.03);
+      --card-bg:             rgba(255,255,255,0.06);
+      --card-bg-hover:       rgba(255,255,255,0.09);
+      --card-border:         rgba(255,255,255,0.10);
+      --card-border-hover:   rgba(255,255,255,0.18);
+      --modal-bg:            rgba(12,14,34,0.90);
+
+      --gradient-cta:        linear-gradient(135deg, #00C2C2 0%, #155DFC 100%);
+      --gradient-cta-hover:  linear-gradient(135deg, #00AAAA 0%, #1250D8 100%);
+      --gradient-card-blue:  linear-gradient(135deg,rgba(21,93,252,.18) 0%,rgba(0,194,194,.10) 100%);
+      --gradient-card-green: linear-gradient(135deg,rgba(0,201,80,.14) 0%,rgba(5,223,114,.08) 100%);
+      --gradient-card-amber: linear-gradient(135deg,rgba(253,199,0,.14) 0%,rgba(253,199,0,.06) 100%);
+
+      --primary:             #2B7FFF;
+      --primary-dark:        #155DFC;
+      --primary-subtle:      rgba(43,127,255,0.15);
+      --primary-border:      rgba(43,127,255,0.30);
+
+      --text-title:    rgba(255,255,255,0.88);
+      --text-body:     rgba(255,255,255,0.60);
+      --text-caption:  rgba(255,255,255,0.40);
+      --text-disabled: rgba(255,255,255,0.25);
+      --text-link:     #2B7FFF;
+
+      --success:       #05DF72;  --success-bg:  rgba(0,201,80,0.15);
+      --error:         #FF6467;  --error-bg:    rgba(251,44,54,0.15);
+      --alert:         #FDC700;  --alert-bg:    rgba(253,199,0,0.15);
+      --info:          #2B7FFF;  --info-bg:     rgba(43,127,255,0.15);
+      --purple:        #A78BFA;  --purple-bg:   rgba(167,139,250,0.15);
+
+      --border:        rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.20);
+
+      --radius-xs:  4px;
+      --radius-s:   8px;
+      --radius-m:   12px;
+      --radius-l:   16px;
+      --radius-xl:  20px;
+      --radius-full:9999px;
+
+      --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
+      --space-4: 16px; --space-5: 20px; --space-6: 24px;
+      --space-8: 32px; --space-10:40px; --space-12:48px;
+
+      --shadow-1: 0 1px 3px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.6);
+      --shadow-2: 0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4);
+      --shadow-3: 0 10px 30px rgba(0,0,0,0.6), 0 4px 8px rgba(0,0,0,0.5);
+    }
+
+    /* ── BASE ── */
+    body {
+      background: var(--app-bg);
+      color: var(--text-title);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    button, input, select, textarea { font-family: 'Inter', sans-serif; }
+    a { text-decoration: none; }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #0a0d1a; }
+    .layout-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── SIDEBAR (AIMS OS Design System) ── */
+    .sidebar-wrap {
+      width: 64px; flex-shrink: 0; background: #000;
+      display: flex; flex-direction: column;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      transition: width .22s cubic-bezier(.4,0,.2,1); overflow: hidden;
+    }
+    .sidebar-wrap.sb-expanded { width: 250px; }
+
+    /* Brand */
+    .sb-brand { display:flex;align-items:center;gap:10px;height:52px;padding:0 18px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.05);overflow:hidden;white-space:nowrap; }
+    .sidebar-wrap:not(.sb-expanded) .sb-brand { justify-content:center;padding:0; }
+    .sb-brand-logo { width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0; }
+    .sb-brand-name { font-size:13px;font-weight:700;color:rgba(255,255,255,.9);opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap; }
+    .sidebar-wrap.sb-expanded .sb-brand-name { opacity:1; }
+
+    /* Nav */
+    .sb-nav { flex:1;display:flex;flex-direction:column;padding:6px 8px;gap:2px;overflow:hidden; }
+
+    /* Nav items */
+    .sb-item {
+      display:flex;align-items:center;height:40px;border:none;border-radius:10px;
+      background:transparent;color:rgba(255,255,255,0.42);font-size:12px;font-weight:600;
+      cursor:pointer;width:100%;text-align:left;transition:background .15s,color .15s;
+      white-space:nowrap;overflow:hidden;flex-shrink:0;padding:0;font-family:'Inter',sans-serif;text-decoration:none;
+    }
+    .sidebar-wrap:not(.sb-expanded) .sb-item { justify-content:center;gap:0; }
+    .sidebar-wrap.sb-expanded .sb-item { justify-content:flex-start;padding:0 12px;gap:10px; }
+    .sb-item:hover { background:rgba(255,255,255,0.07);color:rgba(255,255,255,.80); }
+    .sb-item.active { background:linear-gradient(135deg,rgba(21,93,252,0.55) 0%,rgba(0,194,194,0.35) 100%);color:#fff; }
+    .sb-item.active:hover { background:linear-gradient(135deg,rgba(21,93,252,0.65) 0%,rgba(0,194,194,0.45) 100%); }
+    .sidebar-wrap:not(.sb-expanded) .sb-item.active { background:transparent; }
+    .sidebar-wrap:not(.sb-expanded) .sb-item.active .sb-item-icon { background:linear-gradient(135deg,#155DFC 0%,#00C2C2 100%);border-radius:10px;width:36px;height:36px;box-shadow:0 0 12px rgba(21,93,252,0.45); }
+
+    .sb-item-icon { width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:width .15s,height .15s,background .15s; }
+    .sb-item-icon svg { width:18px;height:18px; }
+    .sb-label { opacity:0;transition:opacity .12s;pointer-events:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .sidebar-wrap.sb-expanded .sb-label { opacity:1;pointer-events:auto; }
+    .sb-chevron { margin-left:auto;width:13px;height:13px;flex-shrink:0;opacity:0;color:rgba(255,255,255,.35); }
+    .sidebar-wrap.sb-expanded .sb-chevron { opacity:1; }
+
+    /* Submenu (channel list) */
+    .nav-submenu { display:flex;flex-direction:column;gap:1px;padding:0 0 4px 0; }
+    .sidebar-wrap:not(.sb-expanded) .nav-submenu { display:none; }
+    .nav-sub-item {
+      display:flex;align-items:center;gap:8px;height:32px;padding:0 12px 0 42px;
+      border:none;background:transparent;color:rgba(255,255,255,0.45);font-size:11px;font-weight:600;
+      cursor:pointer;width:100%;text-align:left;border-radius:8px;transition:background .1s,color .1s;font-family:'Inter',sans-serif;
+    }
+    .nav-sub-item:hover { background:rgba(255,255,255,0.05);color:rgba(255,255,255,.75); }
+    .nav-sub-item.active { color:rgba(255,255,255,.9); }
+    .nav-channel-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+    .nav-channel-dot.on { background:#05DF72; }
+    .nav-channel-dot.warn { background:#FDC700; }
+    .nav-channel-dot.off { background:rgba(255,255,255,.25); }
+
+    /* Divider */
+    .sb-divider { height:1px;background:rgba(255,255,255,0.06);margin:4px 0;flex-shrink:0; }
+    .nav-divider { height:1px;background:rgba(255,255,255,0.06);margin:4px 0; }
+
+    /* Bottom toggle */
+    .sb-bottom { flex-shrink:0;border-top:1px solid rgba(255,255,255,0.05);padding:4px 8px 6px; }
+    .sb-toggle {
+      display:flex;align-items:center;height:40px;border:none;border-radius:10px;
+      background:transparent;color:rgba(128,175,255,0.55);font-size:12px;font-weight:600;
+      cursor:pointer;width:100%;white-space:nowrap;overflow:hidden;transition:background .12s,color .12s;font-family:'Inter',sans-serif;
+    }
+    .sidebar-wrap:not(.sb-expanded) .sb-toggle { justify-content:center;gap:0;padding:0; }
+    .sidebar-wrap.sb-expanded .sb-toggle { justify-content:flex-start;padding:0 12px;gap:10px; }
+    .sb-toggle:hover { background:rgba(255,255,255,0.06);color:#80AFFF; }
+    .sb-toggle-icon { width:18px;height:18px;flex-shrink:0;transition:transform .22s cubic-bezier(.4,0,.2,1); }
+    .sidebar-wrap.sb-expanded .sb-toggle-icon { transform:rotate(180deg); }
+    .sb-toggle-label { opacity:0;transition:opacity .12s; }
+    .sidebar-wrap.sb-expanded .sb-toggle-label { opacity:1; }
+
+    /* ── MAIN ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+    /* ── TOPBAR (Figma design-system exact — 36px, workspace selector + icons) ── */
+    .topbar {
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 12px 0 12px;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Workspace selector chip (left) */
+    .workspace-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 2px 8px 2px 4px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.1s;
+      height: 28px;
+      background: rgba(255,255,255,0.06);
+    }
+    .workspace-selector:hover { background: rgba(255,255,255,0.10); }
+    .workspace-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.80);
+      white-space: nowrap;
+    }
+    .workspace-chevron { color: rgba(255,255,255,0.40); }
+
+    /* Topbar icon buttons (right) */
+    .topbar-right { display: flex; align-items: center; gap: 4px; }
+    .topbar-icon-btn {
+      width: 24px; height: 24px;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      transition: background 0.1s, color 0.1s;
+      position: relative;
+    }
+    .topbar-icon-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); }
+    .topbar-icon-btn .notif-dot {
+      position: absolute; top: 2px; right: 2px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #D32F2F;
+      border: 1.5px solid var(--app-bg);
+    }
+    .topbar-avatar {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--primary-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: #fff;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ── PAGE SUB-NAV (channel tabs left · actions right) ── */
+    .page-subnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding: 0 var(--space-5);
+      flex-shrink: 0;
+      height: 40px;
+      gap: var(--space-3);
+    }
+
+    .tab-row { display: flex; gap: 2px; }
+    .tab {
+      padding: 6px var(--space-3);
+      font-size: 13px; font-weight: 700;
+      color: var(--text-caption);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      border-top: none; border-left: none; border-right: none;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.12s;
+      margin-bottom: -1px;
+    }
+    .tab:hover { color: var(--text-body); }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-count {
+      background: rgba(255,255,255,0.10);
+      border-radius: var(--radius-full);
+      padding: 1px 6px; font-size: 10px; margin-left: 4px;
+    }
+    .tab.active .tab-count { background: var(--primary-subtle); color: var(--primary); }
+
+    /* ── SIDEBAR SUB-MENU (under Comm Hub) ── */
+    .nav-submenu {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin: 2px 0 6px 0;
+      padding-left: var(--space-2);
+      border-left: 1px solid rgba(255,255,255,0.07);
+      margin-left: 20px;
+    }
+    .nav-sub-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      height: 26px;
+      padding: 0 var(--space-2);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.40);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      text-align: left;
+      width: 100%;
+      transition: background 0.1s, color 0.1s;
+    }
+    .nav-sub-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.65); }
+    .nav-sub-item.active { color: var(--primary); background: rgba(43,127,255,0.10); }
+    /* Channel sub-list (under "Channels" nav-sub-item) */
+    .nav-channel-list {
+      display: none; /* shown via JS when Channels tab is active */
+      flex-direction: column;
+      gap: 1px;
+      margin: 2px 0 4px 0;
+      padding-left: var(--space-2);
+      border-left: 1px solid rgba(255,255,255,0.05);
+      margin-left: 12px;
+    }
+    .nav-channel-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      height: 24px;
+      padding: 0 var(--space-2);
+      border-radius: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      text-align: left;
+      width: 100%;
+      transition: background 0.1s, color 0.1s;
+    }
+    .nav-channel-item:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.60); }
+    .nav-channel-item.active { color: var(--primary); background: rgba(43,127,255,0.08); }
+    .nav-channel-dot {
+      width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+    }
+    .nav-channel-dot.on   { background: var(--success); box-shadow: 0 0 4px var(--success); }
+    .nav-channel-dot.warn { background: var(--alert);   box-shadow: 0 0 4px var(--alert); }
+    .nav-channel-dot.off  { background: rgba(255,255,255,0.25); }
+
+    .nav-sub-badge {
+      margin-left: auto;
+      background: var(--error);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+
+    /* ── PAGE ── */
+    .page { flex: 1; overflow-y: auto; padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-5); }
+    .page.hidden { display: none; }
+
+    /* ── MODALS ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; z-index: 500; padding: var(--space-4);
+    }
+    .modal-box {
+      background: #0e1428; border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl); padding: var(--space-6); width: 100%;
+      box-shadow: var(--shadow-3);
+    }
+    .modal-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-4); }
+    .modal-title { font-size:16px; font-weight:700; color:var(--text-title); }
+    .modal-close { background:none; border:none; color:var(--text-caption); font-size:20px; cursor:pointer; line-height:1; padding:2px 6px; border-radius:4px; }
+    .modal-close:hover { background:rgba(255,255,255,.08); color:var(--text-title); }
+    .modal-ft { display:flex; justify-content:flex-end; gap:var(--space-2); }
+
+    /* Channel option grid */
+    .ch-option {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:var(--space-2); padding:var(--space-4); border-radius:var(--radius-m);
+      border:1px solid var(--border); cursor:pointer; transition:all .12s;
+      font-size:13px; font-weight:600; color:var(--text-body);
+    }
+    .ch-option:hover { border-color:var(--primary-border); background:var(--primary-subtle); color:var(--text-title); }
+    .ch-option.selected { border-color:var(--primary); background:var(--primary-subtle); color:var(--text-title); box-shadow:0 0 0 1px var(--primary); }
+
+    /* Activity log rows */
+    .activity-row { display:flex; align-items:flex-start; gap:var(--space-3); padding:var(--space-3) 0; border-bottom:1px solid var(--border); }
+    .activity-row:last-child { border-bottom:none; }
+    .activity-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+    .activity-dot.success { background:var(--success); }
+    .activity-dot.error { background:var(--error); }
+    .activity-dot.info { background:var(--info); }
+    .activity-text { font-size:13px; color:var(--text-body); margin-bottom:2px; }
+    .activity-time { font-size:11px; color:var(--text-caption); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 860px) {
+      .sidebar-wrap { display: none; }
+      .page { padding: var(--space-4); }
+      .page-subnav { padding: 0 var(--space-4); overflow-x: auto; }
+      .tab-row { flex-wrap: nowrap; }
+      .subnav-right .badge { display: none; }
+      .ch-split { flex-direction: column; }
+      .ch-list { width: 100%; max-height: 220px; border-right: none; border-bottom: 1px solid var(--border); }
+    }
+    @media (max-width: 600px) {
+      .grid-4 { grid-template-columns: 1fr; }
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .subnav-right { display: none; }
+      .topbar { padding: 4px var(--space-3) 0; }
+      .workspace-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+      .modal-box { padding: var(--space-4); }
+    }
+
+    /* Page header */
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); }
+    .page-title  { font-size: 22px; font-weight: 900; color: var(--text-title); }
+    .page-sub    { font-size: 13px; color: var(--text-body); margin-top: 2px; }
+
+    /* Channel identity header above subnav */
+    #ch-header { flex-shrink: 0; padding: var(--space-5) var(--space-6) var(--space-4); }
+    #ch-header .page-header { margin-bottom: 0 !important; }
+
+    /* Breadcrumb back link */
+    #ch-breadcrumb { flex-shrink:0; padding: var(--space-3) var(--space-6) 0; display:none; }
+    #ch-breadcrumb button { background:none; border:none; cursor:pointer; font-size:11px; font-weight:600; color:var(--text-caption); font-family:'Inter',sans-serif; display:flex; align-items:center; gap:4px; padding:0; }
+    #ch-breadcrumb button:hover { color:var(--text-body); }
+
+    /* Channel type list rows (landing screen) */
+    .ch-list-row {
+      display: grid;
+      grid-template-columns: 44px 1fr max-content max-content 96px 20px;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      border-radius: var(--radius-m);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+      text-align: left;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+    .ch-list-row:hover { border-color: var(--primary-border); background: rgba(43,127,255,0.04); }
+    .ch-list-name { font-size: 14px; font-weight: 700; color: var(--text-title); }
+    .ch-list-sub  { font-size: 11px; color: var(--text-caption); margin-top: 2px; }
+    .ch-list-vol  { font-size: 13px; font-weight: 700; color: var(--text-title); text-align: right; }
+    .ch-list-arrow { color: var(--text-caption); opacity: 0.4; }
+
+    /* Instance list — rich card (Agentic Networks pattern) */
+    .inst-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-m);
+      overflow: hidden;
+      transition: border-color 0.12s;
+      font-family: 'Inter', sans-serif;
+    }
+    .inst-card:hover { border-color: var(--primary-border); }
+    .inst-row-1 {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: 10px var(--space-4);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .inst-row-2 {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: 7px var(--space-4);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      cursor: pointer;
+    }
+    .inst-row-3 {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px var(--space-4);
+      flex-wrap: wrap;
+    }
+    .inst-name { font-size: 13px; font-weight: 700; color: var(--text-title); flex: 1; min-width: 0; }
+    .inst-desc { font-size: 12px; color: var(--text-body); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .inst-time { font-size: 11px; color: var(--text-caption); white-space: nowrap; }
+    .inst-chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 7px; border-radius: var(--radius-s);
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      font-size: 10px; font-weight: 600; color: var(--text-caption); white-space: nowrap;
+    }
+    .inst-kebab {
+      width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none; cursor: pointer; color: rgba(255,255,255,0.35);
+      font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1; flex-shrink: 0;
+      position: relative;
+    }
+    .inst-kebab:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.7); }
+    .inst-menu {
+      position: absolute; right: 0; top: 28px; z-index: 100;
+      background: #1a1a1f; border: 1px solid var(--border);
+      border-radius: var(--radius-s); min-width: 130px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: none; flex-direction: column;
+    }
+    .inst-menu.open { display: flex; }
+    .inst-menu-item {
+      padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--text-body);
+      cursor: pointer; display: flex; align-items: center; gap: 8px; background: none; border: none;
+      font-family: 'Inter', sans-serif; text-align: left; width: 100%;
+    }
+    .inst-menu-item:hover { background: rgba(255,255,255,0.05); color: var(--text-title); }
+    .inst-menu-item.danger { color: var(--error); }
+    .inst-menu-item.danger:hover { background: rgba(255,75,75,0.08); }
+
+    /* ── AVATAR ── */
+    .avatar {
+      width: 30px; height: 30px;
+      border-radius: var(--radius-full);
+      background: var(--gradient-cta);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 7px var(--space-4);
+      border-radius: var(--radius-m);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-primary { background: var(--gradient-cta); color: #fff; }
+    .btn-primary:hover { background: var(--gradient-cta-hover); box-shadow: 0 0 20px rgba(21,93,252,0.4); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary { background: rgba(255,255,255,0.07); color: var(--text-body); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.11); color: var(--text-title); }
+
+    .btn-ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary-border); }
+    .btn-ghost:hover { background: var(--primary-subtle); }
+
+    .btn-danger { background: var(--error-bg); color: var(--error); border: 1px solid rgba(255,100,103,0.3); }
+    .btn-danger:hover { background: rgba(251,44,54,0.25); border-color: rgba(251,44,54,0.5); }
+
+    .btn-sm { padding: 5px var(--space-3); font-size: 12px; border-radius: var(--radius-s); }
+    .btn-icon {
+      width: 32px; height: 32px; padding: 0;
+      background: rgba(255,255,255,0.07);
+      color: var(--text-body);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-s);
+    }
+    .btn-icon:hover { background: rgba(255,255,255,0.11); color: var(--text-title); }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-l);
+      padding: var(--space-5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-1);
+      transition: all 0.15s;
+    }
+    .card:hover { border-color: var(--card-border-hover); }
+    .card.interactive { cursor: pointer; }
+    .card.interactive:hover {
+      border-color: var(--primary-border);
+      box-shadow: var(--shadow-2), 0 0 0 1px var(--primary-border);
+      transform: translateY(-1px);
+    }
+
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    .card-title  { font-size: 14px; font-weight: 700; color: var(--text-title); }
+    .card-body   { font-size: 13px; color: var(--text-body); line-height: 1.6; }
+    .card-footer {
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    /* ── BADGES ── */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; line-height: 1; }
+    .badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-error   { background: var(--error-bg);   color: var(--error); }
+    .badge-alert   { background: var(--alert-bg);   color: var(--alert); }
+    .badge-info    { background: var(--info-bg);    color: var(--info); }
+    .badge-purple  { background: var(--purple-bg);  color: var(--purple); }
+    .badge-neutral { background: rgba(255,255,255,0.08); color: var(--text-body); }
+
+    /* ── INPUTS ── */
+    .input-group { display: flex; flex-direction: column; gap: 5px; }
+    .input-label { font-size: 12px; font-weight: 700; color: var(--text-body); }
+
+    .input {
+      width: 100%;
+      padding: 8px var(--space-3);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-s);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--text-title);
+      outline: none;
+      transition: all 0.15s;
+    }
+    .input::placeholder { color: var(--text-disabled); }
+    .input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-subtle); }
+    .input-hint { font-size: 11px; color: var(--text-caption); }
+
+    /* ── SELECT ── */
+    .select {
+      width: 100%;
+      padding: 8px var(--space-3);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-s);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--text-title);
+      outline: none;
+      transition: all 0.15s;
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,.4)' d='M6 8L1.5 3.5h9z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+    .select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-subtle); }
+    .select option { background: #1a1f38; color: rgba(255,255,255,.88); }
+
+    /* ── TOGGLE ── */
+    .toggle { width: 34px; height: 18px; border-radius: var(--radius-full); position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+    .toggle.on  { background: var(--gradient-cta); }
+    .toggle.off { background: rgba(255,255,255,.12); border: 1px solid var(--border-strong); }
+    .toggle-thumb { position: absolute; top: 2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+    .toggle.on  .toggle-thumb { left: 18px; }
+    .toggle.off .toggle-thumb { left: 2px; background: rgba(255,255,255,.5); }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-s);
+      padding: var(--space-3) var(--space-4);
+      font-family: 'Menlo','Monaco','Courier New',monospace;
+      font-size: 11px;
+      color: rgba(0,194,194,.9);
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+    .code-comment { color: rgba(255,255,255,.3); }
+    .code-attr    { color: rgba(253,199,0,.8); }
+    .code-val     { color: rgba(167,139,250,.9); }
+
+    /* ── CHIP ── */
+    .chip {
+      display: inline-flex; align-items: center; gap: var(--space-1);
+      padding: 3px var(--space-2);
+      background: var(--primary-subtle);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-xs);
+      font-size: 11px; font-weight: 700; color: var(--primary);
+    }
+    .chip-remove { width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: .5; font-size: 10px; }
+    .chip-remove:hover { opacity: 1; background: rgba(43,127,255,.3); }
+
+    /* ── VAR CHIP (AIMS OS) ── */
+    .var-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px var(--space-2);
+      background: var(--primary-subtle);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-xs);
+      font-size: 11px; font-weight: 700; color: var(--primary);
+      cursor: default; transition: background 0.1s;
+    }
+    .var-chip:hover { background: rgba(43,127,255,0.25); }
+
+    /* ── MODE CARD ── */
+    .mode-card {
+      padding: var(--space-4);
+      border-radius: var(--radius-m);
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
+      flex: 1;
+    }
+    .mode-card:hover { border-color: var(--border-strong); }
+    .mode-card.selected { border-color: var(--primary); background: var(--primary-subtle); }
+    .mode-card-title { font-size: 13px; font-weight: 700; color: var(--text-title); margin-bottom: var(--space-1); }
+    .mode-card-desc  { font-size: 12px; color: var(--text-caption); line-height: 1.5; }
+
+    /* ── CHANNEL LIST ITEM ── */
+    .ch-item {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-m);
+      cursor: pointer; transition: all 0.12s;
+      border: 1px solid transparent;
+    }
+    .ch-item:hover { background: rgba(255,255,255,0.04); }
+    .ch-item.active { background: var(--primary-subtle); border-color: var(--primary-border); }
+
+    .ch-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-s);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .ch-name { font-size: 13px; font-weight: 700; color: var(--text-title); }
+    .ch-sub  { font-size: 11px; color: var(--text-caption); margin-top: 1px; }
+
+    /* ── STATUS DOT ── */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.on   { background: var(--success); box-shadow: 0 0 6px var(--success); }
+    .status-dot.off  { background: var(--text-disabled); }
+    .status-dot.warn { background: var(--alert); box-shadow: 0 0 6px var(--alert); }
+
+    /* ── APPROVAL CARD ── */
+    .appr-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-l); padding: var(--space-5); transition: all 0.15s; }
+    .appr-card:hover { border-color: var(--card-border-hover); }
+    .appr-bubble {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-m);
+      padding: var(--space-3) var(--space-4);
+      margin: var(--space-3) 0;
+      font-size: 13px; color: var(--text-body); line-height: 1.6;
+    }
+
+    /* ── METRIC ROW ── */
+    .metric-row { display: flex; align-items: center; justify-content: space-between; padding: var(--space-2) 0; border-bottom: 1px solid var(--border); }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-bar-bg { height: 4px; background: rgba(255,255,255,0.08); border-radius: var(--radius-full); flex: 1; margin: 0 var(--space-3); }
+    .metric-bar    { height: 4px; border-radius: var(--radius-full); background: var(--gradient-cta); }
+
+    /* ── ACTIVITY ITEM ── */
+    .activity-item { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--border); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+    /* ── DANGER ZONE ── */
+    .danger-zone { border: 1px solid rgba(251,44,54,.25); border-radius: var(--radius-m); padding: var(--space-4); background: rgba(251,44,54,.04); }
+    .danger-zone-title { font-size: 11px; font-weight: 700; color: var(--error); text-transform: uppercase; letter-spacing: .06em; margin-bottom: var(--space-3); }
+
+    /* ── LAYOUT HELPERS ── */
+    .row   { display: flex; align-items: center; gap: var(--space-3); }
+    .col   { display: flex; flex-direction: column; gap: var(--space-4); }
+    .g-1   { gap: var(--space-1); } .g-2 { gap: var(--space-2); } .g-5 { gap: var(--space-5); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr;     gap: var(--space-4); }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--space-4); }
+    .flex-1 { flex: 1; }
+    .mt-auto { margin-top: auto; }
+    .divider { height: 1px; background: var(--border); width: 100%; }
+    .link    { color: var(--text-link); font-size: 12px; cursor: pointer; text-decoration: none; }
+    .link:hover { text-decoration: underline; }
+
+    /* ── STAT CARD ── */
+    .stat-value { font-size: 28px; font-weight: 900; color: var(--text-title); line-height: 1; }
+    .stat-label { font-size: 11px; color: var(--text-caption); margin-bottom: 4px; }
+    .stat-trend { font-size: 11px; font-weight: 700; margin-top: 4px; }
+    .stat-trend.up   { color: var(--success); }
+    .stat-trend.down { color: var(--error); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.22); }
+
+    /* ── TOOLTIP SYSTEM ── */
+    [data-tooltip] { position: relative; }
+
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      bottom: calc(100% + 8px);
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.90);
+      font-size: 11px; font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.4;
+      padding: 5px 9px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      z-index: 9000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.55);
+    }
+    [data-tooltip]::before {
+      content: '';
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      bottom: calc(100% + 4px);
+      border: 4px solid transparent;
+      border-top-color: rgba(255,255,255,0.14);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      z-index: 9001;
+    }
+    [data-tooltip]:hover::after,
+    [data-tooltip]:hover::before { opacity: 1; }
+
+    /* Above (explicit alias — default is already above) */
+    [data-tip-pos="above"]::after { bottom: calc(100% + 8px); top: auto; }
+    [data-tip-pos="above"]::before { bottom: calc(100% + 4px); top: auto; }
+
+    /* Below */
+    [data-tip-pos="below"]::after { bottom: auto; top: calc(100% + 8px); }
+    [data-tip-pos="below"]::before { bottom: auto; top: calc(100% + 4px); border-top-color: transparent; border-bottom-color: rgba(255,255,255,0.14); }
+
+    /* Right */
+    [data-tip-pos="right"]::after { left: calc(100% + 8px); top: 50%; bottom: auto; transform: translateY(-50%); }
+    [data-tip-pos="right"]::before { left: calc(100% + 4px); top: 50%; bottom: auto; transform: translateY(-50%); border-top-color: transparent; border-right-color: rgba(255,255,255,0.14); }
+
+    /* Left */
+    [data-tip-pos="left"]::after { right: calc(100% + 8px); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
+    [data-tip-pos="left"]::before { right: calc(100% + 4px); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); border-top-color: transparent; border-left-color: rgba(255,255,255,0.14); }
+
+    /* ── CHANNEL NUMBERS / IDENTITIES ── */
+    .ch-numbers-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
+    .ch-numbers-title { font-size: 13px; font-weight: 700; color: var(--text-title); }
+    .ch-num-add-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(43,127,255,0.10); color: var(--primary); border: 1px solid var(--primary-border); border-radius: var(--radius-s); font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s; }
+    .ch-num-add-btn:hover { background: rgba(43,127,255,0.18); }
+    .ch-num-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius-m); }
+    .ch-num-avatar { width: 32px; height: 32px; border-radius: var(--radius-s); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ch-num-info { flex: 1; min-width: 0; }
+    .ch-num-value { font-size: 13px; font-weight: 700; color: var(--text-title); font-variant-numeric: tabular-nums; }
+    .ch-num-name { font-size: 11px; color: var(--text-caption); margin-top: 2px; }
+    .ch-num-edit { font-size: 11px; font-weight: 600; color: var(--text-caption); background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif; padding: 3px 6px; border-radius: 4px; transition: color 0.1s, background 0.1s; }
+    .ch-num-edit:hover { color: var(--text-body); background: rgba(255,255,255,0.06); }
+    .ch-num-remove { width: 22px; height: 22px; background: none; border: none; color: var(--text-caption); cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; transition: background 0.1s, color 0.1s; flex-shrink: 0; }
+    .ch-num-remove:hover { background: var(--error-bg); color: var(--error); }
+
+    /* Number picker modal */
+    .num-picker-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 600; padding: 16px; }
+    .num-picker-modal.open { display: flex; }
+    .num-picker-box { background: #0e1428; border: 1px solid rgba(255,255,255,0.20); border-radius: 20px; width: 100%; max-width: 400px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); animation: modalPop 0.2s ease; }
+    .num-picker-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.07); cursor: pointer; transition: background 0.12s; }
+    .num-picker-item:last-child { border-bottom: none; }
+    .num-picker-item:hover { background: rgba(255,255,255,0.04); }
+    .num-picker-item.used { opacity: 0.4; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- TOPBAR — full width spanning sidebar + content -->
+  <header class="topbar">
+    <div class="workspace-selector" data-tooltip="Switch workspace" data-tip-pos="below">
+      <div class="topbar-avatar">A</div>
+      <span class="workspace-name">ACME Corp</span>
+      <svg class="workspace-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-icon-btn" data-tooltip="Pin page" data-tip-pos="below">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M8.5 1.5L12.5 5.5L9.5 8.5L8 7L5 10L4 9L7 6L5.5 4.5L8.5 1.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M2 12L5 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="topbar-icon-btn" data-tooltip="Notifications" data-tip-pos="below">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1.5C4.79 1.5 3 3.29 3 5.5V9L2 10V11H12V10L11 9V5.5C11 3.29 9.21 1.5 7 1.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M5.5 11C5.5 11.83 6.17 12.5 7 12.5C7.83 12.5 8.5 11.83 8.5 11" stroke="currentColor" stroke-width="1.3"/>
+        </svg>
+        <span class="notif-dot"></span>
+      </button>
+      <button class="topbar-icon-btn" data-tooltip="Switch language" data-tip-pos="below">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M7 1.5C7 1.5 9 4 9 7C9 10 7 12.5 7 12.5M7 1.5C7 1.5 5 4 5 7C5 10 7 12.5 7 12.5M1.5 7H12.5" stroke="currentColor" stroke-width="1.3"/>
+        </svg>
+      </button>
+      <div class="topbar-avatar" style="background:var(--gradient-cta);" data-tooltip="Thomas G. · Account settings" data-tip-pos="below">TG</div>
+    </div>
+  </header>
+
+  <div class="layout-body">
+
+  <!-- ════════ SIDEBAR (Figma Design System exact) ════════ -->
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar-wrap" id="appSidebar" aria-label="Main navigation">
+
+    <!-- Brand -->
+    <div class="sb-brand">
+      <div class="sb-brand-logo">AS</div>
+      <span class="sb-brand-name">AIMS OS</span>
+    </div>
+
+    <!-- Nav items -->
+    <div class="sb-nav">
+
+      <button class="sb-item" title="Home" aria-label="Home">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7.5L9 2l7 5.5V16h-4.5v-3.5h-5V16H2V7.5z"/></svg></span>
+        <span class="sb-label">Home</span>
+      </button>
+
+      <button class="sb-item" title="Agents" aria-label="Agents">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6" r="3"/><path d="M3 17c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></span>
+        <span class="sb-label">Agents</span>
+      </button>
+
+      <button class="sb-item" title="Automations" aria-label="Automations">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="10.5" y="10.5" width="5.5" height="5.5" rx="1.5"/><path d="M5 7.5v1.5A1.5 1.5 0 006.5 10.5H8"/></svg></span>
+        <span class="sb-label">Automations</span>
+      </button>
+
+      <div class="sb-divider"></div>
+
+      <!-- Contacts — ACTIVE (Communication Hub lives under Contacts) -->
+      <button class="sb-item active" onclick="showChannelList()" title="Contacts" aria-label="Contacts" aria-current="page">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6.5" r="2.5"/><path d="M3 16c0-2.76 2.686-5 6-5s6 2.24 6 5"/><path d="M14 3a2.5 2.5 0 010 5M15.5 14.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5"/></svg></span>
+        <span class="sb-label">Contacts</span>
+        <svg class="sb-chevron" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3.5 3.5L10 5"/></svg>
+      </button>
+
+      <!-- Channel submenu -->
+      <div class="nav-submenu" id="ch-sidebar-submenu">
+        <button class="nav-sub-item" id="ch-nav-0" onclick="selectChannelByIdx(0)" title="Voice · Twilio"><span class="nav-channel-dot on"></span>Voice</button>
+        <button class="nav-sub-item active" id="ch-nav-1" onclick="selectChannelByIdx(1)" title="Web Chat · Widget"><span class="nav-channel-dot on"></span>Web Chat</button>
+        <button class="nav-sub-item" id="ch-nav-2" onclick="selectChannelByIdx(2)" title="WhatsApp · Meta API"><span class="nav-channel-dot on"></span>WhatsApp</button>
+        <button class="nav-sub-item" id="ch-nav-3" onclick="selectChannelByIdx(3)" title="Email · SendGrid"><span class="nav-channel-dot on"></span>Email</button>
+        <button class="nav-sub-item" id="ch-nav-4" onclick="selectChannelByIdx(4)" title="SMS · High latency"><span class="nav-channel-dot warn"></span>SMS</button>
+      </div>
+
+      <div class="sb-divider"></div>
+
+      <button class="sb-item" title="Knowledge" aria-label="Knowledge">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2.5h12v13H3z"/><path d="M6.5 6h5M6.5 9h5M6.5 12h3"/></svg></span>
+        <span class="sb-label">Knowledge</span>
+      </button>
+
+      <button class="sb-item" title="Admin" aria-label="Admin">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M9 2l1.5 4h4l-3.5 2.5 1.5 4L9 10l-3.5 2.5 1.5-4L3.5 6h4z"/></svg></span>
+        <span class="sb-label">Admin</span>
+        <svg class="sb-chevron" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3.5 3.5L10 5"/></svg>
+      </button>
+
+      <button class="sb-item" title="Workspace" aria-label="Workspace">
+        <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="6" rx="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.5"/></svg></span>
+        <span class="sb-label">Workspace</span>
+      </button>
+
+    </div>
+
+    <!-- Collapse toggle -->
+    <div class="sb-bottom">
+      <button class="sb-toggle" id="sbToggleBtn" onclick="sbToggle()" title="Toggle sidebar" aria-label="Toggle sidebar" aria-expanded="false">
+        <svg class="sb-toggle-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4L6 9l5 5"/><line x1="3" y1="3" x2="3" y2="15"/>
+        </svg>
+        <span class="sb-toggle-label">Collapse</span>
+      </button>
+    </div>
+
+  </nav>
+
+  <!-- ════════ MAIN ════════ -->
+  <main class="main">
+
+    <!-- CHANNEL IDENTITY HEADER (populated by renderChannelHeader) -->
+    <div id="ch-header"></div>
+
+    <!-- BREADCRUMB back to channel list -->
+    <div id="ch-breadcrumb">
+      <button onclick="showChannelList()">← All Channels</button>
+    </div>
+
+    <!-- PAGE SUB-NAV: channel tabs + global actions -->
+    <nav id="channel-subnav" class="page-subnav">
+      <div class="tab-row" id="channel-tab-row">
+        <button class="tab" onclick="showChannelTab('overview', currentChannelIdx)" data-tooltip="Channel overview & stats" data-tip-pos="below">Overview</button>
+        <button class="tab" onclick="showChannelTab('approvals', currentChannelIdx)" data-tooltip="Messages pending review" data-tip-pos="below">Approvals <span class="tab-count" id="tab-approvals-count">3</span></button>
+        <button class="tab" onclick="showChannelTab('outbound', currentChannelIdx)" data-tooltip="Outbound campaigns" data-tip-pos="below">Outbound</button>
+        <button class="tab" onclick="showChannelTab('analytics', currentChannelIdx)" data-tooltip="Performance analytics" data-tip-pos="below">Analytics</button>
+        <button class="tab" onclick="showChannelTab('channels', currentChannelIdx)" data-tooltip="Provider credentials and phone numbers" data-tip-pos="below">Configure</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--space-2);">
+        <span class="badge badge-success" data-tooltip="4 channels active, 1 with issues" data-tip-pos="below"><span class="badge-dot"></span>4 of 5 active</span>
+        <button class="btn btn-secondary btn-sm" onclick="openModal('modal-activity')" data-tooltip="View recent activity" data-tip-pos="below">Activity Log</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-channel')" data-tooltip="Connect a new channel" data-tip-pos="below">+ Add Channel</button>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════
+         TAB: CHANNEL LIST (landing)
+    ══════════════════════════════════════════ -->
+    <div id="tab-channel-list" class="page hidden">
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+
+        <!-- Voice -->
+        <button class="ch-list-row" onclick="selectChannelByIdx(0)">
+          <div class="ch-icon" style="background:rgba(43,127,255,.12);width:44px;height:44px;border-radius:var(--radius-m);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2B7FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+          </div>
+          <div><div class="ch-list-name">Voice</div><div class="ch-list-sub">Twilio · Connected 42 days ago</div></div>
+          <span class="badge badge-success"><span class="badge-dot"></span>Active</span>
+          <span class="badge badge-neutral">Auto mode</span>
+          <div class="ch-list-vol">38 live</div>
+          <svg class="ch-list-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+        </button>
+
+        <!-- Web Chat -->
+        <button class="ch-list-row" onclick="selectChannelByIdx(1)">
+          <div class="ch-icon" style="background:rgba(5,223,114,.10);width:44px;height:44px;border-radius:var(--radius-m);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#05DF72" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </div>
+          <div><div class="ch-list-name">Web Chat</div><div class="ch-list-sub">Widget · Connected 14 days ago</div></div>
+          <span class="badge badge-success"><span class="badge-dot"></span>Active</span>
+          <span class="badge badge-alert">Review mode</span>
+          <div class="ch-list-vol">76 active</div>
+          <svg class="ch-list-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+        </button>
+
+        <!-- WhatsApp -->
+        <button class="ch-list-row" onclick="selectChannelByIdx(2)">
+          <div class="ch-icon" style="background:rgba(5,223,114,.10);width:44px;height:44px;border-radius:var(--radius-m);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#05DF72" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-5"/></svg>
+          </div>
+          <div><div class="ch-list-name">WhatsApp</div><div class="ch-list-sub">Meta API · Connected 28 days ago</div></div>
+          <span class="badge badge-success"><span class="badge-dot"></span>Active</span>
+          <span class="badge badge-neutral">Auto mode</span>
+          <div class="ch-list-vol">21 threads</div>
+          <svg class="ch-list-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+        </button>
+
+        <!-- Email -->
+        <button class="ch-list-row" onclick="selectChannelByIdx(3)">
+          <div class="ch-icon" style="background:rgba(167,139,250,.10);width:44px;height:44px;border-radius:var(--radius-m);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 7 10-7"/></svg>
+          </div>
+          <div><div class="ch-list-name">Email</div><div class="ch-list-sub">SendGrid · DNS verified 21 days ago</div></div>
+          <span class="badge badge-success"><span class="badge-dot"></span>Active</span>
+          <span class="badge badge-neutral">Auto mode</span>
+          <div class="ch-list-vol">4.2k sent</div>
+          <svg class="ch-list-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+        </button>
+
+        <!-- SMS -->
+        <button class="ch-list-row" onclick="selectChannelByIdx(4)" style="border-color:rgba(253,199,0,.2);">
+          <div class="ch-icon" style="background:rgba(253,199,0,.10);width:44px;height:44px;border-radius:var(--radius-m);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FDC700" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/><circle cx="12" cy="18.5" r="1" fill="#FDC700" stroke="none"/></svg>
+          </div>
+          <div><div class="ch-list-name">SMS</div><div class="ch-list-sub">Twilio · Connected 60 days ago</div></div>
+          <span class="badge badge-success"><span class="badge-dot"></span>Active</span>
+          <span class="badge" style="background:rgba(253,199,0,.12);color:#FDC700;border:1px solid rgba(253,199,0,.2);">High latency</span>
+          <div class="ch-list-vol" style="color:var(--alert);">480ms avg</div>
+          <svg class="ch-list-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+        </button>
+
+      </div>
+    </div><!-- /tab-channel-list -->
+
+    <!-- ══════════════════════════════════════
+         TAB: INSTANCE LIST (per channel type)
+    ══════════════════════════════════════════ -->
+    <div id="tab-instance-list" class="page hidden">
+      <div id="instance-list-content" style="display:flex;flex-direction:column;gap:var(--space-2);"></div>
+    </div><!-- /tab-instance-list -->
+
+    <!-- ══════════════════════════════════════
+         TAB: OVERVIEW
+    ══════════════════════════════════════════ -->
+    <div id="tab-overview" class="page hidden">
+
+      <div class="grid-4">
+        <div class="card" style="background:var(--gradient-card-blue);border-color:var(--primary-border);">
+          <p class="stat-label">Messages Today</p>
+          <p class="stat-value">24,831</p>
+          <p class="stat-trend up">↑ 18% vs yesterday</p>
+        </div>
+        <div class="card" style="background:var(--gradient-card-green);border-color:rgba(5,223,114,.2);">
+          <p class="stat-label">Active Conversations</p>
+          <p class="stat-value">142</p>
+          <p class="stat-trend up">↑ 23 since 1h ago</p>
+        </div>
+        <div class="card" style="background:var(--gradient-card-amber);border-color:rgba(253,199,0,.2);">
+          <p class="stat-label">Pending Approvals</p>
+          <p class="stat-value" style="color:var(--alert);">5</p>
+          <p class="stat-trend" style="color:var(--alert);">Requires review</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">Resolution Rate</p>
+          <p class="stat-value">94.7%</p>
+          <p class="stat-trend up">↑ 2.1% this week</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:var(--space-4);">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Channel Status</span>
+            <button class="btn btn-secondary btn-sm" onclick="showTab('channels')">Configure →</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row">
+              <div class="row g-2" style="width:160px;"><div class="status-dot on"></div><span style="font-size:13px;color:var(--text-body);">Voice · Twilio</span></div>
+              <span class="badge badge-neutral">Auto mode</span>
+              <span style="font-size:12px;color:var(--text-title);font-weight:700;width:60px;text-align:right;">38 live</span>
+            </div>
+            <div class="metric-row">
+              <div class="row g-2" style="width:160px;"><div class="status-dot on"></div><span style="font-size:13px;color:var(--text-body);">Web Chat · Widget</span></div>
+              <span class="badge badge-alert">Review mode</span>
+              <span style="font-size:12px;color:var(--text-title);font-weight:700;width:60px;text-align:right;">76 active</span>
+            </div>
+            <div class="metric-row">
+              <div class="row g-2" style="width:160px;"><div class="status-dot on"></div><span style="font-size:13px;color:var(--text-body);">WhatsApp · Meta</span></div>
+              <span class="badge badge-neutral">Auto mode</span>
+              <span style="font-size:12px;color:var(--text-title);font-weight:700;width:60px;text-align:right;">21 threads</span>
+            </div>
+            <div class="metric-row">
+              <div class="row g-2" style="width:160px;"><div class="status-dot on"></div><span style="font-size:13px;color:var(--text-body);">Email · SendGrid</span></div>
+              <span class="badge badge-neutral">Auto mode</span>
+              <span style="font-size:12px;color:var(--text-title);font-weight:700;width:60px;text-align:right;">4.2k sent</span>
+            </div>
+            <div class="metric-row">
+              <div class="row g-2" style="width:160px;"><div class="status-dot warn"></div><span style="font-size:13px;color:var(--text-body);">SMS · Twilio</span></div>
+              <span class="badge badge-alert">High latency</span>
+              <span style="font-size:12px;color:var(--alert);font-weight:700;width:60px;text-align:right;">480ms</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Activity</span>
+            <span class="badge badge-success"><span class="badge-dot"></span>Live</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--alert);"></div>
+            <div class="col g-1 flex-1">
+              <span style="font-size:13px;color:var(--text-body);"><strong style="color:var(--text-title);">5 messages</strong> pending approval · Web Chat</span>
+              <span style="font-size:11px;color:var(--text-caption);">Support Agent v2 · Awaiting review</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-caption);">now</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--success);"></div>
+            <div class="col g-1 flex-1">
+              <span style="font-size:13px;color:var(--text-body);">Voice call resolved · <strong style="color:var(--text-title);">Support Agent v2</strong></span>
+              <span style="font-size:11px;color:var(--text-caption);">CSAT 5/5 · 2m 14s</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-caption);">2m</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--primary);"></div>
+            <div class="col g-1 flex-1">
+              <span style="font-size:13px;color:var(--text-body);">DNS record verified · <strong style="color:var(--text-title);">Email channel</strong></span>
+              <span style="font-size:11px;color:var(--text-caption);">DMARC propagated successfully</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-caption);">14m</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--error);"></div>
+            <div class="col g-1 flex-1">
+              <span style="font-size:13px;color:var(--text-body);">SMS high latency alert · 480ms avg</span>
+              <span style="font-size:11px;color:var(--text-caption);">Provider issue · Twilio status page</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-caption);">22m</span>
+          </div>
+          <div class="card-footer"><a class="link" onclick="openModal('modal-activity')" style="cursor:pointer;">View full activity log →</a></div>
+        </div>
+      </div>
+
+    </div><!-- /tab-overview -->
+
+    <!-- ══════════════════════════════════════
+         TAB: APPROVALS
+    ══════════════════════════════════════════ -->
+    <div id="tab-approvals" class="page hidden">
+
+      <!-- Summary bar -->
+      <div class="card" style="padding:var(--space-4);">
+        <div class="row" style="justify-content:space-between;">
+          <div class="row g-5">
+            <div><p class="stat-value" style="font-size:22px;color:var(--alert);">5</p><p class="stat-label">Pending</p></div>
+            <div style="width:1px;height:36px;background:var(--border);"></div>
+            <div><p class="stat-value" style="font-size:22px;">47</p><p class="stat-label">Approved today</p></div>
+            <div style="width:1px;height:36px;background:var(--border);"></div>
+            <div><p class="stat-value" style="font-size:22px;">3</p><p class="stat-label">Rejected today</p></div>
+            <div style="width:1px;height:36px;background:var(--border);"></div>
+            <div><p class="stat-value" style="font-size:22px;">4.2m</p><p class="stat-label">Avg review time</p></div>
+          </div>
+          <div class="row g-2">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--alert)" stroke-width="1.5"><path d="M6 1l5 9H1z"/><path d="M6 4.5v2M6 8.5v.5"/></svg>
+            <span style="font-size:12px;color:var(--text-caption);">Auto-approve in 30 min if unreviewed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message 1 -->
+      <div class="appr-card" id="appr-1">
+        <div class="row" style="margin-bottom:var(--space-3);">
+          <div class="avatar" style="width:34px;height:34px;font-size:11px;">MR</div>
+          <div class="flex-1">
+            <div class="row g-2" style="justify-content:space-between;">
+              <div><span style="font-size:13px;font-weight:700;color:var(--text-title);">María Rodríguez</span> <span class="badge badge-info" style="margin-left:4px;">Web Chat</span></div>
+              <span style="font-size:11px;color:var(--text-caption);">2 min ago</span>
+            </div>
+            <p style="font-size:11px;color:var(--text-caption);margin-top:2px;">Session #7203 · Support Agent v2</p>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-s);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);">
+          <p style="font-size:10px;font-weight:700;color:var(--text-caption);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Customer said:</p>
+          <p style="font-size:13px;color:var(--text-body);">"Necesito ayuda con mi factura del mes de abril, hay cargos que no reconozco"</p>
+        </div>
+        <div class="appr-bubble" id="appr-bubble-1">
+          <p style="font-size:10px;font-weight:700;color:var(--text-caption);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Worker's response (pending):</p>
+          <span class="appr-text">Entiendo tu preocupación, María. He revisado tu cuenta y noto que los cargos adicionales de $24.99 corresponden a la renovación del plan Premium el día 3 de abril. ¿Deseas que procese un reembolso o prefieres que te explique los beneficios incluidos?</span>
+        </div>
+        <div class="row g-2">
+          <button class="btn btn-primary btn-sm" onclick="approveCard('appr-1')" data-tooltip="Send this response to customer">Approve & Send</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectCard('appr-1')" data-tooltip="Discard this response">Reject</button>
+          <button class="btn btn-secondary btn-sm" onclick="editCard('appr-1')" data-tooltip="Edit before sending">Edit & Send</button>
+          <div class="flex-1"></div>
+          <span class="badge badge-neutral" data-tooltip="High confidence — safe to approve" data-tip-pos="left">Confidence 0.91</span>
+        </div>
+      </div>
+
+      <!-- Message 2 -->
+      <div class="appr-card" id="appr-2">
+        <div class="row" style="margin-bottom:var(--space-3);">
+          <div class="avatar" style="width:34px;height:34px;font-size:11px;background:linear-gradient(135deg,#A78BFA,#7C3AED);">JC</div>
+          <div class="flex-1">
+            <div class="row g-2" style="justify-content:space-between;">
+              <div><span style="font-size:13px;font-weight:700;color:var(--text-title);">John Carter</span> <span class="badge badge-info" style="margin-left:4px;">Web Chat</span></div>
+              <span style="font-size:11px;color:var(--text-caption);">5 min ago</span>
+            </div>
+            <p style="font-size:11px;color:var(--text-caption);margin-top:2px;">Session #7198 · Support Agent v2</p>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-s);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);">
+          <p style="font-size:10px;font-weight:700;color:var(--text-caption);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Customer said:</p>
+          <p style="font-size:13px;color:var(--text-body);">"My refund of $89 hasn't been processed, it's been 7 days already"</p>
+        </div>
+        <div class="appr-bubble" id="appr-bubble-2">
+          <p style="font-size:10px;font-weight:700;color:var(--text-caption);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Worker's response (pending):</p>
+          <span class="appr-text">I sincerely apologize for the delay, John. I've located your refund request REF-44291 confirmed approved on April 16th. The $89.00 should appear on your card within 2–5 business days. I'm escalating this to our billing team for priority follow-up today.</span>
+        </div>
+        <div class="row g-2">
+          <button class="btn btn-primary btn-sm" onclick="approveCard('appr-2')" data-tooltip="Send this response to customer">Approve & Send</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectCard('appr-2')" data-tooltip="Discard this response">Reject</button>
+          <button class="btn btn-secondary btn-sm" onclick="editCard('appr-2')" data-tooltip="Edit before sending">Edit & Send</button>
+          <div class="flex-1"></div>
+          <span class="badge badge-neutral" data-tooltip="Good confidence — review recommended" data-tip-pos="left">Confidence 0.88</span>
+        </div>
+      </div>
+
+      <!-- Message 3 — flagged -->
+      <div class="appr-card" id="appr-3" style="border-color:rgba(251,44,54,.2);">
+        <div class="row" style="margin-bottom:var(--space-3);">
+          <div class="avatar" style="width:34px;height:34px;font-size:11px;background:linear-gradient(135deg,#05DF72,#00765F);">AL</div>
+          <div class="flex-1">
+            <div class="row g-2" style="justify-content:space-between;">
+              <div><span style="font-size:13px;font-weight:700;color:var(--text-title);">Ana Lima</span> <span class="badge badge-success" style="margin-left:4px;">WhatsApp</span></div>
+              <span style="font-size:11px;color:var(--text-caption);">11 min ago</span>
+            </div>
+            <p style="font-size:11px;color:var(--text-caption);margin-top:2px;">Session #7191 · Support Agent v2</p>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-s);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);">
+          <p style="font-size:10px;font-weight:700;color:var(--text-caption);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Customer said:</p>
+          <p style="font-size:13px;color:var(--text-body);">"Quiero cancelar mi suscripción premium"</p>
+        </div>
+        <div class="appr-bubble" id="appr-bubble-3" style="border-color:rgba(251,44,54,.25);background:rgba(251,44,54,.03);">
+          <p style="font-size:10px;font-weight:700;color:var(--error);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Worker's response (pending · sensitive):</p>
+          <span class="appr-text">Entiendo, Ana. Para proceder con la cancelación necesito verificar tu identidad. Por favor indícame el correo de tu cuenta y los últimos 4 dígitos del método de pago registrado.</span>
+        </div>
+        <div class="row g-2">
+          <button class="btn btn-primary btn-sm" onclick="approveCard('appr-3')" data-tooltip="Send this response to customer">Approve & Send</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectCard('appr-3')" data-tooltip="Discard this response">Reject</button>
+          <button class="btn btn-secondary btn-sm" onclick="editCard('appr-3')" data-tooltip="Edit before sending">Edit & Send</button>
+          <div class="flex-1"></div>
+          <span class="badge badge-error" data-tooltip="Low confidence — read carefully before approving" data-tip-pos="left">Confidence 0.61 · Review carefully</span>
+        </div>
+      </div>
+
+      <!-- Empty state (hidden until all cards resolved) -->
+      <div id="approvals-empty" class="card" style="display:none;text-align:center;padding:var(--space-12);">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="var(--success)" stroke-width="1.5" style="margin:0 auto var(--space-4);" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="16"/><path d="M13 20l5 5 9-9"/></svg>
+        <p style="font-size:16px;font-weight:700;color:var(--text-title);margin-bottom:4px;">All caught up</p>
+        <p style="font-size:13px;color:var(--text-caption);">No messages pending review</p>
+      </div>
+
+    </div><!-- /tab-approvals -->
+
+    <!-- ══════════════════════════════════════
+         TAB: OUTBOUND
+    ══════════════════════════════════════════ -->
+    <div id="tab-outbound" class="page hidden">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="row g-3"><div><div class="card-title">Q2 Promo — Premium Upgrade</div><p style="font-size:12px;color:var(--text-caption);margin-top:2px;">Email · 12,400 recipients · Scheduled Apr 25</p></div><span class="badge badge-alert">Scheduled</span></div>
+          <div class="row g-2"><button class="btn btn-secondary btn-sm" data-tooltip="Edit campaign settings">Edit</button><button class="btn btn-ghost btn-sm" data-tooltip="Preview this message">Preview</button></div>
+        </div>
+        <div class="row g-5">
+          <div><p class="stat-value" style="font-size:20px;">12,400</p><p class="stat-label">Recipients</p></div>
+          <div><p class="stat-value" style="font-size:20px;">—</p><p class="stat-label">Sent</p></div>
+          <div><p class="stat-value" style="font-size:20px;">—</p><p class="stat-label">Open rate</p></div>
+          <div><p class="stat-value" style="font-size:20px;">Apr 25, 10:00</p><p class="stat-label">Send time</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="row g-3"><div><div class="card-title">Abandoned Cart Recovery</div><p style="font-size:12px;color:var(--text-caption);margin-top:2px;">SMS · Auto-trigger · 1,100 sent today</p></div><span class="badge badge-success"><span class="badge-dot"></span>Running</span></div>
+          <div class="row g-2"><button class="btn btn-secondary btn-sm" onclick="toggleCampaignPause(this)" data-tooltip="Pause this campaign">Pause</button><button class="btn btn-secondary btn-sm" data-tooltip="Edit campaign settings">Edit</button></div>
+        </div>
+        <div class="row g-5">
+          <div><p class="stat-value" style="font-size:20px;">1,100</p><p class="stat-label">Sent today</p></div>
+          <div><p class="stat-value" style="font-size:20px;color:var(--success);">28.4%</p><p class="stat-label">Click rate</p></div>
+          <div><p class="stat-value" style="font-size:20px;">6.1%</p><p class="stat-label">Conversion</p></div>
+          <div><p class="stat-value" style="font-size:20px;color:var(--alert);">480ms</p><p class="stat-label">Latency ⚠</p></div>
+        </div>
+      </div>
+
+    </div><!-- /tab-outbound -->
+
+    <!-- ══════════════════════════════════════
+         TAB: ANALYTICS
+    ══════════════════════════════════════════ -->
+    <div id="tab-analytics" class="page hidden">
+
+      <div class="grid-4">
+        <div class="card" style="background:var(--gradient-card-blue);border-color:var(--primary-border);">
+          <p class="stat-label">Total Messages</p><p class="stat-value">174,218</p><p class="stat-trend up">↑ 22% WoW</p>
+        </div>
+        <div class="card" style="background:var(--gradient-card-green);border-color:rgba(5,223,114,.2);">
+          <p class="stat-label">Resolution Rate</p><p class="stat-value">94.7%</p><p class="stat-trend up">↑ 2.1% WoW</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">Avg Response Time</p><p class="stat-value">1.4s</p><p class="stat-trend up">↓ 0.3s vs prior week</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">CSAT Average</p><p class="stat-value">4.8/5</p><p class="stat-trend up">↑ 0.2 WoW</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Volume by Channel</div><span style="font-size:12px;color:var(--text-caption);">Messages sent + received</span></div>
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div class="metric-row"><span style="font-size:13px;color:var(--text-body);width:120px;">Voice</span><div class="metric-bar-bg"><div class="metric-bar" style="width:62%;"></div></div><span style="font-size:12px;font-weight:700;color:var(--text-title);width:64px;text-align:right;">107,895</span></div>
+          <div class="metric-row"><span style="font-size:13px;color:var(--text-body);width:120px;">Web Chat</span><div class="metric-bar-bg"><div class="metric-bar" style="width:48%;"></div></div><span style="font-size:12px;font-weight:700;color:var(--text-title);width:64px;text-align:right;">83,610</span></div>
+          <div class="metric-row"><span style="font-size:13px;color:var(--text-body);width:120px;">WhatsApp</span><div class="metric-bar-bg"><div class="metric-bar" style="width:32%;"></div></div><span style="font-size:12px;font-weight:700;color:var(--text-title);width:64px;text-align:right;">55,700</span></div>
+          <div class="metric-row"><span style="font-size:13px;color:var(--text-body);width:120px;">Email</span><div class="metric-bar-bg"><div class="metric-bar" style="width:28%;"></div></div><span style="font-size:12px;font-weight:700;color:var(--text-title);width:64px;text-align:right;">48,730</span></div>
+          <div class="metric-row"><span style="font-size:13px;color:var(--text-body);width:120px;">SMS</span><div class="metric-bar-bg"><div class="metric-bar" style="width:13%;background:var(--alert-bg);"></div></div><span style="font-size:12px;font-weight:700;color:var(--alert);width:64px;text-align:right;">22,800</span></div>
+        </div>
+      </div>
+
+    </div><!-- /tab-analytics -->
+
+    <!-- ══════════════════════════════════════
+         TAB: CHANNEL CONFIGURATION
+    ══════════════════════════════════════════ -->
+    <div id="tab-channels" class="page hidden" style="padding-bottom:var(--space-10);">
+      <div id="channel-config-body"></div>
+    </div><!-- /tab-channels -->
+
+  </main>
+  </div><!-- /layout-body -->
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast-container" style="position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;pointer-events:none;"></div>
+
+<!-- ══ MODAL: ADD CHANNEL ══ -->
+<div class="modal-overlay" id="modal-add-channel" onclick="closeModalOverlay(event,this)">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-hd"><span class="modal-title">Add Channel</span><button class="modal-close" onclick="closeModal('modal-add-channel')">×</button></div>
+    <p style="font-size:13px;color:var(--text-body);margin-bottom:var(--space-5);">Choose the channel type to connect to your tenant workspace.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-6);">
+      <div class="ch-option" onclick="selectOption(this)">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#2B7FFF" stroke-width="1.5" stroke-linecap="round"><path d="M3 5.5A2 2 0 015 3.5h12a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2v-10z"/><path d="M3 7l8 5.5L19 7"/></svg>
+        <span>Email</span></div>
+      <div class="ch-option" onclick="selectOption(this)">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#05DF72" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="3" width="14" height="16" rx="2"/><path d="M8 8h6M8 11h6M8 14h4"/></svg>
+        <span>SMS</span></div>
+      <div class="ch-option" onclick="selectOption(this)">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#05DF72" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M7.5 11l3 3 5-5"/></svg>
+        <span>WhatsApp</span></div>
+      <div class="ch-option" onclick="selectOption(this)">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round"><path d="M4 6h14v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/><path d="M4 8l7 6 7-6"/></svg>
+        <span>Slack</span></div>
+      <div class="ch-option" onclick="selectOption(this)">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#FDC700" stroke-width="1.5" stroke-linecap="round"><path d="M3 6h16v11a2 2 0 01-2 2H5a2 2 0 01-2-2V6z"/><path d="M3 7l8 5.5L19 7"/><path d="M8 3h6"/></svg>
+        <span>Telegram</span></div>
+      <div class="ch-option" onclick="selectOption(this)">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#2B7FFF" stroke-width="1.5" stroke-linecap="round"><path d="M11 3.5C7 3.5 4 6.5 4 10c0 1.8.7 3.4 1.8 4.6L4.5 18l3.7-1.2C9.3 17.6 10.1 17.8 11 17.8c4 0 7-3 7-6.8s-3-7.5-7-7.5z"/></svg>
+        <span>Voice / IVR</span></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-channel')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="closeModal('modal-add-channel');toast('Channel setup initiated','success')">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: DISABLE CHANNEL ══ -->
+<div class="modal-overlay" id="modal-disable" onclick="closeModalOverlay(event,this)">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-hd"><span class="modal-title" style="color:var(--error);">Disable Web Chat?</span><button class="modal-close" onclick="closeModal('modal-disable')">×</button></div>
+    <p style="font-size:13px;color:var(--text-body);margin-bottom:var(--space-2);">This will permanently disconnect Web Chat and remove the widget from all <strong style="color:var(--text-title);">3 domains</strong>. In-progress sessions will be terminated.</p>
+    <p style="font-size:12px;color:var(--error);background:var(--error-bg);border:1px solid rgba(255,100,103,.2);border-radius:var(--radius-s);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-6);">This action cannot be undone.</p>
+    <div class="modal-ft">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-disable')">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="closeModal('modal-disable');toast('Web Chat disabled','error')">Yes, Disable</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: EDIT & SEND ══ -->
+<div class="modal-overlay" id="modal-edit" onclick="closeModalOverlay(event,this)">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-hd"><span class="modal-title">Edit Response</span><button class="modal-close" onclick="closeModal('modal-edit')">×</button></div>
+    <p style="font-size:12px;color:var(--text-caption);margin-bottom:var(--space-3);">Edit the worker's draft before sending to the customer.</p>
+    <textarea id="edit-textarea" class="input" style="min-height:120px;resize:vertical;line-height:1.6;"></textarea>
+    <div class="modal-ft" style="margin-top:var(--space-4);">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="sendEdited()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: NEW CAMPAIGN ══ -->
+<div class="modal-overlay" id="modal-new-campaign" onclick="closeModalOverlay(event,this)">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-hd"><span class="modal-title">New Campaign</span><button class="modal-close" onclick="closeModal('modal-new-campaign')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:var(--space-4);margin-bottom:var(--space-6);">
+      <div class="input-group">
+        <label class="input-label">Campaign name</label>
+        <input class="input" placeholder="e.g. May Promo — Upgrade Push">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Channel</label>
+        <select class="select"><option>Email</option><option>SMS</option><option>WhatsApp</option></select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Schedule</label>
+        <input class="input" type="datetime-local">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Message</label>
+        <textarea class="input" style="min-height:80px;resize:vertical;" placeholder="Write your campaign message…"></textarea>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-new-campaign')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="closeModal('modal-new-campaign');toast('Campaign created','success')">Create Campaign</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ACTIVITY LOG ══ -->
+<div class="modal-overlay" id="modal-activity" onclick="closeModalOverlay(event,this)">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-hd"><span class="modal-title">Activity Log</span><button class="modal-close" onclick="closeModal('modal-activity')">×</button></div>
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div class="activity-row"><span class="activity-dot success"></span><div><p class="activity-text">Web Chat approved — message to María Rodríguez sent</p><p class="activity-time">Today, 10:42 AM · Thomas G.</p></div></div>
+      <div class="activity-row"><span class="activity-dot error"></span><div><p class="activity-text">Web Chat message to Carlos Vega rejected</p><p class="activity-time">Today, 10:38 AM · Thomas G.</p></div></div>
+      <div class="activity-row"><span class="activity-dot info"></span><div><p class="activity-text">SMS channel paused temporarily</p><p class="activity-time">Today, 09:15 AM · System</p></div></div>
+      <div class="activity-row"><span class="activity-dot success"></span><div><p class="activity-text">Email · SendGrid DNS verified successfully</p><p class="activity-time">Yesterday, 4:02 PM · System</p></div></div>
+      <div class="activity-row"><span class="activity-dot info"></span><div><p class="activity-text">Confidence threshold updated to 0.72</p><p class="activity-time">Yesterday, 2:30 PM · Thomas G.</p></div></div>
+      <div class="activity-row"><span class="activity-dot info"></span><div><p class="activity-text">WhatsApp channel connected via Meta Business API</p><p class="activity-time">Apr 9, 11:00 AM · System</p></div></div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-secondary btn-sm" onclick="closeModal('modal-activity')">Close</button></div>
+  </div>
+</div>
+
+<script>
+  /* ── CHANNEL TYPE + INSTANCE DATA ── */
+  const CHANNEL_NAMES = ['Voice', 'Web Chat', 'WhatsApp', 'Email', 'SMS'];
+
+  const CHANNEL_TYPES = [
+    {
+      name: 'Voice', iconBg: 'rgba(43,127,255,.12)', iconColor: '#2B7FFF', instanceLabel: 'Number',
+      iconPath: `<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/>`,
+      instances: [
+        { name: '+1 (415) 555-0101', desc: 'Main IVR line · Routes inbound support calls', time: '42 days ago', mode: 'auto',   vol: '38 live',  worker: 'Support Agent v2',  threshold: '0.72', tags: ['lang: en-US', '↑ 97.5% SLA', 'SLA: 2 min', 'queue: support'] },
+        { name: '+1 (415) 555-0102', desc: 'Support overflow · Secondary inbound line',    time: '38 days ago', mode: 'auto',   vol: '12 live',  worker: 'Support Agent v2',  threshold: '0.72', tags: ['lang: en-US', '↑ 94.1% SLA', 'overflow: true'] },
+        { name: '+1 (800) 555-0103', desc: 'Toll-free line · Enterprise tier customers',   time: '21 days ago', mode: 'review', vol: '7 live',   worker: 'Sales Agent v1',    threshold: '0.85', tags: ['lang: en-US', 'tier: enterprise', 'priority: high'] },
+      ]
+    },
+    {
+      name: 'Web Chat', iconBg: 'rgba(5,223,114,.10)', iconColor: '#05DF72', instanceLabel: 'Widget',
+      iconPath: `<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>`,
+      instances: [
+        { name: 'Main Website',  desc: 'widget-prod · Embedded on acme.com',        time: '14 days ago', mode: 'review', vol: '76 active', worker: 'Support Agent v2', threshold: '0.72', tags: ['domain: acme.com', '↑ 91.2% CSAT', 'lang: multi', 'pending: 3'] },
+        { name: 'Help Center',   desc: 'widget-help · Embedded on help.acme.com',    time: '14 days ago', mode: 'auto',   vol: '23 active', worker: 'Support Agent v2', threshold: '0.72', tags: ['domain: help.acme.com', '↑ 95.0% CSAT', 'lang: en-US'] },
+        { name: 'Mobile App',    desc: 'widget-app · In-app chat for iOS & Android', time: '9 days ago',  mode: 'auto',   vol: '18 active', worker: 'Onboarding Agent', threshold: '0.80', tags: ['platform: mobile', '↑ 88.3% CSAT', 'lang: multi'] },
+      ]
+    },
+    {
+      name: 'WhatsApp', iconBg: 'rgba(5,223,114,.10)', iconColor: '#05DF72', instanceLabel: 'Account',
+      iconPath: `<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-5"/>`,
+      instances: [
+        { name: '+52 55 1234-5678', desc: 'MX Primary · Mexico market inbound',  time: '28 days ago', mode: 'auto', vol: '21 threads', worker: 'Support Agent v2', threshold: '0.72', tags: ['region: MX', 'lang: es-MX', '↑ 96.4% SLA'] },
+        { name: '+1 (669) 555-0199', desc: 'US Beta · North America pilot',      time: '7 days ago',  mode: 'auto', vol: '8 threads',  worker: 'Sales Agent v1',   threshold: '0.80', tags: ['region: US', 'lang: en-US', 'beta: true'] },
+      ]
+    },
+    {
+      name: 'Email', iconBg: 'rgba(167,139,250,.10)', iconColor: '#A78BFA', instanceLabel: 'Address',
+      iconPath: `<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 7 10-7"/>`,
+      instances: [
+        { name: 'support@acme.com', desc: 'SendGrid · Primary support inbox',   time: 'DNS verified 21 days ago', mode: 'auto', vol: '4.2k sent', worker: 'Support Agent v2', threshold: '0.72', tags: ['SPF: pass', 'DKIM: pass', '↑ 98.1% delivery', 'domain: acme.com'] },
+        { name: 'hello@acme.com',   desc: 'SendGrid · General inquiries inbox', time: 'DNS verified 21 days ago', mode: 'auto', vol: '890 sent',  worker: 'Sales Agent v1',   threshold: '0.75', tags: ['SPF: pass', 'DKIM: pass', '↑ 97.5% delivery', 'domain: acme.com'] },
+      ]
+    },
+    {
+      name: 'SMS', iconBg: 'rgba(253,199,0,.10)', iconColor: '#FDC700', instanceLabel: 'Number',
+      iconPath: `<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/><circle cx="12" cy="18.5" r="1" fill="#FDC700" stroke="none"/>`,
+      instances: [
+        { name: '+1 (415) 555-9900', desc: 'US Primary · High volume SMS line',   time: '60 days ago', mode: 'warn',   vol: '480ms avg', worker: 'Support Agent v2', threshold: '0.72', tags: ['carrier: Twilio', 'latency: high', 'region: US'], warn: true },
+        { name: '+1 (669) 555-9901', desc: 'US Secondary · Campaign & outbound',  time: '60 days ago', mode: 'auto',   vol: '92 sent',   worker: 'Support Agent v2', threshold: '0.72', tags: ['carrier: Twilio', '↑ 99.2% delivery', 'region: US'] },
+      ]
+    },
+  ];
+
+  /* ── STATE ── */
+  let currentTypeIdx = 0;
+  let currentInstanceIdx = 0;
+  let currentChannelIdx = 0;
+
+  /* ── HELPERS ── */
+  function typeIcon(type, size) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${type.iconColor}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${type.iconPath}</svg>`;
+  }
+
+  function modeBadge(mode) {
+    if (mode === 'review') return `<span class="badge badge-alert">Review mode</span>`;
+    if (mode === 'warn')   return `<span class="badge" style="background:rgba(253,199,0,.12);color:#FDC700;border:1px solid rgba(253,199,0,.2);">High latency</span>`;
+    return `<span class="badge badge-neutral">Auto mode</span>`;
+  }
+
+  /* ── SHOW PAGE (internal) ── */
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById('tab-' + name).classList.remove('hidden');
+  }
+
+  function showTab(name) { showChannelTab(name, currentTypeIdx); }
+
+  /* ── BREADCRUMB ── */
+  function setBreadcrumb(label, onclick) {
+    const bc = document.getElementById('ch-breadcrumb');
+    bc.style.display = 'block';
+    bc.querySelector('button').textContent = '← ' + label;
+    bc.querySelector('button').setAttribute('onclick', onclick);
+  }
+
+  /* ── RENDER TYPE HEADER (shown on instance list) ── */
+  function renderTypeHeader(typeIdx) {
+    const t = CHANNEL_TYPES[typeIdx];
+    document.getElementById('ch-header').innerHTML = `
+      <div class="page-header" style="margin-bottom:0;">
+        <div class="row g-3">
+          <div style="background:${t.iconBg};width:48px;height:48px;border-radius:var(--radius-m);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${typeIcon(t,24)}</div>
+          <div>
+            <h1 class="page-title" style="font-size:20px;">${t.name}</h1>
+            <p class="page-sub">${t.instances.length} ${t.instanceLabel.toLowerCase()}${t.instances.length !== 1 ? 's' : ''} connected</p>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="toast('Adding ${t.instanceLabel}…','info')">+ Add ${t.instanceLabel}</button>
+      </div>`;
+  }
+
+  /* ── RENDER INSTANCE HEADER (shown on detail tabs) ── */
+  function renderInstanceHeader(typeIdx, instIdx) {
+    const t = CHANNEL_TYPES[typeIdx];
+    const inst = t?.instances[instIdx];
+    if (!inst) return;
+    document.getElementById('ch-header').innerHTML = `
+      <div class="page-header" style="margin-bottom:0;">
+        <div class="row g-3">
+          <div style="background:${t.iconBg};width:48px;height:48px;border-radius:var(--radius-m);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${typeIcon(t,24)}</div>
+          <div>
+            <h1 class="page-title" style="font-size:20px;">${inst.name}</h1>
+            <div class="row g-2" style="margin-top:4px;">
+              <span class="badge badge-success" data-tooltip="Channel is live"><span class="badge-dot"></span>Active</span>
+              ${inst.mode === 'review' ? `<span class="badge badge-alert">Review mode on</span>` : inst.mode === 'warn' ? `<span class="badge" style="background:rgba(253,199,0,.12);color:#FDC700;">High latency</span>` : ''}
+              <span style="font-size:11px;color:var(--text-caption);">${inst.desc.split(' · ')[0]}</span>
+            </div>
+          </div>
+        </div>
+        <div class="row g-2">
+          <button class="btn btn-secondary btn-sm" id="btn-pause-channel" onclick="togglePauseChannel()" data-tooltip="Temporarily stop new conversations">Pause</button>
+          <button class="btn btn-primary btn-sm" onclick="saveChanges()">Save Changes</button>
+        </div>
+      </div>`;
+  }
+
+  /* ── RENDER INSTANCE LIST ── */
+  function renderInstanceList(typeIdx) {
+    const t = CHANNEL_TYPES[typeIdx];
+    const container = document.getElementById('instance-list-content');
+    if (!container || !t) return;
+    container.innerHTML = t.instances.map((inst, i) => `
+      <div class="inst-card${inst.warn ? '" style="border-color:rgba(253,199,0,.2)' : ''}">
+        <div class="inst-row-1" onclick="selectInstance(${typeIdx},${i})">
+          <div style="background:${t.iconBg};width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${typeIcon(t,16)}</div>
+          <span class="inst-name">${inst.name}</span>
+          <span class="badge badge-success" style="margin-right:4px;"><span class="badge-dot"></span>Active</span>
+          ${modeBadge(inst.mode)}
+          <span class="inst-time" style="margin-left:8px;">${inst.time}</span>
+          <div class="inst-kebab" onclick="event.stopPropagation();toggleInstMenu(this)">
+            ···
+            <div class="inst-menu">
+              <button class="inst-menu-item" onclick="selectInstance(${typeIdx},${i})">Open</button>
+              <button class="inst-menu-item" onclick="toast('Duplicated','success')">Duplicate</button>
+              <button class="inst-menu-item" onclick="toast('Paused','info')">Pause</button>
+              <button class="inst-menu-item danger" onclick="toast('Removed','error')">Remove</button>
+            </div>
+          </div>
+        </div>
+        <div class="inst-row-2" onclick="selectInstance(${typeIdx},${i})">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--primary)" stroke-width="1.5" style="flex-shrink:0;opacity:.7;"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          <span class="inst-desc">${inst.desc}</span>
+          <span style="font-size:11px;font-weight:700;color:${inst.warn ? 'var(--alert)' : 'var(--text-title)'};white-space:nowrap;margin-left:auto;">${inst.vol}</span>
+        </div>
+        <div class="inst-row-3">
+          <span class="inst-chip" style="color:rgba(167,139,250,.9);border-color:rgba(167,139,250,.2);background:rgba(167,139,250,.08);">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7"/></svg>
+            Worker
+          </span>
+          <span class="inst-chip">${inst.worker}</span>
+          ${inst.tags.map(tag => `<span class="inst-chip">${tag}</span>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+
+  /* ── TOGGLE KEBAB MENU ── */
+  function toggleInstMenu(btn) {
+    const menu = btn.querySelector('.inst-menu');
+    const isOpen = menu.classList.contains('open');
+    document.querySelectorAll('.inst-menu.open').forEach(m => m.classList.remove('open'));
+    if (!isOpen) menu.classList.add('open');
+  }
+  document.addEventListener('click', () => document.querySelectorAll('.inst-menu.open').forEach(m => m.classList.remove('open')));
+
+  /* ── CHANNEL LIST — top-level landing ── */
+  function showChannelList() {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById('tab-channel-list').classList.remove('hidden');
+    document.getElementById('channel-subnav').style.display = 'none';
+    document.getElementById('ch-breadcrumb').style.display = 'none';
+    document.getElementById('ch-header').innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const btn = document.getElementById('ch-nav-' + i);
+      if (btn) btn.classList.remove('active');
+    }
+  }
+
+  /* ── SELECT CHANNEL TYPE — shows instance list ── */
+  function selectChannelByIdx(typeIdx) {
+    currentTypeIdx = typeIdx;
+    currentChannelIdx = typeIdx;
+    channelPaused = false;
+    document.getElementById('channel-subnav').style.display = 'none';
+    renderTypeHeader(typeIdx);
+    renderInstanceList(typeIdx);
+    setBreadcrumb('All Channels', 'showChannelList()');
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById('tab-instance-list').classList.remove('hidden');
+    for (let i = 0; i < 5; i++) {
+      const btn = document.getElementById('ch-nav-' + i);
+      if (btn) btn.classList.toggle('active', i === typeIdx);
+    }
+  }
+
+  /* ── SELECT INSTANCE — shows overview tabs ── */
+  function selectInstance(typeIdx, instIdx) {
+    currentTypeIdx = typeIdx;
+    currentInstanceIdx = instIdx;
+    currentChannelIdx = typeIdx;
+    channelPaused = false;
+    document.getElementById('channel-subnav').style.display = 'flex';
+    renderInstanceHeader(typeIdx, instIdx);
+    setBreadcrumb(CHANNEL_TYPES[typeIdx].name, `selectChannelByIdx(${typeIdx})`);
+    showChannelTab('overview', typeIdx);
+  }
+
+  /* ── SHOW CHANNEL TAB — Overview / Approvals / Outbound / Analytics / Channels (config) ── */
+  function showChannelTab(name, typeIdx) {
+    currentChannelIdx = typeIdx;
+    if (name === 'channels') {
+      // render the channel configuration panel
+      const body = document.getElementById('channel-config-body');
+      if (body && CHANNEL_PANELS[typeIdx]) {
+        body.innerHTML = CHANNEL_PANELS[typeIdx]();
+      }
+    }
+    showPage(name);
+    for (let i = 0; i < 5; i++) {
+      const btn = document.getElementById('ch-nav-' + i);
+      if (btn) btn.classList.toggle('active', i === typeIdx);
+    }
+    const tabOrder = ['overview', 'approvals', 'outbound', 'analytics', 'channels'];
+    const tabIdx = tabOrder.indexOf(name);
+    const tabs = document.querySelectorAll('#channel-tab-row .tab');
+    tabs.forEach((t, i) => t.classList.toggle('active', i === tabIdx));
+  }
+
+  /* ── CHANNEL PANEL BUILDER ── */
+  function agentMappingSection(threshold='0.72', maxTurns='8') {
+    return `
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Agent Mapping</div><p class="card-body" style="margin-top:2px;">Define which Workers handle inbound conversations on this channel</p></div></div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+        <div class="input-group">
+          <label class="input-label">Primary Worker</label>
+          <select class="select">
+            <option selected>Support Agent v2 — Handles billing, orders, returns</option>
+            <option>Sales Agent v1 — Handles product inquiries</option>
+            <option>Onboarding Agent — New user flows</option>
+          </select>
+          <p class="input-hint">This worker handles all new inbound conversations by default</p>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Fallback on Escalation</label>
+          <select class="select">
+            <option selected>Human in the Loop (HIL) — Route to available agent</option>
+            <option>Escalation Agent v1 — Senior support tier</option>
+            <option>Queue — Hold and notify team</option>
+          </select>
+          <p class="input-hint">Triggered when primary worker confidence falls below threshold or customer requests human</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+          <div class="input-group">
+            <label class="input-label" data-tooltip="Worker escalates when confidence drops below this score" data-tip-pos="right">Confidence Threshold</label>
+            <input class="input" type="number" value="${threshold}" min="0" max="1" step="0.01" data-tooltip="Score 0–1 · lower = escalates more often" data-tip-pos="below">
+            <p class="input-hint">Escalate if confidence &lt; this value (0 – 1)</p>
+          </div>
+          <div class="input-group">
+            <label class="input-label" data-tooltip="Force escalation after this many unresolved exchanges" data-tip-pos="right">Max Turns Before Escalation</label>
+            <input class="input" type="number" value="${maxTurns}" data-tooltip="Number of back-and-forth turns" data-tip-pos="below">
+            <p class="input-hint">Auto-escalate after N unresolved turns</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function responseModeSection(isReview=false, pendingCount=0, queueLink=true) {
+    const reviewNote = isReview && queueLink ? `
+      <div style="background:var(--alert-bg);border:1px solid rgba(253,199,0,.2);border-radius:var(--radius-m);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);">
+        <div class="row g-2" style="margin-bottom:var(--space-1);">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--alert)" stroke-width="1.5"><path d="M6 1l5 9H1z"/><path d="M6 5v2M6 9v.5"/></svg>
+          <span style="font-size:12px;font-weight:700;color:var(--alert);">Review mode is active</span>
+        </div>
+        <p style="font-size:12px;color:rgba(253,199,0,.7);">${pendingCount} messages are waiting in the Approval Queue.</p>
+        <div style="margin-top:var(--space-2);"><a class="link" onclick="showTab('approvals')" style="cursor:pointer;">Go to Approval Queue →</a></div>
+      </div>
+      <div class="input-group" style="margin-bottom:var(--space-4);">
+        <label class="input-label">Approval Reviewers</label>
+        <select class="select" style="max-width:360px;">
+          <option selected>Any admin in this tenant</option>
+          <option>Support Team Lead only</option>
+          <option>Specific users…</option>
+        </select>
+        <p class="input-hint">Who can approve or reject messages from the queue</p>
+      </div>
+      <div class="row" style="justify-content:space-between;">
+        <div><div class="input-label">Auto-approve after timeout</div><p class="input-hint">If no reviewer acts, message sends automatically</p></div>
+        <div class="row g-2"><input class="input" type="number" value="30" style="width:70px;text-align:center;"><span style="font-size:12px;color:var(--text-caption);">minutes</span></div>
+      </div>` : '';
+    return `
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Response Mode</div><p class="card-body" style="margin-top:2px;">Control whether the worker sends messages autonomously or requires human approval</p></div></div>
+      <div class="row g-3" style="align-items:stretch;margin-bottom:var(--space-4);">
+        <div class="mode-card${isReview?'':' selected'}" onclick="selectMode(this,'auto')" data-tooltip="Worker sends directly · no human review">
+          <div class="row g-2" style="margin-bottom:var(--space-1);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="${isReview?'var(--text-caption)':'var(--primary)'}" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5 8l2 2 4-4"/></svg>
+            <div class="mode-card-title" style="${isReview?'':'color:var(--primary);'}">Auto</div>
+          </div>
+          <div class="mode-card-desc">Worker sends messages directly to the customer. Fastest response time. Recommended for high-confidence workers.</div>
+        </div>
+        <div class="mode-card${isReview?' selected':''}" onclick="selectMode(this,'review')" data-tooltip="All responses queue for human approval first">
+          <div class="row g-2" style="margin-bottom:var(--space-1);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="${isReview?'var(--primary)':'var(--text-caption)'}" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3M8 11v.5"/></svg>
+            <div class="mode-card-title" style="${isReview?'color:var(--primary);':''}">Review</div>
+          </div>
+          <div class="mode-card-desc">Every message is placed in the Approval Queue before being sent. Your team reviews and approves.</div>
+        </div>
+      </div>
+      ${reviewNote}
+    </div>`;
+  }
+
+  function dangerZoneSection(name) {
+    return `
+    <div class="danger-zone">
+      <div class="danger-zone-title">Danger Zone</div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text-title);">Pause Channel</div>
+            <p class="input-hint">Temporarily stops ${name} from accepting new conversations. In-progress sessions continue.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-pause-channel" onclick="togglePauseChannel()" data-tooltip="Stop new conversations · active sessions continue" data-tip-pos="left">Pause ${name}</button>
+        </div>
+        <div class="divider"></div>
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--error);">Disable Channel</div>
+            <p class="input-hint">Permanently disconnects ${name} and removes all integrations.</p>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="openModal('modal-disable')" data-tooltip="Permanently remove this channel — cannot be undone" data-tip-pos="left">Disable Channel</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function panelHeader(name, statusBadge, modeBadge, connectedText, iconBg, iconSvg) {
+    return `
+    <div class="page-header" style="margin-bottom:var(--space-6);">
+      <div class="row g-3">
+        <div class="ch-icon" style="background:${iconBg};width:48px;height:48px;border-radius:var(--radius-m);">${iconSvg}</div>
+        <div>
+          <h1 class="page-title" style="font-size:20px;">${name}</h1>
+          <div class="row g-2" style="margin-top:4px;">
+            <span class="badge badge-success" data-tooltip="Channel is live and accepting conversations" data-tip-pos="below"><span class="badge-dot"></span>${statusBadge}</span>
+            ${modeBadge ? `<span class="badge badge-alert" data-tooltip="Messages queue for human review before sending" data-tip-pos="below">${modeBadge}</span>` : ''}
+            <span style="font-size:11px;color:var(--text-caption);">${connectedText}</span>
+          </div>
+        </div>
+      </div>
+      <div class="row g-2">
+        <button class="btn btn-secondary btn-sm" id="btn-pause-channel" onclick="togglePauseChannel()" data-tooltip="Temporarily stop new conversations" data-tip-pos="below">Pause Channel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveChanges()" data-tooltip="Persist all configuration changes" data-tip-pos="below">Save Changes</button>
+      </div>
+    </div>`;
+  }
+
+  // ── CHANNEL NUMBERS DATA ──
+  const CHANNEL_NUMBERS = {
+    voice: {
+      configured: [
+        { id:'v1', value:'+1 (816) 555-0192', name:'Support Line', webhookKey:'voice/acme' },
+        { id:'v2', value:'+1 (555) 012-3456', name:'Sales Inbound', webhookKey:'voice/acme-sales' },
+      ],
+      available: [
+        { id:'va1', value:'+1 (720) 555-0201', region:'Denver, CO' },
+        { id:'va2', value:'+1 (312) 555-0189', region:'Chicago, IL' },
+        { id:'va3', value:'+1 (646) 555-0174', region:'New York, NY' },
+      ]
+    },
+    whatsapp: {
+      configured: [
+        { id:'w1', value:'+52 55 1234 5678', name:'MX Customer Support', meta:'Verified · Business account' },
+      ],
+      available: [
+        { id:'wa1', value:'+1 (888) 555-0100', region:'US Toll-free' },
+        { id:'wa2', value:'+44 20 5550 0192', region:'UK' },
+      ]
+    },
+    sms: {
+      configured: [
+        { id:'s1', value:'+1 (415) 555-0147', name:'Transactional SMS', webhookKey:'sms/acme' },
+      ],
+      available: [
+        { id:'sa1', value:'+1 (213) 555-0161', region:'Los Angeles, CA' },
+        { id:'sa2', value:'+1 (702) 555-0183', region:'Las Vegas, NV' },
+      ]
+    },
+    email: {
+      configured: [
+        { id:'e1', value:'support@acme.com', name:'Customer Support' },
+        { id:'e2', value:'sales@acme.com', name:'Sales Inquiries' },
+      ],
+      available: []
+    }
+  };
+
+  function channelNumbersSection(channelKey, iconBg, iconColor) {
+    const data = CHANNEL_NUMBERS[channelKey];
+    const isEmail = channelKey === 'email';
+    const label = isEmail ? 'Email Addresses' : 'Phone Numbers';
+    const addLabel = isEmail ? '+ Add Address' : '+ Add Number';
+    const items = data.configured.map(n => `
+      <div class="ch-num-item" id="chnum-${n.id}">
+        <div class="ch-num-avatar" style="background:${iconBg};">
+          ${isEmail
+            ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 7 10-7"/></svg>`
+            : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>`
+          }
+        </div>
+        <div class="ch-num-info">
+          <div class="ch-num-value">${n.value}</div>
+          <div class="ch-num-name">${n.name}</div>
+        </div>
+        <button class="ch-num-edit" onclick="toast('Edit coming soon','info')" data-tooltip="Edit name or settings" data-tip-pos="left">Edit</button>
+        <button class="ch-num-remove" onclick="removeChannelNumber('${channelKey}','${n.id}')" data-tooltip="Remove this ${isEmail ? 'address' : 'number'}" data-tip-pos="left">×</button>
+      </div>`).join('');
+
+    return `<div>
+      <div class="ch-numbers-hd">
+        <span class="ch-numbers-title">${label}</span>
+        <button class="ch-num-add-btn" onclick="openNumPicker('${channelKey}')">${addLabel}</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);" id="chnum-list-${channelKey}">
+        ${items || `<div style="padding:12px;text-align:center;font-size:12px;color:var(--text-caption);background:rgba(255,255,255,0.02);border:1px dashed var(--border);border-radius:8px;">No ${isEmail ? 'addresses' : 'numbers'} configured yet.</div>`}
+      </div>
+    </div>`;
+  }
+
+  function removeChannelNumber(channelKey, id) {
+    const data = CHANNEL_NUMBERS[channelKey];
+    if (data.configured.length <= 1) { toast('⚠ Keep at least one number configured','info'); return; }
+    data.configured = data.configured.filter(n => n.id !== id);
+    // rebuild just the list
+    const list = document.getElementById('chnum-list-' + channelKey);
+    if (list) {
+      list.querySelectorAll(`[id^="chnum-${id}"]`).forEach(el => el.remove());
+      document.getElementById('chnum-' + id)?.remove();
+    }
+    // re-render full panel
+    selectChannelByIdx(currentChannelIdx);
+    toast('✓ Number removed', 'success');
+  }
+
+  let _numPickerChannel = 'voice';
+  function openNumPicker(channelKey) {
+    _numPickerChannel = channelKey;
+    const data = CHANNEL_NUMBERS[channelKey];
+    const configuredVals = new Set(data.configured.map(n => n.value));
+    const isEmail = channelKey === 'email';
+    const list = document.getElementById('numPickerList');
+    if (!list) return;
+    if (data.available.length === 0) {
+      list.innerHTML = `<div style="padding:24px;text-align:center;font-size:12px;color:var(--text-caption);">No additional ${isEmail ? 'addresses' : 'numbers'} available.<br>Contact your provider to add more.</div>`;
+    } else {
+      list.innerHTML = data.available.map(n => {
+        const isUsed = configuredVals.has(n.value);
+        return `<div class="num-picker-item ${isUsed ? 'used' : ''}" onclick="${isUsed ? '' : `addChannelNumber('${n.id}')`}">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:var(--text-title);">${n.value}</div>
+            <div style="font-size:11px;color:var(--text-caption);margin-top:2px;">${n.region || ''}</div>
+          </div>
+          ${isUsed ? '<span style="font-size:10px;color:var(--success);font-weight:700;">In use</span>' : '<button class="btn btn-secondary btn-sm" style="pointer-events:none">Add</button>'}
+        </div>`;
+      }).join('');
+    }
+    document.getElementById('numPickerModal').classList.add('open');
+  }
+
+  function addChannelNumber(availId) {
+    const data = CHANNEL_NUMBERS[_numPickerChannel];
+    const avail = data.available.find(n => n.id === availId);
+    if (!avail) return;
+    data.configured.push({ id: availId, value: avail.value, name: 'New ' + (avail.region || 'Number') });
+    document.getElementById('numPickerModal').classList.remove('open');
+    selectChannelByIdx(currentChannelIdx);
+    toast('✓ Number added', 'success');
+  }
+
+  const CHANNEL_PANELS = {
+    /* ──────────────── 0: VOICE ──────────────── */
+    0: () => {
+      const icon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2B7FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>`;
+      return panelHeader('Voice','Active','Auto mode','Connected 42 days ago','rgba(43,127,255,.12)',icon) + `
+      <div style="display:flex;flex-direction:column;gap:var(--space-5);">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Provider & Connection</div><p class="card-body" style="margin-top:2px;">Twilio credentials and inbound call configuration</p></div><span class="badge badge-success">Connected</span></div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+              <div class="input-group">
+                <label class="input-label">Account SID</label>
+                <div class="row g-2"><input class="input" value="AC••••••••••••••••••••••9f2a" readonly><button class="btn btn-secondary btn-sm" onclick="toast('Revealed in real app','info')" data-tooltip="Show hidden credential" data-tip-pos="left">Reveal</button></div>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Auth Token</label>
+                <div class="row g-2"><input class="input" value="••••••••••••••••••••••••••••••••" readonly><button class="btn btn-secondary btn-sm" onclick="toast('Revealed in real app','info')" data-tooltip="Show hidden credential" data-tip-pos="left">Reveal</button></div>
+              </div>
+            </div>
+            ${channelNumbersSection('voice','rgba(43,127,255,0.15)','#2B7FFF')}
+            <div class="input-group">
+              <label class="input-label">Webhook URL</label>
+              <div class="row g-2"><input class="input" value="hooks.aimsos.ai/v1/voice/acme" readonly><button class="btn btn-secondary btn-sm" onclick="copyText('https://hooks.aimsos.ai/v1/voice/acme-corp-9f2a')" data-tooltip="Copy to clipboard" data-tip-pos="left">Copy</button></div>
+              <p class="input-hint">Set this as your Twilio webhook</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Call Handling</div><p class="card-body" style="margin-top:2px;">Configure greeting, duration limits, and IVR behavior</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+            <div class="input-group">
+              <label class="input-label">Greeting Message (TTS)</label>
+              <input class="input" value="Thank you for calling ACME Corp. How can I help you today?">
+              <p class="input-hint">Played to the caller before the worker takes over</p>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+              <div class="input-group">
+                <label class="input-label">Max Call Duration</label>
+                <div class="row g-2"><input class="input" type="number" value="30" style="width:80px;"><span style="font-size:12px;color:var(--text-caption);align-self:center;">minutes</span></div>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Hold Music</label>
+                <select class="select"><option selected>Default AIMS hold music</option><option>Upload custom audio</option><option>Silence</option></select>
+              </div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-2) 0;border-bottom:none;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Record Calls</div><p class="input-hint">Store recordings for quality review. Subject to local laws.</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable call recording" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+          </div>
+        </div>
+        ${agentMappingSection('0.80','5')}
+        ${responseModeSection(false)}
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Safety Controls</div><p class="card-body" style="margin-top:2px;">Rate limits and operating hours for inbound calls</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Max Concurrent Calls</div><p class="input-hint">Calls above this limit are queued or redirected</p></div>
+              <div class="row g-2"><input class="input" type="number" value="50" style="width:70px;text-align:center;"><span style="font-size:12px;color:var(--text-caption);">calls</span></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">PII Redaction in Transcripts</div><p class="input-hint">Automatically redact sensitive data from call transcripts</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable PII redaction" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;border-bottom:none;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Out-of-hours Behavior</div><p class="input-hint">What happens when calls arrive outside business hours</p></div>
+              <select class="select" style="width:220px;"><option selected>Play voicemail prompt</option><option>Redirect to on-call number</option><option>Continue with AI (24/7)</option></select>
+            </div>
+          </div>
+        </div>
+        ${dangerZoneSection('Voice')}
+      </div>`;
+    },
+
+    /* ──────────────── 1: WEB CHAT ──────────────── */
+    1: () => {
+      const icon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#05DF72" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`;
+      return panelHeader('Web Chat','Active','Review mode on','Connected 14 days ago','rgba(5,223,114,.10)',icon) + `
+      <div style="display:flex;flex-direction:column;gap:var(--space-5);">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Provider & Embed Code</div><p class="card-body" style="margin-top:2px;">Add this snippet to your website's &lt;head&gt; to activate the chat widget</p></div><button class="btn btn-secondary btn-sm" id="btn-copy-snippet" onclick="copySnippet()" data-tooltip="Copy embed snippet to clipboard" data-tip-pos="left">Copy snippet</button></div>
+          <div class="code-block"><span class="code-comment">&lt;!-- AIMS OS Web Chat Widget --&gt;</span>
+<span style="color:rgba(255,255,255,.6);">&lt;script&gt;</span>  window.AIMSConfig = { <span class="code-attr">tenantId</span>: <span class="code-val">"acme-corp-9f2a"</span>, <span class="code-attr">channelId</span>: <span class="code-val">"webchat-prod"</span>, <span class="code-attr">primaryColor</span>: <span class="code-val">"#155DFC"</span>, <span class="code-attr">position</span>: <span class="code-val">"bottom-right"</span> }; <span style="color:rgba(255,255,255,.6);">&lt;/script&gt;
+&lt;script src="https://cdn.aimsos.ai/widget/v3/chat.min.js" async&gt;&lt;/script&gt;</span></div>
+          <div style="margin-top:var(--space-4);">
+            <div class="input-label" style="margin-bottom:var(--space-1);">Allowed Domains</div>
+            <p class="input-hint" style="margin-bottom:var(--space-2);">The widget will only load on these domains. Add all environments.</p>
+            <div class="row g-2" style="flex-wrap:wrap;margin-bottom:var(--space-2);" id="domain-chips">
+              <div class="chip">acme.com <span class="chip-remove" onclick="removeChip(this)" data-tooltip="Remove domain" data-tip-pos="above">×</span></div>
+              <div class="chip">app.acme.com <span class="chip-remove" onclick="removeChip(this)" data-tooltip="Remove domain" data-tip-pos="above">×</span></div>
+              <div class="chip">staging.acme.com <span class="chip-remove" onclick="removeChip(this)" data-tooltip="Remove domain" data-tip-pos="above">×</span></div>
+            </div>
+            <div class="row g-2"><input class="input" id="domain-input" style="max-width:280px;" placeholder="Add domain, e.g. help.acme.com" onkeydown="if(event.key==='Enter')addDomain()"><button class="btn btn-ghost btn-sm" onclick="addDomain()" data-tooltip="Add allowed domain" data-tip-pos="right">Add</button></div>
+          </div>
+        </div>
+        ${agentMappingSection('0.72','8')}
+        ${responseModeSection(true, 3, true)}
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Safety Controls</div><p class="card-body" style="margin-top:2px;">Rate limits and emergency controls for this channel</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Message Rate Limit</div><p class="input-hint">Maximum messages per user per hour</p></div>
+              <div class="row g-2"><input class="input" type="number" value="20" style="width:70px;text-align:center;"><span style="font-size:12px;color:var(--text-caption);">msg/hr</span></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Blocked Keywords Filter</div><p class="input-hint">Block messages containing restricted terms</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable keyword filter" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">PII Redaction</div><p class="input-hint">Automatically redact credit cards, SSNs, emails from logs</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable PII redaction" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;border-bottom:none;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Out-of-hours Behavior</div><p class="input-hint">What the widget does outside configured business hours</p></div>
+              <select class="select" style="width:220px;"><option selected>Show offline message + collect email</option><option>Hide widget entirely</option><option>Continue with AI (no escalation)</option></select>
+            </div>
+          </div>
+        </div>
+        ${dangerZoneSection('Web Chat')}
+      </div>`;
+    },
+
+    /* ──────────────── 2: WHATSAPP ──────────────── */
+    2: () => {
+      const icon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#05DF72" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-5"/></svg>`;
+      return panelHeader('WhatsApp','Active','','Connected 28 days ago','rgba(5,223,114,.10)',icon) + `
+      <div style="display:flex;flex-direction:column;gap:var(--space-5);">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Provider & Connection</div><p class="card-body" style="margin-top:2px;">Meta Business API credentials and phone number configuration</p></div><span class="badge badge-success">Verified</span></div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+              <div class="input-group">
+                <label class="input-label">Meta Business Account ID</label>
+                <input class="input" value="1122334455667788">
+              </div>
+              <div class="input-group">
+                <label class="input-label">WhatsApp Phone Number ID</label>
+                <input class="input" value="9988776655443322">
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">System User Access Token</label>
+              <div class="row g-2"><input class="input" value="EAABc••••••••••••••••••••••••••••••••••••••••••ZDZD" readonly><button class="btn btn-secondary btn-sm" onclick="toast('Revealed in real app','info')" data-tooltip="Show hidden credential" data-tip-pos="left">Reveal</button></div>
+              <p class="input-hint">Never share this token. Rotate it immediately if compromised.</p>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Webhook Verify Token</label>
+              <div class="row g-2"><input class="input" value="aims_wh_••••••••••••••••" readonly><button class="btn btn-secondary btn-sm" onclick="copyText('aims_wh_acme_corp_9f2a_verify')" data-tooltip="Copy to clipboard" data-tip-pos="left">Copy</button></div>
+              <p class="input-hint">Paste this in Meta's webhook configuration</p>
+            </div>
+            ${channelNumbersSection('whatsapp','rgba(5,223,114,0.12)','#05DF72')}
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Message Templates</div><p class="card-body" style="margin-top:2px;">Pre-approved Meta templates for outbound messages and session re-entry</p></div><button class="btn btn-ghost btn-sm" onclick="toast('Opening Meta Business Manager…','info')" data-tooltip="Open Meta Business Manager" data-tip-pos="left">Manage in Meta</button></div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div class="flex-1"><div style="font-size:13px;font-weight:700;color:var(--text-title);">order_status_update</div><p class="input-hint">Marketing · Spanish · English</p></div>
+              <span class="badge badge-success">Approved</span>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div class="flex-1"><div style="font-size:13px;font-weight:700;color:var(--text-title);">support_reopen_session</div><p class="input-hint">Utility · Spanish</p></div>
+              <span class="badge badge-success">Approved</span>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div class="flex-1"><div style="font-size:13px;font-weight:700;color:var(--text-title);">refund_confirmation</div><p class="input-hint">Utility · Spanish · English</p></div>
+              <span class="badge badge-success">Approved</span>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;border-bottom:none;">
+              <div class="flex-1"><div style="font-size:13px;font-weight:700;color:var(--text-title);">promo_may_upgrade</div><p class="input-hint">Marketing · Spanish</p></div>
+              <span class="badge badge-alert">In review</span>
+            </div>
+          </div>
+        </div>
+        ${agentMappingSection('0.75','6')}
+        ${responseModeSection(false)}
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Safety & Compliance</div><p class="card-body" style="margin-top:2px;">WhatsApp-specific rules and opt-out handling</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">24-hour Session Window Enforcement</div><p class="input-hint">Use templates automatically when customer window expires</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable session window enforcement" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Opt-out Keyword Handling</div><p class="input-hint">Auto-unsubscribe on STOP, BAJA, CANCELAR</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable opt-out keyword detection" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;border-bottom:none;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">PII Redaction</div><p class="input-hint">Redact sensitive data from message logs</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable PII redaction" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+          </div>
+        </div>
+        ${dangerZoneSection('WhatsApp')}
+      </div>`;
+    },
+
+    /* ──────────────── 3: EMAIL ──────────────── */
+    3: () => {
+      const icon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 7 10-7"/></svg>`;
+      return panelHeader('Email','Active','','DNS verified · 21 days ago','rgba(167,139,250,.10)',icon) + `
+      <div style="display:flex;flex-direction:column;gap:var(--space-5);">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Provider & Credentials</div><p class="card-body" style="margin-top:2px;">SendGrid configuration for inbound and outbound email</p></div><span class="badge badge-success">Connected</span></div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+            <div class="input-group">
+              <label class="input-label">API Key</label>
+              <div class="row g-2"><input class="input" value="SG.••••••••••••••••••••••••••••••••" readonly><button class="btn btn-secondary btn-sm" onclick="toast('Revealed in real app','info')" data-tooltip="Show hidden credential" data-tip-pos="left">Reveal</button></div>
+              <p class="input-hint">Full access key. Rotate immediately if compromised.</p>
+            </div>
+            ${channelNumbersSection('email','rgba(167,139,250,0.12)','#A78BFA')}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+              <div class="input-group">
+                <label class="input-label">Reply-To</label>
+                <input class="input" value="noreply@acme.com">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Inbound Parse Webhook</label>
+                <div class="row g-2"><input class="input" value="hooks.aimsos.ai/email/acme" readonly><button class="btn btn-secondary btn-sm" onclick="copyText('https://hooks.aimsos.ai/email/acme-corp-9f2a')" data-tooltip="Copy to clipboard" data-tip-pos="left">Copy</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">DNS Authentication</div><p class="card-body" style="margin-top:2px;">Records that verify your domain and improve deliverability</p></div><button class="btn btn-ghost btn-sm" onclick="toast('Re-verifying DNS records…','info')" data-tooltip="Re-check DNS records now" data-tip-pos="left">Re-verify</button></div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div class="flex-1"><div style="font-size:13px;font-weight:700;color:var(--text-title);">SPF Record</div><p class="input-hint">v=spf1 include:sendgrid.net ~all</p></div>
+              <span class="badge badge-success">Verified</span>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div class="flex-1"><div style="font-size:13px;font-weight:700;color:var(--text-title);">DKIM Signature</div><p class="input-hint">s1._domainkey.acme.com</p></div>
+              <span class="badge badge-success">Verified</span>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;border-bottom:none;">
+              <div class="flex-1"><div style="font-size:13px;font-weight:700;color:var(--text-title);">DMARC Policy</div><p class="input-hint">p=quarantine; rua=mailto:dmarc@acme.com</p></div>
+              <span class="badge badge-success">Verified</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Email Signature & Footer</div><p class="card-body" style="margin-top:2px;">Appended to every outbound email from this channel</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+            <div class="input-group">
+              <label class="input-label">Signature</label>
+              <textarea class="input" style="min-height:80px;resize:vertical;">Best regards,\nACME Corp Support Team\nsupport@acme.com | acme.com/help</textarea>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Unsubscribe Footer</label>
+              <select class="select"><option selected>Managed by AIMS OS (auto-inserted)</option><option>Custom unsubscribe link</option><option>None (transactional only)</option></select>
+              <p class="input-hint">Required by CAN-SPAM and GDPR for marketing emails</p>
+            </div>
+          </div>
+        </div>
+        ${agentMappingSection('0.78','10')}
+        ${responseModeSection(false)}
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Safety Controls</div><p class="card-body" style="margin-top:2px;">Send limits, filtering, and bounce handling</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Daily Send Limit</div><p class="input-hint">Maximum outbound emails per day across all workers</p></div>
+              <div class="row g-2"><input class="input" type="number" value="50000" style="width:90px;text-align:center;"><span style="font-size:12px;color:var(--text-caption);">emails/day</span></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Auto-Suppress Bounces</div><p class="input-hint">Block sending to hard-bounced addresses automatically</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable bounce suppression" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;border-bottom:none;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">PII Redaction in Logs</div><p class="input-hint">Redact email body content from AIMS audit logs</p></div>
+              <div class="toggle off" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable PII redaction in logs" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+          </div>
+        </div>
+        ${dangerZoneSection('Email')}
+      </div>`;
+    },
+
+    /* ──────────────── 4: SMS ──────────────── */
+    4: () => {
+      const icon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FDC700" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/><circle cx="12" cy="18.5" r="1" fill="#FDC700" stroke="none"/></svg>`;
+      return panelHeader('SMS','Active','High latency','Connected 60 days ago','rgba(253,199,0,.10)',icon) + `
+      <div style="display:flex;flex-direction:column;gap:var(--space-5);">
+        <div class="card" style="border-color:rgba(253,199,0,.25);">
+          <div class="card-header"><div><div class="card-title">Provider & Connection</div><p class="card-body" style="margin-top:2px;">Twilio SMS credentials and phone number</p></div><span class="badge badge-alert">High latency</span></div>
+          <div style="background:var(--alert-bg);border:1px solid rgba(253,199,0,.2);border-radius:var(--radius-m);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);">
+            <div class="row g-2" style="margin-bottom:var(--space-1);">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--alert)" stroke-width="1.5"><path d="M6 1l5 9H1z"/><path d="M6 5v2M6 9v.5"/></svg>
+              <span style="font-size:12px;font-weight:700;color:var(--alert);">Carrier latency detected — 480ms avg</span>
+            </div>
+            <p style="font-size:12px;color:rgba(253,199,0,.7);">Twilio is reporting elevated latency on US carrier routes. Last checked 5 min ago.</p>
+            <div style="margin-top:var(--space-2);"><a class="link" onclick="toast('Opening Twilio status page…','info')" style="cursor:pointer;" data-tooltip="Check Twilio carrier status page" data-tip-pos="right">View Twilio Status →</a></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+              <div class="input-group">
+                <label class="input-label">Account SID</label>
+                <div class="row g-2"><input class="input" value="AC••••••••••••••••••••••9f2a" readonly><button class="btn btn-secondary btn-sm" onclick="toast('Revealed in real app','info')" data-tooltip="Show hidden credential" data-tip-pos="left">Reveal</button></div>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Auth Token</label>
+                <div class="row g-2"><input class="input" value="••••••••••••••••••••••••••••••••" readonly><button class="btn btn-secondary btn-sm" onclick="toast('Revealed in real app','info')" data-tooltip="Show hidden credential" data-tip-pos="left">Reveal</button></div>
+              </div>
+            </div>
+            ${channelNumbersSection('sms','rgba(253,199,0,0.12)','#FDC700')}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+              <div class="input-group">
+                <label class="input-label">Webhook URL</label>
+                <div class="row g-2"><input class="input" value="hooks.aimsos.ai/v1/sms/acme" readonly><button class="btn btn-secondary btn-sm" onclick="copyText('https://hooks.aimsos.ai/v1/sms/acme-corp-9f2a')" data-tooltip="Copy to clipboard" data-tip-pos="left">Copy</button></div>
+                <p class="input-hint">Set this as your Twilio SMS webhook</p>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Messaging Service SID</label>
+                <input class="input" value="MG••••••••••••••••••••••••••••c4a1">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Opt-out & Compliance</div><p class="card-body" style="margin-top:2px;">Keyword handling and carrier compliance settings</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">STOP Keyword Auto-unsubscribe</div><p class="input-hint">Instantly remove from contact list on STOP, UNSUBSCRIBE, CANCEL</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable STOP keyword handling" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">HELP Keyword Auto-reply</div><p class="input-hint">Reply with support info when customer sends HELP or AYUDA</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable HELP auto-reply" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;border-bottom:none;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Quiet Hours</div><p class="input-hint">Block outbound SMS during restricted hours</p></div>
+              <div class="row g-2">
+                <input class="input" type="time" value="21:00" style="width:100px;">
+                <span style="font-size:12px;color:var(--text-caption);align-self:center;">–</span>
+                <input class="input" type="time" value="08:00" style="width:100px;">
+              </div>
+            </div>
+          </div>
+        </div>
+        ${agentMappingSection('0.68','6')}
+        ${responseModeSection(false)}
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Safety Controls</div><p class="card-body" style="margin-top:2px;">Rate limits and carrier filtering</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Message Rate Limit</div><p class="input-hint">Maximum outbound SMS per contact per day</p></div>
+              <div class="row g-2"><input class="input" type="number" value="5" style="width:70px;text-align:center;"><span style="font-size:12px;color:var(--text-caption);">msg/day</span></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">Carrier Filtering</div><p class="input-hint">Skip contacts on carriers with persistent delivery issues</p></div>
+              <div class="toggle off" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable carrier filtering" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+            <div class="metric-row" style="padding:var(--space-3) 0;border-bottom:none;">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text-title);">PII Redaction</div><p class="input-hint">Redact sensitive data from SMS message logs</p></div>
+              <div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off');" data-tooltip="Enable / Disable PII redaction" data-tip-pos="left"><div class="toggle-thumb"></div></div>
+            </div>
+          </div>
+        </div>
+        ${dangerZoneSection('SMS')}
+      </div>`;
+    }
+  };
+
+  function selectChannel(el) { /* no-op */ }
+
+  /* ── MODE CARD TOGGLE ── */
+  function selectMode(el, mode) {
+    el.closest('.card').querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  /* ── COPY HELPER ── */
+  function copyText(text) {
+    navigator.clipboard.writeText(text).catch(()=>{});
+    toast('Copied to clipboard', 'success');
+  }
+
+  /* ── TOAST ── */
+  function toast(msg, type='success') {
+    const colors = { success:'var(--success-bg)', error:'var(--error-bg)', info:'var(--primary-subtle)' };
+    const borders = { success:'rgba(5,223,114,.25)', error:'rgba(255,100,103,.25)', info:'rgba(43,127,255,.25)' };
+    const t = document.createElement('div');
+    t.style.cssText = `background:${colors[type]};border:1px solid ${borders[type]};color:var(--text-title);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:var(--shadow-2);pointer-events:auto;min-width:200px;`;
+    t.textContent = msg;
+    document.getElementById('toast-container').appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); }, 2600);
+  }
+
+  /* ── MODALS ── */
+  function openModal(id) { document.getElementById(id).style.display='flex'; }
+  function closeModal(id) { document.getElementById(id).style.display='none'; }
+  function closeModalOverlay(e, overlay) { if (e.target === overlay) closeModal(overlay.id); }
+
+  /* ── CHANNEL OPTION SELECT (add channel modal) ── */
+  function selectOption(el) {
+    document.querySelectorAll('.ch-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  /* ── PAUSE CHANNEL (header) ── */
+  let channelPaused = false;
+  function togglePauseChannel() {
+    channelPaused = !channelPaused;
+    const btn = document.getElementById('btn-pause-channel');
+    btn.textContent = channelPaused ? 'Resume Channel' : 'Pause Channel';
+    toast(channelPaused ? 'Channel paused' : 'Channel resumed', channelPaused ? 'info' : 'success');
+  }
+
+  /* ── PAUSE WEB CHAT (danger zone) ── */
+  let webchatPaused = false;
+  function togglePauseWebchat() {
+    webchatPaused = !webchatPaused;
+    const btn = document.getElementById('btn-pause-webchat');
+    btn.textContent = webchatPaused ? 'Resume Web Chat' : 'Pause Web Chat';
+    toast(webchatPaused ? 'Web Chat paused' : 'Web Chat resumed', webchatPaused ? 'info' : 'success');
+  }
+
+  /* ── SAVE CHANGES ── */
+  function saveChanges() { toast('Settings saved', 'success'); }
+
+  /* ── COPY SNIPPET ── */
+  function copySnippet() {
+    const snippet = `<!-- AIMS OS Web Chat Widget -->\n<script>window.AIMSConfig={tenantId:"acme-corp-9f2a",channelId:"webchat-prod",primaryColor:"#155DFC",position:"bottom-right"};<\/script>\n<script src="https://cdn.aimsos.ai/widget/v3/chat.min.js" async><\/script>`;
+    navigator.clipboard.writeText(snippet).catch(()=>{});
+    const btn = document.getElementById('btn-copy-snippet');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy snippet'; }, 2000);
+  }
+
+  /* ── DOMAIN CHIPS ── */
+  function addDomain() {
+    const input = document.getElementById('domain-input');
+    const val = input.value.trim();
+    if (!val) return;
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = val + ' <span class="chip-remove" onclick="removeChip(this)">×</span>';
+    document.getElementById('domain-chips').appendChild(chip);
+    input.value = '';
+    toast('Domain added', 'success');
+  }
+  function removeChip(span) { span.parentElement.remove(); }
+
+  /* ── APPROVAL QUEUE ── */
+  let pendingCount = 3;
+  function updatePending() {
+    pendingCount = document.querySelectorAll('.appr-card:not([style*="display:none"])').length;
+    // Sync count in approval summary card
+    const el = document.querySelector('#tab-approvals .stat-value[style*="color:var(--alert)"]');
+    if (el) el.textContent = pendingCount;
+    // Sync subnav tab count
+    const tabCount = document.getElementById('tab-approvals-count');
+    if (tabCount) { tabCount.textContent = pendingCount; tabCount.style.display = pendingCount === 0 ? 'none' : ''; }
+    if (pendingCount === 0) document.getElementById('approvals-empty').style.display='block';
+  }
+  function approveCard(id) {
+    const card = document.getElementById(id);
+    card.style.transition = 'opacity .25s, transform .25s';
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(12px)';
+    setTimeout(() => { card.style.display='none'; updatePending(); }, 260);
+    toast('Response sent to customer', 'success');
+  }
+  function rejectCard(id) {
+    const card = document.getElementById(id);
+    card.style.transition = 'opacity .25s';
+    card.style.opacity = '0';
+    setTimeout(() => { card.style.display='none'; updatePending(); }, 260);
+    toast('Response rejected', 'error');
+  }
+  let editTargetId = null;
+  function editCard(id) {
+    editTargetId = id;
+    const text = document.querySelector('#' + id + ' .appr-text').textContent.trim();
+    document.getElementById('edit-textarea').value = text;
+    openModal('modal-edit');
+  }
+  function sendEdited() {
+    closeModal('modal-edit');
+    if (editTargetId) approveCard(editTargetId);
+    editTargetId = null;
+  }
+  function approveAll() {
+    document.querySelectorAll('.appr-card').forEach(card => { card.style.display='none'; });
+    updatePending();
+    toast('All responses sent', 'success');
+  }
+
+  /* ── OUTBOUND CAMPAIGN PAUSE ── */
+  function toggleCampaignPause(btn) {
+    const paused = btn.textContent === 'Pause';
+    btn.textContent = paused ? 'Resume' : 'Pause';
+    const badge = btn.closest('.card').querySelector('.badge-success');
+    if (badge) {
+      badge.className = paused ? 'badge badge-neutral' : 'badge badge-success';
+      badge.innerHTML = paused ? 'Paused' : '<span class="badge-dot"></span>Running';
+    }
+    toast(paused ? 'Campaign paused' : 'Campaign resumed', paused ? 'info' : 'success');
+  }
+
+  /* ── SIDEBAR COLLAPSE TOGGLE ── */
+  function sbToggle() {
+    const sb = document.getElementById('appSidebar');
+    const btn = document.getElementById('sbToggleBtn');
+    const expanded = sb.classList.toggle('sb-expanded');
+    btn.setAttribute('aria-expanded', expanded);
+    btn.querySelector('.sb-toggle-label').textContent = expanded ? 'Collapse' : 'Expand';
+    try { localStorage.setItem('sb_ch_expanded', expanded ? '1' : '0'); } catch(e) {}
+  }
+  (function sbInit() {
+    try {
+      if (localStorage.getItem('sb_ch_expanded') === '1') {
+        const sb = document.getElementById('appSidebar');
+        const btn = document.getElementById('sbToggleBtn');
+        if (sb) { sb.classList.add('sb-expanded'); }
+        if (btn) { btn.setAttribute('aria-expanded','true'); btn.querySelector('.sb-toggle-label').textContent='Collapse'; }
+      }
+    } catch(e) {}
+  })();
+
+  /* ── INIT ── */
+  document.getElementById('channel-subnav').style.display = 'none';
+  showChannelList();
+</script>
+
+<!-- Number Picker Modal -->
+<div class="num-picker-modal" id="numPickerModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="num-picker-box">
+    <div style="padding:20px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.07);">
+      <span style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.88);">Add Number</span>
+      <button style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px;" onclick="document.getElementById('numPickerModal').classList.remove('open')">×</button>
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);padding:10px 20px 0;margin:0;">Select an available number to add to this channel.</p>
+    <div id="numPickerList" style="max-height:280px;overflow-y:auto;"></div>
+  </div>
+</div>
+</body>
+</html>

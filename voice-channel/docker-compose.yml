@@ -1,0 +1,70 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: voice_postgres
+    environment:
+      POSTGRES_DB: voice_db
+      POSTGRES_USER: voice_user
+      POSTGRES_PASSWORD: voice_pass
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./voice-gateway/src/db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U voice_user -d voice_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: voice_redis
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  voice-gateway:
+    build:
+      context: ./voice-gateway
+      dockerfile: Dockerfile
+    container_name: voice_gateway
+    env_file:
+      - ./voice-gateway/.env
+    environment:
+      DATABASE_URL: postgres://voice_user:voice_pass@postgres:5432/voice_db
+    ports:
+      - '3001:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./voice-gateway/src:/app/src:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:3001/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  voice-ui:
+    build:
+      context: ./voice-ui
+      dockerfile: Dockerfile
+    container_name: voice_ui
+    ports:
+      - '5173:80'
+    depends_on:
+      - voice-gateway
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

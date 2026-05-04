@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIMS-OS — Voice Channel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #0d0f16;
+      --sb:        #111318;
+      --surface:   #171a24;
+      --surface2:  #1d2030;
+      --border:    #242736;
+      --border2:   #2e3349;
+      --accent:    #7c3aed;
+      --acl:       #a78bfa;
+      --text:      #e2e8f0;
+      --t2:        #94a3b8;
+      --muted:     #64748b;
+      --green:     #22c55e;
+      --red:       #ef4444;
+      --amber:     #f59e0b;
+    }
+
+    body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif; height:100vh; overflow:hidden; font-size:13px; line-height:1.4; }
+
+    /* ── LAYOUT ── */
+    .app { display:flex; height:100vh; }
+
+    /* ── SIDEBAR ── */
+    .sb { width:220px; min-width:220px; background:var(--sb); border-right:1px solid var(--border); display:flex; flex-direction:column; }
+
+    .sb-header { padding:15px 14px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border); }
+    .av { width:32px; height:32px; background:var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0; }
+    .av.sm { width:28px; height:28px; border-radius:50%; font-size:12px; background:var(--surface2); }
+    .brand-name { font-size:13px; font-weight:600; }
+    .brand-sub  { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+
+    .sb-nav { flex:1; overflow-y:auto; padding:10px 8px; }
+    .sec-lbl { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; padding:10px 8px 4px; }
+
+    .ni { display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:8px; cursor:pointer; color:var(--t2); font-size:13px; font-weight:500; transition:all .15s; margin-bottom:1px; border-left:2px solid transparent; }
+    .ni:hover { background:rgba(255,255,255,.05); color:var(--text); }
+    .ni.active { background:rgba(124,58,237,.18); color:var(--acl); border-left-color:#7c3aed; padding-left:12px; }
+    .ni svg { width:15px; height:15px; flex-shrink:0; }
+
+    .sb-footer { padding:12px 14px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-footer .info .name { font-size:12px; font-weight:600; }
+    .sb-footer .info .role { font-size:10px; color:var(--muted); }
+
+    /* ── MAIN ── */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+    .pg-header { padding:20px 28px 0; border-bottom:1px solid var(--border); }
+    .pg-title-row { display:flex; align-items:center; gap:14px; }
+    .pg-icon { width:40px; height:40px; background:rgba(124,58,237,.2); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .pg-title { font-size:22px; font-weight:700; }
+    .pg-subtitle { font-size:12px; color:var(--muted); margin:4px 0 0 54px; }
+
+    .pg-tabs { display:flex; margin-left:54px; margin-top:14px; }
+    .tb { padding:9px 18px; font-size:13px; font-weight:500; color:var(--t2); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:6px; }
+    .tb:hover { color:var(--text); }
+    .tb.active { color:var(--acl); border-bottom-color:var(--accent); }
+
+    .pg-content { flex:1; display:flex; overflow:hidden; }
+    .tab-pnl { flex:1; overflow-y:auto; padding:24px 28px; display:none; }
+    .tab-pnl.on { display:block; }
+    .tab-pnl.flex-on { display:flex; flex-direction:column; padding:0; }
+
+    /* ── OVERVIEW ── */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+    .sc { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px 14px; position:relative; overflow:hidden; }
+    .sc-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+    .sc-label { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+    .sc-icon { width:34px; height:34px; background:var(--surface2); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+    .sc-val { font-size:28px; font-weight:700; margin-bottom:6px; line-height:1; }
+    .sc-trend { font-size:11px; color:var(--green); display:flex; align-items:center; gap:3px; }
+    .sc-trend span { color:var(--muted); }
+    .mini-chart { position:absolute; bottom:0; right:10px; opacity:.4; }
+
+    .charts-row { display:grid; grid-template-columns:1fr 350px; gap:14px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; }
+    .card-title { font-size:13px; font-weight:600; margin-bottom:16px; }
+
+    .barchart { display:flex; align-items:flex-end; gap:6px; height:110px; }
+    .bg { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; height:100%; justify-content:flex-end; }
+    .bv { font-size:9px; color:var(--muted); }
+    .bar { width:100%; background:linear-gradient(to top,#7c3aed,#a78bfa); border-radius:4px 4px 0 0; }
+    .bl { font-size:10px; color:var(--muted); }
+
+    .ri { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .ri:last-child { border:none; }
+    .ri-ico { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+    .ri-ico.ok { background:rgba(34,197,94,.15); }
+    .ri-ico.fail { background:rgba(239,68,68,.12); }
+    .ri-info { flex:1; }
+    .ri-num { font-size:12px; font-weight:600; }
+    .ri-sub { font-size:11px; color:var(--muted); }
+    .ri-r { text-align:right; }
+    .ri-time { font-size:10px; color:var(--muted); margin-top:2px; }
+
+    /* ── BADGES ── */
+    .badge { font-size:10px; font-weight:600; padding:3px 8px; border-radius:99px; display:inline-block; }
+    .b-ok  { background:rgba(34,197,94,.13); color:var(--green); }
+    .b-fail{ background:rgba(239,68,68,.11); color:var(--red); }
+    .b-act { background:rgba(34,197,94,.13); color:var(--green); border:1px solid rgba(34,197,94,.25); }
+    .b-avail{background:rgba(99,102,241,.13);color:#818cf8; border:1px solid rgba(99,102,241,.25); }
+    .b-closed{background:rgba(100,116,139,.12);color:var(--muted);border:1px solid var(--border);}
+    .b-agent {background:rgba(99,102,241,.13);color:#818cf8; border:1px solid rgba(99,102,241,.25);}
+    .b-appr { background:rgba(34,197,94,.13); color:var(--green); }
+    .b-pend { background:rgba(245,158,11,.13); color:var(--amber); }
+    .b-na   { background:rgba(100,116,139,.1); color:var(--muted); border:1px solid var(--border); }
+    .b-pos  { background:rgba(34,197,94,.12); color:var(--green); }
+    .b-neu  { background:rgba(245,158,11,.12); color:var(--amber); }
+    .b-neg  { background:rgba(239,68,68,.11); color:var(--red); }
+    .b-neutral-lg { background:rgba(245,158,11,.12); color:var(--amber); padding:4px 12px; border-radius:99px; font-size:11px; font-weight:600; }
+
+    /* ── LOGS ── */
+    .logs-bar { padding:14px 28px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border); flex-shrink:0; }
+    .sw { position:relative; flex:1; max-width:460px; }
+    .sw input { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 14px 8px 36px; color:var(--text); font-size:13px; outline:none; }
+    .sw input::placeholder { color:var(--muted); }
+    .sw .si { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--muted); }
+    .fg { display:flex; gap:4px; }
+    .fb { padding:7px 14px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--t2); font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; }
+    .fb:hover { color:var(--text); }
+    .fb.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+    .logs-body { flex:1; display:flex; overflow:hidden; }
+    .tbl-wrap { flex:1; overflow-y:auto; }
+
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:10px 16px; text-align:left; font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:2; white-space:nowrap; }
+    tbody tr { border-bottom:1px solid var(--border); cursor:pointer; transition:background .1s; }
+    tbody tr:hover { background:rgba(255,255,255,.03); }
+    tbody tr.sel { background:rgba(124,58,237,.07); }
+    td { padding:11px 16px; font-size:13px; white-space:nowrap; }
+    .cn { font-weight:600; margin-bottom:2px; }
+    .cp { font-size:11px; color:var(--muted); }
+
+    .da { display:inline-flex; align-items:center; gap:6px; font-size:12px; }
+    .darr { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; }
+    .darr.in  { background:rgba(124,58,237,.15); color:var(--acl); }
+    .darr.out { background:rgba(34,197,94,.12);  color:var(--green); }
+
+    .src-badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:3px 8px; border-radius:6px; }
+    .src-c { background:rgba(124,58,237,.12); color:var(--acl); border:1px solid rgba(124,58,237,.2); }
+    .src-i { background:rgba(100,116,139,.1);  color:var(--muted); border:1px solid var(--border); }
+
+    /* ── SIDE PANEL ── */
+    .sp { width:0; background:var(--surface); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; transition:width .2s ease; flex-shrink:0; }
+    .sp.open { width:490px; }
+
+    .sp-head { padding:15px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:var(--surface2); flex-shrink:0; }
+    .sp-head-l { display:flex; align-items:center; gap:8px; font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+    .sp-close { width:28px; height:28px; border-radius:6px; background:none; border:1px solid var(--border); color:var(--muted); cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .sp-close:hover { background:var(--surface); color:var(--text); }
+
+    .sp-contact { padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
+    .sp-contact-name { font-size:18px; font-weight:700; margin-bottom:2px; }
+    .sp-contact-num  { font-size:13px; color:var(--muted); margin-bottom:10px; }
+    .sp-badges { display:flex; gap:6px; }
+
+    .sp-tabs { display:flex; border-bottom:1px solid var(--border); background:var(--surface2); flex-shrink:0; }
+    .spt { padding:9px 16px; font-size:12px; font-weight:500; color:var(--t2); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; transition:all .15s; }
+    .spt.active { color:var(--acl); border-bottom-color:var(--accent); }
+
+    .sp-body { flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
+
+    /* convo messages */
+    .msg { display:flex; flex-direction:column; gap:3px; }
+    .msg.ag { align-items:flex-end; }
+    .msg.us { align-items:flex-start; }
+    .msg-meta { font-size:10px; color:var(--muted); font-weight:600; letter-spacing:.03em; }
+    .msg-bbl { max-width:82%; padding:9px 13px; border-radius:12px; font-size:13px; line-height:1.5; }
+    .msg.ag .msg-bbl { background:var(--surface2); border:1px solid var(--border); border-top-right-radius:3px; }
+    .msg.us .msg-bbl { background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.24); border-top-left-radius:3px; }
+
+    .sp-footer { padding:13px 20px; border-top:1px solid var(--border); display:flex; gap:10px; background:var(--surface2); flex-shrink:0; }
+    .btn-sec { flex:1; padding:9px; border-radius:8px; background:none; border:1px solid var(--border); color:var(--t2); font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; }
+    .btn-sec:hover { color:var(--text); border-color:var(--muted); }
+    .btn-pri { flex:2; padding:9px; border-radius:8px; background:var(--accent); border:none; color:#fff; font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-pri:hover { background:#6d28d9; }
+    .btn-dnger { flex:1; padding:9px; border-radius:8px; background:none; border:1px solid rgba(239,68,68,.4); color:var(--red); font-size:13px; font-weight:600; cursor:pointer; }
+    .btn-dnger:hover { background:rgba(239,68,68,.07); }
+
+    /* ── SETTINGS ── */
+    .set-bar { padding:18px 28px 14px; display:flex; align-items:flex-start; justify-content:space-between; border-bottom:1px solid var(--border); flex-shrink:0; }
+    .set-title { font-size:16px; font-weight:700; }
+    .set-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+    .btn-add { padding:9px 16px; border-radius:8px; background:var(--accent); border:none; color:#fff; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; }
+    .btn-add:hover { background:#6d28d9; }
+
+    .gear-btn { background:none; border:1px solid var(--border); width:28px; height:28px; border-radius:6px; cursor:pointer; color:var(--muted); display:flex; align-items:center; justify-content:center; font-size:13px; transition:all .15s; }
+    .gear-btn:hover { color:var(--text); background:var(--surface2); }
+
+    /* Number config panel */
+    .num-hdr { padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
+    .num-main { font-size:20px; font-weight:700; margin-bottom:2px; }
+    .num-sub  { font-size:12px; color:var(--muted); margin-bottom:10px; }
+
+    .num-stats { display:flex; gap:0; padding:14px 0; border-bottom:1px solid var(--border); flex-shrink:0; }
+    .ns { flex:1; text-align:center; }
+    .ns-val { font-size:20px; font-weight:700; }
+    .ns-lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
+
+    .cfg-sec { padding:12px 20px; border-bottom:1px solid var(--border); }
+    .cfg-lbl { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+    .cfg-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; font-size:13px; }
+    .cfg-key { color:var(--t2); }
+    .cfg-val { color:var(--text); font-weight:500; }
+
+    .toggle { width:44px; height:24px; border-radius:99px; border:none; cursor:pointer; position:relative; transition:background .2s; background:var(--green); flex-shrink:0; }
+    .toggle::after { content:''; position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:right .2s, left .2s; }
+    .toggle.off { background:var(--border2); }
+    .toggle.off::after { right:auto; left:3px; }
+
+    /* scroll */
+    ::-webkit-scrollbar { width:4px; height:4px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+    /* ── PAGINATION ── */
+    .pagination{height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;gap:24px}
+    .pgn-rpp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);white-space:nowrap}
+    .pgn-rpp-wrap{position:relative}
+    .pgn-rpp-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text);background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer;transition:border-color .15s,background .15s;white-space:nowrap}
+    .pgn-rpp-btn:hover{background:rgba(255,255,255,0.07);border-color:var(--border2)}
+    .pgn-rpp-menu{position:absolute;bottom:calc(100% + 4px);left:0;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:4px;min-width:72px;z-index:120;display:none;flex-direction:column;gap:1px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+    .pgn-rpp-menu.open{display:flex}
+    .pgn-rpp-val{pointer-events:none}
+    .pgn-rpp-opt{padding:7px 12px;font-size:12px;color:var(--text);border-radius:5px;cursor:pointer;background:none;border:none;text-align:left;width:100%;transition:background .1s}
+    .pgn-rpp-opt:hover{background:rgba(255,255,255,0.06)}
+    .pgn-rpp-opt.sel{color:var(--accent);background:rgba(124,58,237,0.12)}
+    .pgn-range{font-size:12px;color:var(--text);white-space:nowrap}
+    .pgn-nav{display:flex;align-items:center;gap:4px}
+    .pgn-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,0.04);cursor:pointer;color:var(--text);transition:all .15s}
+    .pgn-btn:hover:not(:disabled){border-color:var(--border2);background:rgba(255,255,255,0.08)}
+    .pgn-btn:disabled{opacity:.3;cursor:not-allowed}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sb">
+    <div class="sb-header">
+      <div class="av">A</div>
+      <div>
+        <div class="brand-name">Communications</div>
+        <div class="brand-sub">AIMS OS</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sec-lbl">Global</div>
+      <div class="ni">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18M3 9h18M3 15h18M3 21h18"/><rect x="3" y="3" width="5" height="5" rx="1"/></svg>
+        Overview
+      </div>
+
+      <div class="sec-lbl" style="margin-top:8px">Channels</div>
+      <div class="ni active" onclick="/* already active */">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.54 2.18 2 2 0 012.54 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l.88-.88a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.27v.65z"/></svg>
+        Voice
+      </div>
+      <div class="ni">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        SMS
+      </div>
+      <div class="ni">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </div>
+      <div class="ni">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        Webchat
+      </div>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="av sm">A</div>
+      <div class="info">
+        <div class="name">Admin</div>
+        <div class="role">Platform</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+    <!-- Page header -->
+    <div class="pg-header">
+      <div class="pg-title-row">
+        <div class="pg-icon">📞</div>
+        <div class="pg-title">Voice</div>
+      </div>
+      <div class="pg-subtitle">Phone call performance, conversations, and telephony settings</div>
+      <div class="pg-tabs">
+        <button class="tb active" onclick="switchTab('overview',this)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Overview
+        </button>
+        <button class="tb" onclick="switchTab('logs',this)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Logs
+        </button>
+        <button class="tb" onclick="switchTab('settings',this)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="pg-content">
+
+      <!-- ── OVERVIEW ── -->
+      <div class="tab-pnl on" id="tab-overview">
+        <div class="stats-grid">
+          <div class="sc">
+            <div class="sc-top">
+              <div class="sc-label">Total Calls</div>
+              <div class="sc-icon">📞</div>
+            </div>
+            <div class="sc-val">1,098</div>
+            <div class="sc-trend">↑ +12.3% <span>vs last week</span></div>
+            <svg class="mini-chart" width="80" height="36" viewBox="0 0 80 36">
+              <polyline points="0,30 20,22 35,25 50,12 65,8 80,4" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="sc">
+            <div class="sc-top">
+              <div class="sc-label">Answer Rate</div>
+              <div class="sc-icon" style="background:rgba(34,197,94,.12);color:var(--green)">✓</div>
+            </div>
+            <div class="sc-val">87.2%</div>
+            <div class="sc-trend">↑ +3.1% <span>vs last week</span></div>
+          </div>
+          <div class="sc">
+            <div class="sc-top">
+              <div class="sc-label">Avg Duration</div>
+              <div class="sc-icon" style="font-size:15px">⏱</div>
+            </div>
+            <div class="sc-val">4:12</div>
+            <div class="sc-trend" style="color:var(--muted)"><span>avg across all calls</span></div>
+          </div>
+          <div class="sc">
+            <div class="sc-top">
+              <div class="sc-label">Avg Sentiment</div>
+              <div class="sc-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+              </div>
+            </div>
+            <div class="sc-val">0.68</div>
+            <div class="sc-trend">↑ +0.04 <span>vs last week</span></div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="card">
+            <div class="card-title">Call Volume — 7 Days</div>
+            <div class="barchart">
+              <div class="bg"><div class="bv">45</div><div class="bar" style="height:49%"></div><div class="bl">M</div></div>
+              <div class="bg"><div class="bv">52</div><div class="bar" style="height:57%"></div><div class="bl">T</div></div>
+              <div class="bg"><div class="bv">48</div><div class="bar" style="height:53%"></div><div class="bl">W</div></div>
+              <div class="bg"><div class="bv">61</div><div class="bar" style="height:67%"></div><div class="bl">T</div></div>
+              <div class="bg"><div class="bv">55</div><div class="bar" style="height:60%"></div><div class="bl">F</div></div>
+              <div class="bg"><div class="bv">67</div><div class="bar" style="height:74%"></div><div class="bl">S</div></div>
+              <div class="bg"><div class="bv">72</div><div class="bar" style="height:79%"></div><div class="bl">S</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Recent Numbers Used</div>
+            <div>
+              <div class="ri"><div class="ri-ico ok">✓</div><div class="ri-info"><div class="ri-num">+1 (402) 555-8821</div><div class="ri-sub">Maria Gonzalez · via +1 (402) 555-0171</div></div><div class="ri-r"><div class="badge b-ok">Successful</div><div class="ri-time">2 min ago</div></div></div>
+              <div class="ri"><div class="ri-ico fail">✕</div><div class="ri-info"><div class="ri-num">+1 (402) 555-7744</div><div class="ri-sub">James Wright · via +1 (402) 555-0192</div></div><div class="ri-r"><div class="badge b-fail">Unsuccessful</div><div class="ri-time">18 min ago</div></div></div>
+              <div class="ri"><div class="ri-ico ok">✓</div><div class="ri-info"><div class="ri-num">+1 (402) 555-3309</div><div class="ri-sub">Chen Wei · via +1 (402) 555-0171</div></div><div class="ri-r"><div class="badge b-ok">Successful</div><div class="ri-time">34 min ago</div></div></div>
+              <div class="ri"><div class="ri-ico fail">✕</div><div class="ri-info"><div class="ri-num">+1 (402) 555-5512</div><div class="ri-sub">Sarah Mitchell · via +1 (800) 555-0134</div></div><div class="ri-r"><div class="badge b-fail">Unsuccessful</div><div class="ri-time">1 hr ago</div></div></div>
+              <div class="ri"><div class="ri-ico ok">✓</div><div class="ri-info"><div class="ri-num">+1 (402) 555-2201</div><div class="ri-sub">Robert Lee · via +1 (402) 555-0215</div></div><div class="ri-r"><div class="badge b-ok">Successful</div><div class="ri-time">1.5 hr ago</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LOGS ── -->
+      <div class="tab-pnl flex-on" id="tab-logs" style="display:none">
+        <div class="logs-bar">
+          <div class="sw">
+            <span class="si">🔍</span>
+            <input type="text" placeholder="Search conversations...">
+          </div>
+          <div class="fg">
+            <button class="fb on" onclick="filterLogs('all',this)">All</button>
+            <button class="fb" onclick="filterLogs('inbound',this)">Inbound</button>
+            <button class="fb" onclick="filterLogs('outbound',this)">Outbound</button>
+          </div>
+        </div>
+
+        <div class="logs-body">
+          <div class="tbl-wrap" id="logsTableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:32px"></th>
+                  <th>Contact</th>
+                  <th>Via</th>
+                  <th>Direction</th>
+                  <th class="col-extra">Duration</th>
+                  <th class="col-extra">Sentiment</th>
+                  <th class="col-extra">Source</th>
+                  <th class="col-extra">Time</th>
+                </tr>
+              </thead>
+              <tbody id="logsBody"></tbody>
+            </table>
+            <div class="pagination" id="logs-pgn" data-total="0" data-rows="10" data-page="1">
+              <div class="pgn-rpp">Rows per page:
+                <div class="pgn-rpp-wrap">
+                  <button class="pgn-rpp-btn" onclick="togglePgnMenu(this,event)"><span class="pgn-rpp-val">10</span><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                  <div class="pgn-rpp-menu">
+                    <button class="pgn-rpp-opt sel" onclick="pgnSetRows(this,10)">10</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,25)">25</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,50)">50</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,100)">100</button>
+                  </div>
+                </div>
+              </div>
+              <span class="pgn-range">1–10 of 0 items</span>
+              <div class="pgn-nav">
+                <button class="pgn-btn pgn-prev" onclick="pgnGo(this,-1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button class="pgn-btn pgn-next" onclick="pgnGo(this,1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6l-3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Side panel for conversation -->
+          <div class="sp" id="convPanel">
+            <div class="sp-head">
+              <div class="sp-head-l">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.54 2.18 2 2 0 012.54 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l.88-.88a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.27v.65z"/></svg>
+                Voice
+              </div>
+              <button class="sp-close" onclick="closePanel()">✕</button>
+            </div>
+            <div class="sp-contact">
+              <div class="sp-contact-name" id="panelName"></div>
+              <div class="sp-contact-num"  id="panelNum"></div>
+              <div class="sp-badges">
+                <span class="badge b-closed">✓ Closed</span>
+                <span class="badge b-agent">👤 Agent</span>
+              </div>
+            </div>
+            <div class="sp-tabs">
+              <button class="spt active" onclick="switchPanelTab('convo',this)">Conversation</button>
+              <button class="spt" onclick="switchPanelTab('highlights',this)">Highlights</button>
+              <button class="spt" onclick="switchPanelTab('transcript',this)">Transcript</button>
+            </div>
+            <div class="sp-body" id="panelBody"></div>
+            <div class="sp-footer">
+              <button class="btn-sec">Download</button>
+              <button class="btn-pri">Reply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="tab-pnl flex-on" id="tab-settings" style="display:none">
+        <div class="set-bar">
+          <div>
+            <div class="set-title">Phone Numbers</div>
+            <div class="set-sub">Click any number to view and edit its configuration</div>
+          </div>
+          <button class="btn-add" id="getNumberBtn" onclick="handleGetNumber()">+ Get Number</button>
+        </div>
+
+        <div class="logs-body">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Number</th>
+                  <th>Type</th>
+                  <th>Label</th>
+                  <th>Status</th>
+                  <th>Calls</th>
+                  <th>Avg Dur</th>
+                  <th>10DLC</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="numbersBody"></tbody>
+            </table>
+            <div class="pagination" id="numbers-pgn" data-total="0" data-rows="10" data-page="1">
+              <div class="pgn-rpp">Rows per page:
+                <div class="pgn-rpp-wrap">
+                  <button class="pgn-rpp-btn" onclick="togglePgnMenu(this,event)"><span class="pgn-rpp-val">10</span><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                  <div class="pgn-rpp-menu">
+                    <button class="pgn-rpp-opt sel" onclick="pgnSetRows(this,10)">10</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,25)">25</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,50)">50</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(this,100)">100</button>
+                  </div>
+                </div>
+              </div>
+              <span class="pgn-range">1–10 of 0 items</span>
+              <div class="pgn-nav">
+                <button class="pgn-btn pgn-prev" onclick="pgnGo(this,-1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button class="pgn-btn pgn-next" onclick="pgnGo(this,1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6l-3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Side panel for number config -->
+          <div class="sp" id="numPanel">
+            <div class="sp-head">
+              <div class="sp-head-l">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                Phone Number Configuration
+              </div>
+              <button class="sp-close" onclick="closeNumPanel()">✕</button>
+            </div>
+            <div class="num-hdr">
+              <div class="num-main" id="numPanelNum"></div>
+              <div class="num-sub"  id="numPanelSub"></div>
+              <div class="sp-badges" id="numPanelBadges"></div>
+            </div>
+            <div class="num-stats" id="numPanelStats"></div>
+            <div class="sp-body" style="padding:0; gap:0;" id="numPanelBody"></div>
+            <div class="sp-footer">
+              <button class="btn-dnger">Release Number</button>
+              <button class="btn-pri" style="flex:2">Save Configuration</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pg-content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ── DATA ──────────────────────────────────────────
+const logsData = [
+  { id:1, name:'Maria Gonzalez',  phone:'+1 (402) 555-8821', via:'+1 (402) 555-0171', dir:'Inbound',  dur:'4:32', sent:'Positive', src:'Spring Service Promo', time:'0 hr ago',  convo:[
+    {role:'ag', who:'AGENT', ts:'0:00', text:'Good afternoon, thanks for calling! How can I help?'},
+    {role:'us', who:'MARIA GONZALEZ', ts:'0:08', text:'Hi, I received a mailer about your spring service special?'},
+    {role:'ag', who:'AGENT', ts:'0:22', text:'We have a great promotion. What service were you looking at?'},
+    {role:'us', who:'MARIA GONZALEZ', ts:'0:38', text:'I need a brake inspection. The mailer said $49.99?'},
+    {role:'ag', who:'AGENT', ts:'1:05', text:'Correct! We can get you in Thursday at 10 AM.'},
+    {role:'us', who:'MARIA GONZALEZ', ts:'1:32', text:'Thursday at 10 sounds perfect. Thank you!'},
+  ]},
+  { id:2, name:'James Wright',    phone:'+1 (402) 555-7744', via:'+1 (402) 555-0192', dir:'Outbound', dur:'6:15', sent:'Neutral',  src:'Trade-In Event',      time:'0 hr ago',  convo:[
+    {role:'ag', who:'AGENT', ts:'0:00', text:'Hi James, this is AIMS-OS calling about the trade-in event happening this weekend. Do you have a moment?'},
+    {role:'us', who:'JAMES WRIGHT', ts:'0:12', text:'Sure, what kind of event is it?'},
+    {role:'ag', who:'AGENT', ts:'0:20', text:'We\'re offering top trade-in values on all 2020-2022 models this weekend only.'},
+    {role:'us', who:'JAMES WRIGHT', ts:'0:45', text:'Interesting. What would my 2021 sedan be worth?'},
+  ]},
+  { id:3, name:'Chen Wei',        phone:'+1 (402) 555-3309', via:'+1 (402) 555-0171', dir:'Inbound',  dur:'3:08', sent:'Positive', src:'Recall Notice Q2',    time:'0 hr ago',  convo:[
+    {role:'ag', who:'AGENT', ts:'0:00', text:'Hello! Thank you for calling. What can I help you with today?'},
+    {role:'us', who:'CHEN WEI', ts:'0:09', text:'I got a recall notice for my vehicle. I\'d like to schedule the repair.'},
+    {role:'ag', who:'AGENT', ts:'0:18', text:'Absolutely, I can help with that. Can you share your VIN number?'},
+  ]},
+  { id:4, name:'Sarah Mitchell',  phone:'+1 (402) 555-5512', via:'+1 (800) 555-0134', dir:'Inbound',  dur:'8:42', sent:'Negative', src:'Individual',           time:'1 hr ago',  convo:[
+    {role:'ag', who:'AGENT', ts:'0:00', text:'Thank you for calling support. How can I assist?'},
+    {role:'us', who:'SARAH MITCHELL', ts:'0:07', text:'I\'ve been waiting 3 weeks for my part and nobody has called me back!'},
+    {role:'ag', who:'AGENT', ts:'0:15', text:'I sincerely apologize for the wait. Let me pull up your order immediately.'},
+  ]},
+  { id:5, name:'Robert Lee',      phone:'+1 (402) 555-2201', via:'+1 (402) 555-0215', dir:'Outbound', dur:'2:55', sent:'Positive', src:'Individual',           time:'1 hr ago',  convo:[
+    {role:'ag', who:'AGENT', ts:'0:00', text:'Hi Robert, calling to confirm your appointment tomorrow at 2 PM.'},
+    {role:'us', who:'ROBERT LEE', ts:'0:08', text:'Yes, that works great. See you then!'},
+  ]},
+  { id:6, name:'Patricia Adams',  phone:'+1 (402) 555-6617', via:'+1 (402) 555-0171', dir:'Inbound',  dur:'5:11', sent:'Neutral',  src:'Spring Service Promo', time:'1 hr ago',  convo:[
+    {role:'ag', who:'AGENT', ts:'0:00', text:'Good afternoon! What can I do for you today?'},
+    {role:'us', who:'PATRICIA ADAMS', ts:'0:11', text:'I saw your spring promo and wanted to know more about the oil change deal.'},
+  ]},
+  { id:7, name:'Maria Gonzalez 6',phone:'+1 (402) 555-8821', via:'+1 (402) 555-0171', dir:'Inbound',  dur:'4:32', sent:'Positive', src:'Trade-In Event',       time:'2 hr ago',  convo:[]},
+  { id:8, name:'James Wright 7',  phone:'+1 (402) 555-7744', via:'+1 (402) 555-0192', dir:'Outbound', dur:'3:20', sent:'Neutral',  src:'Individual',            time:'2 hr ago',  convo:[]},
+];
+
+const numbersData = [
+  { id:1, number:'+1 (402) 555-0171', type:'Local',     label:'Main Service Line',  status:'active',    calls:342, dur:'3:42', dlc:'Approved', cap:'Voice, SMS', fwd:'(none)', vm:true, vmt:true, inbound:true },
+  { id:2, number:'+1 (402) 555-0192', type:'Local',     label:'Sales Line 1',       status:'active',    calls:189, dur:'4:11', dlc:'Approved', cap:'Voice, SMS', fwd:'(none)', vm:true, vmt:false, inbound:true },
+  { id:3, number:'+1 (800) 555-0134', type:'Toll-Free', label:'Support Hotline',    status:'active',    calls:567, dur:'5:28', dlc:'N/A',      cap:'Voice, SMS, MMS', fwd:'(none)', vm:true, vmt:true, inbound:true },
+  { id:4, number:'+1 (402) 555-0215', type:'Local',     label:'Service Line 2',     status:'active',    calls:98,  dur:'3:15', dlc:'Approved', cap:'Voice', fwd:'(none)', vm:false, vmt:false, inbound:true },
+  { id:5, number:'+1 (402) 555-0247', type:'Local',     label:'Unassigned',         status:'available', calls:0,   dur:'—',   dlc:'Pending',  cap:'Voice, SMS', fwd:'(none)', vm:false, vmt:false, inbound:false },
+];
+
+// ── STATE ─────────────────────────────────────────
+let activeTab    = 'overview';
+let selectedLog  = null;
+let selectedNum  = null;
+let logsFilter   = 'all';
+
+// ── TAB SWITCHING ──────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.tab-pnl').forEach(p => {
+    p.classList.remove('on');
+    p.style.display = 'none';
+  });
+
+  const el = document.getElementById('tab-' + tab);
+  if (tab === 'overview') {
+    el.classList.add('on');
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'flex';
+  }
+
+  activeTab = tab;
+  closePanel();
+  closeNumPanel();
+}
+
+// ── LOGS ──────────────────────────────────────────
+function sentBadge(s) {
+  const m = { Positive:'b-pos', Neutral:'b-neu', Negative:'b-neg' };
+  return `<span class="badge ${m[s]||'b-neu'}">${s}</span>`;
+}
+function srcBadge(s) {
+  const camp = s !== 'Individual';
+  return `<span class="src-badge ${camp?'src-c':'src-i'}">${camp?'⚡ ':' '}${s}</span>`;
+}
+
+function renderLogs() {
+  const body = document.getElementById('logsBody');
+  const panelOpen = document.getElementById('convPanel').classList.contains('open');
+  const filtered = logsFilter === 'all' ? logsData
+    : logsData.filter(l => l.dir.toLowerCase() === logsFilter);
+  pgnSync('logs-pgn', filtered.length);
+
+  body.innerHTML = filtered.map(l => `
+    <tr onclick="openLog(${l.id})" class="${selectedLog===l.id?'sel':''}">
+      <td><div class="darr ${l.dir==='Inbound'?'in':'out'}">${l.dir==='Inbound'?'←':'→'}</div></td>
+      <td><div class="cn">${l.name}</div><div class="cp">${l.phone}</div></td>
+      <td style="color:var(--t2)">${l.via}</td>
+      <td><div class="da"><span>${l.dir}</span></div></td>
+      ${!panelOpen ? `<td style="color:var(--t2)">${l.dur}</td>
+      <td>${sentBadge(l.sent)}</td>
+      <td>${srcBadge(l.src)}</td>
+      <td style="color:var(--muted)">${l.time}</td>` : ''}
+    </tr>`).join('');
+
+  // Show/hide extra columns header
+  document.querySelectorAll('#tab-logs .col-extra').forEach(th => {
+    th.style.display = panelOpen ? 'none' : '';
+  });
+}
+
+function filterLogs(f, btn) {
+  logsFilter = f;
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  selectedLog = null;
+  closePanel();
+  renderLogs();
+}
+
+function openLog(id) {
+  const log = logsData.find(l => l.id === id);
+  if (!log) return;
+  selectedLog = id;
+
+  document.getElementById('panelName').textContent = log.name;
+  document.getElementById('panelNum').textContent  = log.phone;
+
+  const body = document.getElementById('panelBody');
+  if (log.convo.length === 0) {
+    body.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">No transcript available</div>';
+  } else {
+    body.innerHTML = log.convo.map(m => `
+      <div class="msg ${m.role}">
+        <div class="msg-meta">${m.who} · ${m.ts}</div>
+        <div class="msg-bbl">${m.text}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('convPanel').classList.add('open');
+  renderLogs();
+}
+
+function closePanel() {
+  selectedLog = null;
+  document.getElementById('convPanel').classList.remove('open');
+  renderLogs();
+}
+
+function switchPanelTab(tab, btn) {
+  document.querySelectorAll('.spt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const body = document.getElementById('panelBody');
+  if (tab === 'highlights') {
+    body.innerHTML = `
+      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:var(--green);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Key Moments</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">• Customer inquiry about spring service promo<br>• Confirmed brake inspection at $49.99<br>• Appointment scheduled: Thursday 10 AM ✓</div>
+      </div>
+      <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:var(--acl);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">AI Summary</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">Customer called about spring service promotion mailer. Successfully booked a brake inspection appointment for Thursday morning. Overall sentiment: positive. No escalation needed.</div>
+      </div>`;
+  } else if (tab === 'transcript') {
+    body.innerHTML = `
+      <div style="font-family:monospace;font-size:12px;color:var(--t2);line-height:1.8;white-space:pre-wrap;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px">[00:00] AGENT: Good afternoon, thanks for calling! How can I help?
+[00:08] CUSTOMER: Hi, I received a mailer about your spring service special?
+[00:22] AGENT: We have a great promotion. What service were you looking at?
+[00:38] CUSTOMER: I need a brake inspection. The mailer said $49.99?
+[01:05] AGENT: Correct! We can get you in Thursday at 10 AM.
+[01:32] CUSTOMER: Thursday at 10 sounds perfect. Thank you!</div>`;
+  } else {
+    // re-render convo
+    const log = logsData.find(l => l.id === selectedLog);
+    if (log) openLog(log.id);
+    return;
+  }
+}
+
+// ── SETTINGS ──────────────────────────────────────
+function dlcBadge(d) {
+  const m = { Approved:'b-appr', Pending:'b-pend', 'N/A':'b-na' };
+  return `<span class="badge ${m[d]||'b-na'}">${d}</span>`;
+}
+
+function renderNumbers() {
+  const body = document.getElementById('numbersBody');
+  pgnSync('numbers-pgn', numbersData.length);
+  body.innerHTML = numbersData.map(n => `
+    <tr onclick="openNum(${n.id})" class="${selectedNum===n.id?'sel':''}">
+      <td style="font-weight:600">${n.number}</td>
+      <td style="color:var(--t2)">${n.type}</td>
+      <td>${n.label}</td>
+      <td><span class="badge ${n.status==='active'?'b-act':'b-avail'}">${n.status}</span></td>
+      <td style="color:var(--t2)">${n.calls||'—'}</td>
+      <td style="color:var(--t2)">${n.dur}</td>
+      <td>${dlcBadge(n.dlc)}</td>
+      <td><button class="gear-btn" onclick="event.stopPropagation();openNum(${n.id})">⚙</button></td>
+    </tr>`).join('');
+}
+
+function openNum(id) {
+  const num = numbersData.find(n => n.id === id);
+  if (!num) return;
+  selectedNum = id;
+
+  document.getElementById('numPanelNum').textContent = num.number;
+  document.getElementById('numPanelSub').textContent = num.label + ' · ' + num.type;
+  document.getElementById('numPanelBadges').innerHTML =
+    `<span class="badge b-act">active</span> <span class="badge b-na">10DLC: ${num.dlc}</span>`;
+
+  document.getElementById('numPanelStats').innerHTML = `
+    <div class="ns"><div class="ns-val">${num.calls||0}</div><div class="ns-lbl">Total Calls</div></div>
+    <div class="ns"><div class="ns-val">${num.dur}</div><div class="ns-lbl">Avg Duration</div></div>
+    <div class="ns"><div class="ns-val"><span class="b-neutral-lg">Neutral</span></div><div class="ns-lbl">Sentiment</div></div>`;
+
+  document.getElementById('numPanelBody').innerHTML = `
+    <div class="cfg-sec">
+      <div class="cfg-lbl">General</div>
+      <div class="cfg-row"><span class="cfg-key">Friendly Label</span><span class="cfg-val">${num.label}</span></div>
+      <div class="cfg-row"><span class="cfg-key">Capabilities</span><span class="cfg-val">${num.cap}</span></div>
+      <div class="cfg-row"><span class="cfg-key">Forward To</span><span class="cfg-val">${num.fwd}</span></div>
+    </div>
+    <div class="cfg-sec">
+      <div class="cfg-lbl">Inbound Settings</div>
+      <div class="cfg-row">
+        <div>
+          <div class="cfg-key">Accept Inbound Calls</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Allow this number to receive calls</div>
+        </div>
+        <button class="toggle ${num.inbound?'':'off'}" onclick="this.classList.toggle('off')"></button>
+      </div>
+      <div class="cfg-row">
+        <div>
+          <div class="cfg-key">Voicemail Enabled</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Send unanswered calls to voicemail</div>
+        </div>
+        <button class="toggle ${num.vm?'':'off'}" onclick="this.classList.toggle('off')"></button>
+      </div>
+      <div class="cfg-row">
+        <div>
+          <div class="cfg-key">Voicemail Transcription</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Automatically transcribe voicemails</div>
+        </div>
+        <button class="toggle ${num.vmt?'':'off'}" onclick="this.classList.toggle('off')"></button>
+      </div>
+    </div>`;
+
+  document.getElementById('numPanel').classList.add('open');
+  renderNumbers();
+}
+
+function closeNumPanel() {
+  selectedNum = null;
+  document.getElementById('numPanel').classList.remove('open');
+  renderNumbers();
+}
+
+function handleGetNumber() {
+  const btn = document.getElementById('getNumberBtn');
+  btn.textContent = '⌛ Opening...';
+  setTimeout(() => {
+    btn.textContent = '+ Get Number';
+    alert('📞 Number provisioning UI would open here.\n\nIn production: connect to Twilio/Bandwidth to search & purchase available numbers.');
+  }, 400);
+}
+
+// ── Pagination engine ─────────────────────────────
+function pgnGo(btn,dir){const p=btn.closest('.pagination');const total=+p.dataset.total;const rows=+p.dataset.rows;let page=+p.dataset.page;const totalPages=Math.ceil(total/rows);page=Math.max(1,Math.min(page+dir,totalPages));p.dataset.page=page;pgnUpdate(p);}
+function pgnSetRows(btn,rows){const p=btn.closest('.pagination');p.dataset.rows=rows;p.dataset.page=1;p.querySelectorAll('.pgn-rpp-opt').forEach(o=>o.classList.remove('sel'));btn.classList.add('sel');btn.closest('.pgn-rpp-menu').classList.remove('open');p.querySelector('.pgn-rpp-val').textContent=rows;pgnUpdate(p);}
+function pgnUpdate(p){const total=+p.dataset.total;const rows=+p.dataset.rows;const page=+p.dataset.page;const totalPages=Math.ceil(total/rows)||1;const start=(page-1)*rows+1;const end=Math.min(page*rows,total);p.querySelector('.pgn-range').textContent=start.toLocaleString()+'–'+end.toLocaleString()+' of '+total.toLocaleString()+' items';p.querySelector('.pgn-prev').disabled=page<=1;p.querySelector('.pgn-next').disabled=page>=totalPages;}
+function togglePgnMenu(btn,e){e.stopPropagation();btn.nextElementSibling.classList.toggle('open');}
+document.addEventListener('click',()=>{document.querySelectorAll('.pgn-rpp-menu.open').forEach(m=>m.classList.remove('open'));});
+function pgnSync(pgnId,total){const p=document.getElementById(pgnId);if(!p)return;p.dataset.total=total;p.dataset.page=1;pgnUpdate(p);}
+
+// ── INIT ─────────────────────────────────────────
+renderLogs();
+renderNumbers();
+</script>
+</body>
+</html>
