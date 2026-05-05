@@ -4587,9 +4587,27 @@ const DRV_MKT_CATALOG = [
       {id:'drv-hr-ob-1', name:'Day 1 Checklist.pdf', type:'file'},
       {id:'drv-hr-ob-2', name:'30-60-90 Plan Template.docx', type:'file'},
     ]},
-    {id:'drv-hr-jd', name:'Job Descriptions', type:'folder', count:8, children:[]},
-    {id:'drv-hr-pr', name:'Performance Reviews', type:'folder', count:3, children:[]},
-    {id:'drv-hr-ben', name:'Benefits', type:'folder', count:2, children:[]},
+    {id:'drv-hr-jd', name:'Job Descriptions', type:'folder', count:8, children:[
+      {id:'drv-hr-jd-1', name:'Engineering JDs', type:'folder', count:3, children:[
+        {id:'drv-hr-jd-1a', name:'Senior Engineer.docx', type:'file'},
+        {id:'drv-hr-jd-1b', name:'Staff Engineer.docx', type:'file'},
+        {id:'drv-hr-jd-1c', name:'Engineering Manager.docx', type:'file'},
+      ]},
+      {id:'drv-hr-jd-2', name:'Sales JDs', type:'folder', count:2, children:[
+        {id:'drv-hr-jd-2a', name:'Account Executive.docx', type:'file'},
+        {id:'drv-hr-jd-2b', name:'Sales Manager.docx', type:'file'},
+      ]},
+      {id:'drv-hr-jd-3', name:'Operations JDs', type:'folder', count:3, children:[]},
+    ]},
+    {id:'drv-hr-pr', name:'Performance Reviews', type:'folder', count:3, children:[
+      {id:'drv-hr-pr-1', name:'Q1 2026 Review Template.docx', type:'file'},
+      {id:'drv-hr-pr-2', name:'Annual Review Framework.pdf', type:'file'},
+      {id:'drv-hr-pr-3', name:'360 Feedback Form.docx', type:'file'},
+    ]},
+    {id:'drv-hr-ben', name:'Benefits', type:'folder', count:2, children:[
+      {id:'drv-hr-ben-1', name:'Benefits Overview 2026.pdf', type:'file'},
+      {id:'drv-hr-ben-2', name:'Health Insurance Guide.pdf', type:'file'},
+    ]},
   ]},
   {id:'drv-fin', name:'Finance & Reporting Drive', cat:'Finance', catBg:'rgba(253,199,0,.1)', catColor:'#FDC700', folders:2, docs:9, previewKey:'product',
    folderList:['Budget Templates','Financial Reports'],
@@ -4600,34 +4618,99 @@ const DRV_MKT_CATALOG = [
       {id:'drv-fin-bt-1', name:'Annual Budget Template.xlsx', type:'file'},
       {id:'drv-fin-bt-2', name:'Quarterly Forecast.xlsx', type:'file'},
     ]},
-    {id:'drv-fin-fr', name:'Financial Reports', type:'folder', count:5, children:[]},
+    {id:'drv-fin-fr', name:'Financial Reports', type:'folder', count:5, children:[
+      {id:'drv-fin-fr-1', name:'Q1 2026 Report.pdf', type:'file'},
+      {id:'drv-fin-fr-2', name:'Q4 2025 Report.pdf', type:'file'},
+      {id:'drv-fin-fr-3', name:'Annual Report 2025.pdf', type:'file'},
+      {id:'drv-fin-fr-4', name:'Board Deck March 2026.pptx', type:'file'},
+      {id:'drv-fin-fr-5', name:'Investor Update Q1.pdf', type:'file'},
+    ]},
   ]},
   {id:'drv-ops', name:'Operations Handbook Drive', cat:'Governance & Policy', catBg:'rgba(148,163,184,.12)', catColor:'#94A3B8', folders:3, docs:14, previewKey:'sales',
    folderList:['SOPs','Incident Response','Runbooks'],
    desc:'SOPs, runbooks, incident response guides and operational process documentation.',
    sub:'3 folders · 14 documents',
    children:[
-    {id:'drv-ops-sop', name:'SOPs', type:'folder', count:6, children:[]},
-    {id:'drv-ops-ir',  name:'Incident Response', type:'folder', count:4, children:[]},
-    {id:'drv-ops-rb',  name:'Runbooks', type:'folder', count:4, children:[]},
+    {id:'drv-ops-sop', name:'SOPs', type:'folder', count:6, children:[
+      {id:'drv-ops-sop-1', name:'Onboarding SOP.pdf', type:'file'},
+      {id:'drv-ops-sop-2', name:'Offboarding SOP.pdf', type:'file'},
+      {id:'drv-ops-sop-3', name:'Deployment SOP.pdf', type:'file'},
+      {id:'drv-ops-sop-4', name:'Support Escalation SOP.pdf', type:'file'},
+      {id:'drv-ops-sop-5', name:'Change Management SOP.pdf', type:'file'},
+      {id:'drv-ops-sop-6', name:'Vendor Management SOP.pdf', type:'file'},
+    ]},
+    {id:'drv-ops-ir', name:'Incident Response', type:'folder', count:4, children:[
+      {id:'drv-ops-ir-1', name:'P0 Incident Playbook.pdf', type:'file'},
+      {id:'drv-ops-ir-2', name:'P1 Escalation Guide.pdf', type:'file'},
+      {id:'drv-ops-ir-3', name:'Post-Mortem Template.docx', type:'file'},
+      {id:'drv-ops-ir-4', name:'On-Call Rotation.xlsx', type:'file'},
+    ]},
+    {id:'drv-ops-rb', name:'Runbooks', type:'folder', count:4, children:[
+      {id:'drv-ops-rb-1', name:'Database Backup Runbook.md', type:'file'},
+      {id:'drv-ops-rb-2', name:'Cache Flush Runbook.md', type:'file'},
+      {id:'drv-ops-rb-3', name:'Scaling Runbook.md', type:'file'},
+      {id:'drv-ops-rb-4', name:'DR Runbook.md', type:'file'},
+    ]},
   ]},
   {id:'drv-mkt', name:'Marketing Assets Drive', cat:'Sales', catBg:'rgba(5,223,114,.1)', catColor:'#05DF72', folders:2, docs:10, previewKey:'sales',
    folderList:['Brand Assets','Campaign Briefs'],
    desc:'Brand assets, campaign briefs, content calendars and go-to-market playbooks.',
    sub:'2 folders · 10 documents',
    children:[
-    {id:'drv-mkt-ba', name:'Brand Assets', type:'folder', count:6, children:[]},
-    {id:'drv-mkt-cb', name:'Campaign Briefs', type:'folder', count:4, children:[]},
+    {id:'drv-mkt-ba', name:'Brand Assets', type:'folder', count:6, children:[
+      {id:'drv-mkt-ba-1', name:'Logo Pack.zip', type:'file'},
+      {id:'drv-mkt-ba-2', name:'Brand Guidelines 2026.pdf', type:'file'},
+      {id:'drv-mkt-ba-3', name:'Color Palette.pdf', type:'file'},
+      {id:'drv-mkt-ba-4', name:'Typography Guide.pdf', type:'file'},
+      {id:'drv-mkt-ba-5', name:'Icons & Illustrations.zip', type:'file'},
+      {id:'drv-mkt-ba-6', name:'Photography Guidelines.pdf', type:'file'},
+    ]},
+    {id:'drv-mkt-cb', name:'Campaign Briefs', type:'folder', count:4, children:[
+      {id:'drv-mkt-cb-1', name:'Q1 2026 Campaign Brief.docx', type:'file'},
+      {id:'drv-mkt-cb-2', name:'Product Launch — April.docx', type:'file'},
+      {id:'drv-mkt-cb-3', name:'Webinar Series Brief.docx', type:'file'},
+      {id:'drv-mkt-cb-4', name:'SEO Content Plan.xlsx', type:'file'},
+    ]},
   ]},
   {id:'drv-eng', name:'Engineering Docs Drive', cat:'Product', catBg:'rgba(43,127,255,.12)', catColor:'#2B7FFF', folders:4, docs:22, previewKey:'product',
    folderList:['Architecture','Coding Standards','Deployment Guides','System Design'],
    desc:'Architecture diagrams, coding standards, deployment guides and system design documents.',
    sub:'4 folders · 22 documents',
    children:[
-    {id:'drv-eng-ar', name:'Architecture', type:'folder', count:5, children:[]},
-    {id:'drv-eng-cs', name:'Coding Standards', type:'folder', count:4, children:[]},
-    {id:'drv-eng-dg', name:'Deployment Guides', type:'folder', count:8, children:[]},
-    {id:'drv-eng-sd', name:'System Design', type:'folder', count:5, children:[]},
+    {id:'drv-eng-ar', name:'Architecture', type:'folder', count:5, children:[
+      {id:'drv-eng-ar-1', name:'System Architecture v3.pdf', type:'file'},
+      {id:'drv-eng-ar-2', name:'Data Flow Diagrams.pdf', type:'file'},
+      {id:'drv-eng-ar-3', name:'Microservices Map.pdf', type:'file'},
+      {id:'drv-eng-ar-4', name:'Infrastructure Diagram.pdf', type:'file'},
+      {id:'drv-eng-ar-5', name:'Tech Stack Overview.md', type:'file'},
+    ]},
+    {id:'drv-eng-cs', name:'Coding Standards', type:'folder', count:4, children:[
+      {id:'drv-eng-cs-1', name:'TypeScript Guidelines.md', type:'file'},
+      {id:'drv-eng-cs-2', name:'Python Style Guide.md', type:'file'},
+      {id:'drv-eng-cs-3', name:'API Design Standards.md', type:'file'},
+      {id:'drv-eng-cs-4', name:'Git Workflow.md', type:'file'},
+    ]},
+    {id:'drv-eng-dg', name:'Deployment Guides', type:'folder', count:8, children:[
+      {id:'drv-eng-dg-prod', name:'Production Deploys', type:'folder', count:3, children:[
+        {id:'drv-eng-dg-prod-1', name:'Production Deploy Guide.md', type:'file'},
+        {id:'drv-eng-dg-prod-2', name:'Zero-Downtime Deploy.md', type:'file'},
+        {id:'drv-eng-dg-prod-3', name:'Rollback Procedures.md', type:'file'},
+      ]},
+      {id:'drv-eng-dg-stg', name:'Staging Deploys', type:'folder', count:2, children:[
+        {id:'drv-eng-dg-stg-1', name:'Staging Environment Setup.md', type:'file'},
+        {id:'drv-eng-dg-stg-2', name:'Staging Deploy Guide.md', type:'file'},
+      ]},
+      {id:'drv-eng-dg-k8s', name:'Kubernetes Config.yaml', type:'file'},
+      {id:'drv-eng-dg-ci', name:'CI/CD Pipeline.md', type:'file'},
+      {id:'drv-eng-dg-tf', name:'Terraform Modules.md', type:'file'},
+    ]},
+    {id:'drv-eng-sd', name:'System Design', type:'folder', count:5, children:[
+      {id:'drv-eng-sd-1', name:'Auth System Design.md', type:'file'},
+      {id:'drv-eng-sd-2', name:'Notification System.md', type:'file'},
+      {id:'drv-eng-sd-3', name:'Search Architecture.md', type:'file'},
+      {id:'drv-eng-sd-4', name:'Event Bus Design.md', type:'file'},
+      {id:'drv-eng-sd-5', name:'Rate Limiting Design.md', type:'file'},
+    ]},
   ]},
 ];
 
@@ -4735,10 +4818,9 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
   const children = node.children || [];
   const treeHtml = children.length ? children.map(c => {
     const isFolder = c.type==='folder';
-    const canNav = isFolder && (c.children && c.children.length > 0);
     const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
-    return '<div class="tp-mkt-tree-item '+(isFolder?'folder ':'file ')+(canNav?'clickable':'')+'"'
-      +(canNav ? ' onclick="navigateDrvMkt(\''+driveId+'\','+JSON.stringify(newPath)+')"' : '')+'>'
+    return '<div class="tp-mkt-tree-item '+(isFolder?'folder clickable':'file')+'"'
+      +(isFolder ? ' onclick="navigateDrvMkt(\''+driveId+'\','+JSON.stringify(newPath)+')"' : '')+'>'
       +(isFolder
         ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>'
         : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h6l3 3v8H3v-11z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5V5h3" stroke="currentColor" stroke-width="1.2"/></svg>')
