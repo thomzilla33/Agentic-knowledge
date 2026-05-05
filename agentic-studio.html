@@ -1607,6 +1607,41 @@ body.test-mode #vTestMode{display:flex}
 /* ── TOOLTIP ── */
 .ui-tip{position:fixed;z-index:9999;background:#1e2d4a;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--t1);pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5);animation:tipfade .12s ease}
 @keyframes tipfade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+/* ── SIDEBAR FILTER REDESIGN ── */
+.mkt-show-pills{display:flex;gap:3px;padding:0 2px 2px}
+.mkt-show-pill{flex:1;height:26px;border:1px solid var(--bd);border-radius:8px;background:transparent;color:var(--t3);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mkt-show-pill:hover{background:rgba(255,255,255,.04);color:var(--t2)}
+.mkt-show-pill.active{background:rgba(43,127,255,.14);border-color:rgba(43,127,255,.3);color:var(--pri)}
+.mkt-sidebar-sep{height:1px;background:var(--bd);margin:14px 6px}
+.mkt-sort-sel{width:100%;height:30px;border:1px solid var(--bd);border-radius:8px;background:var(--cs);color:var(--t2);font-size:12px;padding:0 10px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.mkt-sort-sel:focus{outline:none;border-color:rgba(43,127,255,.4)}
+.mkt-chk-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;transition:background .15s;border:none;background:transparent;width:100%;text-align:left;color:var(--t2);font-size:12px;font-weight:500}
+.mkt-chk-item:hover{background:rgba(255,255,255,.04);color:var(--t1)}
+.mkt-chk-item.active .mkt-chk-lbl{color:var(--t1);font-weight:600}
+.mkt-chk-box{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--bds);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.mkt-chk-item.active .mkt-chk-box{background:var(--pri);border-color:var(--pri)}
+.mkt-chk-lbl{flex:1;color:var(--t2)}
+.mkt-plane-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-right:2px}
+/* ── ACTIVE FILTER CHIPS ── */
+.mkt-chips{padding:8px 20px 0;display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0}
+.mkt-chips:empty{padding:0}
+.mkt-chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:20px;background:rgba(43,127,255,.12);border:1px solid rgba(43,127,255,.25);color:var(--pri);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mkt-chip:hover{background:rgba(43,127,255,.22)}
+.mkt-chip-x{font-size:13px;line-height:1;opacity:.7;margin-left:1px}
+.mkt-chip.clear-all{background:transparent;border-color:var(--bds);color:var(--t3)}
+.mkt-chip.clear-all:hover{background:rgba(255,255,255,.05);color:var(--t2)}
+/* ── DETAIL PANEL SEARCH ── */
+.tp-detail-sec-search{display:flex;align-items:center;gap:7px;padding:8px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--bd)}
+.tp-detail-sec-search svg{color:var(--t4);flex-shrink:0}
+.tp-detail-sec-search-inp{flex:1;height:24px;border:none;background:transparent;color:var(--t1);font-size:12px;padding:0}
+.tp-detail-sec-search-inp::placeholder{color:var(--t4)}
+.tp-detail-sec-search-inp:focus{outline:none}
+/* ── DRIVE FILE TYPE FILTER ── */
+.drv-type-bar{display:flex;align-items:center;gap:5px;padding:8px 16px;border-bottom:1px solid var(--bd);flex-wrap:wrap;flex-shrink:0}
+.drv-type-lbl{font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.07em;margin-right:2px;white-space:nowrap}
+.drv-type-pill{height:20px;padding:0 9px;border-radius:20px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.drv-type-pill:hover{background:rgba(255,255,255,.05);color:var(--t2)}
+.drv-type-pill.active{background:rgba(43,127,255,.12);border-color:rgba(43,127,255,.3);color:var(--pri)}
 /* Drives / Own Drive panels */
 .bkp-drives-list{flex:1;overflow-y:auto;padding:6px 0 10px}
 .bkp-sec-lbl{font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;padding:8px 22px 4px}
@@ -3190,14 +3225,38 @@ body.test-mode #vTestMode{display:flex}
     </div>
     <div class="tp-mkt-body">
       <div class="tp-mkt-cats" id="tpMktCats">
+        <div class="tp-mkt-cats-lbl">Show</div>
+        <div class="mkt-show-pills" id="tpMktShowPills">
+          <button class="mkt-show-pill active" onclick="setTpMktShow('all',this)">All</button>
+          <button class="mkt-show-pill" onclick="setTpMktShow('new',this)">Not added</button>
+          <button class="mkt-show-pill" onclick="setTpMktShow('added',this)">Added</button>
+        </div>
+        <div class="mkt-sidebar-sep"></div>
+        <div class="tp-mkt-cats-lbl">Sort by</div>
+        <select class="mkt-sort-sel" id="tpMktSortSel" onchange="setTpMktSort(this.value)">
+          <option value="name">Name A → Z</option>
+          <option value="content">Most content</option>
+          <option value="added-last">Added last</option>
+        </select>
+        <div class="mkt-sidebar-sep"></div>
         <div class="tp-mkt-cats-lbl">Categories</div>
-        <button class="tp-mkt-cat active" onclick="filterTpMkt('all',this)"><span class="tp-mkt-cat-label">All packs</span><span class="tp-mkt-cat-cnt">9</span></button>
-        <button class="tp-mkt-cat" onclick="filterTpMkt('Finance',this)"><span class="tp-mkt-cat-label">Finance</span><span class="tp-mkt-cat-cnt">1</span></button>
-        <button class="tp-mkt-cat" onclick="filterTpMkt('Sales & Revenue',this)"><span class="tp-mkt-cat-label">Sales & GTM</span><span class="tp-mkt-cat-cnt">2</span></button>
-        <button class="tp-mkt-cat" onclick="filterTpMkt('Customer Service',this)"><span class="tp-mkt-cat-label">Customer Support</span><span class="tp-mkt-cat-cnt">2</span></button>
-        <button class="tp-mkt-cat" onclick="filterTpMkt('HR',this)"><span class="tp-mkt-cat-label">HR & Onboarding</span><span class="tp-mkt-cat-cnt">2</span></button>
-        <button class="tp-mkt-cat" onclick="filterTpMkt('Legal',this)"><span class="tp-mkt-cat-label">Legal & Compliance</span><span class="tp-mkt-cat-cnt">1</span></button>
-        <button class="tp-mkt-cat" onclick="filterTpMkt('Operations',this)"><span class="tp-mkt-cat-label">Operations</span><span class="tp-mkt-cat-cnt">1</span></button>
+        <button class="mkt-chk-item" data-cat="Finance" onclick="toggleTpMktCat('Finance',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Finance</span><span class="tp-mkt-cat-cnt">1</span></button>
+        <button class="mkt-chk-item" data-cat="Sales & Revenue" onclick="toggleTpMktCat('Sales & Revenue',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Sales & GTM</span><span class="tp-mkt-cat-cnt">2</span></button>
+        <button class="mkt-chk-item" data-cat="Customer Service" onclick="toggleTpMktCat('Customer Service',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Customer Support</span><span class="tp-mkt-cat-cnt">2</span></button>
+        <button class="mkt-chk-item" data-cat="HR" onclick="toggleTpMktCat('HR',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">HR & Onboarding</span><span class="tp-mkt-cat-cnt">2</span></button>
+        <button class="mkt-chk-item" data-cat="Legal" onclick="toggleTpMktCat('Legal',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Legal & Compliance</span><span class="tp-mkt-cat-cnt">1</span></button>
+        <button class="mkt-chk-item" data-cat="Operations" onclick="toggleTpMktCat('Operations',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Operations</span><span class="tp-mkt-cat-cnt">1</span></button>
+        <div class="mkt-sidebar-sep"></div>
+        <div class="tp-mkt-cats-lbl">Planes Available</div>
+        <button class="mkt-chk-item" data-plane="truth" onclick="toggleTpMktPlane('truth',this)">
+          <span class="mkt-chk-box"></span><span class="mkt-plane-dot" style="background:#93C5FD"></span><span class="mkt-chk-lbl">Truth Plane</span>
+        </button>
+        <button class="mkt-chk-item" data-plane="sandbox" onclick="toggleTpMktPlane('sandbox',this)">
+          <span class="mkt-chk-box"></span><span class="mkt-plane-dot" style="background:#C4B5FD"></span><span class="mkt-chk-lbl">Sandbox Plane</span>
+        </button>
+        <button class="mkt-chk-item" data-plane="sources" onclick="toggleTpMktPlane('sources',this)">
+          <span class="mkt-chk-box"></span><span class="mkt-plane-dot" style="background:#6EE7B7"></span><span class="mkt-chk-lbl">Sources Plane</span>
+        </button>
       </div>
       <div class="tp-mkt-right">
         <div class="tp-mkt-toolbar" id="tpMktToolbar">
@@ -3214,6 +3273,7 @@ body.test-mode #vTestMode{display:flex}
             </button>
           </div>
         </div>
+        <div class="mkt-chips" id="tpMktChips"></div>
         <div class="tp-mkt-bc" id="tpMktBc"></div>
         <div class="tp-mkt-grid" id="tpMktGrid"></div>
         <div class="tp-mkt-detail" id="tpMktDetail"></div>
@@ -3246,14 +3306,27 @@ body.test-mode #vTestMode{display:flex}
     </div>
     <div class="tp-mkt-body">
       <div class="tp-mkt-cats" id="drvMktCats">
+        <div class="tp-mkt-cats-lbl">Show</div>
+        <div class="mkt-show-pills" id="drvMktShowPills">
+          <button class="mkt-show-pill active" onclick="setDrvMktShow('all',this)">All</button>
+          <button class="mkt-show-pill" onclick="setDrvMktShow('new',this)">Not added</button>
+          <button class="mkt-show-pill" onclick="setDrvMktShow('added',this)">Added</button>
+        </div>
+        <div class="mkt-sidebar-sep"></div>
+        <div class="tp-mkt-cats-lbl">Sort by</div>
+        <select class="mkt-sort-sel" id="drvMktSortSel" onchange="setDrvMktSort(this.value)">
+          <option value="name">Name A → Z</option>
+          <option value="content">Most content</option>
+          <option value="added-last">Added last</option>
+        </select>
+        <div class="mkt-sidebar-sep"></div>
         <div class="tp-mkt-cats-lbl">Categories</div>
-        <button class="tp-mkt-cat active" onclick="filterDrvMkt('all',this)"><span class="tp-mkt-cat-label">All drives</span><span class="tp-mkt-cat-cnt">9</span></button>
-        <button class="tp-mkt-cat" onclick="filterDrvMkt('Governance & Policy',this)"><span class="tp-mkt-cat-label">Governance</span><span class="tp-mkt-cat-cnt">2</span></button>
-        <button class="tp-mkt-cat" onclick="filterDrvMkt('Product',this)"><span class="tp-mkt-cat-label">Product</span><span class="tp-mkt-cat-cnt">2</span></button>
-        <button class="tp-mkt-cat" onclick="filterDrvMkt('Sales',this)"><span class="tp-mkt-cat-label">Sales & GTM</span><span class="tp-mkt-cat-cnt">2</span></button>
-        <button class="tp-mkt-cat" onclick="filterDrvMkt('Legal',this)"><span class="tp-mkt-cat-label">Legal</span><span class="tp-mkt-cat-cnt">1</span></button>
-        <button class="tp-mkt-cat" onclick="filterDrvMkt('HR',this)"><span class="tp-mkt-cat-label">HR</span><span class="tp-mkt-cat-cnt">1</span></button>
-        <button class="tp-mkt-cat" onclick="filterDrvMkt('Finance',this)"><span class="tp-mkt-cat-label">Finance</span><span class="tp-mkt-cat-cnt">1</span></button>
+        <button class="mkt-chk-item" data-cat="Governance & Policy" onclick="toggleDrvMktCat('Governance & Policy',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Governance</span><span class="tp-mkt-cat-cnt">2</span></button>
+        <button class="mkt-chk-item" data-cat="Product" onclick="toggleDrvMktCat('Product',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Product</span><span class="tp-mkt-cat-cnt">2</span></button>
+        <button class="mkt-chk-item" data-cat="Sales" onclick="toggleDrvMktCat('Sales',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Sales & GTM</span><span class="tp-mkt-cat-cnt">2</span></button>
+        <button class="mkt-chk-item" data-cat="Legal" onclick="toggleDrvMktCat('Legal',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Legal</span><span class="tp-mkt-cat-cnt">1</span></button>
+        <button class="mkt-chk-item" data-cat="HR" onclick="toggleDrvMktCat('HR',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">HR</span><span class="tp-mkt-cat-cnt">1</span></button>
+        <button class="mkt-chk-item" data-cat="Finance" onclick="toggleDrvMktCat('Finance',this)"><span class="mkt-chk-box"></span><span class="mkt-chk-lbl">Finance</span><span class="tp-mkt-cat-cnt">1</span></button>
       </div>
       <div class="tp-mkt-right">
         <div class="tp-mkt-toolbar">
@@ -3270,6 +3343,7 @@ body.test-mode #vTestMode{display:flex}
             </button>
           </div>
         </div>
+        <div class="mkt-chips" id="drvMktChips"></div>
         <div class="tp-mkt-bc" id="drvMktBc"></div>
         <div class="tp-mkt-grid" id="drvMktGrid"></div>
         <div class="tp-mkt-detail" id="drvMktDetail"></div>
@@ -4552,7 +4626,11 @@ function toggleKmDac(uid) {
 
 // ── DRIVE MARKETPLACE ──
 let drvMktContext = 'kn';
-let drvMktCategory = 'all';
+let drvMktCategory = 'all'; // kept for compat
+let drvMktCategorySet = new Set();
+let drvMktShowFilter = 'all';
+let drvMktSort = 'name';
+let drvFolderTypeFilter = 'all';
 
 const DRV_MKT_CATALOG = [
   {id:'drv-gov', name:'Governance & Policy Drive', cat:'Governance & Policy', catBg:'rgba(148,163,184,.12)', catColor:'#94A3B8', folders:3, docs:12, previewKey:'governance',
@@ -4773,10 +4851,20 @@ let drvMktInitialAdded = [];
 function openDriveMarketplace(ctx) {
   drvMktContext = ctx || 'kn';
   drvMktCategory = 'all';
+  drvMktCategorySet = new Set();
+  drvMktShowFilter = 'all';
+  drvMktSort = 'name';
+  drvFolderTypeFilter = 'all';
   drvMktBreadcrumbs = [];
-  document.querySelectorAll('#drvMktCats .tp-mkt-cat').forEach((b,i)=>b.classList.toggle('active',i===0));
+  // reset sidebar UI
+  document.querySelectorAll('#drvMktCats .mkt-chk-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#drvMktShowPills .mkt-show-pill').forEach((b,i)=>b.classList.toggle('active',i===0));
+  const sortSel = document.getElementById('drvMktSortSel');
+  if (sortSel) sortSel.value = 'name';
   const inp = document.getElementById('drvMktSearch');
   if (inp) inp.value = '';
+  const chips = document.getElementById('drvMktChips');
+  if (chips) chips.innerHTML = '';
   const addedPool = drvMktContext === 'bldr' ? driveAddedItems : knDriveAddedItems;
   drvMktInitialAdded = [...addedPool.map(x=>x.id)];
   drvSelectedItems = new Set();
@@ -4828,6 +4916,7 @@ function showDrvMktDetailView() {
 function navigateDrvMkt(driveId, folderPath) {
   const d = DRV_MKT_CATALOG ? DRV_MKT_CATALOG.find(x=>x.id===driveId) : null;
   if (!d) return;
+  drvFolderTypeFilter = 'all'; // reset type filter on each navigation
   drvMktBreadcrumbs = [{label:'All drives', id:null}, {label:d.name, id:driveId, path:[]}];
   if (folderPath && folderPath.length) {
     folderPath.forEach((f,i) => {
@@ -4927,10 +5016,29 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
     <div class="drv-ai-summary" id="drvAiSummary"></div>`;
 
   // ── SORT: folders first, then files alphabetically ──
-  const sorted = [...children].sort((a,b) => {
+  const rawSorted = [...children].sort((a,b) => {
     if (a.type===b.type) return a.name.localeCompare(b.name);
     return a.type==='folder' ? -1 : 1;
   });
+  const rawFiles = rawSorted.filter(c=>c.type!=='folder');
+
+  // ── FILE TYPE FILTER BAR ──
+  const fileTypes = [...new Set(rawFiles.map(f => getFileType(f.name)?.label || 'Other'))].sort();
+  let typeBarHtml = '';
+  if (fileTypes.length > 1) {
+    const pills = ['All', ...fileTypes].map(t =>
+      '<button class="drv-type-pill'+(drvFolderTypeFilter===t||(t==='All'&&drvFolderTypeFilter==='all')?' active':'')
+      +'" onclick="setDrvFolderType(\''+t+'\',\''+driveId+'\')">'+t+'</button>'
+    ).join('');
+    typeBarHtml = '<div class="drv-type-bar"><span class="drv-type-lbl">Type</span>'+pills+'</div>';
+  }
+
+  // Apply type filter
+  const filteredFiles = drvFolderTypeFilter === 'all'
+    ? rawFiles
+    : rawFiles.filter(f => (getFileType(f.name)?.label || 'Other') === drvFolderTypeFilter);
+
+  const sorted = [...rawSorted.filter(c=>c.type==='folder'), ...filteredFiles];
   const folders = sorted.filter(c=>c.type==='folder');
   const files   = sorted.filter(c=>c.type!=='folder');
   const allIds  = sorted.map(c=>c.id);
@@ -5051,6 +5159,7 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
       </div>
     </div>
     ${toolbarHtml}
+    ${typeBarHtml}
     <div class="tp-mkt-detail-sec" style="margin:0;border-radius:0;border-left:none;border-right:none;border-top:none;flex:1">
       ${contentHtml}
     </div>
@@ -5063,6 +5172,11 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
             : '<button class="tp-mkt-card-add" onclick="addDrvFromMkt(\''+driveId+'\')">+ Add entire drive</button>')
       }
     </div>`;
+}
+
+function setDrvFolderType(type, driveId) {
+  drvFolderTypeFilter = (type === 'All') ? 'all' : type;
+  renderDrvMktDetailPanel(driveId, drvCurrentFolderPath);
 }
 
 // ── HELPER: count selected/total children recursively ──
@@ -5197,11 +5311,63 @@ function confirmSaveMkt() {
   showToast('Changes saved', 'ok');
 }
 
-function filterDrvMkt(cat, btn) {
-  drvMktCategory = cat;
-  document.querySelectorAll('#drvMktCats .tp-mkt-cat').forEach(b=>b.classList.remove('active'));
+function filterDrvMkt(cat, btn) { /* legacy — no-op */ }
+
+// ── DRIVE FILTER CONTROLS ──
+function setDrvMktShow(v, btn) {
+  drvMktShowFilter = v;
+  document.querySelectorAll('#drvMktShowPills .mkt-show-pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderDrvMktGrid(document.getElementById('drvMktSearch')?.value || '');
+}
+function setDrvMktSort(v) {
+  drvMktSort = v;
+  renderDrvMktGrid(document.getElementById('drvMktSearch')?.value || '');
+}
+function toggleDrvMktCat(cat, btn) {
+  btn.classList.toggle('active');
+  if (drvMktCategorySet.has(cat)) drvMktCategorySet.delete(cat);
+  else drvMktCategorySet.add(cat);
+  renderDrvMktGrid(document.getElementById('drvMktSearch')?.value || '');
+}
+function clearDrvMktFilters() {
+  drvMktCategorySet = new Set();
+  drvMktShowFilter = 'all';
+  drvMktSort = 'name';
+  document.querySelectorAll('#drvMktCats .mkt-chk-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#drvMktShowPills .mkt-show-pill').forEach((b,i)=>b.classList.toggle('active',i===0));
+  const sel = document.getElementById('drvMktSortSel'); if (sel) sel.value='name';
+  const inp = document.getElementById('drvMktSearch'); if (inp) inp.value='';
+  renderDrvMktGrid('');
+}
+function renderDrvMktChips() {
+  const el = document.getElementById('drvMktChips');
+  if (!el) return;
+  const chips = [];
+  if (drvMktShowFilter === 'new') chips.push({label:'Not added', key:'show'});
+  if (drvMktShowFilter === 'added') chips.push({label:'Added only', key:'show'});
+  drvMktCategorySet.forEach(c => chips.push({label:c, key:'cat:'+c}));
+  if (!chips.length) { el.innerHTML=''; return; }
+  el.innerHTML = chips.map(c =>
+    '<button class="mkt-chip" onclick="removeDrvMktChip(\''+c.key+'\')">'+c.label+' <span class="mkt-chip-x">×</span></button>'
+  ).join('')
+  + '<button class="mkt-chip clear-all" onclick="clearDrvMktFilters()">Clear all ×</button>';
+}
+function removeDrvMktChip(key) {
+  if (key==='show') { drvMktShowFilter='all'; document.querySelectorAll('#drvMktShowPills .mkt-show-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); }
+  else if (key.startsWith('cat:')) {
+    const cat=key.slice(4); drvMktCategorySet.delete(cat);
+    document.querySelector('#drvMktCats .mkt-chk-item[data-cat="'+cat+'"]')?.classList.remove('active');
+  }
+  renderDrvMktGrid(document.getElementById('drvMktSearch')?.value || '');
+}
+
+// ── FUZZY MATCH HELPER ──
+function mktFuzzyMatch(text, q) {
+  if (!q) return true;
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const t = text.toLowerCase();
+  return words.every(w => t.split(/\s+/).some(tok => tok.startsWith(w)) || t.includes(w));
 }
 
 function renderDrvMktGrid(query) {
@@ -5211,11 +5377,25 @@ function renderDrvMktGrid(query) {
   const addedPool = drvMktContext === 'bldr' ? driveAddedItems : knDriveAddedItems;
   const addedIds = addedPool.map(x=>x.id);
 
-  const filtered = DRV_MKT_CATALOG.filter(d => {
-    const matchCat = drvMktCategory==='all' || d.cat===drvMktCategory;
-    const matchQ = !q || d.name.toLowerCase().includes(q) || d.cat.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q);
-    return matchCat && matchQ;
+  let filtered = DRV_MKT_CATALOG.filter(d => {
+    const matchCat = drvMktCategorySet.size === 0 || drvMktCategorySet.has(d.cat);
+    const matchQ = mktFuzzyMatch(d.name+' '+d.cat+' '+d.desc, q);
+    const matchShow = drvMktShowFilter==='all'
+      || (drvMktShowFilter==='new' && !addedIds.includes(d.id))
+      || (drvMktShowFilter==='added' && addedIds.includes(d.id));
+    return matchCat && matchQ && matchShow;
   });
+
+  // Sort
+  if (drvMktSort === 'content') filtered.sort((a,b) => (b.docs+b.folders) - (a.docs+a.folders));
+  else if (drvMktSort === 'added-last') filtered.sort((a,b) => {
+    const aA=addedIds.includes(a.id), bA=addedIds.includes(b.id);
+    return aA===bA ? a.name.localeCompare(b.name) : aA?1:-1;
+  });
+  else filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+  // Render chips
+  renderDrvMktChips();
 
   // Results count row (above grid)
   let countEl = document.getElementById('drvMktResultsCount');
@@ -5316,7 +5496,11 @@ function addDrvFromMkt(driveId) {
 
 // ── TRUTHPACK MARKETPLACE ──
 let tpMktContext = 'kn'; // 'kn' or 'bldr'
-let tpMktCategory = 'all';
+let tpMktCategory = 'all'; // kept for compat
+let tpMktCategorySet = new Set();
+let tpMktShowFilter = 'all';
+let tpMktSort = 'name';
+let tpMktPlanesFilter = new Set();
 
 const TP_MKT_CATALOG = [
   {id:'finance-2024', name:'Finance Playbook 2024', tag:'Finance', tagColor:'#FDC700', tagBg:'rgba(253,199,0,0.15)', facts:31, claims:8, docs:5,
@@ -5356,10 +5540,20 @@ let mktDiscardTarget = null; // which modal to close after confirm
 function openTpMarketplace(ctx) {
   tpMktContext = ctx || 'kn';
   tpMktCategory = 'all';
+  tpMktCategorySet = new Set();
+  tpMktShowFilter = 'all';
+  tpMktSort = 'name';
+  tpMktPlanesFilter = new Set();
   tpMktBreadcrumbs = [];
-  document.querySelectorAll('#tpMktCats .tp-mkt-cat').forEach((b,i)=>b.classList.toggle('active',i===0));
+  // reset sidebar UI
+  document.querySelectorAll('#tpMktCats .mkt-chk-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#tpMktShowPills .mkt-show-pill').forEach((b,i)=>b.classList.toggle('active',i===0));
+  const sortSel = document.getElementById('tpMktSortSel');
+  if (sortSel) sortSel.value = 'name';
   const inp = document.getElementById('tpMktSearch');
   if (inp) inp.value = '';
+  const chips = document.getElementById('tpMktChips');
+  if (chips) chips.innerHTML = '';
   // snapshot current added IDs
   const net = tpMktContext==='bldr'
     ? (bldrNet || NETWORKS.find(x=>x.id===currentOvId))
@@ -5400,6 +5594,10 @@ function showTpMktListView() {
   if (toolbar) toolbar.style.display = '';
   const cats = document.getElementById('tpMktCats');
   if (cats) cats.style.display = '';
+  const chips = document.getElementById('tpMktChips');
+  if (chips) chips.style.display = '';
+  const cnt = document.getElementById('tpMktResultsCount');
+  if (cnt) cnt.style.display = '';
 }
 
 function showTpMktDetailView() {
@@ -5409,6 +5607,10 @@ function showTpMktDetailView() {
   if (toolbar) toolbar.style.display = 'none';
   const cats = document.getElementById('tpMktCats');
   if (cats) cats.style.display = 'none';
+  const chips = document.getElementById('tpMktChips');
+  if (chips) chips.style.display = 'none';
+  const cnt = document.getElementById('tpMktResultsCount');
+  if (cnt) cnt.style.display = 'none';
 }
 
 function navigateTpMkt(packId) {
@@ -5487,14 +5689,25 @@ function renderTpMktDetailPanel(packId) {
       +'<span class="tp-mkt-detail-plane-nm'+(state==='dis'?' dis':'')+'">'+info.label+'</span>'+pill+'</div>';
   }).join('');
 
-  function listItems(arr, cnt, color) {
+  // Search within detail — preserve query across re-renders
+  const prevDetailQ = detail.querySelector('#tpDetailSearch')?.value || '';
+
+  function listItems(arr, cnt, color, sectionId) {
+    const searchRow = '<div class="tp-detail-sec-search">'
+      +'<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 8l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'
+      +'<input class="tp-detail-sec-search-inp" id="'+sectionId+'Search" placeholder="Search…" oninput="filterTpDetailSection(\''+packId+'\',\''+sectionId+'\')" value="'+(prevDetailQ?'':'')+'"></div>';
     if (!arr || !arr.length) {
-      return '<div class="tp-mkt-detail-item"><span class="tp-mkt-detail-item-txt" style="color:var(--t4);font-style:italic">'+(cnt ? cnt+' items (detail not loaded)' : 'None')+'</span></div>';
+      return searchRow+'<div class="tp-mkt-detail-item"><span class="tp-mkt-detail-item-txt" style="color:var(--t4);font-style:italic">'+(cnt ? cnt+' items (detail not loaded)' : 'None')+'</span></div>';
     }
-    return arr.slice(0,6).map(it => '<div class="tp-mkt-detail-item">'
+    const qSec = (document.getElementById(sectionId+'Search')?.value||'').toLowerCase();
+    const shown = qSec ? arr.filter(it => (it.q||it.title||it.name||it+'').toLowerCase().includes(qSec)) : arr.slice(0,8);
+    const rows = shown.slice(0,8).map(it => '<div class="tp-mkt-detail-item">'
       +'<span class="tp-mkt-detail-dot" style="background:'+color+';margin-top:5px"></span>'
       +'<span class="tp-mkt-detail-item-txt">'+(it.q||it.title||it.name||it)+'</span>'
-      +'</div>').join('') + (arr.length>6 ? '<div class="tp-mkt-detail-item"><span class="tp-mkt-detail-item-txt" style="color:var(--t4)">+' +(arr.length-6)+' more…</span></div>' : '');
+      +'</div>').join('');
+    const moreCount = qSec ? (shown.length - 8) : (arr.length - 8);
+    const more = moreCount > 0 ? '<div class="tp-mkt-detail-item"><span class="tp-mkt-detail-item-txt" style="color:var(--t4)">+'+moreCount+' more…</span></div>' : '';
+    return searchRow + (rows||'<div class="tp-mkt-detail-item"><span class="tp-mkt-detail-item-txt" style="color:var(--t4);font-style:italic">No matches</span></div>') + more;
   }
 
   detail.innerHTML = `
@@ -5518,15 +5731,15 @@ function renderTpMktDetailPanel(packId) {
     <div class="tp-mkt-detail-body">
       <div class="tp-mkt-detail-sec">
         <div class="tp-mkt-detail-sec-hd"><span>Facts / FAQs</span><span class="tp-mkt-detail-sec-cnt">${d._factsCnt||d.facts?.length||0} items</span></div>
-        ${listItems(d.facts, d._factsCnt, '#93C5FD')}
+        ${listItems(d.facts, d._factsCnt, '#93C5FD', 'tpDetailFacts')}
       </div>
       <div class="tp-mkt-detail-sec">
         <div class="tp-mkt-detail-sec-hd"><span>Claims (Sandbox)</span><span class="tp-mkt-detail-sec-cnt">${d._claimsCnt||d.claims?.length||0} items</span></div>
-        ${listItems(d.claims, d._claimsCnt, '#C4B5FD')}
+        ${listItems(d.claims, d._claimsCnt, '#C4B5FD', 'tpDetailClaims')}
       </div>
       <div class="tp-mkt-detail-sec">
         <div class="tp-mkt-detail-sec-hd"><span>Documents / Sources</span><span class="tp-mkt-detail-sec-cnt">${d._docsCnt||d.docs?.length||0} items</span></div>
-        ${listItems(d.docs, d._docsCnt, '#6EE7B7')}
+        ${listItems(d.docs, d._docsCnt, '#6EE7B7', 'tpDetailDocs')}
       </div>
       <div class="tp-mkt-detail-sec">
         <div class="tp-mkt-detail-sec-hd"><span>Planes</span></div>
@@ -5541,12 +5754,70 @@ function renderTpMktDetailPanel(packId) {
     </div>`;
 }
 
-function filterTpMkt(cat, btn) {
-  tpMktCategory = cat;
-  document.querySelectorAll('.tp-mkt-cat').forEach(b=>b.classList.remove('active'));
+function filterTpDetailSection(packId) {
+  renderTpMktDetailPanel(packId);
+}
+
+function filterTpMkt(cat, btn) { /* legacy — no-op */ }
+
+// ── TP FILTER CONTROLS ──
+function setTpMktShow(v, btn) {
+  tpMktShowFilter = v;
+  document.querySelectorAll('#tpMktShowPills .mkt-show-pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const q = document.getElementById('tpMktSearch')?.value || '';
-  renderTpMktGrid(q);
+  renderTpMktGrid(document.getElementById('tpMktSearch')?.value || '');
+}
+function setTpMktSort(v) {
+  tpMktSort = v;
+  renderTpMktGrid(document.getElementById('tpMktSearch')?.value || '');
+}
+function toggleTpMktCat(cat, btn) {
+  btn.classList.toggle('active');
+  if (tpMktCategorySet.has(cat)) tpMktCategorySet.delete(cat);
+  else tpMktCategorySet.add(cat);
+  renderTpMktGrid(document.getElementById('tpMktSearch')?.value || '');
+}
+function toggleTpMktPlane(plane, btn) {
+  btn.classList.toggle('active');
+  if (tpMktPlanesFilter.has(plane)) tpMktPlanesFilter.delete(plane);
+  else tpMktPlanesFilter.add(plane);
+  renderTpMktGrid(document.getElementById('tpMktSearch')?.value || '');
+}
+function clearTpMktFilters() {
+  tpMktCategorySet = new Set();
+  tpMktShowFilter = 'all';
+  tpMktSort = 'name';
+  tpMktPlanesFilter = new Set();
+  document.querySelectorAll('#tpMktCats .mkt-chk-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#tpMktShowPills .mkt-show-pill').forEach((b,i)=>b.classList.toggle('active',i===0));
+  const sel = document.getElementById('tpMktSortSel'); if (sel) sel.value='name';
+  const inp = document.getElementById('tpMktSearch'); if (inp) { inp.value=''; }
+  renderTpMktGrid('');
+}
+function renderTpMktChips() {
+  const el = document.getElementById('tpMktChips');
+  if (!el) return;
+  const chips = [];
+  if (tpMktShowFilter === 'new') chips.push({label:'Not added', key:'show'});
+  if (tpMktShowFilter === 'added') chips.push({label:'Added only', key:'show'});
+  tpMktCategorySet.forEach(c => chips.push({label:c, key:'cat:'+c}));
+  tpMktPlanesFilter.forEach(p => chips.push({label:p.charAt(0).toUpperCase()+p.slice(1)+' plane', key:'plane:'+p}));
+  if (!chips.length) { el.innerHTML=''; return; }
+  el.innerHTML = chips.map(c =>
+    '<button class="mkt-chip" onclick="removeTpMktChip(\''+c.key+'\')">'+c.label+' <span class="mkt-chip-x">×</span></button>'
+  ).join('')
+  + '<button class="mkt-chip clear-all" onclick="clearTpMktFilters()">Clear all ×</button>';
+}
+function removeTpMktChip(key) {
+  if (key==='show') { tpMktShowFilter='all'; document.querySelectorAll('#tpMktShowPills .mkt-show-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); }
+  else if (key.startsWith('cat:')) {
+    const cat=key.slice(4); tpMktCategorySet.delete(cat);
+    document.querySelector('#tpMktCats .mkt-chk-item[data-cat="'+cat+'"]')?.classList.remove('active');
+  } else if (key.startsWith('plane:')) {
+    const pl=key.slice(6); tpMktPlanesFilter.delete(pl);
+    document.querySelector('#tpMktCats .mkt-chk-item[data-plane="'+pl+'"]')?.classList.remove('active');
+  }
+  renderTpMktGrid(document.getElementById('tpMktSearch')?.value || '');
 }
 
 function renderTpMktGrid(query) {
@@ -5558,16 +5829,43 @@ function renderTpMktGrid(query) {
     : NETWORKS.find(x=>x.id===currentOvId);
   const addedIds = (net && net.knowledge) ? net.knowledge.map(k=>k.id) : tpAddedIds;
 
-  const filtered = TP_MKT_CATALOG.filter(p => {
-    const matchCat = tpMktCategory==='all' || p.tag===tpMktCategory;
-    const matchQ = !q || p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
-    return matchCat && matchQ;
+  let filtered = TP_MKT_CATALOG.filter(p => {
+    const matchCat = tpMktCategorySet.size === 0 || tpMktCategorySet.has(p.tag);
+    const matchQ = mktFuzzyMatch(p.name+' '+p.tag+' '+p.desc, q);
+    const matchShow = tpMktShowFilter==='all'
+      || (tpMktShowFilter==='new' && !addedIds.includes(p.id))
+      || (tpMktShowFilter==='added' && addedIds.includes(p.id));
+    const matchPlanes = tpMktPlanesFilter.size === 0
+      || [...tpMktPlanesFilter].every(pl => p.planes?.[pl] && p.planes[pl] !== 'dis');
+    return matchCat && matchQ && matchShow && matchPlanes;
   });
 
+  // Sort
+  if (tpMktSort === 'content') filtered.sort((a,b) => (b.facts+b.claims+b.docs) - (a.facts+a.claims+a.docs));
+  else if (tpMktSort === 'added-last') filtered.sort((a,b) => {
+    const aA=addedIds.includes(a.id), bA=addedIds.includes(b.id);
+    return aA===bA ? a.name.localeCompare(b.name) : aA?1:-1;
+  });
+  else filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+  // Chips
+  renderTpMktChips();
+
+  // Results count
+  let countEl = document.getElementById('tpMktResultsCount');
+  if (!countEl) {
+    countEl = document.createElement('div');
+    countEl.id = 'tpMktResultsCount';
+    countEl.style.cssText = 'padding:10px 24px 0;font-size:11px;color:var(--t3);font-weight:500;flex-shrink:0;line-height:1';
+    grid.parentNode.insertBefore(countEl, grid);
+  }
+
   if (!filtered.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px 20px;text-align:center;color:var(--t3);font-size:13px">No packs match your search.</div>';
+    countEl.textContent = '';
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px 20px;text-align:center;color:var(--t3);font-size:13px">No packs match your filters.</div>';
     return;
   }
+  countEl.textContent = 'Showing ' + filtered.length + ' pack' + (filtered.length !== 1 ? 's' : '');
 
   function resolveColor(v, hex) { return v.replace('var(--ok)',hex==='hex'?'#05DF72':'rgba(5,223,114,.35)').replace('var(--pri)',hex==='hex'?'#2B7FFF':'rgba(43,127,255,.35)').replace('var(--pur)',hex==='hex'?'#A78BFA':'rgba(167,139,250,.35)').replace('var(--err)',hex==='hex'?'#FF6467':'rgba(255,100,103,.35)'); }
 
