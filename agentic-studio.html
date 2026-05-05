@@ -4615,6 +4615,9 @@ const DRV_MKT_CATALOG = [
     {id:'drv-legal-msa', name:'MSA Library', type:'folder', count:3, children:[
       {id:'drv-legal-msa-1', name:'MSA v4.docx', type:'file'},
     ]},
+    {id:'drv-legal-tos', name:'Terms of Service v3.pdf', type:'file'},
+    {id:'drv-legal-pp', name:'Privacy Policy 2026.pdf', type:'file'},
+    {id:'drv-legal-dpa', name:'Data Processing Agreement.docx', type:'file'},
   ]},
   {id:'drv-hr', name:'HR Resources Drive', cat:'HR', catBg:'rgba(167,139,250,.12)', catColor:'#A78BFA', folders:4, docs:18, previewKey:'governance',
    folderList:['Onboarding','Job Descriptions','Performance Reviews','Benefits'],
@@ -4646,6 +4649,8 @@ const DRV_MKT_CATALOG = [
       {id:'drv-hr-ben-1', name:'Benefits Overview 2026.pdf', type:'file'},
       {id:'drv-hr-ben-2', name:'Health Insurance Guide.pdf', type:'file'},
     ]},
+    {id:'drv-hr-org', name:'Org Chart May 2026.pdf', type:'file'},
+    {id:'drv-hr-handbook', name:'Employee Handbook v5.pdf', type:'file'},
   ]},
   {id:'drv-fin', name:'Finance & Reporting Drive', cat:'Finance', catBg:'rgba(253,199,0,.1)', catColor:'#FDC700', folders:2, docs:9, previewKey:'product',
    folderList:['Budget Templates','Financial Reports'],
@@ -4663,6 +4668,8 @@ const DRV_MKT_CATALOG = [
       {id:'drv-fin-fr-4', name:'Board Deck March 2026.pptx', type:'file'},
       {id:'drv-fin-fr-5', name:'Investor Update Q1.pdf', type:'file'},
     ]},
+    {id:'drv-fin-exp', name:'Expense Policy 2026.pdf', type:'file'},
+    {id:'drv-fin-chart', name:'Chart of Accounts.xlsx', type:'file'},
   ]},
   {id:'drv-ops', name:'Operations Handbook Drive', cat:'Governance & Policy', catBg:'rgba(148,163,184,.12)', catColor:'#94A3B8', folders:3, docs:14, previewKey:'sales',
    folderList:['SOPs','Incident Response','Runbooks'],
@@ -4689,6 +4696,8 @@ const DRV_MKT_CATALOG = [
       {id:'drv-ops-rb-3', name:'Scaling Runbook.md', type:'file'},
       {id:'drv-ops-rb-4', name:'DR Runbook.md', type:'file'},
     ]},
+    {id:'drv-ops-master', name:'Operations Master Index.md', type:'file'},
+    {id:'drv-ops-contacts', name:'Escalation Contacts.xlsx', type:'file'},
   ]},
   {id:'drv-mkt', name:'Marketing Assets Drive', cat:'Sales', catBg:'rgba(5,223,114,.1)', catColor:'#05DF72', folders:2, docs:10, previewKey:'sales',
    folderList:['Brand Assets','Campaign Briefs'],
@@ -4709,6 +4718,8 @@ const DRV_MKT_CATALOG = [
       {id:'drv-mkt-cb-3', name:'Webinar Series Brief.docx', type:'file'},
       {id:'drv-mkt-cb-4', name:'SEO Content Plan.xlsx', type:'file'},
     ]},
+    {id:'drv-mkt-readme', name:'Marketing Readme.md', type:'file'},
+    {id:'drv-mkt-cal', name:'Content Calendar Q2 2026.xlsx', type:'file'},
   ]},
   {id:'drv-eng', name:'Engineering Docs Drive', cat:'Product', catBg:'rgba(43,127,255,.12)', catColor:'#2B7FFF', folders:4, docs:22, previewKey:'product',
    folderList:['Architecture','Coding Standards','Deployment Guides','System Design'],
@@ -4749,6 +4760,9 @@ const DRV_MKT_CATALOG = [
       {id:'drv-eng-sd-4', name:'Event Bus Design.md', type:'file'},
       {id:'drv-eng-sd-5', name:'Rate Limiting Design.md', type:'file'},
     ]},
+    {id:'drv-eng-readme', name:'Engineering Readme.md', type:'file'},
+    {id:'drv-eng-adr', name:'ADR Index.md', type:'file'},
+    {id:'drv-eng-oncall', name:'On-Call Setup.md', type:'file'},
   ]},
 ];
 
@@ -4841,6 +4855,23 @@ let drvSelectedItems = new Set();    // selected item IDs
 let drvCurrentDriveId = null;
 let drvCurrentFolderPath = [];
 
+// ── FILE TYPE CONFIG ──
+const FILE_TYPE_CFG = {
+  pdf:  {color:'#FF6467', bg:'rgba(255,100,103,.15)', label:'PDF',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  docx: {color:'#2B7FFF', bg:'rgba(43,127,255,.15)',  label:'DOCX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  doc:  {color:'#2B7FFF', bg:'rgba(43,127,255,.15)',  label:'DOC',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  xlsx: {color:'#05DF72', bg:'rgba(5,223,114,.12)',   label:'XLSX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  xls:  {color:'#05DF72', bg:'rgba(5,223,114,.12)',   label:'XLS',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  pptx: {color:'#FDC700', bg:'rgba(253,199,0,.12)',   label:'PPTX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  md:   {color:'#A78BFA', bg:'rgba(167,139,250,.12)', label:'MD',   icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  zip:  {color:'#94A3B8', bg:'rgba(148,163,184,.12)', label:'ZIP',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  yaml: {color:'#34D399', bg:'rgba(52,211,153,.12)',  label:'YAML', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+};
+function getFileType(name) {
+  const ext = (name||'').split('.').pop().toLowerCase();
+  return FILE_TYPE_CFG[ext] || {color:'#94A3B8', bg:'rgba(148,163,184,.1)', label:ext.toUpperCase()||'FILE', icon:'M3 1.5h5.5l3 3V12H3V1.5z'};
+}
+
 function renderDrvMktDetailPanel(driveId, folderPath) {
   const detail = document.getElementById('drvMktDetail');
   if (!detail) return;
@@ -4891,57 +4922,115 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
     </div>
     <div class="drv-ai-summary" id="drvAiSummary"></div>`;
 
+  // ── SORT: folders first, then files alphabetically ──
+  const sorted = [...children].sort((a,b) => {
+    if (a.type===b.type) return a.name.localeCompare(b.name);
+    return a.type==='folder' ? -1 : 1;
+  });
+  const folders = sorted.filter(c=>c.type==='folder');
+  const files   = sorted.filter(c=>c.type!=='folder');
+  const allIds  = sorted.map(c=>c.id);
+  const selInView = allIds.filter(id=>drvSelectedItems.has(id));
+  const allSel  = allIds.length > 0 && selInView.length === allIds.length;
+  const someSel = selInView.length > 0 && !allSel;
+
+  // ── EMPTY STATE ──
+  function buildEmpty() {
+    return `<div style="padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;margin-bottom:4px">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5.5h6l1.5 2h6.5v10H3v-12z" stroke="var(--t4)" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--t3)">Empty folder</div>
+      <div style="font-size:12px;color:var(--t4)">No documents have been added to this folder yet.</div>
+    </div>`;
+  }
+
+  // ── SELECT ALL ROW ──
+  function buildSelectAllRow() {
+    if (!sorted.length) return '';
+    const checkCls = allSel ? 'checked' : someSel ? 'indeterminate' : '';
+    const checkIcon = allSel
+      ? '<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : someSel
+      ? '<svg width="9" height="2" viewBox="0 0 9 2"><rect x="1" y="0.5" width="7" height="1" rx="0.5" fill="white"/></svg>'
+      : '';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 16px 6px;border-bottom:1px solid rgba(255,255,255,.04)">
+      <div class="tp-mkt-tree-check ${checkCls}" onclick="drvToggleAll('${driveId}')" style="cursor:pointer">${checkIcon}</div>
+      <span style="font-size:11px;color:var(--t4);font-weight:600;text-transform:uppercase;letter-spacing:.06em">
+        ${selInView.length > 0 ? selInView.length+' of '+sorted.length+' selected' : sorted.length+' items — '+folders.length+' folder'+(folders.length!==1?'s':'')+', '+files.length+' file'+(files.length!==1?'s':'')}
+      </span>
+    </div>`;
+  }
+
   // ── LIST VIEW ──
+  function buildListRow(c) {
+    const isFolder = c.type==='folder';
+    const isSel = drvSelectedItems.has(c.id);
+    const childSel = isFolder ? getChildSelCount(c) : 0;
+    const childTotal = isFolder ? countAllChildren(c) : 0;
+    const checkCls = isSel ? 'checked' : (isFolder && childSel > 0 && childSel < childTotal ? 'indeterminate' : '');
+    const checkIcon = isSel
+      ? '<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : (checkCls==='indeterminate' ? '<svg width="9" height="2" viewBox="0 0 9 2"><rect x="1" y="0.5" width="7" height="1" rx="0.5" fill="white"/></svg>' : '');
+    const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
+    const navAttr = isFolder ? ' onclick="drvItemNav(event,\''+driveId+'\',\''+encodeURIComponent(JSON.stringify(newPath))+'\')"' : '';
+    const ft = isFolder ? null : getFileType(c.name);
+    const fileBadge = ft ? '<span style="font-size:9px;font-weight:800;padding:1px 5px;border-radius:3px;background:'+ft.bg+';color:'+ft.color+';letter-spacing:.04em;flex-shrink:0">'+ft.label+'</span>' : '';
+    return '<div class="tp-mkt-tree-item '+(isFolder?'folder':'file')+'"'+navAttr+'>'
+      +'<div class="tp-mkt-tree-check '+checkCls+'" onclick="event.stopPropagation();drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'+checkIcon+'</div>'
+      +(isFolder
+        ? '<svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="#FDC700" stroke-width="1.3" stroke-linejoin="round"/></svg>'
+        : '<svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5l3 3V12H3V1.5z" stroke="'+ft.color+'" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V5h3" stroke="'+ft.color+'" stroke-width="1.2"/></svg>')
+      +'<span class="tp-mkt-tree-nm" style="flex:1">'+c.name+'</span>'
+      + fileBadge
+      +(isFolder && c.count ? '<span class="tp-mkt-tree-cnt">'+c.count+' items</span>' : '')
+      +(isFolder ? '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="color:var(--t4);flex-shrink:0"><path d="M3.5 2l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>' : '')
+      +'</div>';
+  }
+
   function buildListView() {
-    if (!children.length) return '<div style="padding:24px 20px;font-size:12px;color:var(--t4);font-style:italic;text-align:center">This folder is empty</div>';
-    return '<div class="tp-mkt-tree">' + children.map(c => {
-      const isFolder = c.type==='folder';
-      const isSel = drvSelectedItems.has(c.id);
-      const childSel = isFolder ? getChildSelCount(c) : 0;
-      const childTotal = isFolder ? countAllChildren(c) : 0;
-      const checkCls = isSel ? 'checked' : (isFolder && childSel > 0 && childSel < childTotal ? 'indeterminate' : '');
-      const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
-      const navAttr = isFolder ? ' onclick="drvItemNav(event,\''+driveId+'\',\''+encodeURIComponent(JSON.stringify(newPath))+'\')"' : '';
-      return '<div class="tp-mkt-tree-item '+(isFolder?'folder':'file')+'"'+navAttr+'>'
-        +'<div class="tp-mkt-tree-check '+checkCls+'" onclick="event.stopPropagation();drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'
-        +'<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-        +'</div>'
-        +(isFolder
-          ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="#FDC700" stroke-width="1.2" stroke-linejoin="round"/></svg>'
-          : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h6l3 3v8H3v-11z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5V5h3" stroke="currentColor" stroke-width="1.2"/></svg>')
-        +'<span class="tp-mkt-tree-nm">'+c.name+'</span>'
-        +(c.count ? '<span class="tp-mkt-tree-cnt">'+c.count+' items</span>' : '')
-        +'</div>';
-    }).join('') + '</div>';
+    if (!sorted.length) return buildEmpty();
+    let html = buildSelectAllRow();
+    if (folders.length) {
+      html += folders.map(buildListRow).join('');
+    }
+    if (files.length) {
+      if (folders.length) html += '<div style="height:1px;background:rgba(255,255,255,.04);margin:4px 0"></div>';
+      html += files.map(buildListRow).join('');
+    }
+    return '<div class="tp-mkt-tree" style="padding-bottom:8px">'+html+'</div>';
   }
 
   // ── GRID VIEW ──
+  function buildGridCard(c) {
+    const isFolder = c.type==='folder';
+    const isSel = drvSelectedItems.has(c.id);
+    const ft = isFolder ? null : getFileType(c.name);
+    const iconColor = isFolder ? '#FDC700' : ft.color;
+    const iconBg = isFolder ? 'rgba(253,199,0,.12)' : ft.bg;
+    const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
+    const navAttr = isFolder ? ' onclick="drvItemNav(event,\''+driveId+'\',\''+encodeURIComponent(JSON.stringify(newPath))+'\')"' : '';
+    return '<div class="drv-file-card'+(isSel?' selected':'')+(isFolder?' folder-card':'')+'"'+navAttr+'>'
+      +'<div class="drv-file-card-check" onclick="event.stopPropagation();drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'
+      +(isSel?'<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':'')
+      +'</div>'
+      +'<div class="drv-file-card-ico" style="background:'+iconBg+';border:1px solid '+iconColor+'33">'
+      +(isFolder
+        ? '<svg width="20" height="20" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="'+iconColor+'" stroke-width="1.2" stroke-linejoin="round"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5l3 3V12H3V1.5z" stroke="'+iconColor+'" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V5h3" stroke="'+iconColor+'" stroke-width="1.2"/></svg>')
+      +'</div>'
+      +(!isFolder ? '<span style="font-size:9px;font-weight:800;padding:1px 5px;border-radius:3px;background:'+ft.bg+';color:'+ft.color+'">'+ft.label+'</span>' : '<span style="font-size:9px;color:var(--t4)">'+(c.count||0)+' items</span>')
+      +'<div class="drv-file-card-nm">'+c.name+'</div>'
+      +'</div>';
+  }
+
   function buildGridView() {
-    if (!children.length) return '<div style="padding:24px 20px;font-size:12px;color:var(--t4);font-style:italic;text-align:center">This folder is empty</div>';
-    const fileIcons = {
-      pdf:'#FF6467', docx:'#2B7FFF', doc:'#2B7FFF', md:'#A78BFA',
-      xlsx:'#05DF72', pptx:'#FDC700', zip:'#94A3B8', yaml:'#34D399'
-    };
-    return '<div class="drv-file-grid">' + children.map(c => {
-      const isFolder = c.type==='folder';
-      const isSel = drvSelectedItems.has(c.id);
-      const ext = c.name.split('.').pop().toLowerCase();
-      const iconColor = isFolder ? '#FDC700' : (fileIcons[ext]||'#94A3B8');
-      const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
-      const navAttr = isFolder ? ' onclick="drvItemNav(event,\''+driveId+'\',\''+encodeURIComponent(JSON.stringify(newPath))+'\')"' : '';
-      return '<div class="drv-file-card'+(isSel?' selected':'')+(isFolder?' folder-card':'')+'"'
-        +navAttr+' ondblclick="drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'
-        +'<div class="drv-file-card-check" onclick="event.stopPropagation();drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'
-        +(isSel?'<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':'')
-        +'</div>'
-        +'<div class="drv-file-card-ico" style="background:'+iconColor+'22;border:1px solid '+iconColor+'33">'
-        +(isFolder
-          ? '<svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="'+iconColor+'" stroke-width="1.2" stroke-linejoin="round"/></svg>'
-          : '<svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h6l3 3v8H3v-11z" stroke="'+iconColor+'" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5V5h3" stroke="'+iconColor+'" stroke-width="1.2"/></svg>')
-        +'</div>'
-        +'<div class="drv-file-card-nm">'+c.name+'</div>'
-        +'</div>';
-    }).join('') + '</div>';
+    if (!sorted.length) return buildEmpty();
+    return buildSelectAllRow()
+      + '<div class="drv-file-grid">'
+      + folders.map(buildGridCard).join('')
+      + files.map(buildGridCard).join('')
+      + '</div>';
   }
 
   const contentHtml = drvDetailView === 'grid' ? buildGridView() : buildListView();
@@ -4994,6 +5083,22 @@ function drvToggleItem(itemId, driveId, isFolder) {
   renderDrvMktDetailPanel(driveId, drvCurrentFolderPath);
 }
 
+// ── SELECT ALL / DESELECT ALL in current view ──
+function drvToggleAll(driveId) {
+  const drv = DRV_MKT_CATALOG.find(x=>x.id===driveId);
+  if (!drv) return;
+  let node = drv;
+  for (const seg of drvCurrentFolderPath) {
+    const child = (node.children||[]).find(c=>c.id===seg.id);
+    if (child) node = child;
+  }
+  const allIds = (node.children||[]).map(c=>c.id);
+  const allSel = allIds.every(id=>drvSelectedItems.has(id));
+  if (allSel) allIds.forEach(id=>drvSelectedItems.delete(id));
+  else allIds.forEach(id=>drvSelectedItems.add(id));
+  renderDrvMktDetailPanel(driveId, drvCurrentFolderPath);
+}
+
 // ── NAVIGATE WITH CLICK (avoids checkbox click bubbling) ──
 function drvItemNav(e, driveId, encodedPath) {
   navigateDrvMkt(driveId, JSON.parse(decodeURIComponent(encodedPath)));
@@ -5025,14 +5130,24 @@ function drvAddSelected(driveId) {
 
 // ── AI SUMMARIZE ──
 const DRV_AI_SUMMARIES = {
-  'Onboarding': 'This folder contains structured onboarding materials including a Day 1 checklist, a 30-60-90 day plan template, and role-specific ramp guides. Total reading time: ~45 min.',
-  'Job Descriptions': 'Contains 8 role templates across Engineering, Sales, and Operations. Templates follow a standardized format with responsibilities, requirements, and compensation bands.',
-  'Performance Reviews': 'Quarterly and annual review templates based on OKR alignment. Includes a 360-feedback form and calibration guidelines for managers.',
-  'Benefits': 'Overview of health, dental, and vision coverage, plus PTO policy, equity guidelines, and remote work stipend details.',
-  'Corporate Policies': 'Core compliance documents: HR policy, Code of Conduct, and IT Security Policy. Last reviewed Q1 2026.',
-  'API Documentation': 'Full REST API reference including authentication, rate limits, and webhook integration guides. Covers v2 and v3 endpoints.',
-  'Battle Cards': 'Competitive intelligence vs. 2 key competitors with feature comparisons, pricing analysis, and objection handling scripts.',
-  'default': 'This folder contains {count} items including documents, policies, and reference materials relevant to this area of the business.'
+  'Onboarding': 'Structured onboarding materials: Day 1 checklist, 30-60-90 day plan template, and role-specific ramp guides. Estimated reading time ~45 min for new hires.',
+  'Job Descriptions': '8 role templates across Engineering, Sales, and Operations. Standardized format with responsibilities, requirements, and compensation bands.',
+  'Performance Reviews': 'Quarterly and annual review templates aligned to OKRs. Includes 360-feedback form and manager calibration guidelines.',
+  'Benefits': 'Health, dental, and vision coverage overview, plus PTO policy, equity guidelines, and remote work stipend details for 2026.',
+  'Corporate Policies': 'Core compliance documents: HR policy, Code of Conduct, and IT Security Policy. All reviewed and signed off in Q1 2026.',
+  'API Documentation': 'Full REST API reference covering authentication, rate limits, and webhook integrations. Supports v2 and v3 endpoints.',
+  'Battle Cards': 'Competitive intelligence vs. 2 key competitors — feature comparisons, pricing analysis, and objection handling scripts for sales.',
+  'SOPs': '6 standard operating procedures covering onboarding, offboarding, deployment, support escalation, change management, and vendor management.',
+  'Incident Response': 'P0 and P1 playbooks, post-mortem template, and on-call rotation schedule. Aligned with SLA response times.',
+  'Runbooks': '4 operational runbooks for database backup, cache flush, horizontal scaling, and disaster recovery procedures.',
+  'Architecture': 'System architecture diagrams v3, data flow charts, microservices map, and infrastructure overview. Updated March 2026.',
+  'Coding Standards': 'TypeScript and Python style guides, API design standards, and Git workflow conventions used across all engineering teams.',
+  'Deployment Guides': 'Production and staging deploy guides, zero-downtime deploy procedures, rollback playbooks, and Kubernetes config references.',
+  'System Design': '5 technical design documents covering auth, notifications, search, event bus, and rate limiting systems.',
+  'Brand Assets': 'Complete brand kit: logo pack, color palette, typography guide, icon set, photography guidelines. Last updated Jan 2026.',
+  'Financial Reports': 'Q1 2026 through Q4 2025 financial reports, annual report, board deck, and investor update. Prepared by Finance team.',
+  'NDAs & Templates': 'Standard and enterprise NDA templates. Both reviewed by Legal counsel and ready for use in Q1 2026.',
+  'default': 'This folder contains {count} items — a mix of documents, templates, and reference materials. Click individual files to preview their content.'
 };
 
 function drvAiSummarize(driveId, folderName) {
