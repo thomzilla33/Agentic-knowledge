@@ -1549,6 +1549,44 @@ body.test-mode #vTestMode{display:flex}
 .tp-mkt-tree-cnt{font-size:11px;color:var(--t4)}
 .tp-mkt-tree-item.clickable{cursor:pointer}
 .tp-mkt-tree-item.clickable:hover .tp-mkt-tree-nm{color:var(--t1)}
+/* ── DRIVE DETAIL TOOLBAR (grid/list toggle + AI) ── */
+.drv-detail-toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--bd);flex-shrink:0;gap:10px}
+.drv-detail-toolbar-left{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3)}
+.drv-detail-toolbar-left strong{color:var(--t1);font-size:13px}
+.drv-sel-badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:20px;background:rgba(43,127,255,.15);color:var(--pri);font-size:11px;font-weight:700;border:1px solid rgba(43,127,255,.3)}
+.drv-ai-btn{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:linear-gradient(135deg,rgba(43,127,255,.15),rgba(167,139,250,.15));border:1px solid rgba(167,139,250,.3);color:#C4B5FD;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.drv-ai-btn:hover{background:linear-gradient(135deg,rgba(43,127,255,.25),rgba(167,139,250,.25));color:#e0d9ff}
+.drv-ai-btn svg{flex-shrink:0}
+.drv-view-btns{display:flex;gap:3px}
+.drv-vbtn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);background:rgba(255,255,255,.04);border-radius:6px;color:var(--t3);cursor:pointer;transition:all .1s}
+.drv-vbtn.active{background:rgba(43,127,255,.12);border-color:rgba(43,127,255,.3);color:var(--pri)}
+/* ── TREE ROWS WITH CHECKBOXES ── */
+.tp-mkt-tree-item{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;transition:background .1s;user-select:none}
+.tp-mkt-tree-check{width:16px;height:16px;border-radius:4px;border:1.5px solid rgba(255,255,255,.2);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s;cursor:pointer}
+.tp-mkt-tree-check.checked{background:var(--pri);border-color:var(--pri)}
+.tp-mkt-tree-check.indeterminate{background:rgba(43,127,255,.3);border-color:var(--pri)}
+.tp-mkt-tree-check svg{display:none}
+.tp-mkt-tree-check.checked svg,.tp-mkt-tree-check.indeterminate svg{display:block}
+/* ── GRID VIEW ── */
+.drv-file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:16px}
+.drv-file-card{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:10px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all .12s;position:relative}
+.drv-file-card:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}
+.drv-file-card.selected{border-color:var(--pri);background:rgba(43,127,255,.08)}
+.drv-file-card-check{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:4px;border:1.5px solid rgba(255,255,255,.2);background:transparent;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.drv-file-card.selected .drv-file-card-check{background:var(--pri);border-color:var(--pri)}
+.drv-file-card-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.drv-file-card-nm{font-size:11px;color:var(--t2);text-align:center;line-height:1.4;word-break:break-word;width:100%}
+.drv-file-card.folder-card .drv-file-card-ico{background:rgba(253,199,0,.12)}
+/* ── AI SUMMARY PANEL ── */
+.drv-ai-summary{margin:16px 20px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(43,127,255,.08),rgba(167,139,250,.06));border:1px solid rgba(167,139,250,.25);border-radius:12px;display:none;animation:mpop .2s ease}
+.drv-ai-summary.visible{display:block}
+.drv-ai-summary-hd{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#C4B5FD;margin-bottom:8px}
+.drv-ai-summary-txt{font-size:12px;color:var(--t2);line-height:1.7}
+.drv-ai-loading{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3)}
+.drv-ai-dot{width:5px;height:5px;border-radius:50%;background:#C4B5FD;animation:aidot 1.2s ease-in-out infinite}
+.drv-ai-dot:nth-child(2){animation-delay:.2s}
+.drv-ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes aidot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 /* ── DISCARD CONFIRMATION DIALOG ── */
 .mkt-discard-ov{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
 .mkt-discard-ov.open{display:flex}
@@ -4727,6 +4765,8 @@ function openDriveMarketplace(ctx) {
   if (inp) inp.value = '';
   const addedPool = drvMktContext === 'bldr' ? driveAddedItems : knDriveAddedItems;
   drvMktInitialAdded = [...addedPool.map(x=>x.id)];
+  drvSelectedItems = new Set();
+  drvDetailView = 'list';
   renderDrvMktGrid('');
   renderTpBreadcrumbs('drv');
   showDrvMktListView();
@@ -4795,11 +4835,20 @@ function drvMktBcNav(idx) {
   }
 }
 
+// ── DRIVE DETAIL STATE ──
+let drvDetailView = 'list';          // 'list' | 'grid'
+let drvSelectedItems = new Set();    // selected item IDs
+let drvCurrentDriveId = null;
+let drvCurrentFolderPath = [];
+
 function renderDrvMktDetailPanel(driveId, folderPath) {
   const detail = document.getElementById('drvMktDetail');
   if (!detail) return;
   const drv = DRV_MKT_CATALOG ? DRV_MKT_CATALOG.find(x=>x.id===driveId) : null;
   if (!drv) return;
+
+  drvCurrentDriveId = driveId;
+  drvCurrentFolderPath = folderPath || [];
 
   // Navigate into folder path
   let node = drv;
@@ -4810,25 +4859,92 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
 
   const addedPool = drvMktContext === 'bldr' ? driveAddedItems : knDriveAddedItems;
   const isAdded = addedPool.some(x=>x.id===driveId);
-
   const isRoot = (!folderPath || !folderPath.length);
   const catBg = drv.catBg || 'rgba(43,127,255,.12)';
   const catColor = drv.catColor || 'var(--pri)';
-
   const children = node.children || [];
-  const treeHtml = children.length ? children.map(c => {
-    const isFolder = c.type==='folder';
-    const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
-    const pathAttr = JSON.stringify(newPath).replace(/"/g,'&quot;');
-    return '<div class="tp-mkt-tree-item '+(isFolder?'folder clickable':'file')+'"'
-      +(isFolder ? ' onclick="navigateDrvMkt(\''+driveId+'\',JSON.parse(decodeURIComponent(\''+encodeURIComponent(JSON.stringify(newPath))+'\')));"' : '')+'>'
-      +(isFolder
-        ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>'
-        : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h6l3 3v8H3v-11z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5V5h3" stroke="currentColor" stroke-width="1.2"/></svg>')
-      +'<span class="tp-mkt-tree-nm">'+c.name+'</span>'
-      +(c.count ? '<span class="tp-mkt-tree-cnt">'+c.count+' items</span>' : '')
-      +'</div>';
-  }).join('') : '<div style="padding:20px 16px;font-size:12px;color:var(--t4);font-style:italic">No items in this folder</div>';
+  const selCount = drvSelectedItems.size;
+
+  // ── TOOLBAR HTML ──
+  const toolbarHtml = `
+    <div class="drv-detail-toolbar">
+      <div class="drv-detail-toolbar-left">
+        <strong>${isRoot ? drv.name : node.name}</strong>
+        <span style="color:var(--t4)">·</span>
+        <span>${children.length} items</span>
+        ${selCount > 0 ? '<span class="drv-sel-badge"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'+selCount+' selected</span>' : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="drv-ai-btn" onclick="drvAiSummarize('${driveId}','${node.name}')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.2 2.8L10 5 7.2 6.2 6 9l-1.2-2.8L2 5l2.8-1.2L6 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          Summarize with AI
+        </button>
+        <div class="drv-view-btns">
+          <button class="drv-vbtn${drvDetailView==='list'?' active':''}" onclick="drvSetView('list')" title="List view">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 3h9M2 6.5h9M2 10h9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </button>
+          <button class="drv-vbtn${drvDetailView==='grid'?' active':''}" onclick="drvSetView('grid')" title="Grid view">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="7.5" y="1" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="7.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="drv-ai-summary" id="drvAiSummary"></div>`;
+
+  // ── LIST VIEW ──
+  function buildListView() {
+    if (!children.length) return '<div style="padding:24px 20px;font-size:12px;color:var(--t4);font-style:italic;text-align:center">This folder is empty</div>';
+    return '<div class="tp-mkt-tree">' + children.map(c => {
+      const isFolder = c.type==='folder';
+      const isSel = drvSelectedItems.has(c.id);
+      const childSel = isFolder ? getChildSelCount(c) : 0;
+      const childTotal = isFolder ? countAllChildren(c) : 0;
+      const checkCls = isSel ? 'checked' : (isFolder && childSel > 0 && childSel < childTotal ? 'indeterminate' : '');
+      const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
+      const navAttr = isFolder ? ' onclick="drvItemNav(event,\''+driveId+'\',\''+encodeURIComponent(JSON.stringify(newPath))+'\')"' : '';
+      return '<div class="tp-mkt-tree-item '+(isFolder?'folder':'file')+'"'+navAttr+'>'
+        +'<div class="tp-mkt-tree-check '+checkCls+'" onclick="event.stopPropagation();drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'
+        +'<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        +'</div>'
+        +(isFolder
+          ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="#FDC700" stroke-width="1.2" stroke-linejoin="round"/></svg>'
+          : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h6l3 3v8H3v-11z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5V5h3" stroke="currentColor" stroke-width="1.2"/></svg>')
+        +'<span class="tp-mkt-tree-nm">'+c.name+'</span>'
+        +(c.count ? '<span class="tp-mkt-tree-cnt">'+c.count+' items</span>' : '')
+        +'</div>';
+    }).join('') + '</div>';
+  }
+
+  // ── GRID VIEW ──
+  function buildGridView() {
+    if (!children.length) return '<div style="padding:24px 20px;font-size:12px;color:var(--t4);font-style:italic;text-align:center">This folder is empty</div>';
+    const fileIcons = {
+      pdf:'#FF6467', docx:'#2B7FFF', doc:'#2B7FFF', md:'#A78BFA',
+      xlsx:'#05DF72', pptx:'#FDC700', zip:'#94A3B8', yaml:'#34D399'
+    };
+    return '<div class="drv-file-grid">' + children.map(c => {
+      const isFolder = c.type==='folder';
+      const isSel = drvSelectedItems.has(c.id);
+      const ext = c.name.split('.').pop().toLowerCase();
+      const iconColor = isFolder ? '#FDC700' : (fileIcons[ext]||'#94A3B8');
+      const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
+      const navAttr = isFolder ? ' onclick="drvItemNav(event,\''+driveId+'\',\''+encodeURIComponent(JSON.stringify(newPath))+'\')"' : '';
+      return '<div class="drv-file-card'+(isSel?' selected':'')+(isFolder?' folder-card':'')+'"'
+        +navAttr+' ondblclick="drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'
+        +'<div class="drv-file-card-check" onclick="event.stopPropagation();drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'
+        +(isSel?'<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':'')
+        +'</div>'
+        +'<div class="drv-file-card-ico" style="background:'+iconColor+'22;border:1px solid '+iconColor+'33">'
+        +(isFolder
+          ? '<svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="'+iconColor+'" stroke-width="1.2" stroke-linejoin="round"/></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h6l3 3v8H3v-11z" stroke="'+iconColor+'" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5V5h3" stroke="'+iconColor+'" stroke-width="1.2"/></svg>')
+        +'</div>'
+        +'<div class="drv-file-card-nm">'+c.name+'</div>'
+        +'</div>';
+    }).join('') + '</div>';
+  }
+
+  const contentHtml = drvDetailView === 'grid' ? buildGridView() : buildListView();
 
   detail.innerHTML = `
     <div class="tp-mkt-detail-hd">
@@ -4841,16 +4957,96 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
         ${isRoot ? `<div class="tp-mkt-detail-meta"><span class="tp-mkt-detail-stat">${drv.sub||''}</span></div>` : ''}
       </div>
     </div>
-    <div class="tp-mkt-detail-sec">
-      <div class="tp-mkt-detail-sec-hd"><span>${isRoot ? 'Contents' : 'Folder contents'}</span><span class="tp-mkt-detail-sec-cnt">${children.length} items</span></div>
-      <div class="tp-mkt-tree">${treeHtml}</div>
+    ${toolbarHtml}
+    <div class="tp-mkt-detail-sec" style="margin:0;border-radius:0;border-left:none;border-right:none;border-top:none;flex:1">
+      ${contentHtml}
     </div>
     <div class="tp-mkt-detail-add-row">
-      ${isAdded
-        ? '<button class="tp-mkt-card-add added" disabled>✓ Drive added</button>'
-        : '<button class="tp-mkt-card-add" onclick="addDrvFromMkt(\''+driveId+'\')">+ Add drive</button>'
+      ${selCount > 0
+        ? '<button class="tp-mkt-cancel" onclick="drvSelectedItems.clear();renderDrvMktDetailPanel(\''+driveId+'\',drvCurrentFolderPath)">Clear selection</button>'
+          +'<button class="tp-mkt-done" onclick="drvAddSelected(\''+driveId+'\')">+ Add selected ('+selCount+')</button>'
+        : (isAdded
+            ? '<button class="tp-mkt-card-add added" disabled>✓ Drive added</button>'
+            : '<button class="tp-mkt-card-add" onclick="addDrvFromMkt(\''+driveId+'\')">+ Add entire drive</button>')
       }
     </div>`;
+}
+
+// ── HELPER: count selected/total children recursively ──
+function countAllChildren(node) {
+  let n = 0;
+  (node.children||[]).forEach(c => { n++; if(c.children) n += countAllChildren(c); });
+  return n;
+}
+function getChildSelCount(node) {
+  let n = 0;
+  (node.children||[]).forEach(c => {
+    if (drvSelectedItems.has(c.id)) n++;
+    if (c.children) n += getChildSelCount(c);
+  });
+  return n;
+}
+
+// ── TOGGLE ITEM SELECTION ──
+function drvToggleItem(itemId, driveId, isFolder) {
+  if (drvSelectedItems.has(itemId)) drvSelectedItems.delete(itemId);
+  else drvSelectedItems.add(itemId);
+  renderDrvMktDetailPanel(driveId, drvCurrentFolderPath);
+}
+
+// ── NAVIGATE WITH CLICK (avoids checkbox click bubbling) ──
+function drvItemNav(e, driveId, encodedPath) {
+  navigateDrvMkt(driveId, JSON.parse(decodeURIComponent(encodedPath)));
+}
+
+// ── SWITCH VIEW ──
+function drvSetView(v) {
+  drvDetailView = v;
+  renderDrvMktDetailPanel(drvCurrentDriveId, drvCurrentFolderPath);
+}
+
+// ── ADD SELECTED ITEMS ──
+function drvAddSelected(driveId) {
+  const drv = DRV_MKT_CATALOG.find(x=>x.id===driveId);
+  if (!drv) return;
+  const pool = drvMktContext === 'bldr' ? driveAddedItems : knDriveAddedItems;
+  if (!pool.some(x=>x.id===driveId)) {
+    pool.push({id:drv.id, type:'drive', name:drv.name, driveKey:drv.previewKey, sub:drv.sub||''});
+    kmsMarkChanged(drvMktContext);
+    if (drvMktContext==='bldr') renderBldrDriveAdded();
+    else renderKnDriveAdded();
+  }
+  const count = drvSelectedItems.size;
+  drvSelectedItems.clear();
+  showToast(count+' items selected from '+drv.name, 'ok');
+  renderDrvMktDetailPanel(driveId, drvCurrentFolderPath);
+  renderDrvMktGrid(document.getElementById('drvMktSearch')?.value||'');
+}
+
+// ── AI SUMMARIZE ──
+const DRV_AI_SUMMARIES = {
+  'Onboarding': 'This folder contains structured onboarding materials including a Day 1 checklist, a 30-60-90 day plan template, and role-specific ramp guides. Total reading time: ~45 min.',
+  'Job Descriptions': 'Contains 8 role templates across Engineering, Sales, and Operations. Templates follow a standardized format with responsibilities, requirements, and compensation bands.',
+  'Performance Reviews': 'Quarterly and annual review templates based on OKR alignment. Includes a 360-feedback form and calibration guidelines for managers.',
+  'Benefits': 'Overview of health, dental, and vision coverage, plus PTO policy, equity guidelines, and remote work stipend details.',
+  'Corporate Policies': 'Core compliance documents: HR policy, Code of Conduct, and IT Security Policy. Last reviewed Q1 2026.',
+  'API Documentation': 'Full REST API reference including authentication, rate limits, and webhook integration guides. Covers v2 and v3 endpoints.',
+  'Battle Cards': 'Competitive intelligence vs. 2 key competitors with feature comparisons, pricing analysis, and objection handling scripts.',
+  'default': 'This folder contains {count} items including documents, policies, and reference materials relevant to this area of the business.'
+};
+
+function drvAiSummarize(driveId, folderName) {
+  const panel = document.getElementById('drvAiSummary');
+  if (!panel) return;
+  // Toggle off if already showing
+  if (panel.classList.contains('visible')) { panel.classList.remove('visible'); return; }
+  panel.classList.add('visible');
+  panel.innerHTML = '<div class="drv-ai-loading"><div class="drv-ai-dot"></div><div class="drv-ai-dot"></div><div class="drv-ai-dot"></div><span>Analyzing content…</span></div>';
+  setTimeout(() => {
+    const summary = DRV_AI_SUMMARIES[folderName] || DRV_AI_SUMMARIES['default'].replace('{count}', (document.querySelectorAll('.tp-mkt-tree-item,.drv-file-card').length||'several'));
+    panel.innerHTML = '<div class="drv-ai-summary-hd"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.2 2.8L10 5 7.2 6.2 6 9l-1.2-2.8L2 5l2.8-1.2L6 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>AI Summary</div>'
+      +'<div class="drv-ai-summary-txt">'+summary+'</div>';
+  }, 900);
 }
 
 // ── DISCARD DIALOG ──
