@@ -463,9 +463,21 @@ a{text-decoration:none;color:inherit}
 .exec-ago{font-size:11px;color:var(--t3);width:80px;text-align:right;flex-shrink:0}
 
 /* Knowledge panel */
-.kn-panel{background:var(--cb);border:1px solid var(--bd);border-radius:var(--r12);overflow:hidden;position:sticky;top:16px;max-height:calc(100vh - 80px);overflow-y:auto}
-.kn-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bd)}
+.kn-panel{background:var(--cb);border:1px solid var(--bd);border-radius:var(--r12);overflow:hidden;position:sticky;top:16px;max-height:calc(100vh - 80px);display:flex;flex-direction:column}
+.kn-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .kn-title{font-size:13px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:7px}
+/* Overview panel knowledge tabs */
+.kn-ptabs{display:flex;padding:0 14px;border-bottom:1px solid var(--bd);flex-shrink:0;gap:2px}
+.kn-ptab{padding:8px 0;margin-right:14px;font-size:12px;font-weight:600;color:var(--t3);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap}
+.kn-ptab:hover{color:var(--t2)}
+.kn-ptab.active{color:var(--t1);border-bottom-color:var(--pri)}
+.kn-pbody{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.kn-pnl{display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+.kn-pnl.active{display:flex}
+.kn-pinline-search{padding:7px 12px 6px;flex-shrink:0;border-bottom:1px solid var(--bd)}
+.kn-pinline-search input{width:100%;height:26px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:var(--r6);padding:0 9px;color:var(--t1);font-size:11px;outline:none;transition:border-color .15s;box-sizing:border-box}
+.kn-pinline-search input::placeholder{color:var(--t4)}
+.kn-pinline-search input:focus{border-color:var(--pri)}
 .kn-plus{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:14px;line-height:1;color:var(--t2)}
 .kn-plus:hover{background:rgba(255,255,255,0.12);border-color:var(--bds)}
 .kn-sec-lbl{padding:10px 16px 6px;font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em}
@@ -2035,96 +2047,85 @@ body.test-mode #vTestMode{display:flex}
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2h10v12H3V2z" stroke="currentColor" stroke-width="1.3"/><path d="M6 5h4M6 8h4M6 11h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
                   Knowledge
                 </span>
+                <div style="display:flex;gap:5px;align-items:center">
+                  <span id="ovKnStatTp" style="font-size:10px;font-weight:700;color:var(--t3);background:rgba(255,255,255,.07);border:1px solid var(--bd);border-radius:20px;padding:1px 7px">0 packs</span>
+                  <span id="ovKnStatDrv" style="font-size:10px;font-weight:700;color:var(--t3);background:rgba(255,255,255,.07);border:1px solid var(--bd);border-radius:20px;padding:1px 7px">0 drives</span>
+                </div>
               </div>
-              <!-- Single flat-scroll panel: Knowledge Packs → Shared Drives → Own Documents -->
-              <div class="kn-flat-scroll">
+              <!-- Tabs -->
+              <div class="kn-ptabs">
+                <button class="kn-ptab active" onclick="switchKnPanelTab('tp',this)">Packs</button>
+                <button class="kn-ptab" onclick="switchKnPanelTab('drives',this)">Drives</button>
+                <button class="kn-ptab" onclick="switchKnPanelTab('own',this)">Documents</button>
+              </div>
+              <!-- Tab body -->
+              <div class="kn-pbody">
 
-                <!-- ── TRUTHPACKS ── -->
-                <div class="tp-unified">
-                  <div class="tp-added-zone" id="tpAddedZone"><!-- Populated by renderTpAdded() --></div>
-                  <div class="tp-picker-zone">
-                    <button class="tp-picker-trigger" id="tpPickerTrigger" onclick="openTpPicker()">
-                      <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <!-- ── Knowledge Packs ── -->
+                <div class="kn-pnl active" id="knPnlTp">
+                  <div class="kn-pinline-search">
+                    <input placeholder="Search packs…" oninput="filterOvKnTp(this.value)" />
+                  </div>
+                  <div style="flex:1;overflow-y:auto">
+                    <div class="km-ac-list" id="ovKnTpZone"><!-- populated by renderOvKnAddedTp() --></div>
+                  </div>
+                  <div class="km-add-row" style="padding:10px 12px 12px;flex-direction:column;gap:7px;align-items:stretch">
+                    <button class="km-add-pack-btn" style="justify-content:center" onclick="openTpMarketplace('kn')">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                       Add Knowledge Pack
                     </button>
-                    <div class="tp-picker-body" id="tpPickerBody">
-                      <div class="tp-slide-wrap" id="tpSlideWrap">
-                        <div class="tp-slide-list" id="tpSlideList">
-                          <div class="tp-picker-search">
-                            <input placeholder="Search packs…" oninput="filterTpPicker(this.value)" />
-                          </div>
-                          <div id="tpPickerRows"></div>
-                        </div>
-                        <div class="tp-slide-detail" id="tpSlideDetail">
-                          <button class="tp-detail-back" onclick="slideTpBack()">
-                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Back
-                          </button>
-                          <div id="tpDetailContent" style="padding:12px 14px;overflow-y:auto;flex:1"></div>
-                        </div>
-                      </div>
-                      <div class="tp-done-row">
-                        <button class="tp-done-btn" onclick="closeTpPicker()">Done</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="kn-govern" onclick="toast('Redirecting to Governance Studio…','info')">
-                    Manage in Governance
-                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6H9.5M6.5 3L9.5 6L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </div>
-                </div>
-
-                <!-- ── SHARED DRIVES ── -->
-                <div class="kn-flat-section">
-                  <div class="kn-flat-sec-hd">
-                    <span class="kn-flat-sec-lbl">Shared Drives</span>
-                  </div>
-                  <!-- Connected drive -->
-                  <div class="kn-connected-drive" onclick="openDrivePreview('Marketing Assets Drive','Creative assets, brand guidelines, and customer-facing materials.','sales')">
-                    <div class="kn-cd-ico">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8.5" rx="1.5" stroke="var(--ok)" stroke-width="1.2"/><path d="M1.5 6.5h11" stroke="var(--ok)" stroke-width="1.1"/><path d="M4 1.5h3l1 2H4V1.5z" stroke="var(--ok)" stroke-width="1.2"/></svg>
-                    </div>
-                    <div class="kn-cd-info">
-                      <div class="kn-cd-name">Marketing Assets / Customer…</div>
-                      <div class="kn-cd-meta">
-                        <span class="kn-cd-dot"></span>
-                        Connected · 1,240 files accessible
-                      </div>
-                    </div>
-                    <button class="tp-picker-eye" onclick="event.stopPropagation();openDrivePreview('Marketing Assets Drive','Creative assets, brand guidelines, and customer-facing materials.','sales')">
-                      <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2.5-4.5 6-4.5S13 7 13 7s-2.5 4.5-6 4.5S1 7 1 7z" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="1.8" fill="currentColor"/></svg>
+                    <button class="km-govern-btn" style="justify-content:center;padding:0;font-size:11px" onclick="toast('Redirecting to Governance Studio…','info')">
+                      Manage in Governance
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                   </div>
-                  <!-- Connect Drive button -->
-                  <button class="kn-connect-btn" onclick="toast('Connect Drive — coming soon','info')">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8.5" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 6.5h11" stroke="currentColor" stroke-width="1.1"/><path d="M4 1.5h3l1 2H4V1.5z" stroke="currentColor" stroke-width="1.2"/></svg>
-                    Connect Drive
-                  </button>
                 </div>
 
-                <!-- ── OWN DOCUMENTS ── -->
-                <div class="kn-flat-section" style="padding-bottom:14px">
-                  <div class="kn-flat-sec-hd">
-                    <span class="kn-flat-sec-lbl">Own Documents</span>
+                <!-- ── Source Drives ── -->
+                <div class="kn-pnl" id="knPnlDrives">
+                  <div class="kn-pinline-search">
+                    <input placeholder="Search drives…" oninput="filterOvKnDrv(this.value)" />
                   </div>
-                  <!-- Private drive item -->
-                  <div class="kn-own-item">
-                    <div class="kn-cd-ico">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8.5" rx="1.5" stroke="var(--t3)" stroke-width="1.2"/><path d="M1.5 6.5h11" stroke="var(--t3)" stroke-width="1.1"/><path d="M4 1.5h3l1 2H4V1.5z" stroke="var(--t3)" stroke-width="1.2"/></svg>
-                    </div>
-                    <div class="kn-cd-info">
-                      <div class="kn-cd-name">Support Network v1 <span style="font-size:10px;color:var(--t4)">(private)</span></div>
-                      <div class="kn-cd-meta" style="color:var(--t4)">2 documents · Private to this network</div>
-                    </div>
+                  <div style="flex:1;overflow-y:auto">
+                    <div class="km-ac-list" id="ovKnDriveZone"><!-- populated by renderOvKnDriveAdded() --></div>
                   </div>
-                  <!-- Upload button -->
-                  <button class="kn-connect-btn" onclick="toast('Upload dialog','info')">
-                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 2v6M3 5l3-3 3 3M2 10h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Upload
-                  </button>
+                  <div class="km-add-row" style="padding:10px 12px 12px">
+                    <span style="font-size:11px;color:var(--t3)" id="ovKnDrvLbl">0 drives</span>
+                    <button class="km-add-pack-btn" onclick="openDriveMarketplace('kn')">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                      Add Drive
+                    </button>
+                  </div>
                 </div>
 
-              </div><!-- end kn-flat-scroll -->
+                <!-- ── Own Documents ── -->
+                <div class="kn-pnl" id="knPnlOwn" style="overflow-y:auto">
+                  <div class="kn-own-info" style="margin:10px 12px 6px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:var(--r8);display:flex;gap:8px;align-items:flex-start">
+                    <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px"><rect x="2" y="2.5" width="14" height="13" rx="2" stroke="var(--t3)" stroke-width="1.3"/><path d="M5.5 7h7M5.5 10h5" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    <div>
+                      <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:2px" id="ovKnOwnDriveName">Private Drive</div>
+                      <div style="font-size:10px;color:var(--t4);line-height:1.4">Private to this network. Documents here are not shared with other agents.</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 4px">
+                    <span style="font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.07em">Uploaded Documents</span>
+                    <button class="kn-upload-btn" onclick="toast('Upload dialog opened','info')">+ Upload</button>
+                  </div>
+                  <div class="kn-file-item">
+                    <div class="kn-file-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5L11 4v8.5H3V1.5z" stroke="var(--t3)" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V4H11" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div><div class="kn-file-nm">Network_SOP_v1.pdf</div><div class="kn-file-sz">2.4 MB</div></div>
+                  </div>
+                  <div class="kn-file-item">
+                    <div class="kn-file-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5L11 4v8.5H3V1.5z" stroke="var(--t3)" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V4H11" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div><div class="kn-file-nm">Escalation_Matrix.docx</div><div class="kn-file-sz">840 KB</div></div>
+                  </div>
+                  <div class="kn-drop" style="margin:8px 12px 12px" onclick="toast('Upload dialog opened','info')">
+                    <strong>Drop files or click + Upload</strong>
+                    <small>PDF, DOCX, TXT · Max 50MB</small>
+                  </div>
+                </div>
+
+              </div><!-- end kn-pbody -->
             </div>
           </div>
         </div>
@@ -3693,8 +3694,15 @@ function openFullView() {
         <span class="exec-ago">${r.ago}</span>
       </div>`).join('')
     : '<div style="padding:20px 18px;font-size:13px;color:var(--t3)">No executions yet</div>';
-  // Knowledge panel — unified picker
-  initTpPanel(n);
+  // Knowledge panel — tabbed (overview sidebar)
+  renderOvKnAddedTp(n);
+  renderOvKnDriveAdded();
+  // Update private drive name
+  const ovOwnDrive = document.getElementById('ovKnOwnDriveName');
+  if (ovOwnDrive) ovOwnDrive.textContent = 'Private Drive — ' + n.name;
+  // Reset to Packs tab
+  document.querySelectorAll('.kn-ptab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  ['knPnlTp','knPnlDrives','knPnlOwn'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.classList.toggle('active',i===0);});
   showView('vOverview');
   switchOvTab('overview', document.querySelector('.ov-tab'));
 }
@@ -4601,6 +4609,53 @@ function renderKnAddedTp(net) {
     return;
   }
   zone.innerHTML = knowledge.map(tp => buildKmAddedRow(tp, 'toggleTpPack')).join('');
+  // Sync overview sidebar
+  renderOvKnAddedTp(net);
+}
+
+// ── OVERVIEW SIDEBAR KNOWLEDGE RENDER ──
+function renderOvKnAddedTp(net, query) {
+  const zone = document.getElementById('ovKnTpZone');
+  const statEl = document.getElementById('ovKnStatTp');
+  if (!zone) return;
+  const knowledge = (net && net.knowledge) || [];
+  const q = (query||'').toLowerCase();
+  const filtered = q ? knowledge.filter(tp => (tp.name||'').toLowerCase().includes(q)) : knowledge;
+  if (statEl) statEl.textContent = knowledge.length + ' pack' + (knowledge.length!==1?'s':'');
+  if (!filtered.length) {
+    zone.innerHTML = q
+      ? '<div class="km-ar-empty" style="padding:16px 16px 6px">No packs match "'+q.replace(/</g,'&lt;')+'".</div>'
+      : '<div class="km-ar-empty" style="padding:16px 16px 6px">No Knowledge Packs added yet.<small>Click <strong>Add Knowledge Pack</strong> below.</small></div>';
+    return;
+  }
+  zone.innerHTML = filtered.map(tp => buildKmAddedRow(tp, 'toggleTpPack')).join('');
+}
+
+function renderOvKnDriveAdded(query) {
+  const zone = document.getElementById('ovKnDriveZone');
+  const lbl  = document.getElementById('ovKnDrvLbl');
+  const statEl = document.getElementById('ovKnStatDrv');
+  if (!zone) return;
+  const q = (query||'').toLowerCase();
+  const filtered = q ? knDriveAddedItems.filter(d => (d.name||'').toLowerCase().includes(q)) : knDriveAddedItems;
+  if (lbl) lbl.textContent = knDriveAddedItems.length + ' drive' + (knDriveAddedItems.length!==1?'s':'');
+  if (statEl) statEl.textContent = knDriveAddedItems.length + ' drive' + (knDriveAddedItems.length!==1?'s':'');
+  if (!filtered.length) {
+    zone.innerHTML = q
+      ? '<div class="km-ar-empty" style="padding:16px 16px 6px">No drives match.</div>'
+      : '<div class="km-ar-empty" style="padding:16px 16px 6px">No drives added yet.<small>Click <strong>Add Drive</strong> below.</small></div>';
+    return;
+  }
+  zone.innerHTML = filtered.map(item => buildKmDriveAddedRow(item, 'toggleKnDrive')).join('');
+}
+
+function filterOvKnTp(q) {
+  const net = NETWORKS.find(x=>x.id===currentOvId);
+  renderOvKnAddedTp(net, q);
+}
+
+function filterOvKnDrv(q) {
+  renderOvKnDriveAdded(q);
 }
 function renderKnAvailTp(query) {
   // Kept for compatibility with builder modal — renders into catalog zone if present
@@ -6843,6 +6898,8 @@ function renderKnDriveAdded() {
     return;
   }
   zone.innerHTML = knDriveAddedItems.map(item => buildKmDriveAddedRow(item, 'toggleKnDrive')).join('');
+  // Sync overview sidebar
+  renderOvKnDriveAdded();
 }
 function renderKnDriveCatalog(query) {
   const q = (query||'').toLowerCase();
