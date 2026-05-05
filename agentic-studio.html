@@ -1487,7 +1487,7 @@ body.test-mode #vTestMode{display:flex}
 .tp-mkt-vbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);background:rgba(255,255,255,.04);border-radius:8px;color:var(--t3);cursor:pointer;transition:all .1s}
 .tp-mkt-vbtn.active{background:rgba(43,127,255,.12);border-color:rgba(43,127,255,.3);color:var(--pri)}
 /* Grid */
-.tp-mkt-grid{flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-content:start;align-items:start}
+.tp-mkt-grid{flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-content:start;align-items:stretch}
 .tp-mkt-grid.hidden{display:none}
 .tp-mkt-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px;display:flex;flex-direction:column;transition:border-color .15s,background .15s;cursor:default}
 .tp-mkt-card:hover{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.045)}
@@ -1522,7 +1522,7 @@ body.test-mode #vTestMode{display:flex}
 .tp-mkt-plane.sources-on .tp-mkt-plane-dot{background:#6EE7B7}
 .tp-mkt-plane.off .tp-mkt-plane-dot{background:var(--t4)}
 /* Drive folder mini-list */
-.tp-mkt-folders{display:flex;flex-direction:column;gap:1px;margin-top:0}
+.tp-mkt-folders{display:flex;flex-direction:column;gap:1px;margin-top:0;min-height:90px}
 .tp-mkt-folder-item{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:6px;transition:background .1s}
 .tp-mkt-folder-item:hover{background:rgba(255,255,255,.04)}
 .tp-mkt-folder-nm{font-size:11px;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1676,7 +1676,7 @@ body.test-mode #vTestMode{display:flex}
 /* Drives / Own Drive panels */
 .bkp-drives-list{flex:1;overflow-y:auto;padding:6px 0 10px}
 .bkp-sec-lbl{font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;padding:8px 22px 4px}
-.bkp-own-info{display:flex;align-items:flex-start;gap:10px;margin:14px 22px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:var(--r8);font-size:12px;color:var(--t3);line-height:1.5}
+.bkp-own-info{display:flex;align-items:flex-start;gap:10px;margin:12px 14px 10px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:var(--r8);font-size:12px;color:var(--t3);line-height:1.5}
 .bkp-own-info strong{display:block;font-size:13px;font-weight:700;color:var(--t2);margin-bottom:2px}
 .bkp-upload-btn{height:26px;padding:0 12px;border-radius:var(--r4);border:1px solid var(--bds);background:transparent;color:var(--t2);font-size:11px;font-weight:700;cursor:pointer;transition:all .1s}
 .bkp-upload-btn:hover{border-color:var(--ok);color:var(--ok)}
@@ -3015,8 +3015,8 @@ body.test-mode #vTestMode{display:flex}
             Documents here are private to this network only.
           </div>
         </div>
-        <div class="bkp-drives-list" style="padding-top:0">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 6px">
+        <div class="bkp-drives-list" style="padding:0 14px 12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 8px">
             <span class="bkp-sec-lbl" style="padding:0">Uploaded Documents</span>
             <button class="bkp-upload-btn" onclick="toast('Upload dialog opened','info')">+ Upload</button>
           </div>
@@ -3028,7 +3028,7 @@ body.test-mode #vTestMode{display:flex}
             <div class="kn-file-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5L11 4v8.5H3V1.5z" stroke="var(--t3)" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V4H11" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             <div><div class="kn-file-nm">Escalation_Matrix_Custom.docx</div><div class="kn-file-sz">840 KB</div></div>
           </div>
-          <div class="kn-drop" onclick="toast('Upload dialog opened','info')">
+          <div class="kn-drop" style="margin-top:10px;padding:16px" onclick="toast('Upload dialog opened','info')">
             <strong>Drop files here or click + Upload</strong>
             <small>PDF, DOCX, TXT · Max 50MB</small>
           </div>
@@ -5540,9 +5540,11 @@ function renderDrvMktGrid(query) {
     const bg = CAT_COLORS[d.cat] || 'rgba(59,130,246,.12)';
     const tc = CAT_TEXT[d.cat] || '#93C5FD';
     const folders = d.folderList || [];
-    const previewFolders = folders.slice(0,3);
-    const remaining = folders.length - previewFolders.length;
-    const folderRows = previewFolders.map(f =>
+    // Always render exactly 3 rows so all cards have equal folder-section height
+    const FOLDER_ROWS = 3;
+    const showFolders = folders.length > FOLDER_ROWS ? folders.slice(0, FOLDER_ROWS - 1) : folders.slice(0, FOLDER_ROWS);
+    const remaining = folders.length > FOLDER_ROWS ? folders.length - (FOLDER_ROWS - 1) : 0;
+    const folderRows = showFolders.map(f =>
       '<div class="tp-mkt-folder-item">'
       +'<span style="color:'+tc+';display:inline-flex;flex-shrink:0">'+FOLDER_ICO+'</span>'
       +'<span class="tp-mkt-folder-nm" style="color:var(--t2)">'+f+'</span>'
@@ -5550,6 +5552,11 @@ function renderDrvMktGrid(query) {
     ).join('');
     const moreRow = remaining > 0
       ? '<div class="tp-mkt-folder-item"><span class="tp-mkt-folder-cnt">+'+remaining+' more folder'+(remaining>1?'s':'')+'</span></div>'
+      : '';
+    // Pad with invisible spacers to always fill 3 rows
+    const totalRendered = showFolders.length + (remaining > 0 ? 1 : 0);
+    const spacers = totalRendered < FOLDER_ROWS
+      ? Array(FOLDER_ROWS - totalRendered).fill('<div class="tp-mkt-folder-item" style="pointer-events:none;visibility:hidden"><span class="tp-mkt-folder-nm">·</span></div>').join('')
       : '';
     return '<div class="tp-mkt-card">'
       +'<div class="tp-mkt-card-hd">'
@@ -5562,7 +5569,7 @@ function renderDrvMktGrid(query) {
       +'<span class="tp-mkt-card-stat-sep"></span>'
       +'<span class="tp-mkt-card-stat"><strong>'+d.docs+'</strong> documents</span>'
       +'</div>'
-      +'<div class="tp-mkt-folders">'+folderRows+moreRow+'</div>'
+      +'<div class="tp-mkt-folders">'+folderRows+moreRow+spacers+'</div>'
       +'</div>'
       +'<div class="tp-mkt-card-ft">'
       +'<span class="tp-mkt-card-tag" style="background:'+bg+';color:'+tc+'">'+d.cat+'</span>'
