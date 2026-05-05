@@ -972,8 +972,8 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .dpv-add-btn:hover{background:rgba(43,127,255,.14)}
 .dpv-add-btn.added{border-color:rgba(5,223,114,.25);background:rgba(5,223,114,.06);color:var(--ok);cursor:pointer}
 .dpv-add-btn.added:hover{background:rgba(255,100,103,.08);border-color:rgba(255,100,103,.3);color:var(--err)}
-.tp-mkt-card-browse{height:26px;padding:0 10px;border-radius:var(--r6);border:1px solid var(--bds);background:transparent;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
-.tp-mkt-card-browse:hover{background:rgba(255,255,255,.06);color:var(--t1)}
+.tp-mkt-card-browse{height:24px;padding:0 6px;border-radius:6px;border:none;background:transparent;color:var(--t3);font-size:11px;font-weight:500;cursor:pointer;transition:color .15s;white-space:nowrap}
+.tp-mkt-card-browse:hover{color:var(--t1)}
 .drive-prev-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:20px;line-height:1;padding:0;margin-left:6px;transition:color .1s;flex-shrink:0}
 .drive-prev-close:hover{color:var(--t1)}
 .drive-prev-body{flex:1;min-height:0;overflow-y:auto;padding:16px 20px}
@@ -1456,7 +1456,7 @@ body.test-mode #vTestMode{display:flex}
 .tp-mkt-vbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);background:rgba(255,255,255,.04);border-radius:8px;color:var(--t3);cursor:pointer;transition:all .1s}
 .tp-mkt-vbtn.active{background:rgba(43,127,255,.12);border-color:rgba(43,127,255,.3);color:var(--pri)}
 /* Grid */
-.tp-mkt-grid{flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-content:start}
+.tp-mkt-grid{flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-content:start;align-items:start}
 .tp-mkt-grid.hidden{display:none}
 .tp-mkt-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px;display:flex;flex-direction:column;transition:border-color .15s,background .15s;cursor:default}
 .tp-mkt-card:hover{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.045)}
@@ -1465,10 +1465,10 @@ body.test-mode #vTestMode{display:flex}
 .tp-mkt-card-name{font-size:14px;font-weight:700;color:var(--t1);line-height:1.35}
 .tp-mkt-card-desc{font-size:12px;color:var(--t3);line-height:1.6;flex:1}
 .tp-mkt-card-ft{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05)}
-.tp-mkt-card-tag{height:20px;padding:0 9px;border-radius:20px;font-size:10px;font-weight:700;line-height:20px}
-.tp-mkt-card-add{height:30px;padding:0 16px;border-radius:8px;border:1px solid rgba(43,127,255,.4);background:rgba(43,127,255,.1);color:var(--pri);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
-.tp-mkt-card-add:hover{background:rgba(43,127,255,.22);border-color:rgba(43,127,255,.6)}
-.tp-mkt-card-add.added{border-color:rgba(5,223,114,.35);background:rgba(5,223,114,.09);color:var(--ok);cursor:default}
+.tp-mkt-card-tag{height:20px;padding:0 9px;border-radius:20px;font-size:10px;font-weight:700;line-height:20px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.tp-mkt-card-add{height:30px;padding:0 14px;border-radius:8px;border:none;background:var(--pri);color:#fff;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tp-mkt-card-add:hover{background:#1a6fe8;box-shadow:0 0 0 2px rgba(43,127,255,.35)}
+.tp-mkt-card-add.added{border:1px solid rgba(5,223,114,.35);background:rgba(5,223,114,.09);color:var(--ok);cursor:default;box-shadow:none}
 .tp-mkt-card-eye-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--bd);background:rgba(255,255,255,.04);color:var(--t3);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .tp-mkt-card-eye-btn:hover{background:rgba(255,255,255,.08);color:var(--t1);border-color:var(--bds)}
 /* Card composition section */
@@ -4812,6 +4812,8 @@ function showDrvMktListView() {
   document.getElementById('drvMktDetail').classList.remove('visible');
   const drvCats = document.getElementById('drvMktCats');
   if (drvCats) drvCats.style.display = '';
+  const cnt = document.getElementById('drvMktResultsCount');
+  if (cnt) cnt.style.display = '';
 }
 
 function showDrvMktDetailView() {
@@ -4819,6 +4821,8 @@ function showDrvMktDetailView() {
   document.getElementById('drvMktDetail').classList.add('visible');
   const drvCats = document.getElementById('drvMktCats');
   if (drvCats) drvCats.style.display = 'none';
+  const cnt = document.getElementById('drvMktResultsCount');
+  if (cnt) cnt.style.display = 'none';
 }
 
 function navigateDrvMkt(driveId, folderPath) {
@@ -5213,10 +5217,21 @@ function renderDrvMktGrid(query) {
     return matchCat && matchQ;
   });
 
+  // Results count row (above grid)
+  let countEl = document.getElementById('drvMktResultsCount');
+  if (!countEl) {
+    countEl = document.createElement('div');
+    countEl.id = 'drvMktResultsCount';
+    countEl.style.cssText = 'padding:10px 24px 0;font-size:11px;color:var(--t3);font-weight:500;flex-shrink:0;line-height:1';
+    grid.parentNode.insertBefore(countEl, grid);
+  }
+
   if (!filtered.length) {
+    countEl.textContent = '';
     grid.innerHTML = '<div style="grid-column:1/-1;padding:40px 20px;text-align:center;color:var(--t3);font-size:13px">No drives match your search.</div>';
     return;
   }
+  countEl.textContent = 'Showing ' + filtered.length + ' drive' + (filtered.length !== 1 ? 's' : '');
 
   const CAT_COLORS = {
     'Governance & Policy':'rgba(148,163,184,.12)',
@@ -5245,9 +5260,9 @@ function renderDrvMktGrid(query) {
     const previewFolders = folders.slice(0,3);
     const remaining = folders.length - previewFolders.length;
     const folderRows = previewFolders.map(f =>
-      '<div class="tp-mkt-folder-item" style="color:'+tc+'">'
-      +FOLDER_ICO
-      +'<span class="tp-mkt-folder-nm">'+f+'</span>'
+      '<div class="tp-mkt-folder-item">'
+      +'<span style="color:'+tc+';display:inline-flex;flex-shrink:0">'+FOLDER_ICO+'</span>'
+      +'<span class="tp-mkt-folder-nm" style="color:var(--t2)">'+f+'</span>'
       +'</div>'
     ).join('');
     const moreRow = remaining > 0
