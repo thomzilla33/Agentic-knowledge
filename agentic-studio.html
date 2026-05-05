@@ -426,7 +426,26 @@ a{text-decoration:none;color:inherit}
 .ov-m-delta.neg{color:var(--err)}
 
 /* 2-col */
+/* .ov-2col kept for reference — replaced by ov-widget-grid */
 .ov-2col{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+/* ── DRAGGABLE WIDGET GRID ── */
+.ov-widget-grid{display:grid;grid-template-columns:1fr 320px;grid-template-rows:auto auto;gap:16px;align-items:start}
+.ov-widget{position:relative}
+.ov-widget[data-pos="1"]{grid-column:1;grid-row:1}
+.ov-widget[data-pos="2"]{grid-column:1;grid-row:2}
+.ov-widget[data-pos="3"]{grid-column:2;grid-row:1/span 2}
+.ov-drag-grip{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:var(--r4);cursor:grab;color:var(--t4);flex-shrink:0;transition:color .15s,background .15s}
+.ov-drag-grip:hover{color:var(--t2);background:rgba(255,255,255,.07)}
+.ov-drag-grip:active{cursor:grabbing}
+.ov-widget.ov-dragging{opacity:.25;pointer-events:none}
+.ov-widget.ov-drag-over>.ov-card,.ov-widget.ov-drag-over>.kn-panel{outline:2px dashed var(--pri);outline-offset:3px;border-radius:var(--r12)}
+.ov-resize-hdl{position:absolute;bottom:3px;right:3px;width:18px;height:18px;cursor:se-resize;display:flex;align-items:flex-end;justify-content:flex-end;padding:3px;opacity:0;transition:opacity .15s;z-index:5;color:var(--t4)}
+.ov-widget:hover .ov-resize-hdl{opacity:1}
+.ov-resize-hdl:hover{color:var(--t2)}
+/* Read-only badge & edit button for knowledge panel */
+.ov-kn-ro-badge{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--t4);padding:2px 7px;border-radius:20px;border:1px solid var(--bd);white-space:nowrap}
+.ov-kn-edit-btn{height:24px;padding:0 10px;border-radius:var(--r6);border:1px solid var(--bds);background:transparent;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;transition:background .1s;white-space:nowrap;flex-shrink:0}
+.ov-kn-edit-btn:hover{background:rgba(255,255,255,.07)}
 
 /* Card */
 .ov-card{background:var(--cb);border:1px solid var(--bd);border-radius:var(--r12);overflow:hidden}
@@ -2013,10 +2032,14 @@ body.test-mode #vTestMode{display:flex}
             </div>
           </div>
           <div class="ov-metrics" id="ovMetrics"></div>
-          <div class="ov-2col">
-            <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="ov-widget-grid" id="ovWidgetGrid">
+            <!-- Widget 1: Network Composition -->
+            <div class="ov-widget" data-pos="1">
               <div class="ov-card">
                 <div class="ov-card-hd">
+                  <div class="ov-drag-grip" title="Drag to rearrange">
+                    <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><circle cx="3" cy="2.5" r="1.2" fill="currentColor"/><circle cx="7" cy="2.5" r="1.2" fill="currentColor"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="3" cy="11.5" r="1.2" fill="currentColor"/><circle cx="7" cy="11.5" r="1.2" fill="currentColor"/></svg>
+                  </div>
                   <span class="ov-card-title">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="4" r="2" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="13" r="2" stroke="currentColor" stroke-width="1.3"/><circle cx="13" cy="13" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M8 6L3 11M8 6L13 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
                     Network Composition
@@ -2029,8 +2052,17 @@ body.test-mode #vTestMode{display:flex}
                 <div class="flow-mini" id="ovFlow"></div>
                 <div class="flow-stats" id="ovFlowStats"></div>
               </div>
+              <div class="ov-resize-hdl" title="Drag to resize">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M8 2v6M2 8h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 8h3.5V4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <!-- Widget 2: Recent Executions -->
+            <div class="ov-widget" data-pos="2">
               <div class="ov-card">
                 <div class="ov-card-hd">
+                  <div class="ov-drag-grip" title="Drag to rearrange">
+                    <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><circle cx="3" cy="2.5" r="1.2" fill="currentColor"/><circle cx="7" cy="2.5" r="1.2" fill="currentColor"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="3" cy="11.5" r="1.2" fill="currentColor"/><circle cx="7" cy="11.5" r="1.2" fill="currentColor"/></svg>
+                  </div>
                   <span class="ov-card-title">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 5-10 5V3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
                     Recent Executions
@@ -2039,17 +2071,29 @@ body.test-mode #vTestMode{display:flex}
                 </div>
                 <div id="ovExecs"></div>
               </div>
+              <div class="ov-resize-hdl" title="Drag to resize">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M8 2v6M2 8h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 8h3.5V4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
             </div>
-            <!-- Knowledge panel -->
+            <!-- Widget 3: Knowledge (read-only) -->
+            <div class="ov-widget" data-pos="3">
             <div class="kn-panel">
-              <div class="kn-hd">
-                <span class="kn-title">
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2h10v12H3V2z" stroke="currentColor" stroke-width="1.3"/><path d="M6 5h4M6 8h4M6 11h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-                  Knowledge
-                </span>
-                <div style="display:flex;gap:5px;align-items:center">
-                  <span id="ovKnStatTp" style="font-size:10px;font-weight:700;color:var(--t3);background:rgba(255,255,255,.07);border:1px solid var(--bd);border-radius:20px;padding:1px 7px">0 packs</span>
-                  <span id="ovKnStatDrv" style="font-size:10px;font-weight:700;color:var(--t3);background:rgba(255,255,255,.07);border:1px solid var(--bd);border-radius:20px;padding:1px 7px">0 drives</span>
+              <div class="kn-hd" style="gap:6px">
+                <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+                  <div class="ov-drag-grip" title="Drag to rearrange">
+                    <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><circle cx="3" cy="2.5" r="1.2" fill="currentColor"/><circle cx="7" cy="2.5" r="1.2" fill="currentColor"/><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="3" cy="11.5" r="1.2" fill="currentColor"/><circle cx="7" cy="11.5" r="1.2" fill="currentColor"/></svg>
+                  </div>
+                  <span class="kn-title">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2h10v12H3V2z" stroke="currentColor" stroke-width="1.3"/><path d="M6 5h4M6 8h4M6 11h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Knowledge
+                  </span>
+                </div>
+                <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+                  <span class="ov-kn-ro-badge">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 6s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+                    View only
+                  </span>
+                  <button class="ov-kn-edit-btn" onclick="openKnModal()">Edit →</button>
                 </div>
               </div>
               <!-- Tabs -->
@@ -2069,14 +2113,11 @@ body.test-mode #vTestMode{display:flex}
                   <div style="flex:1;overflow-y:auto">
                     <div class="km-ac-list" id="ovKnTpZone"><!-- populated by renderOvKnAddedTp() --></div>
                   </div>
-                  <div class="km-add-row" style="padding:10px 12px 12px;flex-direction:column;gap:7px;align-items:stretch">
-                    <button class="km-add-pack-btn" style="justify-content:center" onclick="openTpMarketplace('kn')">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                      Add Knowledge Pack
-                    </button>
-                    <button class="km-govern-btn" style="justify-content:center;padding:0;font-size:11px" onclick="toast('Redirecting to Governance Studio…','info')">
-                      Manage in Governance
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div style="padding:10px 14px 12px;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+                    <span style="font-size:11px;color:var(--t4)" id="ovKnTpLbl">0 packs</span>
+                    <button class="ov-kn-edit-btn" onclick="openKnModal()">
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style="margin-right:3px"><path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Edit in Knowledge
                     </button>
                   </div>
                 </div>
@@ -2089,16 +2130,16 @@ body.test-mode #vTestMode{display:flex}
                   <div style="flex:1;overflow-y:auto">
                     <div class="km-ac-list" id="ovKnDriveZone"><!-- populated by renderOvKnDriveAdded() --></div>
                   </div>
-                  <div class="km-add-row" style="padding:10px 12px 12px">
-                    <span style="font-size:11px;color:var(--t3)" id="ovKnDrvLbl">0 drives</span>
-                    <button class="km-add-pack-btn" onclick="openDriveMarketplace('kn')">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                      Add Drive
+                  <div style="padding:10px 14px 12px;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+                    <span style="font-size:11px;color:var(--t4)" id="ovKnDrvLbl">0 drives</span>
+                    <button class="ov-kn-edit-btn" onclick="openKnModal()">
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style="margin-right:3px"><path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Edit in Knowledge
                     </button>
                   </div>
                 </div>
 
-                <!-- ── Own Documents ── -->
+                <!-- ── Own Documents (read-only) ── -->
                 <div class="kn-pnl" id="knPnlOwn" style="overflow-y:auto">
                   <div class="kn-own-info" style="margin:10px 12px 6px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:var(--r8);display:flex;gap:8px;align-items:flex-start">
                     <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px"><rect x="2" y="2.5" width="14" height="13" rx="2" stroke="var(--t3)" stroke-width="1.3"/><path d="M5.5 7h7M5.5 10h5" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -2107,28 +2148,33 @@ body.test-mode #vTestMode{display:flex}
                       <div style="font-size:10px;color:var(--t4);line-height:1.4">Private to this network. Documents here are not shared with other agents.</div>
                     </div>
                   </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 4px">
+                  <div style="padding:6px 14px 4px">
                     <span style="font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.07em">Uploaded Documents</span>
-                    <button class="kn-upload-btn" onclick="toast('Upload dialog opened','info')">+ Upload</button>
                   </div>
-                  <div class="kn-file-item">
+                  <div class="kn-file-item" style="margin:0 12px 6px">
                     <div class="kn-file-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5L11 4v8.5H3V1.5z" stroke="var(--t3)" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V4H11" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
                     <div><div class="kn-file-nm">Network_SOP_v1.pdf</div><div class="kn-file-sz">2.4 MB</div></div>
                   </div>
-                  <div class="kn-file-item">
+                  <div class="kn-file-item" style="margin:0 12px 6px">
                     <div class="kn-file-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5L11 4v8.5H3V1.5z" stroke="var(--t3)" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V4H11" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
                     <div><div class="kn-file-nm">Escalation_Matrix.docx</div><div class="kn-file-sz">840 KB</div></div>
                   </div>
-                  <div class="kn-drop" style="margin:8px 12px 12px" onclick="toast('Upload dialog opened','info')">
-                    <strong>Drop files or click + Upload</strong>
-                    <small>PDF, DOCX, TXT · Max 50MB</small>
+                  <div style="padding:8px 14px 12px;border-top:1px solid var(--bd);margin-top:6px;display:flex;justify-content:flex-end">
+                    <button class="ov-kn-edit-btn" onclick="openKnModal()">
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style="margin-right:3px"><path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Edit in Knowledge
+                    </button>
                   </div>
                 </div>
 
               </div><!-- end kn-pbody -->
+            </div><!-- end kn-panel -->
+            <div class="ov-resize-hdl" title="Drag to resize">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M8 2v6M2 8h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 8h3.5V4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-          </div>
-        </div>
+            </div><!-- end widget 3 -->
+          </div><!-- end ov-widget-grid -->
+        </div><!-- end opOverview ov-panel -->
         <!-- Builder panel -->
         <div id="opBuilder" class="ov-panel">
           <div class="bldr-pre-wrap">
@@ -3694,9 +3740,11 @@ function openFullView() {
         <span class="exec-ago">${r.ago}</span>
       </div>`).join('')
     : '<div style="padding:20px 18px;font-size:13px;color:var(--t3)">No executions yet</div>';
-  // Knowledge panel — tabbed (overview sidebar)
+  // Knowledge panel — tabbed, read-only (overview sidebar)
   renderOvKnAddedTp(n);
   renderOvKnDriveAdded();
+  // Initialize drag/resize after DOM update
+  setTimeout(initOvWidgets, 0);
   // Update private drive name
   const ovOwnDrive = document.getElementById('ovKnOwnDriveName');
   if (ovOwnDrive) ovOwnDrive.textContent = 'Private Drive — ' + n.name;
@@ -4616,19 +4664,19 @@ function renderKnAddedTp(net) {
 // ── OVERVIEW SIDEBAR KNOWLEDGE RENDER ──
 function renderOvKnAddedTp(net, query) {
   const zone = document.getElementById('ovKnTpZone');
-  const statEl = document.getElementById('ovKnStatTp');
+  const lblEl = document.getElementById('ovKnTpLbl');
   if (!zone) return;
   const knowledge = (net && net.knowledge) || [];
   const q = (query||'').toLowerCase();
   const filtered = q ? knowledge.filter(tp => (tp.name||'').toLowerCase().includes(q)) : knowledge;
-  if (statEl) statEl.textContent = knowledge.length + ' pack' + (knowledge.length!==1?'s':'');
+  if (lblEl) lblEl.textContent = knowledge.length + ' pack' + (knowledge.length!==1?'s':'');
   if (!filtered.length) {
     zone.innerHTML = q
       ? '<div class="km-ar-empty" style="padding:16px 16px 6px">No packs match "'+q.replace(/</g,'&lt;')+'".</div>'
       : '<div class="km-ar-empty" style="padding:16px 16px 6px">No Knowledge Packs added yet.<small>Click <strong>Add Knowledge Pack</strong> below.</small></div>';
     return;
   }
-  zone.innerHTML = filtered.map(tp => buildKmAddedRow(tp, 'toggleTpPack')).join('');
+  zone.innerHTML = filtered.map(tp => buildKmAddedRow(tp, 'toggleTpPack', true)).join('');
 }
 
 function renderOvKnDriveAdded(query) {
@@ -4646,7 +4694,7 @@ function renderOvKnDriveAdded(query) {
       : '<div class="km-ar-empty" style="padding:16px 16px 6px">No drives added yet.<small>Click <strong>Add Drive</strong> below.</small></div>';
     return;
   }
-  zone.innerHTML = filtered.map(item => buildKmDriveAddedRow(item, 'toggleKnDrive')).join('');
+  zone.innerHTML = filtered.map(item => buildKmDriveAddedRow(item, 'toggleKnDrive', true)).join('');
 }
 
 function filterOvKnTp(q) {
@@ -6405,7 +6453,7 @@ function switchBldrKnTab(tab, btn) {
 const TP_BOOK_ICO = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--pur)" stroke-width="1.5" stroke-linecap="round"><path d="M3 15A2 2 0 015 13H13"/><path d="M5 1H13v15H5A2 2 0 013 13V3A2 2 0 015 1z"/></svg>';
 const TP_EYE_ICO = '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2.5-4.5 6-4.5S13 7 13 7s-2.5 4.5-6 4.5S1 7 1 7z" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="1.8" fill="currentColor"/></svg>';
 
-function buildKmAddedRow(tp, removeCallback) {
+function buildKmAddedRow(tp, removeCallback, readOnly) {
   const id = tp.id || '';
   const factsCnt = tp.facts || 0;
   const claimsCnt = tp.claims || 0;
@@ -6416,7 +6464,7 @@ function buildKmAddedRow(tp, removeCallback) {
   if (docsCnt) subtitleParts.push(docsCnt + ' docs');
   const subtitle = subtitleParts.join(' · ') || 'Knowledge pack';
   const ctx = (typeof bldrNet !== 'undefined' && bldrNet) ? 'bldr' : 'kn';
-  const rmFn = id ? removeCallback+'(\''+id+'\')' : '';
+  const rmFn = (!readOnly && id) ? removeCallback+'(\''+id+'\')' : '';
   const safeRm = rmFn ? 'kmsRemoveWithConfirm(\''+tp.name.replace(/'/g,'\\\'').replace(/"/g,'&quot;')+'\',\'truthpack\',function(){'+rmFn+';kmsMarkChanged(\''+ctx+'\')})' : '';
 
   // Plane chips (collapsed header)
@@ -6438,14 +6486,18 @@ function buildKmAddedRow(tp, removeCallback) {
       return '<div class="km-ac-plane dis">'
         +'<div class="km-ac-plane-ico" style="background:rgba(255,255,255,.04);border:1px solid var(--bd)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none">'+m.ico+'</svg></div>'
         +'<div class="km-ac-plane-txt"><div class="km-ac-plane-name">'+m.label+' <span class="km-ac-plane-dis-tag">off by creator</span></div><div class="km-ac-plane-desc">'+m.desc+'</div></div>'
-        +'<label class="mini-tog"><input type="checkbox" disabled><div class="mini-track"><div class="mini-thumb"></div></div></label>'
+        +(readOnly
+          ? '<span style="font-size:10px;color:var(--t4);font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid var(--bd)">Off</span>'
+          : '<label class="mini-tog"><input type="checkbox" disabled><div class="mini-track"><div class="mini-thumb"></div></div></label>')
         +'</div>';
     }
     const isOn = state==='on';
     return '<div class="km-ac-plane">'
       +'<div class="km-ac-plane-ico" style="background:'+m.bg+';border:1px solid '+m.bc+'"><svg width="14" height="14" viewBox="0 0 16 16" fill="none">'+m.ico+'</svg></div>'
       +'<div class="km-ac-plane-txt"><div class="km-ac-plane-name">'+m.label+'</div><div class="km-ac-plane-desc">'+m.desc+'</div></div>'
-      +'<label class="mini-tog"><input type="checkbox"'+(isOn?' checked':'')+' onchange="'+removeCallback+'_plane(\''+id+'\',\''+key+'\',this)"><div class="mini-track"><div class="mini-thumb"></div></div></label>'
+      +(readOnly
+        ? '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;'+(isOn?'background:rgba(43,127,255,.14);border:1px solid rgba(43,127,255,.3);color:var(--pri)':'background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--t4)')+'">'+( isOn?'On':'Off')+'</span>'
+        : '<label class="mini-tog"><input type="checkbox"'+(isOn?' checked':'')+' onchange="'+removeCallback+'_plane(\''+id+'\',\''+key+'\',this)"><div class="mini-track"><div class="mini-thumb"></div></div></label>')
       +'</div>';
   }).join('');
 
@@ -6538,10 +6590,10 @@ let knDriveAddedItems = []; // overview modal
 const KM_FOLDER_ICO = '<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8.5" rx="1.5" stroke="rgba(249,115,22,.9)" stroke-width="1.2"/><path d="M1.5 6h11" stroke="rgba(249,115,22,.7)" stroke-width="1"/><path d="M4 3.5h3l.8 1.5H4V3.5z" stroke="rgba(249,115,22,.9)" stroke-width="1.1"/></svg>';
 const KM_DOC_ICO   = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 1.5h4.5L9.5 3.5v7H3V1.5z" stroke="var(--t3)" stroke-width="1.1" stroke-linejoin="round"/><path d="M7.5 1.5V3.5H9.5" stroke="var(--t3)" stroke-width="1.1"/></svg>';
 
-function buildKmDriveAddedRow(item, removeCallback) {
+function buildKmDriveAddedRow(item, removeCallback, readOnly) {
   const safeName = item.name.replace(/'/g,'&#39;');
   const ctx2 = removeCallback === 'toggleBldrDrive' ? 'bldr' : 'kn';
-  const safeRm2 = 'kmsRemoveWithConfirm(\''+item.name.replace(/'/g,'\\\'').replace(/"/g,'&quot;')+'\',\''+item.type+'\',function(){'+removeCallback+'(\''+item.id+'\');kmsMarkChanged(\''+ctx2+'\')})';
+  const safeRm2 = readOnly ? '' : 'kmsRemoveWithConfirm(\''+item.name.replace(/'/g,'\\\'').replace(/"/g,'&quot;')+'\',\''+item.type+'\',function(){'+removeCallback+'(\''+item.id+'\');kmsMarkChanged(\''+ctx2+'\')})';
   const uid = 'km-dac-'+item.id.replace(/[^a-z0-9]/gi,'-');
 
   // Determine icon and color by type
@@ -6580,7 +6632,7 @@ function buildKmDriveAddedRow(item, removeCallback) {
     +'<div class="km-ac-ico" style="'+icoBg+'">'+ico+'</div>'
     +'<div class="km-ac-info"><div class="km-ac-name" title="'+safeName+'">'+item.name+'</div><div class="km-ac-meta">'+typeLabel+(sub?' · '+sub:'')+'</div></div>'
     +'<span class="km-ac-chip" style="background:rgba(59,130,246,.12);color:#93C5FD;border-color:rgba(59,130,246,.22)">Connected</span>'
-    +'<button class="km-ac-rm" onclick="event.stopPropagation();'+safeRm2+'" data-tip="Remove">×</button>'
+    +(safeRm2 ? '<button class="km-ac-rm" onclick="event.stopPropagation();'+safeRm2+'" data-tip="Remove">×</button>' : '')
     +'</div>'
     +'<div class="km-ac-body">'
     +bodyContent
@@ -6942,6 +6994,78 @@ function toggleTpPack_plane(packId, planeKey, checkbox) {
 }
 
 // ── KNOWLEDGE PANEL TABS (overview sidebar) ──
+// ── OVERVIEW WIDGET DRAG & RESIZE ──
+let _ovDragSrc = null;
+
+function initOvWidgets() {
+  const grid = document.getElementById('ovWidgetGrid');
+  if (!grid) return;
+  // Drag-to-rearrange
+  grid.querySelectorAll('.ov-widget').forEach(widget => {
+    const grip = widget.querySelector('.ov-drag-grip');
+    if (!grip) return;
+    // Only allow drag when mousedown on the grip
+    grip.addEventListener('mousedown', () => widget.setAttribute('draggable','true'));
+    widget.addEventListener('mouseup', () => widget.setAttribute('draggable','false'));
+    widget.addEventListener('dragstart', e => {
+      _ovDragSrc = widget;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', widget.getAttribute('data-pos') || '');
+      setTimeout(() => widget.classList.add('ov-dragging'), 0);
+    });
+    widget.addEventListener('dragend', () => {
+      widget.classList.remove('ov-dragging');
+      widget.setAttribute('draggable','false');
+      grid.querySelectorAll('.ov-widget').forEach(w => w.classList.remove('ov-drag-over'));
+      _ovDragSrc = null;
+    });
+    widget.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (_ovDragSrc && widget !== _ovDragSrc) widget.classList.add('ov-drag-over');
+    });
+    widget.addEventListener('dragleave', e => {
+      if (!widget.contains(e.relatedTarget)) widget.classList.remove('ov-drag-over');
+    });
+    widget.addEventListener('drop', e => {
+      e.preventDefault();
+      widget.classList.remove('ov-drag-over');
+      if (!_ovDragSrc || _ovDragSrc === widget) return;
+      // Swap data-pos values → CSS grid positions swap
+      const srcPos = _ovDragSrc.getAttribute('data-pos');
+      const tgtPos = widget.getAttribute('data-pos');
+      _ovDragSrc.setAttribute('data-pos', tgtPos);
+      widget.setAttribute('data-pos', srcPos);
+    });
+  });
+  // Height resize
+  grid.querySelectorAll('.ov-resize-hdl').forEach(hdl => {
+    hdl.addEventListener('mousedown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const widget = hdl.closest('.ov-widget');
+      const inner = widget.querySelector('.ov-card') || widget.querySelector('.kn-panel') || widget;
+      const startY = e.clientY;
+      const startH = inner.getBoundingClientRect().height;
+      document.body.style.cursor = 'se-resize';
+      document.body.style.userSelect = 'none';
+      const onMove = e2 => {
+        const newH = Math.max(100, startH + e2.clientY - startY);
+        inner.style.minHeight = newH + 'px';
+        inner.style.maxHeight = 'none';
+      };
+      const onUp = () => {
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+}
+
 function switchKnPanelTab(tab, btn) {
   document.querySelectorAll('.kn-ptab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
