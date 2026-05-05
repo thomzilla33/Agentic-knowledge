@@ -1457,6 +1457,7 @@ body.test-mode #vTestMode{display:flex}
 .tp-mkt-vbtn.active{background:rgba(43,127,255,.12);border-color:rgba(43,127,255,.3);color:var(--pri)}
 /* Grid */
 .tp-mkt-grid{flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-content:start}
+.tp-mkt-grid.hidden{display:none}
 .tp-mkt-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px;display:flex;flex-direction:column;transition:border-color .15s,background .15s;cursor:default}
 .tp-mkt-card:hover{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.045)}
 .tp-mkt-card-hd{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
@@ -1504,6 +1505,67 @@ body.test-mode #vTestMode{display:flex}
 .tp-mkt-cancel:hover{background:rgba(255,255,255,.06);color:var(--t1)}
 .tp-mkt-done{height:38px;padding:0 24px;background:var(--pri);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
 .tp-mkt-done:hover{opacity:.88}
+/* ── BREADCRUMBS ── */
+.tp-mkt-bc{display:none;align-items:center;gap:6px;padding:10px 20px;border-bottom:1px solid var(--bd);background:rgba(255,255,255,.02);flex-shrink:0;min-height:38px}
+.tp-mkt-bc.visible{display:flex}
+.tp-mkt-bc-item{font-size:12px;color:var(--t3);cursor:pointer;padding:2px 6px;border-radius:6px;transition:all .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.tp-mkt-bc-item:hover{color:var(--t1);background:rgba(255,255,255,.06)}
+.tp-mkt-bc-item.current{color:var(--t1);font-weight:600;cursor:default;pointer-events:none}
+.tp-mkt-bc-item.current:hover{background:transparent}
+.tp-mkt-bc-sep{color:var(--t4);font-size:11px;flex-shrink:0}
+/* ── DETAIL VIEW (inline inside modal) ── */
+.tp-mkt-detail{display:none;flex:1;overflow-y:auto;padding:24px}
+.tp-mkt-detail.visible{display:block}
+.tp-mkt-detail-hd{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
+.tp-mkt-detail-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tp-mkt-detail-nm{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:5px}
+.tp-mkt-detail-desc{font-size:13px;color:var(--t3);line-height:1.6}
+.tp-mkt-detail-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tp-mkt-detail-stat{font-size:12px;color:var(--t3)}
+.tp-mkt-detail-stat strong{color:var(--t1)}
+.tp-mkt-detail-stat-sep{width:3px;height:3px;border-radius:50%;background:var(--t4);flex-shrink:0}
+.tp-mkt-detail-body{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tp-mkt-detail-body.single{grid-template-columns:1fr}
+.tp-mkt-detail-sec{background:var(--cb);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.tp-mkt-detail-sec-hd{padding:10px 16px;border-bottom:1px solid var(--bd);font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;justify-content:space-between}
+.tp-mkt-detail-sec-cnt{font-size:11px;color:var(--t4)}
+.tp-mkt-detail-item{display:flex;align-items:flex-start;gap:8px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
+.tp-mkt-detail-item:last-child{border-bottom:none}
+.tp-mkt-detail-dot{width:5px;height:5px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.tp-mkt-detail-item-txt{font-size:12px;color:var(--t2);line-height:1.5}
+.tp-mkt-detail-planes{padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.tp-mkt-detail-plane-row{display:flex;align-items:center;justify-content:space-between}
+.tp-mkt-detail-plane-nm{font-size:13px;color:var(--t2);font-weight:500}
+.tp-mkt-detail-plane-nm.dis{color:var(--t4)}
+.tp-mkt-detail-add-row{margin-top:20px;display:flex;justify-content:flex-end;gap:10px}
+/* Drive detail folder tree */
+.tp-mkt-tree{padding:8px 0}
+.tp-mkt-tree-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;transition:background .1s}
+.tp-mkt-tree-item:hover{background:rgba(255,255,255,.04)}
+.tp-mkt-tree-item.file{cursor:default}
+.tp-mkt-tree-item svg{flex-shrink:0;color:var(--t4)}
+.tp-mkt-tree-item.folder svg{color:#FDC700}
+.tp-mkt-tree-nm{font-size:12px;color:var(--t2);flex:1}
+.tp-mkt-tree-cnt{font-size:11px;color:var(--t4)}
+.tp-mkt-tree-item.clickable{cursor:pointer}
+.tp-mkt-tree-item.clickable:hover .tp-mkt-tree-nm{color:var(--t1)}
+/* ── DISCARD CONFIRMATION DIALOG ── */
+.mkt-discard-ov{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+.mkt-discard-ov.open{display:flex}
+.mkt-discard-dlg{width:400px;background:#0f1a2e;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.8);animation:mpop .18s ease}
+.mkt-discard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.mkt-discard-title{font-size:16px;font-weight:700;color:var(--t1)}
+.mkt-discard-x{background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;line-height:1;padding:0;transition:color .1s}
+.mkt-discard-x:hover{color:var(--t1)}
+.mkt-discard-msg{font-size:13px;color:var(--t3);line-height:1.6;margin-bottom:24px}
+.mkt-discard-btns{display:flex;gap:10px;justify-content:flex-end}
+.mkt-discard-btn{height:38px;padding:0 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none}
+.mkt-discard-btn.secondary{background:transparent;border:1px solid var(--bd);color:var(--t2)}
+.mkt-discard-btn.secondary:hover{background:rgba(255,255,255,.06);color:var(--t1)}
+.mkt-discard-btn.danger{background:rgba(255,100,103,.15);color:#FF6467;border:1px solid rgba(255,100,103,.3)}
+.mkt-discard-btn.danger:hover{background:rgba(255,100,103,.25)}
+.mkt-discard-btn.primary{background:var(--pri);color:#fff}
+.mkt-discard-btn.primary:hover{opacity:.88}
 /* ── TOOLTIP ── */
 .ui-tip{position:fixed;z-index:9999;background:#1e2d4a;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--t1);pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5);animation:tipfade .12s ease}
 @keyframes tipfade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
@@ -3100,7 +3162,7 @@ body.test-mode #vTestMode{display:flex}
         <button class="tp-mkt-cat" onclick="filterTpMkt('Operations',this)"><span class="tp-mkt-cat-label">Operations</span><span class="tp-mkt-cat-cnt">1</span></button>
       </div>
       <div class="tp-mkt-right">
-        <div class="tp-mkt-toolbar">
+        <div class="tp-mkt-toolbar" id="tpMktToolbar">
           <div class="tp-mkt-search">
             <svg width="15" height="15" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             <input class="tp-mkt-search-inp" id="tpMktSearch" placeholder="Search packs…" oninput="renderTpMktGrid(this.value)">
@@ -3114,14 +3176,16 @@ body.test-mode #vTestMode{display:flex}
             </button>
           </div>
         </div>
+        <div class="tp-mkt-bc" id="tpMktBc"></div>
         <div class="tp-mkt-grid" id="tpMktGrid"></div>
+        <div class="tp-mkt-detail" id="tpMktDetail"></div>
       </div>
     </div>
     <div class="tp-mkt-ft">
-      <span class="tp-mkt-ft-info">Select packs to add to this network's knowledge base</span>
+      <span class="tp-mkt-ft-info" id="tpMktFtInfo">Select packs to add to this network's knowledge base</span>
       <div class="tp-mkt-ft-btns">
-        <button class="tp-mkt-cancel" onclick="closeTpMarketplace()">Cancel</button>
-        <button class="tp-mkt-done" onclick="closeTpMarketplace()">Done</button>
+        <button class="tp-mkt-cancel" onclick="onTpMktCancel()">Cancel</button>
+        <button class="tp-mkt-done" onclick="closeTpMarketplace(true)">Done</button>
       </div>
     </div>
   </div>
@@ -3168,15 +3232,32 @@ body.test-mode #vTestMode{display:flex}
             </button>
           </div>
         </div>
+        <div class="tp-mkt-bc" id="drvMktBc"></div>
         <div class="tp-mkt-grid" id="drvMktGrid"></div>
+        <div class="tp-mkt-detail" id="drvMktDetail"></div>
       </div>
     </div>
     <div class="tp-mkt-ft">
-      <span class="tp-mkt-ft-info">Select drives to connect to this network's knowledge base</span>
+      <span class="tp-mkt-ft-info" id="drvMktFtInfo">Select drives to connect to this network's knowledge base</span>
       <div class="tp-mkt-ft-btns">
-        <button class="tp-mkt-cancel" onclick="closeDriveMarketplace()">Cancel</button>
-        <button class="tp-mkt-done" onclick="closeDriveMarketplace()">Done</button>
+        <button class="tp-mkt-cancel" onclick="onDrvMktCancel()">Cancel</button>
+        <button class="tp-mkt-done" onclick="closeDriveMarketplace(true)">Done</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Discard confirmation dialog -->
+<div class="mkt-discard-ov" id="mktDiscardOv">
+  <div class="mkt-discard-dlg">
+    <div class="mkt-discard-top">
+      <div class="mkt-discard-title">Unsaved changes</div>
+      <button class="mkt-discard-x" onclick="hideMktDiscardDialog()">×</button>
+    </div>
+    <p class="mkt-discard-msg">You have unsaved changes. Do you want to save them before leaving, or discard all changes?</p>
+    <div class="mkt-discard-btns">
+      <button class="mkt-discard-btn danger" onclick="confirmDiscardMkt()">Discard changes</button>
+      <button class="mkt-discard-btn primary" onclick="confirmSaveMkt()">Save changes</button>
     </div>
   </div>
 </div>
@@ -4436,50 +4517,287 @@ let drvMktContext = 'kn';
 let drvMktCategory = 'all';
 
 const DRV_MKT_CATALOG = [
-  {id:'drv-gov',   name:'Governance & Policy Drive',  cat:'Governance & Policy', folders:3, docs:12, previewKey:'governance',
+  {id:'drv-gov', name:'Governance & Policy Drive', cat:'Governance & Policy', catBg:'rgba(148,163,184,.12)', catColor:'#94A3B8', folders:3, docs:12, previewKey:'governance',
    folderList:['Corporate Policies','Risk Management','Compliance'],
-   desc:'Corporate policies, compliance requirements, governance charter and risk management documentation.'},
-  {id:'drv-prod',  name:'Product Documentation Drive', cat:'Product', folders:2, docs:8, previewKey:'product',
+   desc:'Corporate policies, compliance requirements, governance charter and risk management documentation.',
+   sub:'3 folders · 12 documents',
+   children:[
+    {id:'drv-gov-cp', name:'Corporate Policies', type:'folder', count:3, children:[
+      {id:'drv-gov-cp-hr', name:'HR Policy v2.pdf', type:'file'},
+      {id:'drv-gov-cp-co', name:'Code of Conduct.pdf', type:'file'},
+      {id:'drv-gov-cp-it', name:'IT Security Policy.pdf', type:'file'},
+    ]},
+    {id:'drv-gov-rm', name:'Risk Management', type:'folder', count:2, children:[
+      {id:'drv-gov-rm-1', name:'Risk Register Q1 2026.xlsx', type:'file'},
+      {id:'drv-gov-rm-2', name:'Risk Framework.pdf', type:'file'},
+    ]},
+    {id:'drv-gov-gc', name:'Governance Charter.pdf', type:'file'},
+  ]},
+  {id:'drv-prod', name:'Product Documentation Drive', cat:'Product', catBg:'rgba(43,127,255,.12)', catColor:'#2B7FFF', folders:2, docs:8, previewKey:'product',
    folderList:['API Documentation','Release Notes'],
-   desc:'API documentation, product specs, release notes and technical integration guides.'},
-  {id:'drv-sales', name:'Sales Enablement Drive',      cat:'Sales', folders:3, docs:11, previewKey:'sales',
+   desc:'API documentation, product specs, release notes and technical integration guides.',
+   sub:'2 folders · 8 documents',
+   children:[
+    {id:'drv-prod-api', name:'API Documentation', type:'folder', count:4, children:[
+      {id:'drv-prod-api-1', name:'REST API Reference.md', type:'file'},
+      {id:'drv-prod-api-2', name:'Webhooks Guide.md', type:'file'},
+      {id:'drv-prod-api-3', name:'Authentication.md', type:'file'},
+      {id:'drv-prod-api-4', name:'Rate Limits.md', type:'file'},
+    ]},
+    {id:'drv-prod-rn', name:'Release Notes', type:'folder', count:4, children:[
+      {id:'drv-prod-rn-1', name:'v2.4 Release Notes.md', type:'file'},
+      {id:'drv-prod-rn-2', name:'v2.3 Release Notes.md', type:'file'},
+    ]},
+    {id:'drv-prod-spec', name:'Product Spec v3.2.pdf', type:'file'},
+  ]},
+  {id:'drv-sales', name:'Sales Enablement Drive', cat:'Sales', catBg:'rgba(5,223,114,.1)', catColor:'#05DF72', folders:3, docs:11, previewKey:'sales',
    folderList:['Battle Cards','Case Studies','Pitch Decks'],
-   desc:'Battle cards, case studies, pitch decks and competitive intelligence for the sales team.'},
-  {id:'drv-legal', name:'Legal & Contracts Drive',     cat:'Legal', folders:2, docs:6, previewKey:'legal',
+   desc:'Battle cards, case studies, pitch decks and competitive intelligence for the sales team.',
+   sub:'3 folders · 11 documents',
+   children:[
+    {id:'drv-sales-bc', name:'Battle Cards', type:'folder', count:5, children:[
+      {id:'drv-sales-bc-1', name:'vs Competitor A.pdf', type:'file'},
+      {id:'drv-sales-bc-2', name:'vs Competitor B.pdf', type:'file'},
+    ]},
+    {id:'drv-sales-cs', name:'Case Studies', type:'folder', count:4, children:[
+      {id:'drv-sales-cs-1', name:'FinTech Case Study.pdf', type:'file'},
+      {id:'drv-sales-cs-2', name:'Healthcare Case Study.pdf', type:'file'},
+    ]},
+    {id:'drv-sales-deck', name:'Pitch Deck Q1 2026.pptx', type:'file'},
+  ]},
+  {id:'drv-legal', name:'Legal & Contracts Drive', cat:'Legal', catBg:'rgba(255,100,103,.12)', catColor:'#FF6467', folders:2, docs:6, previewKey:'legal',
    folderList:['NDAs & Templates','MSA Library'],
-   desc:'Contract templates, NDA agreements, terms of service and legal compliance documents.'},
-  {id:'drv-hr',    name:'HR Resources Drive',          cat:'HR', folders:4, docs:18, previewKey:'governance',
+   desc:'Contract templates, NDA agreements, terms of service and legal compliance documents.',
+   sub:'2 folders · 6 documents',
+   children:[
+    {id:'drv-legal-nda', name:'NDAs & Templates', type:'folder', count:3, children:[
+      {id:'drv-legal-nda-1', name:'NDA Standard.docx', type:'file'},
+      {id:'drv-legal-nda-2', name:'NDA Enterprise.docx', type:'file'},
+    ]},
+    {id:'drv-legal-msa', name:'MSA Library', type:'folder', count:3, children:[
+      {id:'drv-legal-msa-1', name:'MSA v4.docx', type:'file'},
+    ]},
+  ]},
+  {id:'drv-hr', name:'HR Resources Drive', cat:'HR', catBg:'rgba(167,139,250,.12)', catColor:'#A78BFA', folders:4, docs:18, previewKey:'governance',
    folderList:['Onboarding','Job Descriptions','Performance Reviews','Benefits'],
-   desc:'Onboarding materials, job descriptions, performance review templates and benefits documentation.'},
-  {id:'drv-fin',   name:'Finance & Reporting Drive',   cat:'Finance', folders:2, docs:9, previewKey:'product',
+   desc:'Onboarding materials, job descriptions, performance review templates and benefits documentation.',
+   sub:'4 folders · 18 documents',
+   children:[
+    {id:'drv-hr-ob', name:'Onboarding', type:'folder', count:5, children:[
+      {id:'drv-hr-ob-1', name:'Day 1 Checklist.pdf', type:'file'},
+      {id:'drv-hr-ob-2', name:'30-60-90 Plan Template.docx', type:'file'},
+    ]},
+    {id:'drv-hr-jd', name:'Job Descriptions', type:'folder', count:8, children:[]},
+    {id:'drv-hr-pr', name:'Performance Reviews', type:'folder', count:3, children:[]},
+    {id:'drv-hr-ben', name:'Benefits', type:'folder', count:2, children:[]},
+  ]},
+  {id:'drv-fin', name:'Finance & Reporting Drive', cat:'Finance', catBg:'rgba(253,199,0,.1)', catColor:'#FDC700', folders:2, docs:9, previewKey:'product',
    folderList:['Budget Templates','Financial Reports'],
-   desc:'Budget templates, financial reports, expense policies and forecasting models.'},
-  {id:'drv-ops',   name:'Operations Handbook Drive',   cat:'Governance & Policy', folders:3, docs:14, previewKey:'sales',
+   desc:'Budget templates, financial reports, expense policies and forecasting models.',
+   sub:'2 folders · 9 documents',
+   children:[
+    {id:'drv-fin-bt', name:'Budget Templates', type:'folder', count:4, children:[
+      {id:'drv-fin-bt-1', name:'Annual Budget Template.xlsx', type:'file'},
+      {id:'drv-fin-bt-2', name:'Quarterly Forecast.xlsx', type:'file'},
+    ]},
+    {id:'drv-fin-fr', name:'Financial Reports', type:'folder', count:5, children:[]},
+  ]},
+  {id:'drv-ops', name:'Operations Handbook Drive', cat:'Governance & Policy', catBg:'rgba(148,163,184,.12)', catColor:'#94A3B8', folders:3, docs:14, previewKey:'sales',
    folderList:['SOPs','Incident Response','Runbooks'],
-   desc:'SOPs, runbooks, incident response guides and operational process documentation.'},
-  {id:'drv-mkt',   name:'Marketing Assets Drive',      cat:'Sales', folders:2, docs:10, previewKey:'sales',
+   desc:'SOPs, runbooks, incident response guides and operational process documentation.',
+   sub:'3 folders · 14 documents',
+   children:[
+    {id:'drv-ops-sop', name:'SOPs', type:'folder', count:6, children:[]},
+    {id:'drv-ops-ir',  name:'Incident Response', type:'folder', count:4, children:[]},
+    {id:'drv-ops-rb',  name:'Runbooks', type:'folder', count:4, children:[]},
+  ]},
+  {id:'drv-mkt', name:'Marketing Assets Drive', cat:'Sales', catBg:'rgba(5,223,114,.1)', catColor:'#05DF72', folders:2, docs:10, previewKey:'sales',
    folderList:['Brand Assets','Campaign Briefs'],
-   desc:'Brand assets, campaign briefs, content calendars and go-to-market playbooks.'},
-  {id:'drv-eng',   name:'Engineering Docs Drive',      cat:'Product', folders:4, docs:22, previewKey:'product',
+   desc:'Brand assets, campaign briefs, content calendars and go-to-market playbooks.',
+   sub:'2 folders · 10 documents',
+   children:[
+    {id:'drv-mkt-ba', name:'Brand Assets', type:'folder', count:6, children:[]},
+    {id:'drv-mkt-cb', name:'Campaign Briefs', type:'folder', count:4, children:[]},
+  ]},
+  {id:'drv-eng', name:'Engineering Docs Drive', cat:'Product', catBg:'rgba(43,127,255,.12)', catColor:'#2B7FFF', folders:4, docs:22, previewKey:'product',
    folderList:['Architecture','Coding Standards','Deployment Guides','System Design'],
-   desc:'Architecture diagrams, coding standards, deployment guides and system design documents.'},
+   desc:'Architecture diagrams, coding standards, deployment guides and system design documents.',
+   sub:'4 folders · 22 documents',
+   children:[
+    {id:'drv-eng-ar', name:'Architecture', type:'folder', count:5, children:[]},
+    {id:'drv-eng-cs', name:'Coding Standards', type:'folder', count:4, children:[]},
+    {id:'drv-eng-dg', name:'Deployment Guides', type:'folder', count:8, children:[]},
+    {id:'drv-eng-sd', name:'System Design', type:'folder', count:5, children:[]},
+  ]},
 ];
+
+// ── DRIVE MARKETPLACE STATE ──
+let drvMktBreadcrumbs = [];
+let drvMktInitialAdded = [];
 
 function openDriveMarketplace(ctx) {
   drvMktContext = ctx || 'kn';
   drvMktCategory = 'all';
+  drvMktBreadcrumbs = [];
   document.querySelectorAll('#drvMktCats .tp-mkt-cat').forEach((b,i)=>b.classList.toggle('active',i===0));
   const inp = document.getElementById('drvMktSearch');
   if (inp) inp.value = '';
+  const addedPool = drvMktContext === 'bldr' ? driveAddedItems : knDriveAddedItems;
+  drvMktInitialAdded = [...addedPool.map(x=>x.id)];
   renderDrvMktGrid('');
+  renderTpBreadcrumbs('drv');
+  showDrvMktListView();
   document.getElementById('drvMarketplace').classList.add('open');
 }
 
-function closeDriveMarketplace() {
+function closeDriveMarketplace(force) {
+  if (!force && drvMktHasChanges()) {
+    mktDiscardTarget = 'drv';
+    document.getElementById('mktDiscardOv').classList.add('open');
+    return;
+  }
   document.getElementById('drvMarketplace').classList.remove('open');
+  drvMktBreadcrumbs = [];
 }
 
+function onDrvMktCancel() { closeDriveMarketplace(); }
 function onDrvMktClick(e) { if(e.target===e.currentTarget) closeDriveMarketplace(); }
+
+function drvMktHasChanges() {
+  const addedPool = drvMktContext === 'bldr' ? driveAddedItems : knDriveAddedItems;
+  const current = addedPool.map(x=>x.id);
+  if (current.length !== drvMktInitialAdded.length) return true;
+  return current.some(id => !drvMktInitialAdded.includes(id));
+}
+
+function showDrvMktListView() {
+  document.getElementById('drvMktGrid').classList.remove('hidden');
+  document.getElementById('drvMktDetail').classList.remove('visible');
+  const drvCats = document.getElementById('drvMktCats');
+  if (drvCats) drvCats.style.display = '';
+}
+
+function showDrvMktDetailView() {
+  document.getElementById('drvMktGrid').classList.add('hidden');
+  document.getElementById('drvMktDetail').classList.add('visible');
+  const drvCats = document.getElementById('drvMktCats');
+  if (drvCats) drvCats.style.display = 'none';
+}
+
+function navigateDrvMkt(driveId, folderPath) {
+  const d = DRV_MKT_CATALOG ? DRV_MKT_CATALOG.find(x=>x.id===driveId) : null;
+  if (!d) return;
+  drvMktBreadcrumbs = [{label:'All drives', id:null}, {label:d.name, id:driveId, path:[]}];
+  if (folderPath && folderPath.length) {
+    folderPath.forEach((f,i) => {
+      drvMktBreadcrumbs.push({label:f.name, id:driveId, path:folderPath.slice(0,i+1)});
+    });
+  }
+  renderTpBreadcrumbs('drv');
+  renderDrvMktDetailPanel(driveId, folderPath||[]);
+  showDrvMktDetailView();
+}
+
+function drvMktBcNav(idx) {
+  const crumb = drvMktBreadcrumbs[idx];
+  drvMktBreadcrumbs = drvMktBreadcrumbs.slice(0, idx+1);
+  if (idx === 0) {
+    drvMktBreadcrumbs = [];
+    renderTpBreadcrumbs('drv');
+    showDrvMktListView();
+  } else {
+    renderTpBreadcrumbs('drv');
+    renderDrvMktDetailPanel(crumb.id, crumb.path||[]);
+    showDrvMktDetailView();
+  }
+}
+
+function renderDrvMktDetailPanel(driveId, folderPath) {
+  const detail = document.getElementById('drvMktDetail');
+  if (!detail) return;
+  const drv = DRV_MKT_CATALOG ? DRV_MKT_CATALOG.find(x=>x.id===driveId) : null;
+  if (!drv) return;
+
+  // Navigate into folder path
+  let node = drv;
+  for (const seg of (folderPath||[])) {
+    const child = (node.children||[]).find(c=>c.id===seg.id);
+    if (child) node = child;
+  }
+
+  const addedPool = drvMktContext === 'bldr' ? driveAddedItems : knDriveAddedItems;
+  const isAdded = addedPool.some(x=>x.id===driveId);
+
+  const isRoot = (!folderPath || !folderPath.length);
+  const catBg = drv.catBg || 'rgba(43,127,255,.12)';
+  const catColor = drv.catColor || 'var(--pri)';
+
+  const children = node.children || [];
+  const treeHtml = children.length ? children.map(c => {
+    const isFolder = c.type==='folder';
+    const canNav = isFolder && (c.children && c.children.length > 0);
+    const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
+    return '<div class="tp-mkt-tree-item '+(isFolder?'folder ':'file ')+(canNav?'clickable':'')+'"'
+      +(canNav ? ' onclick="navigateDrvMkt(\''+driveId+'\','+JSON.stringify(newPath)+')"' : '')+'>'
+      +(isFolder
+        ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h6l3 3v8H3v-11z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5V5h3" stroke="currentColor" stroke-width="1.2"/></svg>')
+      +'<span class="tp-mkt-tree-nm">'+c.name+'</span>'
+      +(c.count ? '<span class="tp-mkt-tree-cnt">'+c.count+' items</span>' : '')
+      +'</div>';
+  }).join('') : '<div style="padding:20px 16px;font-size:12px;color:var(--t4);font-style:italic">No items in this folder</div>';
+
+  detail.innerHTML = `
+    <div class="tp-mkt-detail-hd">
+      <div class="tp-mkt-detail-ico" style="background:${catBg};border:1px solid ${catColor}40">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="12" rx="2" stroke="${catColor}" stroke-width="1.5"/><path d="M2 9h16" stroke="${catColor}" stroke-width="1"/><path d="M5 5V4a2 2 0 012-2h3l1.5 3" stroke="${catColor}" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="flex:1">
+        <div class="tp-mkt-detail-nm">${isRoot ? drv.name : node.name}</div>
+        <div class="tp-mkt-detail-desc">${isRoot ? (drv.desc||'') : (drv.name+' › '+drvMktBreadcrumbs.slice(2).map(b=>b.label).join(' › '))}</div>
+        ${isRoot ? `<div class="tp-mkt-detail-meta"><span class="tp-mkt-detail-stat">${drv.sub||''}</span></div>` : ''}
+      </div>
+    </div>
+    <div class="tp-mkt-detail-sec">
+      <div class="tp-mkt-detail-sec-hd"><span>${isRoot ? 'Contents' : 'Folder contents'}</span><span class="tp-mkt-detail-sec-cnt">${children.length} items</span></div>
+      <div class="tp-mkt-tree">${treeHtml}</div>
+    </div>
+    <div class="tp-mkt-detail-add-row">
+      ${isAdded
+        ? '<button class="tp-mkt-card-add added" disabled>✓ Drive added</button>'
+        : '<button class="tp-mkt-card-add" onclick="addDrvFromMkt(\''+driveId+'\')">+ Add drive</button>'
+      }
+    </div>`;
+}
+
+// ── DISCARD DIALOG ──
+function hideMktDiscardDialog() {
+  document.getElementById('mktDiscardOv').classList.remove('open');
+  mktDiscardTarget = null;
+}
+
+function confirmDiscardMkt() {
+  hideMktDiscardDialog();
+  if (mktDiscardTarget === 'tp') {
+    document.getElementById('tpMarketplace').classList.remove('open');
+    tpMktBreadcrumbs = [];
+  } else {
+    document.getElementById('drvMarketplace').classList.remove('open');
+    drvMktBreadcrumbs = [];
+  }
+}
+
+function confirmSaveMkt() {
+  hideMktDiscardDialog();
+  if (mktDiscardTarget === 'tp') {
+    document.getElementById('tpMarketplace').classList.remove('open');
+    tpMktBreadcrumbs = [];
+  } else {
+    document.getElementById('drvMarketplace').classList.remove('open');
+    drvMktBreadcrumbs = [];
+  }
+  showToast('Changes saved', 'ok');
+}
 
 function filterDrvMkt(cat, btn) {
   drvMktCategory = cat;
@@ -4557,7 +4875,7 @@ function renderDrvMktGrid(query) {
       +'<div class="tp-mkt-card-ft">'
       +'<span class="tp-mkt-card-tag" style="background:'+bg+';color:'+tc+'">'+d.cat+'</span>'
       +'<div style="display:flex;gap:6px;align-items:center">'
-      +'<button class="tp-mkt-card-browse" onclick="openDrivePreview(\''+d.name.replace(/'/g,'\\x27')+'\',\'\',\''+d.previewKey+'\')" title="Browse folders and documents">Browse →</button>'
+      +'<button class="tp-mkt-card-browse" onclick="event.stopPropagation();navigateDrvMkt(\''+d.id+'\')" title="Browse folders and documents">Browse →</button>'
       +'<button class="tp-mkt-card-add'+(added?' added':'')+'" '+(added?'disabled':'onclick="addDriveFromMkt(\''+d.id+'\')"')+'>'
       +(added?'✓ Added':'+ Add')+'</button>'
       +'</div>'
@@ -4579,6 +4897,12 @@ function addDriveFromMkt(driveId) {
     else renderKnDriveAdded();
   }
   renderDrvMktGrid(document.getElementById('drvMktSearch')?.value||'');
+}
+// Alias used from detail panel
+function addDrvFromMkt(driveId) {
+  addDriveFromMkt(driveId);
+  // Refresh detail panel to update button state
+  renderDrvMktDetailPanel(driveId, drvMktBreadcrumbs.length > 1 ? (drvMktBreadcrumbs[drvMktBreadcrumbs.length-1].path||[]) : []);
 }
 
 // ── TRUTHPACK MARKETPLACE ──
@@ -4615,21 +4939,198 @@ const TP_MKT_CATALOG = [
    desc:'First-week guides, system access checklist, team introductions and culture documentation.'},
 ];
 
+// ── TP MARKETPLACE STATE ──
+let tpMktBreadcrumbs = [];   // [{label, id}]  id=null means root
+let tpMktInitialAdded = [];  // snapshot when modal opened
+let mktDiscardTarget = null; // which modal to close after confirm
+
 function openTpMarketplace(ctx) {
   tpMktContext = ctx || 'kn';
   tpMktCategory = 'all';
-  document.querySelectorAll('.tp-mkt-cat').forEach((b,i)=>b.classList.toggle('active',i===0));
+  tpMktBreadcrumbs = [];
+  document.querySelectorAll('#tpMktCats .tp-mkt-cat').forEach((b,i)=>b.classList.toggle('active',i===0));
   const inp = document.getElementById('tpMktSearch');
   if (inp) inp.value = '';
+  // snapshot current added IDs
+  const net = tpMktContext==='bldr'
+    ? (bldrNet || NETWORKS.find(x=>x.id===currentOvId))
+    : NETWORKS.find(x=>x.id===currentOvId);
+  tpMktInitialAdded = [...((net && net.knowledge) ? net.knowledge.map(k=>k.id) : tpAddedIds)];
   renderTpMktGrid('');
+  renderTpBreadcrumbs('tp');
+  showTpMktListView();
   document.getElementById('tpMarketplace').classList.add('open');
 }
 
-function closeTpMarketplace() {
+function closeTpMarketplace(force) {
+  if (!force && tpMktHasChanges()) {
+    mktDiscardTarget = 'tp';
+    document.getElementById('mktDiscardOv').classList.add('open');
+    return;
+  }
   document.getElementById('tpMarketplace').classList.remove('open');
+  tpMktBreadcrumbs = [];
 }
 
+function onTpMktCancel() { closeTpMarketplace(); }
 function onTpMktClick(e) { if(e.target===e.currentTarget) closeTpMarketplace(); }
+
+function tpMktHasChanges() {
+  const net = tpMktContext==='bldr'
+    ? (bldrNet || NETWORKS.find(x=>x.id===currentOvId))
+    : NETWORKS.find(x=>x.id===currentOvId);
+  const current = (net && net.knowledge) ? net.knowledge.map(k=>k.id) : tpAddedIds;
+  if (current.length !== tpMktInitialAdded.length) return true;
+  return current.some(id => !tpMktInitialAdded.includes(id));
+}
+
+function showTpMktListView() {
+  document.getElementById('tpMktGrid').classList.remove('hidden');
+  document.getElementById('tpMktDetail').classList.remove('visible');
+  const toolbar = document.getElementById('tpMktToolbar');
+  if (toolbar) toolbar.style.display = '';
+  const cats = document.getElementById('tpMktCats');
+  if (cats) cats.style.display = '';
+}
+
+function showTpMktDetailView() {
+  document.getElementById('tpMktGrid').classList.add('hidden');
+  document.getElementById('tpMktDetail').classList.add('visible');
+  const toolbar = document.getElementById('tpMktToolbar');
+  if (toolbar) toolbar.style.display = 'none';
+  const cats = document.getElementById('tpMktCats');
+  if (cats) cats.style.display = 'none';
+}
+
+function navigateTpMkt(packId) {
+  const p = TP_MKT_CATALOG.find(x=>x.id===packId) || (typeof TP_DATA!=='undefined' && TP_DATA[packId]);
+  if (!p) return;
+  tpMktBreadcrumbs = [{label:'All packs', id:null}, {label:p.name||p.id, id:packId}];
+  renderTpBreadcrumbs('tp');
+  renderTpMktDetailPanel(packId);
+  showTpMktDetailView();
+}
+
+function renderTpBreadcrumbs(which) {
+  const bc = document.getElementById(which==='tp' ? 'tpMktBc' : 'drvMktBc');
+  if (!bc) return;
+  const crumbs = which==='tp' ? tpMktBreadcrumbs : drvMktBreadcrumbs;
+  if (!crumbs.length) { bc.classList.remove('visible'); return; }
+  bc.classList.add('visible');
+  bc.innerHTML = crumbs.map((c,i) => {
+    const isCurrent = i === crumbs.length - 1;
+    const clickFn = isCurrent ? '' : (which==='tp' ? 'onclick="tpMktBcNav('+i+')"' : 'onclick="drvMktBcNav('+i+')"');
+    return '<span class="tp-mkt-bc-item'+(isCurrent?' current':'')+'" '+clickFn+'>'+c.label+'</span>'
+      + (isCurrent ? '' : '<span class="tp-mkt-bc-sep">›</span>');
+  }).join('');
+}
+
+function tpMktBcNav(idx) {
+  tpMktBreadcrumbs = tpMktBreadcrumbs.slice(0, idx+1);
+  if (idx === 0) {
+    tpMktBreadcrumbs = [];
+    renderTpBreadcrumbs('tp');
+    showTpMktListView();
+  } else {
+    renderTpBreadcrumbs('tp');
+    renderTpMktDetailPanel(tpMktBreadcrumbs[idx].id);
+    showTpMktDetailView();
+  }
+}
+
+function renderTpMktDetailPanel(packId) {
+  const detail = document.getElementById('tpMktDetail');
+  if (!detail) return;
+  // Find data
+  let d = (typeof TP_DATA !== 'undefined') ? TP_DATA[packId] : null;
+  const cat = TP_MKT_CATALOG.find(x=>x.id===packId);
+  if (!d && cat) {
+    d = { name:cat.name, desc:cat.desc, facts:[], claims:[], docs:[],
+          planes:cat.planes||{}, rule:null,
+          _factsCnt:cat.facts||0, _claimsCnt:cat.claims||0, _docsCnt:cat.docs||0, _isFallback:true };
+  }
+  if (!d) return;
+
+  // Check if already added
+  const net = tpMktContext==='bldr'
+    ? (bldrNet || NETWORKS.find(x=>x.id===currentOvId))
+    : NETWORKS.find(x=>x.id===currentOvId);
+  const addedIds = (net && net.knowledge) ? net.knowledge.map(k=>k.id) : tpAddedIds;
+  const isAdded = addedIds.includes(packId);
+
+  const tagColor = (cat&&cat.tagColor) || 'var(--pri)';
+  const tagBg = (cat&&cat.tagBg) || 'rgba(43,127,255,.12)';
+  const tag = (cat&&cat.tag) || '';
+
+  const PLANE_INFO = {
+    truth:   {label:'Truth Plane',   dotOn:'#93C5FD',  cls:'on'},
+    sandbox: {label:'Sandbox Plane', dotOn:'#C4B5FD',  cls:'sandbox-on'},
+    sources: {label:'Sources Plane', dotOn:'#6EE7B7',  cls:'sources-on'},
+  };
+  const planes = d.planes || {};
+  const planeHtml = Object.entries(PLANE_INFO).map(([k,info]) => {
+    const state = planes[k] || 'off';
+    let pill = '';
+    if (state==='dis') pill = '<span class="tp-prev-plane-state dis">Disabled by creator</span>';
+    else if (state==='on') pill = '<span class="tp-prev-plane-state on">● ON</span>';
+    else pill = '<span class="tp-prev-plane-state off">○ OFF</span>';
+    return '<div class="tp-mkt-detail-plane-row">'
+      +'<span class="tp-mkt-detail-plane-nm'+(state==='dis'?' dis':'')+'">'+info.label+'</span>'+pill+'</div>';
+  }).join('');
+
+  function listItems(arr, cnt, color) {
+    if (!arr || !arr.length) {
+      return '<div class="tp-mkt-detail-item"><span class="tp-mkt-detail-item-txt" style="color:var(--t4);font-style:italic">'+(cnt ? cnt+' items (detail not loaded)' : 'None')+'</span></div>';
+    }
+    return arr.slice(0,6).map(it => '<div class="tp-mkt-detail-item">'
+      +'<span class="tp-mkt-detail-dot" style="background:'+color+';margin-top:5px"></span>'
+      +'<span class="tp-mkt-detail-item-txt">'+(it.q||it.title||it.name||it)+'</span>'
+      +'</div>').join('') + (arr.length>6 ? '<div class="tp-mkt-detail-item"><span class="tp-mkt-detail-item-txt" style="color:var(--t4)">+' +(arr.length-6)+' more…</span></div>' : '');
+  }
+
+  detail.innerHTML = `
+    <div class="tp-mkt-detail-hd">
+      <div class="tp-mkt-detail-ico" style="background:${tagBg};border:1px solid ${tagColor}40">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3l1.8 4.2L16 9l-4.2 1.8L10 15l-1.8-4.2L4 9l4.2-1.8L10 3z" stroke="${tagColor}" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="flex:1">
+        <div class="tp-mkt-detail-nm">${d.name}</div>
+        <div class="tp-mkt-detail-desc">${d.desc||''}</div>
+        <div class="tp-mkt-detail-meta">
+          <span class="tp-mkt-detail-stat"><strong>${d._factsCnt||d.facts?.length||0}</strong> facts</span>
+          <span class="tp-mkt-detail-stat-sep"></span>
+          <span class="tp-mkt-detail-stat"><strong>${d._claimsCnt||d.claims?.length||0}</strong> claims</span>
+          <span class="tp-mkt-detail-stat-sep"></span>
+          <span class="tp-mkt-detail-stat"><strong>${d._docsCnt||d.docs?.length||0}</strong> docs</span>
+          <span style="display:inline-flex;align-items:center;height:20px;padding:0 9px;border-radius:20px;font-size:10px;font-weight:700;background:${tagBg};color:${tagColor};margin-left:4px">${tag}</span>
+        </div>
+      </div>
+    </div>
+    <div class="tp-mkt-detail-body">
+      <div class="tp-mkt-detail-sec">
+        <div class="tp-mkt-detail-sec-hd"><span>Facts / FAQs</span><span class="tp-mkt-detail-sec-cnt">${d._factsCnt||d.facts?.length||0} items</span></div>
+        ${listItems(d.facts, d._factsCnt, '#93C5FD')}
+      </div>
+      <div class="tp-mkt-detail-sec">
+        <div class="tp-mkt-detail-sec-hd"><span>Claims (Sandbox)</span><span class="tp-mkt-detail-sec-cnt">${d._claimsCnt||d.claims?.length||0} items</span></div>
+        ${listItems(d.claims, d._claimsCnt, '#C4B5FD')}
+      </div>
+      <div class="tp-mkt-detail-sec">
+        <div class="tp-mkt-detail-sec-hd"><span>Documents / Sources</span><span class="tp-mkt-detail-sec-cnt">${d._docsCnt||d.docs?.length||0} items</span></div>
+        ${listItems(d.docs, d._docsCnt, '#6EE7B7')}
+      </div>
+      <div class="tp-mkt-detail-sec">
+        <div class="tp-mkt-detail-sec-hd"><span>Planes</span></div>
+        <div class="tp-mkt-detail-planes">${planeHtml}</div>
+      </div>
+    </div>
+    <div class="tp-mkt-detail-add-row">
+      ${isAdded
+        ? '<button class="tp-mkt-card-add added" disabled>✓ Added</button>'
+        : '<button class="tp-mkt-card-add" onclick="addTpFromMkt(\''+packId+'\');renderTpMktDetailPanel(\''+packId+'\')">+ Add to network</button>'
+      }
+    </div>`;
+}
 
 function filterTpMkt(cat, btn) {
   tpMktCategory = cat;
@@ -4701,7 +5202,7 @@ function renderTpMktGrid(query) {
       +'<div class="tp-mkt-card-ft">'
       +'<span class="tp-mkt-card-tag" style="background:'+p.tagBg+';color:'+p.tagColor+'">'+p.tag+'</span>'
       +'<div style="display:flex;gap:6px;align-items:center">'
-      +'<button class="tp-mkt-card-eye-btn" onclick="event.stopPropagation();openTpPreview(\''+p.id+'\')" title="Preview pack contents">'
+      +'<button class="tp-mkt-card-eye-btn" onclick="event.stopPropagation();navigateTpMkt(\''+p.id+'\')" title="View pack details">'
       +'<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2.5-4.5 6-4.5S13 7 13 7s-2.5 4.5-6 4.5S1 7 1 7z" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="1.8" fill="currentColor"/></svg>'
       +'</button>'
       +'<button class="tp-mkt-card-add'+(added?' added':'')+'" '+(added?'disabled':'onclick="addTpFromMkt(\''+p.id+'\')"')+'>'
