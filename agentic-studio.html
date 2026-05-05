@@ -4819,8 +4819,9 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
   const treeHtml = children.length ? children.map(c => {
     const isFolder = c.type==='folder';
     const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
+    const pathAttr = JSON.stringify(newPath).replace(/"/g,'&quot;');
     return '<div class="tp-mkt-tree-item '+(isFolder?'folder clickable':'file')+'"'
-      +(isFolder ? ' onclick="navigateDrvMkt(\''+driveId+'\','+JSON.stringify(newPath)+')"' : '')+'>'
+      +(isFolder ? ' onclick="navigateDrvMkt(\''+driveId+'\',JSON.parse(decodeURIComponent(\''+encodeURIComponent(JSON.stringify(newPath))+'\')));"' : '')+'>'
       +(isFolder
         ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>'
         : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h6l3 3v8H3v-11z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5V5h3" stroke="currentColor" stroke-width="1.2"/></svg>')
