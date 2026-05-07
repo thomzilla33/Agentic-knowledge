@@ -123,11 +123,11 @@ nav.sidebar:not(.sb-expanded) .sb-item.active .sb-item-icon { background: linear
 nav.sidebar.sb-expanded .sb-item.active { background: rgba(43,127,255,0.10); color: rgba(255,255,255,0.90); }
 nav.sidebar.sb-expanded .sb-item.active .sb-item-icon { background: linear-gradient(135deg,#00C2C2 0%,#155DFC 100%); color: #fff; }
 .sb-item.active:hover .sb-item-icon { background: linear-gradient(135deg,#00C2C2 0%,#155DFC 100%); }
-.sb-label { opacity: 0; transition: opacity .12s; pointer-events: none; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-nav.sidebar.sb-expanded .sb-label { opacity: 1; pointer-events: auto; }
-.sb-chevron { margin-left: auto; width: 14px; height: 14px; flex-shrink: 0; transition: transform .2s; opacity: 0; color: var(--color-icon-primary-default); }
+.sb-label { display: none; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+nav.sidebar.sb-expanded .sb-label { display: block; opacity: 1; pointer-events: auto; }
+.sb-chevron { display: none; margin-left: auto; width: 14px; height: 14px; flex-shrink: 0; transition: transform .2s; color: var(--color-icon-primary-default); }
 .sb-item.sb-open .sb-chevron { transform: rotate(90deg); }
-nav.sidebar.sb-expanded .sb-chevron { opacity: 1; }
+nav.sidebar.sb-expanded .sb-chevron { display: block; }
 .sb-popup { position: fixed; display: none; background: #0d1323; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; padding: 6px; min-width: 220px; box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 12px 32px rgba(0,0,0,0.45), 0 24px 56px rgba(0,0,0,0.35); z-index: 150; opacity: 0; transform: translateX(-4px); transition: opacity .15s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1); pointer-events: none; }
 .sb-popup.open { display: block; opacity: 1; transform: translateX(0); pointer-events: auto; }
 .sb-popup-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.38); padding: 8px 10px 10px; letter-spacing: 0.01em; }
@@ -502,6 +502,40 @@ table, .table { width: 100%; border-collapse: collapse; }
     .chrow__times { display: flex; align-items: center; gap: 8px; }
     .chrow__sel { height: 30px !important; font-size: 12px !important; }
     .field-hint { font-size: 11px; color: var(--color-text-caption); margin-top: 4px; line-height: 1.4; }
+    .pagination { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 12px 16px; border-top: 1px solid var(--color-border-neutral-default); background: var(--color-surface-neutral-subtle); }
+    .pgn-rpp { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-caption); }
+    .pgn-rpp-select { height: 28px; padding: 0 26px 0 10px; background: var(--color-surface-neutral-default); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-sm); color: var(--color-text-body); font-family: inherit; font-size: 12px; appearance: none; cursor: pointer; outline: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 16 16' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='1.5'><path d='M4 6l4 4 4-4'/></svg>"); background-repeat: no-repeat; background-position: right 8px center; }
+    .pgn-rpp-select:hover { border-color: var(--color-border-neutral-lighter); }
+    .pgn-range { font-size: 12px; color: var(--color-text-caption); white-space: nowrap; }
+    .pgn-nav { display: flex; align-items: center; gap: 4px; }
+    .pgn-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); border: 1px solid var(--color-border-neutral-default); background: var(--color-surface-neutral-default); color: var(--color-text-body); cursor: pointer; transition: background .12s, color .12s, border-color .12s; }
+    .pgn-btn:hover:not(:disabled) { background: var(--color-surface-neutral-emphasis); border-color: var(--color-border-neutral-lighter); color: var(--color-text-title); }
+    .pgn-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .pgn-page-input { width: 44px; height: 28px; padding: 0 6px; background: var(--color-surface-neutral-default); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-sm); color: var(--color-text-body); font-family: inherit; font-size: 12px; text-align: center; outline: none; }
+    .pgn-page-input:focus { border-color: var(--color-border-primary-default); }
+    .pgn-page-of { font-size: 12px; color: var(--color-text-caption); }
+    /* ── Avatar list (DS) — assigned-to & similar ────────────────── */
+    .avatar-list { display: inline-flex; align-items: center; gap: 8px; }
+    .avatar-list__stack { display: inline-flex; align-items: center; }
+    .avatar { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 50%; font-weight: 700; color: #fff; background: linear-gradient(135deg, #155DFC 0%, #00C2C2 100%); letter-spacing: -.02em; user-select: none; }
+    .avatar-list__stack > .avatar { margin-left: -7px; border: 2px solid var(--color-surface-neutral-black); box-shadow: 0 0 0 1px rgba(255,255,255,0.04); }
+    .avatar-list__stack > .avatar:first-child { margin-left: 0; }
+    .avatar--m { width: 24px; height: 24px; font-size: 9px; }
+    .avatar--s { width: 20px; height: 20px; font-size: 8px; }
+    .avatar--violet { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); }
+    .avatar-list__count { font-size: 13px; font-weight: 500; color: var(--color-text-body); white-space: nowrap; }
+    .avatar-list { cursor: default; }
+    /* Shared rich tooltip for avatar lists */
+    .alt-tooltip { position: fixed; z-index: 800; min-width: 220px; max-width: 280px; background: #131929; border: 1px solid rgba(255,255,255,0.10); border-radius: 10px; padding: 10px 4px; box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 12px 32px rgba(0,0,0,0.45), 0 24px 56px rgba(0,0,0,0.35); opacity: 0; transform: translateY(-4px); transition: opacity .12s, transform .12s; pointer-events: none; }
+    .alt-tooltip.open { opacity: 1; transform: translateY(0); }
+    .alt-tooltip__header { padding: 4px 12px 8px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.40); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 4px; }
+    .alt-tooltip__item { display: flex; align-items: center; gap: 10px; padding: 7px 12px; }
+    .alt-tooltip__avatar { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #155DFC 0%, #00C2C2 100%); }
+    .alt-tooltip__avatar.network { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); }
+    .alt-tooltip__name { flex: 1; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .alt-tooltip__kind { font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0; }
+    .alt-tooltip__kind.agent { background: rgba(43,127,255,0.15); color: #80AFFF; }
+    .alt-tooltip__kind.network { background: rgba(139,92,246,0.18); color: #c4b5fd; }
     /* A11y: visible focus ring (WCAG 2.4.7). Only when navigating via keyboard. */
     button:focus-visible, a:focus-visible, [role="button"]:focus-visible, [role="tab"]:focus-visible, [tabindex="0"]:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--color-border-primary-default); outline-offset: 2px; border-radius: 4px; }
     button:focus:not(:focus-visible), a:focus:not(:focus-visible), [role="button"]:focus:not(:focus-visible), [role="tab"]:focus:not(:focus-visible) { outline: none; }
@@ -642,26 +676,25 @@ table, .table { width: 100%; border-collapse: collapse; }
             <p class="text-title-sm" style="margin-bottom:4px">Voice</p>
             <p class="text-body-md" style="margin-bottom:18px;color:var(--color-text-caption)">Phone numbers, policies and activity for the Voice channel.</p>
             <div class="tabs" style="margin-bottom:24px">
-              <div class="tab-item active" id="vt-numbers" onclick="voiceTab('numbers')">Numbers <span class="tab-count">12</span></div>
-              <div class="tab-item" id="vt-security" onclick="voiceTab('security')">Security <span id="vt-sec-count" class="tab-count">2</span></div>
+              <div class="tab-item active" id="vt-numbers" onclick="voiceTab('numbers')">Numbers</div>
+              <div class="tab-item" id="vt-security" onclick="voiceTab('security')">Security</div>
             </div>
             <div id="voice-tab-numbers">
             <div class="stat-strip">
-              <div class="stat-card"><div class="stat-label">Total Numbers</div><div class="stat-value">12</div><div class="stat-delta up">+2 this month</div></div>
-              <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" style="color:var(--color-text-success)">9</div><div class="stat-delta">3 unassigned</div></div>
-              <div class="stat-card"><div class="stat-label">Calls Today</div><div class="stat-value">147</div><div class="stat-delta up">+23 vs yesterday</div></div>
+              <div class="stat-card"><div class="stat-label">Total Numbers</div><div class="stat-value" id="stat-total">—</div><div class="stat-delta up">+8 this month</div></div>
+              <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" id="stat-active" style="color:var(--color-text-success)">—</div><div class="stat-delta" id="stat-unassigned">—</div></div>
+              <div class="stat-card"><div class="stat-label">Calls Today</div><div class="stat-value">487</div><div class="stat-delta up">+62 vs yesterday</div></div>
               <div class="stat-card"><div class="stat-label">Avg Duration</div><div class="stat-value">3:42</div><div class="stat-delta">minutes</div></div>
             </div>
-            <p style="font-size:13px;color:var(--color-text-caption);margin-bottom:16px">Buy and manage phone numbers. Assign them to agents from the agent's Channels tab.</p>
             <div class="filter-bar">
               <div class="tab-group" id="tg-status">
-                <button class="tg-btn active" onclick="setTabGroup('tg-status',this)">All <span class="tg-cnt">12</span></button>
-                <button class="tg-btn" onclick="setTabGroup('tg-status',this)">Inbound <span class="tg-cnt">7</span></button>
-                <button class="tg-btn" onclick="setTabGroup('tg-status',this)">Outbound <span class="tg-cnt">3</span></button>
-                <button class="tg-btn" onclick="setTabGroup('tg-status',this)">Unassigned <span class="tg-cnt">3</span></button>
+                <button class="tg-btn active" data-filter="all" onclick="setTabGroup('tg-status',this);numbersFilter('all')">All <span class="tg-cnt" id="cnt-all">0</span></button>
+                <button class="tg-btn" data-filter="inbound" onclick="setTabGroup('tg-status',this);numbersFilter('inbound')">Inbound <span class="tg-cnt" id="cnt-inbound">0</span></button>
+                <button class="tg-btn" data-filter="outbound" onclick="setTabGroup('tg-status',this);numbersFilter('outbound')">Outbound <span class="tg-cnt" id="cnt-outbound">0</span></button>
+                <button class="tg-btn" data-filter="unassigned" onclick="setTabGroup('tg-status',this);numbersFilter('unassigned')">Unassigned <span class="tg-cnt" id="cnt-unassigned">0</span></button>
               </div>
               <div style="margin-left:auto;display:flex;gap:8px">
-                <input class="input input-sm" placeholder="Search numbers or labels…" aria-label="Search numbers or labels" style="width:220px">
+                <input class="input input-sm" placeholder="Search numbers or labels…" aria-label="Search numbers or labels" style="width:220px" oninput="numbersSearch(this.value)">
                 <button class="btn btn-primary btn-sm" onclick="openBuyModal()">
                   <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12"/></svg>
                   Buy Number
@@ -670,86 +703,30 @@ table, .table { width: 100%; border-collapse: collapse; }
             </div>
             <div class="table-container">
               <table class="table">
-                <colgroup><col style="width:160px"><col style="width:130px"><col style="width:110px"><col style="width:90px"><col style="width:170px"><col style="width:100px"><col style="width:80px"><col style="width:56px"></colgroup>
-                <thead><tr><th>Number</th><th>Label</th><th>Type</th><th>Status</th><th>Assigned to</th><th>Capabilities</th><th>Calls 30d</th><th></th></tr></thead>
-                <tbody>
-                  <tr onclick="showScreen('agents')">
-                    <td><span class="mono">+1 (305) 892-4710</span></td>
-                    <td style="font-weight:500;color:var(--color-text-title)">Service Desk</td>
-                    <td><span class="badge badge-both">In + Out</span></td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>
-                      <div class="assigned-group">
-                        <div class="assigned-avatars">
-                          <div class="agent-icon primary"><svg width="11" height="11" fill="none" stroke="var(--color-icon-primary-default)" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="6" r="3"/><path d="M2 13c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></div>
-                          <div class="agent-icon primary"><svg width="11" height="11" fill="none" stroke="var(--color-icon-primary-default)" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="6" r="3"/><path d="M2 13c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></div>
-                          <div class="agent-icon primary"><svg width="11" height="11" fill="none" stroke="var(--color-icon-primary-default)" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="6" r="3"/><path d="M2 13c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></div>
-                        </div>
-                        <span class="assigned-name">Sammy</span>
-                        <span class="assigned-overflow" data-names="Alex · Notify Bot · Support AI · Intake Bot">+4 more</span>
-                      </div>
-                    </td>
-                    <td><div class="flex gap-1"><span class="cap-pill">Voice</span><span class="cap-pill">SMS</span></div></td>
-                    <td><span class="calls-high">312</span></td>
-                    <td><div class="ract"><button class="btn-icon-sm" aria-label="Row actions" title="Row actions" onclick="event.stopPropagation();toast('Row actions menu')"><svg width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="4" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="12" r="1.5"/></svg></button></div></td>
-                  </tr>
-                  <tr>
-                    <td><span class="mono">+1 (786) 221-0034</span></td>
-                    <td style="font-weight:500;color:var(--color-text-title)">Sales BDC</td>
-                    <td><span class="badge badge-inbound">Inbound</span></td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>
-                      <div class="assigned-group">
-                        <div class="assigned-avatars"><div class="agent-icon primary"><svg width="11" height="11" fill="none" stroke="var(--color-icon-primary-default)" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="6" r="3"/><path d="M2 13c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></div></div>
-                        <span class="assigned-name">Alex</span>
-                      </div>
-                    </td>
-                    <td><span class="cap-pill">Voice</span></td>
-                    <td><span class="calls-low">84</span></td>
-                    <td><div class="ract"><button class="btn-icon-sm" aria-label="Row actions" title="Row actions" onclick="event.stopPropagation();toast('Row actions menu')"><svg width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="4" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="12" r="1.5"/></svg></button></div></td>
-                  </tr>
-                  <tr>
-                    <td><span class="mono">+1 (954) 448-9201</span></td>
-                    <td style="font-weight:500;color:var(--color-text-title)">Overnight BDC</td>
-                    <td><span class="badge badge-inbound">Inbound</span></td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>
-                      <div class="assigned-group">
-                        <div class="assigned-avatars"><div class="agent-icon violet"><svg width="11" height="11" fill="none" stroke="#a78bfa" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="5" r="2"/><path d="M2 13c0-2.5 2-4.5 6-4.5s6 2 6 4.5"/></svg></div></div>
-                        <span class="assigned-name" style="color:#a78bfa">BDC Network</span>
-                      </div>
-                    </td>
-                    <td><span class="cap-pill">Voice</span></td>
-                    <td><span class="calls-low">201</span></td>
-                    <td><div class="ract"><button class="btn-icon-sm" aria-label="Row actions" title="Row actions" onclick="event.stopPropagation();toast('Row actions menu')"><svg width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="4" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="12" r="1.5"/></svg></button></div></td>
-                  </tr>
-                  <tr>
-                    <td><span class="mono">+1 (305) 740-5580</span></td>
-                    <td style="font-weight:500;color:var(--color-text-title)">Appt Reminders</td>
-                    <td><span class="badge badge-outbound">Outbound</span></td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>
-                      <div class="assigned-group">
-                        <div class="assigned-avatars"><div class="agent-icon primary"><svg width="11" height="11" fill="none" stroke="var(--color-icon-primary-default)" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="6" r="3"/><path d="M2 13c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></div></div>
-                        <span class="assigned-name">Notify Bot</span>
-                      </div>
-                    </td>
-                    <td><div class="flex gap-1"><span class="cap-pill">Voice</span><span class="cap-pill">SMS</span></div></td>
-                    <td><span class="calls-low">56</span></td>
-                    <td><div class="ract"><button class="btn-icon-sm" aria-label="Row actions" title="Row actions" onclick="event.stopPropagation();toast('Row actions menu')"><svg width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="4" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="12" r="1.5"/></svg></button></div></td>
-                  </tr>
-                  <tr>
-                    <td><span class="mono" style="opacity:.45">+1 (786) 558-1102</span></td>
-                    <td style="color:var(--color-text-caption);font-style:italic">No label</td>
-                    <td><span class="badge badge-draft">—</span></td>
-                    <td><span class="badge badge-inactive">Unassigned</span></td>
-                    <td style="color:var(--color-text-caption)">Not assigned</td>
-                    <td><span class="cap-pill">Voice</span></td>
-                    <td class="calls-low">0</td>
-                    <td><div class="ract"><button class="btn btn-primary btn-sm" onclick="showScreen('agents');event.stopPropagation()">Assign</button></div></td>
-                  </tr>
-                </tbody>
+                <colgroup><col style="width:160px"><col style="width:130px"><col style="width:110px"><col style="width:90px"><col style="width:170px"><col style="width:100px"><col style="width:80px"></colgroup>
+                <thead><tr><th>Number</th><th>Label</th><th>Type</th><th>Status</th><th>Assigned to</th><th>Capabilities</th><th>Calls 30d</th></tr></thead>
+                <tbody id="numbers-tbody"></tbody>
               </table>
+              <div class="pagination" id="numbers-pagination">
+                <div class="pgn-rpp">
+                  <span>Rows per page</span>
+                  <select class="pgn-rpp-select" id="pgn-rpp" aria-label="Rows per page" onchange="numbersPageSize(this.value)">
+                    <option value="10">10</option>
+                    <option value="25" selected>25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+                <div class="pgn-range" id="pgn-range">—</div>
+                <div class="pgn-nav">
+                  <button class="pgn-btn" id="pgn-first" aria-label="First page" title="First" onclick="numbersGoTo('first')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M11 3L6 8l5 5M3 3v10"/></svg></button>
+                  <button class="pgn-btn" id="pgn-prev" aria-label="Previous page" title="Previous" onclick="numbersGoTo('prev')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></svg></button>
+                  <input class="pgn-page-input" id="pgn-page" type="number" min="1" value="1" aria-label="Current page" onchange="numbersGoToPage(this.value)" onfocus="this.select()">
+                  <span class="pgn-page-of" id="pgn-page-of">/ 1</span>
+                  <button class="pgn-btn" id="pgn-next" aria-label="Next page" title="Next" onclick="numbersGoTo('next')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg></button>
+                  <button class="pgn-btn" id="pgn-last" aria-label="Last page" title="Last" onclick="numbersGoTo('last')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M5 3l5 5-5 5M13 3v10"/></svg></button>
+                </div>
+              </div>
             </div>
             </div><!-- /voice-tab-numbers -->
             <div id="voice-tab-security" style="display:none">
@@ -1522,7 +1499,6 @@ table, .table { width: 100%; border-collapse: collapse; }
               </div>
             </div>
             <div class="flex items-center gap-2" style="margin-left:12px">
-              <button class="btn btn-secondary btn-sm" id="cd-dl" onclick="toast('Download call recording')">Download</button>
               <button class="btn-icon-sm" onclick="closeCallDetail()" aria-label="Close call detail" title="Close">
                 <svg width="14" height="14" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg>
               </button>
@@ -2295,10 +2271,12 @@ function openCallDetail(id){
   document.getElementById('cd-meta').innerHTML=html;
   document.getElementById('cd-full-transcript').innerHTML=renderTranscript(d.transcript);
   document.getElementById('cd-full-recording').innerHTML='<div class="section-title mb-3">Recording</div>' + buildPlayer() +
-    '<div style="margin-top:16px"><div class="section-title mb-2">Download</div><div class="flex gap-2">' +
-    '<button class="btn btn-secondary btn-sm" onclick="toast(\'Download MP3 audio\')">MP3 audio</button>' +
-    '<button class="btn btn-secondary btn-sm" onclick="toast(\'Download transcript PDF\')">Transcript PDF</button>' +
-    '<button class="btn btn-secondary btn-sm" onclick="toast(\'Download transcript TXT\')">Transcript TXT</button></div></div>';
+    '<div style="margin-top:16px"><div class="flex items-center gap-2 mb-2"><div class="section-title">Download</div><span class="badge badge-alert" style="font-size:10px">Coming soon</span></div>' +
+    '<div class="flex gap-2">' +
+    '<button class="btn btn-secondary btn-sm" disabled aria-disabled="true" title="Coming soon">MP3 audio</button>' +
+    '<button class="btn btn-secondary btn-sm" disabled aria-disabled="true" title="Coming soon">Transcript PDF</button>' +
+    '<button class="btn btn-secondary btn-sm" disabled aria-disabled="true" title="Coming soon">Transcript TXT</button>' +
+    '</div></div>';
   document.getElementById('cd-timeline').innerHTML=d.timeline.map(ev=>'<div class="tl-item"><div class="tl-dot" style="background:'+ev.c+'"><svg width="12" height="12" fill="none" stroke="'+ev.s+'" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></div><div style="flex:1;padding-top:4px"><div class="tl-label">'+ev.label+'</div><div class="tl-meta">'+ev.meta+'</div>'+(ev.note?'<div class="tl-note">'+ev.note+'</div>':'')+'</div></div>').join('');
   document.querySelectorAll('.cd-tab').forEach(t=>t.classList.remove('active'));
   document.querySelector('.cd-tab').classList.add('active');
@@ -2374,6 +2352,237 @@ document.addEventListener('keydown', function(e){
     }
   });
 })();
+// ─── Numbers table data ──────────────────────────────────────────
+const NUMBERS_DATA = (function buildNumbers(){
+  const labels = ['Service Desk','Sales BDC','Overnight BDC','Appt Reminders','Spanish Line','VIP Hotline','Survey Outbound','Tech Support L1','Tech Support L2','Renewals','Win-back','New Customer','Service Center','Lead Routing','Demo Bookings','Loyalty','Collections','Fleet Hotline','Parts Desk','Warranty Claims','Roadside Assist','Trade-in Desk','Finance Desk','Insurance Desk','Body Shop','Service Loaners','Recall Outreach','Owner Marketing','Spanish Service','French Service','Reception','Concierge','24/7 Hotline','Manager Direct','Switchboard','Backup Line','Test Drive Line','Internet Sales','Phone Sales','Lease Returns','Used Car Desk','Express Service','Detail Pickup','Parts Direct','RV Service','Marine Desk','Pre-Owned','Special Ops','Outbound BDC','Recall BDC','Lost Customer','New Owner','First-Time Service','Maintenance Plan','Tire Rotation','Oil Change','Body Damage','Insurance Q&amp;A','Spanish Sales','Translation Line'];
+  const agents = [
+    {name:'Sammy',type:'primary',extra:4,extraNames:'Alex · Notify Bot · Support AI · Intake Bot'},
+    {name:'Alex',type:'primary'},
+    {name:'BDC Network',type:'violet'},
+    {name:'Notify Bot',type:'primary'},
+    {name:'Support AI',type:'primary',extra:2,extraNames:'Sammy · Notify Bot'},
+    {name:'Sales Squad',type:'violet'},
+    {name:'Intake Bot',type:'primary'},
+    {name:'Service Net',type:'violet'},
+    {name:'Concierge AI',type:'primary'},
+    {name:'Renewals AI',type:'primary'},
+    {name:'Reactivation',type:'violet'},
+    {name:'Onboarding',type:'primary'},
+  ];
+  const areaCodes = ['305','786','954','407','321','561','754','239','863','727','813','850','352','386','727'];
+  const types = ['both','inbound','outbound'];
+  const out = [];
+  let i = 0;
+  for(let n = 0; n < 60; n++){
+    const ac = areaCodes[n % areaCodes.length];
+    const mid = String(200 + ((n*37) % 800)).padStart(3,'0');
+    const last = String((n*7919 + 1234) % 10000).padStart(4,'0');
+    const number = '+1 ('+ac+') '+mid+'-'+last;
+    const unassigned = (n % 11 === 9) || (n % 13 === 12);
+    const type = unassigned ? null : types[n % 3];
+    const label = unassigned ? null : labels[n % labels.length];
+    const agent = unassigned ? null : agents[n % agents.length];
+    const calls = unassigned ? 0 : Math.floor(20 + ((n*1117) % 380));
+    const caps = (n % 5 === 0 && !unassigned) ? ['Voice','SMS'] : (n % 7 === 0 ? ['Voice','SMS'] : ['Voice']);
+    out.push({ id: n+1, number, label, type, status: unassigned ? 'unassigned' : 'active', agent, capabilities: caps, calls });
+  }
+  return out;
+})();
+const NUMBERS_STATE = { filter: 'all', search: '', page: 1, pageSize: 25 };
+function _initials(name){
+  if(!name) return '';
+  const parts = name.replace(/[^A-Za-z0-9 ]/g,'').trim().split(/\s+/);
+  if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+function _isNetworkName(n){ return /\b(network|net|squad)\b/i.test(n||''); }
+function _renderAssigned(agent){
+  if(!agent) return '<span style="color:var(--color-text-caption)">Not assigned</span>';
+  const isVioletPrimary = agent.type==='violet';
+  const total = 1 + (agent.extra || 0);
+  const visible = Math.min(3, total);
+  const overflow = total - visible;
+  const allNames = [agent.name].concat((agent.extraNames||'').split(' · ').map(s=>s.trim()).filter(Boolean));
+  // Build members with kind detection
+  const members = allNames.map((n,i)=>({
+    name: n,
+    kind: (i===0 ? (isVioletPrimary ? 'network' : 'agent') : (_isNetworkName(n) ? 'network' : 'agent'))
+  }));
+  let avatars = '';
+  for(let i = 0; i < visible; i++){
+    const m = members[i];
+    const variant = m.kind==='network' ? ' avatar--violet' : '';
+    const initials = _initials(m.name);
+    const fullName = m.name.replace(/"/g,'&quot;');
+    avatars += '<span class="avatar avatar--m'+variant+'" aria-label="'+fullName+'">'+initials+'</span>';
+  }
+  const dataAttr = ' data-members="'+encodeURIComponent(JSON.stringify(members))+'"';
+  let html = '<div class="avatar-list avatar-list--m"'+dataAttr+'><div class="avatar-list__stack">'+avatars+'</div>';
+  if(overflow > 0) html += '<span class="avatar-list__count">+'+overflow+'</span>';
+  html += '</div>';
+  return html;
+}
+function _renderType(type){
+  if(type==='both') return '<span class="badge badge-both">In + Out</span>';
+  if(type==='inbound') return '<span class="badge badge-inbound">Inbound</span>';
+  if(type==='outbound') return '<span class="badge badge-outbound">Outbound</span>';
+  return '<span class="badge badge-draft">—</span>';
+}
+function _renderStatus(s){
+  if(s==='active') return '<span class="badge badge-active">Active</span>';
+  return '<span class="badge badge-inactive">Unassigned</span>';
+}
+function _renderCalls(n){
+  if(n>=200) return '<span class="calls-high">'+n+'</span>';
+  return '<span class="calls-low">'+n+'</span>';
+}
+function _filterNumbers(){
+  const q = NUMBERS_STATE.search.trim().toLowerCase();
+  return NUMBERS_DATA.filter(r=>{
+    if(NUMBERS_STATE.filter==='inbound' && !(r.type==='inbound' || r.type==='both')) return false;
+    if(NUMBERS_STATE.filter==='outbound' && !(r.type==='outbound' || r.type==='both')) return false;
+    if(NUMBERS_STATE.filter==='unassigned' && r.status!=='unassigned') return false;
+    if(q){
+      const hay = (r.number+' '+(r.label||'')+' '+(r.agent?.name||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+function _updateCounts(){
+  const total = NUMBERS_DATA.length;
+  const inbound = NUMBERS_DATA.filter(r=>r.type==='inbound'||r.type==='both').length;
+  const outbound = NUMBERS_DATA.filter(r=>r.type==='outbound'||r.type==='both').length;
+  const unassigned = NUMBERS_DATA.filter(r=>r.status==='unassigned').length;
+  const active = total - unassigned;
+  const set=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=v;};
+  set('cnt-all', total); set('cnt-inbound', inbound); set('cnt-outbound', outbound); set('cnt-unassigned', unassigned);
+  set('stat-total', total);
+  set('stat-active', active);
+  set('stat-unassigned', unassigned + ' unassigned');
+}
+function renderNumbers(){
+  const tbody = document.getElementById('numbers-tbody'); if(!tbody) return;
+  const rows = _filterNumbers();
+  const ps = NUMBERS_STATE.pageSize;
+  const totalPages = Math.max(1, Math.ceil(rows.length / ps));
+  if(NUMBERS_STATE.page > totalPages) NUMBERS_STATE.page = totalPages;
+  if(NUMBERS_STATE.page < 1) NUMBERS_STATE.page = 1;
+  const start = (NUMBERS_STATE.page - 1) * ps;
+  const end = Math.min(start + ps, rows.length);
+  const page = rows.slice(start, end);
+  let html = '';
+  if(page.length===0){
+    html = '<tr><td colspan="7" style="text-align:center;padding:32px 16px;color:var(--color-text-caption)">No numbers match the current filter.</td></tr>';
+  } else {
+    page.forEach(r=>{
+      const numCol = r.status==='unassigned'
+        ? '<td><span class="mono" style="opacity:.45">'+r.number+'</span></td>'
+        : '<td><span class="mono">'+r.number+'</span></td>';
+      const labelCol = r.label
+        ? '<td style="font-weight:500;color:var(--color-text-title)">'+r.label+'</td>'
+        : '<td style="color:var(--color-text-caption);font-style:italic">No label</td>';
+      const capsHtml = r.capabilities.map(c=>'<span class="cap-pill">'+c+'</span>').join('');
+      const capsCol = r.capabilities.length>1 ? '<td><div class="flex gap-1">'+capsHtml+'</div></td>' : '<td>'+capsHtml+'</td>';
+      const onclick = r.status==='active' ? ' onclick="showScreen(\'agents\')"' : '';
+      html += '<tr'+onclick+'>'
+        + numCol + labelCol
+        + '<td>'+_renderType(r.type)+'</td>'
+        + '<td>'+_renderStatus(r.status)+'</td>'
+        + '<td>'+_renderAssigned(r.agent)+'</td>'
+        + capsCol
+        + '<td>'+_renderCalls(r.calls)+'</td>'
+        + '</tr>';
+    });
+  }
+  tbody.innerHTML = html;
+  // Update pagination UI
+  const rangeEl = document.getElementById('pgn-range');
+  if(rangeEl) rangeEl.textContent = rows.length===0 ? '0 of 0' : ((start+1)+'–'+end+' of '+rows.length);
+  const pageInput = document.getElementById('pgn-page'); if(pageInput){ pageInput.value = NUMBERS_STATE.page; pageInput.max = totalPages; }
+  const pageOf = document.getElementById('pgn-page-of'); if(pageOf) pageOf.textContent = '/ '+totalPages;
+  const isFirst = NUMBERS_STATE.page<=1, isLast = NUMBERS_STATE.page>=totalPages;
+  ['pgn-first','pgn-prev'].forEach(id=>{const b=document.getElementById(id); if(b) b.disabled=isFirst;});
+  ['pgn-next','pgn-last'].forEach(id=>{const b=document.getElementById(id); if(b) b.disabled=isLast;});
+}
+function numbersFilter(f){ NUMBERS_STATE.filter = f; NUMBERS_STATE.page = 1; renderNumbers(); }
+function numbersSearch(q){ NUMBERS_STATE.search = q; NUMBERS_STATE.page = 1; renderNumbers(); }
+function numbersPageSize(s){ NUMBERS_STATE.pageSize = parseInt(s,10); NUMBERS_STATE.page = 1; renderNumbers(); }
+function numbersGoTo(dir){
+  const total = _filterNumbers().length;
+  const totalPages = Math.max(1, Math.ceil(total / NUMBERS_STATE.pageSize));
+  if(dir==='first') NUMBERS_STATE.page = 1;
+  else if(dir==='prev') NUMBERS_STATE.page = Math.max(1, NUMBERS_STATE.page-1);
+  else if(dir==='next') NUMBERS_STATE.page = Math.min(totalPages, NUMBERS_STATE.page+1);
+  else if(dir==='last') NUMBERS_STATE.page = totalPages;
+  renderNumbers();
+}
+function numbersGoToPage(v){
+  const n = parseInt(v,10);
+  if(!isNaN(n)) { NUMBERS_STATE.page = n; renderNumbers(); }
+}
+// ── Avatar list rich tooltip ─────────────────────────────────
+(function initAvatarListTooltip(){
+  let tip = null;
+  function ensureTip(){
+    if(tip) return tip;
+    tip = document.createElement('div');
+    tip.className = 'alt-tooltip';
+    tip.setAttribute('role','tooltip');
+    document.body.appendChild(tip);
+    return tip;
+  }
+  function buildTip(members){
+    const header = '<div class="alt-tooltip__header">'+members.length+' assignee'+(members.length===1?'':'s')+'</div>';
+    const items = members.map(m=>{
+      const initials = _initials(m.name);
+      const variant = m.kind==='network' ? 'network' : '';
+      const tag = m.kind==='network'
+        ? '<span class="alt-tooltip__kind network">Network</span>'
+        : '<span class="alt-tooltip__kind agent">Agent</span>';
+      return '<div class="alt-tooltip__item"><span class="alt-tooltip__avatar '+variant+'">'+initials+'</span><span class="alt-tooltip__name">'+m.name.replace(/</g,'&lt;')+'</span>'+tag+'</div>';
+    }).join('');
+    return header+items;
+  }
+  function show(target){
+    const raw = target.getAttribute('data-members'); if(!raw) return;
+    let members; try { members = JSON.parse(decodeURIComponent(raw)); } catch(e){ return; }
+    if(!members || !members.length) return;
+    const t = ensureTip();
+    t.innerHTML = buildTip(members);
+    // Position: prefer above the target; if not enough space, below
+    const r = target.getBoundingClientRect();
+    t.style.left = '0px'; t.style.top = '0px'; t.classList.add('open');
+    const tw = t.offsetWidth, th = t.offsetHeight;
+    let top = r.bottom + 8;
+    let left = r.left;
+    if(top + th > window.innerHeight - 8) top = r.top - th - 8;
+    if(left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+    if(left < 8) left = 8;
+    t.style.left = left + 'px';
+    t.style.top = top + 'px';
+  }
+  function hide(){ if(tip) tip.classList.remove('open'); }
+  document.addEventListener('mouseover', function(e){
+    const el = e.target.closest && e.target.closest('.avatar-list[data-members]');
+    if(el) show(el);
+  });
+  document.addEventListener('mouseout', function(e){
+    const el = e.target.closest && e.target.closest('.avatar-list[data-members]');
+    if(el && (!e.relatedTarget || !el.contains(e.relatedTarget))) hide();
+  });
+  document.addEventListener('focusin', function(e){
+    const el = e.target.closest && e.target.closest('.avatar-list[data-members]');
+    if(el) show(el);
+  });
+  document.addEventListener('focusout', function(e){
+    const el = e.target.closest && e.target.closest('.avatar-list[data-members]');
+    if(el) hide();
+  });
+  window.addEventListener('scroll', hide, true);
+})();
+_updateCounts();
+renderNumbers();
 showScreen('settings');
 updateSecurityCount();
 </script>
