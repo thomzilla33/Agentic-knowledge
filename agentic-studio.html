@@ -1692,19 +1692,19 @@ body.test-mode #vTestMode{display:flex}
   <div class="sb-nav">
 
     <button class="sb-item" onclick="toast('Control Tower')" title="Control Tower" aria-label="Control Tower">
-      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 16v-5"/><path d="M6 16h6"/><rect x="6.5" y="8.5" width="5" height="2.5" rx="1"/><path d="M7.5 8.5V7.5M10.5 8.5V7.5"/><path d="M4 5a6 6 0 0110 0"/><path d="M6 6.5a3.5 3.5 0 016 0"/></svg></span>
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5L9 3.5l6 5"/><path d="M4.5 8v7h9V8"/><path d="M7.5 15v-3.5h3V15"/></svg></span>
       <span class="sb-label">Control Tower</span>
     </button>
 
     <div class="sb-divider"></div>
 
     <button class="sb-item" onclick="toast('Agents')" title="Agents" aria-label="Agents">
-      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6" r="3"/><path d="M3 17c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></span>
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="3"/><path d="M3 17c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></span>
       <span class="sb-label">Agents</span>
     </button>
 
     <button class="sb-item" onclick="toast('Squads')" title="Squads" aria-label="Squads">
-      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6.5" cy="5.5" r="2.5"/><circle cx="11.5" cy="5.5" r="2.5"/><path d="M1 16c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4"/><path d="M12 12c1.5.3 4 1.2 4 4"/></svg></span>
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="5.5" r="2.5"/><circle cx="11.5" cy="5.5" r="2.5"/><path d="M1 16c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4"/><path d="M12 12c1.5.3 4 1.2 4 4"/></svg></span>
       <span class="sb-label">Squads</span>
     </button>
 
@@ -1713,48 +1713,23 @@ body.test-mode #vTestMode{display:flex}
       <span class="sb-label">Workflows</span>
     </button>
 
-    <button class="sb-item active" title="Agentic Networks" aria-label="Agentic Networks" aria-current="page">
-      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="3" r="1.8"/><circle cx="3" cy="15" r="1.8"/><circle cx="15" cy="15" r="1.8"/><path d="M9 4.8L3 13.2M9 4.8L15 13.2M3 13.2h12"/></svg></span>
+    <button class="sb-item active" id="sbAgenticBtn" onclick="showAgenticNetworks()" title="Agentic Networks" aria-label="Agentic Networks" aria-current="page">
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.8"/><circle cx="3" cy="15" r="1.8"/><circle cx="15" cy="15" r="1.8"/><path d="M9 4.8L3 13.2M9 4.8L15 13.2M3 13.2h12"/></svg></span>
       <span class="sb-label">Agentic Networks</span>
     </button>
 
     <div class="sb-divider"></div>
 
-    <button class="sb-item" id="sbPlaybooksBtn" onclick="toggleSbSection('sbPlaybooksSub','sbPlaybooksBtn')" title="Playbooks" aria-label="Playbooks">
+    <button class="sb-item" id="sbPlaybooksBtn" onclick="openPlaybooks()" title="Playbooks" aria-label="Playbooks">
       <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2h7.5L14 4.5V16H4V2z"/><path d="M7 7h4M7 10h4M7 13h2"/><path d="M11.5 2v3H14"/></svg></span>
       <span class="sb-label">Playbooks</span>
-      <svg class="sb-chevron" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3.5 3.5L10 5"/></svg>
     </button>
-    <div class="sb-sub" id="sbPlaybooksSub">
-      <button class="sb-sub-item sub-active" onclick="toast('All Playbooks','info')">
-        <span class="sb-sub-dot"></span>
-        <span class="sb-sub-label">All Playbooks</span>
-        <span class="sb-sub-count">5</span>
-      </button>
-      <button class="sb-sub-item" onclick="toast('Sales & GTM','info')">
-        <span class="sb-sub-dot"></span>
-        <span class="sb-sub-label">Sales &amp; GTM</span>
-      </button>
-      <button class="sb-sub-item" onclick="toast('Customer Support','info')">
-        <span class="sb-sub-dot"></span>
-        <span class="sb-sub-label">Customer Support</span>
-      </button>
-      <button class="sb-sub-item" onclick="toast('Finance &amp; Legal','info')">
-        <span class="sb-sub-dot"></span>
-        <span class="sb-sub-label">Finance &amp; Legal</span>
-      </button>
-      <button class="sb-sub-item" onclick="toast('HR &amp; Onboarding','info')">
-        <span class="sb-sub-dot"></span>
-        <span class="sb-sub-label">HR &amp; Onboarding</span>
-      </button>
-    </div>
 
     <div class="sb-divider"></div>
 
     <button class="sb-item" onclick="toast('Admin')" title="Admin" aria-label="Admin">
-      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M9 2l1.5 4h4l-3.5 2.5 1.5 4L9 10l-3.5 2.5 1.5-4L3.5 6h4z"/></svg></span>
+      <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2l1.5 4h4l-3.5 2.5 1.5 4L9 10l-3.5 2.5 1.5-4L3.5 6h4z"/></svg></span>
       <span class="sb-label">Admin</span>
-      <svg class="sb-chevron" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3.5 3.5L10 5"/></svg>
     </button>
 
 
@@ -1796,7 +1771,7 @@ body.test-mode #vTestMode{display:flex}
             </div>
             <svg class="studio-item-badge" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
-          <a class="studio-item" href="governance-studio.html" role="menuitem">
+          <a class="studio-item" href="governance-studio/" role="menuitem">
             <div class="studio-item-ico" style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)">GS</div>
             <div class="studio-item-info">
               <div class="studio-item-name">Governance Studio</div>
@@ -1862,6 +1837,34 @@ body.test-mode #vTestMode{display:flex}
           </button>
         </div>
         <div class="nets" id="netsList"></div>
+      </div>
+
+      <!-- Pagination (mirrors design system .pagination pattern) -->
+      <div class="pagination" id="netsPagination">
+        <div class="pgn-rpp">
+          Rows per page:
+          <div class="pgn-rpp-wrap">
+            <button class="pgn-rpp-btn" onclick="toggleNetsPgnMenu(event)" id="netsPgnRppBtn">
+              <span id="netsPgnRppVal">10</span>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="pgn-rpp-menu" id="netsPgnRppMenu">
+              <button class="pgn-rpp-opt active" onclick="netsPgnSetRows(10,this)">10</button>
+              <button class="pgn-rpp-opt" onclick="netsPgnSetRows(25,this)">25</button>
+              <button class="pgn-rpp-opt" onclick="netsPgnSetRows(50,this)">50</button>
+              <button class="pgn-rpp-opt" onclick="netsPgnSetRows(100,this)">100</button>
+            </div>
+          </div>
+        </div>
+        <span class="pgn-range" id="netsPgnRange">1 – 6 of 6 items</span>
+        <div class="pgn-nav">
+          <button class="pgn-btn" id="netsPgnPrev" onclick="netsPgnGo(-1)" disabled title="Previous page">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="pgn-btn" id="netsPgnNext" onclick="netsPgnGo(1)" disabled title="Next page">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6l-3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
       </div>
 
       <!-- Preview overlay -->
@@ -1981,6 +1984,13 @@ body.test-mode #vTestMode{display:flex}
         </div>
       </div>
     </div><!-- end vList -->
+
+    <!-- ═══ VIEW: PLAYBOOKS (embedded React app) ═══ -->
+    <div id="vPlaybooks" class="view">
+      <iframe id="playbooksFrame" title="Playbooks"
+              src="about:blank"
+              style="flex:1;width:100%;border:0;display:block;background:var(--bg)"></iframe>
+    </div>
 
     <!-- ═══ VIEW: FULL OVERVIEW ═══ -->
     <div id="vOverview" class="view">
@@ -3579,6 +3589,10 @@ let currentOvId = null;
 let aiStep = 0;
 let aiAnswers = [];
 
+// Pagination state for the networks list
+let netsPage = 1;
+let netsRowsPerPage = 10;
+
 // ── RENDER NETWORK LIST ──
 function renderList() {
   const list = document.getElementById('netsList');
@@ -3587,7 +3601,31 @@ function renderList() {
     const matchSearch = !currentSearch || n.name.toLowerCase().includes(currentSearch.toLowerCase()) || n.desc.toLowerCase().includes(currentSearch.toLowerCase());
     return matchFilter && matchSearch;
   });
-  list.innerHTML = filtered.map(n => buildCard(n)).join('');
+
+  // Clamp page in case filter shrunk the result set
+  const total = filtered.length;
+  const totalPages = total === 0 ? 1 : Math.ceil(total / netsRowsPerPage);
+  if (netsPage > totalPages) netsPage = totalPages;
+  if (netsPage < 1) netsPage = 1;
+
+  // Slice for current page
+  const start = (netsPage - 1) * netsRowsPerPage;
+  const paginated = filtered.slice(start, start + netsRowsPerPage);
+  list.innerHTML = paginated.map(n => buildCard(n)).join('');
+
+  // Update pagination UI
+  updateNetsPagination(total, totalPages);
+}
+
+function updateNetsPagination(total, totalPages) {
+  const start = total === 0 ? 0 : (netsPage - 1) * netsRowsPerPage + 1;
+  const end   = Math.min(netsPage * netsRowsPerPage, total);
+  const range = document.getElementById('netsPgnRange');
+  const prev  = document.getElementById('netsPgnPrev');
+  const next  = document.getElementById('netsPgnNext');
+  if (range) range.textContent = start + ' – ' + end + ' of ' + total + ' ' + (total === 1 ? 'item' : 'items');
+  if (prev)  prev.disabled = netsPage <= 1;
+  if (next)  next.disabled = netsPage >= totalPages;
 }
 
 function buildCard(n) {
@@ -4009,9 +4047,33 @@ function setFilter(f, el) {
   currentFilter = f;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
+  netsPage = 1; // reset to first page when filter changes
   renderList();
 }
-function filterNets(v) { currentSearch=v; renderList(); }
+function filterNets(v) { currentSearch=v; netsPage = 1; renderList(); }
+
+// ── PAGINATION HANDLERS (networks list) ──
+function netsPgnGo(dir) {
+  netsPage += dir;
+  renderList();
+}
+function netsPgnSetRows(n, btn) {
+  netsRowsPerPage = n;
+  netsPage = 1;
+  document.querySelectorAll('#netsPgnRppMenu .pgn-rpp-opt').forEach(o => o.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('netsPgnRppVal').textContent = n;
+  document.getElementById('netsPgnRppMenu').classList.remove('open');
+  renderList();
+}
+function toggleNetsPgnMenu(e) {
+  e.stopPropagation();
+  document.getElementById('netsPgnRppMenu').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  const m = document.getElementById('netsPgnRppMenu');
+  if (m) m.classList.remove('open');
+});
 
 // ── AI CREATION MODAL ──
 const AI_FLOW = [
@@ -4361,9 +4423,39 @@ function restartWizard() {
 let bldrNet = null;
 
 function showView(id) {
-  ['vList','vOverview','vBuilder'].forEach(v=>{
+  ['vList','vOverview','vBuilder','vPlaybooks'].forEach(v=>{
     const el=document.getElementById(v);
     if(el) el.classList.toggle('active', v===id);
+  });
+}
+
+// ─── Embedded Playbooks (React app inside Agentic Studio shell) ───
+function openPlaybooks() {
+  const frame = document.getElementById('playbooksFrame');
+  // Lazy-load: only set src on first open so the iframe doesn't fetch on page load
+  if (frame && (frame.src === 'about:blank' || frame.src.endsWith('about:blank'))) {
+    frame.src = 'governance-studio/?embed=1#/playbooks';
+  }
+  showView('vPlaybooks');
+  setSidebarActive('sbPlaybooksBtn');
+}
+
+function showAgenticNetworks() {
+  showView('vList');
+  setSidebarActive('sbAgenticBtn');
+}
+
+function setSidebarActive(activeId) {
+  ['sbAgenticBtn','sbPlaybooksBtn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    if(id===activeId){
+      el.classList.add('active');
+      el.setAttribute('aria-current','page');
+    } else {
+      el.classList.remove('active');
+      el.removeAttribute('aria-current');
+    }
   });
 }
 

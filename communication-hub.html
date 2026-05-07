@@ -249,12 +249,6 @@
     }
     .tab:hover { color: var(--text-body); }
     .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-    .tab-count {
-      background: rgba(255,255,255,0.10);
-      border-radius: var(--radius-full);
-      padding: 1px 6px; font-size: 10px; margin-left: 4px;
-    }
-    .tab.active .tab-count { background: var(--primary-subtle); color: var(--primary); }
 
     /* ── SIDEBAR SUB-MENU (under Comm Hub) ── */
     .nav-submenu {
@@ -979,7 +973,7 @@
     <nav id="channel-subnav" class="page-subnav">
       <div class="tab-row" id="channel-tab-row">
         <button class="tab" onclick="showChannelTab('overview', currentChannelIdx)" data-tooltip="Channel overview & stats" data-tip-pos="below">Overview</button>
-        <button class="tab" onclick="showChannelTab('approvals', currentChannelIdx)" data-tooltip="Messages pending review" data-tip-pos="below">Approvals <span class="tab-count" id="tab-approvals-count">3</span></button>
+        <button class="tab" onclick="showChannelTab('approvals', currentChannelIdx)" data-tooltip="Messages pending review" data-tip-pos="below">Approvals</button>
         <button class="tab" onclick="showChannelTab('outbound', currentChannelIdx)" data-tooltip="Outbound campaigns" data-tip-pos="below">Outbound</button>
         <button class="tab" onclick="showChannelTab('analytics', currentChannelIdx)" data-tooltip="Performance analytics" data-tip-pos="below">Analytics</button>
         <button class="tab" onclick="showChannelTab('channels', currentChannelIdx)" data-tooltip="Provider credentials and phone numbers" data-tip-pos="below">Configure</button>
@@ -2412,9 +2406,6 @@
     // Sync count in approval summary card
     const el = document.querySelector('#tab-approvals .stat-value[style*="color:var(--alert)"]');
     if (el) el.textContent = pendingCount;
-    // Sync subnav tab count
-    const tabCount = document.getElementById('tab-approvals-count');
-    if (tabCount) { tabCount.textContent = pendingCount; tabCount.style.display = pendingCount === 0 ? 'none' : ''; }
     if (pendingCount === 0) document.getElementById('approvals-empty').style.display='block';
   }
   function approveCard(id) {
