@@ -76,6 +76,13 @@
   --spacing-0:0px;--spacing-1:2px;--spacing-2:4px;--spacing-3:8px;--spacing-4:12px;--spacing-5:16px;--spacing-6:20px;--spacing-7:24px;--spacing-8:32px;--spacing-9:40px;--spacing-10:48px;--spacing-11:64px;--spacing-12:80px;
   --radius-none:0px;--radius-xs:2px;--radius-sm:4px;--radius-md:8px;--radius-lg:16px;--radius-xl:24px;--radius-2xl:32px;--radius-full:9999px;
   --gradient-main-action: radial-gradient(circle at 65% 35%, rgba(33,115,255,1) 0%, rgba(9,226,171,1) 100%);
+  /* DS expansion (2026-05) — floating panels, brand gradients, elevation */
+  --color-surface-floating-elevated:     #131929;
+  --gradient-brand-linear:               linear-gradient(135deg, #00C2C2 0%, #155DFC 100%);
+  --gradient-violet-linear:              linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  --shadow-modal:                        0 40px 120px rgba(0,0,0,0.85);
+  --shadow-floating:                     0 12px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-tooltip:                      0 8px 24px rgba(0,0,0,0.45);
   --card-bg-blue:       linear-gradient(to bottom, rgba(128,175,255,0.22) 0%, rgba(128,175,255,0) 100%);
   --card-bg-green:      linear-gradient(to bottom, rgba(0,160,126,0.22)   0%, rgba(0,160,126,0)   100%);
   --card-bg-red:        linear-gradient(to bottom, rgba(234,145,145,0.22) 0%, rgba(234,145,145,0) 100%);
@@ -119,16 +126,16 @@ nav.sidebar.sb-expanded .sb-item { justify-content: flex-start; padding: 0 8px; 
 .sb-item:hover { background: transparent; color: rgba(255,255,255,0.80); }
 .sb-item:hover .sb-item-icon { background: rgba(255,255,255,0.09); }
 nav.sidebar:not(.sb-expanded) .sb-item.active { background: transparent; }
-nav.sidebar:not(.sb-expanded) .sb-item.active .sb-item-icon { background: linear-gradient(135deg,#00C2C2 0%,#155DFC 100%); color: #fff; box-shadow: 0 2px 10px rgba(21,93,252,0.4); }
+nav.sidebar:not(.sb-expanded) .sb-item.active .sb-item-icon { background: var(--gradient-brand-linear); color: #fff; box-shadow: 0 2px 10px rgba(21,93,252,0.4); }
 nav.sidebar.sb-expanded .sb-item.active { background: rgba(43,127,255,0.10); color: rgba(255,255,255,0.90); }
-nav.sidebar.sb-expanded .sb-item.active .sb-item-icon { background: linear-gradient(135deg,#00C2C2 0%,#155DFC 100%); color: #fff; }
-.sb-item.active:hover .sb-item-icon { background: linear-gradient(135deg,#00C2C2 0%,#155DFC 100%); }
+nav.sidebar.sb-expanded .sb-item.active .sb-item-icon { background: var(--gradient-brand-linear); color: #fff; }
+.sb-item.active:hover .sb-item-icon { background: var(--gradient-brand-linear); }
 .sb-label { display: none; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 nav.sidebar.sb-expanded .sb-label { display: block; opacity: 1; pointer-events: auto; }
 .sb-chevron { display: none; margin-left: auto; width: 14px; height: 14px; flex-shrink: 0; transition: transform .2s; color: var(--color-icon-primary-default); }
 .sb-item.sb-open .sb-chevron { transform: rotate(90deg); }
 nav.sidebar.sb-expanded .sb-chevron { display: block; }
-.sb-popup { position: fixed; display: none; background: #0d1323; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; padding: 6px; min-width: 220px; box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 12px 32px rgba(0,0,0,0.45), 0 24px 56px rgba(0,0,0,0.35); z-index: 150; opacity: 0; transform: translateX(-4px); transition: opacity .15s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1); pointer-events: none; }
+.sb-popup { position: fixed; display: none; background: var(--color-surface-floating-elevated); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); padding: 6px; min-width: 220px; box-shadow: var(--shadow-floating); z-index: 150; opacity: 0; transform: translateX(-4px); transition: opacity .15s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1); pointer-events: none; }
 .sb-popup.open { display: block; opacity: 1; transform: translateX(0); pointer-events: auto; }
 .sb-popup-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.38); padding: 8px 10px 10px; letter-spacing: 0.01em; }
 .sb-popup-item { display: block; width: 100%; padding: 9px 12px; border: none; background: transparent; color: rgba(255,255,255,0.85); font-family: inherit; font-size: 13px; font-weight: 500; text-align: left; border-radius: 7px; cursor: pointer; transition: background .12s, color .12s; }
@@ -161,11 +168,11 @@ nav.sidebar.sb-expanded .sb-toggle-label { opacity: 1; }
 .tb-left { flex: 1; display: flex; align-items: center; gap: 6px; }
 .tb-launcher { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 9px 0 6px; border-radius: 8px; background: transparent; border: none; cursor: pointer; color: rgba(255,255,255,0.90); transition: background .15s; flex-shrink: 0; position: relative; }
 .tb-launcher:hover { background: rgba(255,255,255,0.06); }
-.tb-launcher-logo { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg,#00C2C2 0%,#155DFC 100%); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; letter-spacing: -.3px; }
+.tb-launcher-logo { width: 26px; height: 26px; border-radius: 7px; background: var(--gradient-brand-linear); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; letter-spacing: -.3px; }
 .tb-launcher-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.90); white-space: nowrap; }
 .tb-launcher-chevron { color: rgba(255,255,255,0.50); flex-shrink: 0; transition: transform .15s; }
 .tb-launcher.sw-open .tb-launcher-chevron { transform: rotate(180deg); }
-.studio-sw { position: absolute; top: calc(100% + 8px); left: 0; width: 248px; background: #131929; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; box-shadow: 0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04); z-index: 200; overflow: hidden; opacity: 0; transform: translateY(-6px) scale(0.97); pointer-events: none; transition: opacity .15s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1); }
+.studio-sw { position: absolute; top: calc(100% + 8px); left: 0; width: 248px; background: var(--color-surface-floating-elevated); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); box-shadow: var(--shadow-floating); z-index: 200; overflow: hidden; opacity: 0; transform: translateY(-6px) scale(0.97); pointer-events: none; transition: opacity .15s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1); }
 .studio-sw.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 .studio-sw-hd { padding: 12px 14px 8px; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .studio-sw-title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.22); text-transform: uppercase; letter-spacing: .08em; }
@@ -185,7 +192,7 @@ nav.sidebar.sb-expanded .sb-toggle-label { opacity: 1; }
 .tb-right { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: flex-end; }
 .icon-btn { width: 32px; height: 32px; border-radius: 8px; background: transparent; border: none; color: rgba(255,255,255,0.50); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .1s, color .1s; }
 .icon-btn:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.80); }
-.avatar-sm { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#155DFC,#00C2C2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; cursor: pointer; flex-shrink: 0; }
+.avatar-sm { width: 28px; height: 28px; border-radius: 50%; background: var(--gradient-brand-linear); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; cursor: pointer; flex-shrink: 0; }
 .app-body { display: flex; flex: 1; overflow: hidden; }
 .sidebar { width: 80px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 4px; background: var(--color-surface-neutral-black); border-right: 1px solid var(--color-border-neutral-lighter); transition: width 0.2s ease; }
 .sidebar.expanded { width: 250px; align-items: flex-start; padding: 12px; }
@@ -390,8 +397,8 @@ table, .table { width: 100%; border-collapse: collapse; }
     .agent-tab:hover { color: var(--color-text-title); }
     .agent-tab.active { color: var(--color-text-title); border-bottom-color: var(--color-text-title); font-weight: 600; }
     .agent-content { flex: 1; display: flex; overflow: hidden; min-height: 0; }
-    .tool-library { flex: 1; overflow-y: auto; padding: 24px; border-right: 1px solid var(--color-border-neutral-default); min-width: 0; }
-    .test-panel { width: 520px; flex-shrink: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .tool-library { flex: 1 1 50%; overflow-y: auto; padding: 24px; border-right: 1px solid var(--color-border-neutral-default); min-width: 0; }
+    .test-panel { flex: 1 1 50%; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
     .tool-card { border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: all .15s; margin-bottom: 10px; }
     .tool-card:hover { background: var(--color-surface-neutral-subtle); border-color: var(--color-border-neutral-lighter); }
     .tool-card.configured { border-color: var(--color-border-primary-default); background: var(--color-surface-primary-more-subtle); }
@@ -514,24 +521,279 @@ table, .table { width: 100%; border-collapse: collapse; }
     .pgn-page-input { width: 44px; height: 28px; padding: 0 6px; background: var(--color-surface-neutral-default); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-sm); color: var(--color-text-body); font-family: inherit; font-size: 12px; text-align: center; outline: none; }
     .pgn-page-input:focus { border-color: var(--color-border-primary-default); }
     .pgn-page-of { font-size: 12px; color: var(--color-text-caption); }
+    /* ── Multi-select with chips (Geo countries) ─────────────── */
+    .mselect { position: relative; }
+    .mselect__control { min-height: 36px; background: var(--color-surface-neutral-default); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); padding: 5px 6px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; cursor: text; transition: border-color .15s; }
+    .mselect__control:hover { border-color: var(--color-border-neutral-lighter); }
+    .mselect.is-open .mselect__control, .mselect__control:focus-within { border-color: var(--color-border-primary-default); }
+    .mselect__chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 6px 0 10px; border-radius: var(--radius-full); background: var(--color-surface-primary-subtle); border: 1px solid rgba(43,127,255,0.30); color: rgba(255,255,255,0.90); font-size: 12px; font-weight: 500; }
+    .mselect__chip-remove { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: rgba(255,255,255,0.60); cursor: pointer; border-radius: 50%; padding: 0; font-family: inherit; transition: background .12s, color .12s; }
+    .mselect__chip-remove:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.95); }
+    .mselect__chip-remove svg { width: 9px; height: 9px; }
+    .mselect__placeholder { padding: 0 8px; color: var(--color-text-caption); font-size: 12px; }
+    .mselect__caret { margin-left: auto; padding: 0 8px; color: rgba(255,255,255,0.40); flex-shrink: 0; transition: transform .15s; pointer-events: none; }
+    .mselect.is-open .mselect__caret { transform: rotate(180deg); }
+    .mselect__panel { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--color-surface-floating-elevated); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); box-shadow: var(--shadow-floating); z-index: 50; opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .12s, transform .12s; max-height: 280px; display: flex; flex-direction: column; overflow: hidden; }
+    .mselect.is-open .mselect__panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .mselect__search { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; }
+    .mselect__search input { width: 100%; height: 28px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0 10px 0 26px; color: rgba(255,255,255,0.90); font-family: inherit; font-size: 12px; outline: none; }
+    .mselect__search input:focus { border-color: rgba(43,127,255,0.30); }
+    .mselect__search input::placeholder { color: rgba(255,255,255,0.38); }
+    .mselect__search svg { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.40); pointer-events: none; }
+    .mselect__list { flex: 1; overflow-y: auto; padding: 4px; }
+    .mselect__option { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 6px; cursor: pointer; user-select: none; transition: background .1s; }
+    .mselect__option:hover { background: rgba(255,255,255,0.05); }
+    .mselect__option.is-selected { background: rgba(43,127,255,0.08); }
+    .mselect__option-checkbox { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.20); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; transition: background .12s, border-color .12s; }
+    .mselect__option.is-selected .mselect__option-checkbox { background: var(--color-surface-primary-default); border-color: var(--color-surface-primary-default); }
+    .mselect__option-checkbox svg { width: 10px; height: 10px; opacity: 0; transition: opacity .12s; color: #fff; }
+    .mselect__option.is-selected .mselect__option-checkbox svg { opacity: 1; }
+    .mselect__option-name { flex: 1; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.90); }
+    .mselect__option-dial { font-size: 11px; color: rgba(255,255,255,0.45); }
+    .mselect__empty { padding: 18px 12px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.45); }
+    /* ── Knowledge Packs ──────────────────────────────────── */
+    .kp-list { display: flex; flex-direction: column; gap: 10px; }
+    .kp-card { background: var(--color-surface-neutral-white); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); padding: 16px; display: flex; align-items: flex-start; gap: 14px; transition: border-color .15s, background .15s; }
+    .kp-card:hover { border-color: var(--color-border-neutral-lighter); }
+    .kp-card__icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--color-surface-purple-subtle); color: #a78bfa; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .kp-card__icon svg { width: 18px; height: 18px; }
+    .kp-card__main { flex: 1; min-width: 0; }
+    .kp-card__title { font-size: 14px; font-weight: 700; color: var(--color-text-title); margin-bottom: 3px; }
+    .kp-card__desc { font-size: 12px; color: var(--color-text-caption); margin-bottom: 8px; line-height: 1.5; }
+    .kp-card__meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .kp-meta-chip { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-full); background: var(--color-surface-neutral-default); border: 1px solid var(--color-border-neutral-default); color: var(--color-text-caption); }
+    .kp-meta-chip.version { background: var(--color-surface-primary-subtle); border-color: rgba(43,127,255,0.30); color: #80AFFF; }
+    .kp-meta-chip.blast { background: var(--color-surface-purple-subtle); border-color: rgba(167,139,250,0.30); color: #c4b5fd; }
+    .kp-card__actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    /* Accordion expand for kp-card */
+    .kp-card { flex-direction: column; align-items: stretch; }
+    .kp-card__row { display: flex; align-items: flex-start; gap: 14px; }
+    .kp-card__chev { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--color-text-caption); cursor: pointer; border-radius: var(--radius-sm); padding: 0; flex-shrink: 0; transition: background .12s, color .12s, transform .2s; align-self: center; }
+    .kp-card__chev:hover { background: var(--color-surface-neutral-default); color: var(--color-text-title); }
+    .kp-card.is-expanded .kp-card__chev { transform: rotate(90deg); }
+    .kp-card__expanded { display: none; padding: 14px 4px 4px 54px; border-top: 1px solid var(--color-border-neutral-default); margin-top: 12px; }
+    .kp-card.is-expanded .kp-card__expanded { display: block; }
+    /* Plane toggles inside expanded accordion */
+    .kp-planes-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .kp-planes-lbl { font-size: 11px; font-weight: 600; color: var(--color-text-caption); text-transform: uppercase; letter-spacing: .06em; flex-shrink: 0; }
+    .kp-plane-tog { display: flex; align-items: center; gap: 7px; padding: 4px 10px 4px 6px; border-radius: var(--radius-full); border: 1px solid var(--color-border-neutral-default); background: transparent; color: var(--color-text-caption); font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s; }
+    .kp-plane-tog:hover { border-color: var(--color-border-neutral-lighter); color: var(--color-text-title); }
+    .kp-plane-tog.is-on { border-color: rgba(43,127,255,0.30); background: var(--color-surface-primary-subtle); color: #80AFFF; }
+    .kp-plane-tog__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; opacity: .55; transition: opacity .15s; }
+    .kp-plane-tog.is-on .kp-plane-tog__dot { opacity: 1; }
+    /* Preview eye button */
+    .kp-card__eye { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border-neutral-default); background: transparent; color: var(--color-text-caption); cursor: pointer; border-radius: var(--radius-sm); padding: 0; flex-shrink: 0; transition: all .12s; }
+    .kp-card__eye:hover { background: var(--color-surface-neutral-default); border-color: var(--color-border-neutral-lighter); color: var(--color-text-title); }
+    .kp-card__actions .btn-icon-sm { color: var(--color-text-caption); }
+    .kp-card__actions .btn-icon-sm:hover { color: var(--color-text-title); background: var(--color-surface-neutral-default); }
+    .kp-empty { text-align: center; padding: 60px 24px; border: 1px dashed var(--color-border-neutral-lighter); border-radius: var(--radius-md); }
+    .kp-empty-icon { width: 56px; height: 56px; border-radius: var(--radius-lg); background: var(--color-surface-purple-subtle); color: #a78bfa; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; }
+    .kp-empty-title { font-size: 14px; font-weight: 600; color: var(--color-text-title); margin-bottom: 4px; }
+    .kp-empty-desc { font-size: 12px; color: var(--color-text-caption); margin-bottom: 16px; line-height: 1.5; }
+    /* Pack picker modal */
+    .kp-picker-list { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow-y: auto; padding: 4px; }
+    .kp-picker-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-md); cursor: pointer; transition: background .1s; }
+    .kp-picker-row:hover { background: var(--color-surface-neutral-default); }
+    .kp-picker-row.is-attached { opacity: .55; cursor: not-allowed; }
+    .kp-picker-row.is-selected { background: var(--color-surface-primary-more-subtle); }
+    .kp-picker-checkbox { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.20); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; transition: background .12s, border-color .12s; }
+    .kp-picker-row.is-selected .kp-picker-checkbox { background: var(--color-surface-primary-default); border-color: var(--color-surface-primary-default); }
+    .kp-picker-checkbox svg { width: 11px; height: 11px; opacity: 0; color: #fff; }
+    .kp-picker-row.is-selected .kp-picker-checkbox svg { opacity: 1; }
+    .kp-picker-info { flex: 1; min-width: 0; }
+    .kp-picker-name { font-size: 13px; font-weight: 600; color: var(--color-text-title); display: flex; align-items: center; gap: 8px; }
+    .kp-picker-attached { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: var(--radius-full); background: var(--color-surface-success-subtle); color: var(--color-text-success); }
+    .kp-picker-meta { font-size: 11px; color: var(--color-text-caption); margin-top: 2px; }
+    /* Pack content editor slideout */
+    .slide-out--kp { width: 540px; }
+    .kp-editor-banner { background: var(--color-surface-primary-more-subtle); border: 1px solid var(--color-border-primary-subtle); border-radius: var(--radius-md); padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
+    .kp-editor-banner svg { color: var(--color-icon-primary-default); flex-shrink: 0; margin-top: 2px; }
+    .kp-editor-banner-text { font-size: 12px; color: var(--color-text-subtitle); line-height: 1.5; }
+    .kp-editor-banner-link { color: var(--color-icon-primary-default); font-weight: 600; cursor: pointer; }
+    .kp-doc-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); margin-bottom: 6px; transition: border-color .15s; }
+    .kp-doc-row:hover { border-color: var(--color-border-neutral-lighter); }
+    .kp-doc-row__icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-surface-neutral-default); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-text-caption); }
+    .kp-doc-row__main { flex: 1; min-width: 0; }
+    .kp-doc-row__name { font-size: 13px; font-weight: 600; color: var(--color-text-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kp-doc-row__meta { font-size: 11px; color: var(--color-text-caption); margin-top: 2px; }
+    .kp-doc-row__actions { display: flex; gap: 4px; flex-shrink: 0; opacity: .55; transition: opacity .15s; }
+    .kp-doc-row:hover .kp-doc-row__actions, .kp-doc-row:focus-within .kp-doc-row__actions { opacity: 1; }
+    .kp-doc-row.is-editing { border-color: var(--color-border-primary-default); }
+    .kp-doc-row__name-input { width: 100%; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--color-text-title); background: var(--color-surface-neutral-default); border: 1px solid var(--color-border-primary-default); border-radius: var(--radius-sm); padding: 4px 8px; outline: none; }
+    .kp-doc-row__text-input { width: 100%; min-height: 56px; resize: vertical; font-family: inherit; font-size: 12px; color: var(--color-text-body); background: var(--color-surface-neutral-default); border: 1px solid var(--color-border-primary-default); border-radius: var(--radius-sm); padding: 6px 8px; margin-top: 4px; outline: none; line-height: 1.45; }
+    .kpe-empty { padding: 16px; border: 1px dashed var(--color-border-neutral-lighter); border-radius: var(--radius-md); font-size: 12px; color: var(--color-text-caption); text-align: center; margin-bottom: 6px; }
+    /* Data Access filter bar */
+    .da-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .da-search { position: relative; flex: 1; min-width: 240px; max-width: 320px; }
+    .da-search input { width: 100%; height: 32px; background: var(--color-surface-neutral-default); border: 1px solid var(--color-border-neutral-default); border-radius: 9999px; padding: 0 14px 0 32px; color: var(--color-text-body); font-family: inherit; font-size: 12px; outline: none; transition: border-color .15s; }
+    .da-search input:focus { border-color: var(--color-border-primary-default); }
+    .da-search input::placeholder { color: var(--color-text-caption); }
+    .da-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-caption); pointer-events: none; }
+    .da-toggle-group { display: inline-flex; gap: 6px; }
+    .da-toggle { height: 32px; padding: 0 14px; border-radius: 9999px; border: 1px solid var(--color-border-neutral-lighter); background: transparent; color: var(--color-text-caption); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .da-toggle:hover { color: var(--color-text-title); border-color: var(--color-border-neutral-lighter); }
+    .da-toggle.is-active { background: var(--color-surface-primary-default); border-color: var(--color-surface-primary-default); color: #fff; }
+    .da-spacer { flex: 1; }
+    .da-views { display: inline-flex; gap: 4px; }
+    .da-view-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--color-border-neutral-default); background: transparent; color: var(--color-text-caption); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .12s; }
+    .da-view-btn:hover { color: var(--color-text-title); border-color: var(--color-border-neutral-lighter); }
+    .da-view-btn.is-active { background: var(--color-surface-primary-subtle); border-color: var(--color-border-primary-default); color: var(--color-icon-primary-default); }
+    /* List view variant for kp-card */
+    .kp-list.is-list-view .kp-card { padding: 12px 14px; align-items: center; gap: 12px; }
+    .kp-list.is-list-view .kp-card__icon { width: 32px; height: 32px; }
+    .kp-list.is-list-view .kp-card__icon svg { width: 14px; height: 14px; }
+    .kp-list.is-list-view .kp-card__desc { display: none; }
+    .kp-list.is-list-view .kp-card__title { margin-bottom: 2px; }
+    /* File row */
+    .da-file-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--color-surface-neutral-white); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); margin-bottom: 6px; transition: border-color .15s; }
+    .da-file-row:hover { border-color: var(--color-border-neutral-lighter); }
+    .da-file-row__icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-surface-neutral-default); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-text-caption); }
+    .da-file-row__main { flex: 1; min-width: 0; }
+    .da-file-row__name { font-size: 13px; font-weight: 600; color: var(--color-text-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .da-file-row__meta { font-size: 11px; color: var(--color-text-caption); margin-top: 2px; }
+    .da-file-row__actions { display: flex; gap: 4px; flex-shrink: 0; opacity: 0; transition: opacity .15s; }
+    .da-file-row:hover .da-file-row__actions { opacity: 1; }
+    /* Two-column wrapper for Knowledge */
+    .kp-layout { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+    .kp-pane { flex: 1 1 50%; min-width: 0; overflow-y: auto; padding: 24px; border-right: 1px solid var(--color-border-neutral-default); }
+    /* ── Knowledge Library Marketplace (KML) ─────────────────── */
+    .kml-ov { position: fixed; inset: 0; z-index: 700; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px 60px; }
+    .kml-ov.open { display: flex; }
+    .kml { width: calc(100vw - 120px); height: calc(100vh - 40px); max-width: 1400px; background: var(--color-app-bg); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-lg); display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-modal); }
+    .kml-hd { display: flex; align-items: center; justify-content: space-between; padding: 22px 26px 18px; border-bottom: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
+    .kml-hd-left { display: flex; align-items: center; gap: 14px; }
+    .kml-hd-ico { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .kml.kml--tp .kml-hd-ico { background: linear-gradient(135deg,rgba(167,139,250,.25),rgba(139,92,246,.18)); border: 1px solid rgba(167,139,250,.30); color: #c4b5fd; }
+    .kml.kml--drv .kml-hd-ico { background: linear-gradient(135deg,rgba(43,127,255,.20),rgba(0,194,194,.18)); border: 1px solid rgba(43,127,255,.30); color: #80AFFF; }
+    .kml-title { font-size: 17px; font-weight: 700; color: rgba(255,255,255,.92); }
+    .kml-sub { font-size: 12px; color: rgba(255,255,255,.50); margin-top: 2px; }
+    .kml-close { width: 32px; height: 32px; border: none; border-radius: 8px; background: transparent; color: rgba(255,255,255,.55); cursor: pointer; font-size: 22px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: background .12s, color .12s; }
+    .kml-close:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.95); }
+    .kml-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+    .kml-side { width: 220px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,.08); padding: 18px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+    .kml-side-lbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.32); text-transform: uppercase; letter-spacing: .09em; padding: 0 8px 6px; }
+    .kml-pills { display: flex; gap: 4px; padding: 0 2px 2px; }
+    .kml-pill { flex: 1; height: 26px; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; background: transparent; color: rgba(255,255,255,.55); font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .kml-pill:hover { background: rgba(255,255,255,.04); color: rgba(255,255,255,.85); }
+    .kml-pill.is-active { background: rgba(43,127,255,.14); border-color: rgba(43,127,255,.30); color: #80AFFF; }
+    .kml.kml--tp .kml-pill.is-active { background: rgba(167,139,250,.14); border-color: rgba(167,139,250,.30); color: #c4b5fd; }
+    .kml-sort { width: 100%; height: 30px; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; background: rgba(255,255,255,.04); color: rgba(255,255,255,.85); font-family: inherit; font-size: 12px; padding: 0 26px 0 10px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.5)' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; outline: none; }
+    .kml-sort:focus { border-color: rgba(43,127,255,.40); }
+    .kml-side-sep { height: 1px; background: rgba(255,255,255,.06); margin: 12px 6px; flex-shrink: 0; }
+    .kml-chk-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; cursor: pointer; transition: background .15s; border: none; background: transparent; width: 100%; text-align: left; color: rgba(255,255,255,.70); font-family: inherit; font-size: 12px; font-weight: 500; }
+    .kml-chk-item:hover { background: rgba(255,255,255,.04); color: rgba(255,255,255,.95); }
+    .kml-chk-item.is-active .kml-chk-lbl { color: rgba(255,255,255,.95); font-weight: 600; }
+    .kml-chk-box { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.20); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .kml-chk-item.is-active .kml-chk-box { background: var(--color-surface-primary-default); border-color: var(--color-surface-primary-default); }
+    .kml.kml--tp .kml-chk-item.is-active .kml-chk-box { background: #8B5CF6; border-color: #8B5CF6; }
+    .kml-chk-item.is-active .kml-chk-box::after { content: ''; width: 8px; height: 4px; border-left: 1.5px solid #fff; border-bottom: 1.5px solid #fff; transform: rotate(-45deg) translate(1px,-1px); }
+    .kml-chk-lbl { flex: 1; }
+    .kml-cat-cnt { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.40); padding: 1px 6px; border-radius: 9999px; background: rgba(255,255,255,.05); flex-shrink: 0; }
+    .kml-plane-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .kml-right { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+    .kml-toolbar { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .kml-search { display: flex; align-items: center; gap: 10px; flex: 1; height: 36px; padding: 0 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 9px; transition: border-color .15s; }
+    .kml-search:focus-within { border-color: rgba(43,127,255,.30); }
+    .kml-search svg { color: rgba(255,255,255,.40); flex-shrink: 0; }
+    .kml-search input { flex: 1; background: transparent; border: none; outline: none; font-family: inherit; font-size: 13px; color: rgba(255,255,255,.95); }
+    .kml-search input::placeholder { color: rgba(255,255,255,.40); }
+    .kml-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 18px; border-bottom: 1px solid rgba(255,255,255,.06); align-items: center; flex-shrink: 0; min-height: 0; }
+    .kml-chips:empty { display: none; }
+    .kml-chip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 6px 0 9px; border-radius: 9999px; background: rgba(43,127,255,.14); border: 1px solid rgba(43,127,255,.30); color: #80AFFF; font-size: 11px; font-weight: 500; }
+    .kml.kml--tp .kml-chip { background: rgba(167,139,250,.14); border-color: rgba(167,139,250,.30); color: #c4b5fd; }
+    .kml-chip-x { width: 14px; height: 14px; border: none; background: transparent; color: inherit; cursor: pointer; opacity: .65; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+    .kml-chip-x:hover { opacity: 1; }
+    .kml-grid { flex: 1; overflow-y: auto; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; align-content: start; }
+    .kml-card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; transition: border-color .15s, background .15s; }
+    .kml-card:hover { border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.05); }
+    .kml-card-hd { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .kml-card-ico { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .kml.kml--tp .kml-card-ico { background: rgba(167,139,250,.14); color: #c4b5fd; }
+    .kml.kml--drv .kml-card-ico { background: rgba(43,127,255,.14); color: #80AFFF; }
+    .kml-card-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.95); line-height: 1.35; }
+    .kml-card-cat { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.45); margin-top: 3px; text-transform: uppercase; letter-spacing: .04em; }
+    .kml-card-desc { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.55; flex: 1; }
+    .kml-card-stats { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.05); flex-wrap: wrap; }
+    .kml-card-stat { display: flex; align-items: center; gap: 4px; font-size: 11px; color: rgba(255,255,255,.50); }
+    .kml-card-stat strong { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.90); }
+    .kml-card-planes { display: flex; gap: 4px; }
+    .kml-card-ft { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.05); gap: 8px; }
+    .kml-card-add { height: 30px; padding: 0 14px; border-radius: 8px; border: none; background: var(--color-surface-primary-default); color: #fff; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .kml-card-add:hover { box-shadow: 0 0 0 2px rgba(43,127,255,.30); }
+    .kml.kml--tp .kml-card-add { background: #8B5CF6; }
+    .kml.kml--tp .kml-card-add:hover { box-shadow: 0 0 0 2px rgba(139,92,246,.30); }
+    .kml-card-add.is-added { background: rgba(110,231,183,.10); border: 1px solid rgba(110,231,183,.35); color: var(--color-text-success); cursor: default; box-shadow: none; }
+    .kml-card-add.is-added:hover { box-shadow: none; }
+    .kml-empty { grid-column: 1 / -1; padding: 60px 20px; text-align: center; color: rgba(255,255,255,.50); font-size: 13px; }
+    .kml-ft { padding: 14px 24px; border-top: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .kml-ft-info { font-size: 12px; color: rgba(255,255,255,.55); }
+    .kml-ft-info strong { color: rgba(255,255,255,.95); font-weight: 700; }
+    .kml-ft-btns { display: flex; gap: 8px; }
+    .kml-ft-cancel { height: 36px; padding: 0 16px; border: 1px solid rgba(255,255,255,.10); background: transparent; color: rgba(255,255,255,.85); border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .12s; }
+    .kml-ft-cancel:hover { background: rgba(255,255,255,.05); }
+    .kml-ft-done { height: 36px; padding: 0 18px; border: none; background: var(--color-surface-primary-default); color: #fff; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .12s; }
+    .kml-ft-done:hover { background: var(--color-surface-primary-emphasis); }
+    .kml.kml--tp .kml-ft-done { background: #8B5CF6; }
+    .kml.kml--tp .kml-ft-done:hover { background: #7C3AED; }
+    .kml-ft-done:disabled { opacity: .35; cursor: not-allowed; }
     /* ── Avatar list (DS) — assigned-to & similar ────────────────── */
     .avatar-list { display: inline-flex; align-items: center; gap: 8px; }
     .avatar-list__stack { display: inline-flex; align-items: center; }
-    .avatar { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 50%; font-weight: 700; color: #fff; background: linear-gradient(135deg, #155DFC 0%, #00C2C2 100%); letter-spacing: -.02em; user-select: none; }
+    .avatar { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 50%; font-weight: 700; color: #fff; background: var(--gradient-brand-linear); letter-spacing: -.02em; user-select: none; }
     .avatar-list__stack > .avatar { margin-left: -7px; border: 2px solid var(--color-surface-neutral-black); box-shadow: 0 0 0 1px rgba(255,255,255,0.04); }
     .avatar-list__stack > .avatar:first-child { margin-left: 0; }
     .avatar--m { width: 24px; height: 24px; font-size: 9px; }
     .avatar--s { width: 20px; height: 20px; font-size: 8px; }
-    .avatar--violet { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); }
+    .avatar--violet { background: var(--gradient-violet-linear); }
     .avatar-list__count { font-size: 13px; font-weight: 500; color: var(--color-text-body); white-space: nowrap; }
     .avatar-list { cursor: default; }
+/* ── Workspace Switcher ─────────────────────────────────────── */
+/* Reusable tooltip (data-tt) */
+.tt { position: fixed; z-index: 700; padding: 6px 10px; border-radius: var(--radius-md); font-size: 12px; font-weight: 500; line-height: 1.35; white-space: nowrap; background: var(--color-surface-floating-elevated); color: var(--color-text-title); pointer-events: none; opacity: 0; transform: translateY(-2px); transition: opacity .12s ease, transform .12s ease; box-shadow: var(--shadow-tooltip); border: 1px solid var(--color-border-neutral-default); max-width: 240px; }
+.tt.open { opacity: 1; transform: translateY(0); }
+.tt__title { font-weight: 600; color: var(--color-text-title); }
+.tt__desc { font-size: 11px; font-weight: 400; color: var(--color-text-caption); margin-top: 2px; white-space: normal; }
+.tb-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.10); flex-shrink: 0; }
+.tb-workspace { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 9px 0 6px; border-radius: 8px; background: transparent; border: none; cursor: pointer; color: rgba(255,255,255,0.90); transition: background .15s; flex-shrink: 0; position: relative; font-family: inherit; }
+.tb-workspace:hover { background: rgba(255,255,255,0.06); }
+.tb-workspace-logo { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; letter-spacing: -.3px; overflow: hidden; }
+.tb-workspace-logo img { width: 100%; height: 100%; object-fit: cover; }
+.tb-workspace-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.90); white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+.tb-workspace-chevron { color: rgba(255,255,255,0.50); flex-shrink: 0; transition: transform .15s; }
+.tb-workspace.ws-open .tb-workspace-chevron { transform: rotate(180deg); }
+.workspace-sw { position: absolute; top: calc(100% + 8px); left: 0; width: 280px; background: var(--color-surface-floating-elevated); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); box-shadow: var(--shadow-floating); z-index: 200; overflow: hidden; opacity: 0; transform: translateY(-6px) scale(0.97); pointer-events: none; transition: opacity .15s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1); }
+.workspace-sw.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.workspace-sw__hd { padding: 12px 14px 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.workspace-sw__title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.22); text-transform: uppercase; letter-spacing: .08em; }
+.workspace-sw__search { padding: 8px 12px 4px; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; }
+.workspace-sw__search input { width: 100%; height: 30px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0 10px 0 28px; color: rgba(255,255,255,0.90); font-family: inherit; font-size: 12px; outline: none; }
+.workspace-sw__search input:focus { border-color: rgba(43,127,255,0.30); }
+.workspace-sw__search input::placeholder { color: rgba(255,255,255,0.38); }
+.workspace-sw__search svg { position: absolute; left: 21px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.40); pointer-events: none; }
+.workspace-sw__list { max-height: 320px; overflow-y: auto; padding: 4px 0; }
+.workspace-sw__group-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.22); text-transform: uppercase; letter-spacing: .08em; padding: 10px 14px 4px; }
+.ws-item { display: flex; align-items: center; gap: 11px; padding: 9px 12px; cursor: pointer; transition: background .1s; text-decoration: none; border: none; background: none; width: 100%; text-align: left; color: inherit; font-family: inherit; }
+.ws-item:hover { background: rgba(255,255,255,0.05); }
+.ws-item.s-active { background: rgba(43,127,255,0.08); }
+.ws-item__ico { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; letter-spacing: -.3px; overflow: hidden; }
+.ws-item__ico img { width: 100%; height: 100%; object-fit: cover; }
+.ws-item__info { flex: 1; min-width: 0; text-align: left; }
+.ws-item__name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.90); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-item__sub { font-size: 11px; color: rgba(255,255,255,0.50); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-item__check { width: 16px; height: 16px; flex-shrink: 0; color: #2B7FFF; }
+.workspace-sw__empty { padding: 20px 14px; font-size: 12px; color: rgba(255,255,255,0.50); text-align: center; }
+.workspace-sw__footer { padding: 6px; border-top: 1px solid rgba(255,255,255,0.06); }
+.workspace-sw__footer .ws-create { display: flex; align-items: center; gap: 11px; padding: 9px 12px; width: 100%; background: transparent; border: none; border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.90); font-family: inherit; font-size: 13px; font-weight: 600; transition: background .1s; }
+.workspace-sw__footer .ws-create:hover { background: rgba(255,255,255,0.05); }
+.workspace-sw__footer .ws-create svg { color: rgba(255,255,255,0.50); flex-shrink: 0; }
+.workspace-sw__footer .ws-create:hover svg { color: rgba(255,255,255,0.90); }
     /* Shared rich tooltip for avatar lists */
-    .alt-tooltip { position: fixed; z-index: 800; min-width: 220px; max-width: 280px; background: #131929; border: 1px solid rgba(255,255,255,0.10); border-radius: 10px; padding: 10px 4px; box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 12px 32px rgba(0,0,0,0.45), 0 24px 56px rgba(0,0,0,0.35); opacity: 0; transform: translateY(-4px); transition: opacity .12s, transform .12s; pointer-events: none; }
+    .alt-tooltip { position: fixed; z-index: 800; min-width: 220px; max-width: 280px; background: var(--color-surface-floating-elevated); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); padding: 10px 4px; box-shadow: var(--shadow-floating); opacity: 0; transform: translateY(-4px); transition: opacity .12s, transform .12s; pointer-events: none; }
     .alt-tooltip.open { opacity: 1; transform: translateY(0); }
     .alt-tooltip__header { padding: 4px 12px 8px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.40); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 4px; }
     .alt-tooltip__item { display: flex; align-items: center; gap: 10px; padding: 7px 12px; }
-    .alt-tooltip__avatar { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #155DFC 0%, #00C2C2 100%); }
-    .alt-tooltip__avatar.network { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); }
+    .alt-tooltip__avatar { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; background: var(--gradient-brand-linear); }
+    .alt-tooltip__avatar.network { background: var(--gradient-violet-linear); }
     .alt-tooltip__name { flex: 1; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .alt-tooltip__kind { font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0; }
     .alt-tooltip__kind.agent { background: rgba(43,127,255,0.15); color: #80AFFF; }
@@ -627,21 +889,21 @@ table, .table { width: 100%; border-collapse: collapse; }
   <div id="mainWrapper" style="margin-left:68px;padding-top:60px;padding-right:8px;padding-bottom:8px;display:flex;flex-direction:column;height:100vh;overflow:hidden;box-sizing:border-box;transition:margin-left .22s cubic-bezier(.4,0,.2,1);">
     <header class="topbar">
       <div class="tb-left">
-        <button class="tb-launcher" id="studioLauncher" onclick="toggleStudioSw(event)" aria-label="Switch studio" aria-haspopup="true">
+        <button class="tb-launcher" id="studioLauncher" onclick="toggleStudioSw(event)" aria-label="Switch studio" aria-haspopup="true" data-tt="Switch app" data-tt-desc="Jump between AIMS OS products: Agentic Studio, Governance Studio, Work-surface.">
           <div class="tb-launcher-logo" style="background:linear-gradient(135deg,#0EA5E9 0%,#06B6D4 100%)">WS</div>
           <span class="tb-launcher-name">AIMS OS</span>
           <svg class="tb-launcher-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <div class="studio-sw" id="studioSw" role="menu">
             <div class="studio-sw-hd"><span class="studio-sw-title">Switch Studio</span></div>
             <a class="studio-item" href="agentic-studio.html" role="menuitem">
-              <div class="studio-item-ico" style="background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%)">AS</div>
+              <div class="studio-item-ico" style="background:var(--gradient-brand-linear)">AS</div>
               <div class="studio-item-info">
                 <div class="studio-item-name">Agentic Studio</div>
                 <div class="studio-item-desc">Agents &amp; workflows</div>
               </div>
             </a>
             <a class="studio-item" href="governance-studio.html" role="menuitem">
-              <div class="studio-item-ico" style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)">GS</div>
+              <div class="studio-item-ico" style="background:var(--gradient-violet-linear)">GS</div>
               <div class="studio-item-info">
                 <div class="studio-item-name">Governance Studio</div>
                 <div class="studio-item-desc">Policies &amp; knowledge</div>
@@ -657,16 +919,23 @@ table, .table { width: 100%; border-collapse: collapse; }
             </a>
           </div>
         </button>
+        <span class="tb-divider" aria-hidden="true"></span>
+        <button class="tb-workspace" id="workspaceLauncher" onclick="toggleWorkspaceSw(event)" aria-label="Switch workspace" aria-haspopup="menu" aria-expanded="false" data-tt="Switch workspace" data-tt-desc="Change the active organization or tenant context.">
+          <div class="tb-workspace-logo" id="ws-current-logo">A</div>
+          <span class="tb-workspace-name" id="ws-current-name">Acme Corp</span>
+          <svg class="tb-workspace-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="workspace-sw" id="workspaceSw" role="menu" aria-label="Workspace switcher"></div>
+        </button>
       </div>
       <div class="tb-search">
         <svg class="tb-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         <input placeholder="Search in AIMS-OS Platform..." aria-label="Global search" />
       </div>
       <div class="tb-right">
-        <button class="icon-btn" title="Notifications" aria-label="Notifications" onclick="toast('Notifications')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-        <button class="icon-btn" title="Activity" aria-label="Activity" onclick="toast('Activity')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 6v2l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-        <button class="icon-btn" title="Settings" aria-label="Settings" onclick="toast('Settings')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-        <button class="avatar-sm" aria-label="User profile" title="User profile" onclick="toast('User profile')" style="border:none;font-family:inherit">TH</button>
+        <button class="icon-btn" aria-label="Notifications" onclick="toast('Notifications')" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+        <button class="icon-btn" aria-label="Activity" onclick="toast('Activity')" data-tt="Activity" data-tt-desc="See recent agent runs and system events."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 6v2l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+        <button class="icon-btn" aria-label="Settings" onclick="toast('Settings')" data-tt="Settings" data-tt-desc="Workspace and account preferences."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+        <button class="avatar-sm" aria-label="User profile" onclick="toast('User profile')" data-tt="Account" data-tt-desc="Your profile, preferences, and sign out." style="border:none;font-family:inherit">TH</button>
       </div>
     </header>
     <div style="flex:1;display:flex;overflow:hidden;position:relative;">
@@ -762,13 +1031,20 @@ table, .table { width: 100%; border-collapse: collapse; }
                   </div>
                   <div style="font-size:12px;color:var(--color-text-caption);margin-bottom:14px">Restrict calls to permitted countries only. All others are blocked.</div>
                   <div id="geo-config" style="display:none">
-                    <select class="input input-sm" style="appearance:none;cursor:pointer;padding-right:28px;margin-bottom:8px">
-                      <option>United States (+1)</option>
-                      <option>Canada (+1)</option>
-                      <option>United Kingdom (+44)</option>
-                      <option>Mexico (+52)</option>
-                    </select>
-                    <p style="font-size:11px;color:var(--color-text-caption)">Only calls from selected countries are permitted.</p>
+                    <div class="mselect" id="geo-mselect">
+                      <div class="mselect__control" id="geo-control" onclick="geoOpenPanel(event)" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Permitted countries">
+                        <div id="geo-chips-row" style="display:contents"></div>
+                        <svg class="mselect__caret" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+                      </div>
+                      <div class="mselect__panel" id="geo-panel" role="listbox" aria-multiselectable="true">
+                        <div class="mselect__search">
+                          <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                          <input type="text" id="geo-search" placeholder="Search country…" aria-label="Search country" oninput="geoSearch(this.value)" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="mselect__list" id="geo-list"></div>
+                      </div>
+                    </div>
+                    <p style="font-size:11px;color:var(--color-text-caption);margin-top:8px">Only calls from selected countries are permitted.</p>
                   </div>
                   <div id="geo-off-msg" style="font-size:12px;color:var(--color-text-caption)">All countries permitted when disabled.</div>
                 </div>
@@ -800,11 +1076,6 @@ table, .table { width: 100%; border-collapse: collapse; }
       <div class="screen" id="screen-agents">
         <div class="agent-page">
           <div class="agent-header">
-            <div class="agent-bc">
-              <button type="button" onclick="showScreen('settings')" style="background:none;border:none;cursor:pointer;color:inherit;font:inherit;padding:0">Agents</button>
-              <span style="color:var(--color-border-neutral-lighter)">/</span>
-              <span style="color:var(--color-icon-primary-default)">Sammy — Service Desk</span>
-            </div>
             <div class="agent-title-row">
               <button style="background:none;border:none;cursor:pointer;padding:0;margin-right:4px;color:var(--color-text-caption)" onclick="showScreen('settings')">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></svg>
@@ -821,7 +1092,7 @@ table, .table { width: 100%; border-collapse: collapse; }
           <div class="agent-tabs">
             <div class="agent-tab">Create</div>
             <div class="agent-tab">Configuration</div>
-            <div class="agent-tab">Knowledge</div>
+            <div class="agent-tab" onclick="switchAgentTab(this,'knowledge')">Knowledge</div>
             <div class="agent-tab">Instructions</div>
             <div class="agent-tab">Tools</div>
             <div class="agent-tab active" onclick="switchAgentTab(this,'channels')">Channels</div>
@@ -912,7 +1183,7 @@ table, .table { width: 100%; border-collapse: collapse; }
             </div>
           </div>
           <div id="panel-channels" style="flex:1;display:flex;flex-direction:row;min-height:0;overflow:hidden;">
-            <div style="flex:1;min-width:0;overflow-y:auto;padding:24px;border-right:1px solid var(--color-border-neutral-default);">
+            <div style="flex:1 1 50%;min-width:0;overflow-y:auto;padding:24px;border-right:1px solid var(--color-border-neutral-default);">
               <div class="flex items-start justify-between mb-5">
                 <div>
                   <p class="text-subtitle-sm" style="color:var(--color-text-title);font-weight:700;margin-bottom:3px">Communication Channels</p>
@@ -988,7 +1259,7 @@ table, .table { width: 100%; border-collapse: collapse; }
                 </div>
               </div>
             </div>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--color-border-neutral-default);">
+            <div style="flex:1 1 50%;min-width:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--color-border-neutral-default);">
               <div style="padding:12px 18px;border-bottom:1px solid var(--color-border-neutral-default);display:flex;align-items:center;gap:8px">
                 <span class="section-title">Test your Agent</span>
                 <span style="width:5px;height:5px;border-radius:50%;background:var(--color-text-success);animation:pulse 1.5s ease-in-out infinite;margin-left:2px"></span>
@@ -1008,6 +1279,54 @@ table, .table { width: 100%; border-collapse: collapse; }
                     <button style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-text-title);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;margin-left:auto;transition:background .15s" onclick="sendChTestMsg()">
                       <svg width="14" height="14" stroke="var(--color-surface-neutral-black)" fill="none" stroke-width="2" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="panel-knowledge" style="display:none;flex:1;min-height:0">
+            <div class="kp-layout">
+              <div class="kp-pane">
+                <div class="flex items-start justify-between mb-4">
+                  <div style="flex:1">
+                    <p class="text-subtitle-sm" style="color:var(--color-text-title);font-weight:700;margin-bottom:3px">Data Access</p>
+                    <p class="text-body-sm" style="max-width:560px">Choose what information your agent can use to answer questions. Knowledge Packs and Shared Drives are governed in <span style="color:var(--color-icon-primary-default);cursor:pointer;font-weight:500" onclick="toast('Open Governance Studio → Knowledge Library')">Governance Studio</span>; own documents live with this agent.</p>
+                  </div>
+                  <button class="btn btn-primary btn-sm" style="flex-shrink:0" onclick="daHandleAdd()">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12"/></svg>
+                    Add
+                  </button>
+                </div>
+                <div class="da-toolbar">
+                  <div class="da-search">
+                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    <input id="da-search" type="text" placeholder="Search drives and documents…" aria-label="Search data sources" oninput="daSearch(this.value)">
+                  </div>
+                  <div class="da-toggle-group" role="tablist" aria-label="Data source type">
+                    <button class="da-toggle is-active" id="da-tab-packs" role="tab" aria-selected="true" onclick="daSetTab('packs')">Knowledge Packs</button>
+                    <button class="da-toggle" id="da-tab-shared" role="tab" aria-selected="false" onclick="daSetTab('shared')">Shared Drives</button>
+                    <button class="da-toggle" id="da-tab-uploaded" role="tab" aria-selected="false" onclick="daSetTab('uploaded')">Own Documents</button>
+                  </div>
+                </div>
+                <div id="da-content"></div>
+              </div>
+              <div class="test-panel">
+                <div class="test-panel-body" id="kp-test-body">
+                  <div style="color:var(--color-icon-primary-default)">
+                    <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                  </div>
+                  <div class="test-panel-title">Test your Agent</div>
+                  <div class="test-panel-sub">Use this simulated chat to see how your agent uses these knowledge sources to answer.</div>
+                </div>
+                <div class="test-input-wrap">
+                  <div class="test-input-box">
+                    <textarea class="test-textarea" id="kp-test-msg" placeholder="Ask the agent something…" aria-label="Test message to agent" rows="2"></textarea>
+                    <div class="flex items-center gap-2">
+                      <button class="btn-icon-sm" title="Attach" aria-label="Attach file" onclick="toast('Attach file')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
+                      <button style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-text-title);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;margin-left:auto;transition:background .15s" onclick="toast('Test message sent')">
+                        <svg width="14" height="14" stroke="var(--color-surface-neutral-black)" fill="none" stroke-width="2" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1538,6 +1857,144 @@ table, .table { width: 100%; border-collapse: collapse; }
     </div>
   </div>
 </div>
+<!-- ═══ Knowledge Pack Library Marketplace ═══ -->
+<div class="kml-ov" id="kmlPacks" onclick="if(event.target===this) closeKml('packs')">
+  <div class="kml kml--tp" role="dialog" aria-label="Knowledge Pack Library">
+    <div class="kml-hd">
+      <div class="kml-hd-left">
+        <div class="kml-hd-ico">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3l1.8 4.2L16 9l-4.2 1.8L10 15l-1.8-4.2L4 9l4.2-1.8L10 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="kml-title">Knowledge Pack Library</div>
+          <div class="kml-sub">Browse and add knowledge packs to this agent</div>
+        </div>
+      </div>
+      <button class="kml-close" aria-label="Close" onclick="closeKml('packs')">×</button>
+    </div>
+    <div class="kml-body">
+      <div class="kml-side" id="kml-packs-side"></div>
+      <div class="kml-right">
+        <div class="kml-toolbar">
+          <div class="kml-search">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="kml-packs-search" type="text" placeholder="Search packs by name or topic…" aria-label="Search packs" oninput="kmlSearch('packs',this.value)">
+          </div>
+        </div>
+        <div class="kml-chips" id="kml-packs-chips"></div>
+        <div class="kml-grid" id="kml-packs-grid"></div>
+      </div>
+    </div>
+    <div class="kml-ft">
+      <span class="kml-ft-info" id="kml-packs-ft-info">Select packs to add to this agent's knowledge base</span>
+      <div class="kml-ft-btns">
+        <button class="kml-ft-cancel" onclick="closeKml('packs')">Cancel</button>
+        <button class="kml-ft-done" id="kml-packs-done" onclick="kmlDone('packs')">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══ Source Drive Library Marketplace ═══ -->
+<div class="kml-ov" id="kmlDrives" onclick="if(event.target===this) closeKml('drives')">
+  <div class="kml kml--drv" role="dialog" aria-label="Source Drive Library">
+    <div class="kml-hd">
+      <div class="kml-hd-left">
+        <div class="kml-hd-ico">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 9h16" stroke="currentColor" stroke-width="1"/><path d="M5 5V4a2 2 0 012-2h3l1.5 3" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="kml-title">Source Drive Library</div>
+          <div class="kml-sub">Connect shared drives to this agent's knowledge base</div>
+        </div>
+      </div>
+      <button class="kml-close" aria-label="Close" onclick="closeKml('drives')">×</button>
+    </div>
+    <div class="kml-body">
+      <div class="kml-side" id="kml-drives-side"></div>
+      <div class="kml-right">
+        <div class="kml-toolbar">
+          <div class="kml-search">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="kml-drives-search" type="text" placeholder="Search drives…" aria-label="Search drives" oninput="kmlSearch('drives',this.value)">
+          </div>
+        </div>
+        <div class="kml-chips" id="kml-drives-chips"></div>
+        <div class="kml-grid" id="kml-drives-grid"></div>
+      </div>
+    </div>
+    <div class="kml-ft">
+      <span class="kml-ft-info" id="kml-drives-ft-info">Select drives to connect to this agent</span>
+      <div class="kml-ft-btns">
+        <button class="kml-ft-cancel" onclick="closeKml('drives')">Cancel</button>
+        <button class="kml-ft-done" id="kml-drives-done" onclick="kmlDone('drives')">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Knowledge Pack picker modal (legacy simple, kept for compat — unused now) -->
+<div class="modal-overlay" id="modal-kp-picker">
+  <div class="modal-dialog" style="width:560px">
+    <button class="modal-dialog__close" onclick="closeKpPicker()" aria-label="Close" title="Close"><svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
+    <div class="modal-dialog__body" style="text-align:left;align-items:stretch;padding:24px 24px 14px">
+      <div style="font-size:17px;font-weight:700;color:var(--color-text-title);margin-bottom:4px">Attach Knowledge Packs</div>
+      <div style="font-size:13px;color:var(--color-text-caption);margin-bottom:16px">Select packs from your workspace library. Already-attached packs are disabled.</div>
+      <div style="position:relative;margin-bottom:12px">
+        <svg width="13" height="13" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" viewBox="0 0 16 16" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="7" cy="7" r="4"/><path d="M10.5 10.5L14 14"/></svg>
+        <input class="input input-sm" id="kp-picker-search" placeholder="Search packs by name or topic…" aria-label="Search packs" style="padding-left:30px" oninput="kpPickerSearch(this.value)">
+      </div>
+      <div class="kp-picker-list" id="kp-picker-list"></div>
+    </div>
+    <div class="modal-dialog__footer">
+      <button class="btn btn-secondary btn-md" style="flex:1;justify-content:center" onclick="closeKpPicker()">Cancel</button>
+      <button class="btn btn-primary btn-md" id="kp-picker-confirm" style="flex:1;justify-content:center" onclick="kpPickerConfirm()" disabled>Attach 0 packs</button>
+    </div>
+  </div>
+</div>
+<!-- Knowledge Pack content editor slideout -->
+<div style="display:none;position:fixed;inset:0;background:rgba(5,8,18,.55);z-index:80" id="kp-editor-overlay" onclick="closeKpEditor()" aria-hidden="true"></div>
+<div class="slide-out slide-out--kp" id="so-kp-editor">
+  <div class="slide-out__header">
+    <div style="flex:1;min-width:0">
+      <div class="slide-out__title" id="kp-editor-title">Pack name</div>
+      <div style="font-size:12px;color:var(--color-text-caption);margin-top:2px" id="kp-editor-subtitle">v1.0 · 0 documents</div>
+    </div>
+    <button class="btn-icon-sm" onclick="closeKpEditor()" aria-label="Close" title="Close">
+      <svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg>
+    </button>
+  </div>
+  <div class="slide-out__body">
+    <div class="kp-editor-banner">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 7v5M8 5v.5"/></svg>
+      <div class="kp-editor-banner-text">Edits made here sync across all studios using this pack. To rename, archive or change ownership, <span class="kp-editor-banner-link" onclick="toast('Open Governance Studio → Knowledge Library')">manage in Governance Studio →</span></div>
+    </div>
+    <div class="tabs" style="margin-bottom:14px">
+      <div class="tab-item active" id="kpe-t-docs" onclick="kpEditorTab('docs')">Documents <span class="tab-count" id="kpe-cnt-docs">0</span></div>
+      <div class="tab-item" id="kpe-t-sources" onclick="kpEditorTab('sources')">Sources <span class="tab-count" id="kpe-cnt-sources">0</span></div>
+      <div class="tab-item" id="kpe-t-snippets" onclick="kpEditorTab('snippets')">Snippets <span class="tab-count" id="kpe-cnt-snippets">0</span></div>
+    </div>
+    <div id="kpe-panel-docs">
+      <div id="kpe-docs-list"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="kpAddItem('docs')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12"/></svg>
+        Add document
+      </button>
+    </div>
+    <div id="kpe-panel-sources" style="display:none">
+      <div id="kpe-sources-list"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="kpAddItem('sources')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12"/></svg>
+        Connect source
+      </button>
+    </div>
+    <div id="kpe-panel-snippets" style="display:none">
+      <div id="kpe-snippets-list"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="kpAddItem('snippets')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12"/></svg>
+        Add snippet
+      </button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="modal-addnum">
   <div class="modal-dialog" style="width:500px">
     <button class="modal-dialog__close" onclick="closeNumModal()"><svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
@@ -1826,7 +2283,7 @@ function toast(msg){
   let ctr=document.getElementById('toastCtr');
   if(!ctr){ ctr=document.createElement('div'); ctr.id='toastCtr'; ctr.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:6px;align-items:center'; document.body.appendChild(ctr); }
   const t=document.createElement('div');
-  t.style.cssText='background:#131929;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.9);padding:8px 14px;border-radius:8px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,0.4);transition:opacity .3s,transform .3s';
+  t.style.cssText='background:var(--color-surface-floating-elevated);border:1px solid var(--color-border-neutral-default);color:var(--color-text-title);padding:8px 14px;border-radius:var(--radius-md);font-size:13px;box-shadow:var(--shadow-tooltip);transition:opacity .3s,transform .3s';
   t.textContent=msg;
   ctr.appendChild(t);
   setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(6px)'; setTimeout(()=>t.remove(),300); }, 2000);
@@ -1902,10 +2359,12 @@ function selectVPGroup(groupId, el){
 function switchAgentTab(el, key){
   document.querySelectorAll('.agent-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  const tools = document.getElementById('panel-tools');
-  const channels = document.getElementById('panel-channels');
-  if(key==='channels'){ tools.style.display='none'; channels.style.display='flex'; }
-  else { tools.style.display='flex'; channels.style.display='none'; }
+  const map = { tools:'panel-tools', channels:'panel-channels', knowledge:'panel-knowledge' };
+  Object.keys(map).forEach(k=>{
+    const p = document.getElementById(map[k]); if(!p) return;
+    p.style.display = (k===key) ? (k==='knowledge' ? 'flex' : 'flex') : 'none';
+  });
+  if(key==='knowledge' && typeof renderAttachedPacks==='function') renderAttachedPacks();
 }
 document.querySelectorAll('.agent-tab:not([onclick])').forEach(t=>{
   t.addEventListener('click', function(){ switchAgentTab(this,'tools'); });
@@ -2333,6 +2792,9 @@ document.addEventListener('keydown', function(e){
   if(document.querySelector('.slide-out.open')){ closeAllSlideouts(); return; }
   if(document.querySelector('.sb-popup.open')){ closeAllSbPopups(); return; }
   if(document.getElementById('studioSw')?.classList.contains('open')){ document.getElementById('studioSw').classList.remove('open'); document.getElementById('studioLauncher').classList.remove('sw-open'); return; }
+  if(document.getElementById('workspaceSw')?.classList.contains('open')){ document.getElementById('workspaceSw').classList.remove('open'); document.getElementById('workspaceLauncher')?.classList.remove('ws-open'); document.getElementById('workspaceLauncher')?.setAttribute('aria-expanded','false'); return; }
+  if(document.querySelector('.mselect.is-open')){ document.querySelectorAll('.mselect.is-open').forEach(ms=>{ ms.classList.remove('is-open'); ms.querySelector('[aria-expanded]')?.setAttribute('aria-expanded','false'); }); return; }
+  if(document.querySelector('.kml-ov.open')){ document.querySelectorAll('.kml-ov.open').forEach(o=>o.classList.remove('open')); return; }
 });
 // A11y: enable keyboard activation for div/span elements that act as buttons
 (function enableA11yKeyboard(){
@@ -2521,6 +2983,1029 @@ function numbersGoToPage(v){
   const n = parseInt(v,10);
   if(!isNaN(n)) { NUMBERS_STATE.page = n; renderNumbers(); }
 }
+// ── Knowledge Packs ──────────────────────────────────────────
+const KNOWLEDGE_PACKS = [
+  { id:'kp-svc-proc',  name:'Service procedures',         desc:'Standard repair and maintenance procedures for common vehicle issues.', version:'v1.4', docs:47, sources:3, snippets:12, updated:'2 days ago', agents:8, networks:3 },
+  { id:'kp-spa-obj',   name:'Spanish objection handling', desc:'Sales and service objection responses in neutral Latin American Spanish.', version:'v2.0', docs:23, sources:1, snippets:34, updated:'5 days ago', agents:4, networks:1 },
+  { id:'kp-vehicle',   name:'Vehicle catalog',            desc:'2024-2026 model specs, trims, and pricing for currently sold vehicles.', version:'v3.2', docs:128, sources:2, snippets:0, updated:'1 hour ago', agents:12, networks:5 },
+  { id:'kp-sox',       name:'SOX compliance rules',       desc:'Compliance scripts and disclosures required for financial transactions.', version:'v1.0', docs:14, sources:0, snippets:8, updated:'3 weeks ago', agents:2, networks:1 },
+  { id:'kp-warranty',  name:'Warranty terms',             desc:'Warranty coverage, exclusions, and claim procedures by manufacturer.', version:'v1.1', docs:31, sources:1, snippets:6, updated:'1 week ago', agents:5, networks:2 },
+  { id:'kp-faqs',      name:'Customer FAQs',              desc:'Top 200 customer questions with vetted responses and escalation paths.', version:'v4.7', docs:89, sources:2, snippets:18, updated:'4 days ago', agents:18, networks:7 },
+  { id:'kp-rouce',     name:'Roadside assistance',        desc:'24/7 roadside protocol, dispatch flow, and partner network details.', version:'v1.2', docs:18, sources:1, snippets:4, updated:'2 weeks ago', agents:3, networks:1 },
+  { id:'kp-promos',    name:'Active promotions',          desc:'Current incentives, lease deals, and special offers (auto-synced).', version:'v8.5', docs:52, sources:4, snippets:11, updated:'15 minutes ago', agents:9, networks:3 }
+];
+const ATTACHED_PACK_IDS = ['kp-svc-proc','kp-spa-obj','kp-faqs','kp-promos'];
+const KP_PICKER_STATE = { selected: [], search: '' };
+const KP_EDITOR_STATE = { packId: null, tab: 'docs' };
+function _kpById(id){ return KNOWLEDGE_PACKS.find(p=>p.id===id); }
+function _kpIcon(){ return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h7.5L13 4.5V14H3V2z"/><path d="M6 6h4M6 9h4M6 12h2"/><path d="M10.5 2v3H13"/></svg>'; }
+// Data Access state
+const UPLOADED_FILES = [
+  { id:'f1', name:'Service intake script Q2 2026.pdf',  size:'124 KB', type:'PDF',  uploaded:'3 days ago' },
+  { id:'f2', name:'Vehicle warranty FAQ.docx',         size:'48 KB',  type:'DOCX', uploaded:'1 week ago' },
+  { id:'f3', name:'Holiday hours notice.txt',           size:'2 KB',   type:'TXT',  uploaded:'2 weeks ago' },
+  { id:'f4', name:'Manager escalation flow.png',        size:'312 KB', type:'PNG',  uploaded:'1 month ago' }
+];
+// Source Drives data
+const DRIVES_DATA = [
+  { id:'drv-svc-policy', name:'Service Policy Drive', desc:'Standard operating procedures, warranty rules, and shop manuals.', cat:'Governance', docs:412, updated:'1 day ago', agents:14, networks:6 },
+  { id:'drv-product',    name:'Vehicle Product Drive', desc:'Model specifications, brochures, MSRP sheets, and feature catalogs.', cat:'Product',    docs:1240,updated:'3 days ago', agents:18, networks:8 },
+  { id:'drv-sales-gtm',  name:'Sales & GTM Playbooks', desc:'Pitch decks, scripts, objection guides, and incentive grids.',     cat:'Sales',      docs:218, updated:'2 hours ago', agents:11, networks:5 },
+  { id:'drv-legal',      name:'Legal & Disclosures',   desc:'Required disclosures, consent forms, and regulatory templates.',   cat:'Legal',      docs:64,  updated:'2 weeks ago', agents:7,  networks:3 },
+  { id:'drv-hr',         name:'HR Onboarding',         desc:'Employee handbook, benefits, and onboarding documentation.',       cat:'HR',         docs:38,  updated:'1 month ago', agents:2,  networks:1 },
+  { id:'drv-finance',    name:'Finance & F&I',         desc:'Lease grids, F&I product menus, payment calculators.',             cat:'Finance',    docs:127, updated:'5 days ago', agents:6,  networks:2 }
+];
+const ATTACHED_DRIVE_IDS = ['drv-svc-policy','drv-product'];
+// Augment KNOWLEDGE_PACKS with categories + planes for marketplace
+KNOWLEDGE_PACKS.forEach(p=>{
+  if(p.cat) return;
+  const map = {
+    'kp-svc-proc':  { cat:'Customer Service', planes:['truth','sources'] },
+    'kp-spa-obj':   { cat:'Sales & Revenue',  planes:['truth','sandbox'] },
+    'kp-vehicle':   { cat:'Sales & Revenue',  planes:['truth','sources'] },
+    'kp-sox':       { cat:'Legal',            planes:['truth'] },
+    'kp-warranty':  { cat:'Legal',            planes:['truth','sources'] },
+    'kp-faqs':      { cat:'Customer Service', planes:['truth','sandbox'] },
+    'kp-rouce':     { cat:'Operations',       planes:['truth','sources'] },
+    'kp-promos':    { cat:'Sales & Revenue',  planes:['sandbox','sources'] }
+  };
+  Object.assign(p, map[p.id] || { cat:'Operations', planes:['truth'] });
+});
+const DA_STATE = { tab:'packs', view:'grid', search:'' };
+// Marketplace state per kind
+const KML_STATE = {
+  packs:  { show:'all', sort:'name', cats:new Set(), planes:new Set(), search:'', pending:new Set() },
+  drives: { show:'all', sort:'name', cats:new Set(),                   search:'', pending:new Set() }
+};
+function _daFileIcon(){ return '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 16 16"><path d="M4 2h6.5L13 4.5V14H4V2z"/><path d="M10.5 2v3H13"/></svg>'; }
+function daSetTab(tab){
+  DA_STATE.tab = tab;
+  ['packs','shared','uploaded'].forEach(k=>{
+    const el = document.getElementById('da-tab-'+k);
+    if(!el) return;
+    el.classList.toggle('is-active', k===tab);
+    el.setAttribute('aria-selected', k===tab);
+  });
+  renderDataAccess();
+}
+function daSetView(view){ DA_STATE.view = view; renderDataAccess(); }
+function daSearch(q){ DA_STATE.search = q; renderDataAccess(); }
+function daHandleAdd(){
+  if(DA_STATE.tab === 'packs') openKml('packs');
+  else if(DA_STATE.tab === 'shared') openKml('drives');
+  else toast('Open file uploader');
+}
+function _kpDriveIcon(){ return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M2 7h12"/><path d="M4 4V3a1 1 0 011-1h2.5l1 2"/></svg>'; }
+// Pack planes (referenced by both data access cards and marketplace)
+const PACK_PLANES = [
+  { id:'truth',   label:'Truth Plane',   color:'#93C5FD' },
+  { id:'sandbox', label:'Sandbox Plane', color:'#C4B5FD' },
+  { id:'sources', label:'Sources Plane', color:'#6EE7B7' }
+];
+// Per-attachment plane state: which planes are ENABLED for this agent's use of the pack
+const PACK_ATTACH_PLANES = {};
+function _ensurePackAttachState(packId){
+  if(!PACK_ATTACH_PLANES[packId]){
+    const p = _kpById(packId);
+    PACK_ATTACH_PLANES[packId] = { expanded: false, planes: new Set(p?.planes || []) };
+  }
+  return PACK_ATTACH_PLANES[packId];
+}
+function _renderPackCard(p){
+  const st = _ensurePackAttachState(p.id);
+  const planeBtns = PACK_PLANES.map(pl => {
+    const on = st.planes.has(pl.id);
+    return '<button class="kp-plane-tog'+(on?' is-on':'')+'" onclick="event.stopPropagation();togglePackPlane(\''+p.id+'\',\''+pl.id+'\')" aria-pressed="'+on+'">'
+      + '<span class="kp-plane-tog__dot" style="background:'+pl.color+'"></span>'
+      + pl.label.replace(' Plane','')
+      + '</button>';
+  }).join('');
+  return '<div class="kp-card'+(st.expanded?' is-expanded':'')+'" id="kp-card-'+p.id+'">'
+    + '<div class="kp-card__row">'
+      + '<button class="kp-card__chev" onclick="event.stopPropagation();togglePackExpand(\''+p.id+'\')" aria-label="'+(st.expanded?'Collapse':'Expand')+' pack details" title="'+(st.expanded?'Collapse':'Expand')+'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>'
+      + '<div class="kp-card__icon">'+_kpIcon()+'</div>'
+      + '<div class="kp-card__main">'
+        + '<div class="kp-card__title">'+p.name+'</div>'
+        + '<div class="kp-card__desc">'+p.desc+'</div>'
+        + '<div class="kp-card__meta">'
+          + '<span class="kp-meta-chip version">'+p.version+'</span>'
+          + '<span class="kp-meta-chip">'+p.docs+' documents</span>'
+          + '<span class="kp-meta-chip">Updated '+p.updated+'</span>'
+          + '<span class="kp-meta-chip blast">Used by '+p.agents+' agents · '+p.networks+' networks</span>'
+        + '</div>'
+      + '</div>'
+      + '<div class="kp-card__actions">'
+        + '<button class="kp-card__eye" aria-label="Preview pack content" title="Preview content" onclick="event.stopPropagation();openKpEditor(\''+p.id+'\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2.2"/></svg></button>'
+        + '<button class="btn btn-secondary btn-sm" onclick="openKpEditor(\''+p.id+'\')">Edit content</button>'
+        + '<button class="btn-icon-sm" aria-label="Detach pack" title="Detach pack" onclick="detachPack(\''+p.id+'\')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>'
+      + '</div>'
+    + '</div>'
+    + '<div class="kp-card__expanded">'
+      + '<div class="kp-planes-row">'
+        + '<span class="kp-planes-lbl">Active planes</span>'
+        + planeBtns
+      + '</div>'
+    + '</div>'
+  + '</div>';
+}
+function togglePackExpand(packId){
+  const st = _ensurePackAttachState(packId);
+  st.expanded = !st.expanded;
+  const card = document.getElementById('kp-card-'+packId);
+  if(card){
+    card.classList.toggle('is-expanded', st.expanded);
+    const chev = card.querySelector('.kp-card__chev');
+    if(chev) chev.setAttribute('aria-label', (st.expanded?'Collapse':'Expand') + ' pack details');
+  }
+}
+function togglePackPlane(packId, planeId){
+  const st = _ensurePackAttachState(packId);
+  if(st.planes.has(planeId)) st.planes.delete(planeId);
+  else st.planes.add(planeId);
+  // Re-render only this card to preserve scroll/expansion of others
+  renderDataAccess();
+}
+function _renderDriveCard(d){
+  return '<div class="kp-card">'
+    + '<div class="kp-card__icon" style="background:rgba(43,127,255,.14);color:#80AFFF">'+_kpDriveIcon()+'</div>'
+    + '<div class="kp-card__main">'
+      + '<div class="kp-card__title">'+d.name+'</div>'
+      + '<div class="kp-card__desc">'+d.desc+'</div>'
+      + '<div class="kp-card__meta">'
+        + '<span class="kp-meta-chip version" style="background:rgba(43,127,255,.14);border-color:rgba(43,127,255,.30);color:#80AFFF">'+d.cat+'</span>'
+        + '<span class="kp-meta-chip">'+d.docs+' documents</span>'
+        + '<span class="kp-meta-chip">Updated '+d.updated+'</span>'
+        + '<span class="kp-meta-chip blast">Used by '+d.agents+' agents · '+d.networks+' networks</span>'
+      + '</div>'
+    + '</div>'
+    + '<div class="kp-card__actions">'
+      + '<button class="btn btn-secondary btn-sm" onclick="toast(\'Browse drive: '+d.name.replace(/\'/g,"\\\\'")+'\')">Browse</button>'
+      + '<button class="btn-icon-sm" aria-label="Disconnect drive" title="Disconnect drive" onclick="detachDrive(\''+d.id+'\')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>'
+    + '</div>'
+  + '</div>';
+}
+function detachDrive(id){
+  const idx = ATTACHED_DRIVE_IDS.indexOf(id);
+  if(idx === -1) return;
+  ATTACHED_DRIVE_IDS.splice(idx, 1);
+  renderDataAccess();
+  const d = DRIVES_DATA.find(x=>x.id===id);
+  toast('Disconnected: ' + (d?.name || 'drive'));
+}
+function renderDataAccess(){
+  const root = document.getElementById('da-content'); if(!root) return;
+  const q = DA_STATE.search.trim().toLowerCase();
+  if(DA_STATE.tab === 'packs'){
+    let packs = ATTACHED_PACK_IDS.map(id=>_kpById(id)).filter(Boolean);
+    if(q) packs = packs.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+    if(packs.length === 0){
+      if(ATTACHED_PACK_IDS.length === 0){
+        root.innerHTML = '<div class="kp-empty"><div class="kp-empty-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h7.5L13 4.5V14H3V2z"/><path d="M6 6h4M6 9h4M6 12h2"/></svg></div><div class="kp-empty-title">No knowledge packs attached</div><div class="kp-empty-desc">Browse the workspace library to give this agent curated knowledge.</div><button class="btn btn-primary btn-sm" onclick="openKml(\'packs\')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12"/></svg> Browse library</button></div>';
+      } else {
+        root.innerHTML = '<div class="kp-empty"><div class="kp-empty-title">No packs match "'+q.replace(/</g,'&lt;')+'"</div><div class="kp-empty-desc">Try a different keyword or clear the search.</div></div>';
+      }
+      return;
+    }
+    root.innerHTML = '<div class="kp-list">' + packs.map(_renderPackCard).join('') + '</div>';
+  } else if(DA_STATE.tab === 'shared'){
+    let drives = ATTACHED_DRIVE_IDS.map(id=>DRIVES_DATA.find(d=>d.id===id)).filter(Boolean);
+    if(q) drives = drives.filter(d => d.name.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q));
+    if(drives.length === 0){
+      if(ATTACHED_DRIVE_IDS.length === 0){
+        root.innerHTML = '<div class="kp-empty"><div class="kp-empty-icon" style="background:rgba(43,127,255,.14);color:#80AFFF"><svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M2 7h12"/><path d="M4 4V3a1 1 0 011-1h2.5l1 2"/></svg></div><div class="kp-empty-title">No drives connected</div><div class="kp-empty-desc">Connect shared drives so this agent can search files in your workspace.</div><button class="btn btn-primary btn-sm" onclick="openKml(\'drives\')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12"/></svg> Browse drives</button></div>';
+      } else {
+        root.innerHTML = '<div class="kp-empty"><div class="kp-empty-title">No drives match "'+q.replace(/</g,'&lt;')+'"</div><div class="kp-empty-desc">Try a different keyword or clear the search.</div></div>';
+      }
+      return;
+    }
+    root.innerHTML = '<div class="kp-list">' + drives.map(_renderDriveCard).join('') + '</div>';
+  } else {
+    let files = UPLOADED_FILES;
+    if(q) files = files.filter(f => f.name.toLowerCase().includes(q));
+    if(files.length === 0){
+      root.innerHTML = '<div class="kp-empty"><div class="kp-empty-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2h6.5L13 4.5V14H4V2z"/><path d="M10.5 2v3H13"/></svg></div><div class="kp-empty-title">'+(UPLOADED_FILES.length===0?'No files uploaded yet':'No files match "'+q.replace(/</g,'&lt;')+'"')+'</div><div class="kp-empty-desc">'+(UPLOADED_FILES.length===0?'Upload files directly to give this agent quick reference material.':'Try a different keyword or clear the search.')+'</div>'+(UPLOADED_FILES.length===0?'<button class="btn btn-primary btn-sm" onclick="toast(\'Open file uploader\')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12"/></svg> Upload file</button>':'')+'</div>';
+      return;
+    }
+    root.innerHTML = files.map(f =>
+      '<div class="da-file-row"><div class="da-file-row__icon">'+_daFileIcon()+'</div>'
+      + '<div class="da-file-row__main"><div class="da-file-row__name">'+f.name+'</div><div class="da-file-row__meta">'+f.type+' · '+f.size+' · Uploaded '+f.uploaded+'</div></div>'
+      + '<div class="da-file-row__actions"><button class="btn-icon-sm" aria-label="Download" title="Download" onclick="toast(\'Download '+f.name.replace(/\'/g,"\\\\'")+'\')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></svg></button><button class="btn-icon-sm" aria-label="Remove file" title="Remove file" onclick="toast(\'Remove file\')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button></div></div>'
+    ).join('');
+  }
+}
+function renderAttachedPacks(){ renderDataAccess(); }
+function detachPack(id){
+  const idx = ATTACHED_PACK_IDS.indexOf(id);
+  if(idx === -1) return;
+  ATTACHED_PACK_IDS.splice(idx, 1);
+  renderAttachedPacks();
+  toast('Detached: ' + (_kpById(id)?.name || 'pack'));
+}
+function openKpPicker(){
+  KP_PICKER_STATE.selected = [];
+  KP_PICKER_STATE.search = '';
+  const inp = document.getElementById('kp-picker-search'); if(inp) inp.value = '';
+  renderKpPicker();
+  document.getElementById('modal-kp-picker').classList.add('open');
+}
+function closeKpPicker(){
+  document.getElementById('modal-kp-picker').classList.remove('open');
+}
+function kpPickerSearch(q){ KP_PICKER_STATE.search = q; renderKpPicker(); }
+function kpPickerToggle(id){
+  const p = _kpById(id); if(!p) return;
+  if(ATTACHED_PACK_IDS.includes(id)) return;
+  const i = KP_PICKER_STATE.selected.indexOf(id);
+  if(i === -1) KP_PICKER_STATE.selected.push(id);
+  else KP_PICKER_STATE.selected.splice(i, 1);
+  renderKpPicker();
+}
+function renderKpPicker(){
+  const list = document.getElementById('kp-picker-list'); if(!list) return;
+  const q = KP_PICKER_STATE.search.trim().toLowerCase();
+  const filtered = !q ? KNOWLEDGE_PACKS : KNOWLEDGE_PACKS.filter(p =>
+    p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)
+  );
+  if(filtered.length === 0){
+    list.innerHTML = '<div style="padding:24px 12px;text-align:center;font-size:12px;color:var(--color-text-caption)">No packs match "'+q.replace(/</g,'&lt;')+'"</div>';
+  } else {
+    list.innerHTML = filtered.map(p=>{
+      const attached = ATTACHED_PACK_IDS.includes(p.id);
+      const selected = KP_PICKER_STATE.selected.includes(p.id);
+      const cls = 'kp-picker-row' + (attached?' is-attached':'') + (selected?' is-selected':'');
+      const onclick = attached ? '' : ' onclick="kpPickerToggle(\''+p.id+'\')"';
+      return '<div class="'+cls+'"'+onclick+'>'
+        + '<span class="kp-picker-checkbox"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5l2 2 4.5-5"/></svg></span>'
+        + '<div class="kp-picker-info">'
+          + '<div class="kp-picker-name">'+p.name+(attached?'<span class="kp-picker-attached">Attached</span>':'')+'</div>'
+          + '<div class="kp-picker-meta">'+p.version+' · '+p.docs+' documents · Used by '+p.agents+' agents</div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  }
+  const btn = document.getElementById('kp-picker-confirm');
+  const n = KP_PICKER_STATE.selected.length;
+  if(btn){
+    btn.disabled = n === 0;
+    btn.textContent = n === 0 ? 'Attach 0 packs' : ('Attach ' + n + ' pack' + (n>1?'s':''));
+  }
+}
+function kpPickerConfirm(){
+  const added = [];
+  KP_PICKER_STATE.selected.forEach(id => {
+    if(!ATTACHED_PACK_IDS.includes(id)){ ATTACHED_PACK_IDS.push(id); added.push(_kpById(id)?.name || id); }
+  });
+  closeKpPicker();
+  renderAttachedPacks();
+  if(added.length === 1) toast('Attached: ' + added[0]);
+  else if(added.length > 1) toast('Attached ' + added.length + ' packs');
+}
+// ── Knowledge Pack content editor ──────────────────────────
+// Default seed content used for any pack the user opens for the first time.
+const _KP_DOCS_DEFAULT = [
+  { name:'Engine oil change procedure', updated:'2 days ago', size:'4 KB' },
+  { name:'Brake pad replacement guide',  updated:'1 week ago',  size:'12 KB' },
+  { name:'Tire rotation pattern (FWD)',  updated:'3 days ago',  size:'2 KB' },
+  { name:'Battery diagnostic checklist', updated:'5 hours ago', size:'6 KB' },
+  { name:'Coolant flush — V6 engines',   updated:'2 weeks ago', size:'8 KB' }
+];
+const _KP_SOURCES_DEFAULT = [
+  { name:'Manufacturer service manual feed', type:'API · Auto-sync', updated:'15 min ago' },
+  { name:'Internal SharePoint folder',       type:'Folder sync',     updated:'1 hour ago' },
+  { name:'Service bulletins (RSS)',          type:'RSS · Daily',     updated:'4 hours ago' }
+];
+const _KP_SNIPPETS_DEFAULT = [
+  { name:'Greeting — Service intake', text:'Thanks for calling AIMS Service. I\'m {agent_name}…' },
+  { name:'Disclosure — Recording',    text:'This call may be recorded for quality and training…' },
+  { name:'Closing — Appointment confirmed', text:'Your appointment is set for {appt_date} at {appt_time}…' }
+];
+// Per-pack content store. Lazily initialised from the defaults the first time
+// a pack is opened. Each entry is an immutable-ish snapshot: mutations always
+// create new arrays/objects via _kpUpdateContent() to keep state predictable.
+const PACK_CONTENT = {};
+function _kpEnsureContent(id){
+  if(PACK_CONTENT[id]) return PACK_CONTENT[id];
+  PACK_CONTENT[id] = {
+    docs:     _KP_DOCS_DEFAULT.map(d=>({...d})),
+    sources:  _KP_SOURCES_DEFAULT.map(s=>({...s})),
+    snippets: _KP_SNIPPETS_DEFAULT.map(s=>({...s}))
+  };
+  return PACK_CONTENT[id];
+}
+function _kpUpdateContent(id, kind, transform){
+  const cur = _kpEnsureContent(id);
+  PACK_CONTENT[id] = { ...cur, [kind]: transform(cur[kind]) };
+  // Sync counter on the pack object so the parent card reflects reality.
+  const p = _kpById(id);
+  if(p){
+    if(kind==='docs')     p.docs     = PACK_CONTENT[id].docs.length;
+    if(kind==='sources')  p.sources  = PACK_CONTENT[id].sources.length;
+    if(kind==='snippets') p.snippets = PACK_CONTENT[id].snippets.length;
+    p.updated = 'just now';
+  }
+  return PACK_CONTENT[id];
+}
+function _kpDocIcon(){ return '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 16 16"><path d="M4 2h6.5L13 4.5V14H4V2z"/><path d="M10.5 2v3H13"/></svg>'; }
+function _kpSrcIcon(){ return '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/><path d="M3 8h10M8 3a7 7 0 010 10M8 3a7 7 0 000 10"/></svg>'; }
+function _kpSnipIcon(){ return '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 16 16"><path d="M5 2L3 7l2 5M11 2l2 5-2 5"/></svg>'; }
+function _kpEditIcon(){ return '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M11 3l2 2-7 7H4v-2z"/></svg>'; }
+function _kpCheckIcon(){ return '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg>'; }
+function _kpTrashIcon(){ return '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 4h10M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1M6 7v5M10 7v5M4 4l1 9a1 1 0 001 1h4a1 1 0 001-1l1-9"/></svg>'; }
+function _esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+function _kpRowDoc(d, idx, editing){
+  if(editing){
+    return '<div class="kp-doc-row is-editing"><div class="kp-doc-row__icon">'+_kpDocIcon()+'</div>'
+      + '<div class="kp-doc-row__main">'
+      + '<input class="kp-doc-row__name-input" id="kpe-edit-docs-'+idx+'" value="'+_esc(d.name)+'" aria-label="Document name" onkeydown="if(event.key===\'Enter\'){event.preventDefault();kpCommitEdit()} if(event.key===\'Escape\'){kpCancelEdit()}">'
+      + '<div class="kp-doc-row__meta" style="margin-top:6px">'+_esc(d.size)+' · Updated '+_esc(d.updated)+'</div>'
+      + '</div>'
+      + '<div class="kp-doc-row__actions"><button class="btn-icon-sm" aria-label="Save" title="Save" onclick="kpCommitEdit()">'+_kpCheckIcon()+'</button><button class="btn-icon-sm" aria-label="Cancel" title="Cancel" onclick="kpCancelEdit()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button></div></div>';
+  }
+  return '<div class="kp-doc-row"><div class="kp-doc-row__icon">'+_kpDocIcon()+'</div>'
+    + '<div class="kp-doc-row__main"><div class="kp-doc-row__name">'+_esc(d.name)+'</div><div class="kp-doc-row__meta">'+_esc(d.size)+' · Updated '+_esc(d.updated)+'</div></div>'
+    + '<div class="kp-doc-row__actions"><button class="btn-icon-sm" aria-label="Rename document" title="Rename" onclick="kpStartEdit(\'docs\','+idx+')">'+_kpEditIcon()+'</button><button class="btn-icon-sm" aria-label="Remove document" title="Remove" onclick="kpRemoveItem(\'docs\','+idx+')">'+_kpTrashIcon()+'</button></div></div>';
+}
+function _kpRowSrc(s, idx, editing){
+  if(editing){
+    return '<div class="kp-doc-row is-editing"><div class="kp-doc-row__icon">'+_kpSrcIcon()+'</div>'
+      + '<div class="kp-doc-row__main">'
+      + '<input class="kp-doc-row__name-input" id="kpe-edit-sources-'+idx+'" value="'+_esc(s.name)+'" aria-label="Source name" onkeydown="if(event.key===\'Enter\'){event.preventDefault();kpCommitEdit()} if(event.key===\'Escape\'){kpCancelEdit()}">'
+      + '<div class="kp-doc-row__meta" style="margin-top:6px">'+_esc(s.type)+' · Synced '+_esc(s.updated)+'</div>'
+      + '</div>'
+      + '<div class="kp-doc-row__actions"><button class="btn-icon-sm" aria-label="Save" title="Save" onclick="kpCommitEdit()">'+_kpCheckIcon()+'</button><button class="btn-icon-sm" aria-label="Cancel" title="Cancel" onclick="kpCancelEdit()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button></div></div>';
+  }
+  return '<div class="kp-doc-row"><div class="kp-doc-row__icon">'+_kpSrcIcon()+'</div>'
+    + '<div class="kp-doc-row__main"><div class="kp-doc-row__name">'+_esc(s.name)+'</div><div class="kp-doc-row__meta">'+_esc(s.type)+' · Synced '+_esc(s.updated)+'</div></div>'
+    + '<div class="kp-doc-row__actions"><button class="btn-icon-sm" aria-label="Rename source" title="Rename" onclick="kpStartEdit(\'sources\','+idx+')">'+_kpEditIcon()+'</button><button class="btn-icon-sm" aria-label="Remove source" title="Remove" onclick="kpRemoveItem(\'sources\','+idx+')">'+_kpTrashIcon()+'</button></div></div>';
+}
+function _kpRowSnip(s, idx, editing){
+  if(editing){
+    return '<div class="kp-doc-row is-editing" style="align-items:flex-start"><div class="kp-doc-row__icon">'+_kpSnipIcon()+'</div>'
+      + '<div class="kp-doc-row__main">'
+      + '<input class="kp-doc-row__name-input" id="kpe-edit-snippets-'+idx+'-name" value="'+_esc(s.name)+'" aria-label="Snippet label" onkeydown="if(event.key===\'Enter\'){event.preventDefault();document.getElementById(\'kpe-edit-snippets-'+idx+'-text\').focus()} if(event.key===\'Escape\'){kpCancelEdit()}">'
+      + '<textarea class="kp-doc-row__text-input" id="kpe-edit-snippets-'+idx+'-text" aria-label="Snippet text" onkeydown="if(event.key===\'Escape\'){kpCancelEdit()}">'+_esc(s.text)+'</textarea>'
+      + '</div>'
+      + '<div class="kp-doc-row__actions"><button class="btn-icon-sm" aria-label="Save" title="Save" onclick="kpCommitEdit()">'+_kpCheckIcon()+'</button><button class="btn-icon-sm" aria-label="Cancel" title="Cancel" onclick="kpCancelEdit()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button></div></div>';
+  }
+  return '<div class="kp-doc-row"><div class="kp-doc-row__icon">'+_kpSnipIcon()+'</div>'
+    + '<div class="kp-doc-row__main"><div class="kp-doc-row__name">'+_esc(s.name)+'</div><div class="kp-doc-row__meta">"'+_esc(s.text)+'"</div></div>'
+    + '<div class="kp-doc-row__actions"><button class="btn-icon-sm" aria-label="Edit snippet" title="Edit" onclick="kpStartEdit(\'snippets\','+idx+')">'+_kpEditIcon()+'</button><button class="btn-icon-sm" aria-label="Remove snippet" title="Remove" onclick="kpRemoveItem(\'snippets\','+idx+')">'+_kpTrashIcon()+'</button></div></div>';
+}
+function _renderKpEditor(){
+  const id = KP_EDITOR_STATE.packId; if(!id) return;
+  const p = _kpById(id); if(!p) return;
+  const c = _kpEnsureContent(id);
+  const editing = KP_EDITOR_STATE.editing; // { kind, idx } | null
+  document.getElementById('kp-editor-title').textContent = p.name;
+  document.getElementById('kp-editor-subtitle').textContent = p.version + ' · ' + c.docs.length + ' documents · Updated ' + p.updated;
+  document.getElementById('kpe-cnt-docs').textContent = c.docs.length;
+  document.getElementById('kpe-cnt-sources').textContent = c.sources.length;
+  document.getElementById('kpe-cnt-snippets').textContent = c.snippets.length;
+  const isEd = (kind, idx) => editing && editing.kind===kind && editing.idx===idx;
+  document.getElementById('kpe-docs-list').innerHTML =
+    c.docs.length===0 ? '<div class="kpe-empty">No documents yet. Click <strong>Add document</strong> to start.</div>'
+    : c.docs.map((d,i)=>_kpRowDoc(d, i, isEd('docs', i))).join('');
+  document.getElementById('kpe-sources-list').innerHTML =
+    c.sources.length===0 ? '<div class="kpe-empty">No sources yet. Click <strong>Connect source</strong> to add one.</div>'
+    : c.sources.map((s,i)=>_kpRowSrc(s, i, isEd('sources', i))).join('');
+  document.getElementById('kpe-snippets-list').innerHTML =
+    c.snippets.length===0 ? '<div class="kpe-empty">No snippets yet. Click <strong>Add snippet</strong> to start.</div>'
+    : c.snippets.map((s,i)=>_kpRowSnip(s, i, isEd('snippets', i))).join('');
+  // Auto-focus the active editor field, if any.
+  if(editing){
+    const focusId = editing.kind==='snippets'
+      ? 'kpe-edit-snippets-'+editing.idx+'-name'
+      : 'kpe-edit-'+editing.kind+'-'+editing.idx;
+    const el = document.getElementById(focusId);
+    if(el){ el.focus(); el.select && el.select(); }
+  }
+}
+function openKpEditor(id){
+  const p = _kpById(id); if(!p) return;
+  KP_EDITOR_STATE.packId = id;
+  KP_EDITOR_STATE.tab = 'docs';
+  KP_EDITOR_STATE.editing = null;
+  _kpEnsureContent(id);
+  _renderKpEditor();
+  kpEditorTab('docs');
+  document.getElementById('so-kp-editor').classList.add('open');
+  document.getElementById('kp-editor-overlay').style.display = 'block';
+}
+function closeKpEditor(){
+  document.getElementById('so-kp-editor').classList.remove('open');
+  document.getElementById('kp-editor-overlay').style.display = 'none';
+  KP_EDITOR_STATE.packId = null;
+  KP_EDITOR_STATE.editing = null;
+  // Refresh attached pack cards so doc/source/snippet counts reflect edits.
+  if(typeof renderAttachedPacks==='function') renderAttachedPacks();
+}
+function kpEditorTab(key){
+  KP_EDITOR_STATE.tab = key;
+  KP_EDITOR_STATE.editing = null;
+  ['docs','sources','snippets'].forEach(k=>{
+    document.getElementById('kpe-t-'+k).classList.toggle('active', k===key);
+    document.getElementById('kpe-panel-'+k).style.display = k===key ? 'block' : 'none';
+  });
+  if(KP_EDITOR_STATE.packId) _renderKpEditor();
+}
+function kpStartEdit(kind, idx){
+  KP_EDITOR_STATE.editing = { kind, idx };
+  _renderKpEditor();
+}
+function kpCancelEdit(){
+  KP_EDITOR_STATE.editing = null;
+  _renderKpEditor();
+}
+function kpCommitEdit(){
+  const id = KP_EDITOR_STATE.packId; const e = KP_EDITOR_STATE.editing;
+  if(!id || !e) return;
+  if(e.kind==='snippets'){
+    const nameEl = document.getElementById('kpe-edit-snippets-'+e.idx+'-name');
+    const textEl = document.getElementById('kpe-edit-snippets-'+e.idx+'-text');
+    if(!nameEl || !textEl) return;
+    const name = nameEl.value.trim() || 'Untitled snippet';
+    const text = textEl.value.trim() || '…';
+    _kpUpdateContent(id, 'snippets', list => list.map((s,i)=> i===e.idx ? {...s, name, text} : s));
+    toast('Snippet updated');
+  } else {
+    const inp = document.getElementById('kpe-edit-'+e.kind+'-'+e.idx);
+    if(!inp) return;
+    const name = inp.value.trim() || (e.kind==='docs' ? 'Untitled document' : 'Untitled source');
+    _kpUpdateContent(id, e.kind, list => list.map((it,i)=> i===e.idx ? {...it, name, updated:'just now'} : it));
+    toast(e.kind==='docs' ? 'Document renamed' : 'Source renamed');
+  }
+  KP_EDITOR_STATE.editing = null;
+  _renderKpEditor();
+}
+function kpAddItem(kind){
+  const id = KP_EDITOR_STATE.packId; if(!id) return;
+  let item;
+  if(kind==='docs')          item = { name:'New document',   size:'0 KB',           updated:'just now' };
+  else if(kind==='sources')  item = { name:'New source',     type:'Manual · Draft', updated:'just now' };
+  else                       item = { name:'New snippet',    text:'Type the snippet text here…' };
+  let newIdx;
+  _kpUpdateContent(id, kind, list => { newIdx = list.length; return [...list, item]; });
+  // Switch to the affected tab and immediately enter edit mode on the new row.
+  kpEditorTab(kind);
+  KP_EDITOR_STATE.editing = { kind, idx: newIdx };
+  _renderKpEditor();
+  toast(kind==='docs' ? 'Document added — name it' : kind==='sources' ? 'Source added — name it' : 'Snippet added — write the text');
+}
+function kpRemoveItem(kind, idx){
+  const id = KP_EDITOR_STATE.packId; if(!id) return;
+  _kpUpdateContent(id, kind, list => list.filter((_,i)=> i!==idx));
+  if(KP_EDITOR_STATE.editing && KP_EDITOR_STATE.editing.kind===kind && KP_EDITOR_STATE.editing.idx===idx){
+    KP_EDITOR_STATE.editing = null;
+  }
+  _renderKpEditor();
+  toast(kind==='docs' ? 'Document removed' : kind==='sources' ? 'Source removed' : 'Snippet removed');
+}
+renderAttachedPacks();
+// ── Knowledge / Drive Library Marketplace ────────────────────
+function _kmlData(kind){
+  return kind==='packs' ? KNOWLEDGE_PACKS : DRIVES_DATA;
+}
+function _kmlAttached(kind){
+  return kind==='packs' ? ATTACHED_PACK_IDS : ATTACHED_DRIVE_IDS;
+}
+function _kmlCats(kind){
+  const data = _kmlData(kind);
+  const counts = {};
+  data.forEach(item => { const c = item.cat || 'Other'; counts[c] = (counts[c]||0) + 1; });
+  return Object.keys(counts).sort().map(c => ({ name:c, count:counts[c] }));
+}
+function renderKmlSidebar(kind){
+  const side = document.getElementById('kml-'+kind+'-side'); if(!side) return;
+  const st = KML_STATE[kind];
+  const cats = _kmlCats(kind);
+  let html = '';
+  // Show pills
+  html += '<div class="kml-side-lbl">Show</div>';
+  html += '<div class="kml-pills">';
+  ['all','new','added'].forEach(k=>{
+    const lbl = k==='all'?'All':(k==='new'?'Not added':'Added');
+    html += '<button class="kml-pill'+(st.show===k?' is-active':'')+'" onclick="kmlSetShow(\''+kind+'\',\''+k+'\')">'+lbl+'</button>';
+  });
+  html += '</div>';
+  html += '<div class="kml-side-sep"></div>';
+  // Sort
+  html += '<div class="kml-side-lbl">Sort by</div>';
+  html += '<select class="kml-sort" onchange="kmlSetSort(\''+kind+'\',this.value)">'
+    + '<option value="name"'+(st.sort==='name'?' selected':'')+'>Name A → Z</option>'
+    + '<option value="content"'+(st.sort==='content'?' selected':'')+'>Most content</option>'
+    + '<option value="recent"'+(st.sort==='recent'?' selected':'')+'>Recently updated</option>'
+    + '</select>';
+  html += '<div class="kml-side-sep"></div>';
+  // Categories
+  html += '<div class="kml-side-lbl">Categories</div>';
+  cats.forEach(c=>{
+    const active = st.cats.has(c.name);
+    html += '<button class="kml-chk-item'+(active?' is-active':'')+'" onclick="kmlToggleCat(\''+kind+'\',\''+c.name.replace(/\'/g,"\\\\'")+'\')">'
+      + '<span class="kml-chk-box"></span>'
+      + '<span class="kml-chk-lbl">'+c.name+'</span>'
+      + '<span class="kml-cat-cnt">'+c.count+'</span>'
+      + '</button>';
+  });
+  // Planes (packs only)
+  if(kind==='packs'){
+    html += '<div class="kml-side-sep"></div>';
+    html += '<div class="kml-side-lbl">Planes</div>';
+    PACK_PLANES.forEach(p=>{
+      const active = st.planes.has(p.id);
+      html += '<button class="kml-chk-item'+(active?' is-active':'')+'" onclick="kmlTogglePlane(\''+kind+'\',\''+p.id+'\')">'
+        + '<span class="kml-chk-box"></span>'
+        + '<span class="kml-plane-dot" style="background:'+p.color+'"></span>'
+        + '<span class="kml-chk-lbl">'+p.label+'</span>'
+        + '</button>';
+    });
+  }
+  side.innerHTML = html;
+}
+function _kmlFilter(kind){
+  const st = KML_STATE[kind];
+  const data = _kmlData(kind);
+  const attached = _kmlAttached(kind);
+  let result = data.slice();
+  if(st.show==='new')   result = result.filter(it => !attached.includes(it.id) && !st.pending.has(it.id));
+  if(st.show==='added') result = result.filter(it => attached.includes(it.id) || st.pending.has(it.id));
+  if(st.cats.size > 0)  result = result.filter(it => st.cats.has(it.cat || 'Other'));
+  if(kind==='packs' && st.planes.size > 0) result = result.filter(it => (it.planes||[]).some(p => st.planes.has(p)));
+  if(st.search.trim()){
+    const q = st.search.trim().toLowerCase();
+    result = result.filter(it => it.name.toLowerCase().includes(q) || (it.desc||'').toLowerCase().includes(q) || (it.cat||'').toLowerCase().includes(q));
+  }
+  if(st.sort==='name')    result.sort((a,b)=>a.name.localeCompare(b.name));
+  if(st.sort==='content') result.sort((a,b)=>(b.docs||0)-(a.docs||0));
+  if(st.sort==='recent')  result.sort((a,b)=>(a.updated||'').localeCompare(b.updated||''));
+  return result;
+}
+function renderKmlChips(kind){
+  const root = document.getElementById('kml-'+kind+'-chips'); if(!root) return;
+  const st = KML_STATE[kind];
+  let html = '';
+  st.cats.forEach(c => {
+    html += '<span class="kml-chip">'+c+'<button class="kml-chip-x" onclick="kmlToggleCat(\''+kind+'\',\''+c.replace(/\'/g,"\\\\'")+'\')"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
+  });
+  if(kind==='packs'){
+    st.planes.forEach(pl => {
+      const def = PACK_PLANES.find(p=>p.id===pl);
+      html += '<span class="kml-chip">'+def?.label+'<button class="kml-chip-x" onclick="kmlTogglePlane(\''+kind+'\',\''+pl+'\')"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
+    });
+  }
+  if(st.show==='new'  ) html += '<span class="kml-chip">Not added<button class="kml-chip-x" onclick="kmlSetShow(\''+kind+'\',\'all\')"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
+  if(st.show==='added') html += '<span class="kml-chip">Added<button class="kml-chip-x" onclick="kmlSetShow(\''+kind+'\',\'all\')"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
+  root.innerHTML = html;
+}
+function _renderKmlPackCard(p){
+  const attached = ATTACHED_PACK_IDS.includes(p.id);
+  const pending = KML_STATE.packs.pending.has(p.id);
+  const isAdded = attached || pending;
+  let planeDots = '';
+  (p.planes||[]).forEach(pl=>{ const d = PACK_PLANES.find(x=>x.id===pl); if(d) planeDots += '<span class="kml-plane-dot" style="background:'+d.color+'" title="'+d.label+'"></span>'; });
+  return '<div class="kml-card">'
+    + '<div class="kml-card-hd">'
+      + '<div class="kml-card-ico">'+_kpIcon()+'</div>'
+      + '<div style="flex:1;min-width:0">'
+        + '<div class="kml-card-name">'+p.name+'</div>'
+        + '<div class="kml-card-cat">'+(p.cat||'')+'</div>'
+      + '</div>'
+    + '</div>'
+    + '<div class="kml-card-desc">'+p.desc+'</div>'
+    + '<div class="kml-card-stats">'
+      + '<div class="kml-card-stat"><strong>'+p.docs+'</strong> docs</div>'
+      + '<div class="kml-card-stat">'+p.version+'</div>'
+      + (planeDots ? '<div class="kml-card-planes">'+planeDots+'</div>' : '')
+    + '</div>'
+    + '<div class="kml-card-ft">'
+      + '<span style="font-size:11px;color:rgba(255,255,255,.45)">Updated '+p.updated+'</span>'
+      + '<button class="kml-card-add'+(isAdded?' is-added':'')+'" onclick="kmlToggleAdd(\'packs\',\''+p.id+'\')">'+(isAdded?'✓ Added':'+ Add')+'</button>'
+    + '</div>'
+  + '</div>';
+}
+function _renderKmlDriveCard(d){
+  const attached = ATTACHED_DRIVE_IDS.includes(d.id);
+  const pending = KML_STATE.drives.pending.has(d.id);
+  const isAdded = attached || pending;
+  return '<div class="kml-card">'
+    + '<div class="kml-card-hd">'
+      + '<div class="kml-card-ico">'+_kpDriveIcon()+'</div>'
+      + '<div style="flex:1;min-width:0">'
+        + '<div class="kml-card-name">'+d.name+'</div>'
+        + '<div class="kml-card-cat">'+(d.cat||'')+'</div>'
+      + '</div>'
+    + '</div>'
+    + '<div class="kml-card-desc">'+d.desc+'</div>'
+    + '<div class="kml-card-stats">'
+      + '<div class="kml-card-stat"><strong>'+d.docs+'</strong> documents</div>'
+      + '<div class="kml-card-stat">'+d.agents+' agents</div>'
+    + '</div>'
+    + '<div class="kml-card-ft">'
+      + '<span style="font-size:11px;color:rgba(255,255,255,.45)">Updated '+d.updated+'</span>'
+      + '<button class="kml-card-add'+(isAdded?' is-added':'')+'" onclick="kmlToggleAdd(\'drives\',\''+d.id+'\')">'+(isAdded?'✓ Added':'+ Add')+'</button>'
+    + '</div>'
+  + '</div>';
+}
+function renderKmlGrid(kind){
+  const grid = document.getElementById('kml-'+kind+'-grid'); if(!grid) return;
+  const items = _kmlFilter(kind);
+  if(items.length === 0){
+    grid.innerHTML = '<div class="kml-empty">No '+kind+' match the current filters.</div>';
+  } else {
+    grid.innerHTML = items.map(it => kind==='packs' ? _renderKmlPackCard(it) : _renderKmlDriveCard(it)).join('');
+  }
+  // Update footer info
+  const ft = document.getElementById('kml-'+kind+'-ft-info');
+  const pendingCount = KML_STATE[kind].pending.size;
+  const attachedCount = _kmlAttached(kind).length;
+  if(ft){
+    if(pendingCount > 0) ft.innerHTML = '<strong>'+pendingCount+'</strong> '+(pendingCount===1?(kind==='packs'?'pack':'drive'):(kind==='packs'?'packs':'drives'))+' to add · '+attachedCount+' currently attached';
+    else ft.textContent = attachedCount + ' ' + (kind==='packs'?(attachedCount===1?'pack':'packs'):(attachedCount===1?'drive':'drives')) + ' currently attached';
+  }
+}
+function renderKml(kind){ renderKmlSidebar(kind); renderKmlChips(kind); renderKmlGrid(kind); }
+function openKml(kind){
+  KML_STATE[kind].pending = new Set();
+  KML_STATE[kind].search = '';
+  const inp = document.getElementById('kml-'+kind+'-search'); if(inp) inp.value = '';
+  renderKml(kind);
+  document.getElementById('kml'+(kind==='packs'?'Packs':'Drives')).classList.add('open');
+}
+function closeKml(kind){
+  document.getElementById('kml'+(kind==='packs'?'Packs':'Drives')).classList.remove('open');
+}
+function kmlSearch(kind, q){ KML_STATE[kind].search = q; renderKmlGrid(kind); }
+function kmlSetShow(kind, val){ KML_STATE[kind].show = val; renderKml(kind); }
+function kmlSetSort(kind, val){ KML_STATE[kind].sort = val; renderKmlGrid(kind); }
+function kmlToggleCat(kind, cat){ const s = KML_STATE[kind].cats; if(s.has(cat)) s.delete(cat); else s.add(cat); renderKml(kind); }
+function kmlTogglePlane(kind, pl){ const s = KML_STATE[kind].planes; if(s.has(pl)) s.delete(pl); else s.add(pl); renderKml(kind); }
+function kmlToggleAdd(kind, id){
+  const attached = _kmlAttached(kind);
+  if(attached.includes(id)){
+    // Already attached — remove it (will detach on Done)
+    if(KML_STATE[kind].pending.has(id)) KML_STATE[kind].pending.delete(id);
+    else KML_STATE[kind].pending.add(id+':detach');
+  } else {
+    const p = KML_STATE[kind].pending;
+    if(p.has(id)) p.delete(id); else p.add(id);
+  }
+  renderKmlGrid(kind);
+}
+function kmlDone(kind){
+  const attached = _kmlAttached(kind);
+  let added = 0, removed = 0;
+  KML_STATE[kind].pending.forEach(id => {
+    if(typeof id === 'string' && id.endsWith(':detach')){
+      const realId = id.replace(':detach','');
+      const idx = attached.indexOf(realId);
+      if(idx >= 0){ attached.splice(idx, 1); removed++; }
+    } else if(!attached.includes(id)){
+      attached.push(id); added++;
+    }
+  });
+  closeKml(kind);
+  renderDataAccess();
+  if(added > 0) toast('Added ' + added + ' ' + (kind==='packs' ? (added===1?'pack':'packs') : (added===1?'drive':'drives')));
+  else if(removed > 0) toast('Removed ' + removed + ' ' + (kind==='packs' ? (removed===1?'pack':'packs') : (removed===1?'drive':'drives')));
+}
+// ── Geo countries multi-select ────────────────────────────────
+const COUNTRIES = [
+  { code:'US', name:'United States',   dial:'+1' },
+  { code:'CA', name:'Canada',          dial:'+1' },
+  { code:'MX', name:'Mexico',          dial:'+52' },
+  { code:'GB', name:'United Kingdom',  dial:'+44' },
+  { code:'IE', name:'Ireland',         dial:'+353' },
+  { code:'DE', name:'Germany',         dial:'+49' },
+  { code:'FR', name:'France',          dial:'+33' },
+  { code:'ES', name:'Spain',           dial:'+34' },
+  { code:'IT', name:'Italy',           dial:'+39' },
+  { code:'PT', name:'Portugal',        dial:'+351' },
+  { code:'NL', name:'Netherlands',     dial:'+31' },
+  { code:'BE', name:'Belgium',         dial:'+32' },
+  { code:'CH', name:'Switzerland',     dial:'+41' },
+  { code:'AT', name:'Austria',         dial:'+43' },
+  { code:'SE', name:'Sweden',          dial:'+46' },
+  { code:'NO', name:'Norway',          dial:'+47' },
+  { code:'DK', name:'Denmark',         dial:'+45' },
+  { code:'FI', name:'Finland',         dial:'+358' },
+  { code:'AU', name:'Australia',       dial:'+61' },
+  { code:'NZ', name:'New Zealand',     dial:'+64' },
+  { code:'JP', name:'Japan',           dial:'+81' },
+  { code:'KR', name:'South Korea',     dial:'+82' },
+  { code:'CN', name:'China',           dial:'+86' },
+  { code:'IN', name:'India',           dial:'+91' },
+  { code:'BR', name:'Brazil',          dial:'+55' },
+  { code:'AR', name:'Argentina',       dial:'+54' },
+  { code:'CL', name:'Chile',           dial:'+56' },
+  { code:'CO', name:'Colombia',        dial:'+57' },
+  { code:'PE', name:'Peru',            dial:'+51' },
+  { code:'ZA', name:'South Africa',    dial:'+27' }
+];
+const GEO_STATE = { selected: ['US'], search: '' };
+function _geoCountry(code){ return COUNTRIES.find(c=>c.code===code); }
+function geoRenderChips(){
+  const row = document.getElementById('geo-chips-row'); if(!row) return;
+  let html = '';
+  if(GEO_STATE.selected.length === 0){
+    html = '<span class="mselect__placeholder">Select countries…</span>';
+  } else {
+    GEO_STATE.selected.forEach(code => {
+      const c = _geoCountry(code); if(!c) return;
+      html += '<span class="mselect__chip">'+c.name+' ('+c.dial+')'
+        + '<button type="button" class="mselect__chip-remove" aria-label="Remove '+c.name.replace(/"/g,'&quot;')+'" onclick="event.stopPropagation();geoRemove(\''+code+'\')"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2l6 6M2 8l6-6"/></svg></button>'
+        + '</span>';
+    });
+  }
+  row.innerHTML = html;
+}
+function geoRenderList(){
+  const list = document.getElementById('geo-list'); if(!list) return;
+  const q = GEO_STATE.search.trim().toLowerCase();
+  const filtered = !q ? COUNTRIES : COUNTRIES.filter(c => c.name.toLowerCase().includes(q) || c.dial.includes(q) || c.code.toLowerCase().includes(q));
+  if(filtered.length === 0){
+    list.innerHTML = '<div class="mselect__empty">No countries match "'+q.replace(/</g,'&lt;')+'"</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(c => {
+    const sel = GEO_STATE.selected.includes(c.code);
+    return '<div class="mselect__option'+(sel?' is-selected':'')+'" role="option" aria-selected="'+sel+'" onclick="geoToggle(\''+c.code+'\')">'
+      + '<span class="mselect__option-checkbox"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5l2 2 4.5-5"/></svg></span>'
+      + '<span class="mselect__option-name">'+c.name+'</span>'
+      + '<span class="mselect__option-dial">'+c.dial+'</span>'
+      + '</div>';
+  }).join('');
+}
+function geoOpenPanel(e){
+  if(e) e.stopPropagation();
+  const ms = document.getElementById('geo-mselect'); if(!ms) return;
+  const ctrl = document.getElementById('geo-control');
+  const isOpen = ms.classList.toggle('is-open');
+  if(ctrl) ctrl.setAttribute('aria-expanded', isOpen);
+  if(isOpen){
+    GEO_STATE.search = '';
+    const inp = document.getElementById('geo-search'); if(inp){ inp.value=''; setTimeout(()=>inp.focus(),0); }
+    geoRenderList();
+    setTimeout(()=>{
+      document.addEventListener('click', function closer(ev){
+        if(!ms.contains(ev.target)){
+          ms.classList.remove('is-open');
+          if(ctrl) ctrl.setAttribute('aria-expanded','false');
+          document.removeEventListener('click', closer);
+        }
+      });
+    }, 0);
+  }
+}
+function geoToggle(code){
+  const idx = GEO_STATE.selected.indexOf(code);
+  if(idx === -1) GEO_STATE.selected.push(code);
+  else GEO_STATE.selected.splice(idx, 1);
+  geoRenderChips();
+  geoRenderList();
+  if(typeof updateSecurityCount==='function') updateSecurityCount();
+}
+function geoRemove(code){
+  GEO_STATE.selected = GEO_STATE.selected.filter(c=>c!==code);
+  geoRenderChips();
+  geoRenderList();
+  if(typeof updateSecurityCount==='function') updateSecurityCount();
+}
+function geoSearch(q){ GEO_STATE.search = q; geoRenderList(); }
+geoRenderChips();
+// ── Generic tooltip system (data-tt) ─────────────────────────
+(function initTooltips(){
+  let tip = null, showTimer = null, currentTarget = null;
+  const SHOW_DELAY = 350;
+  function ensureTip(){
+    if(tip) return tip;
+    tip = document.createElement('div');
+    tip.className = 'tt';
+    tip.setAttribute('role','tooltip');
+    document.body.appendChild(tip);
+    return tip;
+  }
+  function _isAnchorOpen(target){
+    // Don't show tooltip if the element is the trigger of an open dropdown
+    if(target.classList.contains('sw-open')) return true;
+    if(target.classList.contains('ws-open')) return true;
+    return false;
+  }
+  function show(target){
+    if(!target || _isAnchorOpen(target)) return;
+    const text = target.getAttribute('data-tt');
+    if(!text) return;
+    const desc = target.getAttribute('data-tt-desc');
+    const t = ensureTip();
+    if(desc){
+      t.innerHTML = '<div class="tt__title">'+text.replace(/</g,'&lt;')+'</div><div class="tt__desc">'+desc.replace(/</g,'&lt;')+'</div>';
+    } else {
+      t.textContent = text;
+    }
+    const r = target.getBoundingClientRect();
+    // Render off-screen first to measure
+    t.style.left = '-9999px'; t.style.top = '0px';
+    t.classList.add('open');
+    const tw = t.offsetWidth, th = t.offsetHeight;
+    let left = r.left + r.width/2 - tw/2;
+    let top = r.bottom + 6;
+    // Clamp to viewport
+    if(left < 8) left = 8;
+    if(left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+    if(top + th > window.innerHeight - 8) top = r.top - th - 6;
+    t.style.left = left + 'px';
+    t.style.top = top + 'px';
+    currentTarget = target;
+  }
+  function hide(){
+    clearTimeout(showTimer);
+    if(tip) tip.classList.remove('open');
+    currentTarget = null;
+  }
+  document.addEventListener('mouseover', function(e){
+    const el = e.target.closest && e.target.closest('[data-tt]');
+    if(!el) return;
+    if(el === currentTarget) return;
+    clearTimeout(showTimer);
+    if(currentTarget) hide();
+    showTimer = setTimeout(()=>show(el), SHOW_DELAY);
+  });
+  document.addEventListener('mouseout', function(e){
+    const el = e.target.closest && e.target.closest('[data-tt]');
+    if(!el) return;
+    if(!e.relatedTarget || !el.contains(e.relatedTarget)){
+      hide();
+    }
+  });
+  document.addEventListener('focusin', function(e){
+    const el = e.target.closest && e.target.closest('[data-tt]');
+    if(el) show(el);
+  });
+  document.addEventListener('focusout', function(e){
+    const el = e.target.closest && e.target.closest('[data-tt]');
+    if(el) hide();
+  });
+  document.addEventListener('click', function(e){
+    // Hide tooltip when user clicks (action taken) — avoid stale tooltip lingering after dropdown opens
+    if(currentTarget) hide();
+  });
+  window.addEventListener('scroll', hide, true);
+})();
+// ── Workspace Switcher ───────────────────────────────────────
+const WORKSPACE_PALETTE = [
+  'linear-gradient(135deg,#155DFC 0%,#00C2C2 100%)',
+  'linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)',
+  'linear-gradient(135deg,#0EA5E9 0%,#06B6D4 100%)',
+  'linear-gradient(135deg,#14B8A6 0%,#10B981 100%)',
+  'linear-gradient(135deg,#F59E0B 0%,#EF4444 100%)',
+  'linear-gradient(135deg,#EC4899 0%,#F43F5E 100%)',
+  'linear-gradient(135deg,#A78BFA 0%,#7C3AED 100%)',
+  'linear-gradient(135deg,#22C55E 0%,#84CC16 100%)',
+  'linear-gradient(135deg,#0284C7 0%,#0EA5E9 100%)',
+  'linear-gradient(135deg,#D946EF 0%,#A855F7 100%)'
+];
+function _wsHashColor(id){
+  let h = 0; const s = String(id);
+  for(let i=0;i<s.length;i++){ h = ((h<<5)-h) + s.charCodeAt(i); h |= 0; }
+  return WORKSPACE_PALETTE[Math.abs(h) % WORKSPACE_PALETTE.length];
+}
+const WORKSPACES_DATA = [
+  { id:'acme',     name:'Acme Corp',           subdomain:'acme.aimsos.ai',     role:'Admin',  logo:null, lastUsed: 100 },
+  { id:'beta',     name:'Beta Industries',     subdomain:'beta.aimsos.ai',     role:'Member', logo:null, lastUsed: 90 },
+  { id:'contoso',  name:'Contoso Ltd',         subdomain:'contoso.aimsos.ai',  role:'Owner',  logo:null, lastUsed: 80 },
+  { id:'demo',     name:'Demo Org',            subdomain:'demo.aimsos.ai',     role:'Viewer', logo:null, lastUsed: 50 },
+  { id:'enerco',   name:'EnerCo',              subdomain:'enerco.aimsos.ai',   role:'Admin',  logo:null, lastUsed: 40 },
+  { id:'factory',  name:'FactoryWorks',        subdomain:'factory.aimsos.ai',  role:'Admin',  logo:null, lastUsed: 30 },
+  { id:'globex',   name:'Globex',              subdomain:'globex.aimsos.ai',   role:'Member', logo:null, lastUsed: 20 }
+];
+const WORKSPACE_STATE = { activeId: null, search: '' };
+function _wsInitials(name){ return name.replace(/[^A-Za-z0-9 ]/g,'').trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase(); }
+function _wsAvatarHtml(ws, sizeClass){
+  const cls = sizeClass || 'tb-workspace-logo';
+  if(ws.logo){
+    return '<div class="'+cls+'"><img src="'+ws.logo+'" alt=""></div>';
+  }
+  return '<div class="'+cls+'" style="background:'+_wsHashColor(ws.id)+'">'+_wsInitials(ws.name)+'</div>';
+}
+function _wsActive(){ return WORKSPACES_DATA.find(w=>w.id===WORKSPACE_STATE.activeId) || WORKSPACES_DATA[0]; }
+function _wsRenderButton(){
+  const w = _wsActive();
+  const logoEl = document.getElementById('ws-current-logo');
+  const nameEl = document.getElementById('ws-current-name');
+  if(!logoEl || !nameEl) return;
+  if(w.logo){ logoEl.innerHTML = '<img src="'+w.logo+'" alt="">'; logoEl.style.background = ''; }
+  else { logoEl.textContent = _wsInitials(w.name); logoEl.style.background = _wsHashColor(w.id); }
+  nameEl.textContent = w.name;
+}
+function _wsRenderDropdown(){
+  const sw = document.getElementById('workspaceSw'); if(!sw) return;
+  const active = _wsActive();
+  const total = WORKSPACES_DATA.length;
+  const showSearch = total > 5;
+  const q = WORKSPACE_STATE.search.trim().toLowerCase();
+  const filtered = !q ? WORKSPACES_DATA : WORKSPACES_DATA.filter(w =>
+    w.name.toLowerCase().includes(q) || w.subdomain.toLowerCase().includes(q) || (w.role||'').toLowerCase().includes(q)
+  );
+  // Group: active first, then recent (by lastUsed desc, excluding active), then rest
+  const others = filtered.filter(w => w.id !== active.id);
+  const sortedByRecent = [...others].sort((a,b)=>b.lastUsed - a.lastUsed);
+  const recent = q ? [] : sortedByRecent.slice(0, 3);
+  const rest = q ? sortedByRecent : sortedByRecent.slice(3);
+  let html = '<div class="workspace-sw__hd"><span class="workspace-sw__title">Switch Workspace</span></div>';
+  if(showSearch){
+    html += '<div class="workspace-sw__search"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="ws-search" type="text" placeholder="Search workspaces…" aria-label="Search workspaces" oninput="wsSearch(this.value)" onclick="event.stopPropagation()" value="'+q.replace(/"/g,'&quot;')+'"></div>';
+  }
+  html += '<div class="workspace-sw__list">';
+  // Active
+  if(filtered.find(w => w.id === active.id)){
+    html += '<button type="button" class="ws-item s-active" role="menuitem" onclick="event.stopPropagation();switchWorkspace(\''+active.id+'\')">'
+      + _wsAvatarHtml(active, 'ws-item__ico')
+      + '<div class="ws-item__info"><div class="ws-item__name">'+active.name+'</div><div class="ws-item__sub">'+active.subdomain+' · '+active.role+'</div></div>'
+      + '<svg class="ws-item__check" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      + '</button>';
+  }
+  // Recent group
+  if(recent.length > 0){
+    html += '<div class="workspace-sw__group-label">Recent</div>';
+    recent.forEach(w => {
+      html += '<button type="button" class="ws-item" role="menuitem" onclick="event.stopPropagation();switchWorkspace(\''+w.id+'\')">'
+        + _wsAvatarHtml(w, 'ws-item__ico')
+        + '<div class="ws-item__info"><div class="ws-item__name">'+w.name+'</div></div>'
+        + '</button>';
+    });
+  }
+  // All / Rest
+  if(rest.length > 0){
+    if(!q) html += '<div class="workspace-sw__group-label">All</div>';
+    rest.forEach(w => {
+      html += '<button type="button" class="ws-item" role="menuitem" onclick="event.stopPropagation();switchWorkspace(\''+w.id+'\')">'
+        + _wsAvatarHtml(w, 'ws-item__ico')
+        + '<div class="ws-item__info"><div class="ws-item__name">'+w.name+'</div></div>'
+        + '</button>';
+    });
+  }
+  if(filtered.length === 0){
+    html += '<div class="workspace-sw__empty">No workspaces match "'+q.replace(/</g,'&lt;')+'"</div>';
+  }
+  html += '</div>';
+  html += '<div class="workspace-sw__footer"><button type="button" class="ws-create" onclick="event.stopPropagation();toast(\'Create workspace\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>Create workspace</button></div>';
+  sw.innerHTML = html;
+}
+function toggleWorkspaceSw(e){
+  if(e) e.stopPropagation();
+  const sw = document.getElementById('workspaceSw');
+  const launcher = document.getElementById('workspaceLauncher');
+  if(!sw || !launcher) return;
+  const isOpen = sw.classList.toggle('open');
+  launcher.classList.toggle('ws-open', isOpen);
+  launcher.setAttribute('aria-expanded', isOpen);
+  if(isOpen){
+    WORKSPACE_STATE.search = '';
+    _wsRenderDropdown();
+    setTimeout(()=>{
+      const inp = document.getElementById('ws-search'); if(inp) inp.focus();
+      document.addEventListener('click', function closer(ev){
+        if(!sw.contains(ev.target) && ev.target !== launcher && !launcher.contains(ev.target)){
+          sw.classList.remove('open');
+          launcher.classList.remove('ws-open');
+          launcher.setAttribute('aria-expanded','false');
+          document.removeEventListener('click', closer);
+        }
+      });
+    }, 0);
+  }
+}
+function wsSearch(q){ WORKSPACE_STATE.search = q; _wsRenderDropdown(); const inp=document.getElementById('ws-search'); if(inp){ inp.focus(); inp.value=q; }}
+function switchWorkspace(id){
+  if(id === WORKSPACE_STATE.activeId){
+    document.getElementById('workspaceSw')?.classList.remove('open');
+    document.getElementById('workspaceLauncher')?.classList.remove('ws-open');
+    return;
+  }
+  const target = WORKSPACES_DATA.find(w=>w.id===id); if(!target) return;
+  const doSwitch = ()=>{
+    WORKSPACE_STATE.activeId = id;
+    target.lastUsed = Date.now();
+    try { localStorage.setItem('aims_active_workspace', id); } catch(e){}
+    document.getElementById('workspaceSw')?.classList.remove('open');
+    document.getElementById('workspaceLauncher')?.classList.remove('ws-open');
+    document.getElementById('workspaceLauncher')?.setAttribute('aria-expanded','false');
+    _wsRenderButton();
+    toast('Switched to ' + target.name);
+  };
+  if(window.IS_DIRTY){
+    const ok = confirm('You have unsaved changes. Switch to ' + target.name + ' anyway?');
+    if(ok) doSwitch();
+  } else {
+    doSwitch();
+  }
+}
+(function wsInit(){
+  try {
+    const stored = localStorage.getItem('aims_active_workspace');
+    if(stored && WORKSPACES_DATA.find(w=>w.id===stored)) WORKSPACE_STATE.activeId = stored;
+    else WORKSPACE_STATE.activeId = WORKSPACES_DATA[0].id;
+  } catch(e){ WORKSPACE_STATE.activeId = WORKSPACES_DATA[0].id; }
+  _wsRenderButton();
+})();
 // ── Avatar list rich tooltip ─────────────────────────────────
 (function initAvatarListTooltip(){
   let tip = null;
