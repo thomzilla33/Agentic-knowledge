@@ -319,6 +319,67 @@ table, .table { width: 100%; border-collapse: collapse; }
 .topbar-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); background: transparent; border: none; cursor: pointer; color: var(--color-icon-neutral-dark); transition: background 0.15s, color 0.15s; }
 .topbar-btn:hover { background: var(--color-surface-neutral-default); color: var(--color-icon-neutral-light); }
 .topbar-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--color-surface-primary-subtle); border: 1.5px solid var(--color-border-primary-default); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--color-icon-primary-default); cursor: pointer; }
+/* ── AI Assistant (Phase 1 shell — bot+sparkle topbar trigger + right slideout) ── */
+.icon-btn.aa-trigger.active{background:rgba(43,127,255,0.14)}
+.icon-btn.aa-trigger.active svg{color:rgba(255,255,255,0.92)}
+.aa-overlay{position:fixed;inset:0;background:rgba(5,8,18,0.55);z-index:80;opacity:0;pointer-events:none;transition:opacity .22s}
+.aa-overlay.open{opacity:1;pointer-events:auto}
+.ai-assistant{position:fixed;top:0;right:0;width:420px;height:100vh;background:#0E1426;border-left:1px solid rgba(255,255,255,0.10);box-shadow:-12px 0 32px rgba(0,0,0,.45);z-index:90;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;font-family:inherit}
+.ai-assistant.open{transform:translateX(0)}
+@media (prefers-reduced-motion: reduce){.ai-assistant{transition:none}.aa-overlay{transition:opacity .05s}}
+.aa-header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+.aa-title-wrap{flex:1;min-width:0;display:flex;align-items:center;gap:11px}
+.aa-title-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.aa-title{font-size:14px;font-weight:700;color:rgba(255,255,255,0.92);line-height:1.2}
+.aa-subtitle{font-size:11px;color:rgba(255,255,255,0.50);margin-top:2px}
+.aa-header-actions{display:flex;gap:4px}
+.aa-header-actions .btn-icon-sm{width:28px;height:28px;border-radius:6px;background:transparent;border:none;color:rgba(255,255,255,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s,color .1s}
+.aa-header-actions .btn-icon-sm:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.85)}
+.aa-context{padding:10px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.aa-context-label{font-size:12px;color:rgba(255,255,255,0.50)}
+.aa-route-pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:9999px;background:rgba(43,127,255,0.10);border:1px solid rgba(43,127,255,0.25);color:rgba(150,200,255,0.95);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .1s}
+.aa-route-pill:hover{background:rgba(43,127,255,0.18)}
+.aa-route-chev{opacity:.6}
+.aa-body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.aa-body::-webkit-scrollbar{width:6px}
+.aa-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
+.aa-empty{padding:32px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;flex:1;justify-content:center}
+.aa-empty-hero{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:14px;box-shadow:0 8px 24px rgba(43,127,255,0.30)}
+.aa-empty-title{font-size:18px;font-weight:700;color:rgba(255,255,255,0.95);margin:0 0 4px}
+.aa-empty-desc{font-size:13px;color:rgba(255,255,255,0.60);margin:0 0 24px;line-height:1.5;max-width:300px}
+.aa-suggestions-wrap{width:100%;max-width:340px;display:flex;flex-direction:column;gap:8px}
+.aa-suggestions-label{font-size:11px;font-weight:600;color:rgba(255,255,255,0.40);text-transform:uppercase;letter-spacing:.06em;text-align:left}
+.aa-sug{display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:10px;cursor:pointer;color:rgba(255,255,255,0.85);font-family:inherit;font-size:13px;text-align:left;transition:all .15s;width:100%}
+.aa-sug:hover{background:rgba(255,255,255,0.08);border-color:rgba(43,127,255,0.30)}
+.aa-sug-text{flex:1;text-align:left}
+.aa-sug-arrow{color:rgba(255,255,255,0.30);flex-shrink:0;transition:color .15s,transform .15s}
+.aa-sug:hover .aa-sug-arrow{color:rgba(43,127,255,0.80);transform:translateX(2px)}
+.aa-thread{padding:14px 20px;display:flex;flex-direction:column;gap:14px}
+.aa-msg{display:flex;gap:10px;align-items:flex-start}
+.aa-msg-avatar{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.aa-msg.user .aa-msg-avatar{background:rgba(255,255,255,0.10);color:rgba(255,255,255,0.80)}
+.aa-msg.assistant .aa-msg-avatar{background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%)}
+.aa-msg-bubble{flex:1;min-width:0;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;color:rgba(255,255,255,0.92)}
+.aa-msg.user .aa-msg-bubble{background:rgba(43,127,255,0.10);border:1px solid rgba(43,127,255,0.20)}
+.aa-msg.assistant .aa-msg-bubble{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06)}
+.aa-typing{display:inline-flex;gap:3px;align-items:center;padding:4px 0}
+.aa-typing span{width:6px;height:6px;border-radius:50%;background:rgba(43,127,255,0.60);animation:aaTypeBounce 1.2s infinite ease-in-out}
+.aa-typing span:nth-child(2){animation-delay:.15s}
+.aa-typing span:nth-child(3){animation-delay:.3s}
+@keyframes aaTypeBounce{0%,60%,100%{transform:translateY(0);opacity:.6}30%{transform:translateY(-4px);opacity:1}}
+.aa-composer{padding:12px 16px 14px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+.aa-composer-row{display:flex;gap:6px;align-items:flex-end;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:6px 6px 6px 12px;transition:border-color .15s}
+.aa-composer-row:focus-within{border-color:rgba(43,127,255,0.40)}
+.aa-input{flex:1;background:transparent;border:none;color:rgba(255,255,255,0.92);font-family:inherit;font-size:13px;line-height:1.5;outline:none;resize:none;padding:6px 0;max-height:120px;min-height:24px}
+.aa-input::placeholder{color:rgba(255,255,255,0.38)}
+.aa-attach-btn,.aa-send-btn{width:32px;height:32px;border-radius:8px;background:transparent;border:none;color:rgba(255,255,255,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.aa-attach-btn:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85)}
+.aa-send-btn{background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);color:#fff}
+.aa-send-btn:hover{filter:brightness(1.1)}
+.aa-send-btn:disabled{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.30);cursor:not-allowed;filter:none}
+.aa-hint{font-size:11px;color:rgba(255,255,255,0.40);margin-top:6px;padding:0 4px}
+.aa-hint kbd{display:inline-flex;padding:1px 5px;border:1px solid rgba(255,255,255,0.15);border-radius:4px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.05)}
+@media (max-width:560px){.ai-assistant{width:100vw}}
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -933,7 +994,7 @@ table, .table { width: 100%; border-collapse: collapse; }
       </div>
       <div class="tb-right">
         <button class="icon-btn" aria-label="Notifications" onclick="toast('Notifications')" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-        <button class="icon-btn" aria-label="Activity" onclick="toast('Activity')" data-tt="Activity" data-tt-desc="See recent agent runs and system events."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 6v2l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+        <button class="icon-btn aa-trigger" aria-label="AI Assistant" onclick="openAiAssistant()" data-tt="AI Assistant" data-tt-desc="Chat with any agent in your workspace · ⌘/"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><defs><linearGradient id="aaDotV" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00C2C2"/><stop offset="100%" stop-color="#155DFC"/></linearGradient></defs><circle cx="8" cy="2.2" r=".8" fill="currentColor"/><path d="M8 3v1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><rect x="2.5" y="4.5" width="11" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.3"/><circle cx="6" cy="8.5" r=".9" fill="currentColor"/><circle cx="10" cy="8.5" r=".9" fill="currentColor"/><circle cx="13.5" cy="3" r="1.5" fill="url(#aaDotV)" stroke="rgba(10,13,26,0.9)" stroke-width=".6"/></svg></button>
         <button class="icon-btn" aria-label="Settings" onclick="toast('Settings')" data-tt="Settings" data-tt-desc="Workspace and account preferences."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
         <button class="avatar-sm" aria-label="User profile" onclick="toast('User profile')" data-tt="Account" data-tt-desc="Your profile, preferences, and sign out." style="border:none;font-family:inherit">TH</button>
       </div>
@@ -4070,6 +4131,175 @@ _updateCounts();
 renderNumbers();
 showScreen('settings');
 updateSecurityCount();
+
+// ── AI Assistant (Phase 1 shell with mock replies) ──────────
+window.AA_SUGGESTIONS = [
+  "Summarize today's call volume and average duration",
+  "Find phone numbers with no calls in the last 7 days",
+  "Which agents handled the most escalations this week?"
+];
+const _AA_BOT_ICON = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="2.2" r=".8" fill="currentColor"/><path d="M8 3v1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="2.5" y="4.5" width="11" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.4"/><circle cx="6" cy="8.5" r=".7" fill="currentColor"/><circle cx="10" cy="8.5" r=".7" fill="currentColor"/></svg>';
+let _aaMessages = [];
+function _aaCurrentWorkspaceName(){
+  try { return (typeof _wsActive === 'function') ? _wsActive().name : 'this workspace'; } catch(e){ return 'this workspace'; }
+}
+function _aaUpdateWsLabels(){
+  const wsName = _aaCurrentWorkspaceName();
+  const el1 = document.getElementById('aa-ws-name');
+  const el2 = document.getElementById('aa-empty-ws');
+  if(el1) el1.textContent = wsName;
+  if(el2) el2.textContent = wsName;
+}
+function _aaRenderSuggestions(){
+  const root = document.getElementById('aa-suggestions');
+  if(!root) return;
+  root.innerHTML = window.AA_SUGGESTIONS.map((s,i) =>
+    '<button type="button" class="aa-sug" onclick="aaUseSuggestion('+i+')">'
+    + '<span class="aa-sug-text">'+s.replace(/</g,'&lt;')+'</span>'
+    + '<svg class="aa-sug-arrow" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M5 3l5 5-5 5"/></svg>'
+    + '</button>'
+  ).join('');
+}
+function openAiAssistant(){
+  const panel = document.getElementById('aiAssistant');
+  const ov = document.getElementById('aaOverlay');
+  if(!panel) return;
+  _aaUpdateWsLabels();
+  _aaRenderSuggestions();
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden','false');
+  ov.classList.add('open');
+  document.querySelector('.aa-trigger')?.classList.add('active');
+  setTimeout(()=>{ document.getElementById('aa-input')?.focus(); }, 220);
+}
+function closeAiAssistant(){
+  const panel = document.getElementById('aiAssistant');
+  const ov = document.getElementById('aaOverlay');
+  if(!panel) return;
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden','true');
+  ov.classList.remove('open');
+  document.querySelector('.aa-trigger')?.classList.remove('active');
+}
+function aaUseSuggestion(idx){
+  const text = window.AA_SUGGESTIONS[idx]; if(text==null) return;
+  const inp = document.getElementById('aa-input'); if(!inp) return;
+  inp.value = text; aaInputChange(inp); inp.focus();
+}
+function aaInputChange(el){
+  const sendBtn = document.getElementById('aa-send-btn');
+  if(sendBtn) sendBtn.disabled = !el.value.trim().length;
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+function aaKeyDown(e){ if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); aaSend(); } }
+function aaSend(){
+  const inp = document.getElementById('aa-input');
+  if(!inp || !inp.value.trim()) return;
+  const text = inp.value.trim();
+  _aaMessages.push({ role:'user', text });
+  document.getElementById('aa-empty').style.display = 'none';
+  const thread = document.getElementById('aa-thread');
+  thread.style.display = 'flex';
+  _aaRenderThread();
+  inp.value = ''; aaInputChange(inp);
+  _aaShowTyping();
+  setTimeout(()=>{
+    _aaHideTyping();
+    const route = document.getElementById('aa-route-name')?.textContent || 'Auto-route';
+    _aaMessages.push({ role:'assistant', text: _aaMockReply(text, route) });
+    _aaRenderThread();
+  }, 1100);
+}
+function _aaShowTyping(){
+  const thread = document.getElementById('aa-thread');
+  if(thread.querySelector('.aa-typing-row')) return;
+  const row = document.createElement('div');
+  row.className = 'aa-msg assistant aa-typing-row';
+  row.innerHTML = '<div class="aa-msg-avatar">'+_AA_BOT_ICON+'</div><div class="aa-msg-bubble"><div class="aa-typing"><span></span><span></span><span></span></div></div>';
+  thread.appendChild(row);
+  thread.scrollTop = thread.scrollHeight;
+}
+function _aaHideTyping(){ document.querySelector('.aa-typing-row')?.remove(); }
+function _aaMockReply(userText, route){
+  return "I'd route this to <strong>" + route.replace(/</g,'&lt;') + "</strong> and pull context from your workspace.<br><br><em style=\"opacity:.65\">Phase 1 mock — real agent routing and streaming responses come in Phase 2.</em>";
+}
+function _aaRenderThread(){
+  const thread = document.getElementById('aa-thread');
+  thread.innerHTML = _aaMessages.map(m => {
+    if(m.role === 'user'){
+      return '<div class="aa-msg user"><div class="aa-msg-avatar">TH</div><div class="aa-msg-bubble">'+m.text.replace(/</g,'&lt;').replace(/\n/g,'<br>')+'</div></div>';
+    }
+    return '<div class="aa-msg assistant"><div class="aa-msg-avatar">'+_AA_BOT_ICON+'</div><div class="aa-msg-bubble">'+m.text+'</div></div>';
+  }).join('');
+  thread.scrollTop = thread.scrollHeight;
+}
+function aaToggleRouter(e){
+  e.stopPropagation();
+  const nameEl = document.getElementById('aa-route-name');
+  if(!nameEl) return;
+  nameEl.textContent = nameEl.textContent === 'Auto-route' ? 'Service Procedures' : 'Auto-route';
+  if(typeof toast === 'function') toast('Routing to: ' + nameEl.textContent);
+}
+document.addEventListener('keydown', function(e){
+  if((e.metaKey || e.ctrlKey) && e.key === '/'){
+    e.preventDefault();
+    const isOpen = document.getElementById('aiAssistant')?.classList.contains('open');
+    if(isOpen) closeAiAssistant(); else openAiAssistant();
+  }
+  if(e.key === 'Escape' && document.getElementById('aiAssistant')?.classList.contains('open')){
+    closeAiAssistant();
+  }
+});
 </script>
+
+<!-- AI Assistant slideout -->
+<div class="aa-overlay" id="aaOverlay" onclick="closeAiAssistant()" aria-hidden="true"></div>
+<aside class="ai-assistant" id="aiAssistant" role="dialog" aria-label="AI Assistant" aria-hidden="true">
+  <header class="aa-header">
+    <div class="aa-title-wrap">
+      <div class="aa-title-icon">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="2.2" r=".8" fill="currentColor"/><path d="M8 3v1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="2.5" y="4.5" width="11" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.4"/><circle cx="6" cy="8.5" r=".9" fill="currentColor"/><circle cx="10" cy="8.5" r=".9" fill="currentColor"/></svg>
+      </div>
+      <div>
+        <div class="aa-title">AI Assistant</div>
+        <div class="aa-subtitle">Workspace: <span id="aa-ws-name">Contoso Ltd</span></div>
+      </div>
+    </div>
+    <div class="aa-header-actions">
+      <button class="btn-icon-sm" aria-label="Close" onclick="closeAiAssistant()" data-tt="Close" data-tt-desc="Press Esc or ⌘/ to close"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
+    </div>
+  </header>
+  <div class="aa-context">
+    <span class="aa-context-label">Talking to:</span>
+    <button class="aa-route-pill" id="aa-route-pill" onclick="aaToggleRouter(event)">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.4 4.6L14 7l-4.6 1.4L8 13l-1.4-4.6L2 7l4.6-1.4L8 1z" fill="currentColor"/></svg>
+      <span id="aa-route-name">Auto-route</span>
+      <svg class="aa-route-chev" width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="aa-body" id="aa-body">
+    <div class="aa-empty" id="aa-empty">
+      <div class="aa-empty-hero">
+        <svg width="28" height="28" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="2.2" r=".8" fill="currentColor"/><path d="M8 3v1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="2.5" y="4.5" width="11" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.4"/><circle cx="6" cy="8.5" r=".9" fill="currentColor"/><circle cx="10" cy="8.5" r=".9" fill="currentColor"/></svg>
+      </div>
+      <h3 class="aa-empty-title">AI Assistant</h3>
+      <p class="aa-empty-desc">Ask anything across your agents in <span id="aa-empty-ws">Contoso Ltd</span>.</p>
+      <div class="aa-suggestions-wrap">
+        <div class="aa-suggestions-label">Try asking</div>
+        <div id="aa-suggestions"></div>
+      </div>
+    </div>
+    <div class="aa-thread" id="aa-thread" style="display:none"></div>
+  </div>
+  <footer class="aa-composer">
+    <div class="aa-composer-row">
+      <button class="aa-attach-btn" aria-label="Attach context" data-tt="Attach context" data-tt-desc="Add files or screen context"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M11 5L6.5 9.5a2 2 0 002.8 2.8L13 9a3.5 3.5 0 00-5-5L4 8a5 5 0 007 7"/></svg></button>
+      <textarea class="aa-input" id="aa-input" placeholder="Ask anything…" rows="1" aria-label="Message" oninput="aaInputChange(this)" onkeydown="aaKeyDown(event)"></textarea>
+      <button class="aa-send-btn" id="aa-send-btn" onclick="aaSend()" aria-label="Send message" disabled><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="aa-hint">Type <kbd>@</kbd> to mention an agent · Press <kbd>⌘/</kbd> to toggle</div>
+  </footer>
+</aside>
 </body>
 </html>
