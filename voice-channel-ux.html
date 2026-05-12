@@ -166,24 +166,6 @@ nav.sidebar.sb-expanded .sb-toggle-icon { transform: rotate(180deg); }
 .sb-toggle-label { opacity: 0; transition: opacity .12s; }
 nav.sidebar.sb-expanded .sb-toggle-label { opacity: 1; }
 .tb-left { flex: 1; display: flex; align-items: center; gap: 6px; }
-.tb-launcher { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 9px 0 6px; border-radius: 8px; background: transparent; border: none; cursor: pointer; color: rgba(255,255,255,0.90); transition: background .15s; flex-shrink: 0; position: relative; }
-.tb-launcher:hover { background: rgba(255,255,255,0.06); }
-.tb-launcher-logo { width: 26px; height: 26px; border-radius: 7px; background: var(--gradient-brand-linear); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; letter-spacing: -.3px; }
-.tb-launcher-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.90); white-space: nowrap; }
-.tb-launcher-chevron { color: rgba(255,255,255,0.50); flex-shrink: 0; transition: transform .15s; }
-.tb-launcher.sw-open .tb-launcher-chevron { transform: rotate(180deg); }
-.studio-sw { position: absolute; top: calc(100% + 8px); left: 0; width: 248px; background: var(--color-surface-floating-elevated); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); box-shadow: var(--shadow-floating); z-index: 200; overflow: hidden; opacity: 0; transform: translateY(-6px) scale(0.97); pointer-events: none; transition: opacity .15s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1); }
-.studio-sw.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-.studio-sw-hd { padding: 12px 14px 8px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.studio-sw-title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.22); text-transform: uppercase; letter-spacing: .08em; }
-.studio-item { display: flex; align-items: center; gap: 11px; padding: 9px 12px; cursor: pointer; transition: background .1s; text-decoration: none; border: none; background: none; width: 100%; text-align: left; }
-.studio-item:hover { background: rgba(255,255,255,0.05); }
-.studio-item.s-active { background: rgba(43,127,255,0.08); }
-.studio-item-ico { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; letter-spacing: -.3px; }
-.studio-item-info { flex: 1; min-width: 0; text-align: left; }
-.studio-item-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.90); white-space: nowrap; }
-.studio-item-desc { font-size: 11px; color: rgba(255,255,255,0.50); margin-top: 1px; }
-.studio-item-badge { width: 16px; height: 16px; flex-shrink: 0; color: #2B7FFF; }
 .tb-search { width: 340px; flex-shrink: 0; position: relative; }
 .tb-search input { width: 100%; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0 12px 0 32px; color: rgba(255,255,255,0.90); font-family: inherit; font-size: 13px; outline: none; transition: border-color .15s; }
 .tb-search input:focus { border-color: rgba(43,127,255,0.30); }
@@ -327,6 +309,7 @@ table, .table { width: 100%; border-collapse: collapse; }
 .tb-context-logo img{width:100%;height:100%;object-fit:cover}
 .tb-context-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.92);white-space:nowrap;max-width:380px;overflow:hidden;text-overflow:ellipsis}
 .tb-context-chev{color:rgba(255,255,255,0.50);flex-shrink:0;transition:transform .15s}
+.tb-context-wrap{position:relative;flex-shrink:0;display:inline-flex;align-items:center}
 .tb-context.cm-open .tb-context-chev{transform:rotate(180deg)}
 .ctx-menu{position:absolute;top:calc(100% + 8px);left:0;width:300px;background:#131929;border:1px solid rgba(255,255,255,0.10);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,0.04);z-index:200;overflow:hidden;opacity:0;transform:translateY(-6px) scale(0.97);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1);text-align:left}
 .ctx-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
@@ -386,6 +369,7 @@ table, .table { width: 100%; border-collapse: collapse; }
 .aa-context{padding:10px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:8px;flex-shrink:0}
 .aa-context-label{font-size:12px;color:rgba(255,255,255,0.50)}
 .aa-route-pill{position:relative;display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:9999px;background:rgba(43,127,255,0.10);border:1px solid rgba(43,127,255,0.25);color:rgba(150,200,255,0.95);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .1s}
+.aa-route-pill-wrap{position:relative;display:inline-flex}
 .aa-route-pill:hover{background:rgba(43,127,255,0.18)}
 .aa-route-pill__ico{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px}
 .aa-route-chev{opacity:.6;transition:transform .15s}
@@ -884,40 +868,6 @@ table, .table { width: 100%; border-collapse: collapse; }
 .tt.open { opacity: 1; transform: translateY(0); }
 .tt__title { font-weight: 600; color: var(--color-text-title); }
 .tt__desc { font-size: 11px; font-weight: 400; color: var(--color-text-caption); margin-top: 2px; white-space: normal; }
-.tb-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.10); flex-shrink: 0; }
-.tb-workspace { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 9px 0 6px; border-radius: 8px; background: transparent; border: none; cursor: pointer; color: rgba(255,255,255,0.90); transition: background .15s; flex-shrink: 0; position: relative; font-family: inherit; }
-.tb-workspace:hover { background: rgba(255,255,255,0.06); }
-.tb-workspace-logo { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; letter-spacing: -.3px; overflow: hidden; }
-.tb-workspace-logo img { width: 100%; height: 100%; object-fit: cover; }
-.tb-workspace-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.90); white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
-.tb-workspace-chevron { color: rgba(255,255,255,0.50); flex-shrink: 0; transition: transform .15s; }
-.tb-workspace.ws-open .tb-workspace-chevron { transform: rotate(180deg); }
-.workspace-sw { position: absolute; top: calc(100% + 8px); left: 0; width: 280px; background: var(--color-surface-floating-elevated); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); box-shadow: var(--shadow-floating); z-index: 200; overflow: hidden; opacity: 0; transform: translateY(-6px) scale(0.97); pointer-events: none; transition: opacity .15s cubic-bezier(.4,0,.2,1), transform .15s cubic-bezier(.4,0,.2,1); }
-.workspace-sw.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-.workspace-sw__hd { padding: 12px 14px 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.workspace-sw__title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.22); text-transform: uppercase; letter-spacing: .08em; }
-.workspace-sw__search { padding: 8px 12px 4px; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; }
-.workspace-sw__search input { width: 100%; height: 30px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0 10px 0 28px; color: rgba(255,255,255,0.90); font-family: inherit; font-size: 12px; outline: none; }
-.workspace-sw__search input:focus { border-color: rgba(43,127,255,0.30); }
-.workspace-sw__search input::placeholder { color: rgba(255,255,255,0.38); }
-.workspace-sw__search svg { position: absolute; left: 21px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.40); pointer-events: none; }
-.workspace-sw__list { max-height: 320px; overflow-y: auto; padding: 4px 0; }
-.workspace-sw__group-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.22); text-transform: uppercase; letter-spacing: .08em; padding: 10px 14px 4px; }
-.ws-item { display: flex; align-items: center; gap: 11px; padding: 9px 12px; cursor: pointer; transition: background .1s; text-decoration: none; border: none; background: none; width: 100%; text-align: left; color: inherit; font-family: inherit; }
-.ws-item:hover { background: rgba(255,255,255,0.05); }
-.ws-item.s-active { background: rgba(43,127,255,0.08); }
-.ws-item__ico { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; letter-spacing: -.3px; overflow: hidden; }
-.ws-item__ico img { width: 100%; height: 100%; object-fit: cover; }
-.ws-item__info { flex: 1; min-width: 0; text-align: left; }
-.ws-item__name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.90); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ws-item__sub { font-size: 11px; color: rgba(255,255,255,0.50); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ws-item__check { width: 16px; height: 16px; flex-shrink: 0; color: #2B7FFF; }
-.workspace-sw__empty { padding: 20px 14px; font-size: 12px; color: rgba(255,255,255,0.50); text-align: center; }
-.workspace-sw__footer { padding: 6px; border-top: 1px solid rgba(255,255,255,0.06); }
-.workspace-sw__footer .ws-create { display: flex; align-items: center; gap: 11px; padding: 9px 12px; width: 100%; background: transparent; border: none; border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.90); font-family: inherit; font-size: 13px; font-weight: 600; transition: background .1s; }
-.workspace-sw__footer .ws-create:hover { background: rgba(255,255,255,0.05); }
-.workspace-sw__footer .ws-create svg { color: rgba(255,255,255,0.50); flex-shrink: 0; }
-.workspace-sw__footer .ws-create:hover svg { color: rgba(255,255,255,0.90); }
     /* Shared rich tooltip for avatar lists */
     .alt-tooltip { position: fixed; z-index: 800; min-width: 220px; max-width: 280px; background: var(--color-surface-floating-elevated); border: 1px solid var(--color-border-neutral-default); border-radius: var(--radius-md); padding: 10px 4px; box-shadow: var(--shadow-floating); opacity: 0; transform: translateY(-4px); transition: opacity .12s, transform .12s; pointer-events: none; }
     .alt-tooltip.open { opacity: 1; transform: translateY(0); }
@@ -1020,12 +970,14 @@ table, .table { width: 100%; border-collapse: collapse; }
   <div id="mainWrapper" style="margin-left:68px;padding-top:60px;padding-right:8px;padding-bottom:8px;display:flex;flex-direction:column;height:100vh;overflow:hidden;box-sizing:border-box;transition:margin-left .22s cubic-bezier(.4,0,.2,1);">
     <header class="topbar">
       <div class="tb-left">
-        <button class="tb-context" id="ctxLauncher" type="button" onclick="toggleContextMenu(event)" aria-label="Switch workspace and app" aria-haspopup="menu" aria-expanded="false" data-tt="Workspace and apps" data-tt-desc="Switch workspace, switch app, manage members">
-          <div class="tb-context-logo" id="ctx-logo">CL</div>
-          <span class="tb-context-name" id="ctx-name">Contoso Ltd</span>
-          <svg class="tb-context-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="tb-context-wrap">
+          <button class="tb-context" id="ctxLauncher" type="button" onclick="toggleContextMenu(event)" aria-label="Switch workspace and app" aria-haspopup="menu" aria-expanded="false" data-tt="Workspace and apps" data-tt-desc="Switch workspace, switch app, manage members">
+            <div class="tb-context-logo" id="ctx-logo">CL</div>
+            <span class="tb-context-name" id="ctx-name">Contoso Ltd</span>
+            <svg class="tb-context-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
           <div class="ctx-menu" id="ctxMenu" role="menu" aria-label="Workspace and app switcher"></div>
-        </button>
+        </div>
       </div>
       <div class="tb-search">
         <svg class="tb-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
@@ -2407,8 +2359,6 @@ function sbToggle(){
     }
   } catch(e){}
 })();
-// Legacy stub — old studio launcher removed, but keep symbol in case anything calls it.
-function toggleStudioSw(e){ if(e) e.stopPropagation(); toggleContextMenu(e); }
 function setTabGroup(groupId, el){
   document.querySelectorAll('#'+groupId+' .tg-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
@@ -3963,16 +3913,7 @@ const WORKSPACES_DATA = [
 ];
 const WORKSPACE_STATE = { activeId: null, search: '' };
 function _wsInitials(name){ return name.replace(/[^A-Za-z0-9 ]/g,'').trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase(); }
-function _wsAvatarHtml(ws, sizeClass){
-  const cls = sizeClass || 'tb-workspace-logo';
-  if(ws.logo){
-    return '<div class="'+cls+'"><img src="'+ws.logo+'" alt=""></div>';
-  }
-  return '<div class="'+cls+'" style="background:'+_wsHashColor(ws.id)+'">'+_wsInitials(ws.name)+'</div>';
-}
 function _wsActive(){ return WORKSPACES_DATA.find(w=>w.id===WORKSPACE_STATE.activeId) || WORKSPACES_DATA[0]; }
-// Legacy — kept for backward compat; delegates to new unified trigger renderer.
-function _wsRenderButton(){ _ctxRenderTrigger(); }
 // ── Unified Context Menu (apps + workspace switcher) ────────
 window.CURRENT_APP_ID = 'work-surface';
 const CTX_APPS = [
@@ -4118,10 +4059,6 @@ function _ctxAction(action){
   if(typeof toast === 'function') toast(msg);
   else if(typeof showToast === 'function') showToast(msg);
 }
-// Legacy aliases (kept for backward compat if anything still references them)
-function toggleWorkspaceSw(e){ toggleContextMenu(e); }
-function switchWorkspace(id){ ctxPickWs(id); }
-function wsSearch(q){ ctxSearchWs(q); }
 // Init: load active workspace from localStorage, then render the unified trigger
 (function ctxInit(){
   try {
@@ -4348,6 +4285,14 @@ function aaToggleRouter(e){
 }
 function _aaCreateRouterDropdown(){
   const pill = document.getElementById('aa-route-pill');
+  // Wrap pill in a positioned span the first time, so the dropdown can sit beside it (valid HTML).
+  let wrap = pill.parentElement;
+  if(!wrap.classList.contains('aa-route-pill-wrap')){
+    wrap = document.createElement('span');
+    wrap.className = 'aa-route-pill-wrap';
+    pill.parentNode.insertBefore(wrap, pill);
+    wrap.appendChild(pill);
+  }
   const sw = document.createElement('div');
   sw.id = 'aa-route-sw';
   sw.className = 'aa-route-sw';
@@ -4355,7 +4300,7 @@ function _aaCreateRouterDropdown(){
   sw.innerHTML = '<div class="aa-route-sw__search"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="aa-route-search" type="text" placeholder="Search agents…" aria-label="Search agents" oninput="aaSearchAgents(this.value)" onclick="event.stopPropagation()"></div><div class="aa-route-sw__list" id="aa-route-list"></div>';
   // Stop clicks inside the dropdown from bubbling to the pill button (which would re-toggle).
   sw.addEventListener('click', function(e){ e.stopPropagation(); });
-  pill.appendChild(sw);
+  wrap.appendChild(sw);
   return sw;
 }
 function _aaRenderRouterList(){
