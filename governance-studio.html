@@ -408,6 +408,54 @@ textarea.input{resize:vertical;line-height:1.5}
 .mini-tog input:checked+.mini-track{background:var(--tog-on)}
 .mini-thumb{position:absolute;top:2.5px;left:2.5px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .mini-tog input:checked+.mini-track .mini-thumb{transform:translateX(13px)}
+/* ── Unified Context Menu (apps + workspace switcher) ── */
+.tb-brand{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:4px}
+.tb-context{display:flex;align-items:center;gap:8px;height:34px;padding:0 9px 0 6px;border-radius:8px;background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,0.90);transition:background .15s;flex-shrink:0;position:relative;font-family:inherit}
+.tb-context:hover{background:rgba(255,255,255,0.06)}
+.tb-context-logo{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px;overflow:hidden}
+.tb-context-logo img{width:100%;height:100%;object-fit:cover}
+.tb-context-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.92);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.tb-context-chev{color:rgba(255,255,255,0.50);flex-shrink:0;transition:transform .15s}
+.tb-context.cm-open .tb-context-chev{transform:rotate(180deg)}
+.ctx-menu{position:absolute;top:calc(100% + 8px);left:0;width:300px;background:#131929;border:1px solid rgba(255,255,255,0.10);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,0.04);z-index:200;overflow:hidden;opacity:0;transform:translateY(-6px) scale(0.97);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1);text-align:left}
+.ctx-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.cm-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px}
+.cm-action-btn{display:flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.10);color:rgba(255,255,255,0.85);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .1s,border-color .1s}
+.cm-action-btn:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.20)}
+.cm-action-btn svg{flex-shrink:0;color:rgba(255,255,255,0.65)}
+.cm-section{padding:4px 0;border-top:1px solid rgba(255,255,255,0.06)}
+.cm-section-hd{display:flex;align-items:center;gap:6px;padding:10px 14px 6px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.40);text-transform:uppercase;letter-spacing:.08em}
+.cm-section-hd-count{font-weight:500;opacity:.7;text-transform:none;letter-spacing:0}
+.cm-search{padding:0 10px 6px;position:relative}
+.cm-search input{width:100%;height:30px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:0 10px 0 28px;color:rgba(255,255,255,0.90);font-family:inherit;font-size:12px;outline:none}
+.cm-search input:focus{border-color:rgba(43,127,255,0.30)}
+.cm-search input::placeholder{color:rgba(255,255,255,0.38)}
+.cm-search svg{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.40);pointer-events:none}
+.cm-item{display:flex;align-items:center;gap:11px;padding:9px 12px;cursor:pointer;transition:background .1s;border:none;background:none;width:100%;text-align:left;color:inherit;font-family:inherit;text-decoration:none}
+.cm-item:hover{background:rgba(255,255,255,0.05)}
+.cm-item.is-active{background:rgba(43,127,255,0.10)}
+.cm-item.is-disabled{opacity:.35;cursor:not-allowed}
+.cm-item.is-disabled:hover{background:transparent}
+.cm-item-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px;overflow:hidden}
+.cm-item-ico img{width:100%;height:100%;object-fit:cover}
+.cm-item-info{flex:1;min-width:0;text-align:left}
+.cm-item-name{font-size:13px;font-weight:600;color:rgba(255,255,255,0.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.cm-item.is-active .cm-item-name{font-weight:700}
+.cm-item-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cm-item-role{display:inline-flex;padding:0 6px;height:15px;align-items:center;border-radius:9999px;background:rgba(43,127,255,0.15);color:#80AFFF;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;flex-shrink:0}
+.cm-item-check{width:16px;height:16px;flex-shrink:0;color:#2B7FFF;opacity:0}
+.cm-item.is-active .cm-item-check{opacity:1}
+.cm-ws-list{max-height:280px;overflow-y:auto;padding-bottom:4px}
+.cm-ws-list::-webkit-scrollbar{width:6px}
+.cm-ws-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
+.cm-empty{padding:14px;font-size:12px;color:rgba(255,255,255,0.50);text-align:center}
+.cm-footer{padding:6px;border-top:1px solid rgba(255,255,255,0.06)}
+.cm-create{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 12px;width:100%;background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.85);font-family:inherit;font-size:13px;font-weight:600;transition:all .1s}
+.cm-create:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.30);color:rgba(255,255,255,0.95)}
+.cm-create svg{color:rgba(255,255,255,0.60);flex-shrink:0}
+.cm-create:hover svg{color:rgba(255,255,255,0.95)}
+@media (max-width:560px){.ctx-menu{width:calc(100vw - 16px)}}
+@media (prefers-reduced-motion: reduce){.ctx-menu{transition:opacity .05s;transform:none}.ctx-menu.open{transform:none}}
 /* ── AI Assistant (Phase 1 shell — bot+sparkle topbar trigger + right slideout) ── */
 .icon-btn.aa-trigger.active{background:rgba(43,127,255,0.14)}
 .icon-btn.aa-trigger.active svg{color:rgba(255,255,255,0.92)}
@@ -496,42 +544,14 @@ textarea.input{resize:vertical;line-height:1.5}
 <body>
 <header class="topbar">
   <div class="tb-left">
-    <button class="tb-launcher" id="studioLauncher" onclick="toggleStudioSw(event)" aria-label="Switch studio" aria-haspopup="true" data-tt="Switch app" data-tt-desc="Jump between AIMS OS products: Agentic Studio, Governance Studio, Work-surface.">
-      <div class="tb-launcher-logo" style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)">GS</div>
-      <span class="tb-launcher-name">AIMS OS</span>
-      <svg class="tb-launcher-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div class="studio-sw" id="studioSw" role="menu">
-        <div class="studio-sw-hd"><span class="studio-sw-title">Switch Studio</span></div>
-        <a class="studio-item" href="agentic-studio.html" role="menuitem">
-          <div class="studio-item-ico" style="background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%)">AS</div>
-          <div class="studio-item-info">
-            <div class="studio-item-name">Agentic Studio</div>
-            <div class="studio-item-desc">Agents &amp; workflows</div>
-          </div>
-        </a>
-        <a class="studio-item s-active" href="#" onclick="event.preventDefault();" role="menuitem">
-          <div class="studio-item-ico" style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)">GS</div>
-          <div class="studio-item-info">
-            <div class="studio-item-name">Governance Studio</div>
-            <div class="studio-item-desc">Policies &amp; knowledge</div>
-          </div>
-          <svg class="studio-item-badge" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <a class="studio-item" href="voice-channel-ux.html" role="menuitem">
-          <div class="studio-item-ico" style="background:linear-gradient(135deg,#0EA5E9 0%,#06B6D4 100%)">WS</div>
-          <div class="studio-item-info">
-            <div class="studio-item-name">Work-surface</div>
-            <div class="studio-item-desc">Unified workspace</div>
-          </div>
-        </a>
-      </div>
-    </button>
-    <span class="tb-divider" aria-hidden="true"></span>
-    <button class="tb-workspace" id="workspaceLauncher" onclick="toggleWorkspaceSw(event)" aria-label="Switch workspace" aria-haspopup="menu" aria-expanded="false" data-tt="Switch workspace" data-tt-desc="Change the active organization or tenant context.">
-      <div class="tb-workspace-logo" id="ws-current-logo">C</div>
-      <span class="tb-workspace-name" id="ws-current-name">Contoso Ltd</span>
-      <svg class="tb-workspace-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div class="workspace-sw" id="workspaceSw" role="menu" aria-label="Workspace switcher"></div>
+    <span class="tb-brand" aria-label="AIMS OS" data-tt="AIMS OS" data-tt-desc="Enterprise agent platform">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true"><defs><linearGradient id="aimsLogoGradG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00C2C2"/><stop offset="100%" stop-color="#155DFC"/></linearGradient></defs><rect width="20" height="20" rx="5" fill="url(#aimsLogoGradG)"/><text x="10" y="13.5" text-anchor="middle" font-size="7" font-weight="900" fill="#fff" font-family="Inter,sans-serif" letter-spacing="-.3">AI</text></svg>
+    </span>
+    <button class="tb-context" id="ctxLauncher" type="button" onclick="toggleContextMenu(event)" aria-label="Switch workspace and app" aria-haspopup="menu" aria-expanded="false" data-tt="Workspace and apps" data-tt-desc="Switch workspace, switch app, manage members">
+      <div class="tb-context-logo" id="ctx-logo">CL</div>
+      <span class="tb-context-name" id="ctx-name">Contoso Ltd</span>
+      <svg class="tb-context-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="ctx-menu" id="ctxMenu" role="menu" aria-label="Workspace and app switcher"></div>
     </button>
   </div>
   <div class="tb-search">
@@ -2443,25 +2463,8 @@ function render(){
 
 render();
 
-// ── AIMS app shell: studio switcher + workspace switcher + tooltip (ported from voice) ──
-function toggleStudioSw(e){
-  e.stopPropagation();
-  const launcher=document.getElementById('studioLauncher');
-  const sw=document.getElementById('studioSw');
-  const isOpen=sw.classList.toggle('open');
-  launcher.classList.toggle('sw-open', isOpen);
-  if(isOpen){
-    setTimeout(()=>{
-      document.addEventListener('click', function closeSw(ev){
-        if(!sw.contains(ev.target) && ev.target!==launcher){
-          sw.classList.remove('open');
-          launcher.classList.remove('sw-open');
-          document.removeEventListener('click', closeSw);
-        }
-      });
-    }, 0);
-  }
-}
+// ── AIMS app shell: unified context menu + tooltip ──
+function toggleStudioSw(e){ if(e) e.stopPropagation(); toggleContextMenu(e); }
 const WORKSPACE_PALETTE = [
   'linear-gradient(135deg,#155DFC 0%,#00C2C2 100%)',
   'linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)',
@@ -2492,91 +2495,114 @@ function _wsAvatarHtml(ws, sizeClass){
   return '<div class="'+cls+'" style="background:'+_wsHashColor(ws.id)+'">'+_wsInitials(ws.name)+'</div>';
 }
 function _wsActive(){ return WORKSPACES_DATA.find(w=>w.id===WORKSPACE_STATE.activeId) || WORKSPACES_DATA[0]; }
-function _wsRenderButton(){
+// ── Unified Context Menu (apps + workspace switcher) ────────
+window.CURRENT_APP_ID = 'governance';
+const CTX_APPS = [
+  { id:'work-surface',   name:'Work Surface',   desc:'Unified workspace',    href:'voice-channel-ux.html',  gradient:'linear-gradient(135deg,#0EA5E9 0%,#06B6D4 100%)', initials:'WS' },
+  { id:'governance',     name:'Governance',     desc:'Policies & knowledge', href:'governance-studio.html', gradient:'linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)', initials:'GS' },
+  { id:'agentic-studio', name:'Agentic Studio', desc:'Agents & workflows',   href:'agentic-studio.html',    gradient:'linear-gradient(135deg,#00C2C2 0%,#155DFC 100%)', initials:'AS' }
+];
+const _ctxState = { search: '' };
+function _ctxWsAvatarHtml(ws){ if(ws.logo){ return '<div class="cm-item-ico"><img src="'+ws.logo+'" alt=""></div>'; } return '<div class="cm-item-ico" style="background:'+_wsHashColor(ws.id)+'">'+_wsInitials(ws.name)+'</div>'; }
+function _ctxRenderTrigger(){
   const w = _wsActive();
-  const logoEl = document.getElementById('ws-current-logo');
-  const nameEl = document.getElementById('ws-current-name');
+  const logoEl = document.getElementById('ctx-logo');
+  const nameEl = document.getElementById('ctx-name');
   if(!logoEl || !nameEl) return;
   if(w.logo){ logoEl.innerHTML = '<img src="'+w.logo+'" alt="">'; logoEl.style.background = ''; }
   else { logoEl.textContent = _wsInitials(w.name); logoEl.style.background = _wsHashColor(w.id); }
-  nameEl.textContent = w.name;
+  nameEl.textContent = w.name; nameEl.title = w.name;
 }
-function _wsRenderDropdown(){
-  const sw = document.getElementById('workspaceSw'); if(!sw) return;
-  const active = _wsActive();
-  const total = WORKSPACES_DATA.length;
-  const showSearch = total > 5;
-  const q = WORKSPACE_STATE.search.trim().toLowerCase();
-  const filtered = !q ? WORKSPACES_DATA : WORKSPACES_DATA.filter(w =>
-    w.name.toLowerCase().includes(q) || w.subdomain.toLowerCase().includes(q) || (w.role||'').toLowerCase().includes(q)
-  );
-  const others = filtered.filter(w => w.id !== active.id);
-  const sortedByRecent = [...others].sort((a,b)=>b.lastUsed - a.lastUsed);
-  const recent = q ? [] : sortedByRecent.slice(0, 3);
-  const rest = q ? sortedByRecent : sortedByRecent.slice(3);
-  let html = '<div class="workspace-sw__hd"><span class="workspace-sw__title">Switch Workspace</span></div>';
-  if(showSearch){ html += '<div class="workspace-sw__search"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="ws-search" type="text" placeholder="Search workspaces…" aria-label="Search workspaces" oninput="wsSearch(this.value)" onclick="event.stopPropagation()" value="'+q.replace(/"/g,'&quot;')+'"></div>'; }
-  html += '<div class="workspace-sw__list">';
-  if(filtered.find(w => w.id === active.id)){
-    html += '<button type="button" class="ws-item s-active" role="menuitem" onclick="event.stopPropagation();switchWorkspace(\''+active.id+'\')">' + _wsAvatarHtml(active, 'ws-item__ico') + '<div class="ws-item__info"><div class="ws-item__name">'+active.name+'</div><div class="ws-item__sub">'+active.subdomain+' · '+active.role+'</div></div><svg class="ws-item__check" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
-  }
-  if(recent.length > 0){
-    html += '<div class="workspace-sw__group-label">Recent</div>';
-    recent.forEach(w => { html += '<button type="button" class="ws-item" role="menuitem" onclick="event.stopPropagation();switchWorkspace(\''+w.id+'\')">' + _wsAvatarHtml(w, 'ws-item__ico') + '<div class="ws-item__info"><div class="ws-item__name">'+w.name+'</div></div></button>'; });
-  }
-  if(rest.length > 0){
-    if(!q) html += '<div class="workspace-sw__group-label">All</div>';
-    rest.forEach(w => { html += '<button type="button" class="ws-item" role="menuitem" onclick="event.stopPropagation();switchWorkspace(\''+w.id+'\')">' + _wsAvatarHtml(w, 'ws-item__ico') + '<div class="ws-item__info"><div class="ws-item__name">'+w.name+'</div></div></button>'; });
-  }
-  if(filtered.length === 0){ html += '<div class="workspace-sw__empty">No workspaces match "'+q.replace(/</g,'&lt;')+'"</div>'; }
+function _renderContextMenu(){
+  const menu = document.getElementById('ctxMenu'); if(!menu) return;
+  const currentAppId = window.CURRENT_APP_ID || 'work-surface';
+  const totalWs = WORKSPACES_DATA.length;
+  const showSearch = totalWs > 5;
+  const q = _ctxState.search.trim().toLowerCase();
+  const filteredWs = !q ? WORKSPACES_DATA : WORKSPACES_DATA.filter(w => w.name.toLowerCase().includes(q) || w.subdomain.toLowerCase().includes(q) || (w.role||'').toLowerCase().includes(q));
+  let html = '';
+  html += '<div class="cm-actions"><button type="button" class="cm-action-btn" onclick="event.stopPropagation();_ctxAction(\'settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke-linecap="round"/></svg>Settings</button><button type="button" class="cm-action-btn" onclick="event.stopPropagation();_ctxAction(\'people\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="6" cy="6" r="2.5"/><path d="M2.5 13.5c0-2 1.6-3.5 3.5-3.5s3.5 1.5 3.5 3.5"/><circle cx="11" cy="6" r="2"/><path d="M14 13c0-1.6-1-2.5-2.5-2.5" stroke-linecap="round"/></svg>People</button></div>';
+  html += '<div class="cm-section"><div class="cm-section-hd"><span>Applications</span></div>';
+  CTX_APPS.forEach(app => {
+    const isActive = app.id === currentAppId;
+    const tag = isActive ? 'div' : 'a';
+    const hrefAttr = isActive ? '' : ' href="'+app.href+'"';
+    const clickAttr = isActive ? ' onclick="event.stopPropagation();_ctxClose()"' : ' onclick="event.stopPropagation()"';
+    html += '<'+tag+' class="cm-item'+(isActive?' is-active':'')+'"'+hrefAttr+clickAttr+' role="menuitem"><div class="cm-item-ico" style="background:'+app.gradient+'">'+app.initials+'</div><div class="cm-item-info"><div class="cm-item-name">'+app.name+'</div><div class="cm-item-sub">'+app.desc+'</div></div><svg class="cm-item-check" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></'+tag+'>';
+  });
   html += '</div>';
-  html += '<div class="workspace-sw__footer"><button type="button" class="ws-create" onclick="event.stopPropagation();typeof showToast===\'function\'&&showToast(\'Create workspace\')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>Create workspace</button></div>';
-  sw.innerHTML = html;
+  if(totalWs > 1){
+    html += '<div class="cm-section"><div class="cm-section-hd"><span>Switch Workspace</span><span class="cm-section-hd-count">('+totalWs+')</span></div>';
+    if(showSearch){ html += '<div class="cm-search"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="cm-ws-search" type="text" placeholder="Search workspaces…" aria-label="Search workspaces" oninput="ctxSearchWs(this.value)" onclick="event.stopPropagation()" value="'+q.replace(/"/g,'&quot;')+'"></div>'; }
+    html += '<div class="cm-ws-list">';
+    if(filteredWs.length === 0){ html += '<div class="cm-empty">No workspaces match "'+q.replace(/</g,'&lt;')+'"</div>'; }
+    else {
+      const active = _wsActive();
+      const others = filteredWs.filter(w => w.id !== active.id);
+      const sorted = [...others].sort((a,b)=>b.lastUsed - a.lastUsed);
+      if(filteredWs.find(w => w.id === active.id)){
+        const roleHtml = active.role ? '<span class="cm-item-role">'+active.role+'</span>' : '';
+        html += '<button type="button" class="cm-item is-active" role="menuitem" onclick="event.stopPropagation();ctxPickWs(\''+active.id+'\')">' + _ctxWsAvatarHtml(active) + '<div class="cm-item-info"><div class="cm-item-name"><span>'+active.name+'</span>'+roleHtml+'</div><div class="cm-item-sub">'+active.subdomain+'</div></div><svg class="cm-item-check" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+      }
+      sorted.forEach(w => { html += '<button type="button" class="cm-item" role="menuitem" onclick="event.stopPropagation();ctxPickWs(\''+w.id+'\')">' + _ctxWsAvatarHtml(w) + '<div class="cm-item-info"><div class="cm-item-name">'+w.name+'</div></div></button>'; });
+    }
+    html += '</div></div>';
+  }
+  html += '<div class="cm-footer"><button type="button" class="cm-create" onclick="event.stopPropagation();_ctxAction(\'create-workspace\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>Create workspace</button></div>';
+  menu.innerHTML = html;
 }
-function toggleWorkspaceSw(e){
+function toggleContextMenu(e){
   if(e) e.stopPropagation();
-  const sw = document.getElementById('workspaceSw');
-  const launcher = document.getElementById('workspaceLauncher');
-  if(!sw || !launcher) return;
-  const isOpen = sw.classList.toggle('open');
-  launcher.classList.toggle('ws-open', isOpen);
+  const launcher = document.getElementById('ctxLauncher');
+  const menu = document.getElementById('ctxMenu');
+  if(!menu || !launcher) return;
+  const isOpen = menu.classList.toggle('open');
+  launcher.classList.toggle('cm-open', isOpen);
   launcher.setAttribute('aria-expanded', isOpen);
   if(isOpen){
-    WORKSPACE_STATE.search = '';
-    _wsRenderDropdown();
+    _ctxState.search = '';
+    _renderContextMenu();
     setTimeout(()=>{
-      const inp = document.getElementById('ws-search'); if(inp) inp.focus();
+      const inp = document.getElementById('cm-ws-search'); if(inp) inp.focus();
       document.addEventListener('click', function closer(ev){
-        if(!sw.contains(ev.target) && ev.target !== launcher && !launcher.contains(ev.target)){
-          sw.classList.remove('open');
-          launcher.classList.remove('ws-open');
-          launcher.setAttribute('aria-expanded','false');
+        if(!menu.contains(ev.target) && !launcher.contains(ev.target)){
+          menu.classList.remove('open'); launcher.classList.remove('cm-open'); launcher.setAttribute('aria-expanded','false');
           document.removeEventListener('click', closer);
         }
       });
     }, 0);
   }
 }
-function wsSearch(q){ WORKSPACE_STATE.search = q; _wsRenderDropdown(); const inp=document.getElementById('ws-search'); if(inp){ inp.focus(); inp.value=q; }}
-function switchWorkspace(id){
-  if(id === WORKSPACE_STATE.activeId){ document.getElementById('workspaceSw')?.classList.remove('open'); document.getElementById('workspaceLauncher')?.classList.remove('ws-open'); return; }
+function _ctxClose(){ document.getElementById('ctxMenu')?.classList.remove('open'); document.getElementById('ctxLauncher')?.classList.remove('cm-open'); document.getElementById('ctxLauncher')?.setAttribute('aria-expanded','false'); }
+function ctxSearchWs(q){ _ctxState.search = q; _renderContextMenu(); const inp = document.getElementById('cm-ws-search'); if(inp){ inp.focus(); inp.value = q; } }
+function ctxPickWs(id){
+  if(id === WORKSPACE_STATE.activeId){ _ctxClose(); return; }
   const target = WORKSPACES_DATA.find(w=>w.id===id); if(!target) return;
   WORKSPACE_STATE.activeId = id;
   target.lastUsed = Date.now();
   try { localStorage.setItem('aims_active_workspace', id); } catch(e){}
-  document.getElementById('workspaceSw')?.classList.remove('open');
-  document.getElementById('workspaceLauncher')?.classList.remove('ws-open');
-  document.getElementById('workspaceLauncher')?.setAttribute('aria-expanded','false');
-  _wsRenderButton();
-  if(typeof showToast==='function') showToast('Switched to ' + target.name);
+  _ctxClose(); _ctxRenderTrigger();
+  if(typeof showToast === 'function') showToast('Switched to ' + target.name);
 }
-(function wsInit(){
+function _ctxAction(action){
+  _ctxClose();
+  const msg = { 'settings':'Workspace settings — coming soon', 'people':'Members & access control — coming soon', 'create-workspace':'Create workspace — coming soon' }[action] || action;
+  if(typeof showToast === 'function') showToast(msg);
+}
+function _wsRenderButton(){ _ctxRenderTrigger(); }
+function toggleWorkspaceSw(e){ toggleContextMenu(e); }
+function switchWorkspace(id){ ctxPickWs(id); }
+function wsSearch(q){ ctxSearchWs(q); }
+(function ctxInit(){
   try {
     const stored = localStorage.getItem('aims_active_workspace');
     if(stored && WORKSPACES_DATA.find(w=>w.id===stored)) WORKSPACE_STATE.activeId = stored;
     else WORKSPACE_STATE.activeId = 'contoso';
   } catch(e){ WORKSPACE_STATE.activeId = 'contoso'; }
-  _wsRenderButton();
+  _ctxRenderTrigger();
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && document.getElementById('ctxMenu')?.classList.contains('open')){ _ctxClose(); }
+  });
 })();
 (function initTooltips(){
   let tip = null, showTimer = null, currentTarget = null;
