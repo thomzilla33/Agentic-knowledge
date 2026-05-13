@@ -447,6 +447,26 @@ textarea.input{resize:vertical;line-height:1.5}
 .am-item.is-danger svg{color:rgba(248,113,113,0.65)}
 .am-item.is-danger:hover{background:rgba(248,113,113,0.08);color:rgba(252,165,165,0.95)}
 .am-item.is-danger:hover svg{color:rgba(252,165,165,0.85)}
+/* ── Gear menu (Personal settings — Jira-style) ── */
+.tb-gear-wrap{position:relative;flex-shrink:0;display:inline-flex;align-items:center}
+.gear-menu{position:absolute;top:calc(100% + 8px);right:0;width:320px;background:#131929;border:1px solid rgba(255,255,255,0.10);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,0.04);z-index:200;overflow:hidden;opacity:0;transform:translateY(-6px) scale(0.97);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1);text-align:left;max-height:calc(100vh - 80px);overflow-y:auto}
+.gear-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.gear-menu::-webkit-scrollbar{width:6px}
+.gear-menu::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
+.gear-menu-hd{padding:14px 16px 6px;font-size:13px;font-weight:700;color:rgba(255,255,255,0.92)}
+.gear-section-hd{padding:10px 16px 4px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.40);text-transform:uppercase;letter-spacing:.08em}
+.gear-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:rgba(255,255,255,0.88);font-family:inherit;font-size:13px;font-weight:500;transition:background .1s}
+.gear-item:hover{background:rgba(255,255,255,0.05)}
+.gear-item-ico{width:20px;height:20px;flex-shrink:0;color:rgba(255,255,255,0.55);margin-top:1px}
+.gear-item:hover .gear-item-ico{color:rgba(255,255,255,0.90)}
+.gear-item-main{flex:1;min-width:0}
+.gear-item-name{font-size:13px;font-weight:600;color:rgba(255,255,255,0.92);line-height:1.25}
+.gear-item-desc{font-size:11px;color:rgba(255,255,255,0.50);margin-top:3px;line-height:1.45}
+.gear-divider{height:1px;background:rgba(255,255,255,0.06);margin:4px 0}
+.gear-notice{margin:6px 12px 12px;padding:11px 12px;background:rgba(252,165,165,0.06);border:1px solid rgba(252,165,165,0.18);border-radius:8px;font-size:12px;color:rgba(252,200,200,0.90);line-height:1.5}
+.gear-notice strong{color:rgba(255,220,220,1);font-weight:600}
+.gear-notice a{color:rgba(150,200,255,0.95);text-decoration:underline;cursor:pointer}
+.gear-notice a:hover{color:rgba(150,200,255,1)}
 /* Footer-link buttons in app switcher dropdown (reused for Discover/Manage) */
 .cm-footer{display:flex;flex-direction:column;padding:4px;border-top:1px solid rgba(255,255,255,0.06);gap:2px}
 .cm-footer-link{display:flex;align-items:center;gap:10px;padding:8px 10px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;text-align:left;transition:background .1s,color .1s}
@@ -560,6 +580,12 @@ textarea.input{resize:vertical;line-height:1.5}
   <div class="tb-right">
     <button class="icon-btn" aria-label="Notifications" onclick="typeof showToast==='function'&&showToast('Notifications')" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
     <button class="icon-btn aa-trigger" aria-label="AI Assistant" onclick="openAiAssistant()" data-tt="AI Assistant" data-tt-desc="Chat with any agent in your workspace · ⌘/"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><defs><linearGradient id="aaDotG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00C2C2"/><stop offset="100%" stop-color="#155DFC"/></linearGradient></defs><circle cx="8" cy="2.2" r=".8" fill="currentColor"/><path d="M8 3v1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><rect x="2.5" y="4.5" width="11" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.3"/><circle cx="6" cy="8.5" r=".9" fill="currentColor"/><circle cx="10" cy="8.5" r=".9" fill="currentColor"/><circle cx="13.5" cy="3" r="1.5" fill="url(#aaDotG)" stroke="rgba(10,13,26,0.9)" stroke-width=".6"/></svg></button>
+    <div class="tb-gear-wrap">
+      <button class="icon-btn" id="gearLauncher" type="button" onclick="toggleGearMenu(event)" aria-label="Settings" aria-haspopup="menu" aria-expanded="false" data-tt="Settings" data-tt-desc="Personal settings and workspace admin">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+      <div class="gear-menu" id="gearMenu" role="menu" aria-label="Settings"></div>
+    </div>
     <div class="tb-avatar-wrap">
       <button class="avatar-sm" id="avatarLauncher" type="button" onclick="toggleAvatarMenu(event)" aria-label="Account menu" aria-haspopup="menu" aria-expanded="false" data-tt="Account" data-tt-desc="Workspace, settings, sign out" style="border:none;font-family:inherit">TH</button>
       <div class="avatar-menu" id="avatarMenu" role="menu" aria-label="Account and workspace"></div>
@@ -2584,7 +2610,9 @@ function _ctxAction(action){
     'appearance':'Appearance preferences — coming soon',
     'notifications':'Notification preferences — coming soon',
     'help':'Help & docs — coming soon',
-    'sign-out':'Sign out — coming soon'
+    'sign-out':'Sign out — coming soon',
+    'general-settings':'General preferences — coming soon',
+    'contact-admin':'Reach out to your workspace admin — coming soon'
   }[action] || action;
   if(typeof toast === 'function') toast(msg);
   else if(typeof showToast === 'function') showToast(msg);
@@ -2737,6 +2765,95 @@ if(typeof _origToggleContextMenu === 'function'){
   window.toggleContextMenu = function(e){
     _avatarClose();
     _origToggleContextMenu(e);
+  };
+}
+// ── Gear menu (Personal settings — Jira-style) ────────
+function _renderGearMenu(){
+  const menu = document.getElementById('gearMenu'); if(!menu) return;
+  const hasAnyAdmin = userCan('canManageWorkspaceSettings') || userCan('canManageMembers');
+  let html = '';
+  html += '<div class="gear-menu-hd">Personal settings</div>';
+  // General settings
+  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'general-settings\')">';
+  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>';
+  html += '<div class="gear-item-main"><div class="gear-item-name">General</div><div class="gear-item-desc">Profile, language, time zone, and other personal preferences</div></div>';
+  html += '</button>';
+  // Notifications settings
+  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'notifications\')">';
+  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>';
+  html += '<div class="gear-item-main"><div class="gear-item-name">Notifications</div><div class="gear-item-desc">Manage email and in-app notifications from AIMS&nbsp;OS</div></div>';
+  html += '</button>';
+  // Workspace admin section (gated) — or notice if no access
+  if(hasAnyAdmin){
+    html += '<div class="gear-divider"></div>';
+    html += '<div class="gear-section-hd">Workspace admin</div>';
+    if(userCan('canManageWorkspaceSettings')){
+      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'workspace-settings\')">';
+      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2" stroke-linecap="round"/></svg>';
+      html += '<div class="gear-item-main"><div class="gear-item-name">Workspace settings</div><div class="gear-item-desc">Billing, integrations, security, and organization preferences</div></div>';
+      html += '</button>';
+    }
+    if(userCan('canManageMembers')){
+      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'members\')">';
+      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3 2.5-5 6-5s6 2 6 5" stroke-linecap="round"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19c0-2.5-2-4-4-4" stroke-linecap="round"/></svg>';
+      html += '<div class="gear-item-main"><div class="gear-item-name">Members &amp; access</div><div class="gear-item-desc">Invite members, manage roles and permissions</div></div>';
+      html += '</button>';
+    }
+  } else {
+    html += '<div class="gear-divider"></div>';
+    html += '<div class="gear-notice">You don\'t have access to workspace settings or admin. <a href="#" onclick="event.preventDefault();event.stopPropagation();_ctxAction(\'contact-admin\')">Contact your workspace admin</a> to grant you access.</div>';
+  }
+  menu.innerHTML = html;
+}
+
+function toggleGearMenu(e){
+  if(e) e.stopPropagation();
+  // Close peer menus
+  if(typeof _ctxClose === 'function') _ctxClose();
+  if(typeof _avatarClose === 'function') _avatarClose();
+  const launcher = document.getElementById('gearLauncher');
+  const menu = document.getElementById('gearMenu');
+  if(!launcher || !menu) return;
+  const isOpen = menu.classList.toggle('open');
+  launcher.setAttribute('aria-expanded', isOpen);
+  if(isOpen){
+    _renderGearMenu();
+    setTimeout(()=>{
+      document.addEventListener('click', function closer(ev){
+        if(!menu.contains(ev.target) && !launcher.contains(ev.target)){
+          _gearClose();
+          document.removeEventListener('click', closer);
+        }
+      });
+    }, 0);
+  }
+}
+
+function _gearClose(){
+  document.getElementById('gearMenu')?.classList.remove('open');
+  document.getElementById('gearLauncher')?.setAttribute('aria-expanded','false');
+}
+
+// Esc key closes gear menu
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.getElementById('gearMenu')?.classList.contains('open')){
+    _gearClose();
+  }
+});
+
+// Wrap toggleContextMenu and toggleAvatarMenu so opening either closes the gear menu
+const _origToggleContextMenuForGear = window.toggleContextMenu;
+if(typeof _origToggleContextMenuForGear === 'function'){
+  window.toggleContextMenu = function(e){
+    _gearClose();
+    _origToggleContextMenuForGear(e);
+  };
+}
+const _origToggleAvatarMenuForGear = window.toggleAvatarMenu;
+if(typeof _origToggleAvatarMenuForGear === 'function'){
+  window.toggleAvatarMenu = function(e){
+    _gearClose();
+    _origToggleAvatarMenuForGear(e);
   };
 }
 (function initTooltips(){
