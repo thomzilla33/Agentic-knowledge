@@ -917,23 +917,28 @@
     .am-ws-role{font-size:10px;font-weight:700;color:rgba(43,127,255,0.85);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
     .am-ws-chev{color:rgba(255,255,255,0.50);transition:transform .15s;flex-shrink:0}
     .am-ws-card.is-expanded .am-ws-chev{transform:rotate(180deg)}
-    .am-ws-expand{max-height:0;overflow:hidden;transition:max-height .22s cubic-bezier(.4,0,.2,1)}
-    .am-ws-expand.is-open{max-height:420px}
-    .am-ws-search{padding:6px 12px 4px;position:relative}
-    .am-ws-search input{width:100%;height:30px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:0 10px 0 28px;color:rgba(255,255,255,0.90);font-family:inherit;font-size:12px;outline:none}
-    .am-ws-search input:focus{border-color:rgba(43,127,255,0.30)}
-    .am-ws-search input::placeholder{color:rgba(255,255,255,0.38)}
-    .am-ws-search svg{position:absolute;left:21px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.40);pointer-events:none}
-    .am-ws-list{max-height:260px;overflow-y:auto;padding-bottom:4px}
-    .am-ws-list::-webkit-scrollbar{width:6px}
-    .am-ws-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
-    .am-ws-item{display:flex;align-items:center;gap:10px;padding:7px 12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:inherit;font-family:inherit;transition:background .1s}
-    .am-ws-item:hover{background:rgba(255,255,255,0.05)}
-    .am-ws-item.is-active{background:rgba(43,127,255,0.08)}
-    .am-ws-item-ico{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px}
-    .am-ws-item-name{flex:1;min-width:0;font-size:12px;font-weight:500;color:rgba(255,255,255,0.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .am-ws-create{display:flex;align-items:center;gap:8px;padding:9px 12px;margin:4px 8px 8px;width:calc(100% - 16px);background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.85);font-family:inherit;font-size:12px;font-weight:600;justify-content:center;transition:all .1s}
-    .am-ws-create:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.30);color:rgba(255,255,255,0.95)}
+    /* ── Workspace dropdown selector (replaces accordion) ── */
+    .am-ws-section{position:relative}
+    .am-ws-dropdown{position:absolute;top:calc(100% + 4px);left:8px;right:8px;background:#131929;border:1px solid rgba(255,255,255,0.12);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,0.04);z-index:5;overflow:hidden;opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1)}
+    .am-ws-dropdown.open{opacity:1;transform:translateY(0);pointer-events:auto}
+    .am-ws-dropdown-search{padding:8px 10px;position:relative;border-bottom:1px solid rgba(255,255,255,0.06)}
+    .am-ws-dropdown-search input{width:100%;height:30px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:0 10px 0 28px;color:rgba(255,255,255,0.92);font-family:inherit;font-size:12px;outline:none}
+    .am-ws-dropdown-search input:focus{border-color:rgba(43,127,255,0.30)}
+    .am-ws-dropdown-search input::placeholder{color:rgba(255,255,255,0.38)}
+    .am-ws-dropdown-search svg{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.40);pointer-events:none}
+    .am-ws-dropdown-list{max-height:240px;overflow-y:auto;padding:4px 0}
+    .am-ws-dropdown-list::-webkit-scrollbar{width:6px}
+    .am-ws-dropdown-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
+    .am-ws-dropdown-item{display:flex;align-items:center;gap:10px;padding:7px 12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:inherit;font-family:inherit;transition:background .1s}
+    .am-ws-dropdown-item:hover{background:rgba(255,255,255,0.05)}
+    .am-ws-dropdown-item.is-active{background:rgba(43,127,255,0.10)}
+    .am-ws-dropdown-item-ico{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px;overflow:hidden}
+    .am-ws-dropdown-item-name{flex:1;min-width:0;font-size:12px;font-weight:500;color:rgba(255,255,255,0.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .am-ws-dropdown-item-check{width:14px;height:14px;flex-shrink:0;color:#2B7FFF;opacity:0}
+    .am-ws-dropdown-item.is-active .am-ws-dropdown-item-check{opacity:1}
+    .am-ws-dropdown-create{display:flex;align-items:center;gap:8px;padding:9px 12px;margin:4px 8px 8px;width:calc(100% - 16px);background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.85);font-family:inherit;font-size:12px;font-weight:600;justify-content:center;transition:all .1s}
+    .am-ws-dropdown-create:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.30);color:rgba(255,255,255,0.95)}
+    .am-ws-dropdown-empty{padding:14px;font-size:12px;color:rgba(255,255,255,0.50);text-align:center}
     .am-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:rgba(255,255,255,0.88);font-family:inherit;font-size:13px;font-weight:500;transition:background .1s}
     .am-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.95)}
     .am-item svg{color:rgba(255,255,255,0.55);flex-shrink:0}
@@ -2831,38 +2836,46 @@
     const active = _wsActive();
     let html = '';
     html += '<div class="am-user"><div class="am-user-name">'+CURRENT_USER.name+'</div><div class="am-user-email">'+CURRENT_USER.email+'</div></div>';
-    html += '<div class="am-section" style="border-top:none">';
+    html += '<div class="am-section am-ws-section" style="border-top:none">';
     html += '<div class="am-section-hd">Workspace</div>';
-    const isExpanded = _avatarState.workspacesExpanded;
-    html += '<button type="button" class="am-ws-card'+(isExpanded?' is-expanded':'')+'" onclick="event.stopPropagation();_avatarToggleWorkspaces()">';
+    const isDropdownOpen = _avatarState.workspacesExpanded;
+    html += '<button type="button" class="am-ws-card'+(isDropdownOpen?' is-expanded':'')+'" onclick="event.stopPropagation();_avatarToggleWorkspaces()">';
     html += '<div class="am-ws-ico" style="background:'+_wsHashColor(active.id)+'">'+_wsInitials(active.name)+'</div>';
     html += '<div class="am-ws-info"><div class="am-ws-name" title="'+_ctxEscAttr(active.name)+'">'+_ctxTrunc(active.name,50)+'</div><div class="am-ws-role">'+(active.role||'')+'</div></div>';
     html += '<svg class="am-ws-chev" width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     html += '</button>';
-    html += '<div class="am-ws-expand'+(isExpanded?' is-open':'')+'">';
-    if(isExpanded){
+    html += '<div class="am-ws-dropdown'+(isDropdownOpen?' open':'')+'" id="am-ws-dropdown">';
+    if(isDropdownOpen){
       const totalWs = WORKSPACES_DATA.length;
       const showSearch = totalWs > 5;
       const q = _avatarState.wsSearch.trim().toLowerCase();
       const filtered = !q ? WORKSPACES_DATA : WORKSPACES_DATA.filter(w => w.name.toLowerCase().includes(q) || (w.subdomain||'').toLowerCase().includes(q) || (w.role||'').toLowerCase().includes(q));
       if(showSearch){
-        html += '<div class="am-ws-search"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="am-ws-search-input" type="text" placeholder="Search workspaces…" aria-label="Search workspaces" oninput="event.stopPropagation();_avatarSearchWs(this.value)" onclick="event.stopPropagation()" value="'+q.replace(/"/g,'&quot;')+'"></div>';
+        html += '<div class="am-ws-dropdown-search"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="am-ws-search-input" type="text" placeholder="Search workspaces…" aria-label="Search workspaces" oninput="event.stopPropagation();_avatarSearchWs(this.value)" onclick="event.stopPropagation()" value="'+q.replace(/"/g,'&quot;')+'"></div>';
       }
-      html += '<div class="am-ws-list">';
-      const others = filtered.filter(w => w.id !== active.id);
-      const sorted = [...others].sort((a,b)=>b.lastUsed - a.lastUsed);
+      html += '<div class="am-ws-dropdown-list">';
       if(filtered.length === 0){
-        html += '<div style="padding:14px;font-size:12px;color:rgba(255,255,255,0.50);text-align:center">No workspaces match "'+q.replace(/</g,'&lt;')+'"</div>';
-      } else if(sorted.length === 0 && filtered.length === 1){
-        html += '<div style="padding:10px 14px;font-size:11px;color:rgba(255,255,255,0.40);text-align:center">You are in your only workspace</div>';
+        html += '<div class="am-ws-dropdown-empty">No workspaces match "'+q.replace(/</g,'&lt;')+'"</div>';
       } else {
+        if(filtered.find(w => w.id === active.id)){
+          html += '<button type="button" class="am-ws-dropdown-item is-active" onclick="event.stopPropagation();_avatarPickWs(\''+active.id+'\')">'
+            + '<div class="am-ws-dropdown-item-ico" style="background:'+_wsHashColor(active.id)+'">'+_wsInitials(active.name)+'</div>'
+            + '<div class="am-ws-dropdown-item-name" title="'+_ctxEscAttr(active.name)+'">'+_ctxTrunc(active.name,40)+'</div>'
+            + '<svg class="am-ws-dropdown-item-check" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            + '</button>';
+        }
+        const others = filtered.filter(w => w.id !== active.id);
+        const sorted = [...others].sort((a,b)=>b.lastUsed - a.lastUsed);
         sorted.forEach(w => {
-          html += '<button type="button" class="am-ws-item" onclick="event.stopPropagation();_avatarPickWs(\''+w.id+'\')"><div class="am-ws-item-ico" style="background:'+_wsHashColor(w.id)+'">'+_wsInitials(w.name)+'</div><div class="am-ws-item-name" title="'+_ctxEscAttr(w.name)+'">'+_ctxTrunc(w.name,40)+'</div></button>';
+          html += '<button type="button" class="am-ws-dropdown-item" onclick="event.stopPropagation();_avatarPickWs(\''+w.id+'\')">'
+            + '<div class="am-ws-dropdown-item-ico" style="background:'+_wsHashColor(w.id)+'">'+_wsInitials(w.name)+'</div>'
+            + '<div class="am-ws-dropdown-item-name" title="'+_ctxEscAttr(w.name)+'">'+_ctxTrunc(w.name,40)+'</div>'
+            + '</button>';
         });
       }
       html += '</div>';
       if(userCan('canCreateWorkspace')){
-        html += '<button type="button" class="am-ws-create" onclick="event.stopPropagation();_ctxAction(\'create-workspace\')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>Create workspace</button>';
+        html += '<button type="button" class="am-ws-dropdown-create" onclick="event.stopPropagation();_ctxAction(\'create-workspace\')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>Create workspace</button>';
       }
     }
     html += '</div>';
@@ -2921,7 +2934,23 @@
     _avatarState.wsSearch = '';
     _renderAvatarMenu();
     if(_avatarState.workspacesExpanded){
-      setTimeout(()=>{ document.getElementById('am-ws-search-input')?.focus(); }, 50);
+      setTimeout(()=>{
+        document.getElementById('am-ws-search-input')?.focus();
+        const dropdown = document.getElementById('am-ws-dropdown');
+        const card = document.querySelector('.am-ws-card');
+        if(!dropdown || !card) return;
+        document.addEventListener('click', function dropCloser(ev){
+          if(!_avatarState.workspacesExpanded){
+            document.removeEventListener('click', dropCloser);
+            return;
+          }
+          if(!dropdown.contains(ev.target) && !card.contains(ev.target)){
+            _avatarState.workspacesExpanded = false;
+            _renderAvatarMenu();
+            document.removeEventListener('click', dropCloser);
+          }
+        });
+      }, 50);
     }
   }
 
@@ -2951,6 +2980,11 @@
 
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape' && document.getElementById('avatarMenu')?.classList.contains('open')){
+      if(_avatarState.workspacesExpanded){
+        _avatarState.workspacesExpanded = false;
+        _renderAvatarMenu();
+        return;
+      }
       _avatarClose();
     }
   });
