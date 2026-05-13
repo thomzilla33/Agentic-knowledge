@@ -369,7 +369,7 @@ table, .table { width: 100%; border-collapse: collapse; }
 .am-ws-card.is-expanded .am-ws-chev{transform:rotate(180deg)}
 /* ── Workspace dropdown selector (replaces accordion) ── */
 .am-ws-section{position:relative}
-.am-ws-dropdown{position:absolute;top:calc(100% + 4px);left:8px;right:8px;background:#131929;border:1px solid rgba(255,255,255,0.12);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,0.04);z-index:5;overflow:hidden;opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1)}
+.am-ws-dropdown{position:fixed;width:284px;background:#131929;border:1px solid rgba(255,255,255,0.12);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,0.04);z-index:210;overflow:hidden;opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1)}
 .am-ws-dropdown.open{opacity:1;transform:translateY(0);pointer-events:auto}
 .am-ws-dropdown-search{padding:8px 10px;position:relative;border-bottom:1px solid rgba(255,255,255,0.06)}
 .am-ws-dropdown-search input{width:100%;height:30px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:0 10px 0 28px;color:rgba(255,255,255,0.92);font-family:inherit;font-size:12px;outline:none}
@@ -4206,6 +4206,17 @@ function _renderAvatarMenu(){
   html += '<button type="button" class="am-item is-danger" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
   html += '</div>';
   menu.innerHTML = html;
+  // Position the workspace dropdown if open — use fixed positioning so it escapes the avatar-menu's overflow
+  if(_avatarState.workspacesExpanded){
+    const card = document.querySelector('.am-ws-card');
+    const dropdown = document.getElementById('am-ws-dropdown');
+    if(card && dropdown){
+      const rect = card.getBoundingClientRect();
+      dropdown.style.top = (rect.bottom + 4) + 'px';
+      dropdown.style.left = rect.left + 'px';
+      dropdown.style.width = rect.width + 'px';
+    }
+  }
 }
 
 function toggleAvatarMenu(e){
