@@ -403,6 +403,56 @@ textarea.input{resize:vertical;line-height:1.5}
 .cm-create:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.30);color:rgba(255,255,255,0.95)}
 .cm-create svg{color:rgba(255,255,255,0.60);flex-shrink:0}
 .cm-create:hover svg{color:rgba(255,255,255,0.95)}
+/* ── Avatar menu (account + workspace switcher) ── */
+.tb-avatar-wrap{position:relative;flex-shrink:0;display:inline-flex;align-items:center}
+.avatar-menu{position:absolute;top:calc(100% + 8px);right:0;width:300px;background:#131929;border:1px solid rgba(255,255,255,0.10);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,0.04);z-index:200;overflow:hidden;opacity:0;transform:translateY(-6px) scale(0.97);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1);text-align:left;max-height:calc(100vh - 80px);overflow-y:auto}
+.avatar-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.avatar-menu::-webkit-scrollbar{width:6px}
+.avatar-menu::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
+.am-user{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.am-user-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.92);line-height:1.2}
+.am-user-email{font-size:11px;color:rgba(255,255,255,0.50);margin-top:3px}
+.am-section{padding:4px 0;border-top:1px solid rgba(255,255,255,0.06)}
+.am-section-hd{padding:10px 14px 4px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.40);text-transform:uppercase;letter-spacing:.08em}
+.am-ws-card{display:flex;align-items:center;gap:11px;padding:8px 12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:inherit;font-family:inherit;transition:background .1s;border-radius:0}
+.am-ws-card:hover{background:rgba(255,255,255,0.04)}
+.am-ws-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px;overflow:hidden}
+.am-ws-info{flex:1;min-width:0}
+.am-ws-name{font-size:13px;font-weight:600;color:rgba(255,255,255,0.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.am-ws-role{font-size:10px;font-weight:700;color:rgba(43,127,255,0.85);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.am-ws-chev{color:rgba(255,255,255,0.50);transition:transform .15s;flex-shrink:0}
+.am-ws-card.is-expanded .am-ws-chev{transform:rotate(180deg)}
+.am-ws-expand{max-height:0;overflow:hidden;transition:max-height .22s cubic-bezier(.4,0,.2,1)}
+.am-ws-expand.is-open{max-height:420px}
+.am-ws-search{padding:6px 12px 4px;position:relative}
+.am-ws-search input{width:100%;height:30px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:0 10px 0 28px;color:rgba(255,255,255,0.90);font-family:inherit;font-size:12px;outline:none}
+.am-ws-search input:focus{border-color:rgba(43,127,255,0.30)}
+.am-ws-search input::placeholder{color:rgba(255,255,255,0.38)}
+.am-ws-search svg{position:absolute;left:21px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.40);pointer-events:none}
+.am-ws-list{max-height:260px;overflow-y:auto;padding-bottom:4px}
+.am-ws-list::-webkit-scrollbar{width:6px}
+.am-ws-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
+.am-ws-item{display:flex;align-items:center;gap:10px;padding:7px 12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:inherit;font-family:inherit;transition:background .1s}
+.am-ws-item:hover{background:rgba(255,255,255,0.05)}
+.am-ws-item.is-active{background:rgba(43,127,255,0.08)}
+.am-ws-item-ico{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px}
+.am-ws-item-name{flex:1;min-width:0;font-size:12px;font-weight:500;color:rgba(255,255,255,0.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.am-ws-create{display:flex;align-items:center;gap:8px;padding:9px 12px;margin:4px 8px 8px;width:calc(100% - 16px);background:transparent;border:1px dashed rgba(255,255,255,0.15);border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.85);font-family:inherit;font-size:12px;font-weight:600;justify-content:center;transition:all .1s}
+.am-ws-create:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.30);color:rgba(255,255,255,0.95)}
+.am-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:rgba(255,255,255,0.88);font-family:inherit;font-size:13px;font-weight:500;transition:background .1s}
+.am-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.95)}
+.am-item svg{color:rgba(255,255,255,0.55);flex-shrink:0}
+.am-item:hover svg{color:rgba(255,255,255,0.85)}
+.am-item.is-danger{color:rgba(248,113,113,0.85)}
+.am-item.is-danger svg{color:rgba(248,113,113,0.65)}
+.am-item.is-danger:hover{background:rgba(248,113,113,0.08);color:rgba(252,165,165,0.95)}
+.am-item.is-danger:hover svg{color:rgba(252,165,165,0.85)}
+/* Footer-link buttons in app switcher dropdown (reused for Discover/Manage) */
+.cm-footer{display:flex;flex-direction:column;padding:4px;border-top:1px solid rgba(255,255,255,0.06);gap:2px}
+.cm-footer-link{display:flex;align-items:center;gap:10px;padding:8px 10px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;text-align:left;transition:background .1s,color .1s}
+.cm-footer-link:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.95)}
+.cm-footer-link svg{color:rgba(255,255,255,0.50);flex-shrink:0}
+.cm-footer-link:hover svg{color:rgba(255,255,255,0.85)}
 @media (max-width:560px){.ctx-menu{width:calc(100vw - 16px)}}
 @media (prefers-reduced-motion: reduce){.ctx-menu{transition:opacity .05s;transform:none}.ctx-menu.open{transform:none}}
 /* ── AI Assistant (Phase 1 shell — bot+sparkle topbar trigger + right slideout) ── */
@@ -495,12 +545,12 @@ textarea.input{resize:vertical;line-height:1.5}
 <header class="topbar">
   <div class="tb-left">
     <div class="tb-context-wrap">
-      <button class="tb-context" id="ctxLauncher" type="button" onclick="toggleContextMenu(event)" aria-label="Switch workspace and app" aria-haspopup="menu" aria-expanded="false" data-tt="Workspace and apps" data-tt-desc="Switch workspace, switch app, manage members">
-        <div class="tb-context-logo" id="ctx-logo">CL</div>
-        <span class="tb-context-name" id="ctx-name">Contoso Ltd</span>
+      <button class="tb-context" id="ctxLauncher" type="button" onclick="toggleContextMenu(event)" aria-haspopup="menu" aria-expanded="false" data-tt="Switch app" data-tt-desc="Change to a different application">
+        <div class="tb-context-logo" id="ctx-logo" style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)">GS</div>
+        <span class="tb-context-name" id="ctx-name">Governance</span>
         <svg class="tb-context-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="ctx-menu" id="ctxMenu" role="menu" aria-label="Workspace and app switcher"></div>
+      <div class="ctx-menu" id="ctxMenu" role="menu" aria-label="App switcher"></div>
     </div>
   </div>
   <div class="tb-search">
@@ -511,7 +561,10 @@ textarea.input{resize:vertical;line-height:1.5}
     <button class="icon-btn" aria-label="Notifications" onclick="typeof showToast==='function'&&showToast('Notifications')" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
     <button class="icon-btn aa-trigger" aria-label="AI Assistant" onclick="openAiAssistant()" data-tt="AI Assistant" data-tt-desc="Chat with any agent in your workspace · ⌘/"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><defs><linearGradient id="aaDotG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00C2C2"/><stop offset="100%" stop-color="#155DFC"/></linearGradient></defs><circle cx="8" cy="2.2" r=".8" fill="currentColor"/><path d="M8 3v1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><rect x="2.5" y="4.5" width="11" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.3"/><circle cx="6" cy="8.5" r=".9" fill="currentColor"/><circle cx="10" cy="8.5" r=".9" fill="currentColor"/><circle cx="13.5" cy="3" r="1.5" fill="url(#aaDotG)" stroke="rgba(10,13,26,0.9)" stroke-width=".6"/></svg></button>
     <button class="icon-btn" aria-label="Settings" onclick="typeof showToast==='function'&&showToast('Settings')" data-tt="Settings" data-tt-desc="Workspace and account preferences."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-    <button class="avatar-sm" aria-label="User profile" onclick="typeof showToast==='function'&&showToast('User profile')" data-tt="Account" data-tt-desc="Your profile, preferences, and sign out." style="border:none;font-family:inherit">TH</button>
+    <div class="tb-avatar-wrap">
+      <button class="avatar-sm" id="avatarLauncher" type="button" onclick="toggleAvatarMenu(event)" aria-label="Account menu" aria-haspopup="menu" aria-expanded="false" data-tt="Account" data-tt-desc="Workspace, settings, sign out" style="border:none;font-family:inherit">TH</button>
+      <div class="avatar-menu" id="avatarMenu" role="menu" aria-label="Account and workspace"></div>
+    </div>
   </div>
 </header>
 <div id="app"></div>
@@ -2439,6 +2492,20 @@ const WORKSPACES_DATA = [
 const WORKSPACE_STATE = { activeId: null, search: '' };
 function _wsInitials(name){ return name.replace(/[^A-Za-z0-9 ]/g,'').trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase(); }
 function _wsActive(){ return WORKSPACES_DATA.find(w=>w.id===WORKSPACE_STATE.activeId) || WORKSPACES_DATA[0]; }
+// ── Current user + permissions (mock for prototype) ────────
+const CURRENT_USER = {
+  name: 'Thomas Gonzalez',
+  email: 'thomas@aimsos.ai',
+  initials: 'TH',
+  role: 'owner',  // 'owner' | 'admin' | 'member' | 'viewer'
+  permissions: {
+    canCreateWorkspace: true,
+    canManageWorkspaceSettings: true,
+    canManageMembers: true,
+    canManageApps: true
+  }
+};
+function userCan(action){ return !!(CURRENT_USER.permissions && CURRENT_USER.permissions[action]); }
 // ── Unified Context Menu (apps + workspace switcher) ────────
 window.CURRENT_APP_ID = 'governance';
 const CTX_APPS = [
@@ -2451,50 +2518,38 @@ function _ctxTrunc(s, max){ max = max || 50; return s && s.length > max ? s.slic
 function _ctxEscAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function _ctxWsAvatarHtml(ws){ if(ws.logo){ return '<div class="cm-item-ico"><img src="'+ws.logo+'" alt=""></div>'; } return '<div class="cm-item-ico" style="background:'+_wsHashColor(ws.id)+'">'+_wsInitials(ws.name)+'</div>'; }
 function _ctxRenderTrigger(){
-  const w = _wsActive();
+  const currentAppId = window.CURRENT_APP_ID || 'work-surface';
+  const app = CTX_APPS.find(a => a.id === currentAppId) || CTX_APPS[0];
   const logoEl = document.getElementById('ctx-logo');
   const nameEl = document.getElementById('ctx-name');
   if(!logoEl || !nameEl) return;
-  if(w.logo){ logoEl.innerHTML = '<img src="'+w.logo+'" alt="">'; logoEl.style.background = ''; }
-  else { logoEl.textContent = _wsInitials(w.name); logoEl.style.background = _wsHashColor(w.id); }
-  nameEl.textContent = _ctxTrunc(w.name, 50); nameEl.title = w.name;
+  logoEl.textContent = app.initials;
+  logoEl.style.background = app.gradient;
+  nameEl.textContent = app.name;
+  nameEl.title = app.name;
 }
 function _renderContextMenu(){
   const menu = document.getElementById('ctxMenu'); if(!menu) return;
   const currentAppId = window.CURRENT_APP_ID || 'work-surface';
-  const totalWs = WORKSPACES_DATA.length;
-  const showSearch = totalWs > 5;
-  const q = _ctxState.search.trim().toLowerCase();
-  const filteredWs = !q ? WORKSPACES_DATA : WORKSPACES_DATA.filter(w => w.name.toLowerCase().includes(q) || w.subdomain.toLowerCase().includes(q) || (w.role||'').toLowerCase().includes(q));
   let html = '';
-  html += '<div class="cm-actions"><button type="button" class="cm-action-btn" onclick="event.stopPropagation();_ctxAction(\'settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke-linecap="round"/></svg>Settings</button><button type="button" class="cm-action-btn" onclick="event.stopPropagation();_ctxAction(\'people\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="6" cy="6" r="2.5"/><path d="M2.5 13.5c0-2 1.6-3.5 3.5-3.5s3.5 1.5 3.5 3.5"/><circle cx="11" cy="6" r="2"/><path d="M14 13c0-1.6-1-2.5-2.5-2.5" stroke-linecap="round"/></svg>People</button></div>';
-  html += '<div class="cm-section"><div class="cm-section-hd"><span>Applications</span></div>';
+  html += '<div class="cm-section" style="border-top:none">';
+  html += '<div class="cm-section-hd"><span>Applications</span><span class="cm-section-hd-count">('+CTX_APPS.length+')</span></div>';
   CTX_APPS.forEach(app => {
     const isActive = app.id === currentAppId;
     const tag = isActive ? 'div' : 'a';
     const hrefAttr = isActive ? '' : ' href="'+app.href+'"';
     const clickAttr = isActive ? ' onclick="event.stopPropagation();_ctxClose()"' : ' onclick="event.stopPropagation()"';
-    html += '<'+tag+' class="cm-item'+(isActive?' is-active':'')+'"'+hrefAttr+clickAttr+' role="menuitem"><div class="cm-item-ico" style="background:'+app.gradient+'">'+app.initials+'</div><div class="cm-item-info"><div class="cm-item-name">'+app.name+'</div><div class="cm-item-sub">'+app.desc+'</div></div><svg class="cm-item-check" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></'+tag+'>';
+    html += '<'+tag+' class="cm-item'+(isActive?' is-active':'')+'"'+hrefAttr+clickAttr+' role="menuitem">'
+      + '<div class="cm-item-ico" style="background:'+app.gradient+'">'+app.initials+'</div>'
+      + '<div class="cm-item-info"><div class="cm-item-name">'+app.name+'</div><div class="cm-item-sub">'+app.desc+'</div></div>'
+      + '<svg class="cm-item-check" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      + '</'+tag+'>';
   });
   html += '</div>';
-  if(totalWs > 1){
-    html += '<div class="cm-section"><div class="cm-section-hd"><span>Switch Workspace</span><span class="cm-section-hd-count">('+totalWs+')</span></div>';
-    if(showSearch){ html += '<div class="cm-search"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="cm-ws-search" type="text" placeholder="Search workspaces…" aria-label="Search workspaces" oninput="ctxSearchWs(this.value)" onclick="event.stopPropagation()" value="'+q.replace(/"/g,'&quot;')+'"></div>'; }
-    html += '<div class="cm-ws-list">';
-    if(filteredWs.length === 0){ html += '<div class="cm-empty">No workspaces match "'+q.replace(/</g,'&lt;')+'"</div>'; }
-    else {
-      const active = _wsActive();
-      const others = filteredWs.filter(w => w.id !== active.id);
-      const sorted = [...others].sort((a,b)=>b.lastUsed - a.lastUsed);
-      if(filteredWs.find(w => w.id === active.id)){
-        const roleHtml = active.role ? '<span class="cm-item-role">'+active.role+'</span>' : '';
-        html += '<button type="button" class="cm-item is-active" role="menuitem" onclick="event.stopPropagation();ctxPickWs(\''+active.id+'\')">' + _ctxWsAvatarHtml(active) + '<div class="cm-item-info"><div class="cm-item-name" title="'+_ctxEscAttr(active.name)+'"><span>'+_ctxTrunc(active.name,50)+'</span>'+roleHtml+'</div></div><svg class="cm-item-check" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
-      }
-      sorted.forEach(w => { html += '<button type="button" class="cm-item" role="menuitem" onclick="event.stopPropagation();ctxPickWs(\''+w.id+'\')">' + _ctxWsAvatarHtml(w) + '<div class="cm-item-info"><div class="cm-item-name" title="'+_ctxEscAttr(w.name)+'">'+_ctxTrunc(w.name,50)+'</div></div></button>'; });
-    }
-    html += '</div></div>';
-  }
-  html += '<div class="cm-footer"><button type="button" class="cm-create" onclick="event.stopPropagation();_ctxAction(\'create-workspace\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>Create workspace</button></div>';
+  html += '<div class="cm-footer">';
+  html += '<button type="button" class="cm-footer-link" onclick="event.stopPropagation();_ctxAction(\'discover\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>Discover more apps</button>';
+  html += '<button type="button" class="cm-footer-link" onclick="event.stopPropagation();_ctxAction(\'manage-apps\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke-linecap="round"/></svg>Manage apps</button>';
+  html += '</div>';
   menu.innerHTML = html;
 }
 function toggleContextMenu(e){
@@ -2509,7 +2564,6 @@ function toggleContextMenu(e){
     _ctxState.search = '';
     _renderContextMenu();
     setTimeout(()=>{
-      const inp = document.getElementById('cm-ws-search'); if(inp) inp.focus();
       document.addEventListener('click', function closer(ev){
         if(!menu.contains(ev.target) && !launcher.contains(ev.target)){
           menu.classList.remove('open'); launcher.classList.remove('cm-open'); launcher.setAttribute('aria-expanded','false');
@@ -2520,20 +2574,21 @@ function toggleContextMenu(e){
   }
 }
 function _ctxClose(){ document.getElementById('ctxMenu')?.classList.remove('open'); document.getElementById('ctxLauncher')?.classList.remove('cm-open'); document.getElementById('ctxLauncher')?.setAttribute('aria-expanded','false'); }
-function ctxSearchWs(q){ _ctxState.search = q; _renderContextMenu(); const inp = document.getElementById('cm-ws-search'); if(inp){ inp.focus(); inp.value = q; } }
-function ctxPickWs(id){
-  if(id === WORKSPACE_STATE.activeId){ _ctxClose(); return; }
-  const target = WORKSPACES_DATA.find(w=>w.id===id); if(!target) return;
-  WORKSPACE_STATE.activeId = id;
-  target.lastUsed = Date.now();
-  try { localStorage.setItem('aims_active_workspace', id); } catch(e){}
-  _ctxClose(); _ctxRenderTrigger();
-  if(typeof showToast === 'function') showToast('Switched to ' + target.name);
-}
 function _ctxAction(action){
   _ctxClose();
-  const msg = { 'settings':'Workspace settings — coming soon', 'people':'Members & access control — coming soon', 'create-workspace':'Create workspace — coming soon' }[action] || action;
-  if(typeof showToast === 'function') showToast(msg);
+  const msg = {
+    'discover':'Discover apps — coming soon',
+    'manage-apps':'Manage apps — coming soon',
+    'workspace-settings':'Workspace settings — coming soon',
+    'members':'Members & access control — coming soon',
+    'create-workspace':'Create workspace — coming soon',
+    'appearance':'Appearance preferences — coming soon',
+    'notifications':'Notification preferences — coming soon',
+    'help':'Help & docs — coming soon',
+    'sign-out':'Sign out — coming soon'
+  }[action] || action;
+  if(typeof toast === 'function') toast(msg);
+  else if(typeof showToast === 'function') showToast(msg);
 }
 (function ctxInit(){
   try {
@@ -2546,6 +2601,145 @@ function _ctxAction(action){
     if(e.key === 'Escape' && document.getElementById('ctxMenu')?.classList.contains('open')){ _ctxClose(); }
   });
 })();
+// ── Avatar menu (account + workspace switcher) ────────
+const _avatarState = { workspacesExpanded: false, wsSearch: '' };
+
+function _renderAvatarMenu(){
+  const menu = document.getElementById('avatarMenu'); if(!menu) return;
+  const active = _wsActive();
+  let html = '';
+  html += '<div class="am-user"><div class="am-user-name">'+CURRENT_USER.name+'</div><div class="am-user-email">'+CURRENT_USER.email+'</div></div>';
+  html += '<div class="am-section" style="border-top:none">';
+  html += '<div class="am-section-hd">Workspace</div>';
+  const isExpanded = _avatarState.workspacesExpanded;
+  html += '<button type="button" class="am-ws-card'+(isExpanded?' is-expanded':'')+'" onclick="event.stopPropagation();_avatarToggleWorkspaces()">';
+  html += '<div class="am-ws-ico" style="background:'+_wsHashColor(active.id)+'">'+_wsInitials(active.name)+'</div>';
+  html += '<div class="am-ws-info"><div class="am-ws-name" title="'+_ctxEscAttr(active.name)+'">'+_ctxTrunc(active.name,50)+'</div><div class="am-ws-role">'+(active.role||'')+'</div></div>';
+  html += '<svg class="am-ws-chev" width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  html += '</button>';
+  html += '<div class="am-ws-expand'+(isExpanded?' is-open':'')+'">';
+  if(isExpanded){
+    const totalWs = WORKSPACES_DATA.length;
+    const showSearch = totalWs > 5;
+    const q = _avatarState.wsSearch.trim().toLowerCase();
+    const filtered = !q ? WORKSPACES_DATA : WORKSPACES_DATA.filter(w => w.name.toLowerCase().includes(q) || (w.subdomain||'').toLowerCase().includes(q) || (w.role||'').toLowerCase().includes(q));
+    if(showSearch){
+      html += '<div class="am-ws-search"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><input id="am-ws-search-input" type="text" placeholder="Search workspaces…" aria-label="Search workspaces" oninput="event.stopPropagation();_avatarSearchWs(this.value)" onclick="event.stopPropagation()" value="'+q.replace(/"/g,'&quot;')+'"></div>';
+    }
+    html += '<div class="am-ws-list">';
+    const others = filtered.filter(w => w.id !== active.id);
+    const sorted = [...others].sort((a,b)=>b.lastUsed - a.lastUsed);
+    if(filtered.length === 0){
+      html += '<div style="padding:14px;font-size:12px;color:rgba(255,255,255,0.50);text-align:center">No workspaces match "'+q.replace(/</g,'&lt;')+'"</div>';
+    } else if(sorted.length === 0 && filtered.length === 1){
+      html += '<div style="padding:10px 14px;font-size:11px;color:rgba(255,255,255,0.40);text-align:center">You are in your only workspace</div>';
+    } else {
+      sorted.forEach(w => {
+        html += '<button type="button" class="am-ws-item" onclick="event.stopPropagation();_avatarPickWs(\''+w.id+'\')"><div class="am-ws-item-ico" style="background:'+_wsHashColor(w.id)+'">'+_wsInitials(w.name)+'</div><div class="am-ws-item-name" title="'+_ctxEscAttr(w.name)+'">'+_ctxTrunc(w.name,40)+'</div></button>';
+      });
+    }
+    html += '</div>';
+    if(userCan('canCreateWorkspace')){
+      html += '<button type="button" class="am-ws-create" onclick="event.stopPropagation();_ctxAction(\'create-workspace\')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>Create workspace</button>';
+    }
+  }
+  html += '</div>';
+  html += '</div>';
+  if(userCan('canManageWorkspaceSettings') || userCan('canManageMembers')){
+    html += '<div class="am-section">';
+    if(userCan('canManageWorkspaceSettings')){
+      html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'workspace-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke-linecap="round"/></svg>Workspace settings</button>';
+    }
+    if(userCan('canManageMembers')){
+      html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'members\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="6" cy="6" r="2.5"/><path d="M2.5 13.5c0-2 1.6-3.5 3.5-3.5s3.5 1.5 3.5 3.5"/><circle cx="11" cy="6" r="2"/><path d="M14 13c0-1.6-1-2.5-2.5-2.5" stroke-linecap="round"/></svg>Members &amp; access</button>';
+    }
+    html += '</div>';
+  }
+  html += '<div class="am-section">';
+  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'appearance\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v11" stroke-linecap="round"/></svg>Appearance</button>';
+  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'notifications\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke-linecap="round"/></svg>Notifications</button>';
+  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
+  html += '</div>';
+  html += '<div class="am-section">';
+  html += '<button type="button" class="am-item is-danger" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
+  html += '</div>';
+  menu.innerHTML = html;
+}
+
+function toggleAvatarMenu(e){
+  if(e) e.stopPropagation();
+  _ctxClose();
+  const launcher = document.getElementById('avatarLauncher');
+  const menu = document.getElementById('avatarMenu');
+  if(!launcher || !menu) return;
+  const isOpen = menu.classList.toggle('open');
+  launcher.setAttribute('aria-expanded', isOpen);
+  if(isOpen){
+    _avatarState.workspacesExpanded = false;
+    _avatarState.wsSearch = '';
+    _renderAvatarMenu();
+    setTimeout(()=>{
+      document.addEventListener('click', function closer(ev){
+        if(!menu.contains(ev.target) && !launcher.contains(ev.target)){
+          _avatarClose();
+          document.removeEventListener('click', closer);
+        }
+      });
+    }, 0);
+  }
+}
+
+function _avatarClose(){
+  document.getElementById('avatarMenu')?.classList.remove('open');
+  document.getElementById('avatarLauncher')?.setAttribute('aria-expanded','false');
+}
+
+function _avatarToggleWorkspaces(){
+  _avatarState.workspacesExpanded = !_avatarState.workspacesExpanded;
+  _avatarState.wsSearch = '';
+  _renderAvatarMenu();
+  if(_avatarState.workspacesExpanded){
+    setTimeout(()=>{ document.getElementById('am-ws-search-input')?.focus(); }, 50);
+  }
+}
+
+function _avatarSearchWs(q){
+  _avatarState.wsSearch = q;
+  _renderAvatarMenu();
+  const inp = document.getElementById('am-ws-search-input');
+  if(inp){ inp.focus(); inp.value = q; }
+}
+
+function _avatarPickWs(id){
+  if(id === WORKSPACE_STATE.activeId){ _avatarClose(); return; }
+  const target = WORKSPACES_DATA.find(w=>w.id===id); if(!target) return;
+  const doSwitch = ()=>{
+    WORKSPACE_STATE.activeId = id;
+    target.lastUsed = Date.now();
+    try { localStorage.setItem('aims_active_workspace', id); } catch(e){}
+    _avatarClose();
+    if(typeof toast === 'function') toast('Switched to ' + target.name);
+    else if(typeof showToast === 'function') showToast('Switched to ' + target.name);
+  };
+  if(window.IS_DIRTY){
+    const ok = confirm('You have unsaved changes. Switch to ' + target.name + ' anyway?');
+    if(ok) doSwitch();
+  } else { doSwitch(); }
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.getElementById('avatarMenu')?.classList.contains('open')){
+    _avatarClose();
+  }
+});
+
+const _origToggleContextMenu = window.toggleContextMenu;
+if(typeof _origToggleContextMenu === 'function'){
+  window.toggleContextMenu = function(e){
+    _avatarClose();
+    _origToggleContextMenu(e);
+  };
+}
 (function initTooltips(){
   let tip = null, showTimer = null, currentTarget = null;
   const SHOW_DELAY = 350;
