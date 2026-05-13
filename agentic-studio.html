@@ -4944,7 +4944,6 @@ if(typeof _origToggleContextMenu === 'function'){
 // ── Gear menu (Personal settings — Jira-style) ────────
 function _renderGearMenu(){
   const menu = document.getElementById('gearMenu'); if(!menu) return;
-  const hasAnyAdmin = userCan('canManageWorkspaceSettings') || userCan('canManageMembers');
   let html = '';
   html += '<div class="gear-menu-hd">Personal settings</div>';
   // General settings
@@ -4957,26 +4956,6 @@ function _renderGearMenu(){
   html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>';
   html += '<div class="gear-item-main"><div class="gear-item-name">Notifications</div><div class="gear-item-desc">Manage email and in-app notifications from AIMS&nbsp;OS</div></div>';
   html += '</button>';
-  // Workspace admin section (gated) — or notice if no access
-  if(hasAnyAdmin){
-    html += '<div class="gear-divider"></div>';
-    html += '<div class="gear-section-hd">Workspace admin</div>';
-    if(userCan('canManageWorkspaceSettings')){
-      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'workspace-settings\')">';
-      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
-      html += '<div class="gear-item-main"><div class="gear-item-name">Workspace settings</div><div class="gear-item-desc">Billing, integrations, security, and organization preferences</div></div>';
-      html += '</button>';
-    }
-    if(userCan('canManageMembers')){
-      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'members\')">';
-      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3 2.5-5 6-5s6 2 6 5" stroke-linecap="round"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19c0-2.5-2-4-4-4" stroke-linecap="round"/></svg>';
-      html += '<div class="gear-item-main"><div class="gear-item-name">Members &amp; access</div><div class="gear-item-desc">Invite members, manage roles and permissions</div></div>';
-      html += '</button>';
-    }
-  } else {
-    html += '<div class="gear-divider"></div>';
-    html += '<div class="gear-notice">You don\'t have access to workspace settings or admin. <a href="#" onclick="event.preventDefault();event.stopPropagation();_ctxAction(\'contact-admin\')">Contact your workspace admin</a> to grant you access.</div>';
-  }
   menu.innerHTML = html;
 }
 
