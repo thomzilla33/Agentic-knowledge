@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import {
   testWorkflowInputs, testWorkflowTraceLeadA, testWorkflowComparisonLeadA,
+  testWorkflowComparisonLeadASandbox,
   getTraceForWorkflow, getPackLineage, getPacksForWorkflow,
   isAttestationExpired,
 } from '../../../data/mockKnowledge'
@@ -207,14 +208,17 @@ export default function TestWorkflowView({
           {phase === 'complete' && (
             <>
               <button onClick={() => setCompareMode(v => !v)}
-                title="Show what this run would look like without the pack constraint"
+                title={isSandboxEnv
+                  ? 'Show what this run would do in production'
+                  : 'Show what this run would look like without the pack constraint'}
                 className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                 style={{
                   background: compareMode ? 'rgba(43,127,255,0.16)' : 'rgba(255,255,255,0.04)',
                   border: `1px solid ${compareMode ? 'rgba(43,127,255,0.40)' : 'var(--border-subtle)'}`,
                   color: compareMode ? '#80AFFF' : 'var(--text-secondary)',
                 }}>
-                <GitCompareArrows size={11} /> Compare without pack
+                <GitCompareArrows size={11} />
+                {isSandboxEnv ? 'Compare vs production' : 'Compare without pack'}
               </button>
               {isHistorical ? (
                 <button onClick={() => { onExitHistorical?.(); reset() }}
@@ -383,7 +387,11 @@ function TraceLayout({ trace, input, selectedStep, onSelectStep, expanded, onTog
         {isSandboxEnv && (
           <SandboxBanner />
         )}
-        {compareMode && <ComparisonPanel data={testWorkflowComparisonLeadA} />}
+        {compareMode && (
+          isSandboxEnv
+            ? <SandboxComparisonPanel data={testWorkflowComparisonLeadASandbox} />
+            : <ComparisonPanel data={testWorkflowComparisonLeadA} />
+        )}
         {selectedStep ? (
           <StepDetail step={selectedStep} />
         ) : (
@@ -552,6 +560,92 @@ function CompareColumn({ label, accent, stats }) {
         ))}
       </div>
     </div>
+  )
+}
+
+// M5 — sandbox-mode comparison reframes the question from "what if no pack"
+// to "what would this run do in production". For Lead A with an expired
+// attestation, sandbox completes (advisory) while production halts — the
+// panel surfaces the promotion readiness gap explicitly.
+function SandboxComparisonPanel({ data }) {
+  const { sandboxRun, productionRun, promotionReadiness } = data
+
+  return (
+    <section className="rounded-xl overflow-hidden"
+      style={{ border: '1px solid rgba(43,127,255,0.30)', background: 'rgba(43,127,255,0.04)' }}>
+      <header className="px-4 py-3 flex items-center gap-2"
+        style={{ borderBottom: '1px solid rgba(43,127,255,0.20)' }}>
+        <GitCompareArrows size={12} style={{ color: '#80AFFF' }} />
+        <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: '#80AFFF' }}>
+          What in production?
+        </p>
+      </header>
+
+      {/* Side-by-side stats: sandbox (this run) vs production (would-happen) */}
+      <div className="grid grid-cols-2 gap-px"
+        style={{ background: 'var(--border-subtle)' }}>
+        <CompareColumn
+          label={sandboxRun.label}
+          accent="#fbbf24"
+          stats={[
+            { label: 'Facts in scope',  value: sandboxRun.factsAvailable.toLocaleString() },
+            { label: 'Facts cited',     value: sandboxRun.factsCited },
+            { label: 'Governance gates', value: sandboxRun.governanceEvents },
+            { label: 'Latency',          value: `${sandboxRun.latencyMs} ms` },
+            { label: 'Side effects',     value: sandboxRun.sideEffects === 0 ? 'none' : String(sandboxRun.sideEffects) },
+            { label: 'Final state',      value: sandboxRun.finalState },
+          ]}
+        />
+        <CompareColumn
+          label={productionRun.label}
+          accent="#4ade80"
+          stats={[
+            { label: 'Facts in scope',  value: productionRun.factsAvailable },
+            { label: 'Facts cited',     value: productionRun.factsCited, delta: `-${sandboxRun.factsCited - productionRun.factsCited}`, deltaNegative: true },
+            { label: 'Governance gates', value: productionRun.governanceEvents },
+            { label: 'Latency',          value: `${productionRun.latencyMs} ms` },
+            { label: 'Side effects',     value: productionRun.sideEffects },
+            { label: 'Final state',      value: productionRun.finalState, delta: productionRun.finalState.includes('Halt') ? 'halt' : null, deltaNegative: true },
+          ]}
+        />
+      </div>
+
+      {/* Promotion readiness assessment */}
+      {promotionReadiness && (
+        <div className="px-4 py-3"
+          style={{ borderTop: '1px solid var(--border-subtle)' }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            {promotionReadiness.ready
+              ? <CheckCircle2 size={10} style={{ color: '#4ade80' }} />
+              : <ShieldOff size={10} style={{ color: '#f87171' }} />}
+            <p className="text-[9px] font-bold tracking-widest uppercase"
+              style={{ color: promotionReadiness.ready ? '#4ade80' : '#f87171' }}>
+              {promotionReadiness.ready ? 'Ready to promote' : 'Promotion readiness'}
+            </p>
+          </div>
+          <p className="text-[11px] leading-snug mb-2" style={{ color: 'var(--text-secondary)' }}>
+            {promotionReadiness.summary}
+          </p>
+          {(promotionReadiness.blockers || []).length > 0 && (
+            <div className="space-y-1.5">
+              {promotionReadiness.blockers.map((b, i) => (
+                <div key={i} className="rounded-md px-2.5 py-2"
+                  style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.30)' }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <AlertTriangle size={11} style={{ color: '#f87171' }} className="shrink-0" />
+                    <span className="font-mono text-[10px]" style={{ color: '#fca5a5' }}>{b.factId}</span>
+                    <span className="text-[11px] font-semibold" style={{ color: 'var(--text-primary)' }}>{b.label}</span>
+                  </div>
+                  <p className="text-[10px] leading-snug" style={{ color: 'var(--text-secondary)' }}>
+                    <strong style={{ color: '#fca5a5' }}>Action:</strong> {b.action}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
   )
 }
 

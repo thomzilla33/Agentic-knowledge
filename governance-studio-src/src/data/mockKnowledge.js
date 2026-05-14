@@ -1172,6 +1172,46 @@ export const testWorkflowComparisonLeadA = {
   ],
 }
 
+// M5 — sandbox-mode comparison. Instead of "vs no-pack" (irrelevant in
+// sandbox where the pack is already advisory) we frame this as
+// "promotion readiness": what would happen if we promoted the workflow
+// to production right now? The interesting case is the TF-0012 expired
+// attestation — sandbox lets the run complete, production would halt.
+export const testWorkflowComparisonLeadASandbox = {
+  sandboxRun: {
+    label: 'Sandbox · this run',
+    factsAvailable: 8400,             // full truth-plane access in sandbox
+    factsCited:     3,                 // TF-0010, 11, 12 (advisory)
+    governanceEvents: 3,               // 2 pass + 1 warn (TF-0012 advisory)
+    latencyMs:      4412,
+    sideEffects:    0,                 // no CRM writes, no email
+    finalState:     'Completed with warnings',
+  },
+  productionRun: {
+    label: 'Production · would-happen',
+    factsAvailable: 3,                 // pack-scoped
+    factsCited:     2,                 // halted before citing TF-0012
+    governanceEvents: 3,               // 2 pass + 1 fail (gate halt)
+    latencyMs:      2272,              // halted early
+    sideEffects:    '∅ halted',        // run blocked before CRM/email
+    finalState:     'Halted at Customer Analyst',
+  },
+  // Promotion readiness assessment surfaced when there are unresolved
+  // expired attestations. When all gates pass, the workflow can promote.
+  promotionReadiness: {
+    ready: false,
+    blockers: [
+      {
+        kind: 'attestation-expired',
+        factId: 'TF-0012',
+        label: 'Discount authority ceiling — VP Sales for >25%',
+        action: 'Re-attest TF-0012 before promoting · production policy fails closed',
+      },
+    ],
+    summary: 'Not ready to promote. 1 attestation overdue would halt production runs.',
+  },
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // WORKFLOW ENVIRONMENTS (F1.2 — Mike's pillar)
 // ────────────────────────────────────────────────────────────────────────────
