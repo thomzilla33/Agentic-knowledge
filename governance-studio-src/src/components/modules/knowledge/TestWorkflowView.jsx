@@ -74,17 +74,6 @@ export default function TestWorkflowView({ open, workflowId, workflowName, packN
     if (isSandboxEnv) setCompareMode(true)
   }, [isSandboxEnv])
 
-  // Auto-expand the first agent step when the run completes, so the user
-  // doesn't land on an empty tree.
-  useEffect(() => {
-    if (phase !== 'complete') return
-    const firstAgent = testWorkflowTraceLeadA.steps.find(s => s.type === 'Agent')
-    if (firstAgent) {
-      setExpanded(prev => new Set([...prev, firstAgent.id]))
-      setSelected(firstAgent.id)
-    }
-  }, [phase])
-
   // F1.5 — detect whether the workflow's pack has any fact with expired
   // attestation. If yes, the Test viewer picks a different trace variant:
   //   - production env → trace halts at the offending step (fail closed)
@@ -104,6 +93,20 @@ export default function TestWorkflowView({ open, workflowId, workflowName, packN
     hasExpiredAttestation,
   })
   const input = testWorkflowInputs.leadA
+
+  // Auto-expand and select the most relevant step when the run completes.
+  // Prefer a failed/warn step (likely what the user wants to inspect first);
+  // fall back to the first Agent step on a clean pass so the detail panel
+  // isn't empty. Declared AFTER `trace` so it doesn't hit TDZ at render.
+  useEffect(() => {
+    if (phase !== 'complete') return
+    const failedStep = trace.steps.find(s => s.status === 'error' || s.status === 'warn')
+    const target = failedStep || trace.steps.find(s => s.type === 'Agent')
+    if (target) {
+      setExpanded(prev => new Set([...prev, target.id]))
+      setSelected(target.id)
+    }
+  }, [phase, trace])
 
   // Flatten the trace tree for selection lookup. Must be declared before
   // any conditional return — hooks must run on every render.
@@ -548,8 +551,14 @@ function RunSummary({ trace, isSandboxEnv }) {
       <div className="grid grid-cols-2 gap-2 mt-2">
         <SummaryStat label="Latency" value={`${trace.totalLatencyMs} ms`} />
         <SummaryStat
-          label={isSandboxEnv ? 'Facts would-cite' : 'Facts used'}
-          value={`${trace.factsUsed.length} / ${trace.factsUsed.length + trace.factsBlocked.length || trace.factsUsed.length}`}
+          label={isError ? 'Facts before halt' : isSandboxEnv ? 'Facts would-cite' : 'Facts used'}
+          value={
+            // Drop the X/Y denominator unless we actually blocked something —
+            // showing "3/3" with no blocked facts adds noise without meaning.
+            (trace.factsBlocked?.length || 0) > 0
+              ? `${trace.factsUsed.length} / ${trace.factsUsed.length + trace.factsBlocked.length}`
+              : `${trace.factsUsed.length}`
+          }
         />
       </div>
     </div>

@@ -430,12 +430,40 @@ function ExpiredAttestationBanner({ count, ids, isSandbox }) {
             <strong style={{ color: 'var(--text-primary)' }}>{count} {count === 1 ? 'fact needs' : 'facts need'} re-attestation.</strong>{' '}
             {isSandbox
               ? <>Runs will continue in sandbox but governance won't be enforced. Re-attest before promoting to production.</>
-              : <>Runs that cite {ids.length === 1 ? 'this fact' : 'these facts'} will <strong>halt at the governance gate</strong> until re-attested. Affected: <span className="font-mono">{ids.join(', ')}</span>.</>
+              : <>Runs that cite {ids.length === 1 ? 'this fact' : 'these facts'} will <strong>halt at the governance gate</strong> until re-attested. Affected: <ExpiredFactLinks ids={ids} />.</>
             }
           </p>
         </div>
       </div>
     </div>
+  )
+}
+
+// Inline list of clickable fact IDs in the expired-attestation banner.
+// Click scrolls the matching FactRow into view + opens it briefly so the
+// user can re-attest without hunting.
+function ExpiredFactLinks({ ids }) {
+  const onClick = (id) => {
+    const row = document.getElementById(`fact-row-${id}`)
+    if (!row) return
+    row.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    // Brief outline pulse to draw the eye.
+    row.classList.add('fact-row-pulse')
+    setTimeout(() => row.classList.remove('fact-row-pulse'), 1400)
+  }
+  return (
+    <>
+      {ids.map((id, i) => (
+        <React.Fragment key={id}>
+          {i > 0 && ', '}
+          <button onClick={() => onClick(id)}
+            className="font-mono cursor-pointer hover:underline underline-offset-2 transition-colors"
+            style={{ color: '#fca5a5' }}>
+            {id}
+          </button>
+        </React.Fragment>
+      ))}
+    </>
   )
 }
 
@@ -454,7 +482,7 @@ function FactRow({ fact }) {
   const overdueDays   = expired ? daysOverdue(fact) : 0
 
   return (
-    <div className="rounded-lg overflow-hidden"
+    <div id={`fact-row-${fact.id}`} className="rounded-lg overflow-hidden"
       style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
       {/* ── Compact summary row ────────────────────────────────────── */}
       <button
