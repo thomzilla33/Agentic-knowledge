@@ -1711,6 +1711,161 @@ body.test-mode #vTestMode{display:flex}
 .bkp-own-info strong{display:block;font-size:13px;font-weight:700;color:var(--t2);margin-bottom:2px}
 .bkp-upload-btn{height:26px;padding:0 12px;border-radius:var(--r4);border:1px solid var(--bds);background:transparent;color:var(--t2);font-size:11px;font-weight:700;cursor:pointer;transition:all .1s}
 .bkp-upload-btn:hover{border-color:var(--ok);color:var(--ok)}
+
+/* ════════════════════════════════════════════════════════════════════════
+   GUIDED DEMO / WALKTHROUGH
+   ──────────────────────────────────────────────────────────────────────── */
+:root{
+  --demo-accent: #2B7FFF;
+  --demo-accent-glow: 0 0 0 4px rgba(43,127,255,0.30);
+  --demo-grad: linear-gradient(135deg, #00C2C2 0%, #155DFC 100%);
+}
+
+/* Start demo button — sits in the topbar with a pulsing gradient glow */
+.demo-start-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  height:30px;padding:0 12px;margin-right:8px;
+  border-radius:999px;border:1px solid transparent;
+  background:var(--demo-grad);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.01em;
+  cursor:pointer;transition:filter .15s, transform .1s;
+  position:relative;
+  box-shadow:0 0 0 0 rgba(43,127,255,0.0);
+  animation: demo-pulse 2.2s ease-in-out infinite;
+}
+.demo-start-btn:hover{filter:brightness(1.10)}
+.demo-start-btn:active{transform:translateY(1px)}
+.demo-start-btn.is-active{
+  background:transparent;
+  border:1px solid var(--bd);
+  color:var(--t2);
+  animation:none;
+  box-shadow:none;
+}
+@keyframes demo-pulse{
+  0%, 100%{ box-shadow: 0 0 0 0 rgba(43,127,255,0.0), 0 0 12px 0 rgba(43,127,255,0.0); }
+  50%     { box-shadow: 0 0 0 4px rgba(43,127,255,0.18), 0 0 16px 0 rgba(0,194,194,0.30); }
+}
+@media (prefers-reduced-motion: reduce){
+  .demo-start-btn{ animation:none; }
+}
+
+/* Side panel — fixed top-right under the topbar */
+.demo-panel{
+  position:fixed;top:62px;right:18px;width:230px;
+  background:#0b1220;border:1px solid var(--bd);
+  border-radius:14px;
+  box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(43,127,255,0.10);
+  z-index:9100;
+  opacity:0;transform:translateX(12px);
+  pointer-events:none;
+  transition:opacity .22s ease, transform .22s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  max-height:calc(100vh - 80px);overflow:hidden;
+}
+.demo-panel.open{opacity:1;transform:translateX(0);pointer-events:auto}
+.demo-panel-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;border-bottom:1px solid var(--bd);
+  background:rgba(43,127,255,0.05);
+}
+.demo-panel-title{font-size:11px;font-weight:700;color:#80AFFF;letter-spacing:.02em}
+.demo-panel-close{
+  width:22px;height:22px;border-radius:6px;background:transparent;border:none;color:var(--t3);
+  cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;
+}
+.demo-panel-close:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+.demo-panel-list{
+  flex:1;overflow-y:auto;padding:6px;
+}
+.demo-step{
+  display:flex;gap:8px;align-items:flex-start;
+  padding:8px 10px;border-radius:8px;
+  cursor:pointer;
+  border-left:2px solid transparent;
+  transition:background .12s, border-color .12s, opacity .12s;
+}
+.demo-step:hover{background:rgba(255,255,255,0.03)}
+.demo-step.is-done{opacity:0.45}
+.demo-step.is-current{
+  background:rgba(43,127,255,0.10);
+  border-left-color:var(--demo-accent);
+}
+.demo-step-mark{
+  width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:1px;
+  border:1.5px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:var(--t3);
+}
+.demo-step.is-done .demo-step-mark{
+  background:var(--demo-accent);border-color:var(--demo-accent);color:#fff;
+}
+.demo-step.is-current .demo-step-mark{
+  border-color:var(--demo-accent);color:var(--demo-accent);
+}
+.demo-step-body{min-width:0}
+.demo-step-title{font-size:11px;font-weight:700;color:var(--t1);line-height:1.25}
+.demo-step.is-done .demo-step-title{color:var(--t3)}
+.demo-step.is-current .demo-step-title{color:#80AFFF}
+.demo-step-desc{font-size:10px;color:var(--t3);line-height:1.35;margin-top:1px}
+.demo-panel-ft{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 10px;border-top:1px solid var(--bd);
+  background:rgba(255,255,255,0.02);
+  gap:6px;
+}
+.demo-nav-btn{
+  height:26px;padding:0 12px;border-radius:6px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  color:var(--t2);font-size:11px;font-weight:700;cursor:pointer;
+  transition:background .12s, color .12s, opacity .12s;
+}
+.demo-nav-btn:hover{background:rgba(255,255,255,0.08);color:var(--t1)}
+.demo-nav-btn.is-disabled{opacity:0.3;cursor:not-allowed}
+.demo-nav-btn.is-primary{
+  background:var(--demo-grad);border-color:transparent;color:#fff;
+}
+.demo-nav-btn.is-primary:hover{filter:brightness(1.10);background:var(--demo-grad)}
+.demo-counter{font-size:10px;color:var(--t3);font-weight:600;tabular-nums:tabular-nums}
+
+/* Element highlight overlay — drawn over a target element */
+.demo-highlight-box{
+  position:fixed;pointer-events:none;z-index:9050;
+  border:1.5px solid var(--demo-accent);border-radius:8px;
+  box-shadow: var(--demo-accent-glow), 0 0 24px 0 rgba(43,127,255,0.35);
+  transition:top .25s, left .25s, width .25s, height .25s, opacity .15s;
+  opacity:0;
+}
+.demo-highlight-box.is-visible{opacity:1}
+
+/* Tooltip card next to the highlight */
+.demo-tooltip{
+  position:fixed;width:220px;z-index:9120;
+  background:#0b1220;border:1px solid var(--bd);border-radius:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,0.50);
+  padding:10px 12px;
+  opacity:0;transform:translateY(4px);
+  transition:opacity .18s, transform .18s;
+  pointer-events:auto;
+}
+.demo-tooltip.is-visible{opacity:1;transform:translateY(0)}
+.demo-tooltip-label{
+  font-size:9px;font-weight:700;letter-spacing:.10em;color:#80AFFF;
+  text-transform:uppercase;margin-bottom:4px;
+}
+.demo-tooltip-text{font-size:11px;color:var(--t1);line-height:1.45}
+/* Arrow indicators */
+.demo-tooltip::before{
+  content:'';position:absolute;width:10px;height:10px;
+  background:#0b1220;border:1px solid var(--bd);
+  transform:rotate(45deg);
+}
+.demo-tooltip[data-side="down"]::before{
+  top:-6px;left:18px;border-right:none;border-bottom:none;
+}
+.demo-tooltip[data-side="left"]::before{
+  right:-6px;top:18px;border-left:none;border-bottom:none;
+}
 </style>
 </head>
 <body>
@@ -1827,11 +1982,38 @@ body.test-mode #vTestMode{display:flex}
     </div>
     <!-- Right: actions + avatar -->
     <div class="tb-right">
+      <button class="demo-start-btn" id="demoStartBtn" onclick="demoToggle()" aria-label="Start guided demo">
+        <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+        <span id="demoStartLabel">Start demo</span>
+      </button>
       <button class="icon-btn" title="Notifications"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
       <button class="icon-btn" title="Activity"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 6v2l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
       <button class="icon-btn" title="Settings"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
       <div class="avatar-sm">JJ</div>
     </div>
+  </div>
+
+  <!-- ════ GUIDED DEMO PANEL ════ -->
+  <aside class="demo-panel" id="demoPanel" role="region" aria-label="Demo walkthrough">
+    <div class="demo-panel-hd">
+      <span class="demo-panel-title" id="demoPanelTitle">Demo · Knowledge governance</span>
+      <button class="demo-panel-close" onclick="demoStop()" aria-label="Close demo">×</button>
+    </div>
+    <div class="demo-panel-list" id="demoPanelList"><!-- steps rendered here --></div>
+    <div class="demo-panel-ft">
+      <button class="demo-nav-btn" id="demoPrevBtn" onclick="demoNav(-1)">Prev</button>
+      <span class="demo-counter" id="demoCounter">1 / 9</span>
+      <button class="demo-nav-btn is-primary" id="demoNextBtn" onclick="demoNav(1)">Next</button>
+    </div>
+  </aside>
+
+  <!-- ════ GUIDED DEMO HIGHLIGHT BOX ════ -->
+  <div class="demo-highlight-box" id="demoHighlightBox"></div>
+
+  <!-- ════ GUIDED DEMO TOOLTIP ════ -->
+  <div class="demo-tooltip" id="demoTooltip" role="tooltip" aria-live="polite">
+    <div class="demo-tooltip-label" id="demoTooltipLabel">Step 1 of 9</div>
+    <div class="demo-tooltip-text" id="demoTooltipText"></div>
   </div>
 
   <!-- Views container -->
@@ -8333,6 +8515,332 @@ function toast(msg, type='default') {
   document.getElementById('toastCtr').appendChild(t);
   setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(6px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300)},3000);
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// GUIDED DEMO / WALKTHROUGH
+// ────────────────────────────────────────────────────────────────────────────
+// Tour through Mike's 5 governance pillars: Truth/Sandbox planes, claim-level
+// permissions at attestation time, CYA chain of custody, and workflows with
+// the same sandbox/production model. Targets resolve in both the main doc
+// and the Knowledge slide-out iframe so the user follows one narrative
+// across the React boundary.
+// ════════════════════════════════════════════════════════════════════════════
+const demoSteps = [
+  {
+    title: 'Agentic Networks',
+    desc:  'Live workflows orchestrating agents',
+    sideEffect: () => { demoResetToList(); },
+    target: null,
+    tipFixed: { top: 110, right: 270 },
+    tipLabel: 'Step 1 of 9',
+    tipText: 'These are the live Agentic Networks — multi-agent workflows that run across your business. Each row has its own runs, KPIs, and triggers.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Workflow preview',
+    desc:  'Inspect live stats without leaving the list',
+    sideEffect: () => { demoResetToList(); setTimeout(() => selectNetwork('n1'), 80); },
+    target: { selector: '#prevName' },
+    tipLabel: 'Step 2 of 9',
+    tipText: 'Click a workflow card → preview drawer with live runs, success rate, AI summary, and recent executions.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Full overview',
+    desc:  'Metrics, composition, and runs in one place',
+    sideEffect: () => {
+      if (!selectedId) selectNetwork('n1');
+      setTimeout(() => openFullView(), 80);
+    },
+    target: { selector: '#ovName' },
+    tipLabel: 'Step 3 of 9',
+    tipText: 'The full overview is the workflow\'s live cockpit — every metric, trigger, and execution surfaced at once.',
+    tipSide: 'down',
+  },
+  {
+    title: 'Builder canvas',
+    desc:  'Visual graph of workflows + agents',
+    sideEffect: () => {
+      const tab = [...document.querySelectorAll('.ov-tab')].find(b => b.textContent.trim() === 'Builder');
+      if (tab) switchOvTab('builder', tab);
+    },
+    target: { selector: '#opBuilder' },
+    tipLabel: 'Step 4 of 9',
+    tipText: 'The Builder canvas visualizes every step. Each node is a sub-workflow, agent, or tool call — from here you can constrain or extend the workflow\'s knowledge.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Knowledge slide-out',
+    desc:  'Inspect the attached pack with full provenance',
+    sideEffect: () => { openKnowledgeConstraint(); },
+    target: { selector: '#kcFrame' },
+    tipLabel: 'Step 5 of 9',
+    tipText: 'The Knowledge slide-out inspects the pack constraining this workflow — what facts it can see, where they came from, and who attested them.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Attestation governance',
+    desc:  'Expired attestations block production runs',
+    sideEffect: null,
+    target: {
+      iframe: 'kcFrame',
+      find: (innerDoc) => {
+        const labels = [...innerDoc.querySelectorAll('p')].filter(p => /ATTESTATION OVERDUE/i.test(p.textContent));
+        return labels[0]?.closest('.rounded-xl') || labels[0] || null;
+      },
+    },
+    tipLabel: 'Step 6 of 9',
+    tipText: 'When a fact in the pack has an expired attestation, the slide-out warns that production runs will halt at the governance gate until it\'s re-attested.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Re-attest from slide-out',
+    desc:  'One-click governance recovery',
+    sideEffect: null,
+    target: {
+      iframe: 'kcFrame',
+      find: (innerDoc) => [...innerDoc.querySelectorAll('button')].find(b => /Re-attest TF-/i.test(b.textContent)) || null,
+    },
+    tipLabel: 'Step 7 of 9',
+    tipText: 'Re-attest the expired fact inline — confirm dialog → next review window updates → governance gate clears, all without leaving inspection.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Test workflow dry-run',
+    desc:  'Run with the pack as a live constraint',
+    sideEffect: () => {
+      const iframe = document.getElementById('kcFrame');
+      const innerDoc = iframe?.contentDocument;
+      const scrollable = innerDoc?.querySelector('.flex-1.overflow-y-auto');
+      if (scrollable) scrollable.scrollTop = scrollable.scrollHeight;
+    },
+    target: {
+      iframe: 'kcFrame',
+      find: (innerDoc) => [...innerDoc.querySelectorAll('button')].find(b => /Test workflow with this knowledge/i.test(b.textContent)) || null,
+    },
+    tipLabel: 'Step 8 of 9',
+    tipText: 'Run the workflow with the pack applied to see governance gates fire live. Production runs halt on expired attestation; sandbox warns but completes.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Audit log · view trace',
+    desc:  'Chain of custody for every past run',
+    sideEffect: () => {
+      const iframe = document.getElementById('kcFrame');
+      const innerDoc = iframe?.contentDocument;
+      const scrollable = innerDoc?.querySelector('.flex-1.overflow-y-auto');
+      if (scrollable) scrollable.scrollTop = scrollable.scrollHeight;
+    },
+    target: {
+      iframe: 'kcFrame',
+      find: (innerDoc) => {
+        const header = [...innerDoc.querySelectorAll('p')].find(p => /RECENT RUNS/i.test(p.textContent));
+        return header?.parentElement?.parentElement || header?.parentElement || null;
+      },
+    },
+    tipLabel: 'Step 9 of 9',
+    tipText: 'Every workflow execution is logged with status, env, pack version, governance event tally, and a retained trace you can re-open from here.',
+    tipSide: 'left',
+  },
+];
+
+const demoState = { active: false, idx: 0 };
+
+function demoToggle() {
+  if (demoState.active) demoStop();
+  else demoStart();
+}
+
+function demoStart() {
+  demoState.active = true;
+  demoState.idx = 0;
+  const btn = document.getElementById('demoStartBtn');
+  const label = document.getElementById('demoStartLabel');
+  btn?.classList.add('is-active');
+  if (label) label.textContent = 'Stop demo';
+  document.getElementById('demoPanel')?.classList.add('open');
+  demoGoto(0);
+}
+
+function demoStop() {
+  demoState.active = false;
+  const btn = document.getElementById('demoStartBtn');
+  const label = document.getElementById('demoStartLabel');
+  btn?.classList.remove('is-active');
+  if (label) label.textContent = 'Start demo';
+  document.getElementById('demoPanel')?.classList.remove('open');
+  demoClearHighlight();
+  demoHideTooltip();
+}
+
+function demoGoto(idx) {
+  if (idx < 0 || idx >= demoSteps.length) return;
+  demoState.idx = idx;
+  const step = demoSteps[idx];
+  demoRenderPanel();
+  demoUpdateFooter();
+  demoClearHighlight();
+  demoHideTooltip();
+  // Fire any side-effect (view nav, drawer open, scroll, etc.)
+  try { step.sideEffect && step.sideEffect(); } catch (e) { console.warn('demo side-effect:', e); }
+  // After view transitions settle, highlight + tooltip.
+  setTimeout(() => {
+    if (!demoState.active || demoState.idx !== idx) return;
+    demoHighlightTarget(step);
+    demoShowTooltip(step);
+  }, 400);
+}
+
+function demoNav(dir) {
+  const next = demoState.idx + dir;
+  if (next < 0) return;
+  if (next >= demoSteps.length) { demoStop(); return; }
+  demoGoto(next);
+}
+
+function demoRenderPanel() {
+  const list = document.getElementById('demoPanelList');
+  if (!list) return;
+  list.innerHTML = demoSteps.map((s, i) => {
+    const cls = i < demoState.idx ? 'is-done' : (i === demoState.idx ? 'is-current' : '');
+    const mark = i < demoState.idx ? '✓' : '';
+    return `<div class="demo-step ${cls}" onclick="demoGoto(${i})">
+      <span class="demo-step-mark">${mark}</span>
+      <div class="demo-step-body">
+        <div class="demo-step-title">${s.title}</div>
+        <div class="demo-step-desc">${s.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function demoUpdateFooter() {
+  const counter = document.getElementById('demoCounter');
+  const prevBtn = document.getElementById('demoPrevBtn');
+  const nextBtn = document.getElementById('demoNextBtn');
+  if (counter) counter.textContent = `${demoState.idx + 1} / ${demoSteps.length}`;
+  if (prevBtn) prevBtn.classList.toggle('is-disabled', demoState.idx === 0);
+  if (nextBtn) nextBtn.textContent = demoState.idx === demoSteps.length - 1 ? 'Finish' : 'Next';
+}
+
+// ── Target resolution ────────────────────────────────────────────────────
+// A step's target can be: null (no highlight), { selector: '#x' } in main
+// doc, or { iframe: 'kcFrame', find: (innerDoc) => el } for elements inside
+// the React slide-out. Returns a viewport-coords rect or null.
+function demoResolveTarget(step) {
+  if (!step?.target) return null;
+  const t = step.target;
+  // Main-doc selector
+  if (t.selector) {
+    const el = document.querySelector(t.selector);
+    return el ? el.getBoundingClientRect() : null;
+  }
+  // Iframe-scoped finder
+  if (t.iframe && t.find) {
+    const frame = document.getElementById(t.iframe);
+    const innerDoc = frame?.contentDocument;
+    if (!innerDoc) return null;
+    const el = t.find(innerDoc);
+    if (!el) return null;
+    const inner = el.getBoundingClientRect();
+    const outer = frame.getBoundingClientRect();
+    return {
+      top:    inner.top    + outer.top,
+      left:   inner.left   + outer.left,
+      bottom: inner.bottom + outer.top,
+      right:  inner.right  + outer.left,
+      width:  inner.width,
+      height: inner.height,
+    };
+  }
+  return null;
+}
+
+function demoHighlightTarget(step) {
+  const box = document.getElementById('demoHighlightBox');
+  if (!box) return;
+  const rect = demoResolveTarget(step);
+  if (!rect) {
+    box.classList.remove('is-visible');
+    return;
+  }
+  // Offset 4px around the target.
+  box.style.top    = `${Math.max(0, rect.top - 4)}px`;
+  box.style.left   = `${Math.max(0, rect.left - 4)}px`;
+  box.style.width  = `${rect.width + 8}px`;
+  box.style.height = `${rect.height + 8}px`;
+  box.classList.add('is-visible');
+}
+
+function demoClearHighlight() {
+  document.getElementById('demoHighlightBox')?.classList.remove('is-visible');
+}
+
+function demoShowTooltip(step) {
+  const tip = document.getElementById('demoTooltip');
+  if (!tip) return;
+  document.getElementById('demoTooltipLabel').textContent = step.tipLabel || '';
+  document.getElementById('demoTooltipText').textContent  = step.tipText  || '';
+  tip.dataset.side = step.tipSide || 'down';
+
+  if (step.tipFixed) {
+    // Steps without a specific target use a fixed corner anchor.
+    if (step.tipFixed.top    != null) tip.style.top    = typeof step.tipFixed.top    === 'number' ? step.tipFixed.top    + 'px' : step.tipFixed.top;
+    if (step.tipFixed.left   != null) tip.style.left   = typeof step.tipFixed.left   === 'number' ? step.tipFixed.left   + 'px' : step.tipFixed.left;
+    if (step.tipFixed.right  != null) { tip.style.right  = typeof step.tipFixed.right  === 'number' ? step.tipFixed.right  + 'px' : step.tipFixed.right;  tip.style.left = 'auto'; }
+    if (step.tipFixed.bottom != null) { tip.style.bottom = typeof step.tipFixed.bottom === 'number' ? step.tipFixed.bottom + 'px' : step.tipFixed.bottom; tip.style.top  = 'auto'; }
+    tip.classList.add('is-visible');
+    return;
+  }
+
+  const rect = demoResolveTarget(step);
+  if (!rect) { tip.classList.remove('is-visible'); return; }
+
+  // Default placement per side. Tooltip is 220px wide.
+  // 'down' = below target; 'left' = to the left of target.
+  if (step.tipSide === 'left') {
+    tip.style.top   = `${Math.max(8, rect.top - 6)}px`;
+    tip.style.right = 'auto';
+    tip.style.bottom= 'auto';
+    tip.style.left  = `${Math.max(8, rect.left - 232)}px`;
+  } else {
+    tip.style.top    = `${rect.bottom + 12}px`;
+    tip.style.left   = `${Math.max(8, rect.left)}px`;
+    tip.style.right  = 'auto';
+    tip.style.bottom = 'auto';
+  }
+  tip.classList.add('is-visible');
+}
+
+function demoHideTooltip() {
+  document.getElementById('demoTooltip')?.classList.remove('is-visible');
+}
+
+// Reset to the list view (close drawers + slide-outs) so step 1 always
+// looks the same regardless of where the user was when they started.
+function demoResetToList() {
+  try { closeKnowledgeConstraint?.(); } catch {}
+  try { closePreview?.(); } catch {}
+  // Switch the main view back to vList if showAgenticNetworks exists.
+  try { if (typeof showAgenticNetworks === 'function') showAgenticNetworks(); } catch {}
+}
+
+// Re-anchor highlight + tooltip on resize / scroll so they track their
+// targets if the page reflows.
+window.addEventListener('resize', () => {
+  if (!demoState.active) return;
+  const step = demoSteps[demoState.idx];
+  if (!step) return;
+  demoHighlightTarget(step);
+  demoShowTooltip(step);
+});
+window.addEventListener('scroll', () => {
+  if (!demoState.active) return;
+  const step = demoSteps[demoState.idx];
+  if (!step) return;
+  demoHighlightTarget(step);
+  demoShowTooltip(step);
+}, true);
 
 // ── INIT ──
 renderList();
