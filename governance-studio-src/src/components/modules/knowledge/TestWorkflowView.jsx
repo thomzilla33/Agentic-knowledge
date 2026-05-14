@@ -47,7 +47,14 @@ const TYPE_META = {
   Output:  { color: '#4ade80', icon: FileOutput },
 }
 
-export default function TestWorkflowView({ open, workflowId, workflowName, packName, environment = 'production', onClose }) {
+export default function TestWorkflowView({
+  open, workflowId, workflowName, packName,
+  environment = 'production',
+  // M1 — session-level re-attested set; an expired fact in this set is
+  // treated as current and lets the trace pick the clean-pass variant.
+  reAttestedFactIds,
+  onClose,
+}) {
   const isSandboxEnv = environment === 'sandbox'
   const [phase, setPhase]               = useState('idle')       // 'idle' | 'running' | 'complete'
   const [selectedStepId, setSelected]   = useState(null)
@@ -78,8 +85,11 @@ export default function TestWorkflowView({ open, workflowId, workflowName, packN
   // attestation. If yes, the Test viewer picks a different trace variant:
   //   - production env → trace halts at the offending step (fail closed)
   //   - sandbox env    → trace warns but completes (advisory)
+  // M1 — exclude facts the user has re-attested in this session.
   const hasExpiredAttestation = (getPacksForWorkflow(workflowId) || [])
-    .some(p => (getPackLineage(p.id)?.items || []).some(isAttestationExpired))
+    .some(p => (getPackLineage(p.id)?.items || [])
+      .some(f => isAttestationExpired(f) && !reAttestedFactIds?.has(f.id))
+    )
 
   // D6: per-workflow trace lookup. Falls back to null when this workflow
   // has no dry-run mock — the body then renders a NoTraceState so the user

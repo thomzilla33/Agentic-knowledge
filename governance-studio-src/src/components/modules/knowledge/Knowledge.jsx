@@ -517,6 +517,10 @@ export default function Knowledge() {
   const [workflowEnvironment, setWorkflowEnvironment] = useState(() =>
     workflowContext ? getWorkflowEnvironmentDefault(workflowContext.workflowId) : 'production'
   )
+  // M1 — session-level set of fact ids the user has re-attested in this
+  // session. Treated as "not expired" by every check downstream, regardless
+  // of the persisted attestation.nextReview. Resets on reload (no backend).
+  const [reAttestedFactIds, setReAttestedFactIds] = useState(() => new Set())
 
   // Effective list of packs attached to the active workflow, filtered for
   // session-level detaches. Recomputed when workflowContext or detach set
@@ -610,6 +614,16 @@ export default function Knowledge() {
           workflowName={workflowContext.workflowName}
           packs={workflowPacks}
           recentlyUpdatedPackIds={recentlyUpdatedPackIds}
+          reAttestedFactIds={reAttestedFactIds}
+          onReAttest={(factIds) => {
+            // factIds is an array. Add all to the session set.
+            setReAttestedFactIds(prev => new Set([...prev, ...factIds]))
+            const label = factIds.length === 1 ? factIds[0] : `${factIds.length} facts`
+            showToast(
+              `Re-attested ${label} · next review in 6 months · run will resume`,
+              '#4ade80',
+            )
+          }}
           environment={workflowEnvironment}
           onChangeEnvironment={(next) => {
             setWorkflowEnvironment(next)
@@ -683,6 +697,7 @@ export default function Knowledge() {
           workflowName={workflowContext.workflowName}
           packName={workflowPacks[0]?.name}
           environment={workflowEnvironment}
+          reAttestedFactIds={reAttestedFactIds}
           onClose={() => {
             try { window.parent?.postMessage({ type: 'kc:collapse' }, '*') } catch {}
             setTestMode(false)

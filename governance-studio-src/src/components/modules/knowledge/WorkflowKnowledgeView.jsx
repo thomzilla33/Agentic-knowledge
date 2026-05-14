@@ -57,6 +57,11 @@ export default function WorkflowKnowledgeView({
   // copy + colors throughout the view. Defaults to production when omitted.
   environment = 'production',
   onChangeEnvironment,
+  // M1 — session-level set of fact ids the user has re-attested. Treated as
+  // not-expired everywhere downstream even if the persisted nextReview is
+  // still in the past.
+  reAttestedFactIds,
+  onReAttest,
   onClose, onModify, onTest, onDetach,
 }) {
   // ESC dismisses the view OR cancels a pending detach confirm, whichever is
@@ -80,6 +85,7 @@ export default function WorkflowKnowledgeView({
   const packs = packsProp ?? getPacksForWorkflow(workflowId)
   const hasPack = packs.length > 0
   const updatedSet = recentlyUpdatedPackIds || new Set()
+  const reAttestedSet = reAttestedFactIds || new Set()
   const env = WORKFLOW_ENVIRONMENTS[environment] || WORKFLOW_ENVIRONMENTS.production
   const isSandbox = environment === 'sandbox'
 
@@ -136,6 +142,8 @@ export default function WorkflowKnowledgeView({
             isSandbox={isSandbox}
             onPromote={isSandbox ? () => onChangeEnvironment?.('production') : null}
             workflowId={workflowId}
+            reAttestedSet={reAttestedSet}
+            onReAttest={onReAttest}
           />
         ) : (
           <EmptyState onAdd={onModify} workflowName={workflowName} isSandbox={isSandbox} />
@@ -223,19 +231,26 @@ function DetachConfirm({ workflowName, onCancel, onConfirm }) {
 }
 
 // ── Attached state — one or more packs linked to this workflow ────────────
-function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, workflowId }) {
+function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, workflowId, reAttestedSet, onReAttest }) {
   // F1.5 — aggregate expired-attestation count across all attached packs.
-  // Used by the banner to warn the user before they hit Test or Modify.
+  // M1 — exclude facts the user has re-attested in this session (set check).
   const expiredFactIds = packs.flatMap(p => {
     const lineage = getPackLineage(p.id)
-    return (lineage?.items || []).filter(isAttestationExpired).map(f => f.id)
+    return (lineage?.items || [])
+      .filter(f => isAttestationExpired(f) && !reAttestedSet?.has(f.id))
+      .map(f => f.id)
   })
   const expiredCount = expiredFactIds.length
 
   return (
     <>
       {expiredCount > 0 && (
-        <ExpiredAttestationBanner count={expiredCount} ids={expiredFactIds} isSandbox={isSandbox} />
+        <ExpiredAttestationBanner
+          count={expiredCount}
+          ids={expiredFactIds}
+          isSandbox={isSandbox}
+          onReAttest={() => onReAttest?.(expiredFactIds)}
+        />
       )}
 
       <div>
@@ -251,6 +266,7 @@ function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, wo
               recentlyUpdated={recentlyUpdatedPackIds?.has(p.id)}
               isSandbox={isSandbox}
               workflowId={workflowId}
+              reAttestedSet={reAttestedSet}
             />
           ))}
         </div>
@@ -292,7 +308,7 @@ function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, wo
 }
 
 // ── A single attached pack: compact header + expandable items ─────────────
-function PackSection({ pack, recentlyUpdated, isSandbox, workflowId }) {
+function PackSection({ pack, recentlyUpdated, isSandbox, workflowId, reAttestedSet }) {
   // getPackLineage resolves factIds → fully hydrated items with source docs +
   // sandbox claim records. Falls back to a thin shape if enrichment is missing.
   const lineage = getPackLineage(pack.id)
@@ -320,7 +336,9 @@ function PackSection({ pack, recentlyUpdated, isSandbox, workflowId }) {
             </p>
           </div>
           <div className="px-2 pb-2 space-y-1.5">
-            {items.map(item => <FactRow key={item.id} fact={item} />)}
+            {items.map(item => (
+              <FactRow key={item.id} fact={item} reAttestedSet={reAttestedSet} />
+            ))}
           </div>
         </div>
       )}
@@ -411,12 +429,27 @@ function PackHeader({ pack, itemCount, recentlyUpdated, isSandbox }) {
 
 // F1.5 — surfaces expired attestations before the user enters Test or
 // Modify. Different copy + color in sandbox (advisory) vs production (must
-// fix before next run). Click cycle would scroll to the offending row — for
-// now it just highlights the banner.
-function ExpiredAttestationBanner({ count, ids, isSandbox }) {
+// fix before next run). M1 — Re-attest CTA opens an inline confirm so the
+// user can clear the gate without leaving the slide-out.
+function ExpiredAttestationBanner({ count, ids, isSandbox, onReAttest }) {
+  const [confirming, setConfirming] = useState(false)
   const tone = isSandbox
     ? { bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.30)', accent: '#fbbf24', label: 'Advisory' }
     : { bg: 'rgba(239,68,68,0.06)',  border: 'rgba(239,68,68,0.30)',  accent: '#fca5a5', label: 'Blocking' }
+
+  if (confirming) {
+    return (
+      <ReAttestConfirm
+        ids={ids}
+        onCancel={() => setConfirming(false)}
+        onConfirm={() => {
+          setConfirming(false)
+          onReAttest?.()
+        }}
+      />
+    )
+  }
+
   return (
     <div className="rounded-xl px-4 py-3"
       style={{ background: tone.bg, border: `1px solid ${tone.border}` }}>
@@ -433,7 +466,56 @@ function ExpiredAttestationBanner({ count, ids, isSandbox }) {
               : <>Runs that cite {ids.length === 1 ? 'this fact' : 'these facts'} will <strong>halt at the governance gate</strong> until re-attested. Affected: <ExpiredFactLinks ids={ids} />.</>
             }
           </p>
+          {onReAttest && (
+            <button onClick={() => setConfirming(true)}
+              className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: `1px solid ${tone.border}`,
+                color: tone.accent,
+              }}>
+              <UserCheck size={11} /> Re-attest {count === 1 ? ids[0] : `${count} facts`}
+            </button>
+          )}
         </div>
+      </div>
+    </div>
+  )
+}
+
+// Inline confirmation panel that replaces the expired banner while a
+// re-attestation is pending. Mirrors the DetachConfirm pattern — no extra
+// modal layer — so the user stays in flow.
+function ReAttestConfirm({ ids, onCancel, onConfirm }) {
+  // Next review date = today + 6 months. Mock — real product would derive
+  // from each fact's cadence and pull the actual attestor's signature.
+  const nextReview = new Date()
+  nextReview.setMonth(nextReview.getMonth() + 6)
+  return (
+    <div className="rounded-xl px-4 py-3"
+      style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.30)' }}>
+      <div className="flex items-start gap-2 mb-3">
+        <UserCheck size={13} style={{ color: '#4ade80' }} className="shrink-0 mt-0.5" />
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-bold uppercase tracking-widest mb-1" style={{ color: '#4ade80' }}>
+            Confirm re-attestation
+          </p>
+          <p className="text-[11px] leading-snug" style={{ color: 'var(--text-secondary)' }}>
+            You're re-attesting <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>{ids.join(', ')}</strong> on behalf of the current attestor. Next review window will be set to <strong style={{ color: 'var(--text-primary)' }}>{nextReview.toLocaleDateString()}</strong> (6 months). This action is logged in the audit trail.
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <button onClick={onCancel}
+          className="flex-1 py-2 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
+          Cancel
+        </button>
+        <button onClick={onConfirm}
+          className="flex-1 py-2 rounded-lg text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-all hover:brightness-110 cursor-pointer"
+          style={{ background: 'rgba(34,197,94,0.20)', border: '1px solid rgba(34,197,94,0.50)', color: '#86efac' }}>
+          <UserCheck size={12} /> Confirm re-attestation
+        </button>
       </div>
     </div>
   )
@@ -470,7 +552,7 @@ function ExpiredFactLinks({ ids }) {
 // Collapsed: scannable summary line.
 // Expanded: full statement, source documents (with section anchors), lineage
 // chain (sandbox → truth → pack), attestation, justification.
-function FactRow({ fact }) {
+function FactRow({ fact, reAttestedSet }) {
   const [expanded, setExpanded] = useState(false)
 
   const attestor      = fact.attestation?.attestor
@@ -478,7 +560,9 @@ function FactRow({ fact }) {
   const nextReview    = fact.attestation?.nextReview
   const sourceCount   = fact.sourceDocuments?.length || 0
   const hasFullData   = !!fact.statement   // enrichment present?
-  const expired       = isAttestationExpired(fact)
+  // M1 — session re-attestation overrides the persisted nextReview.
+  const reAttested    = reAttestedSet?.has(fact.id)
+  const expired       = !reAttested && isAttestationExpired(fact)
   const overdueDays   = expired ? daysOverdue(fact) : 0
 
   return (
