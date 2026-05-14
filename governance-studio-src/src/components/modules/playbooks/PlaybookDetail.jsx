@@ -717,7 +717,7 @@ const OVERVIEW_NOTES = {
 }
 
 // ── Reusable widget card chrome (matches the design system pattern) ──────────
-function WidgetCard({ label, children }) {
+function WidgetCard({ label, right, children }) {
   return (
     <div className="rounded-xl overflow-hidden flex flex-col"
       style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)' }}>
@@ -730,9 +730,10 @@ function WidgetCard({ label, children }) {
           <span className="text-[10px] font-bold tracking-widest uppercase"
             style={{ color: 'var(--text-muted)' }}>{label}</span>
         </div>
+        {right && <div className="ml-auto shrink-0">{right}</div>}
       </div>
 
-      {/* Rows */}
+      {/* Body — children manage their own padding/structure */}
       <div className="flex flex-col">
         {children}
       </div>
@@ -866,47 +867,42 @@ function OverviewWhatTab({ pb }) {
       <div className="grid grid-cols-2 gap-4 items-start">
         <DetailsWidget pb={pb} />
 
-      {/* ── AI Intelligence Summary ── */}
-      <div className="rounded-xl p-5"
-        style={{ background: 'rgba(124,92,252,0.07)', border: '1px solid rgba(124,92,252,0.25)' }}>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
-            style={{ background: 'linear-gradient(135deg,#00C2C2 0%,#155DFC 100%)' }}>
-            <Sparkles size={11} color="#fff" />
-          </div>
-          <span className="text-xs font-bold" style={{ color: '#a78bfa' }}>AI Intelligence Summary</span>
-          <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full font-medium"
+      {/* ── AI Intelligence Summary (unified WidgetCard chrome) ── */}
+      <WidgetCard
+        label="AI Intelligence Summary"
+        right={
+          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium"
             style={{ background: 'rgba(124,92,252,0.15)', color: '#c4b5fd', border: '1px solid rgba(124,92,252,0.3)' }}>
+            <Sparkles size={9} />
             Auto-generated
           </span>
+        }>
+        <div className="px-4 py-3.5">
+          <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            {detail.aiSummary}
+          </p>
+          {/* Quick stat chips */}
+          <div className="flex items-center gap-2 mt-3.5 flex-wrap">
+            {[
+              { label: 'Stage',  val: pb.stage,              color: STAGE_STYLE[pb.stage]?.color  || '#60a5fa' },
+              { label: 'Phases', val: `${pb.phases} phases`, color: '#4ade80' },
+              { label: 'Gates',  val: `${pb.gates} gates`,   color: '#fbbf24' },
+              { label: 'Trust',  val: trust.label,           color: trust.color },
+            ].map(s => (
+              <div key={s.label}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold"
+                style={{ background: `${s.color}18`, color: s.color, border: `1px solid ${s.color}35` }}>
+                <span style={{ opacity: 0.65 }}>{s.label}:</span> {s.val}
+              </div>
+            ))}
+          </div>
         </div>
-        <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-          {detail.aiSummary}
-        </p>
-        {/* Quick stat chips */}
-        <div className="flex items-center gap-2 mt-4 flex-wrap">
-          {[
-            { label: 'Stage',   val: pb.stage,                color: STAGE_STYLE[pb.stage]?.color  || '#60a5fa' },
-            { label: 'Phases',  val: `${pb.phases} phases`,   color: '#4ade80' },
-            { label: 'Gates',   val: `${pb.gates} gates`,     color: '#fbbf24' },
-            { label: 'Trust',   val: trust.label,             color: trust.color },
-          ].map(s => (
-            <div key={s.label}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold"
-              style={{ background: `${s.color}18`, color: s.color, border: `1px solid ${s.color}35` }}>
-              <span style={{ opacity: 0.65 }}>{s.label}:</span> {s.val}
-            </div>
-          ))}
-        </div>
-      </div>
+      </WidgetCard>
       </div>
 
-      {/* ── Playbook Flow — two-column layout ── */}
-      <div>
-        <p className="text-[10px] font-bold tracking-widest uppercase mb-3"
-          style={{ color: 'var(--text-muted)' }}>Playbook Flow</p>
-
-        <div className="flex gap-4 items-start">
+      {/* ── Playbook Flow — two-column layout (unified WidgetCard chrome) ── */}
+      <WidgetCard label="Playbook Flow">
+        <div className="p-4 flex gap-4 items-start">
 
           {/* ── Left column (fixed 360px): Objective → Trigger → Trust ── */}
           <div className="flex flex-col shrink-0" style={{ width: 360 }}>
@@ -1009,7 +1005,7 @@ function OverviewWhatTab({ pb }) {
 
           </div>
         </div>
-      </div>
+      </WidgetCard>
 
       {/* ── Activity + Notes widgets (design system pattern) ── */}
       <OverviewWidgets pb={pb} />
