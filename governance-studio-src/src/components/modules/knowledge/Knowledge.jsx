@@ -11,6 +11,7 @@ import {
 import {
   truthPacks as SEED, userDrafts,
   getPacksForWorkflow, getWorkflowEnvironmentDefault,
+  getTraceForRun,
 } from '../../../data/mockKnowledge'
 import {
   SearchBar, ThreeDot, AllFiltersPanel, FilterSection, Modal, FormField,
@@ -521,6 +522,10 @@ export default function Knowledge() {
   // session. Treated as "not expired" by every check downstream, regardless
   // of the persisted attestation.nextReview. Resets on reload (no backend).
   const [reAttestedFactIds, setReAttestedFactIds] = useState(() => new Set())
+  // M3 — when the user clicks "View trace" on an audit row, we open the
+  // Test viewer with this historical trace + run id so it shows the past
+  // execution instead of computing one fresh. Null means "live test mode".
+  const [historicalRun, setHistoricalRun] = useState(null) // { runId, trace }
 
   // Effective list of packs attached to the active workflow, filtered for
   // session-level detaches. Recomputed when workflowContext or detach set
@@ -624,6 +629,14 @@ export default function Knowledge() {
               '#4ade80',
             )
           }}
+          onViewTrace={(runId) => {
+            // M3 — open Test viewer with the historical trace for this run.
+            const trace = getTraceForRun(runId)
+            if (!trace) return
+            setHistoricalRun({ runId, trace })
+            try { window.parent?.postMessage({ type: 'kc:expand' }, '*') } catch {}
+            setTestMode(true)
+          }}
           environment={workflowEnvironment}
           onChangeEnvironment={(next) => {
             setWorkflowEnvironment(next)
@@ -698,9 +711,12 @@ export default function Knowledge() {
           packName={workflowPacks[0]?.name}
           environment={workflowEnvironment}
           reAttestedFactIds={reAttestedFactIds}
+          historicalRun={historicalRun}
+          onExitHistorical={() => setHistoricalRun(null)}
           onClose={() => {
             try { window.parent?.postMessage({ type: 'kc:collapse' }, '*') } catch {}
             setTestMode(false)
+            setHistoricalRun(null)
           }}
         />
         {/* Toast (keeps working even in embed mode) */}

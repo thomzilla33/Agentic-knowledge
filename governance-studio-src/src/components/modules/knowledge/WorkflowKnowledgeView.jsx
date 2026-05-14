@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import {
   getPacksForWorkflow, getPackLineage, WORKFLOW_ENVIRONMENTS,
-  isAttestationExpired, daysOverdue, getRecentRunsForPack,
+  isAttestationExpired, daysOverdue, getRecentRunsForPack, getTraceForRun,
 } from '../../../data/mockKnowledge'
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -62,6 +62,9 @@ export default function WorkflowKnowledgeView({
   // still in the past.
   reAttestedFactIds,
   onReAttest,
+  // M3 — click handler for "View trace" on an audit row. Parent decides
+  // which trace to open and flips testMode.
+  onViewTrace,
   onClose, onModify, onTest, onDetach,
 }) {
   // ESC dismisses the view OR cancels a pending detach confirm, whichever is
@@ -144,6 +147,7 @@ export default function WorkflowKnowledgeView({
             workflowId={workflowId}
             reAttestedSet={reAttestedSet}
             onReAttest={onReAttest}
+            onViewTrace={onViewTrace}
           />
         ) : (
           <EmptyState onAdd={onModify} workflowName={workflowName} isSandbox={isSandbox} />
@@ -231,7 +235,7 @@ function DetachConfirm({ workflowName, onCancel, onConfirm }) {
 }
 
 // ── Attached state — one or more packs linked to this workflow ────────────
-function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, workflowId, reAttestedSet, onReAttest }) {
+function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, workflowId, reAttestedSet, onReAttest, onViewTrace }) {
   // F1.5 — aggregate expired-attestation count across all attached packs.
   // M1 — exclude facts the user has re-attested in this session (set check).
   const expiredFactIds = packs.flatMap(p => {
@@ -267,6 +271,7 @@ function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, wo
               isSandbox={isSandbox}
               workflowId={workflowId}
               reAttestedSet={reAttestedSet}
+              onViewTrace={onViewTrace}
             />
           ))}
         </div>
@@ -308,7 +313,7 @@ function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, wo
 }
 
 // ── A single attached pack: compact header + expandable items ─────────────
-function PackSection({ pack, recentlyUpdated, isSandbox, workflowId, reAttestedSet }) {
+function PackSection({ pack, recentlyUpdated, isSandbox, workflowId, reAttestedSet, onViewTrace }) {
   // getPackLineage resolves factIds → fully hydrated items with source docs +
   // sandbox claim records. Falls back to a thin shape if enrichment is missing.
   const lineage = getPackLineage(pack.id)
@@ -346,7 +351,7 @@ function PackSection({ pack, recentlyUpdated, isSandbox, workflowId, reAttestedS
       {/* F2.2 — Audit log section: who ran what with this pack, when, and */}
       {/* what governance gates fired. Closes the CYA pillar in context.   */}
       {recentRuns.length > 0 && (
-        <RecentRunsSection runs={recentRuns} />
+        <RecentRunsSection runs={recentRuns} onViewTrace={onViewTrace} />
       )}
     </div>
   )
@@ -943,7 +948,7 @@ function EnvPill({ active, icon: Icon, label, activeColor, activeBg, activeBorde
 // shows status + env, when it ran, who triggered it, governance event
 // summary, and the final recommendation in one line. Click a row to
 // expand a small detail block with the halt reason / facts cited list.
-function RecentRunsSection({ runs }) {
+function RecentRunsSection({ runs, onViewTrace }) {
   return (
     <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
       <div className="px-4 pt-3 pb-1.5">
@@ -956,13 +961,13 @@ function RecentRunsSection({ runs }) {
         </p>
       </div>
       <div className="px-2 pb-2 space-y-1">
-        {runs.map(r => <AuditRow key={r.id} run={r} />)}
+        {runs.map(r => <AuditRow key={r.id} run={r} onViewTrace={onViewTrace} />)}
       </div>
     </div>
   )
 }
 
-function AuditRow({ run }) {
+function AuditRow({ run, onViewTrace }) {
   const [expanded, setExpanded] = useState(false)
 
   // Status palette: success / halted / warn / running.
@@ -1053,6 +1058,28 @@ function AuditRow({ run }) {
               ))}
             </div>
           </div>
+          {/* M3 — open the full retained trace for this historical run. */}
+          {/* Disabled when the trace was archived (older runs).         */}
+          {(() => {
+            const hasTrace = !!getTraceForRun(run.id)
+            if (!onViewTrace) return null
+            return (
+              <button
+                onClick={() => hasTrace && onViewTrace(run.id)}
+                disabled={!hasTrace}
+                title={hasTrace ? 'Open the retained trace in the Test viewer' : 'Trace archived — no longer retained for this run'}
+                className="w-full mt-1 py-2 rounded-md text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                style={{
+                  background: hasTrace ? 'rgba(43,127,255,0.10)' : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${hasTrace ? 'rgba(43,127,255,0.30)' : 'var(--border-subtle)'}`,
+                  color: hasTrace ? '#80AFFF' : 'var(--text-muted)',
+                  opacity: hasTrace ? 1 : 0.6,
+                }}>
+                <Play size={11} />
+                {hasTrace ? 'View full trace' : 'Trace archived'}
+              </button>
+            )
+          })()}
         </div>
       )}
     </div>

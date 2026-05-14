@@ -1334,3 +1334,31 @@ export function getRecentRunsForPack(workflowId, packId, limit = 6) {
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
     .slice(0, limit)
 }
+
+// M3 — map an audit run id to its retained trace. Returns null for runs
+// whose detailed trace was archived/lost (the "View trace" button is hidden
+// in that case). Real product would page in cold-store traces on demand.
+const RUN_TRACE_MAP = {
+  // Recent v2.4 runs all use the live trace variants by status:
+  'RN-8852': null,   // wired lazily below — needs reference to expired-production
+  'RN-8851': null,   // wired lazily below — needs reference to expired-sandbox
+  'RN-8841': null,   // wired lazily below — clean pass
+  'RN-8839': null,   // clean pass (re-used)
+  // Older v2.3 runs are not retained in detail here.
+  'RN-8835': null,   // discount-ceiling halt — trace not authored for this scenario
+  'RN-8800': null,   // clean pass v2.3
+}
+
+export function getTraceForRun(runId) {
+  // Wire mapping at call time to avoid TDZ on traces declared further down.
+  switch (runId) {
+    case 'RN-8852': return testWorkflowTraceLeadA_ExpiredProduction
+    case 'RN-8851': return testWorkflowTraceLeadA_ExpiredSandbox
+    case 'RN-8841': return testWorkflowTraceLeadA
+    case 'RN-8839': return testWorkflowTraceLeadA
+    case 'RN-8800': return testWorkflowTraceLeadA
+    // RN-8835 has no authored trace yet (discount-ceiling halt scenario);
+    // returning null hides the "View trace" button on that row.
+    default: return null
+  }
+}

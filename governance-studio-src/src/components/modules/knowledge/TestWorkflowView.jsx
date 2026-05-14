@@ -53,6 +53,10 @@ export default function TestWorkflowView({
   // M1 — session-level re-attested set; an expired fact in this set is
   // treated as current and lets the trace pick the clean-pass variant.
   reAttestedFactIds,
+  // M3 — when set, the viewer renders this archived trace instead of a
+  // live computation. Skips idle/running phases.
+  historicalRun,
+  onExitHistorical,
   onClose,
 }) {
   const isSandboxEnv = environment === 'sandbox'
@@ -81,6 +85,12 @@ export default function TestWorkflowView({
     if (isSandboxEnv) setCompareMode(true)
   }, [isSandboxEnv])
 
+  // M3 — when a historical run is opened, pin phase to 'complete' so the
+  // viewer skips idle/running and jumps straight to the trace.
+  useEffect(() => {
+    if (historicalRun) setPhase('complete')
+  }, [historicalRun])
+
   // F1.5 — detect whether the workflow's pack has any fact with expired
   // attestation. If yes, the Test viewer picks a different trace variant:
   //   - production env → trace halts at the offending step (fail closed)
@@ -91,14 +101,15 @@ export default function TestWorkflowView({
       .some(f => isAttestationExpired(f) && !reAttestedFactIds?.has(f.id))
     )
 
-  // D6: per-workflow trace lookup. Falls back to null when this workflow
-  // has no dry-run mock — the body then renders a NoTraceState so the user
-  // sees a clear "not available yet" message instead of an empty trace.
-  const trace = getTraceForWorkflow(workflowId, {
-    env: environment,
-    hasExpiredAttestation,
-  }) || testWorkflowTraceLeadA
-  const hasTrace = !!getTraceForWorkflow(workflowId, {
+  // M3 — historical override wins over live computation. The user clicked
+  // "View trace" on an audit row; show that archived trace and pin the
+  // phase to 'complete' so we skip idle/running entirely.
+  const isHistorical = !!historicalRun?.trace
+  const trace = isHistorical
+    ? historicalRun.trace
+    : (getTraceForWorkflow(workflowId, { env: environment, hasExpiredAttestation })
+       || testWorkflowTraceLeadA)
+  const hasTrace = isHistorical || !!getTraceForWorkflow(workflowId, {
     env: environment,
     hasExpiredAttestation,
   })
@@ -165,8 +176,14 @@ export default function TestWorkflowView({
           </div>
           <div className="min-w-0">
             <p className="text-[10px] font-bold tracking-widest uppercase mb-0.5"
-              style={{ color: isSandboxEnv ? '#fbbf24' : 'var(--text-muted)' }}>
-              {isSandboxEnv ? 'Test workflow · Sandbox' : 'Test workflow'}
+              style={{
+                color: isHistorical ? '#a78bfa'
+                     : isSandboxEnv ? '#fbbf24'
+                     : 'var(--text-muted)',
+              }}>
+              {isHistorical
+                ? `Historical run · ${historicalRun.runId}`
+                : isSandboxEnv ? 'Test workflow · Sandbox' : 'Test workflow'}
             </p>
             <p id="twv-title" className="text-base font-semibold leading-tight truncate"
               style={{ color: 'var(--text-primary)' }}>
@@ -174,13 +191,15 @@ export default function TestWorkflowView({
             </p>
             <p className="text-[11px] mt-0.5 flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
               <BookOpen size={10} />
-              {isSandboxEnv ? (
+              {isHistorical ? (
+                <>Read-only archive · ran on {new Date(historicalRun.trace.startedAt).toLocaleDateString()}</>
+              ) : isSandboxEnv ? (
                 <>Pack is <strong style={{ color: '#fbbf24' }}>advisory</strong> — no enforcement</>
               ) : (
                 <>Constrained by <strong style={{ color: 'var(--text-secondary)' }}>{packName || 'attached pack'}</strong></>
               )}
               <span style={{ opacity: 0.4 }}>·</span>
-              Dry-run · no side effects
+              {isHistorical ? <>Pack {historicalRun.trace.packId} {historicalRun.trace.packVersion ? `· ${historicalRun.trace.packVersion}` : ''}</> : <>Dry-run · no side effects</>}
             </p>
           </div>
         </div>
@@ -197,11 +216,20 @@ export default function TestWorkflowView({
                 }}>
                 <GitCompareArrows size={11} /> Compare without pack
               </button>
-              <button onClick={reset}
-                className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
-                <RotateCcw size={11} /> Run again
-              </button>
+              {isHistorical ? (
+                <button onClick={() => { onExitHistorical?.(); reset() }}
+                  title="Exit historical view and return to live testing"
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  style={{ background: 'rgba(167,139,250,0.10)', border: '1px solid rgba(167,139,250,0.30)', color: '#a78bfa' }}>
+                  <RotateCcw size={11} /> Back to live test
+                </button>
+              ) : (
+                <button onClick={reset}
+                  className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
+                  <RotateCcw size={11} /> Run again
+                </button>
+              )}
             </>
           )}
           <button onClick={onClose} aria-label="Close"
