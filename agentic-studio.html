@@ -3480,11 +3480,14 @@ body.test-mode #vTestMode{display:flex}
 <div class="toast-ctr" id="toastCtr"></div>
 
 <script>
-// ── WORKFLOW ENVIRONMENT MAP (F2.1) ──
+// ── WORKFLOW ENVIRONMENT MAP (F2.1 + M4) ──
 // Mirrors workflowEnvironmentDefaults from governance-studio's mockKnowledge.
 // Truth Plane = production = enforced pack, audited side effects.
 // Sandbox Plane = sandbox = advisory pack, no side effects.
 // Promoting a workflow is the analog of promoting a sandbox claim to truth.
+// M4 — env is mutable per session. The slide-out (React) and the workflow
+// header badge (HTML) both write into the same map via postMessage so the
+// two stay in sync.
 const WORKFLOW_ENV = {
   n1: 'production',   // Customer Renewal Pipeline — live
   n2: 'production',   // Outbound Prospecting Engine
@@ -3496,6 +3499,51 @@ const WORKFLOW_ENV = {
 const ENV_LABEL = { production: 'Production', sandbox: 'Sandbox' };
 const ENV_CLASS = { production: 'env-prod',   sandbox: 'env-sandbox' };
 const getWorkflowEnv = (id) => WORKFLOW_ENV[id] || 'production';
+
+// M4 — toggle workflow env from any badge. Mutates the map, re-renders
+// every visible badge, fires a toast, and (if the Knowledge slide-out is
+// open) tells the iframe to pick up the new env via postMessage.
+function envBadgeIcon(env) {
+  return env === 'sandbox'
+    ? '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><path d="M5 1.5v3l-2.5 4a1 1 0 0 0 .9 1.5h5.2a1 1 0 0 0 .9-1.5L7 4.5v-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 1.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
+    : '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><rect x="2.5" y="5.5" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V3.5a2 2 0 0 1 4 0v2" stroke="currentColor" stroke-width="1.2"/></svg>';
+}
+function paintEnvBadge(el, env, workflowId) {
+  if (!el) return;
+  el.innerHTML = envBadgeIcon(env) + ENV_LABEL[env];
+  el.className = `sc ${ENV_CLASS[env]}`;
+  el.style.cursor = workflowId ? 'pointer' : 'default';
+  el.style.display = 'inline-flex';
+  el.title = workflowId
+    ? `Workflow env · ${ENV_LABEL[env]} · click to switch`
+    : `Workflow env · ${ENV_LABEL[env]}`;
+  // Replace onclick instead of stacking it on re-paint.
+  el.onclick = workflowId ? (ev) => { ev.stopPropagation(); toggleWorkflowEnv(workflowId); } : null;
+}
+function repaintAllEnvBadges(workflowId) {
+  const env = getWorkflowEnv(workflowId);
+  paintEnvBadge(document.getElementById('ovEnv'),   env, workflowId);
+  paintEnvBadge(document.getElementById('prevEnv'), env, workflowId);
+}
+function toggleWorkflowEnv(workflowId) {
+  const cur = getWorkflowEnv(workflowId);
+  const next = cur === 'production' ? 'sandbox' : 'production';
+  WORKFLOW_ENV[workflowId] = next;
+  repaintAllEnvBadges(workflowId);
+  const tone = next === 'production' ? 'ok' : 'warn';
+  const msg  = next === 'production'
+    ? `Promoted to production · pack now enforced`
+    : `Switched to sandbox · pack is advisory only`;
+  if (typeof toast === 'function') toast(msg, tone);
+  // Tell the embedded Knowledge slide-out (if open) so it stays in sync.
+  try {
+    const kcFrame = document.getElementById('kcFrame');
+    kcFrame?.contentWindow?.postMessage(
+      { type: 'kc:env-set', workflowId, env: next },
+      window.location.origin
+    );
+  } catch {}
+}
 
 // ── DATA ──
 const NETWORKS = [
@@ -3762,17 +3810,8 @@ function populatePreview(id) {
   const sc = document.getElementById('prevStatus');
   sc.textContent = statusLabel[n.status];
   sc.className = `sc ${n.status}`;
-  // F2.1 — env badge mirrors the slide-out env switcher palette.
-  const prevEnv = document.getElementById('prevEnv');
-  if (prevEnv) {
-    const env = getWorkflowEnv(n.id);
-    const icon = env === 'sandbox'
-      ? '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><path d="M5 1.5v3l-2.5 4a1 1 0 0 0 .9 1.5h5.2a1 1 0 0 0 .9-1.5L7 4.5v-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 1.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
-      : '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><rect x="2.5" y="5.5" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V3.5a2 2 0 0 1 4 0v2" stroke="currentColor" stroke-width="1.2"/></svg>';
-    prevEnv.innerHTML = icon + ENV_LABEL[env];
-    prevEnv.className = `sc ${ENV_CLASS[env]}`;
-    prevEnv.style.display = 'inline-flex';
-  }
+  // F2.1 + M4 — env badge is clickable; click toggles env.
+  paintEnvBadge(document.getElementById('prevEnv'), getWorkflowEnv(n.id), n.id);
   document.getElementById('prevMeta').textContent = `${n.version} · ${n.category} · Updated ${n.updated}`;
   document.getElementById('prevAiText').textContent = n.aiText;
   document.getElementById('prevAiChips').innerHTML = [
@@ -3815,18 +3854,8 @@ function openFullView() {
   document.getElementById('ovName').textContent = n.name;
   const ovSc = document.getElementById('ovStatus');
   ovSc.textContent = statusLabel[n.status]; ovSc.className=`sc ${n.status}`;
-  // F2.1 — environment badge next to status. Production = green/lock, Sandbox = amber/beaker.
-  // Same palette as the slide-out env switcher so the user sees one consistent signal.
-  const env = getWorkflowEnv(n.id);
-  const ovEnv = document.getElementById('ovEnv');
-  if (ovEnv) {
-    const icon = env === 'sandbox'
-      ? '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><path d="M5 1.5v3l-2.5 4a1 1 0 0 0 .9 1.5h5.2a1 1 0 0 0 .9-1.5L7 4.5v-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 1.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
-      : '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><rect x="2.5" y="5.5" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V3.5a2 2 0 0 1 4 0v2" stroke="currentColor" stroke-width="1.2"/></svg>';
-    ovEnv.innerHTML = icon + ENV_LABEL[env];
-    ovEnv.className = `sc ${ENV_CLASS[env]}`;
-    ovEnv.style.display = 'inline-flex';
-  }
+  // F2.1 + M4 — clickable env badge next to the status pill.
+  paintEnvBadge(document.getElementById('ovEnv'), getWorkflowEnv(n.id), n.id);
   document.getElementById('ovVer').textContent = n.version;
   document.getElementById('ovAiText').textContent = n.aiText;
   // Metrics
@@ -4542,9 +4571,12 @@ function openKnowledgeConstraint() {
   }
   const id   = encodeURIComponent(n.id);
   const name = encodeURIComponent(n.name);
+  // M4 — pass the current env so the slide-out picks up the workflow's
+  // session-mutable state, not just the seed default.
+  const env  = encodeURIComponent(getWorkflowEnv(n.id));
   // Land on the Knowledge list with workflow params — Knowledge.jsx detects
-  // workflowId/intent and auto-opens the Copilot modal with full context.
-  const url  = `governance-studio/?embed=1&workflowId=${id}&workflowName=${name}&intent=restrict#/intelligence-library/knowledge`;
+  // workflowId/intent/env and auto-opens the Copilot modal with full context.
+  const url  = `governance-studio/?embed=1&workflowId=${id}&workflowName=${name}&intent=restrict&env=${env}#/intelligence-library/knowledge`;
   const frame = document.getElementById('kcFrame');
   frame.src = url;
   document.getElementById('kcOverlay').classList.add('open');
@@ -4592,6 +4624,13 @@ window.addEventListener('message', (e) => {
   if (type === 'kc:expand')   ov.classList.add('kc-fullscreen');
   if (type === 'kc:collapse') ov.classList.remove('kc-fullscreen');
   if (type === 'kc:close')    closeKnowledgeConstraint();
+  // M4 — React side flipped the env via the slide-out switcher. Mirror the
+  // change in WORKFLOW_ENV so the header badge stays in sync without the
+  // user having to re-open the workflow.
+  if (type === 'kc:env-change' && e.data?.workflowId && e.data?.env) {
+    WORKFLOW_ENV[e.data.workflowId] = e.data.env;
+    repaintAllEnvBadges(e.data.workflowId);
+  }
 });
 
 function showAgenticNetworks() {

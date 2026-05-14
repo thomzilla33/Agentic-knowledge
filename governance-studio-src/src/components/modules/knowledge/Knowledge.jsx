@@ -515,9 +515,34 @@ export default function Knowledge() {
   // mock defaults; the slide-out can flip it per session. Mirrors the
   // Truth/Sandbox Plane model — pack enforced in production, advisory in
   // sandbox.
-  const [workflowEnvironment, setWorkflowEnvironment] = useState(() =>
-    workflowContext ? getWorkflowEnvironmentDefault(workflowContext.workflowId) : 'production'
-  )
+  // M4 — also honor a `?env=` URL param so the agentic-studio header
+  // badge can pass its current session state into the iframe.
+  const [workflowEnvironment, setWorkflowEnvironment] = useState(() => {
+    if (!workflowContext) return 'production'
+    try {
+      const p = new URLSearchParams(window.location.search)
+      const fromUrl = p.get('env')
+      if (fromUrl === 'production' || fromUrl === 'sandbox') return fromUrl
+    } catch {}
+    return getWorkflowEnvironmentDefault(workflowContext.workflowId)
+  })
+
+  // M4 — accept env updates from the embedding parent (when the user
+  // toggles the workflow header badge in agentic-studio while the slide-
+  // out is open). Keeps the slide-out env switcher visually in sync.
+  useEffect(() => {
+    const onMsg = (e) => {
+      if (e.data?.type !== 'kc:env-set') return
+      if (!workflowContext) return
+      if (e.data.workflowId !== workflowContext.workflowId) return
+      const next = e.data.env
+      if (next === 'production' || next === 'sandbox') {
+        setWorkflowEnvironment(next)
+      }
+    }
+    window.addEventListener('message', onMsg)
+    return () => window.removeEventListener('message', onMsg)
+  }, [workflowContext])
   // M1 — session-level set of fact ids the user has re-attested in this
   // session. Treated as "not expired" by every check downstream, regardless
   // of the persisted attestation.nextReview. Resets on reload (no backend).
@@ -640,6 +665,14 @@ export default function Knowledge() {
           environment={workflowEnvironment}
           onChangeEnvironment={(next) => {
             setWorkflowEnvironment(next)
+            // M4 — notify the embedding parent so the workflow header badge
+            // stays in sync without requiring a workflow reopen.
+            try {
+              window.parent?.postMessage(
+                { type: 'kc:env-change', workflowId: workflowContext.workflowId, env: next },
+                '*',
+              )
+            } catch {}
             if (next === 'production') {
               showToast(`Promoted to production · pack now enforced`, '#4ade80')
             } else {

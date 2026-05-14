@@ -158,6 +158,14 @@ export default function KnowledgePackChat({ open, onBack, onClose, onComplete })
   const [pendingInput, setPendingInput] = useState('')
   const [isTyping, setIsTyping]       = useState(false)
   const [exitConfirm, setExitConfirm] = useState(false)
+  // D5 — if the user closed mid-draft and re-opens the Copilot, ask whether
+  // to resume or start fresh instead of silently restoring. Re-checks on
+  // every transition from closed→open so a draft persisted *after* the
+  // component first mounted still triggers the prompt.
+  const [resumePrompt, setResumePrompt] = useState(() => {
+    const initial = loadState()
+    return (initial?.step || 0) > 0
+  })
   const scrollRef = useRef(null)
   // dataRef always reflects the latest data state, so handlers bound to a
   // chip in an earlier render (before subsequent setData calls were applied)
@@ -183,6 +191,20 @@ export default function KnowledgePackChat({ open, onBack, onClose, onComplete })
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = prev }
+  }, [open])
+
+  // D5 — every time the Copilot transitions from closed → open, re-check
+  // sessionStorage. The state was initialized at the component's *first*
+  // mount, which can be earlier than when the user re-opens the Copilot
+  // after persisting a draft. Without this, the resume prompt only fires
+  // for drafts already present at first mount.
+  useEffect(() => {
+    if (!open) return
+    const fresh = loadState()
+    if ((fresh?.step || 0) > 0) {
+      setData(fresh)
+      setResumePrompt(true)
+    }
   }, [open])
 
   // ESC = back to mode picker (unless mid-conversation, then confirm)
@@ -781,6 +803,27 @@ export default function KnowledgePackChat({ open, onBack, onClose, onComplete })
           onConfirm={() => exit(true)}
         />
       )}
+      {/* D5 — Resume-or-fresh prompt when re-opening with an in-progress draft */}
+      {resumePrompt && (
+        <ResumeFreshDialog
+          stepNumber={data.step}
+          totalSteps={STEPS.length}
+          packName={data.name}
+          intent={data.intent}
+          onResume={() => setResumePrompt(false)}
+          onFresh={() => {
+            // Clear storage, reset to a clean state, but preserve URL context
+            // (workflowId, workflowName, intent) when the Copilot was launched
+            // from another product.
+            try { sessionStorage.removeItem(STORAGE_KEY) } catch {}
+            const reset = loadState() // re-runs URL-merge against empty storage
+            setData(reset)
+            setMessages(buildInitialTranscript())
+            setPendingInput('')
+            setResumePrompt(false)
+          }}
+        />
+      )}
     </div>
   )
 
@@ -1126,6 +1169,53 @@ function ConfirmDialog({ title, body, cancel, confirm, onCancel, onConfirm }) {
             className="px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer"
             style={{ background: 'rgba(239,68,68,0.16)', border: '1px solid rgba(239,68,68,0.40)', color: '#f87171' }}>
             {confirm}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// D5 — Resume-or-fresh prompt: shown when the Copilot opens and detects a
+// non-empty draft from a previous session. Mirrors the ConfirmDialog chrome
+// but uses two equal CTAs (no "destructive" framing — neither option is
+// wrong). Surfaces what the user was in the middle of so they remember
+// before deciding.
+function ResumeFreshDialog({ stepNumber, totalSteps, packName, intent, onResume, onFresh }) {
+  const intentLabel = intent === 'restrict' ? 'restrict knowledge'
+                    : intent === 'add'      ? 'add knowledge'
+                    : intent === 'both'     ? 'restrict + add knowledge'
+                    : 'configure a new pack'
+  return (
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }}
+      role="alertdialog" aria-modal="true">
+      <div className="w-full max-w-md rounded-2xl p-5"
+        style={{ background: 'var(--modal-bg, #0b1220)', border: '1px solid var(--border-subtle)' }}>
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(167,139,250,0.16)', border: '1px solid rgba(167,139,250,0.30)' }}>
+            <Sparkles size={13} style={{ color: '#c4b5fd' }} />
+          </div>
+          <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+            Resume your draft?
+          </p>
+        </div>
+        <p className="text-[12px] leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
+          You left mid-conversation on step <strong style={{ color: 'var(--text-primary)' }}>{stepNumber + 1} of {totalSteps}</strong>
+          {packName ? <> · pack name <strong style={{ color: 'var(--text-primary)' }}>"{packName}"</strong></> : null}
+          {' '}({intentLabel}). Pick up where you left off, or scrap and start over.
+        </p>
+        <div className="flex items-center gap-2 justify-end">
+          <button onClick={onFresh}
+            className="px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
+            Start fresh
+          </button>
+          <button onClick={onResume}
+            className="px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all hover:brightness-110 cursor-pointer"
+            style={{ background: AIMS_GRADIENT, color: '#fff' }}>
+            Resume draft
           </button>
         </div>
       </div>
