@@ -1824,6 +1824,52 @@ body.test-mode #vTestMode{display:flex}
 .demo-panel.is-expanded .demo-panel-list{
   max-height:50vh;padding-top:6px;padding-bottom:6px;
 }
+
+/* Resize handle — bottom-right corner of the panel */
+.demo-resize-handle{
+  position:absolute;right:0;bottom:0;
+  width:16px;height:16px;
+  cursor:nwse-resize;
+  z-index:1;
+  /* Diagonal grip lines */
+  background-image:
+    linear-gradient(135deg, transparent 0%, transparent 40%, rgba(255,255,255,0.18) 42%, rgba(255,255,255,0.18) 48%, transparent 50%),
+    linear-gradient(135deg, transparent 50%, transparent 60%, rgba(255,255,255,0.18) 62%, rgba(255,255,255,0.18) 68%, transparent 70%),
+    linear-gradient(135deg, transparent 70%, transparent 80%, rgba(255,255,255,0.18) 82%, rgba(255,255,255,0.18) 88%, transparent 90%);
+  border-bottom-right-radius:14px;
+  opacity:0.7;
+  transition:opacity .12s;
+}
+.demo-resize-handle:hover{opacity:1}
+.demo-panel.resizing{
+  transition:none;
+  box-shadow:0 24px 64px rgba(0,0,0,0.65), 0 0 0 1px rgba(43,127,255,0.40);
+  user-select:none;
+}
+
+/* ── Auto-scale typography by panel width ─────────────────────────────────
+   The panel ships with text sized for compact (210px). As the user
+   drags it wider, two breakpoints bump font-size + button height so
+   the content stays readable instead of small-and-airy. */
+.demo-panel.size-md .demo-panel-title       { font-size:12px; }
+.demo-panel.size-md .demo-panel-current-label{ font-size:10px; }
+.demo-panel.size-md .demo-panel-current-title{ font-size:14px; }
+.demo-panel.size-md .demo-panel-current-desc { font-size:12px; }
+.demo-panel.size-md .demo-panel-toggle      { font-size:11px;padding:8px 12px; }
+.demo-panel.size-md .demo-step-title        { font-size:12px; }
+.demo-panel.size-md .demo-step-desc         { font-size:11px; }
+.demo-panel.size-md .demo-counter           { font-size:11px; }
+.demo-panel.size-md .demo-nav-btn           { font-size:12px;height:28px; }
+
+.demo-panel.size-lg .demo-panel-title       { font-size:13px; }
+.demo-panel.size-lg .demo-panel-current-label{ font-size:11px; }
+.demo-panel.size-lg .demo-panel-current-title{ font-size:15px; }
+.demo-panel.size-lg .demo-panel-current-desc { font-size:13px;line-height:1.5; }
+.demo-panel.size-lg .demo-panel-toggle      { font-size:12px;padding:10px 12px; }
+.demo-panel.size-lg .demo-step-title        { font-size:13px; }
+.demo-panel.size-lg .demo-step-desc         { font-size:12px;line-height:1.45; }
+.demo-panel.size-lg .demo-counter           { font-size:12px; }
+.demo-panel.size-lg .demo-nav-btn           { font-size:13px;height:30px;padding:0 14px; }
 .demo-step{
   display:flex;gap:8px;align-items:flex-start;
   padding:8px 10px;border-radius:8px;
@@ -8947,6 +8993,44 @@ window.addEventListener('scroll', () => {
     if (!dragging) return;
     dragging = false;
     panel.classList.remove('dragging');
+  });
+})();
+
+// ── Demo panel resize — drag the bottom-right handle ───────────────────────
+// Width-only resize (height auto-fits the content). As the panel widens,
+// typography auto-scales via the .size-md / .size-lg classes so the demo
+// stays readable when projecting or screen-sharing.
+(function setupDemoResize(){
+  const panel = document.getElementById('demoPanel');
+  if (!panel) return;
+  // Inject the resize handle once.
+  let handle = panel.querySelector('.demo-resize-handle');
+  if (!handle) {
+    handle = document.createElement('div');
+    handle.className = 'demo-resize-handle';
+    handle.title = 'Drag to resize';
+    panel.appendChild(handle);
+  }
+  let resizing = false, startX = 0, startW = 0;
+  handle.addEventListener('mousedown', (e) => {
+    resizing = true;
+    startX  = e.clientX;
+    startW  = panel.offsetWidth;
+    panel.classList.add('resizing');
+    e.preventDefault();
+    e.stopPropagation();   // don't trigger the header drag
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!resizing) return;
+    const w = Math.max(200, Math.min(480, startW + (e.clientX - startX)));
+    panel.style.width = `${w}px`;
+    panel.classList.toggle('size-md', w >= 260 && w < 320);
+    panel.classList.toggle('size-lg', w >= 320);
+  });
+  window.addEventListener('mouseup', () => {
+    if (!resizing) return;
+    resizing = false;
+    panel.classList.remove('resizing');
   });
 })();
 
