@@ -1750,33 +1750,79 @@ body.test-mode #vTestMode{display:flex}
   .demo-start-btn{ animation:none; }
 }
 
-/* Side panel — fixed top-right under the topbar */
+/* Side panel — compact by default (slim, just-enough), expandable to show
+   the full step list; draggable by the header so users can park it anywhere. */
 .demo-panel{
-  position:fixed;top:62px;right:18px;width:230px;
+  position:fixed;top:62px;right:18px;width:210px;
   background:#0b1220;border:1px solid var(--bd);
   border-radius:14px;
   box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(43,127,255,0.10);
   z-index:9100;
   opacity:0;transform:translateX(12px);
   pointer-events:none;
-  transition:opacity .22s ease, transform .22s cubic-bezier(.4,0,.2,1);
+  transition:opacity .22s ease, transform .22s cubic-bezier(.4,0,.2,1), box-shadow .15s;
   display:flex;flex-direction:column;
   max-height:calc(100vh - 80px);overflow:hidden;
 }
 .demo-panel.open{opacity:1;transform:translateX(0);pointer-events:auto}
+.demo-panel.dragging{
+  opacity:0.95;
+  box-shadow:0 24px 64px rgba(0,0,0,0.65), 0 0 0 1px rgba(43,127,255,0.30);
+  transition:opacity .12s, box-shadow .15s;  /* drop position transition while dragging */
+}
 .demo-panel-hd{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 12px;border-bottom:1px solid var(--bd);
   background:rgba(43,127,255,0.05);
+  cursor:move;user-select:none;
 }
-.demo-panel-title{font-size:11px;font-weight:700;color:#80AFFF;letter-spacing:.02em}
+.demo-panel-hd:hover{background:rgba(43,127,255,0.08)}
+.demo-panel-title{font-size:11px;font-weight:700;color:#80AFFF;letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+.demo-panel-title::before{
+  content:'';display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  flex-shrink:0;
+}
 .demo-panel-close{
   width:22px;height:22px;border-radius:6px;background:transparent;border:none;color:var(--t3);
   cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;
 }
 .demo-panel-close:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+/* Current-step card — always visible, dominant in compact mode */
+.demo-panel-current{
+  padding:10px 12px;border-bottom:1px solid var(--bd);
+  background:rgba(43,127,255,0.04);
+}
+.demo-panel-current-label{
+  font-size:9px;font-weight:700;letter-spacing:.10em;color:#80AFFF;
+  text-transform:uppercase;
+}
+.demo-panel-current-title{
+  font-size:13px;font-weight:700;color:var(--t1);margin-top:3px;line-height:1.25;
+}
+.demo-panel-current-desc{
+  font-size:11px;color:var(--t3);margin-top:4px;line-height:1.4;
+}
+/* Show-all-steps toggle row */
+.demo-panel-toggle{
+  width:100%;padding:7px 12px;background:transparent;border:none;
+  border-bottom:1px solid var(--bd);
+  color:var(--t3);font-size:10px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:background .12s, color .12s;
+  letter-spacing:.02em;
+}
+.demo-panel-toggle:hover{background:rgba(255,255,255,0.03);color:var(--t1)}
+.demo-panel-toggle svg{transition:transform .18s}
+.demo-panel.is-expanded .demo-panel-toggle svg{transform:rotate(180deg)}
 .demo-panel-list{
   flex:1;overflow-y:auto;padding:6px;
+  /* Hidden in compact mode (default), shown when .is-expanded is set */
+  max-height:0;padding-top:0;padding-bottom:0;
+  transition:max-height .25s ease, padding .25s ease;
+}
+.demo-panel.is-expanded .demo-panel-list{
+  max-height:50vh;padding-top:6px;padding-bottom:6px;
 }
 .demo-step{
   display:flex;gap:8px;align-items:flex-start;
@@ -1995,10 +2041,21 @@ body.test-mode #vTestMode{display:flex}
 
   <!-- ════ GUIDED DEMO PANEL ════ -->
   <aside class="demo-panel" id="demoPanel" role="region" aria-label="Demo walkthrough">
-    <div class="demo-panel-hd">
+    <div class="demo-panel-hd" id="demoPanelHd" title="Drag to move">
       <span class="demo-panel-title" id="demoPanelTitle">Demo · Knowledge governance</span>
       <button class="demo-panel-close" onclick="demoStop()" aria-label="Close demo">×</button>
     </div>
+    <!-- Current step (always visible) — dominates the compact panel -->
+    <div class="demo-panel-current">
+      <div class="demo-panel-current-label" id="demoPanelCurrentLabel">Step 1 of 9</div>
+      <div class="demo-panel-current-title" id="demoPanelCurrentTitle">Loading…</div>
+      <div class="demo-panel-current-desc" id="demoPanelCurrentDesc"></div>
+    </div>
+    <!-- Toggle row: expand/collapse the full step list -->
+    <button class="demo-panel-toggle" onclick="demoToggleList()" aria-controls="demoPanelList">
+      <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><polygon points="1,3 5,7 9,3"/></svg>
+      <span id="demoPanelToggleLabel">Show all steps</span>
+    </button>
     <div class="demo-panel-list" id="demoPanelList"><!-- steps rendered here --></div>
     <div class="demo-panel-ft">
       <button class="demo-nav-btn" id="demoPrevBtn" onclick="demoNav(-1)">Prev</button>
@@ -8712,6 +8769,23 @@ function demoRenderPanel() {
       </div>
     </div>`;
   }).join('');
+  // Refresh the always-visible current-step card.
+  const cur = demoSteps[demoState.idx];
+  const curLabel = document.getElementById('demoPanelCurrentLabel');
+  const curTitle = document.getElementById('demoPanelCurrentTitle');
+  const curDesc  = document.getElementById('demoPanelCurrentDesc');
+  if (curLabel) curLabel.textContent = `Step ${demoState.idx + 1} of ${demoSteps.length}`;
+  if (curTitle) curTitle.textContent = cur?.title || '';
+  if (curDesc)  curDesc.textContent  = cur?.desc  || '';
+}
+
+// Toggle the full step list (collapsed by default to keep the panel slim).
+function demoToggleList() {
+  const panel = document.getElementById('demoPanel');
+  const label = document.getElementById('demoPanelToggleLabel');
+  if (!panel) return;
+  panel.classList.toggle('is-expanded');
+  if (label) label.textContent = panel.classList.contains('is-expanded') ? 'Hide step list' : 'Show all steps';
 }
 
 function demoUpdateFooter() {
@@ -8841,6 +8915,40 @@ window.addEventListener('scroll', () => {
   demoHighlightTarget(step);
   demoShowTooltip(step);
 }, true);
+
+// ── Demo panel drag — header is the handle ─────────────────────────────────
+// Drag-to-move so the panel never sits over what's being demonstrated.
+// Clamped to the viewport so it can't escape offscreen.
+(function setupDemoDrag(){
+  const hd = document.getElementById('demoPanelHd');
+  const panel = document.getElementById('demoPanel');
+  if (!hd || !panel) return;
+  let dragging = false, offsetX = 0, offsetY = 0;
+  hd.addEventListener('mousedown', (e) => {
+    // Don't start a drag when the user clicked the close button.
+    if (e.target.closest('.demo-panel-close')) return;
+    dragging = true;
+    const rect = panel.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    panel.classList.add('dragging');
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const x = Math.max(8, Math.min(window.innerWidth  - w - 8, e.clientX - offsetX));
+    const y = Math.max(8, Math.min(window.innerHeight - h - 8, e.clientY - offsetY));
+    panel.style.left = `${x}px`;
+    panel.style.top  = `${y}px`;
+    panel.style.right = 'auto';   // unlock the right anchor once user drags
+  });
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    panel.classList.remove('dragging');
+  });
+})();
 
 // ── INIT ──
 renderList();
