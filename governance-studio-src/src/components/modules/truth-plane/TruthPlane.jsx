@@ -545,7 +545,6 @@ function CreateTruthPlaneModal({ onClose }) {
 export default function TruthPlane() {
   const navigate = useNavigate()
   const [selected, setSelected]           = useState(null)
-  const [showCreate, setShowCreate]       = useState(false)
   const [showFilters, setShowFilters]     = useState(false)
   const [search, setSearch]               = useState('')
   const [activeFilters, setActiveFilters] = useState(EMPTY_FILTERS)
@@ -628,9 +627,6 @@ export default function TruthPlane() {
               <p className="text-xs text-text-muted">{truthPlanes.length} planes</p>
             </div>
           </div>
-          <button className="btn-primary" onClick={() => setShowCreate(true)}>
-            <Plus size={14} /> New Truth Plane
-          </button>
         </div>
 
         {/* Search + filter bar */}
@@ -788,9 +784,6 @@ export default function TruthPlane() {
           onOpen={() => navigate(`/truth-plane/${selected.id}`)}
           onNavigate={() => navigate(`/truth-plane/${selected.id}`)} />
       )}
-
-      {/* Create Truth Plane modal */}
-      {showCreate && <CreateTruthPlaneModal onClose={() => setShowCreate(false)} />}
 
       {/* All Filters panel */}
       {showFilters && (

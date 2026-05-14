@@ -556,6 +556,14 @@
     0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
     40%           { transform: translateY(-4px); opacity: 1; }
   }
+  /* Typing-dot pulse used by Lex chat */
+  @keyframes kp-chat-dot {
+    0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+    30%           { opacity: 1;    transform: translateY(-2px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    @keyframes kp-chat-dot { 0%, 100% { opacity: 0.6; } }
+  }
 
   /* ── Row items ── */
   .row-item {

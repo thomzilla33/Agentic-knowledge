@@ -11,6 +11,7 @@ import TruthPlaneDetail from './components/modules/truth-plane/TruthPlaneDetail'
 import TruthFactDetail from './components/modules/truth-plane/TruthFactDetail'
 import Knowledge from './components/modules/knowledge/Knowledge'
 import TruthPackDetail from './components/modules/knowledge/TruthPackDetail'
+import KnowledgePackBuilder from './components/modules/knowledge/KnowledgePackBuilder'
 import Playbooks from './components/modules/playbooks/Playbooks'
 import CreatePlaybook from './components/modules/playbooks/CreatePlaybook'
 import PlaybookBuilder from './components/modules/playbooks/PlaybookBuilder'
@@ -24,6 +25,11 @@ export default function App() {
         <Route path="/intelligence-library" element={<IntelligenceLibrary />} />
         <Route path="/intelligence-library/source-drives" element={<SourceDrives />} />
         <Route path="/intelligence-library/knowledge" element={<Knowledge />} />
+        <Route path="/intelligence-library/knowledge/create" element={<Navigate to="/intelligence-library/knowledge" replace />} />
+        <Route path="/intelligence-library/knowledge/create/scratch" element={<KnowledgePackBuilder />} />
+        {/* Templates and Copilot are modals now — old routes redirect to the list. */}
+        <Route path="/intelligence-library/knowledge/create/conversation" element={<Navigate to="/intelligence-library/knowledge" replace />} />
+        <Route path="/intelligence-library/knowledge/templates" element={<Navigate to="/intelligence-library/knowledge" replace />} />
         <Route path="/intelligence-library/knowledge/:id" element={<TruthPackDetail />} />
         <Route path="/sandbox" element={<SandboxPlane />} />
         <Route path="/sandbox/:id" element={<SandboxDetail />} />

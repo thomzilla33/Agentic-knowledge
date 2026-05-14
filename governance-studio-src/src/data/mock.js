@@ -72,9 +72,9 @@ export const bundles = [
 ]
 
 export const promotions = [
-  { id: 'PKG-001', name: 'Q1 2024 Financial Performance', desc: 'Revenue growth claims from quarterly financial statements', owner: 'Sarah Chen', tags: ['Financial', 'Q1', 'Revenue'], target: 'Financial Truth Plane', claims: 24, status: 'promoted', time: '2 days ago', factsCreated: 18, factsChanged: 5, failed: 1 },
-  { id: 'PKG-002', name: 'Cloud Services Migration', desc: 'Infrastructure and service transition claims', owner: 'Michael Torres', tags: ['Cloud', 'Infrastructure', 'Migration'], target: 'Technical Truth Plane', claims: 18, status: 'in-progress', time: '3 days ago', factsCreated: 10, factsChanged: 3, failed: 0 },
-  { id: 'PKG-003', name: 'Vendor Partnership Terms', desc: 'Strategic partnership agreement claims', owner: 'Emma Wilson', tags: ['Legal', 'Partnerships'], target: 'Legal Truth Plane', claims: 12, status: 'queue', time: '4 days ago', factsCreated: 0, factsChanged: 0, failed: 0 },
+  { id: 'KP-001', name: 'Q1 2024 Financial Performance', desc: 'Revenue growth claims from quarterly financial statements', owner: 'Sarah Chen', tags: ['Financial', 'Q1', 'Revenue'], target: 'Financial Truth Plane', claims: 24, status: 'promoted', time: '2 days ago', factsCreated: 18, factsChanged: 5, failed: 1 },
+  { id: 'KP-002', name: 'Cloud Services Migration', desc: 'Infrastructure and service transition claims', owner: 'Michael Torres', tags: ['Cloud', 'Infrastructure', 'Migration'], target: 'Technical Truth Plane', claims: 18, status: 'in-progress', time: '3 days ago', factsCreated: 10, factsChanged: 3, failed: 0 },
+  { id: 'KP-003', name: 'Vendor Partnership Terms', desc: 'Strategic partnership agreement claims', owner: 'Emma Wilson', tags: ['Legal', 'Partnerships'], target: 'Legal Truth Plane', claims: 12, status: 'queue', time: '4 days ago', factsCreated: 0, factsChanged: 0, failed: 0 },
 ]
 
 export const pkgClaims = [
@@ -437,7 +437,7 @@ export const factProposals = [
     factId: 'TF-0001', factTitle: 'Service Level Agreement - Uptime Guarantee', tag: 'Compliance',
     origin: 'sandbox-promotion', originLabel: 'Sandbox Promotion',
     scenario: 'modify-fact',
-    originMeta: { sandboxName: 'Enterprise SLA Renegotiation Pack', packageId: 'PKG-007', packageName: 'SLA Uplift Q2 2024', sandboxId: 's9' },
+    originMeta: { sandboxName: 'Enterprise SLA Renegotiation Pack', packageId: 'KP-007', packageName: 'SLA Uplift Q2 2024', sandboxId: 's9' },
     sourceBundle: { id: 'BDL-022', name: 'Uptime SLA Claims Bundle' },
     incomingClaims: [
       { id: 'CL-0201', title: 'Monthly Uptime Target 99.95%', text: 'The vendor shall achieve a minimum monthly uptime of 99.95% for all production services.', doc: 'Enterprise SLA Addendum v2', bundle: 'BDL-022', bundleName: 'Uptime SLA Claims Bundle', confidence: 94, risk: 'Low', polarity: '+' },
@@ -469,7 +469,7 @@ export const factProposals = [
     factId: 'TF-0004', factTitle: 'Payment Terms and Conditions', tag: 'Finance',
     origin: 'sandbox-promotion', originLabel: 'Sandbox Promotion',
     scenario: 'modify-fact',
-    originMeta: { sandboxName: 'Enterprise Payment Flexibility Pack', packageId: 'PKG-008', packageName: 'Finance Terms Update Q2 2024', sandboxId: 's10' },
+    originMeta: { sandboxName: 'Enterprise Payment Flexibility Pack', packageId: 'KP-008', packageName: 'Finance Terms Update Q2 2024', sandboxId: 's10' },
     sourceBundle: { id: 'BDL-023', name: 'Payment Terms Claims Bundle' },
     incomingClaims: [
       { id: 'CL-0211', title: 'Net-60 Payment Window for Enterprise Accounts', text: 'Enterprise accounts with ACV above $100,000 shall be eligible for Net-60 payment terms upon written request and credit approval.', doc: 'Enterprise Payment Policy 2024', bundle: 'BDL-023', bundleName: 'Payment Terms Claims Bundle', confidence: 88, risk: 'Medium', polarity: '+' },
@@ -501,7 +501,7 @@ export const factProposals = [
     tag: 'Compliance',
     origin: 'sandbox-promotion', originLabel: 'Sandbox Promotion',
     scenario: 'new-fact',
-    originMeta: { sandboxName: 'Compliance Policy Update', packageId: 'PKG-003', packageName: 'Vendor Partnership Terms', sandboxId: 's5' },
+    originMeta: { sandboxName: 'Compliance Policy Update', packageId: 'KP-003', packageName: 'Vendor Partnership Terms', sandboxId: 's5' },
     sourceBundle: { id: 'BDL-013', name: 'GDPR Compliance Policy Bundle' },
     incomingClaims: [
       { id: 'CL-0099', title: 'GDPR 72-Hour Breach Notification Requirement', text: 'In the event of a confirmed personal data breach, the data controller must notify the relevant supervisory authority within seventy-two (72) hours of becoming aware of the breach, in accordance with Article 33 of GDPR.', doc: 'GDPR Compliance Policy Addendum 2024', bundle: 'BDL-013', bundleName: 'GDPR Compliance Policy Bundle', confidence: 96, risk: 'High', polarity: '+' },

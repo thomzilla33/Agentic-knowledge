@@ -220,6 +220,10 @@ a{text-decoration:none;color:inherit}
 .sc.error{background:var(--err-bg);color:var(--err)}
 .sc.inactive{background:rgba(255,255,255,0.06);color:var(--t3)}
 .sc.draft{background:var(--warn-bg);color:var(--warn)}
+/* F2.1 — workflow environment badges (mirror Truth/Sandbox Plane palette) */
+.sc.env-prod{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.30)}
+.sc.env-sandbox{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.30)}
+.sc.env-prod .sc-icon, .sc.env-sandbox .sc-icon{width:9px;height:9px}
 
 .card-desc{font-size:13px;color:var(--t2);margin-bottom:10px;line-height:1.5}
 .ai-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(43,127,255,0.05);border:1px solid rgba(43,127,255,0.12);border-radius:var(--r8);margin-bottom:12px}
@@ -534,8 +538,36 @@ a{text-decoration:none;color:inherit}
 .bldr-zoom-btn:hover{background:rgba(255,255,255,0.06)}
 .bldr-zoom-val{font-size:12px;font-weight:600;color:var(--t2);min-width:36px;text-align:center}
 .bldr-sep{width:1px;height:18px;background:var(--bd)}
-.bldr-edit-btn,.bldr-test-btn{height:28px;padding:0 12px;border-radius:var(--r6);border:1px solid var(--bds);background:transparent;color:var(--t1);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .1s}
-.bldr-edit-btn:hover,.bldr-test-btn:hover{background:rgba(255,255,255,0.07)}
+.bldr-edit-btn,.bldr-test-btn,.bldr-knowledge-btn{height:28px;padding:0 12px;border-radius:var(--r6);border:1px solid var(--bds);background:transparent;color:var(--t1);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .1s,border-color .1s}
+.bldr-edit-btn:hover,.bldr-test-btn:hover,.bldr-knowledge-btn:hover{background:rgba(255,255,255,0.07)}
+.bldr-knowledge-btn{border-color:rgba(99,102,241,0.45);color:#c4b5fd}
+.bldr-knowledge-btn:hover{background:rgba(99,102,241,0.10);border-color:rgba(99,102,241,0.65)}
+
+/* ─ Knowledge Constraint surface ─
+   Two visual modes:
+     SLIDE-OUT (default) — right-aligned panel, no backdrop. Workflow stays
+       visible behind. Used for inspection of attached knowledge.
+     FULLSCREEN MODAL    — adds .kc-fullscreen class. Centered modal with
+       dimmed backdrop. Triggered via postMessage('kc:expand') from the
+       iframe when the user clicks "Modify constraint" (the Copilot needs
+       room to breathe). Reverts to slide-out on 'kc:collapse'.            */
+.kc-overlay{position:fixed;inset:0;z-index:9000;display:none;pointer-events:none;background:transparent;transition:background .25s cubic-bezier(.4,0,.2,1),backdrop-filter .25s cubic-bezier(.4,0,.2,1)}
+.kc-overlay.open{display:block}
+.kc-overlay.kc-fullscreen{background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);pointer-events:auto}
+
+.kc-modal{position:absolute;top:16px;right:16px;bottom:16px;width:min(560px,calc(100vw - 100px));pointer-events:auto;background:#0b1220;border:1px solid rgba(255,255,255,0.10);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:-24px 0 80px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.03);transition:all .3s cubic-bezier(.4,0,.2,1);opacity:0;transform:translateX(40px)}
+.kc-overlay.open .kc-modal{opacity:1;transform:translateX(0)}
+.kc-overlay.kc-fullscreen .kc-modal{top:24px;right:60px;bottom:24px;left:60px;width:auto;box-shadow:0 40px 120px rgba(0,0,0,0.85)}
+
+.kc-modal-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;background:rgba(255,255,255,0.02)}
+.kc-modal-title{display:flex;align-items:center;gap:11px;min-width:0}
+.kc-modal-ico{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px}
+.kc-modal-eyebrow{font-size:10px;font-weight:700;color:#5d6380;text-transform:uppercase;letter-spacing:.08em;margin:0 0 2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:50vw}
+.kc-modal-eyebrow .kc-wf{color:#c4b5fd;font-weight:700}
+.kc-modal-h{font-size:13px;font-weight:600;color:#e8eaf2;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc-modal-close{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:#a8a8b8;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
+.kc-modal-close:hover{background:rgba(255,255,255,0.12);color:#fff}
+#kcFrame{flex:1;width:100%;border:0;background:#0b1220;display:block}
 .bldr-canvas-area{flex:1;display:flex;position:relative;overflow:hidden}
 .bldr-canvas{flex:1;overflow:auto;position:relative;background:radial-gradient(circle at 50% 50%,rgba(43,127,255,0.04) 0%,transparent 70%)}
 .bldr-canvas-inner{position:relative;min-width:100%;min-height:280px}
@@ -1876,6 +1908,7 @@ body.test-mode #vTestMode{display:flex}
           <div class="prev-hd1">
             <span class="prev-name" id="prevName">–</span>
             <span class="sc" id="prevStatus"></span>
+            <span class="sc" id="prevEnv" style="display:none"></span>
             <button class="prev-open" onclick="openFullView()">
               <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M7 2h3v3M10 2L6.5 5.5M5 3H2v7h7V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Open full view
@@ -1992,6 +2025,18 @@ body.test-mode #vTestMode{display:flex}
               style="flex:1;width:100%;border:0;display:block;background:var(--bg)"></iframe>
     </div>
 
+    <!-- ═══ Knowledge Constraint surface — slide-out by default, expands to
+         fullscreen via postMessage('kc:expand') when the embedded Copilot
+         opens. The iframe owns the header + close button; no outer chrome
+         duplication. Clicks on the dim backdrop (only present in fullscreen
+         mode) collapse back to the slide-out. ═══ -->
+    <div id="kcOverlay" class="kc-overlay"
+         onclick="if(event.target===this && this.classList.contains('kc-fullscreen')) this.classList.remove('kc-fullscreen')">
+      <div class="kc-modal" role="dialog" aria-modal="true" aria-label="Workflow knowledge">
+        <iframe id="kcFrame" title="Knowledge constraint" src="about:blank"></iframe>
+      </div>
+    </div>
+
     <!-- ═══ VIEW: FULL OVERVIEW ═══ -->
     <div id="vOverview" class="view">
       <div class="ov-topbar">
@@ -2001,6 +2046,7 @@ body.test-mode #vTestMode{display:flex}
         </button>
         <span class="ov-name" id="ovName">–</span>
         <span class="sc" id="ovStatus"></span>
+        <span class="sc" id="ovEnv" style="display:none"></span>
         <span class="ov-ver" id="ovVer">–</span>
         <div class="ov-actions">
           <button class="ov-btn" onclick="toast('Test run started','info')">
@@ -2212,6 +2258,10 @@ body.test-mode #vTestMode{display:flex}
                 <button class="bldr-test-btn" onclick="openTestMode()">
                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 2l7 4-7 4V2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
                   Test
+                </button>
+                <button class="bldr-knowledge-btn" onclick="openKnowledgeConstraint()" title="Constrain or add knowledge for this workflow">
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="2" y="2" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.2 5h3.6M4.2 7h2.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Knowledge
                 </button>
               </div>
             </div>
@@ -3430,6 +3480,23 @@ body.test-mode #vTestMode{display:flex}
 <div class="toast-ctr" id="toastCtr"></div>
 
 <script>
+// ── WORKFLOW ENVIRONMENT MAP (F2.1) ──
+// Mirrors workflowEnvironmentDefaults from governance-studio's mockKnowledge.
+// Truth Plane = production = enforced pack, audited side effects.
+// Sandbox Plane = sandbox = advisory pack, no side effects.
+// Promoting a workflow is the analog of promoting a sandbox claim to truth.
+const WORKFLOW_ENV = {
+  n1: 'production',   // Customer Renewal Pipeline — live
+  n2: 'production',   // Outbound Prospecting Engine
+  n3: 'production',   // Churn Risk Intervention
+  n4: 'production',   // Invoice & Collections Flow
+  n5: 'sandbox',      // Lead Nurture Automation — still being validated
+  n6: 'sandbox',
+};
+const ENV_LABEL = { production: 'Production', sandbox: 'Sandbox' };
+const ENV_CLASS = { production: 'env-prod',   sandbox: 'env-sandbox' };
+const getWorkflowEnv = (id) => WORKFLOW_ENV[id] || 'production';
+
 // ── DATA ──
 const NETWORKS = [
   {
@@ -3695,6 +3762,17 @@ function populatePreview(id) {
   const sc = document.getElementById('prevStatus');
   sc.textContent = statusLabel[n.status];
   sc.className = `sc ${n.status}`;
+  // F2.1 — env badge mirrors the slide-out env switcher palette.
+  const prevEnv = document.getElementById('prevEnv');
+  if (prevEnv) {
+    const env = getWorkflowEnv(n.id);
+    const icon = env === 'sandbox'
+      ? '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><path d="M5 1.5v3l-2.5 4a1 1 0 0 0 .9 1.5h5.2a1 1 0 0 0 .9-1.5L7 4.5v-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 1.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
+      : '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><rect x="2.5" y="5.5" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V3.5a2 2 0 0 1 4 0v2" stroke="currentColor" stroke-width="1.2"/></svg>';
+    prevEnv.innerHTML = icon + ENV_LABEL[env];
+    prevEnv.className = `sc ${ENV_CLASS[env]}`;
+    prevEnv.style.display = 'inline-flex';
+  }
   document.getElementById('prevMeta').textContent = `${n.version} · ${n.category} · Updated ${n.updated}`;
   document.getElementById('prevAiText').textContent = n.aiText;
   document.getElementById('prevAiChips').innerHTML = [
@@ -3737,6 +3815,18 @@ function openFullView() {
   document.getElementById('ovName').textContent = n.name;
   const ovSc = document.getElementById('ovStatus');
   ovSc.textContent = statusLabel[n.status]; ovSc.className=`sc ${n.status}`;
+  // F2.1 — environment badge next to status. Production = green/lock, Sandbox = amber/beaker.
+  // Same palette as the slide-out env switcher so the user sees one consistent signal.
+  const env = getWorkflowEnv(n.id);
+  const ovEnv = document.getElementById('ovEnv');
+  if (ovEnv) {
+    const icon = env === 'sandbox'
+      ? '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><path d="M5 1.5v3l-2.5 4a1 1 0 0 0 .9 1.5h5.2a1 1 0 0 0 .9-1.5L7 4.5v-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 1.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
+      : '<svg class="sc-icon" viewBox="0 0 12 12" fill="none"><rect x="2.5" y="5.5" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V3.5a2 2 0 0 1 4 0v2" stroke="currentColor" stroke-width="1.2"/></svg>';
+    ovEnv.innerHTML = icon + ENV_LABEL[env];
+    ovEnv.className = `sc ${ENV_CLASS[env]}`;
+    ovEnv.style.display = 'inline-flex';
+  }
   document.getElementById('ovVer').textContent = n.version;
   document.getElementById('ovAiText').textContent = n.aiText;
   // Metrics
@@ -4439,6 +4529,70 @@ function openPlaybooks() {
   showView('vPlaybooks');
   setSidebarActive('sbPlaybooksBtn');
 }
+
+// ─── Knowledge Constraint modal (workflow-bound Governance Studio Copilot) ───
+// Opens the Knowledge Pack Copilot in an iframe overlay with the current
+// workflow's id/name pre-loaded as query params and intent=constrain hinted.
+// The Copilot reads these on mount and pre-recommends the Restrict path.
+function openKnowledgeConstraint() {
+  const n = (typeof currentOvId !== 'undefined') ? NETWORKS.find(x => x.id === currentOvId) : null;
+  if (!n) {
+    if (typeof toast === 'function') toast('Open a network first to add a knowledge constraint','warn');
+    return;
+  }
+  const id   = encodeURIComponent(n.id);
+  const name = encodeURIComponent(n.name);
+  // Land on the Knowledge list with workflow params — Knowledge.jsx detects
+  // workflowId/intent and auto-opens the Copilot modal with full context.
+  const url  = `governance-studio/?embed=1&workflowId=${id}&workflowName=${name}&intent=restrict#/intelligence-library/knowledge`;
+  const frame = document.getElementById('kcFrame');
+  frame.src = url;
+  document.getElementById('kcOverlay').classList.add('open');
+  // Body scroll stays unlocked in slide-out mode so the workflow remains
+  // interactive behind the panel. Body lock only applies when we expand
+  // to fullscreen (handled by .kc-overlay.kc-fullscreen pointer-events).
+}
+function closeKnowledgeConstraint() {
+  const ov = document.getElementById('kcOverlay');
+  if (!ov) return;
+  ov.classList.remove('open');
+  ov.classList.remove('kc-fullscreen');    // ensure we leave any expanded state too
+  document.body.style.overflow = '';
+  // Free the iframe so subsequent opens get a fresh, context-correct load.
+  setTimeout(() => {
+    const f = document.getElementById('kcFrame');
+    if (f) f.src = 'about:blank';
+  }, 300);
+}
+// ESC closes the constraint surface first (before other ESC handlers).
+// In fullscreen (Copilot) mode, ESC collapses back to slide-out instead
+// of closing entirely — gives the user a way back without losing context.
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const ov = document.getElementById('kcOverlay');
+    if (!ov || !ov.classList.contains('open')) return;
+    e.stopPropagation();
+    if (ov.classList.contains('kc-fullscreen')) {
+      ov.classList.remove('kc-fullscreen');     // collapse back to slide-out
+    } else {
+      closeKnowledgeConstraint();                // close the slide-out entirely
+    }
+  }
+});
+
+// ─── postMessage bridge — the iframe (Governance Studio Copilot) signals
+// when it needs the surface to expand (Modify clicked) or collapse back
+// (Copilot dismissed) or close (user dismissed the slide-out content).
+window.addEventListener('message', (e) => {
+  // Trust only same-origin messages (the iframe is loaded from this hub).
+  if (e.origin && e.origin !== window.location.origin) return;
+  const type = e.data?.type;
+  const ov = document.getElementById('kcOverlay');
+  if (!ov) return;
+  if (type === 'kc:expand')   ov.classList.add('kc-fullscreen');
+  if (type === 'kc:collapse') ov.classList.remove('kc-fullscreen');
+  if (type === 'kc:close')    closeKnowledgeConstraint();
+});
 
 function showAgenticNetworks() {
   showView('vList');

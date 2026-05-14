@@ -106,7 +106,7 @@ function ActionsDropdown({ onEdit, onAddFacts, onAddAccess, onArchive, isArchive
   }, [open])
 
   const items = [
-    { label: 'Edit Truth Pack', icon: Edit,     onClick: onEdit },
+    { label: 'Edit Knowledge Pack', icon: Edit,     onClick: onEdit },
     { label: 'Add Facts',       icon: FileText, onClick: onAddFacts },
     { label: 'Add Access',      icon: Users,    onClick: onAddAccess },
     { label: 'divider' },
@@ -599,7 +599,7 @@ function AddFactsPanel({ currentFactIds, onClose, onAdd }) {
               <Shield size={15} style={{ color: '#22c55e' }} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-text-primary leading-tight">Add Facts to Truth Pack</p>
+              <p className="text-sm font-semibold text-text-primary leading-tight">Add Facts to Knowledge Pack</p>
               <p className="text-xs text-text-muted mt-0.5">Browse verified facts from your Truth Planes and curate them into this pack</p>
             </div>
           </div>
@@ -908,7 +908,7 @@ const NETWORKS_POOL = [
 const ACCESS_MODAL_CONFIG = {
   users: {
     title: 'Add User Access',
-    subtitle: 'Grant users the ability to read or execute facts from this Truth Pack',
+    subtitle: 'Grant users the ability to read or execute facts from this Knowledge Pack',
     searchPlaceholder: 'Search users by name or role…',
     Icon: Users,
     iconColor: '#60a5fa',
@@ -926,7 +926,7 @@ const ACCESS_MODAL_CONFIG = {
   },
   agents: {
     title: 'Add Agent Access',
-    subtitle: 'Allow agents to query this Truth Pack within their reasoning pipelines',
+    subtitle: 'Allow agents to query this Knowledge Pack within their reasoning pipelines',
     searchPlaceholder: 'Search agents by name or type…',
     Icon: Bot,
     iconColor: '#a78bfa',
@@ -1807,7 +1807,7 @@ function NetworksTab({ pack, onAddAccess }) {
       <div className="text-center py-24">
         <Network size={36} className="mx-auto mb-4 text-text-muted opacity-20" />
         <p className="text-sm font-medium text-text-muted">No agentic networks connected</p>
-        <p className="text-xs text-text-muted mt-1 opacity-60">Connect networks to enable multi-agent consumption of this Truth Pack.</p>
+        <p className="text-xs text-text-muted mt-1 opacity-60">Connect networks to enable multi-agent consumption of this Knowledge Pack.</p>
         <button className="btn-primary mt-5 gap-1.5" onClick={onAddAccess}><Plus size={13} /> Add Network</button>
       </div>
     )
@@ -1863,7 +1863,7 @@ const FULL_ACTIVITY = [
   { type: 'network', action: 'Sales Agentic Network connected',                 by: 'James Park',    at: '2026-03-25 · 03:17 PM', color: '#2dd4bf' },
   { type: 'access',  action: '14 users bulk-added from Legal team',             by: 'Sarah Chen',    at: '2026-03-20 · 10:00 AM', color: '#60a5fa' },
   { type: 'publish', action: 'Pack published (status: Draft → Active)',         by: 'Sarah Chen',    at: '2026-03-20 · 09:55 AM', color: '#4ade80' },
-  { type: 'create',  action: 'Truth Pack created',                             by: 'Sarah Chen',    at: '2026-03-15 · 02:00 PM', color: '#a78bfa' },
+  { type: 'create',  action: 'Knowledge Pack created',                             by: 'Sarah Chen',    at: '2026-03-15 · 02:00 PM', color: '#a78bfa' },
 ]
 
 function ActivityTab({ pack }) {
@@ -1921,7 +1921,7 @@ export default function TruthPackDetail() {
     return (
       <div className="p-6 text-center py-24">
         <BookOpen size={36} className="mx-auto mb-4 text-text-muted opacity-20" />
-        <p className="text-sm text-text-muted">Truth Pack not found</p>
+        <p className="text-sm text-text-muted">Knowledge Pack not found</p>
         <button className="btn-secondary mt-4 gap-1.5" onClick={() => navigate('/intelligence-library/knowledge')}>
           <ArrowLeft size={13} /> Back to Knowledge
         </button>

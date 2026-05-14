@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
@@ -6,13 +6,21 @@ import {
   BookOpen, Plus, Filter, LayoutGrid, List, Users, Bot, Network,
   FileText, Clock, TrendingUp, AlertTriangle, Sparkles, X,
   Building2, Search, CheckCircle, Archive, Copy, Edit, Activity,
-  Shield, Calendar, Eye,
+  Shield, Calendar, Eye, ChevronRight,
 } from 'lucide-react'
-import { truthPacks as SEED } from '../../../data/mockKnowledge'
+import {
+  truthPacks as SEED, userDrafts,
+  getPacksForWorkflow, getWorkflowEnvironmentDefault,
+} from '../../../data/mockKnowledge'
 import {
   SearchBar, ThreeDot, AllFiltersPanel, FilterSection, Modal, FormField,
 } from '../../ui/index'
 import TruthPackSlideOut from './TruthPackSlideOut'
+import NewKnowledgePackModal from './NewKnowledgePackModal'
+import KnowledgePackTemplateLibrary from './KnowledgePackTemplateLibrary'
+import KnowledgePackChat from './KnowledgePackChat'
+import WorkflowKnowledgeView from './WorkflowKnowledgeView'
+import TestWorkflowView from './TestWorkflowView'
 
 // ── Design-system maps ────────────────────────────────────────────────────────
 
@@ -57,6 +65,129 @@ function SummaryMetric({ icon: Icon, value, label, color }) {
         <p className="text-base font-bold leading-none" style={{ color }}>{value}</p>
         <p className="text-[10px] text-text-muted mt-0.5">{label}</p>
       </div>
+    </div>
+  )
+}
+
+// ── Drafts pill: collapsed banner above the packs table ──────────────────────
+// Shows up to 3 drafts as compact chips. Clicking a chip resumes that draft.
+// When more than 3 drafts exist, a "+N more" trigger opens a dropdown with
+// the full list (scrolls past 6 rows). ESC and click-outside dismiss.
+function DraftsPill({ drafts, onResume }) {
+  const [showAll, setShowAll] = useState(false)
+  const ref = useRef(null)
+  const top = drafts.slice(0, 3)
+  const overflow = Math.max(0, drafts.length - 3)
+
+  useEffect(() => {
+    if (!showAll) return
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setShowAll(false) }
+    const onKey = (e) => { if (e.key === 'Escape') setShowAll(false) }
+    document.addEventListener('mousedown', onDoc)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDoc)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [showAll])
+
+  const resume = (id) => { setShowAll(false); onResume(id) }
+
+  return (
+    <div ref={ref} className="relative">
+      <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl"
+        style={{ background: 'rgba(43,127,255,0.06)', border: '1px solid rgba(43,127,255,0.20)' }}>
+        <div className="flex items-center gap-2 shrink-0">
+          <Clock size={13} style={{ color: '#80AFFF' }} />
+          <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+            Resume drafts <span style={{ color: 'var(--text-muted)' }}>({drafts.length})</span>
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-1 min-w-0 overflow-x-auto">
+          {top.map(d => (
+            <button
+              key={d.id}
+              onClick={() => onResume(d.id)}
+              className="flex items-center gap-2 px-2.5 py-1 rounded-lg transition-all hover:brightness-125 cursor-pointer shrink-0"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-subtle)' }}
+              title={`${d.completion}% complete · saved ${d.savedAgo}`}
+            >
+              <span className="text-[11px] font-semibold truncate max-w-[180px]"
+                style={{ color: 'var(--text-primary)' }}>{d.name}</span>
+              <span className="text-[10px] tabular-nums whitespace-nowrap"
+                style={{ color: '#80AFFF' }}>{d.completion}%</span>
+            </button>
+          ))}
+          {overflow > 0 && (
+            <button
+              onClick={() => setShowAll(s => !s)}
+              aria-haspopup="listbox"
+              aria-expanded={showAll}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold tabular-nums whitespace-nowrap transition-all hover:brightness-125 cursor-pointer shrink-0"
+              style={{
+                background: showAll ? 'rgba(43,127,255,0.16)' : 'rgba(43,127,255,0.08)',
+                border: `1px solid ${showAll ? 'rgba(43,127,255,0.45)' : 'rgba(43,127,255,0.30)'}`,
+                color: '#80AFFF',
+              }}
+            >
+              +{overflow} more
+              <ChevronRight size={9} className={`transition-transform ${showAll ? 'rotate-90' : ''}`} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Dropdown — full draft list */}
+      {showAll && (
+        <div
+          role="listbox"
+          aria-label="All drafts"
+          className="absolute top-full left-0 right-0 mt-2 z-40 rounded-xl shadow-2xl overflow-hidden"
+          style={{ background: 'var(--modal-bg, #0b1220)', border: '1px solid var(--border-subtle)' }}
+        >
+          <div className="px-4 py-2.5 flex items-center justify-between"
+            style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
+            <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>
+              All drafts ({drafts.length})
+            </p>
+            <button onClick={() => setShowAll(false)} aria-label="Close drafts list"
+              className="text-[10px] font-semibold cursor-pointer"
+              style={{ color: 'var(--text-muted)' }}>
+              Close
+            </button>
+          </div>
+          <div className="max-h-[320px] overflow-y-auto">
+            {drafts.map(d => (
+              <button
+                key={d.id}
+                role="option"
+                onClick={() => resume(d.id)}
+                className="w-full grid grid-cols-[1fr_auto_60px] items-center gap-3 px-4 py-2.5 text-left transition-colors hover:brightness-125 cursor-pointer"
+                style={{ borderBottom: '1px solid var(--border-subtle)' }}
+              >
+                <div className="min-w-0">
+                  <p className="text-[12px] font-semibold truncate"
+                    style={{ color: 'var(--text-primary)' }}>{d.name}</p>
+                  <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>
+                    {d.department || 'Cross-departmental'} · {d.itemsCount} items · saved {d.savedAgo}
+                  </p>
+                </div>
+                <span className="text-[10px] font-bold tabular-nums tracking-wide"
+                  style={{ color: '#80AFFF' }}>{d.completion}%</span>
+                <div className="h-1 rounded-full overflow-hidden"
+                  style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <div className="h-full"
+                    style={{
+                      width: `${d.completion}%`,
+                      background: 'linear-gradient(90deg,#00C2C2,#155DFC)',
+                    }}
+                  />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -261,159 +392,6 @@ function PackListCard({ pack, selected, onSelect, onPreview, onEdit, onArchive, 
   )
 }
 
-// ── New Truth Pack Modal ──────────────────────────────────────────────────────
-
-const ACCESS_OPTIONS = [
-  { id: 'users',              label: 'Users',            icon: Users,   color: '#60a5fa' },
-  { id: 'agents',             label: 'Agents',           icon: Bot,     color: '#a78bfa' },
-  { id: 'agentic-networks',   label: 'Agentic Networks', icon: Network, color: '#2dd4bf' },
-]
-const STATUS_OPTIONS = ['draft', 'active']
-
-function NewPackModal({ onClose, onSubmit }) {
-  const [form, setForm] = useState({
-    name: '', description: '', status: 'draft', accessTypes: [],
-    department: '', scope: '', owner: 'Alex Rivera',
-  })
-  const [errors, setErrors] = useState({})
-
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
-
-  const toggleAccessType = (id) =>
-    setForm(f => ({
-      ...f,
-      accessTypes: f.accessTypes.includes(id)
-        ? f.accessTypes.filter(x => x !== id)
-        : [...f.accessTypes, id],
-    }))
-
-  // Derive single accessType for the card: if >1 selected → 'mixed', else the single value
-  const resolveAccessType = (types) =>
-    types.length === 0 ? 'users' : types.length === 1 ? types[0] : 'mixed'
-
-  const validate = () => {
-    const e = {}
-    if (!form.name.trim())           e.name = 'Name is required'
-    if (!form.department.trim())     e.department = 'Department is required'
-    if (form.accessTypes.length === 0) e.accessTypes = 'Select at least one access type'
-    return e
-  }
-
-  const handleSubmit = () => {
-    const e = validate()
-    if (Object.keys(e).length) { setErrors(e); return }
-    onSubmit({
-      ...form,
-      accessType: resolveAccessType(form.accessTypes),
-      id: `PKG-${String(Math.floor(Math.random() * 900) + 100)}`,
-      ownerInitials: form.owner.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2),
-      ownerGradient: 'linear-gradient(135deg,#f59e0b,#ef4444)',
-      factsCount: 0, usersCount: 0, agentsCount: 0, networksCount: 0,
-      lastUpdated: new Date().toISOString().split('T')[0],
-      usage: 'low', isStale: false, tags: [],
-      recentActivity: [{ action: 'Pack created', by: form.owner, at: new Date().toISOString().split('T')[0] }],
-      accessDetails: { users: [], agents: [], networks: [] },
-    })
-  }
-
-  return (
-    <Modal
-      title="New Truth Pack"
-      subtitle="Create a governed distribution unit of verified facts"
-      onClose={onClose}
-      footer={
-        <>
-          <button className="btn-secondary" onClick={onClose}>Cancel</button>
-          <button className="btn-primary gap-1.5" onClick={handleSubmit}>
-            <BookOpen size={13} /> Create Pack
-          </button>
-        </>
-      }>
-
-      <FormField label="Pack Name" required hint="Give it a clear, descriptive name">
-        <input
-          className={clsx('input-base text-xs px-3 py-2 w-full', errors.name && 'border-red-500/50')}
-          placeholder="e.g. Enterprise Contract Standards"
-          value={form.name} onChange={e => set('name', e.target.value)} />
-        {errors.name && <p className="text-[11px] text-red-400">{errors.name}</p>}
-      </FormField>
-
-      <FormField label="Purpose / Description">
-        <textarea
-          className="input-base text-xs px-3 py-2 w-full resize-none"
-          rows={3}
-          placeholder="What facts does this pack contain and who is it for?"
-          value={form.description} onChange={e => set('description', e.target.value)} />
-      </FormField>
-
-      <div className="grid grid-cols-2 gap-3">
-        <FormField label="Department" required>
-          <input
-            className={clsx('input-base text-xs px-3 py-2 w-full', errors.department && 'border-red-500/50')}
-            placeholder="e.g. Legal"
-            value={form.department} onChange={e => set('department', e.target.value)} />
-          {errors.department && <p className="text-[11px] text-red-400">{errors.department}</p>}
-        </FormField>
-        <FormField label="Scope">
-          <input
-            className="input-base text-xs px-3 py-2 w-full"
-            placeholder="e.g. Enterprise"
-            value={form.scope} onChange={e => set('scope', e.target.value)} />
-        </FormField>
-      </div>
-
-      <FormField label="Initial Status">
-        <div className="flex gap-2">
-          {STATUS_OPTIONS.map(s => {
-            const st = STATUS_MAP[s]
-            return (
-              <button key={s}
-                className="flex-1 text-xs py-2 rounded-lg font-medium border transition-all"
-                style={form.status === s
-                  ? { background: st.bg, border: `1px solid ${st.border}`, color: st.color }
-                  : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b' }}
-                onClick={() => set('status', s)}>
-                {st.label}
-              </button>
-            )
-          })}
-        </div>
-      </FormField>
-
-      <FormField label="Access Type" hint="Select all that apply — who will consume this Truth Pack">
-        <div className="grid grid-cols-3 gap-2">
-          {ACCESS_OPTIONS.map(({ id, label, icon: Icon, color }) => {
-            const active = form.accessTypes.includes(id)
-            return (
-              <button key={id}
-                className="flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-lg border text-xs font-medium transition-all relative"
-                style={active
-                  ? { background: `${color}18`, border: `1px solid ${color}55`, color }
-                  : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b' }}
-                onClick={() => toggleAccessType(id)}>
-                {active && (
-                  <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full flex items-center justify-center"
-                    style={{ background: color }}>
-                    <CheckCircle size={9} style={{ color: '#fff' }} />
-                  </span>
-                )}
-                <Icon size={16} style={{ color: active ? color : '#475569' }} />
-                <span className="text-[10px] text-center leading-tight">{label}</span>
-              </button>
-            )
-          })}
-        </div>
-        {form.accessTypes.length > 1 && (
-          <p className="text-[10px] mt-1.5 flex items-center gap-1" style={{ color: '#fbbf24' }}>
-            <Users size={9} /> Multiple types selected — pack will be marked as Mixed Access
-          </p>
-        )}
-        {errors.accessTypes && <p className="text-[11px] text-red-400 mt-1">{errors.accessTypes}</p>}
-      </FormField>
-
-    </Modal>
-  )
-}
 
 // ── All Filters Panel content ─────────────────────────────────────────────────
 
@@ -496,10 +474,58 @@ export default function Knowledge() {
   const [quickOwner, setQuickOwner]     = useState('All')
   const [viewMode, setViewMode]         = useState('list')   // 'grid' | 'list'
   const [showFilters, setShowFilters]   = useState(false)
-  const [showNewModal, setShowNewModal] = useState(false)
+  // creationView: null | 'modes' | 'templates' | 'copilot' — multi-modal flow.
+  const [creationView, setCreationView] = useState(null)
+
+  // Workflow context — captured from URL when launched from Agentic Studio
+  // (?workflowId=n1&workflowName=...&intent=restrict). Used to drive the
+  // Workflow-Knowledge View as the first layer, instead of jumping straight
+  // into the Copilot. This avoids the modal-on-modal-on-modal stack.
+  const workflowContext = useMemo(() => {
+    try {
+      const p = new URLSearchParams(window.location.search)
+      const id     = p.get('workflowId')
+      const name   = p.get('workflowName')
+      const intent = p.get('intent')
+      if (!id && !name) return null
+      return { workflowId: id, workflowName: name, intent }
+    } catch { return null }
+  }, [])
+
+  // Mount the Workflow-Knowledge View as the entry point when workflow
+  // context is present. The user can still close it (returns to standalone
+  // Knowledge list) or click Modify to open the Copilot intentionally.
+  const [showWorkflowView, setShowWorkflowView] = useState(() => !!workflowContext)
   const [selected, setSelected]         = useState(null)
   const [allFilters, setAllFilters]     = useState(DEFAULT_FILTERS)
   const [toast, setToast]               = useState(null)
+
+  // D1: packs the user has explicitly detached in this session. Removed from
+  // the slide-out view so the workflow visibly returns to "no constraint".
+  const [detachedPackIds, setDetachedPackIds] = useState(() => new Set())
+  // D2: transient set of pack ids that were just modified via the Copilot.
+  // Drives a "Just updated" pill in the pack header. Auto-clears after 8s.
+  const [recentlyUpdatedPackIds, setRecentlyUpdatedPackIds] = useState(() => new Set())
+  // F1.1: when true, the slide-out replaces the inspection view with the
+  // Test viewer. The parent (Agentic Studio) is told to expand to fullscreen
+  // via postMessage so the trace tree has room.
+  const [testMode, setTestMode] = useState(false)
+  // F1.2: workflow environment (sandbox vs production). Seeded from the
+  // mock defaults; the slide-out can flip it per session. Mirrors the
+  // Truth/Sandbox Plane model — pack enforced in production, advisory in
+  // sandbox.
+  const [workflowEnvironment, setWorkflowEnvironment] = useState(() =>
+    workflowContext ? getWorkflowEnvironmentDefault(workflowContext.workflowId) : 'production'
+  )
+
+  // Effective list of packs attached to the active workflow, filtered for
+  // session-level detaches. Recomputed when workflowContext or detach set
+  // changes.
+  const workflowPacks = useMemo(() => {
+    if (!workflowContext) return []
+    return getPacksForWorkflow(workflowContext.workflowId)
+      .filter(p => !detachedPackIds.has(p.id))
+  }, [workflowContext, detachedPackIds])
 
   const showToast = (msg, color = '#4ade80') => {
     setToast({ msg, color })
@@ -545,11 +571,7 @@ export default function Knowledge() {
   }), [packs])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleCreate = (pack) => {
-    setPacks(prev => [pack, ...prev])
-    setShowNewModal(false)
-    showToast(`"${pack.name}" created`)
-  }
+  // handleCreate removed — creation flow now lives at /create + /create/scratch
 
   const handleArchive = (pack) => {
     setPacks(prev => prev.map(p => p.id === pack.id ? { ...p, status: 'archived' } : p))
@@ -560,7 +582,7 @@ export default function Knowledge() {
   const handleDuplicate = (pack) => {
     const copy = {
       ...pack,
-      id: `PKG-${String(Math.floor(Math.random() * 900) + 100)}`,
+      id: `KP-${String(Math.floor(Math.random() * 900) + 100)}`,
       name: `${pack.name} (Copy)`,
       status: 'draft',
       factsCount: 0, usersCount: 0, agentsCount: 0, networksCount: 0,
@@ -575,6 +597,114 @@ export default function Knowledge() {
     (typeof v === 'boolean' && v) || (typeof v === 'string' && v !== 'All')
   ).length
 
+  // When launched from a workflow (Agentic Studio's "Knowledge" CTA), render
+  // ONLY the Workflow-Knowledge View — the slide-out content. The generic
+  // Knowledge list isn't relevant in this entry path. The Copilot still
+  // mounts below (conditionally) for the Modify action.
+  if (workflowContext && showWorkflowView) {
+    return (
+      <>
+        <WorkflowKnowledgeView
+          open={creationView !== 'copilot' && !testMode}
+          workflowId={workflowContext.workflowId}
+          workflowName={workflowContext.workflowName}
+          packs={workflowPacks}
+          recentlyUpdatedPackIds={recentlyUpdatedPackIds}
+          environment={workflowEnvironment}
+          onChangeEnvironment={(next) => {
+            setWorkflowEnvironment(next)
+            if (next === 'production') {
+              showToast(`Promoted to production · pack now enforced`, '#4ade80')
+            } else {
+              showToast(`Switched to sandbox · pack is advisory only`, '#fbbf24')
+            }
+          }}
+          onClose={() => {
+            setShowWorkflowView(false)
+            // Notify the embedding parent (Agentic Studio) to dismiss the slide-out.
+            try { window.parent?.postMessage({ type: 'kc:close' }, '*') } catch {}
+          }}
+          onModify={() => {
+            // Tell the embedding parent to expand the slide-out into a modal
+            // so the Copilot has room to breathe.
+            try { window.parent?.postMessage({ type: 'kc:expand' }, '*') } catch {}
+            setCreationView('copilot')
+          }}
+          onTest={() => {
+            // F1.1: open the Test viewer. Same expand pattern as Modify so
+            // the trace tree has room to breathe.
+            try { window.parent?.postMessage({ type: 'kc:expand' }, '*') } catch {}
+            setTestMode(true)
+          }}
+          onDetach={(packId) => {
+            // Session-level detach: remove the pack from this workflow's
+            // visible constraints. Falls back to EmptyState automatically.
+            if (!packId) return
+            setDetachedPackIds(prev => new Set([...prev, packId]))
+            showToast(
+              `Constraint detached · ${workflowContext.workflowName} now sees all truth facts`,
+              '#fbbf24',
+            )
+          }}
+        />
+        {/* Copilot mounts on top when user clicks Modify. Same iframe, just an */}
+        {/* internal modal layer — the parent slide-out has already expanded.  */}
+        <KnowledgePackChat
+          open={creationView === 'copilot'}
+          onBack={() => {
+            // Notify parent to collapse back to slide-out width.
+            try { window.parent?.postMessage({ type: 'kc:collapse' }, '*') } catch {}
+            setCreationView(null)
+          }}
+          onClose={() => {
+            try { window.parent?.postMessage({ type: 'kc:collapse' }, '*') } catch {}
+            setCreationView(null)
+          }}
+          onComplete={() => {
+            try { window.parent?.postMessage({ type: 'kc:collapse' }, '*') } catch {}
+            setCreationView(null)
+            // Mark currently-attached packs as "just updated" so the slide-out
+            // shows a transient pill confirming the change landed. Clears
+            // automatically after 8 seconds.
+            const justUpdated = new Set(workflowPacks.map(p => p.id))
+            setRecentlyUpdatedPackIds(justUpdated)
+            setTimeout(() => setRecentlyUpdatedPackIds(new Set()), 8000)
+            showToast(
+              `Pack updated · changes published to ${workflowContext.workflowName}`,
+              '#4ade80',
+            )
+          }}
+        />
+        {/* F1.1 — Test workflow viewer mounts on top when user clicks Test. */}
+        {/* Parent slide-out has expanded to fullscreen via kc:expand.       */}
+        <TestWorkflowView
+          open={testMode}
+          workflowId={workflowContext.workflowId}
+          workflowName={workflowContext.workflowName}
+          packName={workflowPacks[0]?.name}
+          environment={workflowEnvironment}
+          onClose={() => {
+            try { window.parent?.postMessage({ type: 'kc:collapse' }, '*') } catch {}
+            setTestMode(false)
+          }}
+        />
+        {/* Toast (keeps working even in embed mode) */}
+        {toast && createPortal(
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[99999] px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-xl"
+            style={{
+              background: 'rgba(15,23,42,0.95)',
+              border: `1px solid ${toast.color}50`,
+              color: toast.color,
+              backdropFilter: 'blur(12px)',
+            }}>
+            <CheckCircle size={13} /> {toast.msg}
+          </div>,
+          document.body
+        )}
+      </>
+    )
+  }
+
   return (
     <div className="p-6 space-y-5">
 
@@ -587,16 +717,16 @@ export default function Knowledge() {
           <div>
             <h1 className="text-xl font-semibold text-text-primary">Knowledge</h1>
             <p className="text-xs text-text-muted mt-0.5 max-w-lg">
-              Manage Truth Packs to control how validated facts are used by users, agents, and agentic networks.
+              Manage Knowledge Packs to control how validated facts are used by users, agents, and agentic networks.
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <button className="btn-secondary gap-1.5 opacity-50 cursor-not-allowed" disabled title="Coming soon">
-            <Sparkles size={13} /> AI Assistant
-          </button>
-          <button className="btn-primary gap-1.5" onClick={() => setShowNewModal(true)}>
-            <Plus size={14} /> New Truth Pack
+          <button
+            onClick={() => setCreationView('modes')}
+            className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:brightness-110 cursor-pointer"
+            style={{ background: 'linear-gradient(135deg,#00C2C2 0%,#155DFC 100%)', color: '#fff', boxShadow: '0 2px 12px rgba(21,93,252,0.45)' }}>
+            <Plus size={14} /> New Knowledge Pack <ChevronRight size={13} />
           </button>
         </div>
       </div>
@@ -609,9 +739,14 @@ export default function Knowledge() {
         <SummaryMetric icon={AlertTriangle} value={stats.stale} label="Stale Packs" color="#fbbf24" />
       </div>
 
+      {/* ── Resume drafts pill (only if drafts exist) ── */}
+      {userDrafts.length > 0 && (
+        <DraftsPill drafts={userDrafts} onResume={(id) => navigate(`/intelligence-library/knowledge/create/scratch?draft=${id}`)} />
+      )}
+
       {/* ── Filter bar ──────────────────────────────── */}
       <div className="flex items-center gap-2 flex-wrap">
-        <SearchBar placeholder="Search Truth Packs..." value={search} onChange={setSearch} />
+        <SearchBar placeholder="Search Knowledge Packs..." value={search} onChange={setSearch} />
 
         <select className="input-base text-xs px-3 py-2" style={{ width: 'auto' }}
           value={quickStatus} onChange={e => setQuickStatus(e.target.value)}>
@@ -691,7 +826,7 @@ export default function Knowledge() {
       {filtered.length === 0 ? (
         <div className="text-center py-20">
           <BookOpen size={32} className="mx-auto mb-4 text-text-muted opacity-25" />
-          <p className="text-sm text-text-muted">No Truth Packs match your filters</p>
+          <p className="text-sm text-text-muted">No Knowledge Packs match your filters</p>
           <button className="btn-secondary mt-4" onClick={() => {
             setSearch(''); setQuickStatus('All'); setQuickAccess('All')
             setQuickOwner('All'); setAllFilters(DEFAULT_FILTERS)
@@ -730,7 +865,7 @@ export default function Knowledge() {
           onClose={() => setShowFilters(false)} />
       )}
 
-      {/* ── Truth Pack slide-out ─────────────────────── */}
+      {/* ── Knowledge Pack slide-out ─────────────────────── */}
       {selected && (
         <TruthPackSlideOut
           pack={selected}
@@ -738,13 +873,6 @@ export default function Knowledge() {
           onEdit={() => {}}
           onArchive={() => handleArchive(selected)}
           onDuplicate={() => handleDuplicate(selected)} />
-      )}
-
-      {/* ── New Pack modal ───────────────────────────── */}
-      {showNewModal && (
-        <NewPackModal
-          onClose={() => setShowNewModal(false)}
-          onSubmit={handleCreate} />
       )}
 
       {/* ── Toast ───────────────────────────────────── */}
@@ -760,6 +888,48 @@ export default function Knowledge() {
         </div>,
         document.body
       )}
+
+      {/* WorkflowKnowledgeView is rendered up-top when workflowContext exists. */}
+      {/* The standalone Knowledge list path below doesn't include it.          */}
+
+      {/* ── New Knowledge Pack — multi-modal creation flow ─── */}
+      {/* Step 1: mode picker. Hidden when a sub-modal is up so the dim   */}
+      {/* layers don't compound visually.                                  */}
+      <NewKnowledgePackModal
+        open={creationView === 'modes'}
+        onClose={() => setCreationView(null)}
+        onPickTemplate={() => setCreationView('templates')}
+        onPickConversation={() => setCreationView('copilot')}
+      />
+      {/* Step 2a: template library (full-screen). */}
+      <KnowledgePackTemplateLibrary
+        open={creationView === 'templates'}
+        onBack={() => setCreationView('modes')}
+        onClose={() => setCreationView(null)}
+        onUseTemplate={(id) => {
+          setCreationView(null)
+          navigate(`/intelligence-library/knowledge/create/scratch?template=${id}`)
+        }}
+      />
+      {/* Step 2b: copilot chat (full-screen). When launched from a workflow */}
+      {/* (workflowContext present), back/close return to the inspection     */}
+      {/* layer (WorkflowKnowledgeView) instead of the generic mode picker.  */}
+      <KnowledgePackChat
+        open={creationView === 'copilot'}
+        onBack={() => {
+          if (workflowContext) setCreationView(null)   // reveal WorkflowKnowledgeView
+          else setCreationView('modes')
+        }}
+        onClose={() => setCreationView(null)}
+        onComplete={() => {
+          setCreationView(null)
+          if (workflowContext) {
+            showToast(`Draft saved · attached to ${workflowContext.workflowName}`, '#4ade80')
+          } else {
+            showToast('Draft saved', '#4ade80')
+          }
+        }}
+      />
     </div>
   )
 }
