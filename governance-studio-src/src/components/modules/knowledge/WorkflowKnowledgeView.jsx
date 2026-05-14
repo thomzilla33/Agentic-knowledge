@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import {
   getPacksForWorkflow, getPackLineage, WORKFLOW_ENVIRONMENTS,
-  isAttestationExpired, daysOverdue,
+  isAttestationExpired, daysOverdue, getRecentRunsForPack,
 } from '../../../data/mockKnowledge'
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -135,6 +135,7 @@ export default function WorkflowKnowledgeView({
             recentlyUpdatedPackIds={updatedSet}
             isSandbox={isSandbox}
             onPromote={isSandbox ? () => onChangeEnvironment?.('production') : null}
+            workflowId={workflowId}
           />
         ) : (
           <EmptyState onAdd={onModify} workflowName={workflowName} isSandbox={isSandbox} />
@@ -222,7 +223,7 @@ function DetachConfirm({ workflowName, onCancel, onConfirm }) {
 }
 
 // ── Attached state — one or more packs linked to this workflow ────────────
-function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote }) {
+function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote, workflowId }) {
   // F1.5 — aggregate expired-attestation count across all attached packs.
   // Used by the banner to warn the user before they hit Test or Modify.
   const expiredFactIds = packs.flatMap(p => {
@@ -249,6 +250,7 @@ function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote }) 
               pack={p}
               recentlyUpdated={recentlyUpdatedPackIds?.has(p.id)}
               isSandbox={isSandbox}
+              workflowId={workflowId}
             />
           ))}
         </div>
@@ -290,11 +292,13 @@ function AttachedState({ packs, recentlyUpdatedPackIds, isSandbox, onPromote }) 
 }
 
 // ── A single attached pack: compact header + expandable items ─────────────
-function PackSection({ pack, recentlyUpdated, isSandbox }) {
+function PackSection({ pack, recentlyUpdated, isSandbox, workflowId }) {
   // getPackLineage resolves factIds → fully hydrated items with source docs +
   // sandbox claim records. Falls back to a thin shape if enrichment is missing.
   const lineage = getPackLineage(pack.id)
   const items = lineage?.items || []
+  // F2.2 — audit log entries for this workflow + pack pair (newest first).
+  const recentRuns = workflowId ? getRecentRunsForPack(workflowId, pack.id) : []
 
   return (
     <div className="rounded-xl"
@@ -319,6 +323,12 @@ function PackSection({ pack, recentlyUpdated, isSandbox }) {
             {items.map(item => <FactRow key={item.id} fact={item} />)}
           </div>
         </div>
+      )}
+
+      {/* F2.2 — Audit log section: who ran what with this pack, when, and */}
+      {/* what governance gates fired. Closes the CYA pillar in context.   */}
+      {recentRuns.length > 0 && (
+        <RecentRunsSection runs={recentRuns} />
       )}
     </div>
   )
@@ -813,6 +823,148 @@ function EnvPill({ active, icon: Icon, label, activeColor, activeBg, activeBorde
       }}>
       <Icon size={11} /> {label}
     </button>
+  )
+}
+
+// ── Recent runs (F2.2) ────────────────────────────────────────────────────
+// Audit log of the last N runs of this workflow + pack pair. Each row
+// shows status + env, when it ran, who triggered it, governance event
+// summary, and the final recommendation in one line. Click a row to
+// expand a small detail block with the halt reason / facts cited list.
+function RecentRunsSection({ runs }) {
+  return (
+    <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
+      <div className="px-4 pt-3 pb-1.5">
+        <p className="text-[10px] font-bold tracking-widest uppercase"
+          style={{ color: 'var(--text-muted)' }}>
+          Recent runs · {runs.length} {runs.length === 1 ? 'execution' : 'executions'}
+        </p>
+        <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+          Chain of custody for every workflow execution gated by this pack.
+        </p>
+      </div>
+      <div className="px-2 pb-2 space-y-1">
+        {runs.map(r => <AuditRow key={r.id} run={r} />)}
+      </div>
+    </div>
+  )
+}
+
+function AuditRow({ run }) {
+  const [expanded, setExpanded] = useState(false)
+
+  // Status palette: success / halted / warn / running.
+  const STATUS = {
+    success: { color: '#4ade80', bg: 'rgba(34,197,94,0.10)',  border: 'rgba(34,197,94,0.30)',  label: 'Success' },
+    halted:  { color: '#f87171', bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.30)',  label: 'Halted'  },
+    warn:    { color: '#fbbf24', bg: 'rgba(245,158,11,0.10)', border: 'rgba(245,158,11,0.30)', label: 'Warning' },
+    running: { color: '#60a5fa', bg: 'rgba(59,130,246,0.10)', border: 'rgba(59,130,246,0.30)', label: 'Running' },
+  }[run.status] || {
+    color: 'var(--text-muted)', bg: 'rgba(255,255,255,0.04)', border: 'var(--border-subtle)', label: run.status,
+  }
+
+  const envBadgeStyle = run.environment === 'sandbox'
+    ? { color: '#fbbf24', bg: 'rgba(245,158,11,0.10)', border: 'rgba(245,158,11,0.30)' }
+    : { color: '#4ade80', bg: 'rgba(34,197,94,0.10)',  border: 'rgba(34,197,94,0.30)'  }
+
+  const gov = run.governanceEvents || { pass: 0, warn: 0, fail: 0 }
+
+  return (
+    <div className="rounded-lg overflow-hidden"
+      style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)' }}>
+      <button
+        onClick={() => setExpanded(v => !v)}
+        className="w-full px-3 py-2 flex items-start gap-2.5 text-left transition-colors cursor-pointer"
+        aria-expanded={expanded}
+      >
+        <div className="w-7 h-7 rounded-md flex items-center justify-center shrink-0 mt-0.5"
+          style={{ background: STATUS.bg, border: `1px solid ${STATUS.border}` }}>
+          <span className="w-1.5 h-1.5 rounded-full" style={{ background: STATUS.color }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-0.5">
+            <span className="font-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>{run.id}</span>
+            <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+              style={{ background: STATUS.bg, color: STATUS.color, border: `1px solid ${STATUS.border}` }}>
+              {STATUS.label}
+            </span>
+            <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+              style={{ background: envBadgeStyle.bg, color: envBadgeStyle.color, border: `1px solid ${envBadgeStyle.border}` }}>
+              {run.environment === 'sandbox' ? 'Sandbox' : 'Production'}
+            </span>
+            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+              v{run.packVersion}
+            </span>
+          </div>
+          <p className="text-[11px] leading-snug" style={{ color: 'var(--text-primary)' }}>
+            {run.recommendation}
+          </p>
+          <div className="flex items-center gap-2 mt-1 text-[10px] flex-wrap" style={{ color: 'var(--text-muted)' }}>
+            <span>{relativeTime(run.startedAt)}</span>
+            <span style={{ opacity: 0.4 }}>·</span>
+            <span>{run.triggeredBy?.label || 'Unknown trigger'}</span>
+            <span style={{ opacity: 0.4 }}>·</span>
+            <span>{run.latencyMs} ms</span>
+            <span style={{ opacity: 0.4 }}>·</span>
+            <span>{run.factsCited?.length || 0} cited</span>
+            <span style={{ opacity: 0.4 }}>·</span>
+            <span><GovBadges gov={gov} /></span>
+          </div>
+        </div>
+        <span className="shrink-0 mt-1.5" style={{ color: 'var(--text-muted)' }}>
+          {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+        </span>
+      </button>
+      {expanded && (
+        <div className="px-3 pb-3 pt-1 space-y-2"
+          style={{ borderTop: '1px solid var(--border-subtle)' }}>
+          {run.haltReason && (
+            <div className="rounded-md px-2.5 py-2 flex items-start gap-2"
+              style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.30)' }}>
+              <AlertTriangle size={11} style={{ color: '#f87171' }} className="shrink-0 mt-0.5" />
+              <p className="text-[11px]" style={{ color: 'var(--text-primary)' }}>
+                <strong style={{ color: '#fca5a5' }}>Halt reason:</strong> {run.haltReason}
+              </p>
+            </div>
+          )}
+          <div>
+            <p className="text-[9px] font-bold tracking-widest uppercase mb-1"
+              style={{ color: 'var(--text-muted)' }}>
+              Facts cited ({run.factsCited?.length || 0})
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {(run.factsCited || []).map(id => (
+                <span key={id} className="font-mono text-[10px] px-1.5 py-0.5 rounded-md"
+                  style={{ background: 'rgba(34,197,94,0.10)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.30)' }}>
+                  {id}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Compact pass/warn/fail counter row. Hides zero counts so the line stays
+// short in the common all-pass case.
+function GovBadges({ gov }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {gov.pass > 0 && (
+        <span style={{ color: '#4ade80' }}>✓ {gov.pass}</span>
+      )}
+      {gov.warn > 0 && (
+        <span style={{ color: '#fbbf24' }}>⚠ {gov.warn}</span>
+      )}
+      {gov.fail > 0 && (
+        <span style={{ color: '#f87171' }}>✕ {gov.fail}</span>
+      )}
+      {gov.pass === 0 && gov.warn === 0 && gov.fail === 0 && (
+        <span>0 gates</span>
+      )}
+    </span>
   )
 }
 

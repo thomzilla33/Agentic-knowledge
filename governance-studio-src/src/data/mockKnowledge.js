@@ -1219,3 +1219,118 @@ export const workflowEnvironmentDefaults = {
 export function getWorkflowEnvironmentDefault(workflowId) {
   return workflowEnvironmentDefaults[workflowId] || 'production'
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// AUDIT LOG — CYA chain of past runs (F2.2)
+// ────────────────────────────────────────────────────────────────────────────
+// One row per historical execution of a workflow with a pack attached.
+// Each row captures *who* ran the workflow, *when*, *which pack version
+// was applied*, *which facts were cited*, *which governance events fired*
+// and *what was the final recommendation*. This is the chain-of-custody
+// view the user can hand to legal / compliance to demonstrate that every
+// agent decision was gated by attested facts.
+//
+// Hand-authored for KP-003 × n1 (Customer Renewal Pipeline) so the slide-
+// out has a populated "Recent runs" section. Other pairings show empty.
+// ────────────────────────────────────────────────────────────────────────────
+export const auditRuns = [
+  {
+    id: 'RN-8852',
+    workflowId: 'n1',
+    packId: 'KP-003',
+    packVersion: 'v2.4',
+    environment: 'production',
+    status: 'halted',                 // governance gate failed closed
+    startedAt: '2026-05-14T15:22:00.000Z',
+    latencyMs: 2272,
+    triggeredBy: { type: 'event', label: 'Salesforce · opportunity.renewal' },
+    factsCited: ['TF-0010', 'TF-0011'],   // never reached TF-0012
+    governanceEvents: { pass: 2, warn: 1, fail: 1 },
+    haltReason: 'TF-0012 attestation expired (26 days overdue)',
+    recommendation: 'Halted at Customer Analyst — re-attest TF-0012 to resume',
+  },
+  {
+    id: 'RN-8851',
+    workflowId: 'n1',
+    packId: 'KP-003',
+    packVersion: 'v2.4',
+    environment: 'sandbox',
+    status: 'warn',                    // sandbox advisory — run completed
+    startedAt: '2026-05-14T14:05:00.000Z',
+    latencyMs: 4412,
+    triggeredBy: { type: 'manual', label: 'Alex Rivera (sandbox dry-run)' },
+    factsCited: ['TF-0010', 'TF-0011', 'TF-0012'],
+    governanceEvents: { pass: 2, warn: 1, fail: 0 },
+    haltReason: null,
+    recommendation: 'Completed with warnings — TF-0012 advisory only in sandbox',
+  },
+  {
+    id: 'RN-8841',
+    workflowId: 'n1',
+    packId: 'KP-003',
+    packVersion: 'v2.4',
+    environment: 'production',
+    status: 'success',
+    startedAt: '2026-05-13T12:48:00.000Z',
+    latencyMs: 4412,
+    triggeredBy: { type: 'event', label: 'Salesforce · opportunity.renewal' },
+    factsCited: ['TF-0010', 'TF-0011', 'TF-0012'],
+    governanceEvents: { pass: 4, warn: 0, fail: 0 },
+    haltReason: null,
+    recommendation: 'send_offer · enterprise · 15% · no escalation',
+  },
+  {
+    id: 'RN-8839',
+    workflowId: 'n1',
+    packId: 'KP-003',
+    packVersion: 'v2.4',
+    environment: 'production',
+    status: 'success',
+    startedAt: '2026-05-13T08:11:00.000Z',
+    latencyMs: 3984,
+    triggeredBy: { type: 'event', label: 'Salesforce · opportunity.renewal' },
+    factsCited: ['TF-0010', 'TF-0011', 'TF-0012'],
+    governanceEvents: { pass: 4, warn: 0, fail: 0 },
+    haltReason: null,
+    recommendation: 'send_offer · enterprise · 12% · no escalation',
+  },
+  {
+    id: 'RN-8835',
+    workflowId: 'n1',
+    packId: 'KP-003',
+    packVersion: 'v2.3',                // earlier pack version
+    environment: 'production',
+    status: 'halted',
+    startedAt: '2026-05-12T16:30:00.000Z',
+    latencyMs: 5104,
+    triggeredBy: { type: 'event', label: 'Salesforce · opportunity.renewal' },
+    factsCited: ['TF-0010', 'TF-0011', 'TF-0012'],
+    governanceEvents: { pass: 2, warn: 0, fail: 1 },
+    haltReason: 'Discount request 32% exceeded TF-0012 ceiling (>25% requires VP Sales)',
+    recommendation: 'Halted — escalated to VP Sales for discount approval',
+  },
+  {
+    id: 'RN-8800',
+    workflowId: 'n1',
+    packId: 'KP-003',
+    packVersion: 'v2.3',
+    environment: 'production',
+    status: 'success',
+    startedAt: '2026-05-09T09:02:00.000Z',
+    latencyMs: 4280,
+    triggeredBy: { type: 'scheduled', label: 'Weekday 09:00 cron' },
+    factsCited: ['TF-0010', 'TF-0011', 'TF-0012'],
+    governanceEvents: { pass: 4, warn: 0, fail: 0 },
+    haltReason: null,
+    recommendation: 'send_offer · enterprise · 18% · no escalation',
+  },
+]
+
+// Returns runs newest-first for a given workflow + pack pair. Falls back to
+// an empty array when no audit history exists for the pair.
+export function getRecentRunsForPack(workflowId, packId, limit = 6) {
+  return auditRuns
+    .filter(r => r.workflowId === workflowId && r.packId === packId)
+    .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
+    .slice(0, limit)
+}
