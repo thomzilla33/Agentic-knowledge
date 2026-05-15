@@ -706,40 +706,46 @@ html.theme-light .aims-modal-overlay{background:rgba(15,23,42,.35)}
 .aims-empty-title{font-size:14px;font-weight:600;color:var(--shell-text-strong);margin-bottom:6px}
 .aims-empty-desc{font-size:12px;color:var(--shell-text-muted);line-height:1.5;max-width:340px;margin:0 auto}
 
-/* ── Notifications panel ── */
-.notif-overlay{position:fixed;inset:0;background:rgba(5,8,18,.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .22s}
-html.theme-light .notif-overlay{background:rgba(15,23,42,.25)}
-.notif-overlay.open{opacity:1;pointer-events:auto}
-.notif-panel{position:fixed;top:0;right:0;width:380px;height:100vh;background:var(--shell-menu-bg);border-left:1px solid var(--shell-menu-border);box-shadow:-12px 0 32px rgba(0,0,0,.35);z-index:91;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
-.notif-panel.open{transform:translateX(0)}
-@media (prefers-reduced-motion: reduce){.notif-panel{transition:none}.notif-overlay{transition:opacity .05s}}
-.notif-header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--shell-divider);flex-shrink:0}
-.notif-title{flex:1;font-size:14px;font-weight:700;color:var(--shell-text-strong)}
-.notif-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9999px;background:var(--shell-menu-item-active-bg);color:var(--shell-accent-blue)}
-.notif-action-btn{height:28px;padding:0 10px;border-radius:6px;background:transparent;border:none;color:var(--shell-text-muted);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer}
-.notif-action-btn:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong)}
-.notif-close{width:28px;height:28px;border-radius:6px;background:transparent;border:none;color:var(--shell-icon-default);cursor:pointer;display:flex;align-items:center;justify-content:center}
-.notif-close:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-icon-hover)}
-.notif-tabs{display:flex;gap:2px;padding:8px 12px 0;border-bottom:1px solid var(--shell-divider);flex-shrink:0}
-.notif-tab{padding:8px 12px;border:none;background:transparent;color:var(--shell-text-muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
-.notif-tab.is-active{color:var(--shell-accent-blue);border-bottom-color:var(--shell-accent-blue)}
-.notif-list{flex:1;overflow-y:auto;padding:6px 0}
-.notif-list::-webkit-scrollbar{width:6px}
-.notif-list::-webkit-scrollbar-thumb{background:var(--shell-divider);border-radius:3px}
-.notif-item{display:flex;gap:12px;padding:12px 20px;cursor:pointer;border-left:3px solid transparent;transition:background .1s}
-.notif-item:hover{background:var(--shell-menu-item-hover-bg)}
-.notif-item.is-unread{border-left-color:var(--shell-accent-blue)}
-.notif-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0}
-.notif-body{flex:1;min-width:0}
-.notif-msg{font-size:13px;color:var(--shell-text-body);line-height:1.45}
-.notif-msg strong{color:var(--shell-text-strong);font-weight:600}
-.notif-time{font-size:11px;color:var(--shell-text-caption);margin-top:4px}
-.notif-empty{padding:40px 20px;text-align:center}
-.notif-footer{padding:10px 20px;border-top:1px solid var(--shell-divider);flex-shrink:0}
-.notif-footer-link{display:block;text-align:center;font-size:12px;font-weight:600;color:var(--shell-accent-blue);cursor:pointer;text-decoration:none}
-.notif-bell-wrap{position:relative;display:inline-flex}
-.notif-bell-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#DC2626;border:2px solid var(--shell-topbar-bg);pointer-events:none}
+/* ── Notifications dropdown (anchored to bell) ── */
+.notif-bell-wrap{position:relative;display:inline-flex;align-items:center;flex-shrink:0}
+.notif-bell-dot{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;border-radius:8px;background:#DC2626;border:2px solid var(--shell-topbar-bg);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1;pointer-events:none;font-family:inherit}
 .notif-bell-dot.is-empty{display:none}
+.notif-menu{position:absolute;top:calc(100% + 10px);right:-32px;width:400px;background:var(--shell-menu-bg);border:1px solid var(--shell-menu-border);border-radius:12px;box-shadow:var(--shell-menu-shadow);z-index:200;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1);text-align:left;max-height:calc(100vh - 80px);display:flex;flex-direction:column;font-family:inherit}
+.notif-menu.open{opacity:1;pointer-events:auto}
+.notif-menu-header{display:flex;align-items:center;gap:10px;padding:14px 14px 12px;flex-shrink:0}
+.notif-menu-title{font-size:14px;font-weight:700;color:var(--shell-text-strong);flex:1;line-height:1}
+.notif-only-unread{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--shell-text-muted);cursor:pointer;user-select:none;font-weight:500}
+.notif-only-unread input{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+.notif-toggle{width:26px;height:14px;background:var(--shell-divider);border-radius:7px;position:relative;transition:background .15s;flex-shrink:0}
+.notif-toggle::after{content:'';position:absolute;top:1px;left:1px;width:12px;height:12px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.notif-only-unread input:checked + .notif-toggle{background:var(--shell-accent-blue)}
+.notif-only-unread input:checked + .notif-toggle::after{transform:translateX(12px)}
+.notif-menu-action{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:transparent;border:none;color:var(--shell-icon-default);cursor:pointer;transition:background .12s,color .12s;flex-shrink:0}
+.notif-menu-action:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-icon-hover)}
+.notif-menu-tabs{display:flex;gap:0;padding:0 14px;border-bottom:1px solid var(--shell-divider);flex-shrink:0}
+.notif-menu-tab{padding:10px 0;margin-right:24px;border:none;background:transparent;color:var(--shell-text-muted);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;align-items:center;gap:6px;transition:color .12s,border-color .12s}
+.notif-menu-tab:hover{color:var(--shell-text-body)}
+.notif-menu-tab.is-active{color:var(--shell-text-strong);border-bottom-color:#8B5CF6}
+.notif-menu-tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:16px;padding:0 5px;height:16px;background:var(--shell-menu-item-hover-bg);border-radius:8px;font-size:10px;font-weight:700;color:var(--shell-text-muted)}
+.notif-menu-tab.is-active .notif-menu-tab-count{background:#8B5CF6;color:#fff}
+.notif-menu-list{flex:1;overflow-y:auto;padding:4px 0;max-height:480px}
+.notif-menu-list::-webkit-scrollbar{width:6px}
+.notif-menu-list::-webkit-scrollbar-thumb{background:var(--shell-divider);border-radius:3px}
+.notif-menu-item{position:relative;display:flex;gap:12px;padding:12px 14px;cursor:pointer;transition:background .1s}
+.notif-menu-item:hover{background:var(--shell-menu-item-hover-bg)}
+.notif-menu-item.is-unread{background:rgba(139,92,246,0.07)}
+html.theme-light .notif-menu-item.is-unread{background:rgba(139,92,246,0.06)}
+.notif-menu-item.is-unread:hover{background:rgba(139,92,246,0.12)}
+.notif-menu-item.is-unread::after{content:'';position:absolute;top:18px;right:14px;width:8px;height:8px;border-radius:50%;background:#8B5CF6}
+.notif-menu-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;letter-spacing:-.2px}
+.notif-menu-body{flex:1;min-width:0;padding-right:14px}
+.notif-menu-msg{font-size:13px;color:var(--shell-text-body);line-height:1.45;word-wrap:break-word}
+.notif-menu-msg strong{color:var(--shell-text-strong);font-weight:700}
+.notif-menu-msg .notif-link{color:#8B5CF6;text-decoration:none;font-weight:500;cursor:pointer}
+.notif-menu-msg .notif-link:hover{text-decoration:underline}
+.notif-menu-time{font-size:11px;color:var(--shell-text-caption);margin-top:4px}
+.notif-menu-empty{padding:36px 20px;text-align:center;font-size:12px;color:var(--shell-text-muted)}
+@media (prefers-reduced-motion: reduce){.notif-menu{transition:opacity .05s}}
 </style>
 </head>
 <body>
@@ -761,8 +767,9 @@ html.theme-light .notif-overlay{background:rgba(15,23,42,.25)}
   <div class="tb-right">
     <button class="icon-btn aa-trigger" aria-label="AI Assistant" onclick="openAiAssistant()" data-tt="AI Assistant" data-tt-desc="Chat with any agent in your workspace · ⌘/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5c.5 0 1 .4 1.1.9l1.1 4.9c.1.3.3.5.6.6l4.9 1.1c.5.1.9.6.9 1.1s-.4 1-.9 1.1l-4.9 1.1c-.3.1-.5.3-.6.6l-1.1 4.9c-.1.5-.6.9-1.1.9s-1-.4-1.1-.9l-1.1-4.9c-.1-.3-.3-.5-.6-.6l-4.9-1.1c-.5-.1-.9-.6-.9-1.1s.4-1 .9-1.1l4.9-1.1c.3-.1.5-.3.6-.6l1.1-4.9c.1-.5.6-.9 1.1-.9z" fill="#fff"/><path d="M19.5 3c.2 0 .4.2.5.4l.4 1.7.4-1.7c0-.2.2-.4.5-.4s.4.2.5.4l.4 1.7 1.7.4c.2 0 .4.2.4.5s-.2.4-.4.5l-1.7.4-.4 1.7c0 .2-.2.4-.5.4s-.4-.2-.5-.4l-.4-1.7-1.7-.4c-.2 0-.4-.2-.4-.5s.2-.4.4-.5l1.7-.4z" fill="#fff" opacity=".75"/></svg></button>
     <span class="notif-bell-wrap">
-      <button class="icon-btn" aria-label="Notifications" onclick="_openNotifications()" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-      <span class="notif-bell-dot" id="notif-bell-dot" aria-label="Unread notifications"></span>
+      <button class="icon-btn" id="notifBellLauncher" type="button" aria-label="Notifications" aria-haspopup="dialog" aria-expanded="false" onclick="_toggleNotifications(event)" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+      <span class="notif-bell-dot" id="notif-bell-dot" aria-label="Unread notifications">3</span>
+      <div class="notif-menu" id="notif-menu" role="dialog" aria-label="Notifications" aria-hidden="true"></div>
     </span>
     <div class="tb-gear-wrap">
       <button class="icon-btn" id="gearLauncher" type="button" onclick="toggleGearMenu(event)" aria-label="Settings" aria-haspopup="menu" aria-expanded="false" data-tt="Settings" data-tt-desc="Personal settings and workspace admin">
@@ -3004,73 +3011,136 @@ function _doSignOut(){
   _closeModal('sign-out');
 }
 
-// ── Notifications panel ────────
+// ── Notifications dropdown ────────
 const NOTIFICATIONS_DATA = [
-  { id:'n1', tab:'mentions',  unread:true,  avatar:{init:'AR', color:'#F59E0B'}, msg:'<strong>Ana Rodríguez</strong> mentioned you in <strong>Outbound Prospecting Engine</strong>',  time:'2 min ago' },
-  { id:'n2', tab:'agents',    unread:true,  avatar:{init:'SD', color:'#0EA5E9'}, msg:'<strong>Sammy — Service Desk</strong> completed a run with 96.6% success',  time:'14 min ago' },
-  { id:'n3', tab:'workspace', unread:true,  avatar:{init:'CL', color:'#22C55E'}, msg:'<strong>Contoso Ltd</strong> upgraded to the Enterprise plan',  time:'1 hour ago' },
-  { id:'n4', tab:'agents',    unread:false, avatar:{init:'EH', color:'#EF4444'}, msg:'<strong>Escalation Handler</strong> routed a call to a human agent',  time:'3 hours ago' },
-  { id:'n5', tab:'mentions',  unread:false, avatar:{init:'MT', color:'#8B5CF6'}, msg:'<strong>Miguel Torres</strong> replied to your comment on <strong>Churn Risk Intervention</strong>',  time:'Yesterday' },
-  { id:'n6', tab:'workspace', unread:false, avatar:{init:'CL', color:'#22C55E'}, msg:'2 new members joined <strong>Contoso Ltd</strong>',  time:'2 days ago' },
-  { id:'n7', tab:'agents',    unread:false, avatar:{init:'WC', color:'#10B981'}, msg:'<strong>Warranty Claims</strong> flagged 3 conversations for review',  time:'3 days ago' }
+  { id:'n1', tab:'direct', unread:true,  avatar:{init:'MR', color:'#3B82F6'},
+    msg:'<strong>Marcus Reid</strong> mentioned you on <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">PRD-459 · Multi-tenant agent rollout</a>',
+    time:'2m ago' },
+  { id:'n2', tab:'direct', unread:true,  avatar:{init:'JC', color:'#8B5CF6'},
+    msg:'<strong>Jennifer Chang</strong> requested your review on <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">Policy P-2025-014 · PII redaction</a>',
+    time:'18m ago' },
+  { id:'n3', tab:'direct', unread:true,  avatar:{init:'SC', color:'#22C55E'},
+    msg:'<strong>Sarah Chen</strong> assigned <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">AGT-204 · Vendor classifier</a> to you',
+    time:'1h ago' },
+  { id:'n4', tab:'direct', unread:false, avatar:{init:'DN', color:'#F97316'},
+    msg:'<strong>Diego Núñez</strong> resolved <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">WRK-1281 · CRM webhook 429s</a>',
+    time:'3h ago' },
+  { id:'n5', tab:'direct', unread:false, avatar:{init:'AI', color:'#0EA5E9'},
+    msg:'<strong>AIMS Insight</strong> 3 agents drifted from baseline this week. <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">View report</a>',
+    time:'5h ago' },
+  { id:'n6', tab:'direct', unread:false, avatar:{init:'EM', color:'#EF4444'},
+    msg:'<strong>Eve Martin</strong> commented on <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">INV-2026-003</a>',
+    time:'Yesterday' },
+  { id:'n7',  tab:'watching', unread:true,  avatar:{init:'SD', color:'#0EA5E9'},
+    msg:'<strong>Sammy · Service Desk</strong> handed off a call to a human on <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">CALL-8821</a> · low confidence',
+    time:'12m ago' },
+  { id:'n8',  tab:'watching', unread:true,  avatar:{init:'GR', color:'#DC2626'},
+    msg:'<strong>Guardrail · PII</strong> blocked a reply containing SSN on <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">AGT-189</a>',
+    time:'47m ago' },
+  { id:'n9',  tab:'watching', unread:false, avatar:{init:'LT', color:'#10B981'},
+    msg:'Network <strong>Lead Triage</strong> completed 142 runs · 96.6% success rate',
+    time:'2h ago' },
+  { id:'n10', tab:'watching', unread:false, avatar:{init:'⚠', color:'#F59E0B'},
+    msg:'Workspace is at <strong>85% of monthly token budget</strong>. <a class="notif-link" href="#" onclick="event.preventDefault();event.stopPropagation()">Review usage</a>',
+    time:'4h ago' },
+  { id:'n11', tab:'watching', unread:false, avatar:{init:'SF', color:'#2563EB'},
+    msg:'<strong>Salesforce</strong> integration disconnected · re-authentication required',
+    time:'8h ago' },
+  { id:'n12', tab:'watching', unread:false, avatar:{init:'CP', color:'#7C3AED'},
+    msg:'Compliance audit <strong>PROC-12</strong> completed · 0 findings',
+    time:'Yesterday' }
 ];
-let _notifTab = 'all';
-function _renderNotifications(){
-  const tabsEl = document.getElementById('notif-tabs');
-  const listEl = document.getElementById('notif-list');
-  const tabs = [
-    { id:'all', label:'All' },
-    { id:'mentions', label:'Mentions' },
-    { id:'agents', label:'Agents' },
-    { id:'workspace', label:'Workspace' }
-  ];
-  if(tabsEl){
-    tabsEl.innerHTML = tabs.map(t => '<button type="button" class="notif-tab'+(_notifTab===t.id?' is-active':'')+'" onclick="_notifSetTab(\''+t.id+'\')">'+t.label+'</button>').join('');
-  }
-  if(listEl){
-    const filtered = _notifTab === 'all' ? NOTIFICATIONS_DATA : NOTIFICATIONS_DATA.filter(n => n.tab === _notifTab);
-    if(filtered.length === 0){
-      listEl.innerHTML = '<div class="notif-empty"><div style="font-size:13px;color:var(--shell-text-muted)">You\'re all caught up.</div></div>';
-    } else {
-      listEl.innerHTML = filtered.map(n =>
-        '<div class="notif-item'+(n.unread?' is-unread':'')+'" onclick="_notifMarkRead(\''+n.id+'\')">'
-        + '<div class="notif-avatar" style="background:'+n.avatar.color+'">'+n.avatar.init+'</div>'
-        + '<div class="notif-body"><div class="notif-msg">'+n.msg+'</div><div class="notif-time">'+n.time+'</div></div>'
+let _notifTab = 'direct';
+let _notifOnlyUnread = false;
+
+function _renderNotifMenu(){
+  const menu = document.getElementById('notif-menu'); if(!menu) return;
+  const directUnread = NOTIFICATIONS_DATA.filter(n => n.tab === 'direct' && n.unread).length;
+  const watchingUnread = NOTIFICATIONS_DATA.filter(n => n.tab === 'watching' && n.unread).length;
+  let filtered = NOTIFICATIONS_DATA.filter(n => n.tab === _notifTab);
+  if(_notifOnlyUnread) filtered = filtered.filter(n => n.unread);
+
+  const itemHtml = filtered.length === 0
+    ? '<div class="notif-menu-empty">You\'re all caught up.</div>'
+    : filtered.map(n =>
+        '<div class="notif-menu-item'+(n.unread?' is-unread':'')+'" role="button" tabindex="0" onclick="_notifMarkRead(\''+n.id+'\')">'
+        + '<div class="notif-menu-avatar" style="background:'+n.avatar.color+'">'+n.avatar.init+'</div>'
+        + '<div class="notif-menu-body"><div class="notif-menu-msg">'+n.msg+'</div><div class="notif-menu-time">'+n.time+'</div></div>'
         + '</div>'
       ).join('');
-    }
-  }
-  const unread = NOTIFICATIONS_DATA.filter(n=>n.unread).length;
-  const countEl = document.getElementById('notif-unread-count');
-  if(countEl){ countEl.textContent = unread; countEl.style.display = unread ? '' : 'none'; }
+
+  menu.innerHTML = ''
+    + '<div class="notif-menu-header">'
+      + '<div class="notif-menu-title">Notifications</div>'
+      + '<label class="notif-only-unread"><span>Only unread</span>'
+        + '<input type="checkbox"'+(_notifOnlyUnread?' checked':'')+' onchange="_notifToggleOnlyUnread(this.checked)" />'
+        + '<span class="notif-toggle" aria-hidden="true"></span>'
+      + '</label>'
+      + '<button type="button" class="notif-menu-action" aria-label="Open in new window" onclick="event.stopPropagation();_notifOpenFull()">'
+        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7"/><path d="M21 3l-9 9"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>'
+      + '</button>'
+      + '<button type="button" class="notif-menu-action" aria-label="Mark all read" onclick="event.stopPropagation();_notifMarkAllRead()" data-tt="Mark all read">'
+        + '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>'
+      + '</button>'
+    + '</div>'
+    + '<div class="notif-menu-tabs" role="tablist">'
+      + '<button type="button" class="notif-menu-tab'+(_notifTab==='direct'?' is-active':'')+'" role="tab" aria-selected="'+(_notifTab==='direct')+'" onclick="_notifSetTab(\'direct\')">Direct'+(directUnread>0?'<span class="notif-menu-tab-count">'+directUnread+'</span>':'')+'</button>'
+      + '<button type="button" class="notif-menu-tab'+(_notifTab==='watching'?' is-active':'')+'" role="tab" aria-selected="'+(_notifTab==='watching')+'" onclick="_notifSetTab(\'watching\')">Watching'+(watchingUnread>0?'<span class="notif-menu-tab-count">'+watchingUnread+'</span>':'')+'</button>'
+    + '</div>'
+    + '<div class="notif-menu-list">' + itemHtml + '</div>';
+
+  const totalUnread = NOTIFICATIONS_DATA.filter(n => n.unread).length;
   const dotEl = document.getElementById('notif-bell-dot');
-  if(dotEl) dotEl.classList.toggle('is-empty', unread === 0);
+  if(dotEl){
+    dotEl.textContent = totalUnread > 0 ? (totalUnread > 9 ? '9+' : String(totalUnread)) : '';
+    dotEl.classList.toggle('is-empty', totalUnread === 0);
+  }
 }
-function _notifSetTab(tab){ _notifTab = tab; _renderNotifications(); }
+function _renderNotifications(){ _renderNotifMenu(); }
+
+function _notifSetTab(tab){ _notifTab = tab; _renderNotifMenu(); }
+function _notifToggleOnlyUnread(checked){ _notifOnlyUnread = !!checked; _renderNotifMenu(); }
 function _notifMarkRead(id){
   const n = NOTIFICATIONS_DATA.find(x=>x.id===id); if(n) n.unread = false;
-  _renderNotifications();
+  _renderNotifMenu();
 }
 function _notifMarkAllRead(){
   NOTIFICATIONS_DATA.forEach(n => n.unread = false);
-  _renderNotifications();
+  _renderNotifMenu();
 }
+function _notifOpenFull(){
+  _closeNotifications();
+  if(typeof toast === 'function') toast('Opening notifications inbox…');
+}
+
 function _openNotifications(){
-  _ctxClose();
+  if(typeof _ctxClose === 'function') _ctxClose();
   if(typeof _avatarClose === 'function') _avatarClose();
   if(typeof _gearClose === 'function') _gearClose();
-  _renderNotifications();
-  document.getElementById('notif-panel')?.classList.add('open');
-  document.getElementById('notif-panel')?.setAttribute('aria-hidden','false');
-  document.getElementById('notif-overlay')?.classList.add('open');
+  _renderNotifMenu();
+  const menu = document.getElementById('notif-menu');
+  if(menu){ menu.classList.add('open'); menu.setAttribute('aria-hidden','false'); }
+  document.getElementById('notifBellLauncher')?.setAttribute('aria-expanded','true');
+  setTimeout(()=>{ document.addEventListener('click', _notifOutsideClick); }, 0);
 }
 function _closeNotifications(){
-  document.getElementById('notif-panel')?.classList.remove('open');
-  document.getElementById('notif-panel')?.setAttribute('aria-hidden','true');
-  document.getElementById('notif-overlay')?.classList.remove('open');
+  const menu = document.getElementById('notif-menu');
+  if(menu){ menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); }
+  document.getElementById('notifBellLauncher')?.setAttribute('aria-expanded','false');
+  document.removeEventListener('click', _notifOutsideClick);
+}
+function _toggleNotifications(e){
+  if(e) e.stopPropagation();
+  const menu = document.getElementById('notif-menu');
+  if(menu && menu.classList.contains('open')) _closeNotifications();
+  else _openNotifications();
+}
+function _notifOutsideClick(e){
+  const wrap = document.querySelector('.notif-bell-wrap');
+  if(wrap && !wrap.contains(e.target)) _closeNotifications();
 }
 document.addEventListener('keydown', function(e){
-  if(e.key === 'Escape' && document.getElementById('notif-panel')?.classList.contains('open')){
+  if(e.key === 'Escape' && document.getElementById('notif-menu')?.classList.contains('open')){
     _closeNotifications();
   }
 });
@@ -3703,19 +3773,5 @@ document.addEventListener('keydown', function(e){ if((e.metaKey || e.ctrlKey) &&
   </div>
 </div>
 
-<div class="notif-overlay" id="notif-overlay" onclick="_closeNotifications()" aria-hidden="true"></div>
-<aside class="notif-panel" id="notif-panel" role="dialog" aria-label="Notifications" aria-hidden="true">
-  <header class="notif-header">
-    <div class="notif-title">Notifications</div>
-    <span class="notif-count" id="notif-unread-count">3</span>
-    <button type="button" class="notif-action-btn" onclick="_notifMarkAllRead()">Mark all read</button>
-    <button type="button" class="notif-close" aria-label="Close" onclick="_closeNotifications()"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3" stroke-linecap="round"/></svg></button>
-  </header>
-  <div class="notif-tabs" id="notif-tabs"></div>
-  <div class="notif-list" id="notif-list"></div>
-  <div class="notif-footer">
-    <a class="notif-footer-link" href="#" onclick="event.preventDefault()">Notification preferences</a>
-  </div>
-</aside>
 </body>
 </html>
