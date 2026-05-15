@@ -565,13 +565,16 @@ textarea.input{resize:vertical;line-height:1.5}
 @media (prefers-reduced-motion: reduce){.ctx-menu{transition:opacity .05s;transform:none}.ctx-menu.open{transform:none}}
 /* ── AI Assistant (Phase 1 shell — bot+sparkle topbar trigger + right slideout) ── */
 /* ── AI Assistant trigger — AIMS isotype + hover animation ── */
-.icon-btn.aa-trigger{transition:background .15s}
-.icon-btn.aa-trigger:hover{background:transparent}
-.icon-btn.aa-trigger svg{transition:transform .35s cubic-bezier(.34,1.4,.64,1),filter .3s ease;transform-origin:center}
-.icon-btn.aa-trigger:hover svg{transform:scale(1.22) rotate(-8deg);filter:drop-shadow(0 0 10px rgba(9,226,171,0.55)) drop-shadow(0 0 5px rgba(27,114,255,0.45))}
-.icon-btn.aa-trigger.active{background:rgba(43,127,255,0.14)}
-.icon-btn.aa-trigger.active svg{transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(9,226,171,0.45)) drop-shadow(0 0 4px rgba(27,114,255,0.35))}
-@media (prefers-reduced-motion: reduce){.icon-btn.aa-trigger svg{transition:none}.icon-btn.aa-trigger:hover svg{transform:scale(1.06);filter:none}}
+/* AI Assistant — gradient square with sparkle + glow */
+.icon-btn.aa-trigger{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#6366F1 0%,#2B7FFF 50%,#09E2AB 100%);border:1px solid rgba(255,255,255,0.10);color:#fff;box-shadow:0 8px 16px -6px rgba(43,127,255,0.55),0 1px 0 0 rgba(255,255,255,0.18) inset;transition:transform .15s ease,box-shadow .2s ease;position:relative}
+.icon-btn.aa-trigger:hover{background:linear-gradient(135deg,#6366F1 0%,#2B7FFF 50%,#09E2AB 100%);transform:translateY(-1px);box-shadow:0 12px 22px -8px rgba(43,127,255,0.75),0 1px 0 0 rgba(255,255,255,0.22) inset}
+.icon-btn.aa-trigger svg{transition:transform .25s cubic-bezier(.34,1.4,.64,1);transform-origin:center}
+.icon-btn.aa-trigger:hover svg{transform:scale(1.08) rotate(-4deg)}
+.icon-btn.aa-trigger.active{background:linear-gradient(135deg,#6366F1 0%,#2B7FFF 50%,#09E2AB 100%);box-shadow:0 10px 20px -6px rgba(43,127,255,0.7),0 0 0 2px rgba(43,127,255,0.35) inset}
+.icon-btn.aa-trigger.active svg{transform:scale(1.04)}
+@media (prefers-reduced-motion: reduce){.icon-btn.aa-trigger,.icon-btn.aa-trigger svg{transition:none}.icon-btn.aa-trigger:hover{transform:none}.icon-btn.aa-trigger:hover svg{transform:scale(1.04)}}
+/* Vertical divider between gear and workspace badge */
+.tb-divider-v{display:inline-block;width:1px;height:22px;background:var(--shell-divider);margin:0 4px;flex-shrink:0;align-self:center}
 .aa-overlay{position:fixed;inset:0;background:rgba(5,8,18,0.55);z-index:80;opacity:0;pointer-events:none;transition:opacity .22s}
 .aa-overlay.open{opacity:1;pointer-events:auto}
 .ai-assistant{position:fixed;top:0;right:0;width:420px;height:100vh;background:var(--shell-menu-bg);border-left:1px solid var(--shell-menu-border);box-shadow:-12px 0 32px rgba(0,0,0,.45);z-index:90;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;font-family:inherit}
@@ -753,17 +756,18 @@ html.theme-light .notif-overlay{background:rgba(15,23,42,.25)}
     <input placeholder="Search in AIMS-OS Platform..." aria-label="Global search" />
   </div>
   <div class="tb-right">
+    <button class="icon-btn aa-trigger" aria-label="AI Assistant" onclick="openAiAssistant()" data-tt="AI Assistant" data-tt-desc="Chat with any agent in your workspace · ⌘/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5c.5 0 1 .4 1.1.9l1.1 4.9c.1.3.3.5.6.6l4.9 1.1c.5.1.9.6.9 1.1s-.4 1-.9 1.1l-4.9 1.1c-.3.1-.5.3-.6.6l-1.1 4.9c-.1.5-.6.9-1.1.9s-1-.4-1.1-.9l-1.1-4.9c-.1-.3-.3-.5-.6-.6l-4.9-1.1c-.5-.1-.9-.6-.9-1.1s.4-1 .9-1.1l4.9-1.1c.3-.1.5-.3.6-.6l1.1-4.9c.1-.5.6-.9 1.1-.9z" fill="#fff"/><path d="M19.5 3c.2 0 .4.2.5.4l.4 1.7.4-1.7c0-.2.2-.4.5-.4s.4.2.5.4l.4 1.7 1.7.4c.2 0 .4.2.4.5s-.2.4-.4.5l-1.7.4-.4 1.7c0 .2-.2.4-.5.4s-.4-.2-.5-.4l-.4-1.7-1.7-.4c-.2 0-.4-.2-.4-.5s.2-.4.4-.5l1.7-.4z" fill="#fff" opacity=".75"/></svg></button>
     <span class="notif-bell-wrap">
       <button class="icon-btn" aria-label="Notifications" onclick="_openNotifications()" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
       <span class="notif-bell-dot" id="notif-bell-dot" aria-label="Unread notifications"></span>
     </span>
-    <button class="icon-btn aa-trigger" aria-label="AI Assistant" onclick="openAiAssistant()" data-tt="AI Assistant" data-tt-desc="Chat with any agent in your workspace · ⌘/"><svg width="20" height="16" viewBox="0 0 234 187" fill="none" aria-hidden="true"><defs><linearGradient id="aaIsoG" x1="189.036" y1="47.0792" x2="91.8984" y2="213.621" gradientUnits="userSpaceOnUse"><stop stop-color="#09E2AB"/><stop offset="1" stop-color="#1B72FF"/></linearGradient></defs><path d="M232.854 166.743L146.1 16.7697C140.025 6.26923 129.146 0 117 0C104.854 0 93.9747 6.26923 87.8998 16.7697L1.14583 166.743C-0.381945 169.385 -0.381945 172.64 1.14583 175.285C2.67361 177.927 5.50109 179.556 8.55665 179.556H51.9318C54.991 179.556 57.8149 177.927 59.3426 175.285L95.307 113.11L123.861 162.472H108.735C105.889 158.003 100.9 155.022 95.2129 155.022C86.3793 155.022 79.1929 162.194 79.1929 171.011C79.1929 179.827 86.3793 187 95.2129 187C100.9 187 105.889 184.019 108.735 179.549H138.682C141.741 179.549 144.565 177.92 146.093 175.278C147.621 172.637 147.621 169.381 146.093 166.736L102.721 91.7583C101.194 89.1169 98.3662 87.4873 95.3106 87.4873C92.2514 87.4873 89.4276 89.1169 87.8998 91.7583L46.9937 162.472H23.3819L102.725 25.3118C105.705 20.1591 111.041 17.0841 117 17.0841C122.959 17.0841 128.295 20.1591 131.275 25.3118L210.618 162.472H187.006L131.177 65.9588C132.35 63.7365 133.02 61.2144 133.02 58.5332C133.02 49.7166 125.834 42.544 117 42.544C108.166 42.544 100.98 49.7166 100.98 58.5332C100.98 67.1295 107.819 74.1467 116.352 74.49L174.657 175.282C176.185 177.923 179.013 179.553 182.068 179.553H225.443C228.503 179.553 231.326 177.923 232.854 175.282C234.382 172.644 234.382 169.388 232.854 166.743Z" fill="url(#aaIsoG)"/></svg></button>
     <div class="tb-gear-wrap">
       <button class="icon-btn" id="gearLauncher" type="button" onclick="toggleGearMenu(event)" aria-label="Settings" aria-haspopup="menu" aria-expanded="false" data-tt="Settings" data-tt-desc="Personal settings and workspace admin">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
       <div class="gear-menu" id="gearMenu" role="menu" aria-label="Settings"></div>
     </div>
+    <span class="tb-divider-v" aria-hidden="true"></span>
     <button class="tb-ws-badge" id="tb-ws-badge" type="button" onclick="_openWorkspaceFromBadge(event)" data-tt="Workspace" data-tt-desc="Click to switch workspace" aria-label="Current workspace. Click to switch">
       <span class="tb-ws-badge-logo" id="tb-ws-badge-logo">CL</span>
       <span class="tb-ws-badge-name" id="tb-ws-badge-name">Contoso Ltd</span>
