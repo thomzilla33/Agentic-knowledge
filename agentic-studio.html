@@ -1945,6 +1945,87 @@ body.test-mode #vTestMode{display:flex}
 .aa-hint{font-size:11px;color:rgba(255,255,255,0.40);margin-top:6px;padding:0 4px}
 .aa-hint kbd{display:inline-flex;padding:1px 5px;border:1px solid rgba(255,255,255,0.15);border-radius:4px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.05)}
 @media (max-width:560px){.ai-assistant{width:100vw}}
+
+/* ── Generic AIMS modal system ── */
+.aims-modal-overlay{position:fixed;inset:0;background:rgba(5,8,18,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:300;display:flex;align-items:flex-start;justify-content:center;padding:60px 20px 20px;opacity:0;pointer-events:none;transition:opacity .2s;overflow-y:auto}
+html.theme-light .aims-modal-overlay{background:rgba(15,23,42,.35)}
+.aims-modal-overlay.open{opacity:1;pointer-events:auto}
+.aims-modal-dialog{background:var(--shell-menu-bg);border:1px solid var(--shell-menu-border);border-radius:12px;box-shadow:var(--shell-menu-shadow);width:100%;max-width:560px;display:flex;flex-direction:column;max-height:calc(100vh - 80px);transform:translateY(-8px) scale(0.98);transition:transform .2s cubic-bezier(.34,1.4,.64,1)}
+.aims-modal-overlay.open .aims-modal-dialog{transform:translateY(0) scale(1)}
+.aims-modal-dialog.size-sm{max-width:420px}
+.aims-modal-dialog.size-lg{max-width:760px}
+.aims-modal-header{display:flex;align-items:flex-start;gap:12px;padding:18px 22px;border-bottom:1px solid var(--shell-divider)}
+.aims-modal-title-wrap{flex:1;min-width:0}
+.aims-modal-title{font-size:16px;font-weight:700;color:var(--shell-text-strong);line-height:1.3}
+.aims-modal-subtitle{font-size:12px;color:var(--shell-text-muted);margin-top:3px;line-height:1.45}
+.aims-modal-close{width:30px;height:30px;border-radius:6px;background:transparent;border:none;color:var(--shell-icon-default);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;flex-shrink:0}
+.aims-modal-close:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-icon-hover)}
+.aims-modal-tabs{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--shell-divider);overflow-x:auto}
+.aims-modal-tab{padding:11px 14px;border:none;background:transparent;color:var(--shell-text-muted);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .12s,border-color .12s}
+.aims-modal-tab:hover{color:var(--shell-text-strong)}
+.aims-modal-tab.is-active{color:var(--shell-accent-blue);border-bottom-color:var(--shell-accent-blue)}
+.aims-modal-body{flex:1;overflow-y:auto;padding:22px}
+.aims-modal-body::-webkit-scrollbar{width:6px}
+.aims-modal-body::-webkit-scrollbar-thumb{background:var(--shell-divider);border-radius:3px}
+.aims-modal-footer{padding:14px 22px;border-top:1px solid var(--shell-divider);display:flex;justify-content:flex-end;gap:8px}
+.aims-modal-btn{height:34px;padding:0 14px;border-radius:7px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:background .12s,border-color .12s,color .12s}
+.aims-modal-btn.primary{background:var(--shell-accent-blue);border-color:var(--shell-accent-blue);color:#fff}
+.aims-modal-btn.primary:hover{filter:brightness(1.08)}
+.aims-modal-btn.secondary{background:transparent;border-color:var(--shell-menu-border);color:var(--shell-text-body)}
+.aims-modal-btn.secondary:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong)}
+.aims-modal-btn.danger{background:#DC2626;border-color:#DC2626;color:#fff}
+.aims-modal-btn.danger:hover{background:#B91C1C;border-color:#B91C1C}
+.aims-field{margin-bottom:16px}
+.aims-field-label{display:block;font-size:12px;font-weight:600;color:var(--shell-text-strong);margin-bottom:6px}
+.aims-field-hint{display:block;font-size:11px;color:var(--shell-text-muted);margin-top:4px;line-height:1.4}
+.aims-input,.aims-select,.aims-textarea{width:100%;height:36px;background:var(--shell-topbar-search-bg);border:1px solid var(--shell-menu-border);border-radius:7px;padding:0 12px;color:var(--shell-text-strong);font-family:inherit;font-size:13px;outline:none;transition:border-color .12s}
+.aims-textarea{height:auto;min-height:80px;padding:9px 12px;resize:vertical;line-height:1.5}
+.aims-input:focus,.aims-select:focus,.aims-textarea:focus{border-color:var(--shell-focus-ring)}
+.aims-input::placeholder,.aims-textarea::placeholder{color:var(--shell-topbar-search-placeholder)}
+.aims-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.aims-section{padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--shell-divider)}
+.aims-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.aims-section-title{font-size:13px;font-weight:700;color:var(--shell-text-strong);margin-bottom:4px}
+.aims-section-desc{font-size:12px;color:var(--shell-text-muted);margin-bottom:14px;line-height:1.5}
+.aims-empty{padding:30px 20px;text-align:center}
+.aims-empty-icon{width:48px;height:48px;border-radius:12px;background:var(--shell-menu-item-hover-bg);display:inline-flex;align-items:center;justify-content:center;color:var(--shell-icon-default);margin-bottom:14px}
+.aims-empty-title{font-size:14px;font-weight:600;color:var(--shell-text-strong);margin-bottom:6px}
+.aims-empty-desc{font-size:12px;color:var(--shell-text-muted);line-height:1.5;max-width:340px;margin:0 auto}
+
+/* ── Notifications panel ── */
+.notif-overlay{position:fixed;inset:0;background:rgba(5,8,18,.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .22s}
+html.theme-light .notif-overlay{background:rgba(15,23,42,.25)}
+.notif-overlay.open{opacity:1;pointer-events:auto}
+.notif-panel{position:fixed;top:0;right:0;width:380px;height:100vh;background:var(--shell-menu-bg);border-left:1px solid var(--shell-menu-border);box-shadow:-12px 0 32px rgba(0,0,0,.35);z-index:91;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.notif-panel.open{transform:translateX(0)}
+@media (prefers-reduced-motion: reduce){.notif-panel{transition:none}.notif-overlay{transition:opacity .05s}}
+.notif-header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--shell-divider);flex-shrink:0}
+.notif-title{flex:1;font-size:14px;font-weight:700;color:var(--shell-text-strong)}
+.notif-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9999px;background:var(--shell-menu-item-active-bg);color:var(--shell-accent-blue)}
+.notif-action-btn{height:28px;padding:0 10px;border-radius:6px;background:transparent;border:none;color:var(--shell-text-muted);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer}
+.notif-action-btn:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong)}
+.notif-close{width:28px;height:28px;border-radius:6px;background:transparent;border:none;color:var(--shell-icon-default);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.notif-close:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-icon-hover)}
+.notif-tabs{display:flex;gap:2px;padding:8px 12px 0;border-bottom:1px solid var(--shell-divider);flex-shrink:0}
+.notif-tab{padding:8px 12px;border:none;background:transparent;color:var(--shell-text-muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.notif-tab.is-active{color:var(--shell-accent-blue);border-bottom-color:var(--shell-accent-blue)}
+.notif-list{flex:1;overflow-y:auto;padding:6px 0}
+.notif-list::-webkit-scrollbar{width:6px}
+.notif-list::-webkit-scrollbar-thumb{background:var(--shell-divider);border-radius:3px}
+.notif-item{display:flex;gap:12px;padding:12px 20px;cursor:pointer;border-left:3px solid transparent;transition:background .1s}
+.notif-item:hover{background:var(--shell-menu-item-hover-bg)}
+.notif-item.is-unread{border-left-color:var(--shell-accent-blue)}
+.notif-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0}
+.notif-body{flex:1;min-width:0}
+.notif-msg{font-size:13px;color:var(--shell-text-body);line-height:1.45}
+.notif-msg strong{color:var(--shell-text-strong);font-weight:600}
+.notif-time{font-size:11px;color:var(--shell-text-caption);margin-top:4px}
+.notif-empty{padding:40px 20px;text-align:center}
+.notif-footer{padding:10px 20px;border-top:1px solid var(--shell-divider);flex-shrink:0}
+.notif-footer-link{display:block;text-align:center;font-size:12px;font-weight:600;color:var(--shell-accent-blue);cursor:pointer;text-decoration:none}
+.notif-bell-wrap{position:relative;display:inline-flex}
+.notif-bell-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#DC2626;border:2px solid var(--shell-topbar-bg);pointer-events:none}
+.notif-bell-dot.is-empty{display:none}
 </style>
 </head>
 <body>
@@ -2060,7 +2141,10 @@ body.test-mode #vTestMode{display:flex}
       <input placeholder="Search in AIMS-OS Platform..." aria-label="Global search" />
     </div>
     <div class="tb-right">
-      <button class="icon-btn" aria-label="Notifications" onclick="typeof toast==='function'&&toast('Notifications')" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+      <span class="notif-bell-wrap">
+        <button class="icon-btn" aria-label="Notifications" onclick="_openNotifications()" data-tt="Notifications" data-tt-desc="Recent alerts and system updates."><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+        <span class="notif-bell-dot" id="notif-bell-dot" aria-label="Unread notifications"></span>
+      </span>
       <button class="icon-btn aa-trigger" aria-label="AI Assistant" onclick="openAiAssistant()" data-tt="AI Assistant" data-tt-desc="Chat with any agent in your workspace · ⌘/"><svg width="20" height="16" viewBox="0 0 234 187" fill="none" aria-hidden="true"><defs><linearGradient id="aaIsoA" x1="189.036" y1="47.0792" x2="91.8984" y2="213.621" gradientUnits="userSpaceOnUse"><stop stop-color="#09E2AB"/><stop offset="1" stop-color="#1B72FF"/></linearGradient></defs><path d="M232.854 166.743L146.1 16.7697C140.025 6.26923 129.146 0 117 0C104.854 0 93.9747 6.26923 87.8998 16.7697L1.14583 166.743C-0.381945 169.385 -0.381945 172.64 1.14583 175.285C2.67361 177.927 5.50109 179.556 8.55665 179.556H51.9318C54.991 179.556 57.8149 177.927 59.3426 175.285L95.307 113.11L123.861 162.472H108.735C105.889 158.003 100.9 155.022 95.2129 155.022C86.3793 155.022 79.1929 162.194 79.1929 171.011C79.1929 179.827 86.3793 187 95.2129 187C100.9 187 105.889 184.019 108.735 179.549H138.682C141.741 179.549 144.565 177.92 146.093 175.278C147.621 172.637 147.621 169.381 146.093 166.736L102.721 91.7583C101.194 89.1169 98.3662 87.4873 95.3106 87.4873C92.2514 87.4873 89.4276 89.1169 87.8998 91.7583L46.9937 162.472H23.3819L102.725 25.3118C105.705 20.1591 111.041 17.0841 117 17.0841C122.959 17.0841 128.295 20.1591 131.275 25.3118L210.618 162.472H187.006L131.177 65.9588C132.35 63.7365 133.02 61.2144 133.02 58.5332C133.02 49.7166 125.834 42.544 117 42.544C108.166 42.544 100.98 49.7166 100.98 58.5332C100.98 67.1295 107.819 74.1467 116.352 74.49L174.657 175.282C176.185 177.923 179.013 179.553 182.068 179.553H225.443C228.503 179.553 231.326 177.923 232.854 175.282C234.382 172.644 234.382 169.388 232.854 166.743Z" fill="url(#aaIsoA)"/></svg></button>
       <div class="tb-gear-wrap">
         <button class="icon-btn" id="gearLauncher" type="button" onclick="toggleGearMenu(event)" aria-label="Settings" aria-haspopup="menu" aria-expanded="false" data-tt="Settings" data-tt-desc="Personal settings and workspace admin">
@@ -4873,24 +4957,263 @@ function toggleContextMenu(e){
   }
 }
 function _ctxClose(){ document.getElementById('ctxMenu')?.classList.remove('open'); document.getElementById('ctxLauncher')?.classList.remove('cm-open'); document.getElementById('ctxLauncher')?.setAttribute('aria-expanded','false'); }
+// ── Generic modal helpers ────────
+function _openModal(key){
+  document.querySelectorAll('.aims-modal-overlay.open').forEach(m=>m.classList.remove('open'));
+  const el = document.getElementById('aims-modal-'+key);
+  if(el){
+    el.classList.add('open');
+    if(key === 'workspace-settings'){ _wsSettingsActiveTab='general'; _wsSettingsTab('general'); }
+    if(key === 'members'){ _membersFilter=''; const s=document.getElementById('members-search'); if(s) s.value=''; _renderMembers(); }
+    setTimeout(()=>{
+      const focusable = el.querySelector('input,button,select,textarea,[tabindex]');
+      if(focusable) focusable.focus();
+    }, 50);
+  }
+}
+function _closeModal(key){
+  const el = key ? document.getElementById('aims-modal-'+key) : document.querySelector('.aims-modal-overlay.open');
+  if(el) el.classList.remove('open');
+}
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.querySelector('.aims-modal-overlay.open')){
+    _closeModal();
+  }
+});
+
 function _ctxAction(action){
   _ctxClose();
+  if(typeof _avatarClose === 'function') _avatarClose();
+  if(typeof _gearClose === 'function') _gearClose();
+  const modalMap = {
+    'workspace-settings':'workspace-settings',
+    'members':'members',
+    'general-settings':'general-settings',
+    'help':'help',
+    'discover':'discover',
+    'manage-apps':'manage-apps',
+    'sign-out':'sign-out'
+  };
+  if(modalMap[action]){ _openModal(modalMap[action]); return; }
+  if(action === 'notifications'){ _openNotifications(); return; }
   const msg = {
-    'discover':'Discover apps — coming soon',
-    'manage-apps':'Manage apps — coming soon',
-    'workspace-settings':'Workspace settings — coming soon',
-    'members':'Members & access control — coming soon',
     'create-workspace':'Create workspace — coming soon',
-    'appearance':'Appearance preferences — coming soon',
-    'notifications':'Notification preferences — coming soon',
-    'help':'Help & docs — coming soon',
-    'sign-out':'Sign out — coming soon',
-    'general-settings':'General preferences — coming soon',
-    'contact-admin':'Reach out to your workspace admin — coming soon'
+    'contact-admin':'Reach out to your workspace admin — coming soon',
+    'appearance':'Appearance preferences — handled by Theme toggle'
   }[action] || action;
   if(typeof toast === 'function') toast(msg);
   else if(typeof showToast === 'function') showToast(msg);
 }
+
+// ── Workspace settings modal ────────
+let _wsSettingsActiveTab = 'general';
+function _wsSettingsTab(tab){
+  _wsSettingsActiveTab = tab;
+  document.querySelectorAll('#ws-settings-tabs .aims-modal-tab').forEach((b,i)=>{
+    const tabs = ['general','billing','integrations'];
+    b.classList.toggle('is-active', tabs[i]===tab);
+  });
+  _renderWsSettings();
+}
+function _renderWsSettings(){
+  const body = document.getElementById('ws-settings-body'); if(!body) return;
+  const ws = _wsActive();
+  const nameEl = document.getElementById('ws-settings-ws-name');
+  if(nameEl) nameEl.textContent = ws.name;
+  if(_wsSettingsActiveTab === 'general'){
+    body.innerHTML =
+      '<div class="aims-section">'
+      + '<div class="aims-section-title">Workspace identity</div>'
+      + '<div class="aims-section-desc">Basic information about your organization.</div>'
+      + '<div class="aims-field-row">'
+        + '<div class="aims-field"><label class="aims-field-label">Workspace name</label><input class="aims-input" value="'+_ctxEscAttr(ws.name)+'"></div>'
+        + '<div class="aims-field"><label class="aims-field-label">Subdomain</label><input class="aims-input" value="'+_ctxEscAttr(ws.subdomain||ws.id||'')+'"></div>'
+      + '</div>'
+      + '<div class="aims-field-row">'
+        + '<div class="aims-field"><label class="aims-field-label">Default timezone</label><select class="aims-select"><option>America/New_York (EST)</option><option>America/Los_Angeles (PST)</option><option>America/Bogota (COT)</option><option>Europe/London (GMT)</option></select></div>'
+        + '<div class="aims-field"><label class="aims-field-label">Locale</label><select class="aims-select"><option>English (US)</option><option>Spanish (LATAM)</option><option>Portuguese (BR)</option></select></div>'
+      + '</div>'
+      + '<div class="aims-field"><label class="aims-field-label">Description</label><textarea class="aims-textarea" placeholder="A short description of your workspace">'+ (ws.id==='contoso' ? 'Multi-channel customer operations for the dealer network.' : '') +'</textarea></div>'
+      + '</div>'
+      + '<div class="aims-section">'
+      + '<div class="aims-section-title">Security</div>'
+      + '<div class="aims-section-desc">Authentication and data protection.</div>'
+      + '<div class="aims-field"><label class="aims-field-label">Single sign-on (SSO)</label><select class="aims-select"><option>Disabled</option><option>Okta SAML 2.0</option><option>Microsoft Entra ID</option><option>Google Workspace</option></select><span class="aims-field-hint">Enforce sign-in through your identity provider.</span></div>'
+      + '<div class="aims-field"><label class="aims-field-label">Session timeout</label><select class="aims-select"><option>30 days</option><option>7 days</option><option>24 hours</option><option>4 hours</option></select></div>'
+      + '</div>';
+  } else if(_wsSettingsActiveTab === 'billing'){
+    body.innerHTML =
+      '<div class="aims-section">'
+      + '<div class="aims-section-title">Current plan</div>'
+      + '<div style="padding:14px;border:1px solid var(--shell-menu-border);border-radius:10px;background:var(--shell-menu-item-active-bg)">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
+          + '<div><div style="font-size:13px;font-weight:700;color:var(--shell-text-strong)">Enterprise</div><div style="font-size:12px;color:var(--shell-text-muted);margin-top:3px">Unlimited workspaces, SSO, audit log, premium support</div></div>'
+          + '<div style="text-align:right"><div style="font-size:18px;font-weight:700;color:var(--shell-text-strong)">$2,400<span style="font-size:12px;color:var(--shell-text-muted);font-weight:500">/mo</span></div><div style="font-size:11px;color:var(--shell-text-muted)">Renews Jun 12, 2026</div></div>'
+        + '</div>'
+        + '<div style="display:flex;gap:8px"><button class="aims-modal-btn secondary" onclick="event.stopPropagation()">Manage plan</button><button class="aims-modal-btn secondary" onclick="event.stopPropagation()">View invoices</button></div>'
+      + '</div>'
+      + '</div>'
+      + '<div class="aims-section">'
+      + '<div class="aims-section-title">Payment method</div>'
+      + '<div class="aims-field"><div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border:1px solid var(--shell-menu-border);border-radius:8px"><div style="width:34px;height:24px;border-radius:4px;background:linear-gradient(135deg,#1A1F71,#0F76C2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700">VISA</div><div style="flex:1;font-size:13px;color:var(--shell-text-body)">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</div><div style="font-size:11px;color:var(--shell-text-muted)">Exp 09/27</div></div></div>'
+      + '<button class="aims-modal-btn secondary" onclick="event.stopPropagation()">Update payment method</button>'
+      + '</div>'
+      + '<div class="aims-section">'
+      + '<div class="aims-section-title">Usage this month</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'
+        + '<div style="padding:12px;border:1px solid var(--shell-menu-border);border-radius:8px"><div style="font-size:11px;color:var(--shell-text-muted);text-transform:uppercase;letter-spacing:.06em">Agent runs</div><div style="font-size:20px;font-weight:700;color:var(--shell-text-strong);margin-top:4px">28,431</div><div style="font-size:11px;color:var(--shell-text-muted)">of 50,000</div></div>'
+        + '<div style="padding:12px;border:1px solid var(--shell-menu-border);border-radius:8px"><div style="font-size:11px;color:var(--shell-text-muted);text-transform:uppercase;letter-spacing:.06em">Voice minutes</div><div style="font-size:20px;font-weight:700;color:var(--shell-text-strong);margin-top:4px">12,847</div><div style="font-size:11px;color:var(--shell-text-muted)">of 25,000</div></div>'
+        + '<div style="padding:12px;border:1px solid var(--shell-menu-border);border-radius:8px"><div style="font-size:11px;color:var(--shell-text-muted);text-transform:uppercase;letter-spacing:.06em">Knowledge tokens</div><div style="font-size:20px;font-weight:700;color:var(--shell-text-strong);margin-top:4px">4.2M</div><div style="font-size:11px;color:var(--shell-text-muted)">of 10M</div></div>'
+      + '</div>'
+      + '</div>';
+  } else {
+    const integrations = [
+      { name:'Slack',       desc:'Send agent alerts to channels',     status:'connected', color:'#4A154B' },
+      { name:'Salesforce',  desc:'Sync customer records and tickets', status:'connected', color:'#00A1E0' },
+      { name:'HubSpot',     desc:'Two-way contact and deal sync',     status:'connected', color:'#FF7A59' },
+      { name:'Twilio',      desc:'Voice and SMS provider',            status:'connected', color:'#F22F46' },
+      { name:'Zendesk',     desc:'Ticket creation and updates',       status:'available', color:'#03363D' },
+      { name:'Microsoft Teams', desc:'Agent notifications and chat',  status:'available', color:'#5059C9' },
+      { name:'Snowflake',   desc:'Data warehouse export',             status:'available', color:'#29B5E8' },
+      { name:'Webhooks',    desc:'Send events to any URL',            status:'available', color:'#6B7280' }
+    ];
+    body.innerHTML = '<div class="aims-section"><div class="aims-section-desc">Connect AIMS OS to the tools your team uses.</div>'
+      + '<div style="display:flex;flex-direction:column;gap:8px">'
+      + integrations.map(i =>
+        '<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--shell-menu-border);border-radius:8px">'
+        + '<div style="width:34px;height:34px;border-radius:8px;background:'+i.color+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+i.name.charAt(0)+'</div>'
+        + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--shell-text-strong)">'+i.name+'</div><div style="font-size:12px;color:var(--shell-text-muted);margin-top:2px">'+i.desc+'</div></div>'
+        + (i.status==='connected'
+          ? '<span style="font-size:11px;font-weight:600;color:#10B981">&bull; Connected</span><button class="aims-modal-btn secondary" style="height:28px;padding:0 10px;font-size:12px;margin-left:8px">Configure</button>'
+          : '<button class="aims-modal-btn primary" style="height:28px;padding:0 10px;font-size:12px">Connect</button>')
+        + '</div>'
+      ).join('')
+      + '</div></div>';
+  }
+}
+function _wsSettingsSave(){
+  if(typeof toast === 'function') toast('Workspace settings saved');
+  else if(typeof showToast === 'function') showToast('Workspace settings saved');
+  _closeModal('workspace-settings');
+}
+
+// ── Members modal ────────
+const MEMBERS_DATA = [
+  { id:'m1', name:'Thomas Gonzalez',   email:'thomas@aimsos.ai',     role:'Owner',  status:'active',  lastActive:'Active now',     avatar:{init:'TH', color:'#155DFC'} },
+  { id:'m2', name:'Edgardo Sierra',    email:'edgardo@aimsos.ai',    role:'Admin',  status:'active',  lastActive:'5 min ago',      avatar:{init:'ES', color:'#22C55E'} },
+  { id:'m3', name:'Carlos Méndez',     email:'carlos@aimsos.ai',     role:'Admin',  status:'active',  lastActive:'1 hour ago',     avatar:{init:'CM', color:'#A78BFA'} },
+  { id:'m4', name:'Ana Rodríguez',     email:'ana@aimsos.ai',        role:'Member', status:'active',  lastActive:'3 hours ago',    avatar:{init:'AR', color:'#F59E0B'} },
+  { id:'m5', name:'Miguel Torres',     email:'miguel@aimsos.ai',     role:'Member', status:'active',  lastActive:'Yesterday',      avatar:{init:'MT', color:'#8B5CF6'} },
+  { id:'m6', name:'Lucía Vargas',      email:'lucia@aimsos.ai',      role:'Member', status:'active',  lastActive:'2 days ago',     avatar:{init:'LV', color:'#EC4899'} },
+  { id:'m7', name:'James Whittaker',   email:'james@gary-crossley.com', role:'Viewer', status:'active', lastActive:'4 days ago', avatar:{init:'JW', color:'#0EA5E9'} },
+  { id:'m8', name:'Priya Sharma',      email:'priya@aimsos.ai',      role:'Member', status:'pending', lastActive:'Invited',        avatar:{init:'PS', color:'#10B981'} }
+];
+let _membersFilter = '';
+function _renderMembers(){
+  const list = document.getElementById('members-list'); if(!list) return;
+  const q = _membersFilter.trim().toLowerCase();
+  const filtered = !q ? MEMBERS_DATA : MEMBERS_DATA.filter(m =>
+    m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q) || m.role.toLowerCase().includes(q)
+  );
+  if(filtered.length === 0){
+    list.innerHTML = '<div class="aims-empty"><div class="aims-empty-title">No members match "'+q.replace(/</g,'&lt;').replace(/"/g,'&quot;')+'"</div></div>';
+    return;
+  }
+  const roleColors = { 'Owner':'#FBBF24', 'Admin':'#A78BFA', 'Member':'#60A5FA', 'Viewer':'#94A3B8' };
+  list.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="text-align:left;font-size:11px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.06em"><th style="padding:8px 0;border-bottom:1px solid var(--shell-divider)">Member</th><th style="padding:8px 12px;border-bottom:1px solid var(--shell-divider)">Role</th><th style="padding:8px 12px;border-bottom:1px solid var(--shell-divider)">Last active</th><th style="padding:8px 0;border-bottom:1px solid var(--shell-divider);width:40px"></th></tr></thead>'
+    + '<tbody>'
+    + filtered.map(m => '<tr>'
+        + '<td style="padding:10px 0;border-bottom:1px solid var(--shell-divider)"><div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:50%;background:'+m.avatar.color+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0">'+m.avatar.init+'</div><div><div style="font-size:13px;font-weight:600;color:var(--shell-text-strong)">'+m.name+(m.status==='pending'?' <span style=\"font-size:10px;font-weight:600;color:#F59E0B;padding:1px 6px;border-radius:9999px;background:rgba(245,158,11,0.15);text-transform:uppercase;letter-spacing:.04em;margin-left:6px\">Pending</span>':'')+'</div><div style="font-size:11px;color:var(--shell-text-muted);margin-top:1px">'+m.email+'</div></div></div></td>'
+        + '<td style="padding:10px 12px;border-bottom:1px solid var(--shell-divider)"><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--shell-text-body)"><span style="width:8px;height:8px;border-radius:50%;background:'+(roleColors[m.role]||'#94A3B8')+'"></span>'+m.role+'</span></td>'
+        + '<td style="padding:10px 12px;border-bottom:1px solid var(--shell-divider);font-size:12px;color:var(--shell-text-muted)">'+m.lastActive+'</td>'
+        + '<td style="padding:10px 0;border-bottom:1px solid var(--shell-divider);text-align:right"><button class="notif-action-btn" style="width:28px;height:28px;padding:0" onclick="event.stopPropagation()" aria-label="Member options"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="3.5" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="8" cy="12.5" r="1"/></svg></button></td>'
+      + '</tr>').join('')
+    + '</tbody></table>';
+}
+function _membersInvite(){
+  if(typeof toast === 'function') toast('Invite flow — coming soon');
+  else if(typeof showToast === 'function') showToast('Invite flow — coming soon');
+}
+
+// ── Sign out ────────
+function _doSignOut(){
+  if(typeof toast === 'function') toast('Signing out…');
+  else if(typeof showToast === 'function') showToast('Signing out…');
+  _closeModal('sign-out');
+}
+
+// ── Notifications panel ────────
+const NOTIFICATIONS_DATA = [
+  { id:'n1', tab:'mentions',  unread:true,  avatar:{init:'AR', color:'#F59E0B'}, msg:'<strong>Ana Rodríguez</strong> mentioned you in <strong>Outbound Prospecting Engine</strong>',  time:'2 min ago' },
+  { id:'n2', tab:'agents',    unread:true,  avatar:{init:'SD', color:'#0EA5E9'}, msg:'<strong>Sammy — Service Desk</strong> completed a run with 96.6% success',  time:'14 min ago' },
+  { id:'n3', tab:'workspace', unread:true,  avatar:{init:'CL', color:'#22C55E'}, msg:'<strong>Contoso Ltd</strong> upgraded to the Enterprise plan',  time:'1 hour ago' },
+  { id:'n4', tab:'agents',    unread:false, avatar:{init:'EH', color:'#EF4444'}, msg:'<strong>Escalation Handler</strong> routed a call to a human agent',  time:'3 hours ago' },
+  { id:'n5', tab:'mentions',  unread:false, avatar:{init:'MT', color:'#8B5CF6'}, msg:'<strong>Miguel Torres</strong> replied to your comment on <strong>Churn Risk Intervention</strong>',  time:'Yesterday' },
+  { id:'n6', tab:'workspace', unread:false, avatar:{init:'CL', color:'#22C55E'}, msg:'2 new members joined <strong>Contoso Ltd</strong>',  time:'2 days ago' },
+  { id:'n7', tab:'agents',    unread:false, avatar:{init:'WC', color:'#10B981'}, msg:'<strong>Warranty Claims</strong> flagged 3 conversations for review',  time:'3 days ago' }
+];
+let _notifTab = 'all';
+function _renderNotifications(){
+  const tabsEl = document.getElementById('notif-tabs');
+  const listEl = document.getElementById('notif-list');
+  const tabs = [
+    { id:'all', label:'All' },
+    { id:'mentions', label:'Mentions' },
+    { id:'agents', label:'Agents' },
+    { id:'workspace', label:'Workspace' }
+  ];
+  if(tabsEl){
+    tabsEl.innerHTML = tabs.map(t => '<button type="button" class="notif-tab'+(_notifTab===t.id?' is-active':'')+'" onclick="_notifSetTab(\''+t.id+'\')">'+t.label+'</button>').join('');
+  }
+  if(listEl){
+    const filtered = _notifTab === 'all' ? NOTIFICATIONS_DATA : NOTIFICATIONS_DATA.filter(n => n.tab === _notifTab);
+    if(filtered.length === 0){
+      listEl.innerHTML = '<div class="notif-empty"><div style="font-size:13px;color:var(--shell-text-muted)">You\'re all caught up.</div></div>';
+    } else {
+      listEl.innerHTML = filtered.map(n =>
+        '<div class="notif-item'+(n.unread?' is-unread':'')+'" onclick="_notifMarkRead(\''+n.id+'\')">'
+        + '<div class="notif-avatar" style="background:'+n.avatar.color+'">'+n.avatar.init+'</div>'
+        + '<div class="notif-body"><div class="notif-msg">'+n.msg+'</div><div class="notif-time">'+n.time+'</div></div>'
+        + '</div>'
+      ).join('');
+    }
+  }
+  const unread = NOTIFICATIONS_DATA.filter(n=>n.unread).length;
+  const countEl = document.getElementById('notif-unread-count');
+  if(countEl){ countEl.textContent = unread; countEl.style.display = unread ? '' : 'none'; }
+  const dotEl = document.getElementById('notif-bell-dot');
+  if(dotEl) dotEl.classList.toggle('is-empty', unread === 0);
+}
+function _notifSetTab(tab){ _notifTab = tab; _renderNotifications(); }
+function _notifMarkRead(id){
+  const n = NOTIFICATIONS_DATA.find(x=>x.id===id); if(n) n.unread = false;
+  _renderNotifications();
+}
+function _notifMarkAllRead(){
+  NOTIFICATIONS_DATA.forEach(n => n.unread = false);
+  _renderNotifications();
+}
+function _openNotifications(){
+  _ctxClose();
+  if(typeof _avatarClose === 'function') _avatarClose();
+  if(typeof _gearClose === 'function') _gearClose();
+  _renderNotifications();
+  document.getElementById('notif-panel')?.classList.add('open');
+  document.getElementById('notif-panel')?.setAttribute('aria-hidden','false');
+  document.getElementById('notif-overlay')?.classList.add('open');
+}
+function _closeNotifications(){
+  document.getElementById('notif-panel')?.classList.remove('open');
+  document.getElementById('notif-panel')?.setAttribute('aria-hidden','true');
+  document.getElementById('notif-overlay')?.classList.remove('open');
+}
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.getElementById('notif-panel')?.classList.contains('open')){
+    _closeNotifications();
+  }
+});
+if(document.getElementById('notif-bell-dot')) _renderNotifications();
 (function ctxInit(){
   try {
     const stored = localStorage.getItem('aims_active_workspace');
@@ -8893,6 +9216,175 @@ document.addEventListener('keydown', function(e){ if((e.metaKey || e.ctrlKey) &&
     </div>
     <div class="aa-hint">Type <kbd>@</kbd> to mention an agent · Press <kbd>⌘/</kbd> to toggle</div>
   </footer>
+</aside>
+
+<!-- AIMS shell modals + notifications panel -->
+<div class="aims-modal-overlay" id="aims-modal-workspace-settings" onclick="if(event.target===this)_closeModal('workspace-settings')" aria-hidden="true">
+  <div class="aims-modal-dialog size-lg">
+    <header class="aims-modal-header">
+      <div class="aims-modal-title-wrap">
+        <div class="aims-modal-title">Workspace settings</div>
+        <div class="aims-modal-subtitle">Manage <span id="ws-settings-ws-name">Contoso Ltd</span> · billing, integrations, and security</div>
+      </div>
+      <button class="aims-modal-close" type="button" aria-label="Close" onclick="_closeModal('workspace-settings')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="aims-modal-tabs" id="ws-settings-tabs">
+      <button type="button" class="aims-modal-tab is-active" onclick="_wsSettingsTab('general')">General</button>
+      <button type="button" class="aims-modal-tab" onclick="_wsSettingsTab('billing')">Billing &amp; plan</button>
+      <button type="button" class="aims-modal-tab" onclick="_wsSettingsTab('integrations')">Integrations</button>
+    </div>
+    <div class="aims-modal-body" id="ws-settings-body"></div>
+    <footer class="aims-modal-footer">
+      <button type="button" class="aims-modal-btn secondary" onclick="_closeModal('workspace-settings')">Cancel</button>
+      <button type="button" class="aims-modal-btn primary" onclick="_wsSettingsSave()">Save changes</button>
+    </footer>
+  </div>
+</div>
+
+<div class="aims-modal-overlay" id="aims-modal-members" onclick="if(event.target===this)_closeModal('members')" aria-hidden="true">
+  <div class="aims-modal-dialog size-lg">
+    <header class="aims-modal-header">
+      <div class="aims-modal-title-wrap">
+        <div class="aims-modal-title">Members &amp; access</div>
+        <div class="aims-modal-subtitle">Manage who can access this workspace and their roles.</div>
+      </div>
+      <button class="aims-modal-close" type="button" aria-label="Close" onclick="_closeModal('members')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="aims-modal-body">
+      <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+        <div style="flex:1;position:relative">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--shell-icon-default);pointer-events:none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <input class="aims-input" id="members-search" placeholder="Search members…" oninput="_membersFilter=this.value;_renderMembers()" style="padding-left:32px">
+        </div>
+        <button type="button" class="aims-modal-btn primary" onclick="_membersInvite()">Invite members</button>
+      </div>
+      <div id="members-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="aims-modal-overlay" id="aims-modal-sign-out" onclick="if(event.target===this)_closeModal('sign-out')" aria-hidden="true">
+  <div class="aims-modal-dialog size-sm">
+    <header class="aims-modal-header" style="border-bottom:none;padding-bottom:6px">
+      <div class="aims-modal-title-wrap">
+        <div class="aims-modal-title">Sign out of AIMS OS?</div>
+      </div>
+    </header>
+    <div class="aims-modal-body" style="padding-top:0">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--shell-menu-border);border-radius:8px;background:var(--shell-menu-item-hover-bg)">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700">TH</div>
+        <div><div style="font-size:13px;font-weight:600;color:var(--shell-text-strong)">Thomas Gonzalez</div><div style="font-size:11px;color:var(--shell-text-muted)">thomas@aimsos.ai</div></div>
+      </div>
+      <p style="font-size:13px;color:var(--shell-text-muted);line-height:1.5;margin-top:14px;margin-bottom:0">You'll be returned to the sign-in screen. Any unsaved work will be lost.</p>
+    </div>
+    <footer class="aims-modal-footer">
+      <button type="button" class="aims-modal-btn secondary" onclick="_closeModal('sign-out')">Cancel</button>
+      <button type="button" class="aims-modal-btn danger" onclick="_doSignOut()">Sign out</button>
+    </footer>
+  </div>
+</div>
+
+<div class="aims-modal-overlay" id="aims-modal-general-settings" onclick="if(event.target===this)_closeModal('general-settings')" aria-hidden="true">
+  <div class="aims-modal-dialog">
+    <header class="aims-modal-header">
+      <div class="aims-modal-title-wrap">
+        <div class="aims-modal-title">General preferences</div>
+        <div class="aims-modal-subtitle">Profile, language, time zone, and other personal settings.</div>
+      </div>
+      <button class="aims-modal-close" type="button" aria-label="Close" onclick="_closeModal('general-settings')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="aims-modal-body">
+      <div class="aims-empty">
+        <div class="aims-empty-icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg></div>
+        <div class="aims-empty-title">Personal preferences coming soon</div>
+        <div class="aims-empty-desc">Profile, language, time zone, and account-level settings will live here. The Theme toggle in the avatar menu already works.</div>
+      </div>
+    </div>
+    <footer class="aims-modal-footer">
+      <button type="button" class="aims-modal-btn secondary" onclick="_closeModal('general-settings')">Close</button>
+    </footer>
+  </div>
+</div>
+
+<div class="aims-modal-overlay" id="aims-modal-help" onclick="if(event.target===this)_closeModal('help')" aria-hidden="true">
+  <div class="aims-modal-dialog">
+    <header class="aims-modal-header">
+      <div class="aims-modal-title-wrap">
+        <div class="aims-modal-title">Help &amp; docs</div>
+        <div class="aims-modal-subtitle">Guides, API reference, and direct support.</div>
+      </div>
+      <button class="aims-modal-close" type="button" aria-label="Close" onclick="_closeModal('help')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="aims-modal-body">
+      <div class="aims-empty">
+        <div class="aims-empty-icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 0c0 1.3-2.5 1.7-2.5 3M12 17.5v.01" stroke-linecap="round"/></svg></div>
+        <div class="aims-empty-title">Help center coming soon</div>
+        <div class="aims-empty-desc">Searchable documentation, API references, and a direct line to support will be available here.</div>
+      </div>
+    </div>
+    <footer class="aims-modal-footer">
+      <button type="button" class="aims-modal-btn secondary" onclick="_closeModal('help')">Close</button>
+    </footer>
+  </div>
+</div>
+
+<div class="aims-modal-overlay" id="aims-modal-discover" onclick="if(event.target===this)_closeModal('discover')" aria-hidden="true">
+  <div class="aims-modal-dialog">
+    <header class="aims-modal-header">
+      <div class="aims-modal-title-wrap">
+        <div class="aims-modal-title">Discover more apps</div>
+        <div class="aims-modal-subtitle">Expand AIMS OS with marketplace apps and integrations.</div>
+      </div>
+      <button class="aims-modal-close" type="button" aria-label="Close" onclick="_closeModal('discover')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="aims-modal-body">
+      <div class="aims-empty">
+        <div class="aims-empty-icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><circle cx="17.5" cy="17.5" r="3.5"/></svg></div>
+        <div class="aims-empty-title">App marketplace coming soon</div>
+        <div class="aims-empty-desc">Browse a catalog of first-party and partner apps that extend AIMS OS — vertical agents, data connectors, and workflow templates.</div>
+      </div>
+    </div>
+    <footer class="aims-modal-footer">
+      <button type="button" class="aims-modal-btn secondary" onclick="_closeModal('discover')">Close</button>
+    </footer>
+  </div>
+</div>
+
+<div class="aims-modal-overlay" id="aims-modal-manage-apps" onclick="if(event.target===this)_closeModal('manage-apps')" aria-hidden="true">
+  <div class="aims-modal-dialog">
+    <header class="aims-modal-header">
+      <div class="aims-modal-title-wrap">
+        <div class="aims-modal-title">Manage apps</div>
+        <div class="aims-modal-subtitle">Reorder, hide, or uninstall apps from your sidebar.</div>
+      </div>
+      <button class="aims-modal-close" type="button" aria-label="Close" onclick="_closeModal('manage-apps')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="aims-modal-body">
+      <div class="aims-empty">
+        <div class="aims-empty-icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/></svg></div>
+        <div class="aims-empty-title">App customization coming soon</div>
+        <div class="aims-empty-desc">Drag to reorder apps in the switcher, pin frequently used ones, and hide what you don't need.</div>
+      </div>
+    </div>
+    <footer class="aims-modal-footer">
+      <button type="button" class="aims-modal-btn secondary" onclick="_closeModal('manage-apps')">Close</button>
+    </footer>
+  </div>
+</div>
+
+<div class="notif-overlay" id="notif-overlay" onclick="_closeNotifications()" aria-hidden="true"></div>
+<aside class="notif-panel" id="notif-panel" role="dialog" aria-label="Notifications" aria-hidden="true">
+  <header class="notif-header">
+    <div class="notif-title">Notifications</div>
+    <span class="notif-count" id="notif-unread-count">3</span>
+    <button type="button" class="notif-action-btn" onclick="_notifMarkAllRead()">Mark all read</button>
+    <button type="button" class="notif-close" aria-label="Close" onclick="_closeNotifications()"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3" stroke-linecap="round"/></svg></button>
+  </header>
+  <div class="notif-tabs" id="notif-tabs"></div>
+  <div class="notif-list" id="notif-list"></div>
+  <div class="notif-footer">
+    <a class="notif-footer-link" href="#" onclick="event.preventDefault()">Notification preferences</a>
+  </div>
 </aside>
 </body>
 </html>
