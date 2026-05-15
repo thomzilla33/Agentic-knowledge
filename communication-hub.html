@@ -978,9 +978,12 @@
     .avatar-menu.open{opacity:1;pointer-events:auto}
     .avatar-menu::-webkit-scrollbar{width:6px}
     .avatar-menu::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
-    .am-user{padding:14px 14px 10px;border-bottom:1px solid var(--shell-divider)}
-    .am-user-name{font-size:13px;font-weight:700;color:var(--shell-text-strong);line-height:1.2}
-    .am-user-email{font-size:11px;color:var(--shell-text-muted);margin-top:3px}
+    /* Avatar menu header — bigger avatar + name + email (personal space identity) */
+    .am-user{padding:16px 16px 14px;border-bottom:1px solid var(--shell-divider);display:flex;align-items:center;gap:12px}
+    .am-user-avatar{width:44px;height:44px;border-radius:50%;background:var(--gradient-brand-linear);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0;letter-spacing:-.3px;line-height:1}
+    .am-user-info{flex:1;min-width:0}
+    .am-user-name{font-size:14px;font-weight:700;color:var(--shell-text-strong);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .am-user-email{font-size:11.5px;color:var(--shell-text-muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .am-section{padding:4px 0;border-top:1px solid var(--shell-divider)}
     .am-section-hd{padding:10px 14px 4px;font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em}
     .am-ws-card{display:flex;align-items:center;gap:11px;padding:8px 12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:inherit;font-family:inherit;transition:background .1s;border-radius:0}
@@ -1036,6 +1039,9 @@
     .gear-menu::-webkit-scrollbar{width:6px}
     .gear-menu::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
     .gear-menu-hd{padding:14px 16px 6px;font-size:13px;font-weight:700;color:var(--shell-text-strong)}
+.gear-empty{padding:18px 16px;display:flex;gap:10px;align-items:flex-start;color:var(--shell-text-muted)}
+.gear-empty svg{color:var(--shell-icon-default);flex-shrink:0;margin-top:1px}
+.gear-empty-text{font-size:12px;line-height:1.5}
     .gear-section-hd{padding:10px 16px 4px;font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em}
     .gear-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:var(--shell-text-body);font-family:inherit;font-size:13px;font-weight:500;transition:background .1s}
     .gear-item:hover{background:var(--shell-menu-item-hover-bg)}
@@ -3232,7 +3238,8 @@
     const msg = {
       'create-workspace':'Create workspace — coming soon',
       'contact-admin':'Reach out to your workspace admin — coming soon',
-      'appearance':'Appearance preferences — handled by Theme toggle'
+      'appearance':'Appearance preferences — handled by Theme toggle',
+      'notification-prefs':'Notification preferences — coming soon'
     }[action] || action;
     if(typeof toast === 'function') toast(msg);
     else if(typeof showToast === 'function') showToast(msg);
@@ -3420,6 +3427,14 @@
 
   function _renderNotifMenu(){
     const menu = document.getElementById('notif-menu'); if(!menu) return;
+    // Bug fix: when a tab/item click re-renders innerHTML, the original click target is
+    // detached from the DOM. The outside-click handler then sees the orphan target as
+    // "not contained" and closes the menu incorrectly. Catch clicks at the menu boundary
+    // and stop them from bubbling to the document listener. Bind once per menu instance.
+    if(!menu.dataset.searchBound){
+      menu.addEventListener('click', function(e){ e.stopPropagation(); });
+      menu.dataset.searchBound = '1';
+    }
     const directUnread = NOTIFICATIONS_DATA.filter(n => n.tab === 'direct' && n.unread).length;
     const watchingUnread = NOTIFICATIONS_DATA.filter(n => n.tab === 'watching' && n.unread).length;
     let filtered = NOTIFICATIONS_DATA.filter(n => n.tab === _notifTab);
@@ -3529,7 +3544,13 @@
     const menu = document.getElementById('avatarMenu'); if(!menu) return;
     const active = _wsActive();
     let html = '';
-    html += '<div class="am-user"><div class="am-user-name">'+CURRENT_USER.name+'</div><div class="am-user-email">'+CURRENT_USER.email+'</div></div>';
+    html += '<div class="am-user">'
+      + '<div class="am-user-avatar">'+CURRENT_USER.initials+'</div>'
+      + '<div class="am-user-info">'
+        + '<div class="am-user-name">'+CURRENT_USER.name+'</div>'
+        + '<div class="am-user-email">'+CURRENT_USER.email+'</div>'
+      + '</div>'
+    + '</div>';
     html += '<div class="am-section am-ws-section" style="border-top:none">';
     html += '<div class="am-section-hd">Workspace</div>';
     const isDropdownOpen = _avatarState.workspacesExpanded;
@@ -3571,16 +3592,11 @@
     }
     html += '</div>';
     html += '</div>';
-    if(userCan('canManageWorkspaceSettings') || userCan('canManageMembers')){
-      html += '<div class="am-section">';
-      if(userCan('canManageWorkspaceSettings')){
-        html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'workspace-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Workspace settings</button>';
-      }
-      if(userCan('canManageMembers')){
-        html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'members\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="6" cy="6" r="2.5"/><path d="M2.5 13.5c0-2 1.6-3.5 3.5-3.5s3.5 1.5 3.5 3.5"/><circle cx="11" cy="6" r="2"/><path d="M14 13c0-1.6-1-2.5-2.5-2.5" stroke-linecap="round"/></svg>Members &amp; access</button>';
-      }
-      html += '</div>';
-    }
+    // Personal preferences — moved from gear menu (these are "me as a user")
+    html += '<div class="am-section">';
+    html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
+    html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
+    html += '</div>';
     html += '<div class="am-section">';
     const currentTheme = _getTheme();
     html += '<div class="am-item am-theme-row" style="cursor:default">';
@@ -3723,20 +3739,32 @@
     };
   }
   // ── Gear menu (Personal settings — Jira-style) ────────
-  function _renderGearMenu(){
+    function _renderGearMenu(){
     const menu = document.getElementById('gearMenu'); if(!menu) return;
+    const active = (typeof _wsActive === 'function') ? _wsActive() : null;
     let html = '';
-    html += '<div class="gear-menu-hd">Personal settings</div>';
-    // General settings
-    html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'general-settings\')">';
-    html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>';
-    html += '<div class="gear-item-main"><div class="gear-item-name">General</div><div class="gear-item-desc">Profile, language, time zone, and other personal preferences</div></div>';
-    html += '</button>';
-    // Notifications settings
-    html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'notifications\')">';
-    html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>';
-    html += '<div class="gear-item-main"><div class="gear-item-name">Notifications</div><div class="gear-item-desc">Manage email and in-app notifications from AIMS&nbsp;OS</div></div>';
-    html += '</button>';
+    html += '<div class="gear-menu-hd">Workspace administration'+(active ? ' · '+_ctxEscAttr(active.name) : '')+'</div>';
+    const canSettings = userCan('canManageWorkspaceSettings');
+    const canMembers  = userCan('canManageMembers');
+    // Workspace settings
+    if(canSettings){
+      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'workspace-settings\')">';
+      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
+      html += '<div class="gear-item-main"><div class="gear-item-name">Workspace settings</div><div class="gear-item-desc">Name, defaults, retention, branding, and security policies</div></div>';
+      html += '</button>';
+    }
+    if(canMembers){
+      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'members\')">';
+      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.5"/><path d="M3 19c0-3.5 3-5.5 6-5.5s6 2 6 5.5" stroke-linecap="round"/><circle cx="17" cy="10" r="2.5"/><path d="M21 18c0-2.5-1.6-3.8-4-3.8" stroke-linecap="round"/></svg>';
+      html += '<div class="gear-item-main"><div class="gear-item-name">Members &amp; access</div><div class="gear-item-desc">Invite people, manage roles, and review pending invitations</div></div>';
+      html += '</button>';
+    }
+    if(!canSettings && !canMembers){
+      html += '<div class="gear-empty">';
+      html += '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.5" stroke-linecap="round"/></svg>';
+      html += '<div class="gear-empty-text">No admin actions available for your role. Contact a workspace admin if you need access.</div>';
+      html += '</div>';
+    }
     menu.innerHTML = html;
   }
 
