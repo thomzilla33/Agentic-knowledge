@@ -1770,6 +1770,13 @@ body.test-mode #vTestMode{display:flex}
 .cm-create:hover{background:var(--shell-menu-item-hover-bg);border-color:var(--shell-menu-border);color:var(--shell-text-strong)}
 .cm-create svg{color:var(--shell-icon-default);flex-shrink:0}
 .cm-create:hover svg{color:var(--shell-icon-hover)}
+/* ── Workspace badge (visible chip showing active workspace) ── */
+.tb-ws-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 3px;border-radius:9999px;background:var(--shell-topbar-search-bg);border:1px solid var(--shell-topbar-search-border);cursor:pointer;color:var(--shell-text-body);font-family:inherit;font-size:12px;font-weight:600;line-height:1;margin-right:4px;flex-shrink:0;transition:background .12s,border-color .12s,color .12s;max-width:200px;height:30px}
+.tb-ws-badge:hover{background:var(--shell-menu-item-hover-bg);border-color:var(--shell-menu-border);color:var(--shell-text-strong)}
+.tb-ws-badge:focus-visible{outline:2px solid var(--shell-focus-ring);outline-offset:2px}
+.tb-ws-badge-logo{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px;background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%)}
+.tb-ws-badge-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+@media (max-width: 720px){ .tb-ws-badge-name{display:none} .tb-ws-badge{padding:3px;width:30px;justify-content:center} }
 /* ── Avatar menu (account + workspace switcher) ── */
 .tb-avatar-wrap{position:relative;flex-shrink:0;display:inline-flex;align-items:center}
 .avatar-menu{position:absolute;top:calc(100% + 8px);right:0;width:300px;background:var(--shell-menu-bg);border:1px solid var(--shell-menu-border);border-radius:10px;box-shadow:var(--shell-menu-shadow);z-index:200;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1);text-align:left;max-height:calc(100vh - 80px);overflow-y:auto}
@@ -2152,6 +2159,10 @@ html.theme-light .notif-overlay{background:rgba(15,23,42,.25)}
         </button>
         <div class="gear-menu" id="gearMenu" role="menu" aria-label="Settings"></div>
       </div>
+      <button class="tb-ws-badge" id="tb-ws-badge" type="button" onclick="_openWorkspaceFromBadge(event)" data-tt="Workspace" data-tt-desc="Click to switch workspace" aria-label="Current workspace. Click to switch">
+        <span class="tb-ws-badge-logo" id="tb-ws-badge-logo">CL</span>
+        <span class="tb-ws-badge-name" id="tb-ws-badge-name">Contoso Ltd</span>
+      </button>
       <div class="tb-avatar-wrap">
         <button class="avatar-sm" id="avatarLauncher" type="button" onclick="toggleAvatarMenu(event)" aria-label="Account menu" aria-haspopup="menu" aria-expanded="false" data-tt="Account" data-tt-desc="Workspace, settings, sign out" style="border:none;font-family:inherit">TH</button>
         <div class="avatar-menu" id="avatarMenu" role="menu" aria-label="Account and workspace"></div>
@@ -5221,6 +5232,7 @@ if(document.getElementById('notif-bell-dot')) _renderNotifications();
     else WORKSPACE_STATE.activeId = 'contoso';
   } catch(e){ WORKSPACE_STATE.activeId = 'contoso'; }
   _ctxRenderTrigger();
+  if(typeof _renderTbWsBadge === 'function') _renderTbWsBadge();
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape' && document.getElementById('ctxMenu')?.classList.contains('open')){ _ctxClose(); }
   });
@@ -5382,6 +5394,7 @@ function _avatarPickWs(id){
     target.lastUsed = Date.now();
     try { localStorage.setItem('aims_active_workspace', id); } catch(e){}
     _avatarClose();
+    _renderTbWsBadge();
     if(typeof toast === 'function') toast('Switched to ' + target.name);
     else if(typeof showToast === 'function') showToast('Switched to ' + target.name);
   };
@@ -5389,6 +5402,26 @@ function _avatarPickWs(id){
     const ok = confirm('You have unsaved changes. Switch to ' + target.name + ' anyway?');
     if(ok) doSwitch();
   } else { doSwitch(); }
+}
+
+// ── Workspace topbar badge (chip beside avatar) ─────────
+function _renderTbWsBadge(){
+  const ws = _wsActive(); if(!ws) return;
+  const logoEl = document.getElementById('tb-ws-badge-logo');
+  const nameEl = document.getElementById('tb-ws-badge-name');
+  const badgeEl = document.getElementById('tb-ws-badge');
+  if(logoEl){ logoEl.textContent = _wsInitials(ws.name); logoEl.style.background = _wsHashColor(ws.id); }
+  if(nameEl){ nameEl.textContent = ws.name; }
+  if(badgeEl){ badgeEl.setAttribute('data-tt-desc', 'Workspace · ' + ws.name + ' · click to switch'); badgeEl.setAttribute('aria-label', 'Current workspace: ' + ws.name + '. Click to switch workspace'); }
+}
+function _openWorkspaceFromBadge(e){
+  if(e) e.stopPropagation();
+  const menu = document.getElementById('avatarMenu'); if(!menu) return;
+  if(!menu.classList.contains('open')){
+    if(typeof toggleAvatarMenu === 'function') toggleAvatarMenu(e);
+  }
+  _avatarState.workspacesExpanded = true;
+  if(typeof _renderAvatarMenu === 'function') _renderAvatarMenu();
 }
 
 document.addEventListener('keydown', function(e){
