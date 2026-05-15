@@ -2578,14 +2578,20 @@ html.theme-light .search-modal-inner{box-shadow:0 24px 60px rgba(15,23,42,.18),v
 .search-esc{font-family:inherit;font-size:10px;font-weight:600;padding:3px 6px;border-radius:5px;background:rgba(255,255,255,0.05);color:var(--shell-text-caption);border:1px solid var(--shell-topbar-search-border);line-height:1;flex-shrink:0}
 html.theme-light .search-esc{background:rgba(15,23,42,0.04);border-color:rgba(15,23,42,0.10)}
 
-/* Tabs (chips) */
-.search-tabs{display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid var(--shell-divider);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+/* Tabs row (Filters button + pill tabs with icons, alphabetical) */
+.search-tabs{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--shell-divider);flex-shrink:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .search-tabs::-webkit-scrollbar{display:none}
-.search-tab{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;background:transparent;border:1px solid transparent;color:var(--shell-text-muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .1s,color .1s,border-color .1s}
+.search-filters-btn{width:30px;height:28px;border-radius:8px;background:transparent;border:1px solid var(--shell-menu-border);color:var(--shell-text-muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .1s,color .1s,border-color .1s}
+.search-filters-btn:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong);border-color:var(--shell-text-muted)}
+.search-tab{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;height:28px;border-radius:9999px;background:transparent;border:1px solid transparent;color:var(--shell-text-muted);font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .1s,color .1s,border-color .1s;flex-shrink:0}
+.search-tab svg{flex-shrink:0;opacity:.75}
 .search-tab:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-body)}
-.search-tab.is-active{background:var(--shell-menu-item-active-bg);color:var(--shell-text-strong);border-color:var(--shell-menu-border)}
-.search-tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:16px;padding:0 5px;height:16px;background:var(--shell-menu-item-hover-bg);border-radius:8px;font-size:10px;font-weight:700;color:var(--shell-text-muted)}
-.search-tab.is-active .search-tab-count{background:var(--shell-accent-blue);color:#fff}
+.search-tab:hover svg{opacity:1}
+.search-tab.is-active{background:rgba(139,92,246,.12);color:#8B5CF6;border-color:rgba(139,92,246,.28);font-weight:600}
+html.theme-light .search-tab.is-active{background:rgba(139,92,246,.10);color:#7C3AED;border-color:rgba(139,92,246,.25)}
+.search-tab.is-active svg{opacity:1;color:#8B5CF6}
+.search-tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:16px;padding:0 5px;height:16px;background:var(--shell-menu-item-hover-bg);border-radius:8px;font-size:10px;font-weight:700;color:var(--shell-text-muted);margin-left:2px}
+.search-tab.is-active .search-tab-count{background:rgba(139,92,246,.20);color:#8B5CF6}
 
 /* Applied filters row */
 .search-filters-row{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid var(--shell-divider);flex-wrap:wrap;flex-shrink:0}
@@ -2600,23 +2606,27 @@ html.theme-light .search-esc{background:rgba(15,23,42,0.04);border-color:rgba(15
 .search-section-hd .search-see-all{margin-left:auto;text-transform:none;letter-spacing:0;font-size:11px;font-weight:600;color:var(--shell-accent-blue);background:transparent;border:none;cursor:pointer;padding:2px 6px;border-radius:4px}
 .search-section-hd .search-see-all:hover{background:var(--shell-menu-item-hover-bg)}
 
-/* Result row */
-.search-row{display:flex;align-items:center;gap:12px;padding:9px 14px;cursor:pointer;border-left:2px solid transparent;transition:background .08s}
+/* Result row — cleaner look: icon · ID + title · sub · meta; actions hidden by default, shown on hover/keyboard-active */
+.search-row{display:flex;align-items:center;gap:11px;padding:10px 14px;cursor:pointer;border-left:2px solid transparent;transition:background .08s}
 .search-row:hover{background:var(--shell-menu-item-hover-bg)}
-.search-row.is-active{background:var(--shell-menu-item-active-bg);border-left-color:var(--shell-accent-blue)}
-.search-row-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:800;color:#fff;letter-spacing:-.2px}
-.search-row-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.search-row-title{font-size:13px;font-weight:600;color:var(--shell-text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
-.search-row-title mark{background:rgba(139,92,246,.20);color:inherit;padding:0 1px;border-radius:2px;font-weight:700}
-.search-row-sub{font-size:11px;color:var(--shell-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.search-row.is-active{background:var(--shell-menu-item-active-bg);border-left-color:#8B5CF6}
+.search-row-ico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--shell-text-muted);background:var(--shell-menu-item-hover-bg)}
+.search-row-ico svg{width:14px;height:14px}
+.search-row-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.search-row-title{font-size:13px;color:var(--shell-text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;display:flex;align-items:baseline;gap:8px}
+.search-row-title-id{color:var(--shell-text-muted);font-weight:500;flex-shrink:0;font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;font-size:12px;letter-spacing:-.2px}
+.search-row-title-text{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.search-row-title-text mark, .search-row-title-id mark{background:rgba(139,92,246,.20);color:inherit;padding:0 1px;border-radius:2px;font-weight:700}
+.search-row-sub{font-size:11.5px;color:var(--shell-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
 .search-row-sub mark{background:rgba(139,92,246,.18);color:inherit;padding:0 1px;border-radius:2px}
-.search-row-meta{font-size:11px;color:var(--shell-text-caption);flex-shrink:0;white-space:nowrap}
-.search-row-actions{display:flex;align-items:center;gap:2px;flex-shrink:0;margin-left:8px}
-.search-row-action{height:26px;padding:0 9px;border-radius:6px;background:transparent;border:1px solid var(--shell-topbar-search-border);color:var(--shell-text-body);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .1s,border-color .1s,color .1s}
-.search-row-action:hover{background:var(--shell-menu-item-hover-bg);border-color:var(--shell-menu-border);color:var(--shell-text-strong)}
-.search-row-action--primary{background:rgba(43,127,255,.08);border-color:rgba(43,127,255,.30);color:var(--shell-accent-blue)}
-.search-row-action--primary:hover{background:rgba(43,127,255,.16);border-color:rgba(43,127,255,.45)}
-.search-row-overflow{width:26px;padding:0;justify-content:center}
+.search-row-meta{display:none}
+.search-row-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;opacity:0;pointer-events:none;transition:opacity .12s}
+.search-row:hover .search-row-actions, .search-row.is-active .search-row-actions, .search-row:focus-within .search-row-actions{opacity:1;pointer-events:auto}
+.search-row-action{height:26px;padding:0 10px;border-radius:6px;background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.25);color:#8B5CF6;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .1s,border-color .1s,color .1s}
+.search-row-action:hover{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.40)}
+html.theme-light .search-row-action{color:#7C3AED}
+.search-row-overflow{width:26px;padding:0;justify-content:center;background:transparent;border-color:var(--shell-menu-border);color:var(--shell-text-muted)}
+.search-row-overflow:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong);border-color:var(--shell-text-muted)}
 
 /* Hero result (single exact match — bigger row) */
 .search-row.is-hero{padding:14px;background:linear-gradient(135deg,rgba(43,127,255,.06),rgba(139,92,246,.04));border-left-color:var(--shell-accent-blue);border-bottom:1px solid var(--shell-divider)}
@@ -2630,13 +2640,21 @@ html.theme-light .search-row.is-hero{background:linear-gradient(135deg,rgba(43,1
 .search-row-overflow-menu button{display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;background:transparent;border:none;border-radius:5px;font-family:inherit;font-size:12px;font-weight:500;color:var(--shell-text-body);cursor:pointer;text-align:left}
 .search-row-overflow-menu button:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong)}
 
-/* Empty / no-results / error states */
-.search-empty{padding:24px 14px;display:flex;flex-direction:column;gap:6px}
-.search-empty-hd{font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em;padding:0 0 4px}
-.search-empty-row{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .08s}
+/* Empty state — Suggested actions + Recent (entities) */
+.search-empty{padding:8px 0 0}
+.search-empty-hd{font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em;padding:12px 14px 6px}
+.search-empty-row{display:flex;align-items:center;gap:11px;padding:10px 14px;cursor:pointer;transition:background .08s;border-left:2px solid transparent}
 .search-empty-row:hover{background:var(--shell-menu-item-hover-bg)}
-.search-empty-row svg{color:var(--shell-icon-default);flex-shrink:0}
-.search-empty-row-text{font-size:13px;color:var(--shell-text-body)}
+.search-empty-row.is-active{background:var(--shell-menu-item-active-bg);border-left-color:#8B5CF6}
+.search-empty-row-ico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--shell-text-muted);background:var(--shell-menu-item-hover-bg)}
+.search-empty-row-ico svg{width:14px;height:14px}
+.search-empty-row-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.search-empty-row-title{font-size:13px;color:var(--shell-text-strong);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;display:flex;align-items:baseline;gap:8px}
+.search-empty-row-title strong{font-weight:600}
+.search-empty-row-title .search-row-title-id{font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;font-size:12px;color:var(--shell-text-muted);font-weight:500;letter-spacing:-.2px}
+.search-empty-row-sub{font-size:11.5px;color:var(--shell-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.search-empty-row-kbd{font-family:inherit;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.05);color:var(--shell-text-muted);border:1px solid var(--shell-topbar-search-border);line-height:1;flex-shrink:0;margin-left:auto}
+html.theme-light .search-empty-row-kbd{background:rgba(15,23,42,0.04);border-color:rgba(15,23,42,0.10)}
 .search-noresults{padding:36px 24px;text-align:center;display:flex;flex-direction:column;gap:8px}
 .search-noresults-title{font-size:14px;font-weight:600;color:var(--shell-text-strong)}
 .search-noresults-sub{font-size:12px;color:var(--shell-text-muted);line-height:1.45}
@@ -2660,15 +2678,39 @@ html.theme-light .search-row.is-hero{background:linear-gradient(135deg,rgba(43,1
 .search-op-autocomplete button:hover, .search-op-autocomplete button.is-active{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong)}
 .search-op-key{font-weight:700;color:#8B5CF6}
 
-/* Footer */
-.search-footer{padding:8px 14px;border-top:1px solid var(--shell-divider);display:flex;align-items:center;gap:14px;flex-shrink:0;flex-wrap:wrap;font-size:11px;color:var(--shell-text-caption)}
-.search-footer-hints{display:flex;gap:12px;flex-wrap:wrap}
-.search-footer-hints span{display:inline-flex;align-items:center;gap:4px}
-.search-footer kbd{font-family:inherit;font-size:10px;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.05);color:var(--shell-text-muted);border:1px solid var(--shell-topbar-search-border);line-height:1}
+/* Footer — Navigate/Open hints on left, Advanced search link on right */
+.search-footer{padding:8px 14px;border-top:1px solid var(--shell-divider);display:flex;align-items:center;gap:14px;flex-shrink:0;font-size:11px;color:var(--shell-text-caption)}
+.search-footer-hints{display:flex;gap:14px;flex-wrap:wrap}
+.search-footer-hints span{display:inline-flex;align-items:center;gap:5px}
+.search-footer kbd{font-family:inherit;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.05);color:var(--shell-text-muted);border:1px solid var(--shell-topbar-search-border);line-height:1;display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px}
 html.theme-light .search-footer kbd{background:rgba(15,23,42,0.04);border-color:rgba(15,23,42,0.10)}
-.search-footer-tip{margin-left:auto;color:var(--shell-text-muted)}
-.search-footer-tip code{font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;font-size:10px;background:rgba(139,92,246,.10);color:#8B5CF6;padding:1px 4px;border-radius:3px}
-@media (max-width: 720px){.search-footer-tip{display:none}}
+.search-footer-link{margin-left:auto;background:transparent;border:none;color:#8B5CF6;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:5px;transition:background .1s}
+.search-footer-link:hover{background:rgba(139,92,246,.10);text-decoration:underline}
+html.theme-light .search-footer-link{color:#7C3AED}
+
+/* Mobile (≤720px) — full-screen, larger touch targets, scrollable tabs, no kbd hints */
+@media (max-width: 720px){
+  .search-modal-inner{height:100vh;border-radius:0}
+  .search-input-row{padding:14px 12px;gap:10px}
+  .search-input{font-size:16px}
+  .search-esc{display:none}
+  .search-input-mobile-cancel{display:inline-flex;align-items:center;justify-content:center;font-family:inherit;font-size:14px;font-weight:600;color:#8B5CF6;background:transparent;border:none;cursor:pointer;padding:0 4px;flex-shrink:0}
+  html.theme-light .search-input-mobile-cancel{color:#7C3AED}
+  .search-tabs{padding:8px 12px;gap:6px}
+  .search-tab{height:32px;padding:6px 14px;font-size:13px}
+  .search-row{padding:14px 12px;gap:12px}
+  .search-row-ico{width:32px;height:32px}
+  .search-row-title{font-size:14px}
+  .search-row-sub{font-size:12px}
+  .search-row-actions{opacity:1;pointer-events:auto}
+  .search-empty-row{padding:14px 12px}
+  .search-empty-row-ico{width:32px;height:32px}
+  .search-empty-row-kbd{display:none}
+  .search-footer{padding:10px 12px}
+  .search-footer-hints{display:none}
+  .search-footer-link{margin-left:0;font-size:13px;padding:8px 12px}
+}
+.search-input-mobile-cancel{display:none}
 </style>
 <script>
 const screens = {
@@ -5392,17 +5434,34 @@ document.addEventListener('keydown', function(e){
   function _memberById(id){ return (typeof MEMBERS_DATA !== 'undefined') ? MEMBERS_DATA.find(m => m.id === id) : null; }
   function _memberName(id){ const m = _memberById(id); return m ? m.name : ''; }
 
-  // Entity type config — defines icon color, primary action, overflow actions, label
-  const TYPE_CONFIG = {
-    agent:        { label:'Agents',      color:'#22C55E', singular:'Agent',        primaryAction:'Assign to me', overflow:['Open','Copy link','View runs'] },
-    network:      { label:'Networks',    color:'#155DFC', singular:'Network',      primaryAction:'Open',         overflow:['Copy link','Pause','View runs'] },
-    ticket:       { label:'Tickets',     color:'#F97316', singular:'Ticket',       primaryAction:'Open',         overflow:['Copy link','Mark done','Reassign'] },
-    policy:       { label:'Policies',    color:'#8B5CF6', singular:'Policy',       primaryAction:'Open',         overflow:['Copy link','Request review','Archive'] },
-    person:       { label:'People',      color:'#3B82F6', singular:'Person',       primaryAction:'Send message', overflow:['Open profile','Copy email','Mention'] },
-    channel:      { label:'Channels',    color:'#0EA5E9', singular:'Channel',      primaryAction:'Configure',    overflow:['Open','Copy link','Disable'] },
-    workspace:    { label:'Workspaces',  color:'#10B981', singular:'Workspace',    primaryAction:'Switch to',    overflow:['Open settings','Copy link'] },
-    conversation: { label:'Conversations',color:'#D946EF',singular:'Conversation', primaryAction:'Open',         overflow:['Copy link','Listen','Transcribe'] }
+  // Entity type config — label, icon (lucide-style), primary + overflow actions
+  // Order in tabs is alphabetical (after "All") — see TAB_ORDER below
+  const ICON_PATHS = {
+    agent:        '<path d="M12 2v4M3 12h4M21 12h-4M12 21v-4"/><circle cx="12" cy="12" r="5"/>',
+    network:      '<circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M6 8v8M18 8v8M8 6h8M8 18h8"/>',
+    ticket:       '<path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z"/>',
+    policy:       '<path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/>',
+    person:       '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.5-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15 19c0-2 1.5-3.5 4-3.5s4 1.5 4 3.5"/>',
+    channel:      '<path d="M4 12c4-4 12-4 16 0M7 15c2.5-2.5 7.5-2.5 10 0M10 18a2 2 0 0 1 4 0"/>',
+    workspace:    '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/>',
+    conversation: '<path d="M4 4h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 4V6a2 2 0 0 1 2-2z"/>'
   };
+  const TYPE_CONFIG = {
+    agent:        { label:'Agents',       singular:'Agent',        primaryAction:'Assign to me', overflow:['Open','Copy link','View runs'] },
+    channel:      { label:'Channels',     singular:'Channel',      primaryAction:'Configure',    overflow:['Open','Copy link','Disable'] },
+    conversation: { label:'Conversations',singular:'Conversation', primaryAction:'Open',         overflow:['Copy link','Listen','Transcribe'] },
+    network:      { label:'Networks',     singular:'Network',      primaryAction:'Open',         overflow:['Copy link','Pause','View runs'] },
+    person:       { label:'People',       singular:'Person',       primaryAction:'Send message', overflow:['Open profile','Copy email','Mention'] },
+    policy:       { label:'Policies',     singular:'Policy',       primaryAction:'Open',         overflow:['Copy link','Request review','Archive'] },
+    ticket:       { label:'Tickets',      singular:'Ticket',       primaryAction:'Open',         overflow:['Copy link','Mark done','Reassign'] },
+    workspace:    { label:'Workspaces',   singular:'Workspace',    primaryAction:'Switch to',    overflow:['Open settings','Copy link'] }
+  };
+  // Tabs: All first, then alphabetical
+  const TAB_ORDER = ['all','agent','channel','conversation','network','person','policy','ticket','workspace'];
+  function _iconSvg(type){
+    const p = ICON_PATHS[type] || ICON_PATHS.ticket;
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';
+  }
 
   function _buildIndex(){
     const idx = [];
@@ -5413,46 +5472,40 @@ document.addEventListener('keydown', function(e){
         id:'agent:'+a.id, type:'agent', title:a.name,
         sub:'Agent · in workspace',
         meta:'', owner:'m1', status:'active',
-        ts: Date.now() - Math.random()*86400e3*7,
-        iconText:a.name.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase(),
-        iconBg:a.color || TYPE_CONFIG.agent.color
+        ts: Date.now() - Math.random()*86400e3*7
       });
     });
     // Networks
     NETWORKS_MOCK.forEach(n => idx.push({
       id:'network:'+n.id, type:'network', title:n.name,
-      sub:'Network · '+n.agents+' agents · '+n.stat,
+      sub:'Network · '+n.agents+' agents · '+n.stat+' · '+n.updated,
       meta:n.updated, owner:n.owner, status:n.status,
-      ts: Date.now() - Math.random()*86400e3*5,
-      iconText:n.name.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase(),
-      iconBg:TYPE_CONFIG.network.color
+      ts: Date.now() - Math.random()*86400e3*5
     }));
-    // Tickets
+    // Tickets — separate displayId from title for cleaner row rendering
     TICKETS_MOCK.forEach(t => idx.push({
-      id:'ticket:'+t.id, type:'ticket', title:t.id+' · '+t.title,
-      sub:'Ticket · '+t.status+' · '+_memberName(t.owner),
+      id:'ticket:'+t.id, type:'ticket', title:t.id+' '+t.title,
+      displayId:t.id, displayTitle:t.title,
+      sub:'Work item · '+t.status+' · '+_memberName(t.owner)+' · '+t.updated,
       meta:t.updated, owner:t.owner, status:t.status,
-      ts:t.ts || Date.now()-86400e3,
-      iconText:t.id.split('-')[0].slice(0,3),
-      iconBg:TYPE_CONFIG.ticket.color
+      ts:t.ts || Date.now()-86400e3
     }));
     // Policies
     POLICIES_MOCK.forEach(p => idx.push({
-      id:'policy:'+p.id, type:'policy', title:'Policy '+p.id+' · '+p.title,
-      sub:'Policy · '+p.status+' · '+_memberName(p.owner),
+      id:'policy:'+p.id, type:'policy', title:p.id+' '+p.title,
+      displayId:p.id, displayTitle:p.title,
+      sub:'Policy · '+p.status+' · '+_memberName(p.owner)+' · '+p.updated,
       meta:p.updated, owner:p.owner, status:p.status,
-      ts: Date.now() - Math.random()*86400e3*60,
-      iconText:'P',
-      iconBg:TYPE_CONFIG.policy.color
+      ts: Date.now() - Math.random()*86400e3*60
     }));
-    // People (members)
+    // People (members) — keep colored avatar circle (consistent with rest of UI)
     (typeof MEMBERS_DATA !== 'undefined' ? MEMBERS_DATA : []).forEach(m => idx.push({
       id:'person:'+m.id, type:'person', title:m.name,
       sub:'Person · '+m.role+' · '+m.email,
       meta:m.lastActive, owner:m.id, status:m.status,
       ts: Date.now() - Math.random()*86400e3*3,
-      iconText:m.avatar.init,
-      iconBg:m.avatar.color
+      avatarInit:m.avatar.init,
+      avatarColor:m.avatar.color
     }));
     // Channels
     CHANNELS_MOCK.forEach(c => idx.push({
@@ -5473,14 +5526,16 @@ document.addEventListener('keydown', function(e){
       iconBg:typeof _wsHashColor === 'function' ? _wsHashColor(w.id) : TYPE_CONFIG.workspace.color
     }));
     // Conversations / Calls
-    CALLS_MOCK.forEach(c => idx.push({
-      id:'conversation:'+c.id, type:'conversation', title:c.title,
-      sub:'Conversation · '+c.from+' · '+c.tag,
-      meta:c.updated, owner:c.owner, status:c.tag,
-      ts: Date.now() - Math.random()*86400e3*2,
-      iconText:'☎',
-      iconBg:TYPE_CONFIG.conversation.color
-    }));
+    CALLS_MOCK.forEach(c => {
+      const titleParts = c.title.split(' · ');
+      idx.push({
+        id:'conversation:'+c.id, type:'conversation', title:c.title,
+        displayId:c.id, displayTitle:titleParts.length > 1 ? titleParts.slice(1).join(' · ') : c.title,
+        sub:'Conversation · '+c.from+' · '+c.tag+' · '+c.updated,
+        meta:c.updated, owner:c.owner, status:c.tag,
+        ts: Date.now() - Math.random()*86400e3*2
+      });
+    });
     return idx;
   }
   let SEARCH_INDEX = [];
@@ -5532,12 +5587,39 @@ document.addEventListener('keydown', function(e){
     try { localStorage.setItem(_recentsKey(), JSON.stringify(arr)); } catch(e){}
   }
 
-  // Pinned suggestions (curated per app context — voice file shows agents/networks)
-  const PINNED_SUGGESTIONS = [
-    { type:'agent',   id:'sammy',    label:'Sammy — Service Desk' },
-    { type:'network', id:'net-lead', label:'Lead Triage' },
-    { type:'ticket',  id:'AGT-204',  label:'AGT-204 · Vendor classifier' }
+  // Suggested actions — quick commands shown in empty state. Each has its own hotkey.
+  const SUGGESTED_ACTIONS = [
+    { id:'create-ticket',  label:'Create work item',  kbd:'C', icon:'<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' },
+    { id:'invite-member',  label:'Invite member',     kbd:'I', icon:'<circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3 20c0-3 2.5-5 6-5s6 2 6 5M17 8v6M20 11h-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' },
+    { id:'create-network', label:'New automation',    kbd:'N', icon:'<path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' }
   ];
+  function _recentlyViewedKey(){ return 'aims_search_viewed_'+((WORKSPACE_STATE && WORKSPACE_STATE.activeId) || 'default'); }
+  function _recentlyViewedGet(){
+    try { return JSON.parse(localStorage.getItem(_recentlyViewedKey()) || '[]'); }
+    catch(e){ return []; }
+  }
+  function _recentlyViewedAdd(item){
+    if(!item || !item.id) return;
+    let arr = _recentlyViewedGet().filter(r => r.id !== item.id);
+    const snapshot = {
+      id:item.id, type:item.type, title:item.title,
+      displayId:item.displayId, displayTitle:item.displayTitle,
+      sub:item.sub, avatarInit:item.avatarInit, avatarColor:item.avatarColor,
+      ts:Date.now()
+    };
+    arr.unshift(snapshot);
+    arr = arr.slice(0, 6);
+    try { localStorage.setItem(_recentlyViewedKey(), JSON.stringify(arr)); } catch(e){}
+  }
+  function _humanAgo(ts){
+    if(!ts) return '';
+    const diff = Date.now() - ts;
+    if(diff < 60e3) return 'just now';
+    if(diff < 3600e3) return Math.floor(diff/60e3)+'m ago';
+    if(diff < 86400e3) return Math.floor(diff/3600e3)+'h ago';
+    const d = Math.floor(diff/86400e3);
+    return d === 1 ? '1d ago' : d+'d ago';
+  }
 
   // ── 5. Permissions (proxy through userCan if defined) ──
   function _canSee(entity){
@@ -5736,24 +5818,28 @@ document.addEventListener('keydown', function(e){
     const wrap = document.getElementById('search-tabs');
     if(!wrap) return;
     const counts = _countsByType(_searchState.results);
-    const tabs = [
-      { id:'all', label:'All', count:_searchState.results.length },
-      { id:'agent', label:'Agents', count:counts.agent || 0 },
-      { id:'network', label:'Networks', count:counts.network || 0 },
-      { id:'ticket', label:'Tickets', count:counts.ticket || 0 },
-      { id:'policy', label:'Policies', count:counts.policy || 0 },
-      { id:'person', label:'People', count:counts.person || 0 },
-      { id:'channel', label:'Channels', count:counts.channel || 0 },
-      { id:'conversation', label:'Conversations', count:counts.conversation || 0 },
-      { id:'workspace', label:'Workspaces', count:counts.workspace || 0 }
-    ];
-    wrap.innerHTML = tabs.map(t =>
-      '<button type="button" class="search-tab'+(_searchState.tab===t.id?' is-active':'')+'" role="tab" aria-selected="'+(_searchState.tab===t.id)+'" onclick="window._searchSetTab(\''+t.id+'\')">'
-      + t.label
-      + (t.count > 0 ? '<span class="search-tab-count">'+t.count+'</span>' : '')
-      + '</button>'
-    ).join('');
+    // Filters button + tabs in alphabetical order (after "All")
+    let html = '<button type="button" class="search-filters-btn" id="search-filters-btn" aria-label="Advanced filters" onclick="window._searchToggleFilters()" data-tt="Filters" data-tt-desc="Refine by date, status, owner, tags (coming soon)">'
+      + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="20" y2="12"/><line x1="10" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="1.5" fill="currentColor"/><circle cx="14" cy="12" r="1.5" fill="currentColor"/><circle cx="17" cy="18" r="1.5" fill="currentColor"/></svg>'
+      + '</button>';
+    html += TAB_ORDER.map(tabId => {
+      const isAll = tabId === 'all';
+      const label = isAll ? 'All' : TYPE_CONFIG[tabId].label;
+      const count = isAll ? _searchState.results.length : (counts[tabId] || 0);
+      const icon = isAll
+        ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'
+        : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON_PATHS[tabId]+'</svg>';
+      return '<button type="button" class="search-tab'+(_searchState.tab===tabId?' is-active':'')+'" role="tab" aria-selected="'+(_searchState.tab===tabId)+'" onclick="window._searchSetTab(\''+tabId+'\')">'
+        + icon + label
+        + (count > 0 ? '<span class="search-tab-count">'+count+'</span>' : '')
+        + '</button>';
+    }).join('');
+    wrap.innerHTML = html;
   }
+  window._searchToggleFilters = function(){
+    _track('search.filters_button_click', {});
+    if(typeof toast === 'function') toast('Advanced filters — coming soon');
+  };
   window._searchSetTab = function(tab){
     _track('search.tab_change', { from:_searchState.tab, to:tab });
     _searchState.tab = tab;
@@ -5812,25 +5898,56 @@ document.addEventListener('keydown', function(e){
   }
 
   function _renderEmptyState(){
-    const recents = _recentsGet();
     let html = '';
-    if(recents.length > 0){
+    let idx = 0;
+    const flat = [];
+
+    // SECTION 1 — Suggested actions
+    html += '<div class="search-empty"><div class="search-empty-hd">Suggested actions</div>';
+    SUGGESTED_ACTIONS.forEach(action => {
+      flat.push({ kind:'action', action:action });
+      html += '<div class="search-empty-row" role="option" id="search-empty-'+idx+'" data-idx="'+idx+'" onclick="window._searchActionRun(\''+action.id+'\')" onmouseenter="window._searchEmptyHover('+idx+')">'
+        + '<div class="search-empty-row-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">'+action.icon+'</svg></div>'
+        + '<div class="search-empty-row-body"><div class="search-empty-row-title">'+_esc(action.label)+'</div></div>'
+        + '<kbd class="search-empty-row-kbd">'+action.kbd+'</kbd>'
+        + '</div>';
+      idx++;
+    });
+    html += '</div>';
+
+    // SECTION 2 — Recent (recently viewed entities)
+    const recent = _recentlyViewedGet();
+    if(recent.length > 0){
       html += '<div class="search-empty"><div class="search-empty-hd">Recent</div>';
-      html += recents.map(r =>
-        '<div class="search-empty-row" onclick="window._searchUseRecent(\''+_esc(r.q).replace(/\x27/g,'\\\x27')+'\')">'
-        + '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
-        + '<span class="search-empty-row-text">'+_esc(r.q)+'</span></div>'
-      ).join('');
+      recent.forEach(item => {
+        flat.push({ kind:'entity', item:item });
+        const cfg = TYPE_CONFIG[item.type] || {};
+        const ago = _humanAgo(item.ts);
+        const subParts = [cfg.singular || item.type];
+        if(item.sub){
+          const subSegs = item.sub.split(' · ').slice(1, 3); // drop the type prefix already used
+          subSegs.forEach(s => subParts.push(s));
+        }
+        const subText = subParts.join(' · ') + ' · viewed ' + ago;
+        const titleHtml = item.displayId && item.displayTitle
+          ? '<span class="search-row-title-id">'+_esc(item.displayId)+'</span> <strong>'+_esc(item.displayTitle)+'</strong>'
+          : '<strong>'+_esc(item.title)+'</strong>';
+        const icoHtml = (item.type === 'person' && item.avatarInit)
+          ? '<div class="search-empty-row-ico" style="background:'+item.avatarColor+';color:#fff;font-weight:700;font-size:10px">'+_esc(item.avatarInit)+'</div>'
+          : '<div class="search-empty-row-ico">'+_iconSvg(item.type)+'</div>';
+        html += '<div class="search-empty-row" role="option" id="search-empty-'+idx+'" data-idx="'+idx+'" onclick="window._searchOpenRecent(\''+_esc(item.id)+'\')" onmouseenter="window._searchEmptyHover('+idx+')">'
+          + icoHtml
+          + '<div class="search-empty-row-body">'
+            + '<div class="search-empty-row-title">'+titleHtml+'</div>'
+            + '<div class="search-empty-row-sub">'+_esc(subText)+'</div>'
+          + '</div>'
+          + '</div>';
+        idx++;
+      });
       html += '</div>';
     }
-    html += '<div class="search-empty"><div class="search-empty-hd">Suggested</div>';
-    html += PINNED_SUGGESTIONS.map(s => {
-      const cfg = TYPE_CONFIG[s.type];
-      return '<div class="search-empty-row" onclick="window._searchUseRecent(\''+_esc(s.label)+'\')">'
-        + '<div class="search-row-ico" style="background:'+cfg.color+';width:22px;height:22px;border-radius:5px;font-size:9px">'+s.label.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase()+'</div>'
-        + '<span class="search-empty-row-text">'+_esc(s.label)+' <span style="color:var(--shell-text-caption);font-size:11px;margin-left:6px">'+cfg.singular+'</span></span></div>';
-    }).join('');
-    html += '</div>';
+
+    _searchState._flat = flat; // shared flat list with keyboard nav
     return html;
   }
   function _renderNoResults(){
@@ -5855,6 +5972,44 @@ document.addEventListener('keydown', function(e){
   window._searchRetry = function(){
     _searchState.error = null;
     _runSearch();
+  };
+  // Empty-state interactions
+  window._searchEmptyHover = function(idx){
+    _searchState.activeIdx = idx;
+    _setActiveEmptyRow(idx);
+  };
+  function _setActiveEmptyRow(idx){
+    const rows = document.querySelectorAll('#search-body .search-empty-row');
+    rows.forEach(r => r.classList.remove('is-active'));
+    const row = rows[idx];
+    if(row){
+      row.classList.add('is-active');
+      row.scrollIntoView({ block:'nearest' });
+      document.getElementById('search-input')?.setAttribute('aria-activedescendant', row.id);
+    }
+  }
+  window._searchActionRun = function(actionId){
+    _track('search.action', { action_type:'suggested_action', entity_type:'action', action_id:actionId });
+    _closeSearch('action_click');
+    const labels = { 'create-ticket':'Create work item', 'invite-member':'Invite member', 'create-network':'New automation' };
+    if(typeof toast === 'function') toast(labels[actionId] || 'Action triggered');
+  };
+  window._searchOpenRecent = function(itemId){
+    const recent = _recentlyViewedGet();
+    const item = recent.find(r => r.id === itemId);
+    if(!item) return;
+    _track('search.click', {
+      query_hash:'__recent__', result_type:item.type, result_position:-1,
+      result_id_hash:_hashQuery(item.id), total_results:recent.length, source:'recent'
+    });
+    _recentlyViewedAdd(item); // bumps to top
+    _closeSearch('result_click');
+    if(typeof toast === 'function') toast('Opening '+(item.displayTitle || item.title)+'…');
+  };
+  window._searchAdvanced = function(){
+    _track('search.advanced_click', {});
+    _closeSearch('advanced');
+    if(typeof toast === 'function') toast('Advanced search — coming soon');
   };
 
   function _renderGroupedResults(items, q, isExactId){
@@ -5896,16 +6051,30 @@ document.addEventListener('keydown', function(e){
     return html;
   }
 
+  function _rowIcon(item){
+    // People keep their colored avatar circle (consistent with rest of UI); other types use a monochrome lucide-style icon
+    if(item.type === 'person' && item.avatarInit){
+      return '<div class="search-row-ico" style="background:'+item.avatarColor+';color:#fff;font-weight:700;font-size:10px;letter-spacing:-.2px">'+_esc(item.avatarInit)+'</div>';
+    }
+    return '<div class="search-row-ico">'+_iconSvg(item.type)+'</div>';
+  }
+  function _renderTitle(item, q){
+    // Split ID prefix from title text when present (Tickets, Policies, Conversations)
+    if(item.displayId && item.displayTitle){
+      return '<span class="search-row-title-id">'+_highlight(item.displayId, q)+'</span>'
+        + '<span class="search-row-title-text">'+_highlight(item.displayTitle, q)+'</span>';
+    }
+    return '<span class="search-row-title-text">'+_highlight(item.title, q)+'</span>';
+  }
   function _rowHtml(item, q, isHero, idx){
     const cfg = TYPE_CONFIG[item.type];
     const id = 'search-result-'+idx;
     return '<div class="search-row'+(isHero?' is-hero':'')+'" role="option" id="'+id+'" data-idx="'+idx+'" data-result-id="'+_esc(item.id)+'" onclick="window._searchActivate('+idx+')" onmouseenter="window._searchHover('+idx+')">'
-      + '<div class="search-row-ico" style="background:'+item.iconBg+'">'+_esc(item.iconText)+'</div>'
+      + _rowIcon(item)
       + '<div class="search-row-body">'
-        + '<div class="search-row-title">'+_highlight(item.title, q)+'</div>'
+        + '<div class="search-row-title">'+_renderTitle(item, q)+'</div>'
         + '<div class="search-row-sub">'+_highlight(item.sub, q)+'</div>'
       + '</div>'
-      + (item.meta ? '<div class="search-row-meta">'+_esc(item.meta)+'</div>' : '')
       + '<div class="search-row-actions">'
         + '<button type="button" class="search-row-action search-row-action--primary" onclick="event.stopPropagation();window._searchPrimary('+idx+')">'+_esc(cfg.primaryAction)+'</button>'
         + '<button type="button" class="search-row-action search-row-overflow" aria-label="More actions" onclick="event.stopPropagation();window._searchOverflow('+idx+', event)">'
@@ -5916,7 +6085,7 @@ document.addEventListener('keydown', function(e){
   }
 
   function _setActiveRow(idx){
-    const rows = document.querySelectorAll('#search-body .search-row');
+    const rows = document.querySelectorAll('#search-body .search-row, #search-body .search-empty-row');
     rows.forEach(r => r.classList.remove('is-active'));
     const row = rows[idx];
     if(row){
@@ -5933,8 +6102,17 @@ document.addEventListener('keydown', function(e){
     _setActiveRow(idx);
   };
   window._searchActivate = function(idx){
-    const item = (_searchState._flat || [])[idx];
-    if(!item) return;
+    // In empty state, items are wrapped: { kind:'action'|'entity', action|item }
+    const entry = (_searchState._flat || [])[idx];
+    if(!entry) return;
+    if(entry.kind === 'action'){
+      return window._searchActionRun(entry.action.id);
+    }
+    if(entry.kind === 'entity'){
+      return window._searchOpenRecent(entry.item.id);
+    }
+    // Regular result row (when query is active)
+    const item = entry;
     _track('search.click', {
       query_hash: _hashQuery(_searchState.query),
       result_type: item.type,
@@ -5943,21 +6121,25 @@ document.addEventListener('keydown', function(e){
       total_results: _searchState.results.length
     });
     _recentsAdd(_searchState.query);
+    _recentlyViewedAdd(item);
     _closeSearch('result_click');
-    if(typeof toast === 'function') toast('Opening '+item.title.split('·')[0].trim()+'…');
+    if(typeof toast === 'function') toast('Opening '+(item.displayTitle || item.title.split('·')[0].trim())+'…');
   };
   window._searchPrimary = function(idx){
-    const item = (_searchState._flat || [])[idx];
-    if(!item) return;
+    const entry = (_searchState._flat || [])[idx];
+    if(!entry || entry.kind) return; // suggested actions/recent items use their own activate paths
+    const item = entry;
     const cfg = TYPE_CONFIG[item.type];
     _track('search.action', { action_type:cfg.primaryAction, entity_type:item.type, from_position:idx });
     _recentsAdd(_searchState.query);
+    _recentlyViewedAdd(item);
     _closeSearch('action_click');
-    if(typeof toast === 'function') toast(cfg.primaryAction + ' · ' + item.title.split('·')[0].trim());
+    if(typeof toast === 'function') toast(cfg.primaryAction + ' · ' + (item.displayTitle || item.title.split('·')[0].trim()));
   };
   window._searchOverflow = function(idx, evt){
-    const item = (_searchState._flat || [])[idx];
-    if(!item) return;
+    const entry = (_searchState._flat || [])[idx];
+    if(!entry || entry.kind) return; // no overflow on empty state items
+    const item = entry;
     const cfg = TYPE_CONFIG[item.type];
     // Close any existing overflow menu
     document.querySelectorAll('.search-row-overflow-menu').forEach(m => m.remove());
@@ -6053,25 +6235,37 @@ document.addEventListener('keydown', function(e){
     } else if(e.key === 'Tab'){
       // Let default tab order work (focus moves to chips/buttons)
     } else if(e.key >= '1' && e.key <= '9' && (e.metaKey || e.ctrlKey)){
-      // ⌘+N → jump to tab N
-      const tabs = ['all','agent','network','ticket','policy','person','channel','conversation','workspace'];
+      // ⌘+N → jump to tab N (uses TAB_ORDER, alphabetical after "All")
       const n = parseInt(e.key, 10) - 1;
-      if(tabs[n]){ e.preventDefault(); window._searchSetTab(tabs[n]); }
+      if(TAB_ORDER[n]){ e.preventDefault(); window._searchSetTab(TAB_ORDER[n]); }
     }
+    // Note: the C/I/N kbd badges on Suggested actions are visual only (Linear/Notion
+    // pattern). Triggering a real hotkey would conflict with the user typing those
+    // letters into the search input.
   }
 
   // ── 12. Open / Close ──
+  function _isMobileView(){ return window.matchMedia && window.matchMedia('(max-width: 720px)').matches; }
   window._openSearch = function(trigger){
     if(_searchState.open) return;
     SEARCH_INDEX = _buildIndex(); // rebuild on each open in case data changed
     _searchState.open = true;
     _searchState.sessionId = 'sess_'+Math.random().toString(36).slice(2,10);
-    _track('search.open', { trigger: trigger || 'unknown' });
+    _track('search.open', { trigger: trigger || 'unknown', mobile: _isMobileView() });
     document.getElementById('search-overlay')?.classList.add('open');
     const modal = document.getElementById('search-modal');
     if(modal){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); }
+    // Mobile: lock body scroll behind the full-screen overlay
+    if(_isMobileView()){
+      document.body.dataset.searchPrevOverflow = document.body.style.overflow || '';
+      document.body.style.overflow = 'hidden';
+    }
     const input = document.getElementById('search-input');
-    if(input){ setTimeout(()=>{ input.focus(); input.select(); }, 0); input.setAttribute('aria-expanded','true'); }
+    if(input){
+      // On mobile, defer focus slightly so the keyboard animation doesn't fight the modal transition
+      setTimeout(()=>{ input.focus({ preventScroll:true }); input.select(); }, _isMobileView() ? 120 : 0);
+      input.setAttribute('aria-expanded','true');
+    }
     // Close other top-bar menus
     if(typeof _ctxClose === 'function') _ctxClose();
     if(typeof _avatarClose === 'function') _avatarClose();
@@ -6087,6 +6281,11 @@ document.addEventListener('keydown', function(e){
     if(modal){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
     document.getElementById('search-input')?.setAttribute('aria-expanded','false');
     document.querySelectorAll('.search-row-overflow-menu, .search-op-autocomplete').forEach(d => d.remove());
+    // Restore body scroll
+    if(typeof document.body.dataset.searchPrevOverflow !== 'undefined'){
+      document.body.style.overflow = document.body.dataset.searchPrevOverflow || '';
+      delete document.body.dataset.searchPrevOverflow;
+    }
     _track('search.close', { reason: reason || 'unknown', had_query: !!_searchState.query, had_results: _searchState.results.length > 0 });
   };
   window._searchClear = function(){
@@ -6355,28 +6554,27 @@ document.addEventListener('keydown', function(e){
       <div class="search-input-chips" id="search-input-chips" aria-hidden="true"></div>
       <input id="search-input" type="text" class="search-input" autocomplete="off" spellcheck="false"
         role="combobox" aria-expanded="false" aria-controls="search-listbox" aria-activedescendant=""
-        placeholder="Search agents, networks, tickets, policies…" />
+        placeholder="Search agents, networks, tickets, policies, people…" />
       <span class="search-input-loader" id="search-input-loader" aria-hidden="true"></span>
       <button type="button" class="search-input-clear" id="search-input-clear" aria-label="Clear search" onclick="_searchClear()" hidden>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 3l6 6M3 9l6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
       <kbd class="search-esc" aria-hidden="true">esc</kbd>
+      <button type="button" class="search-input-mobile-cancel" onclick="_closeSearch('mobile-cancel')" aria-label="Close search">Cancel</button>
     </div>
 
     <div class="search-tabs" id="search-tabs" role="tablist" aria-label="Filter by type"></div>
 
     <div class="search-filters-row" id="search-filters-row" hidden></div>
 
-    <div class="search-body" id="search-body" role="listbox" aria-label="Search results" id="search-listbox"></div>
+    <div class="search-body" id="search-body" role="listbox" aria-label="Search results"></div>
 
     <div class="search-footer">
       <div class="search-footer-hints">
-        <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
-        <span><kbd>↵</kbd> open</span>
-        <span><kbd>⌘</kbd><kbd>↵</kbd> new tab</span>
-        <span><kbd>esc</kbd> close</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+        <span><kbd>↵</kbd> Open</span>
       </div>
-      <div class="search-footer-tip" id="search-footer-tip">Tip: try <code>type:agent</code>, <code>owner:me</code>, <code>status:open</code></div>
+      <button type="button" class="search-footer-link" onclick="_searchAdvanced()">Advanced search</button>
     </div>
   </div>
 </div>
