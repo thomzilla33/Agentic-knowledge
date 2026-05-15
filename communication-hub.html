@@ -1028,6 +1028,24 @@
     .am-theme-btn:hover{color:var(--shell-text-strong)}
     .am-theme-btn.is-active{background:var(--shell-menu-item-active-bg);color:var(--shell-accent-blue)}
     .am-theme-btn svg{flex-shrink:0}
+    /* Language row + dropdown selector */
+    .am-lang-row{width:100%;display:flex;align-items:center;gap:10px;padding:9px 14px;background:none;border:none;color:var(--shell-text-body);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;text-align:left;transition:background .1s}
+    .am-lang-row:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong)}
+    .am-lang-row > svg:first-of-type{color:var(--shell-icon-default);flex-shrink:0}
+    .am-lang-current{font-size:11.5px;color:var(--shell-text-muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+    .am-lang-chev{color:var(--shell-icon-default);transition:transform .15s;flex-shrink:0}
+    .am-lang-row.is-expanded .am-lang-chev{transform:rotate(180deg)}
+    .am-lang-dropdown{position:fixed;background:var(--shell-menu-bg);border:1px solid var(--shell-menu-border);border-radius:8px;box-shadow:var(--shell-menu-shadow);z-index:201;max-height:300px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .12s;padding:4px}
+    .am-lang-dropdown.open{opacity:1;pointer-events:auto}
+    .am-lang-dropdown::-webkit-scrollbar{width:6px}
+    .am-lang-dropdown::-webkit-scrollbar-thumb{background:var(--shell-divider);border-radius:3px}
+    .am-lang-item{display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;background:transparent;border:none;border-radius:5px;font-family:inherit;font-size:12px;color:var(--shell-text-body);cursor:pointer;text-align:left;transition:background .1s}
+    .am-lang-item:hover{background:var(--shell-menu-item-hover-bg)}
+    .am-lang-item.is-active{background:rgba(43,127,255,0.08);color:var(--shell-accent-blue)}
+    .am-lang-item-name{font-weight:600;flex-shrink:0}
+    .am-lang-item-region{color:var(--shell-text-muted);font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .am-lang-item.is-active .am-lang-item-region{color:rgba(43,127,255,.65)}
+    .am-lang-item-check{color:var(--shell-accent-blue);flex-shrink:0}
     .am-item.is-danger{color:rgba(248,113,113,0.85)}
     .am-item.is-danger svg{color:rgba(248,113,113,0.65)}
     .am-item.is-danger:hover{background:rgba(248,113,113,0.08);color:rgba(252,165,165,0.95)}
@@ -3564,7 +3582,29 @@
     });
   })();
   /* ── Avatar menu (account + workspace switcher) ── */
-  const _avatarState = { workspacesExpanded: false, wsSearch: '' };
+  const _avatarState = { workspacesExpanded: false, wsSearch: '', languageOpen: false };
+const LANGUAGES_DATA = [
+  { code:'en-US', name:'English',    region:'United States' },
+  { code:'en-GB', name:'English',    region:'United Kingdom' },
+  { code:'es-ES', name:'Español',    region:'España' },
+  { code:'es-419',name:'Español',    region:'Latinoamérica' },
+  { code:'pt-BR', name:'Português',  region:'Brasil' },
+  { code:'fr-FR', name:'Français',   region:'France' },
+  { code:'de-DE', name:'Deutsch',    region:'Deutschland' },
+  { code:'ja-JP', name:'日本語',      region:'日本' },
+  { code:'zh-CN', name:'中文',        region:'中国' },
+  { code:'ko-KR', name:'한국어',      region:'대한민국' }
+];
+function _getLang(){ try { return localStorage.getItem('aims_language') || 'en-US'; } catch(e){ return 'en-US'; } }
+function _avatarToggleLanguage(){ _avatarState.languageOpen = !_avatarState.languageOpen; _renderAvatarMenu(); }
+function _avatarPickLanguage(code){
+  try { localStorage.setItem('aims_language', code); } catch(e){}
+  _avatarState.languageOpen = false;
+  const lang = LANGUAGES_DATA.find(l => l.code === code);
+  _renderAvatarMenu();
+  if(lang && typeof toast === 'function') toast('Language set to '+lang.name+' · '+lang.region);
+  else if(lang && typeof showToast === 'function') showToast('Language set to '+lang.name);
+}
 
   function _renderAvatarMenu(){
     const menu = document.getElementById('avatarMenu'); if(!menu) return;
@@ -3634,6 +3674,31 @@
     html += '<button type="button" class="am-theme-btn'+(currentTheme==='dark'?' is-active':'')+'" role="radio" aria-checked="'+(currentTheme==='dark')+'" onclick="event.stopPropagation();_setTheme(\'dark\')" title="Dark" aria-label="Dark mode"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M13 9.5A6 6 0 016.5 3a6 6 0 109.5 6.5 5 5 0 01-3-.001z" stroke-linejoin="round"/></svg></button>';
     html += '</div>';
     html += '</div>';
+    // Language row (dropdown selector — opens an inline picker)
+    const _lang = _getLang();
+    const _activeLang = LANGUAGES_DATA.find(l => l.code === _lang) || LANGUAGES_DATA[0];
+    const _langOpen = _avatarState.languageOpen;
+    html += '<button type="button" class="am-item am-lang-row'+(_langOpen?' is-expanded':'')+'" onclick="event.stopPropagation();_avatarToggleLanguage()" aria-haspopup="listbox" aria-expanded="'+_langOpen+'">';
+    html += '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20" stroke-linecap="round"/><path d="M12 2a14 14 0 010 20M12 2a14 14 0 000 20" stroke-linecap="round"/></svg>';
+    html += '<span style="flex:1;text-align:left">Language</span>';
+    html += '<span class="am-lang-current">'+_ctxEscAttr(_activeLang.name)+' · '+_ctxEscAttr(_activeLang.region)+'</span>';
+    html += '<svg class="am-lang-chev" width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    html += '</button>';
+    // Language dropdown popover (positioned with fixed coords to escape menu overflow)
+    html += '<div class="am-lang-dropdown'+(_langOpen?' open':'')+'" id="am-lang-dropdown" role="listbox" aria-label="Select language">';
+    if(_langOpen){
+      LANGUAGES_DATA.forEach(lang => {
+        const isActive = lang.code === _lang;
+        html += '<button type="button" class="am-lang-item'+(isActive?' is-active':'')+'" role="option" aria-selected="'+isActive+'" onclick="event.stopPropagation();_avatarPickLanguage(\''+lang.code+'\')">';
+        html += '<span class="am-lang-item-name">'+_ctxEscAttr(lang.name)+'</span>';
+        html += '<span class="am-lang-item-region">'+_ctxEscAttr(lang.region)+'</span>';
+        if(isActive){
+          html += '<svg class="am-lang-item-check" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        }
+        html += '</button>';
+      });
+    }
+    html += '</div>';
     html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
     html += '</div>';
     html += '<div class="am-section">';
@@ -3646,6 +3711,17 @@
       const dropdown = document.getElementById('am-ws-dropdown');
       if(card && dropdown){
         const rect = card.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + 4) + 'px';
+        dropdown.style.left = rect.left + 'px';
+        dropdown.style.width = rect.width + 'px';
+      }
+    }
+    // Position the language dropdown if open — same fixed pattern
+    if(_avatarState.languageOpen){
+      const row = document.querySelector('.am-lang-row');
+      const dropdown = document.getElementById('am-lang-dropdown');
+      if(row && dropdown){
+        const rect = row.getBoundingClientRect();
         dropdown.style.top = (rect.bottom + 4) + 'px';
         dropdown.style.left = rect.left + 'px';
         dropdown.style.width = rect.width + 'px';
