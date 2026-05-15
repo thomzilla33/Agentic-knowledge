@@ -488,8 +488,14 @@ table, .table { width: 100%; border-collapse: collapse; }
 .gear-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
 .gear-menu::-webkit-scrollbar{width:6px}
 .gear-menu::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
-.gear-menu-hd{padding:14px 16px 6px;font-size:13px;font-weight:700;color:var(--shell-text-strong)}
-.gear-empty{padding:18px 16px;display:flex;gap:10px;align-items:flex-start;color:var(--shell-text-muted)}
+.gear-menu-hd{padding:14px 16px 4px;font-size:13px;font-weight:700;color:var(--shell-text-strong)}
+.gear-section{padding:4px 0 6px}
+.gear-section + .gear-section{border-top:1px solid var(--shell-divider);padding-top:6px}
+.gear-section-hd{padding:10px 16px 4px;font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:baseline;gap:5px;max-width:100%;min-width:0}
+.gear-section-hd-scope{flex-shrink:0}
+.gear-section-hd-sep{flex-shrink:0;color:var(--shell-text-caption);opacity:.7}
+.gear-section-hd-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--shell-text-muted);font-weight:600;text-transform:none;letter-spacing:0;font-size:11px}
+.gear-empty{padding:14px 16px;display:flex;gap:10px;align-items:flex-start;color:var(--shell-text-muted)}
 .gear-empty svg{color:var(--shell-icon-default);flex-shrink:0;margin-top:1px}
 .gear-empty-text{font-size:12px;line-height:1.5}
 .gear-section-hd{padding:10px 16px 4px;font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em}
@@ -2602,6 +2608,25 @@ html.theme-light .search-tab.is-active{background:rgba(139,92,246,.10);color:#7C
 /* Applied filters row */
 .search-filters-row{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid var(--shell-divider);flex-wrap:wrap;flex-shrink:0}
 
+/* Filters popover (opens from the Filters button in the tabs row) */
+.search-filters-popover{position:absolute;top:calc(50px + 46px + 4px);left:14px;width:340px;max-width:calc(100% - 28px);background:var(--shell-menu-bg);border:1px solid var(--shell-menu-border);border-radius:10px;box-shadow:var(--shell-menu-shadow);z-index:5;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.search-filters-popover.open{opacity:1;pointer-events:auto;transform:translateY(0)}
+.search-filters-pop-row{padding:10px 14px;border-bottom:1px solid var(--shell-divider)}
+.search-filters-pop-row:last-of-type{border-bottom:none}
+.search-filters-pop-label{font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.search-filters-pop-pills{display:flex;flex-wrap:wrap;gap:6px}
+.search-filters-pop-pills button{padding:4px 10px;height:24px;border-radius:6px;background:transparent;border:1px solid var(--shell-menu-border);color:var(--shell-text-body);font-family:inherit;font-size:11.5px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;transition:background .1s,border-color .1s,color .1s;line-height:1}
+.search-filters-pop-pills button:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-text-strong);border-color:var(--shell-text-muted)}
+.search-filters-pop-pills button.is-active{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.35);color:#8B5CF6;font-weight:600}
+html.theme-light .search-filters-pop-pills button.is-active{color:#7C3AED}
+.search-filters-pop-footer{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--shell-menu-item-hover-bg);border-top:1px solid var(--shell-divider)}
+.search-filters-pop-clear{background:transparent;border:none;color:var(--shell-text-muted);font-family:inherit;font-size:11.5px;font-weight:500;cursor:pointer;padding:6px 8px;border-radius:5px}
+.search-filters-pop-clear:hover{background:rgba(255,255,255,.05);color:var(--shell-text-strong)}
+html.theme-light .search-filters-pop-clear:hover{background:rgba(15,23,42,.05)}
+.search-filters-pop-done{background:#8B5CF6;border:none;color:#fff;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;padding:6px 12px;border-radius:5px;transition:background .1s}
+.search-filters-pop-done:hover{background:#7C3AED}
+.search-filters-btn.is-active{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.30);color:#8B5CF6}
+
 /* Body / list */
 .search-body{flex:1;overflow-y:auto;padding:6px 0;min-height:120px}
 .search-body::-webkit-scrollbar{width:6px}
@@ -4519,7 +4544,13 @@ function _ctxAction(action){
     'create-workspace':'Create workspace — coming soon',
     'contact-admin':'Reach out to your workspace admin — coming soon',
     'appearance':'Appearance preferences — handled by Theme toggle',
-    'notification-prefs':'Notification preferences — coming soon'
+    'notification-prefs':'Notification preferences — coming soon',
+    'account-settings':'Account & security — coming soon',
+    'api-keys':'API keys & tokens — coming soon',
+    'studio-defaults':'Studio defaults — coming soon',
+    'studio-views':'Custom views & layouts — coming soon',
+    'billing':'Billing & plan — coming soon',
+    'integrations':'Integrations — coming soon'
   }[action] || action;
   if(typeof toast === 'function') toast(msg);
   else if(typeof showToast === 'function') showToast(msg);
@@ -5048,29 +5079,68 @@ if(typeof _origToggleContextMenu === 'function'){
 function _renderGearMenu(){
   const menu = document.getElementById('gearMenu'); if(!menu) return;
   const active = (typeof _wsActive === 'function') ? _wsActive() : null;
-  let html = '';
-  html += '<div class="gear-menu-hd">Workspace administration'+(active ? ' · '+_ctxEscAttr(active.name) : '')+'</div>';
+  const appName = document.getElementById('ctx-name')?.textContent?.trim() || 'Studio';
   const canSettings = userCan('canManageWorkspaceSettings');
   const canMembers  = userCan('canManageMembers');
-  // Workspace settings
-  if(canSettings){
-    html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'workspace-settings\')">';
-    html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
-    html += '<div class="gear-item-main"><div class="gear-item-name">Workspace settings</div><div class="gear-item-desc">Name, defaults, retention, branding, and security policies</div></div>';
+  let html = '';
+  html += '<div class="gear-menu-hd">Settings</div>';
+
+  // ── PERSONAL — settings scoped to "me as a user" ──
+  html += '<div class="gear-section">';
+  html += '<div class="gear-section-hd"><span class="gear-section-hd-scope">Personal</span></div>';
+  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'account-settings\')">';
+  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>';
+  html += '<div class="gear-item-main"><div class="gear-item-name">Account &amp; security</div><div class="gear-item-desc">Login method, two-factor auth, and active sessions</div></div>';
+  html += '</button>';
+  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'api-keys\')">';
+  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="14" r="3.5"/><path d="M12 11l8-8M16 7l3 3M14 9l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  html += '<div class="gear-item-main"><div class="gear-item-name">API keys &amp; tokens</div><div class="gear-item-desc">Personal access tokens for the AIMS-OS API and SDKs</div></div>';
+  html += '</button>';
+  html += '</div>';
+
+  // ── STUDIO — settings scoped to the current app/studio ──
+  html += '<div class="gear-section">';
+  html += '<div class="gear-section-hd"><span class="gear-section-hd-scope">Studio</span><span class="gear-section-hd-sep">·</span><span class="gear-section-hd-name" title="'+_ctxEscAttr(appName)+'">'+_esc(appName)+'</span></div>';
+  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'studio-defaults\')">';
+  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke-linejoin="round"/></svg>';
+  html += '<div class="gear-item-main"><div class="gear-item-name">Studio defaults</div><div class="gear-item-desc">Default behavior, statuses, and templates for '+_esc(appName)+'</div></div>';
+  html += '</button>';
+  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'studio-views\')">';
+  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="11" width="18" height="4" rx="1"/><rect x="3" y="18" width="18" height="3" rx="1"/></svg>';
+  html += '<div class="gear-item-main"><div class="gear-item-name">Custom views &amp; layouts</div><div class="gear-item-desc">Saved filters and shared layouts inside this studio</div></div>';
+  html += '</button>';
+  html += '</div>';
+
+  // ── WORKSPACE — settings scoped to the whole workspace (admin only) ──
+  if(active){
+    html += '<div class="gear-section">';
+    html += '<div class="gear-section-hd"><span class="gear-section-hd-scope">Workspace</span><span class="gear-section-hd-sep">·</span><span class="gear-section-hd-name" title="'+_ctxEscAttr(active.name)+'">'+_esc(active.name)+'</span></div>';
+    if(canSettings){
+      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'workspace-settings\')">';
+      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
+      html += '<div class="gear-item-main"><div class="gear-item-name">Workspace settings</div><div class="gear-item-desc">Name, defaults, retention, branding, and security policies</div></div>';
+      html += '</button>';
+    }
+    if(canMembers){
+      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'members\')">';
+      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.5"/><path d="M3 19c0-3.5 3-5.5 6-5.5s6 2 6 5.5" stroke-linecap="round"/><circle cx="17" cy="10" r="2.5"/><path d="M21 18c0-2.5-1.6-3.8-4-3.8" stroke-linecap="round"/></svg>';
+      html += '<div class="gear-item-main"><div class="gear-item-name">Members &amp; access</div><div class="gear-item-desc">Invite people, manage roles, and review pending invitations</div></div>';
+      html += '</button>';
+    }
+    html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'billing\')">';
+    html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18" stroke-linecap="round"/><path d="M6 14h3M12 14h3" stroke-linecap="round"/></svg>';
+    html += '<div class="gear-item-main"><div class="gear-item-name">Billing &amp; plan</div><div class="gear-item-desc">Subscription, usage, invoices, and payment method</div></div>';
     html += '</button>';
-  }
-  // Members & access
-  if(canMembers){
-    html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'members\')">';
-    html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.5"/><path d="M3 19c0-3.5 3-5.5 6-5.5s6 2 6 5.5" stroke-linecap="round"/><circle cx="17" cy="10" r="2.5"/><path d="M21 18c0-2.5-1.6-3.8-4-3.8" stroke-linecap="round"/></svg>';
-    html += '<div class="gear-item-main"><div class="gear-item-name">Members &amp; access</div><div class="gear-item-desc">Invite people, manage roles, and review pending invitations</div></div>';
+    html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'integrations\')">';
+    html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 4v6h6V4M3 10h6M15 10h6M9 14v6h6v-6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    html += '<div class="gear-item-main"><div class="gear-item-name">Integrations</div><div class="gear-item-desc">Salesforce, Slack, Zendesk, Twilio, and 30+ more</div></div>';
     html += '</button>';
-  }
-  // Empty state when user has no admin permissions
-  if(!canSettings && !canMembers){
-    html += '<div class="gear-empty">';
-    html += '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.5" stroke-linecap="round"/></svg>';
-    html += '<div class="gear-empty-text">No admin actions available for your role. Contact a workspace admin if you need access.</div>';
+    if(!canSettings && !canMembers){
+      html += '<div class="gear-empty">';
+      html += '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.5" stroke-linecap="round"/></svg>';
+      html += '<div class="gear-empty-text">You can only view this section. Ask a workspace admin if you need to make changes.</div>';
+      html += '</div>';
+    }
     html += '</div>';
   }
   menu.innerHTML = html;
@@ -5866,9 +5936,56 @@ document.addEventListener('keydown', function(e){
     wrap.innerHTML = html;
   }
   window._searchToggleFilters = function(){
-    _track('search.filters_button_click', {});
-    if(typeof toast === 'function') toast('Advanced filters — coming soon');
+    const pop = document.getElementById('search-filters-popover');
+    const btn = document.getElementById('search-filters-btn');
+    if(!pop) return;
+    const isOpen = pop.classList.toggle('open');
+    pop.setAttribute('aria-hidden', String(!isOpen));
+    btn && btn.classList.toggle('is-active', isOpen);
+    _track(isOpen ? 'search.filters_open' : 'search.filters_close', { applied_chip_count: _searchState.chips.length });
+    if(isOpen){
+      _renderFiltersPopover();
+      // Close on outside click (mousedown to fire before re-render)
+      setTimeout(() => document.addEventListener('mousedown', _searchFiltersOutsideClick), 0);
+    } else {
+      document.removeEventListener('mousedown', _searchFiltersOutsideClick);
+    }
   };
+  function _searchFiltersOutsideClick(e){
+    const pop = document.getElementById('search-filters-popover');
+    const btn = document.getElementById('search-filters-btn');
+    if(!pop || !pop.classList.contains('open')) return;
+    if(pop.contains(e.target) || (btn && btn.contains(e.target))) return;
+    window._searchToggleFilters();
+  }
+  // Render: mark current chips as active pills in the popover
+  window._renderFiltersPopover = function(){
+    const pop = document.getElementById('search-filters-popover');
+    if(!pop) return;
+    pop.querySelectorAll('.search-filters-pop-pills button[data-value]').forEach(btn => {
+      const key = btn.parentElement.dataset.key;
+      const value = btn.dataset.value;
+      const isActive = _searchState.chips.some(c => c.key === key && c.value === value);
+      btn.classList.toggle('is-active', isActive);
+    });
+  };
+  // Filter pill click — toggle chip on/off
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.search-filters-pop-pills button[data-value]');
+    if(!btn) return;
+    e.stopPropagation();
+    const key = btn.parentElement.dataset.key;
+    const value = btn.dataset.value;
+    const existing = _searchState.chips.find(c => c.key === key && c.value === value);
+    if(existing){
+      _searchState.chips = _searchState.chips.filter(c => !(c.key === key && c.value === value));
+      _renderChips();
+      _runSearch();
+    } else {
+      _addChip(key, value);
+    }
+    window._renderFiltersPopover();
+  });
   window._searchSetTab = function(tab){
     _track('search.tab_change', { from:_searchState.tab, to:tab });
     _searchState.tab = tab;
@@ -5944,10 +6061,21 @@ document.addEventListener('keydown', function(e){
     });
     html += '</div>';
 
-    // SECTION 2 — Recent (recently viewed entities)
-    const recent = _recentlyViewedGet();
+    // SECTION 2 — Recent (recently viewed entities) — or "Popular this week" on cold start
+    let recent = _recentlyViewedGet();
+    let isCold = recent.length === 0;
+    if(isCold){
+      // Cold start: curate a mixed sample of entity types so the user immediately
+      // sees what real result rows look like (without having to type anything).
+      const wanted = ['network','agent','ticket','policy','person'];
+      recent = [];
+      wanted.forEach(type => {
+        const item = SEARCH_INDEX.find(i => i.type === type);
+        if(item) recent.push(Object.assign({}, item, { ts: Date.now() - (recent.length+1)*3600e3 }));
+      });
+    }
     if(recent.length > 0){
-      html += '<div class="search-empty"><div class="search-empty-hd">Recent</div>';
+      html += '<div class="search-empty"><div class="search-empty-hd">'+(isCold?'Popular this week':'Recent')+'</div>';
       recent.forEach(item => {
         flat.push({ kind:'entity', item:item });
         const cfg = TYPE_CONFIG[item.type] || {};
@@ -5957,7 +6085,7 @@ document.addEventListener('keydown', function(e){
           const subSegs = item.sub.split(' · ').slice(1, 3); // drop the type prefix already used
           subSegs.forEach(s => subParts.push(s));
         }
-        const subText = subParts.join(' · ') + ' · viewed ' + ago;
+        const subText = subParts.join(' · ') + (isCold ? ' · '+ago : ' · viewed '+ago);
         const titleHtml = item.displayId && item.displayTitle
           ? '<span class="search-row-title-id">'+_esc(item.displayId)+'</span> <strong>'+_esc(item.displayTitle)+'</strong>'
           : '<strong>'+_esc(item.title)+'</strong>';
@@ -6593,6 +6721,46 @@ document.addEventListener('keydown', function(e){
     </div>
 
     <div class="search-tabs" id="search-tabs" role="tablist" aria-label="Filter by type"></div>
+
+    <div class="search-filters-popover" id="search-filters-popover" role="dialog" aria-label="Advanced filters" aria-hidden="true">
+      <div class="search-filters-pop-row">
+        <div class="search-filters-pop-label">Type</div>
+        <div class="search-filters-pop-pills" data-key="type">
+          <button type="button" data-value="agent">Agents</button>
+          <button type="button" data-value="network">Networks</button>
+          <button type="button" data-value="ticket">Tickets</button>
+          <button type="button" data-value="policy">Policies</button>
+          <button type="button" data-value="person">People</button>
+          <button type="button" data-value="channel">Channels</button>
+          <button type="button" data-value="conversation">Conversations</button>
+          <button type="button" data-value="workspace">Workspaces</button>
+        </div>
+      </div>
+      <div class="search-filters-pop-row">
+        <div class="search-filters-pop-label">Owner</div>
+        <div class="search-filters-pop-pills" data-key="owner">
+          <button type="button" data-value="me">Me</button>
+          <button type="button" data-value="Edgardo">Edgardo Sierra</button>
+          <button type="button" data-value="Sarah">Sarah Chen</button>
+          <button type="button" data-value="Marcus">Marcus Reid</button>
+        </div>
+      </div>
+      <div class="search-filters-pop-row">
+        <div class="search-filters-pop-label">Status</div>
+        <div class="search-filters-pop-pills" data-key="status">
+          <button type="button" data-value="active">Active</button>
+          <button type="button" data-value="draft">Draft</button>
+          <button type="button" data-value="open">Open</button>
+          <button type="button" data-value="in-progress">In progress</button>
+          <button type="button" data-value="done">Done</button>
+          <button type="button" data-value="archived">Archived</button>
+        </div>
+      </div>
+      <div class="search-filters-pop-footer">
+        <button type="button" class="search-filters-pop-clear" onclick="event.stopPropagation();_searchClearChips();_renderFiltersPopover();">Clear all</button>
+        <button type="button" class="search-filters-pop-done" onclick="event.stopPropagation();_searchToggleFilters();">Done</button>
+      </div>
+    </div>
 
     <div class="search-filters-row" id="search-filters-row" hidden></div>
 
