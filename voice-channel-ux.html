@@ -502,17 +502,25 @@ table, .table { width: 100%; border-collapse: collapse; }
 .am-item.is-danger:hover svg{color:rgba(252,165,165,0.85)}
 /* ── Gear menu (Personal settings — Jira-style) ── */
 .tb-gear-wrap{position:relative;flex-shrink:0;display:inline-flex;align-items:center}
-.gear-menu{position:absolute;top:calc(100% + 8px);right:0;width:320px;background:var(--shell-menu-bg);border:1px solid var(--shell-menu-border);border-radius:10px;box-shadow:var(--shell-menu-shadow);z-index:200;overflow:hidden;opacity:0;transform:translateY(-6px) scale(0.97);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1);text-align:left;max-height:calc(100vh - 80px);overflow-y:auto}
+.gear-menu{position:absolute;top:calc(100% + 8px);right:0;width:360px;background:var(--shell-menu-bg);border:1px solid var(--shell-menu-border);border-radius:10px;box-shadow:var(--shell-menu-shadow);z-index:200;overflow:hidden;opacity:0;transform:translateY(-6px) scale(0.97);pointer-events:none;transition:opacity .15s cubic-bezier(.4,0,.2,1),transform .15s cubic-bezier(.4,0,.2,1);text-align:left;max-height:calc(100vh - 80px);display:flex;flex-direction:column;min-height:0}
 .gear-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-.gear-menu::-webkit-scrollbar{width:6px}
-.gear-menu::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:3px}
-.gear-menu-hd{padding:14px 16px 4px;font-size:13px;font-weight:700;color:var(--shell-text-strong)}
+.gear-menu-hd{padding:14px 16px 6px;font-size:13px;font-weight:700;color:var(--shell-text-strong);flex-shrink:0}
+.gear-search-row{display:flex;align-items:center;gap:8px;padding:6px 12px 10px;border-bottom:1px solid var(--shell-divider);flex-shrink:0}
+.gear-search-ic{color:var(--shell-icon-default);flex-shrink:0}
+.gear-search-row input{flex:1;min-width:0;border:none;background:transparent;outline:none;color:var(--shell-text-strong);font-family:inherit;font-size:13px;padding:4px 0}
+.gear-search-row input::placeholder{color:var(--shell-text-muted)}
+.gear-search-kbd{font-family:inherit;font-size:10px;font-weight:600;padding:2px 5px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--shell-text-caption);border:1px solid var(--shell-topbar-search-border);line-height:1;flex-shrink:0}
+html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rgba(15,23,42,0.10)}
+.gear-menu-scroll{flex:1;overflow-y:auto;min-height:0;padding:4px 0 8px}
+.gear-menu-scroll::-webkit-scrollbar{width:6px}
+.gear-menu-scroll::-webkit-scrollbar-thumb{background:var(--shell-divider);border-radius:3px}
 .gear-section{padding:4px 0 6px}
 .gear-section + .gear-section{border-top:1px solid var(--shell-divider);padding-top:6px}
-.gear-section-hd{padding:10px 16px 4px;font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:baseline;gap:5px;max-width:100%;min-width:0}
-.gear-section-hd-scope{flex-shrink:0}
-.gear-section-hd-sep{flex-shrink:0;color:var(--shell-text-caption);opacity:.7}
-.gear-section-hd-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--shell-text-muted);font-weight:600;text-transform:none;letter-spacing:0;font-size:11px}
+.gear-section-hd{padding:10px 16px 6px;font-size:10px;font-weight:700;color:var(--shell-text-caption);text-transform:uppercase;letter-spacing:.08em;line-height:1.2}
+.gear-item.is-active{background:var(--shell-menu-item-hover-bg)}
+.gear-item-name mark,.gear-item-desc mark{background:rgba(139,92,246,.18);color:inherit;padding:0 1px;border-radius:2px;font-weight:600}
+.gear-menu-empty{padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;color:var(--shell-text-muted);font-size:12px;line-height:1.5}
+.gear-menu-empty svg{color:var(--shell-icon-default)}
 .gear-empty{padding:14px 16px;display:flex;gap:10px;align-items:flex-start;color:var(--shell-text-muted)}
 .gear-empty svg{color:var(--shell-icon-default);flex-shrink:0;margin-top:1px}
 .gear-empty-text{font-size:12px;line-height:1.5}
@@ -4563,7 +4571,14 @@ function _ctxAction(action){
     'studio-defaults':'Studio defaults — coming soon',
     'studio-views':'Custom views & layouts — coming soon',
     'billing':'Billing & plan — coming soon',
-    'integrations':'Integrations — coming soon'
+    'integrations':'Integrations — coming soon',
+    'profile':'Profile — coming soon',
+    'active-sessions':'Active sessions — coming soon',
+    'system':'System settings — coming soon',
+    'apps':'Apps — coming soon',
+    'spaces':'Spaces — coming soon',
+    'work-items':'Work items — coming soon',
+    'marketplace':'Marketplace — coming soon'
   }[action] || action;
   if(typeof toast === 'function') toast(msg);
   else if(typeof showToast === 'function') showToast(msg);
@@ -5146,75 +5161,156 @@ if(typeof _origToggleContextMenu === 'function'){
     _origToggleContextMenu(e);
   };
 }
-// ── Gear menu (Personal settings — Jira-style) ────────
+// ── Gear menu (Settings — three sections + search + keyboard nav) ────────
+const _gearState = { query: '', activeIdx: 0, justOpened: false, _flat: [] };
+const _GEAR_ICONS = {
+  profile:    '<circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/>',
+  bell:       '<path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/>',
+  device:     '<rect x="3" y="4" width="14" height="11" rx="2"/><rect x="19" y="9" width="3" height="9" rx="1"/><path d="M5 18h12M8 21h6" stroke-linecap="round"/>',
+  shield:     '<path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>',
+  key:        '<circle cx="9" cy="14" r="3.5"/><path d="M12 11l8-8M16 7l3 3M14 9l3 3" stroke-linecap="round" stroke-linejoin="round"/>',
+  cpu:        '<rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3" stroke-linecap="round"/>',
+  grid:       '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  folder:     '<path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>',
+  workitem:   '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 12l3 3 7-7" stroke-linecap="round" stroke-linejoin="round"/>',
+  store:      '<path d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9h18M9 13h6M9 17h3" stroke-linecap="round" stroke-linejoin="round"/>',
+  gear:       '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+  users:      '<circle cx="9" cy="9" r="3.5"/><path d="M3 19c0-3.5 3-5.5 6-5.5s6 2 6 5.5" stroke-linecap="round"/><circle cx="17" cy="10" r="2.5"/><path d="M21 18c0-2.5-1.6-3.8-4-3.8" stroke-linecap="round"/>',
+  card:       '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18" stroke-linecap="round"/><path d="M6 14h3M12 14h3" stroke-linecap="round"/>',
+  plug:       '<path d="M9 4v6h6V4M3 10h6M15 10h6M9 14v6h6v-6" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+function _gearIconSvg(name){
+  return '<svg class="gear-item-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(_GEAR_ICONS[name] || _GEAR_ICONS.gear)+'</svg>';
+}
+const GEAR_SECTIONS = [
+  { id:'personal', label:'PERSONAL SETTINGS', items: [
+    { id:'profile',          icon:'profile', name:'Profile',             desc:'Name, photo, time zone, and basic account info' },
+    { id:'notification-prefs',icon:'bell',   name:'Notifications',       desc:'Email and in-app notification preferences' },
+    { id:'active-sessions',  icon:'device',  name:'Active sessions',     desc:'Devices currently signed into your account' },
+    { id:'account-settings', icon:'shield',  name:'Account & security',  desc:'Login method, two-factor auth, and recovery' },
+    { id:'api-keys',         icon:'key',     name:'API keys & tokens',   desc:'Personal access tokens for the AIMS-OS API and SDKs' }
+  ]},
+  { id:'studio', label:'AGENT STUDIO SETTINGS', items: [
+    { id:'system',       icon:'cpu',      name:'System',       desc:'General settings, security, and automation rules' },
+    { id:'apps',         icon:'grid',     name:'Apps',         desc:'Manage apps installed in this studio' },
+    { id:'spaces',       icon:'folder',   name:'Spaces',       desc:'Categories, defaults, and archive policy' },
+    { id:'work-items',   icon:'workitem', name:'Work items',   desc:'Types, workflows, and custom fields' },
+    { id:'marketplace',  icon:'store',    name:'Marketplace',  desc:'Explore and install integrations' }
+  ]},
+  { id:'workspace', label:'WORKSPACE SETTINGS', items: [
+    { id:'workspace-settings', icon:'gear',  name:'Workspace settings', desc:'Name, defaults, retention, branding, and security policies', permission:'canManageWorkspaceSettings' },
+    { id:'members',            icon:'users', name:'Members & access',   desc:'Invite people, manage roles, and review pending invitations', permission:'canManageMembers' },
+    { id:'billing',            icon:'card',  name:'Billing & plan',     desc:'Subscription, usage, invoices, and payment method' },
+    { id:'integrations',       icon:'plug',  name:'Integrations',       desc:'Salesforce, Slack, Zendesk, Twilio, and 30+ more' }
+  ]}
+];
+function _gearHighlight(text, q){
+  const safe = _ctxEscAttr(text);
+  if(!q) return safe;
+  const re = new RegExp('('+q.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')+')','ig');
+  return safe.replace(re, '<mark>$1</mark>');
+}
+function _gearMatch(item, q){
+  return item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q);
+}
 function _renderGearMenu(){
   const menu = document.getElementById('gearMenu'); if(!menu) return;
-  const active = (typeof _wsActive === 'function') ? _wsActive() : null;
-  const appName = document.getElementById('ctx-name')?.textContent?.trim() || 'Studio';
-  const canSettings = userCan('canManageWorkspaceSettings');
-  const canMembers  = userCan('canManageMembers');
+  const q = _gearState.query.trim().toLowerCase();
+  const flat = [];
+  // Filter sections by permission + query
+  const sections = GEAR_SECTIONS.map(section => ({
+    label: section.label,
+    items: section.items.filter(i => {
+      if(i.permission && !userCan(i.permission)) return false;
+      if(q && !_gearMatch(i, q)) return false;
+      return true;
+    })
+  })).filter(s => s.items.length > 0);
+
   let html = '';
   html += '<div class="gear-menu-hd">Settings</div>';
-
-  // ── PERSONAL — settings scoped to "me as a user" ──
-  html += '<div class="gear-section">';
-  html += '<div class="gear-section-hd"><span class="gear-section-hd-scope">Personal</span></div>';
-  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'account-settings\')">';
-  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>';
-  html += '<div class="gear-item-main"><div class="gear-item-name">Account &amp; security</div><div class="gear-item-desc">Login method, two-factor auth, and active sessions</div></div>';
-  html += '</button>';
-  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'api-keys\')">';
-  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="14" r="3.5"/><path d="M12 11l8-8M16 7l3 3M14 9l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  html += '<div class="gear-item-main"><div class="gear-item-name">API keys &amp; tokens</div><div class="gear-item-desc">Personal access tokens for the AIMS-OS API and SDKs</div></div>';
-  html += '</button>';
+  // Search input
+  html += '<div class="gear-search-row">';
+  html += '<svg class="gear-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+  html += '<input id="gear-search-input" type="text" placeholder="Search settings..." autocomplete="off" spellcheck="false" value="'+_ctxEscAttr(_gearState.query)+'" oninput="event.stopPropagation();_gearSetQuery(this.value)" onkeydown="_gearOnKey(event)" />';
+  html += '<kbd class="gear-search-kbd" aria-hidden="true">esc</kbd>';
   html += '</div>';
 
-  // ── STUDIO — settings scoped to the current app/studio ──
-  html += '<div class="gear-section">';
-  html += '<div class="gear-section-hd"><span class="gear-section-hd-scope">Studio</span><span class="gear-section-hd-sep">·</span><span class="gear-section-hd-name" title="'+_ctxEscAttr(appName)+'">'+_esc(appName)+'</span></div>';
-  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'studio-defaults\')">';
-  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke-linejoin="round"/></svg>';
-  html += '<div class="gear-item-main"><div class="gear-item-name">Studio defaults</div><div class="gear-item-desc">Default behavior, statuses, and templates for '+_esc(appName)+'</div></div>';
-  html += '</button>';
-  html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'studio-views\')">';
-  html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="11" width="18" height="4" rx="1"/><rect x="3" y="18" width="18" height="3" rx="1"/></svg>';
-  html += '<div class="gear-item-main"><div class="gear-item-name">Custom views &amp; layouts</div><div class="gear-item-desc">Saved filters and shared layouts inside this studio</div></div>';
-  html += '</button>';
-  html += '</div>';
-
-  // ── WORKSPACE — settings scoped to the whole workspace (admin only) ──
-  if(active){
-    html += '<div class="gear-section">';
-    html += '<div class="gear-section-hd"><span class="gear-section-hd-scope">Workspace</span><span class="gear-section-hd-sep">·</span><span class="gear-section-hd-name" title="'+_ctxEscAttr(active.name)+'">'+_esc(active.name)+'</span></div>';
-    if(canSettings){
-      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'workspace-settings\')">';
-      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
-      html += '<div class="gear-item-main"><div class="gear-item-name">Workspace settings</div><div class="gear-item-desc">Name, defaults, retention, branding, and security policies</div></div>';
-      html += '</button>';
-    }
-    if(canMembers){
-      html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'members\')">';
-      html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.5"/><path d="M3 19c0-3.5 3-5.5 6-5.5s6 2 6 5.5" stroke-linecap="round"/><circle cx="17" cy="10" r="2.5"/><path d="M21 18c0-2.5-1.6-3.8-4-3.8" stroke-linecap="round"/></svg>';
-      html += '<div class="gear-item-main"><div class="gear-item-name">Members &amp; access</div><div class="gear-item-desc">Invite people, manage roles, and review pending invitations</div></div>';
-      html += '</button>';
-    }
-    html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'billing\')">';
-    html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18" stroke-linecap="round"/><path d="M6 14h3M12 14h3" stroke-linecap="round"/></svg>';
-    html += '<div class="gear-item-main"><div class="gear-item-name">Billing &amp; plan</div><div class="gear-item-desc">Subscription, usage, invoices, and payment method</div></div>';
-    html += '</button>';
-    html += '<button type="button" class="gear-item" onclick="event.stopPropagation();_ctxAction(\'integrations\')">';
-    html += '<svg class="gear-item-ico" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 4v6h6V4M3 10h6M15 10h6M9 14v6h6v-6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    html += '<div class="gear-item-main"><div class="gear-item-name">Integrations</div><div class="gear-item-desc">Salesforce, Slack, Zendesk, Twilio, and 30+ more</div></div>';
-    html += '</button>';
-    if(!canSettings && !canMembers){
-      html += '<div class="gear-empty">';
-      html += '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.5" stroke-linecap="round"/></svg>';
-      html += '<div class="gear-empty-text">You can only view this section. Ask a workspace admin if you need to make changes.</div>';
+  html += '<div class="gear-menu-scroll" role="listbox">';
+  if(sections.length === 0){
+    html += '<div class="gear-menu-empty">'
+      + '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.5" stroke-linecap="round"/></svg>'
+      + '<div>No settings match <strong>"'+_ctxEscAttr(_gearState.query)+'"</strong></div>'
+      + '</div>';
+  } else {
+    sections.forEach(section => {
+      html += '<div class="gear-section">';
+      html += '<div class="gear-section-hd">'+_ctxEscAttr(section.label)+'</div>';
+      section.items.forEach(item => {
+        const idx = flat.length;
+        flat.push(item);
+        const isActive = idx === _gearState.activeIdx;
+        html += '<button type="button" class="gear-item'+(isActive?' is-active':'')+'" role="option" aria-selected="'+isActive+'" data-idx="'+idx+'" onclick="event.stopPropagation();_ctxAction(\''+item.id+'\')">';
+        html += _gearIconSvg(item.icon);
+        html += '<div class="gear-item-main">';
+        html += '<div class="gear-item-name">'+_gearHighlight(item.name, q)+'</div>';
+        html += '<div class="gear-item-desc">'+_gearHighlight(item.desc, q)+'</div>';
+        html += '</div>';
+        html += '</button>';
+      });
       html += '</div>';
-    }
-    html += '</div>';
+    });
   }
+  html += '</div>';
   menu.innerHTML = html;
+  _gearState._flat = flat;
+  if(_gearState.activeIdx >= flat.length) _gearState.activeIdx = Math.max(0, flat.length - 1);
+  // Auto-focus the search input on first open
+  if(_gearState.justOpened){
+    _gearState.justOpened = false;
+    setTimeout(() => document.getElementById('gear-search-input')?.focus(), 0);
+  }
+}
+function _gearSetQuery(q){
+  _gearState.query = q;
+  _gearState.activeIdx = 0;
+  _renderGearMenu();
+  // Restore cursor in input after re-render
+  const input = document.getElementById('gear-search-input');
+  if(input){ input.focus(); try { input.setSelectionRange(input.value.length, input.value.length); } catch(e){} }
+}
+function _gearOnKey(e){
+  const items = _gearState._flat || [];
+  if(e.key === 'ArrowDown'){
+    e.preventDefault();
+    if(items.length > 0){
+      _gearState.activeIdx = (_gearState.activeIdx + 1) % items.length;
+      _gearSyncActive();
+    }
+  } else if(e.key === 'ArrowUp'){
+    e.preventDefault();
+    if(items.length > 0){
+      _gearState.activeIdx = (_gearState.activeIdx - 1 + items.length) % items.length;
+      _gearSyncActive();
+    }
+  } else if(e.key === 'Enter'){
+    e.preventDefault();
+    const item = items[_gearState.activeIdx];
+    if(item) _ctxAction(item.id);
+  } else if(e.key === 'Escape'){
+    e.preventDefault();
+    if(_gearState.query){ _gearSetQuery(''); }
+    else { _gearClose(); }
+  }
+}
+function _gearSyncActive(){
+  const rows = document.querySelectorAll('#gearMenu .gear-item');
+  rows.forEach((el, i) => {
+    const isActive = i === _gearState.activeIdx;
+    el.classList.toggle('is-active', isActive);
+    el.setAttribute('aria-selected', isActive);
+    if(isActive) el.scrollIntoView({ block:'nearest' });
+  });
 }
 
 function toggleGearMenu(e){
@@ -5228,6 +5324,10 @@ function toggleGearMenu(e){
   const isOpen = menu.classList.toggle('open');
   launcher.setAttribute('aria-expanded', isOpen);
   if(isOpen){
+    // Reset filter state + flag for auto-focus
+    _gearState.query = '';
+    _gearState.activeIdx = 0;
+    _gearState.justOpened = true;
     _renderGearMenu();
     setTimeout(()=>{
       document.addEventListener('click', function closer(ev){
