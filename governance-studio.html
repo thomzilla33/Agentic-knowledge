@@ -1018,30 +1018,30 @@ function renderSidebar(){
   </div>
   <!-- Nav -->
   <div class="sb-nav">
-    <button class="sb-item" title="Home" aria-label="Home">
+    <button class="sb-item" onclick="showToast('Home — coming soon')" title="Home" aria-label="Home">
       <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7.5L9 2l7 5.5V16h-4.5v-3.5h-5V16H2V7.5z"/></svg></span>
       <span class="sb-label">Home</span>
     </button>
-    <button class="sb-item" title="Agents" aria-label="Agents">
+    <button class="sb-item" onclick="showToast('Agents — coming soon')" title="Agents" aria-label="Agents">
       <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6" r="3"/><path d="M3 17c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></span>
       <span class="sb-label">Agents</span>
     </button>
-    <button class="sb-item" title="Automations" aria-label="Automations">
+    <button class="sb-item" onclick="showToast('Automations — coming soon')" title="Automations" aria-label="Automations">
       <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="10.5" y="10.5" width="5.5" height="5.5" rx="1.5"/><path d="M5 7.5v1.5A1.5 1.5 0 006.5 10.5H8"/></svg></span>
       <span class="sb-label">Automations</span>
     </button>
     <div class="sb-divider"></div>
-    <button class="sb-item" title="Knowledge" aria-label="Knowledge">
+    <button class="sb-item" onclick="setState({nav:'knowledge'})" title="Knowledge" aria-label="Knowledge">
       <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2.5h12v13H3z"/><path d="M6.5 6h5M6.5 9h5M6.5 12h3"/></svg></span>
       <span class="sb-label">Knowledge</span>
     </button>
-    <button class="sb-item" title="Contacts" aria-label="Contacts">
+    <button class="sb-item" onclick="showToast('Contacts — coming soon')" title="Contacts" aria-label="Contacts">
       <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="6.5" r="2.5"/><path d="M3 16c0-2.76 2.686-5 6-5s6 2.24 6 5"/></svg></span>
       <span class="sb-label">Contacts</span>
     </button>
     <div class="sb-divider"></div>
     <!-- Admin — ACTIVE (Governance lives here) -->
-    <button class="sb-item active" title="Admin" aria-label="Admin" aria-current="page">
+    <button class="sb-item active" onclick="showToast('Already on Admin')" title="Admin" aria-label="Admin" aria-current="page">
       <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M9 2l1.5 4h4l-3.5 2.5 1.5 4L9 10l-3.5 2.5 1.5-4L3.5 6h4z"/></svg></span>
       <span class="sb-label">Admin</span>
       <svg class="sb-chevron" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l3.5 3.5L10 5"/></svg>
@@ -1050,11 +1050,12 @@ function renderSidebar(){
     <div class="gov-subnav">
       ${govItems.map(n=>`
       <button class="gov-nav-item${S.nav===n.id?' active':''}"
+        title="${n.label}" aria-label="${n.label}"
         onclick="setState({nav:'${n.id}',netScreen:S.netScreen==='builder'&&'${n.id}'!=='networks'?'list':S.netScreen})">
         ${n.label}
       </button>`).join('')}
     </div>
-    <button class="sb-item" title="Workspace" aria-label="Workspace">
+    <button class="sb-item" onclick="_openModal('workspace-settings')" title="Workspace" aria-label="Workspace">
       <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="6" rx="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.5"/></svg></span>
       <span class="sb-label">Workspace</span>
     </button>
