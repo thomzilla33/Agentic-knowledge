@@ -2273,6 +2273,156 @@ body.test-mode #vTestMode{display:flex}
 .agt-mod-body.is-knowledge-host{
   padding:0;background:#0a0d1a;
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+   NODE KNOWLEDGE PICKER — replaces the iframe inspector for the common
+   case ("attach a pack or drive to this node"). Two-column layout:
+   • Left: ATTACHED list (per-node) + source filter
+   • Right: source tabs (Packs / Drives) with filterable rows + Attach btn
+   ────────────────────────────────────────────────────────────────────── */
+.nkp-shell{
+  display:flex;width:100%;height:100%;min-height:0;background:#0a0d1a;
+}
+.nkp-left{
+  width:280px;flex-shrink:0;
+  border-right:1px solid rgba(255,255,255,0.06);
+  display:flex;flex-direction:column;overflow:hidden;
+  background:rgba(255,255,255,0.012);
+}
+.nkp-left-hd{
+  padding:14px 14px 10px;display:flex;align-items:baseline;gap:6px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.nkp-left-hd .ttl{
+  font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;
+  color:var(--t3);
+}
+.nkp-left-hd .cnt{
+  font-size:10px;font-weight:700;color:#c4b5fd;
+  background:rgba(167,139,250,0.14);padding:2px 7px;border-radius:9px;
+}
+.nkp-left-list{flex:1;overflow-y:auto;padding:8px 8px}
+.nkp-attached-row{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border-radius:8px;background:rgba(255,255,255,0.025);
+  border:1px solid rgba(255,255,255,0.05);margin-bottom:6px;
+  transition:background .12s;
+}
+.nkp-attached-row:hover{background:rgba(255,255,255,0.05)}
+.nkp-attached-row .ico{
+  width:26px;height:26px;border-radius:6px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;color:#fff;
+}
+.nkp-attached-row .body{flex:1;min-width:0}
+.nkp-attached-row .nm{font-size:11.5px;font-weight:600;color:var(--t1);line-height:1.25;display:flex;align-items:center;gap:5px}
+.nkp-attached-row .sub{font-size:10px;color:var(--t3);margin-top:2px}
+.nkp-attached-row .src-badge{
+  font-size:8.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:1px 5px;border-radius:3px;line-height:1.2;
+}
+.nkp-src-workflow{background:rgba(43,127,255,0.16);color:#80AFFF}
+.nkp-src-agent   {background:rgba(167,139,250,0.16);color:#c4b5fd}
+.nkp-src-node    {background:rgba(34,211,238,0.16);color:#22d3ee}
+.nkp-detach-btn{
+  width:24px;height:24px;border-radius:5px;
+  background:transparent;border:1px solid var(--bd);color:var(--t3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .1s, color .1s, border-color .1s;
+  flex-shrink:0;
+}
+.nkp-detach-btn:hover{background:rgba(255,100,103,0.10);border-color:rgba(255,100,103,0.40);color:var(--err)}
+.nkp-detach-btn:disabled{opacity:0.30;cursor:not-allowed}
+.nkp-empty{
+  padding:18px 14px;text-align:center;color:var(--t3);font-size:11px;line-height:1.5;
+  border:1px dashed rgba(255,255,255,0.06);border-radius:8px;margin:4px;
+}
+
+.nkp-right{
+  flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;
+}
+.nkp-right-hd{
+  display:flex;align-items:center;gap:6px;padding:10px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.012);
+}
+.nkp-tab{
+  height:30px;padding:0 12px;border-radius:6px;
+  background:transparent;border:1px solid transparent;
+  color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.nkp-tab:hover{background:rgba(255,255,255,0.04);color:var(--t1)}
+.nkp-tab.is-active{
+  background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.32);color:#c4b5fd;
+}
+.nkp-tab .count{
+  font-size:10px;font-weight:700;
+  background:rgba(255,255,255,0.06);color:var(--t3);
+  padding:1px 6px;border-radius:8px;
+}
+.nkp-tab.is-active .count{background:rgba(167,139,250,0.22);color:#c4b5fd}
+.nkp-right-hd-search{
+  flex:1;margin-left:6px;display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  border-radius:6px;padding:0 10px;height:30px;
+}
+.nkp-right-hd-search input{
+  background:transparent;border:none;outline:none;color:var(--t1);
+  font-size:12px;width:100%;font-family:inherit;
+}
+.nkp-right-hd-search input::placeholder{color:var(--t4)}
+.nkp-open-lib{
+  height:30px;padding:0 11px;border-radius:6px;
+  background:rgba(43,127,255,0.10);border:1px solid rgba(43,127,255,0.32);
+  color:#80AFFF;font-size:11.5px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:background .12s, border-color .12s, color .12s;
+}
+.nkp-open-lib:hover{background:rgba(43,127,255,0.20);border-color:rgba(43,127,255,0.55);color:#a5c6ff}
+
+.nkp-right-body{flex:1;overflow-y:auto;padding:12px 14px 16px}
+.nkp-card{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);
+  border-radius:9px;margin-bottom:8px;transition:background .12s, border-color .12s;
+}
+.nkp-card:hover{background:rgba(255,255,255,0.045);border-color:rgba(255,255,255,0.10)}
+.nkp-card-ico{
+  width:34px;height:34px;flex-shrink:0;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;color:#fff;font-size:12px;
+}
+.nkp-card-body{flex:1;min-width:0}
+.nkp-card-nm{
+  font-size:13px;font-weight:700;color:var(--t1);line-height:1.25;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.nkp-card-nm .pill{
+  font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:1px 6px;border-radius:3px;
+}
+.nkp-card-desc{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.45}
+.nkp-card-meta{font-size:10px;color:var(--t4);margin-top:5px;display:flex;gap:10px;align-items:center}
+.nkp-attach-btn{
+  height:30px;padding:0 13px;border-radius:7px;
+  background:linear-gradient(180deg, #06DA72 0%, #04B85F 100%);
+  border:1px solid rgba(5,223,114,0.55);color:#02180c;
+  font-size:11.5px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:background .12s, transform .08s;
+  box-shadow:0 1px 0 rgba(255,255,255,0.18) inset, 0 2px 6px rgba(5,223,114,0.22);
+  flex-shrink:0;
+}
+.nkp-attach-btn:hover{background:linear-gradient(180deg, #08E978 0%, #05C667 100%)}
+.nkp-attach-btn:active{transform:translateY(1px)}
+.nkp-attach-btn.is-attached{
+  background:transparent;border-color:var(--bd);color:var(--t3);
+  font-weight:600;box-shadow:none;cursor:default;
+}
+.nkp-attach-btn.is-attached:hover{background:transparent}
+
+/* Body class flips when picker mode is active */
+.agt-mod-body.is-picker-host{padding:0;background:#0a0d1a}
 .agt-mod-overlay.is-knowledge-view .agt-mod-ft-hint{
   color:#c4b5fd;
 }
@@ -2582,6 +2732,7 @@ body.test-mode #vTestMode{display:flex}
   padding:1px 5px;border-radius:3px;
 }
 .insp-knl-row .src-badge.from-workflow{background:rgba(43,127,255,0.14);color:#80AFFF;border:1px solid rgba(43,127,255,0.30)}
+.insp-knl-row .src-badge.from-agent{background:rgba(34,211,238,0.14);color:#67e8f9;border:1px solid rgba(34,211,238,0.30)}
 .insp-knl-row .src-badge.from-node{background:rgba(167,139,250,0.14);color:#c4b5fd;border:1px solid rgba(167,139,250,0.30)}
 .insp-knl-empty{
   padding:20px 12px;text-align:center;border:1px dashed var(--bd);border-radius:10px;
@@ -5987,7 +6138,7 @@ const AGENT_CATALOG = [
       tone: 'analytical',
     },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.2, maxTokens: 1200, topP: 1.0 },
-    knowledge: { packIds: [] },
+    knowledge: { packIds: ['KP-003'], driveIds: ['d1'] },
     tools: { functionCalls: ['fetch_crm_record', 'search_history'], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: ['personal_health'], outputValidation: true },
     runtime: { timeoutMs: 30000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.50 },
@@ -6009,7 +6160,7 @@ const AGENT_CATALOG = [
       tone: 'precise',
     },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.0, maxTokens: 2000, topP: 1.0 },
-    knowledge: { packIds: [] },
+    knowledge: { packIds: [], driveIds: [] },
     tools: { functionCalls: ['fetch_document', 'ocr_image'], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
     runtime: { timeoutMs: 60000, retryPolicy: 'linear', maxRetries: 2, fallbackAgentId: null, costCapUsd: 1.00 },
@@ -6031,7 +6182,7 @@ const AGENT_CATALOG = [
       tone: 'decisive',
     },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.1, maxTokens: 1500, topP: 1.0 },
-    knowledge: { packIds: ['KP-003'] },
+    knowledge: { packIds: ['KP-003'], driveIds: ['d1'] },
     tools: { functionCalls: ['check_icp', 'check_bant', 'fetch_crm_record'], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
     runtime: { timeoutMs: 30000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.40 },
@@ -6053,7 +6204,7 @@ const AGENT_CATALOG = [
       tone: 'analytical',
     },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.2, maxTokens: 1000, topP: 1.0 },
-    knowledge: { packIds: [] },
+    knowledge: { packIds: [], driveIds: [] },
     tools: { functionCalls: ['fetch_health_score', 'fetch_support_tickets'], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
     runtime: { timeoutMs: 25000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.35 },
@@ -6075,7 +6226,7 @@ const AGENT_CATALOG = [
       tone: 'persuasive',
     },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.3, maxTokens: 1800, topP: 1.0 },
-    knowledge: { packIds: ['KP-003'] },
+    knowledge: { packIds: ['KP-003'], driveIds: [] },
     tools: { functionCalls: ['fetch_pricing_matrix', 'create_offer', 'check_discount_authority'], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
     runtime: { timeoutMs: 45000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: 'agt-customer-analyst', costCapUsd: 0.75 },
@@ -6097,7 +6248,7 @@ const AGENT_CATALOG = [
       tone: 'cautious',
     },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.0, maxTokens: 2500, topP: 1.0 },
-    knowledge: { packIds: ['KP-005'] },
+    knowledge: { packIds: ['KP-005'], driveIds: [] },
     tools: { functionCalls: ['fetch_contract', 'diff_clauses', 'flag_for_legal'], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
     runtime: { timeoutMs: 90000, retryPolicy: 'linear', maxRetries: 2, fallbackAgentId: null, costCapUsd: 1.50 },
@@ -6119,7 +6270,7 @@ const AGENT_CATALOG = [
       tone: 'friendly',
     },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.5, maxTokens: 1500, topP: 1.0 },
-    knowledge: { packIds: [] },
+    knowledge: { packIds: [], driveIds: [] },
     tools: { functionCalls: ['create_onboarding_plan', 'schedule_check_in'], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: [], outputValidation: false },
     runtime: { timeoutMs: 30000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.50 },
@@ -6141,7 +6292,7 @@ const AGENT_CATALOG = [
       tone: 'on-brand',
     },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.4, maxTokens: 1200, topP: 1.0 },
-    knowledge: { packIds: [] },
+    knowledge: { packIds: [], driveIds: [] },
     tools: { functionCalls: ['fetch_brand_voice', 'send_draft_for_review'], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: [], outputValidation: false },
     runtime: { timeoutMs: 25000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.40 },
@@ -6394,7 +6545,7 @@ function createNewAgentFromSelector() {
     tags: [],
     behavior: { systemPrompt: '', responseFormat: 'text', tone: '' },
     model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.3, maxTokens: 1200, topP: 1.0 },
-    knowledge: { packIds: [] },
+    knowledge: { packIds: [], driveIds: [] },
     tools: { functionCalls: [], mcpServers: [], webhooks: [] },
     guardrails: { piiFilter: true, topicFilters: [], outputValidation: false },
     runtime: { timeoutMs: 30000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.50 },
@@ -6462,10 +6613,16 @@ function hasPromptSuffixOverride(node) {
   return typeof s === 'string' && s.trim().length > 0;
 }
 
+function hasKnowledgeOverride(node) {
+  const k = node && node.nodeOverrides && node.nodeOverrides.knowledge;
+  if (!k) return false;
+  return (k.packIds && k.packIds.length > 0) || (k.driveIds && k.driveIds.length > 0);
+}
 function countNodeOverrides(node) {
   let n = 0;
   if (hasToolsOverride(node)) n++;
   if (hasPromptSuffixOverride(node)) n++;
+  if (hasKnowledgeOverride(node)) n++;
   return n;
 }
 
@@ -6473,8 +6630,9 @@ function countNodeOverrides(node) {
 // Used to draw the small purple dot next to the tab label.
 function tabHasOverride(node, tabId) {
   if (!node) return false;
-  if (tabId === 'behavior') return hasPromptSuffixOverride(node);
-  if (tabId === 'tools')    return hasToolsOverride(node);
+  if (tabId === 'behavior')  return hasPromptSuffixOverride(node);
+  if (tabId === 'tools')     return hasToolsOverride(node);
+  if (tabId === 'knowledge') return hasKnowledgeOverride(node);
   return false;
 }
 
@@ -7106,12 +7264,88 @@ const PACK_PREVIEWS = {
   'KP-004': { name: 'Vendor SLA Registry',      intent: 'add',            factsCount: 1,  status: 'draft'  },
   'KP-005': { name: 'Enterprise Contract Pack', intent: 'restrict',       factsCount: 6,  status: 'active' },
   'KP-006': { name: 'Quick Pricing Reference',  intent: 'add',            factsCount: 4,  status: 'active' },
+  'KP-001': { name: 'Onboarding Knowledge',     intent: 'add',            factsCount: 5,  status: 'active' },
 };
 const INTENT_PALETTE = {
   restrict: { bg: 'rgba(99,102,241,0.16)',  color: '#c4b5fd', label: 'RESTRICT' },
   add:      { bg: 'rgba(34,211,238,0.16)',  color: '#22d3ee', label: 'EXTEND'   },
   both:     { bg: 'rgba(43,127,255,0.16)',  color: '#80AFFF', label: 'RESTRICT + EXTEND' },
 };
+
+// ── Source Drives mock (mirrors governance-studio's mock.js drives) ──
+// Used by the Node Knowledge Picker as a second attachable source type.
+const KNOWLEDGE_DRIVES = [
+  { id: 'd1', name: 'Sales Drive',       desc: 'Sales-related documents, proposals, and contracts',     owner: 'Sales',           scope: 'Company-wide', docs: 24, color: '#34d399' },
+  { id: 'd2', name: 'Marketing Drive',   desc: 'Marketing materials, campaigns, and brand assets',      owner: 'Marketing',       scope: 'Private',      docs: 24, color: '#f472b6' },
+  { id: 'd3', name: 'Engineering Drive', desc: 'Technical documentation, specifications, architecture', owner: 'Engineering',     scope: 'Private',      docs: 24, color: '#60a5fa' },
+  { id: 'd4', name: 'Product Drive',     desc: 'Product requirements, roadmaps, and feature specs',     owner: 'Product',         scope: 'Private',      docs: 24, color: '#a78bfa' },
+  { id: 'd5', name: 'HR Drive',          desc: 'Human resources policies and employee documents',       owner: 'HR',              scope: 'Private',      docs:  8, color: '#fbbf24' },
+  { id: 'd6', name: 'Customer Success',  desc: 'Case studies, support docs, customer feedback',         owner: 'Customer Success',scope: 'Company-wide', docs: 18, color: '#22d3ee' },
+];
+function getDriveById(id) { return KNOWLEDGE_DRIVES.find(d => d.id === id) || null; }
+
+// ── Effective knowledge resolution (agent + node-level additions) ──
+// The "attached set" for a node is the UNION of:
+//   • Agent base knowledge.packIds + knowledge.driveIds
+//   • Node-level additions: nodeOverrides.knowledge.{packIds, driveIds}
+// Workflow-level packs come from packsForCurrentWorkflow() and are merged in
+// at render time too.
+function getEffectiveKnowledge(node, agent) {
+  const basePackIds  = (agent && agent.knowledge && agent.knowledge.packIds)  || [];
+  const baseDriveIds = (agent && agent.knowledge && agent.knowledge.driveIds) || [];
+  const ovPackIds    = (node && node.nodeOverrides && node.nodeOverrides.knowledge && node.nodeOverrides.knowledge.packIds)  || [];
+  const ovDriveIds   = (node && node.nodeOverrides && node.nodeOverrides.knowledge && node.nodeOverrides.knowledge.driveIds) || [];
+  return {
+    packIds:  Array.from(new Set([...basePackIds,  ...ovPackIds])),
+    driveIds: Array.from(new Set([...baseDriveIds, ...ovDriveIds])),
+  };
+}
+
+// Returns "node" if the id was added per-node, "agent" if from agent base,
+// "workflow" if from packsForCurrentWorkflow(). Used to label provenance.
+function knowledgeSource(node, agent, kind, id) {
+  if (kind === 'pack') {
+    if (packsForCurrentWorkflow().includes(id)) return 'workflow';
+  }
+  const ov = node && node.nodeOverrides && node.nodeOverrides.knowledge;
+  const ovList = kind === 'pack' ? (ov?.packIds || []) : (ov?.driveIds || []);
+  if (ovList.includes(id)) return 'node';
+  return 'agent';
+}
+
+// Attach a pack/drive to the active node. Mutates nodeOverrides.knowledge.
+function attachToNode(kind, id) {
+  const node = getActiveNode();
+  if (!node) return;
+  ensureNodeOverrides(node);
+  if (!node.nodeOverrides.knowledge) node.nodeOverrides.knowledge = { packIds: [], driveIds: [] };
+  const key = kind === 'pack' ? 'packIds' : 'driveIds';
+  if (!Array.isArray(node.nodeOverrides.knowledge[key])) node.nodeOverrides.knowledge[key] = [];
+  if (!node.nodeOverrides.knowledge[key].includes(id)) {
+    node.nodeOverrides.knowledge[key].push(id);
+    flagSaving();
+  }
+}
+
+// Detach a pack/drive from this node — only works on node-level additions.
+// Agent-base / workflow attachments require editing the agent or workflow.
+function detachFromNode(kind, id) {
+  const node = getActiveNode();
+  if (!node || !node.nodeOverrides || !node.nodeOverrides.knowledge) return;
+  const key = kind === 'pack' ? 'packIds' : 'driveIds';
+  const arr = node.nodeOverrides.knowledge[key] || [];
+  const idx = arr.indexOf(id);
+  if (idx < 0) return;
+  arr.splice(idx, 1);
+  // Prune empty objects so countNodeOverrides() stays accurate.
+  if (!node.nodeOverrides.knowledge.packIds?.length && !node.nodeOverrides.knowledge.driveIds?.length) {
+    delete node.nodeOverrides.knowledge;
+  }
+  if (node.nodeOverrides && Object.keys(node.nodeOverrides).length === 0) {
+    delete node.nodeOverrides;
+  }
+  flagSaving();
+}
 
 function packsForCurrentWorkflow() {
   // The host workflow's pack(s) — for the demo, n1 has KP-003 attached.
@@ -7128,8 +7362,12 @@ function packRowHtml(packId, source) {
     </div>`;
   }
   const intent = INTENT_PALETTE[p.intent] || INTENT_PALETTE.restrict;
-  const srcCls = source === 'workflow' ? 'from-workflow' : 'from-node';
-  const srcLbl = source === 'workflow' ? 'From workflow' : 'From node';
+  const srcCls = source === 'workflow' ? 'from-workflow'
+              : source === 'agent'    ? 'from-agent'
+              :                          'from-node';
+  const srcLbl = source === 'workflow' ? 'From workflow'
+              : source === 'agent'    ? 'From agent'
+              :                          'From node';
   return `<div class="insp-knl-row">
     <div style="flex:1;min-width:0">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
@@ -7148,32 +7386,58 @@ function packRowHtml(packId, source) {
 }
 
 function tabKnowledge(a) {
+  const node = getActiveNode();
   const workflowPacks = packsForCurrentWorkflow();
-  const nodePacks = a.knowledge?.packIds || [];
-  const total = workflowPacks.length + nodePacks.length;
-  const wfRows = workflowPacks.map(id => packRowHtml(id, 'workflow')).join('');
-  const ndRows = nodePacks.map(id => packRowHtml(id, 'node')).join('');
+  const eff = getEffectiveKnowledge(node, a);
+  // Render packs with provenance (workflow / agent / node) so the user
+  // understands where each source came from.
+  const allPackIds = Array.from(new Set([...workflowPacks, ...eff.packIds]));
+  const allDriveIds = eff.driveIds;
+  const total = allPackIds.length + allDriveIds.length;
+
+  const packRows = allPackIds.map(id => {
+    const src = knowledgeSource(node, a, 'pack', id);
+    return packRowHtml(id, src);
+  }).join('');
+  const driveRows = allDriveIds.map(id => {
+    const d = getDriveById(id); if (!d) return '';
+    const src = knowledgeSource(node, a, 'drive', id);
+    const srcLabel = src === 'agent' ? 'From agent' : 'From node';
+    const srcCls = src === 'agent' ? 'nkp-src-agent' : 'nkp-src-node';
+    return `<div class="insp-knl-row">
+      <div class="ico" style="background:${d.color}33;color:${d.color};width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px">D</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11.5px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:5px">
+          ${escText(d.name)}
+          <span class="src-badge ${srcCls}" style="font-size:8.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:3px;line-height:1.2">${srcLabel}</span>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">${d.docs} docs · ${escText(d.owner)} · ${d.scope}</div>
+      </div>
+    </div>`;
+  }).join('');
+
   const empty = total === 0;
   return `
     <div class="insp-cfg-section">
       <div class="insp-cfg-label">In scope for this agent
-        <span style="font-weight:600;color:var(--t4);font-size:9px">${total} pack${total === 1 ? '' : 's'}</span>
+        <span style="font-weight:600;color:var(--t4);font-size:9px">
+          ${allPackIds.length} pack${allPackIds.length === 1 ? '' : 's'} · ${allDriveIds.length} drive${allDriveIds.length === 1 ? '' : 's'}
+        </span>
       </div>
       ${empty ? `
         <div class="insp-knl-empty">
-          <div style="font-size:18px;margin-bottom:6px">📚</div>
           <div style="font-size:11px;color:var(--t2);font-weight:600;margin-bottom:3px">No Knowledge in scope</div>
-          <div style="font-size:10px;color:var(--t3);line-height:1.5">This agent reads the full Truth Plane by default. Attach a pack to scope what it can use.</div>
+          <div style="font-size:10px;color:var(--t3);line-height:1.5">This agent reads the full Truth Plane by default. Attach a pack or drive to scope what it can use.</div>
         </div>
       ` : `
-        <div class="insp-knl-list">${wfRows}${ndRows}</div>
+        <div class="insp-knl-list">${packRows}${driveRows}</div>
       `}
     </div>
 
     <div class="insp-cfg-section">
       <div class="insp-cfg-label">Scoping rule</div>
       <div class="insp-cfg-help" style="background:rgba(43,127,255,0.06);border:1px solid rgba(43,127,255,0.18);padding:10px 12px;border-radius:8px;color:var(--t2)">
-        Workflow + node packs are <strong style="color:#80AFFF">unioned</strong>. RESTRICT packs intersect (only facts in both are visible). EXTEND packs add new sources on top.
+        Workflow + agent + node sources are <strong style="color:#80AFFF">unioned</strong>. RESTRICT packs intersect (only facts in both are visible). EXTEND packs and drives add new sources on top.
       </div>
     </div>
 
@@ -7185,32 +7449,69 @@ function tabKnowledge(a) {
 }
 
 // "Manage knowledge" CTA inside the agent config modal.
-// Previously: opened a slide-out (kcOverlay) which stacked overlays on top of
-// the modal — modal-on-modal anti-pattern. Now: opens the governance-studio
-// Knowledge Library INLINE inside this same modal (auto-expands to fullscreen
-// for breathing room, replaces the body with the iframe, and adds a
-// breadcrumb "Back to agent" button to the header).
+//
+// Resolves a modal-on-modal anti-pattern that existed before: the old
+// slide-out (kcOverlay) used to stack on top of the modal. Now we open
+// inline inside the same modal.
+//
+// Two surfaces are available:
+//   1. Node Knowledge Picker (DEFAULT)
+//      Native picker UI that lets the user attach Packs / Drives to THIS
+//      node from the catalogs. Faster for the common case.
+//   2. Full Library (escape hatch)
+//      Embedded governance-studio iframe for deep inspection (attestation,
+//      facts, recent runs, env switching). Reached via "Open full Library"
+//      button at the top of the picker.
+//
+// State tracked on the overlay element:
+//   .is-knowledge-view → "we are in some knowledge surface" (hides Fork/Save)
+//   .is-fullscreen     → working surface takes most of the viewport
+//   ov._kpMode         → 'picker' | 'library' (which surface is rendered)
+//   ov._kpTab          → 'packs' | 'drives'  (active source tab in picker)
+//   ov._kpSearch       → search filter text  (debounced on input)
+
 function manageKnowledgeForNode() {
   const node = EDIT_FLOW.find(n => n.id === activeNodeId);
   if (!node || !node.agentId) return;
-  enterInlineKnowledgeView(node);
+  enterNodeKnowledgePicker(node);
 }
 
-function enterInlineKnowledgeView(node) {
+function enterNodeKnowledgePicker(node) {
+  const ov = document.getElementById('agtModOv');
+  const body = document.getElementById('agtModBody');
+  if (!ov || !body) return;
+  const agent = getAgentById(node.agentId);
+  ov.classList.add('is-knowledge-view');
+  ov.classList.add('is-fullscreen');
+  body.classList.remove('is-knowledge-host');
+  body.classList.add('is-picker-host');
+  ov._kpMode = 'picker';
+  if (!ov._kpTab) ov._kpTab = 'packs';
+  if (!ov._kpSearch) ov._kpSearch = '';
+
+  // Header copy — same as before
+  const eyebrow = document.getElementById('agtModEyebrowLabel');
+  if (eyebrow) eyebrow.textContent = `Knowledge · for ${agent?.name || 'this agent'}`;
+  const expandBtn = document.getElementById('agtModExpand');
+  if (expandBtn) expandBtn.style.display = 'none';
+  const forkBtn = document.getElementById('agtModFork');
+  if (forkBtn) { forkBtn._previousDisplay = forkBtn.style.display; forkBtn.style.display = ''; }
+
+  renderNodeKnowledgePicker();
+}
+
+// Switches the inline surface from the native picker to the full iframe
+// Library (for deep inspection / attestation). Reached via the "Open full
+// Library" button inside the picker header.
+function openFullKnowledgeLibrary() {
+  const node = getActiveNode();
+  if (!node) return;
   const ov = document.getElementById('agtModOv');
   const body = document.getElementById('agtModBody');
   if (!ov || !body) return;
   const network = (typeof currentOvId !== 'undefined') ? NETWORKS.find(x => x.id === currentOvId) : null;
-  if (!network) {
-    if (typeof toast === 'function') toast('Open a workflow first', 'warn');
-    return;
-  }
+  if (!network) return;
   const agent = getAgentById(node.agentId);
-  // Snapshot the agent config body so we can restore it on exit.
-  if (!ov._configBodySnapshot) ov._configBodySnapshot = body.innerHTML;
-
-  // Build the embedded Library URL with full context. Same URL the slide-out
-  // used to fetch — the React side already supports workflowId + nodeId.
   const wfId   = encodeURIComponent(network.id);
   const wfName = encodeURIComponent(network.name);
   const env    = encodeURIComponent(typeof getWorkflowEnv === 'function' ? getWorkflowEnv(network.id) : 'sandbox');
@@ -7218,47 +7519,231 @@ function enterInlineKnowledgeView(node) {
   const agId   = encodeURIComponent(node.agentId);
   const agName = encodeURIComponent(agent?.name || '');
   const url = `governance-studio/?embed=1&workflowId=${wfId}&workflowName=${wfName}&intent=restrict&env=${env}&nodeId=${ndId}&agentId=${agId}&agentName=${agName}#/intelligence-library/knowledge`;
-
-  // Swap surfaces.
-  ov.classList.add('is-knowledge-view');
-  ov.classList.add('is-fullscreen');             // auto-expand for working room
+  ov._kpMode = 'library';
+  body.classList.remove('is-picker-host');
   body.classList.add('is-knowledge-host');
   body.innerHTML = `<iframe class="agt-mod-knowledge-frame" id="agtModKnFrame" src="${url}" title="Knowledge Library"></iframe>`;
-
-  // Header copy: keep agent name visible so user knows what they're scoping for.
   const eyebrow = document.getElementById('agtModEyebrowLabel');
   if (eyebrow) eyebrow.textContent = `Knowledge Library · for ${agent?.name || 'this agent'}`;
-  const expandBtn = document.getElementById('agtModExpand');
-  if (expandBtn) expandBtn.style.display = 'none';     // already fullscreen — hide
-  // Fork uses inline style for its agent._isFresh logic — clear it so the
-  // CSS rule (.is-knowledge-view .agt-mod-hd-fork{display:none}) takes effect.
-  const forkBtn = document.getElementById('agtModFork');
-  if (forkBtn) { forkBtn._previousDisplay = forkBtn.style.display; forkBtn.style.display = ''; }
 }
 
+// Returns from the iframe Library to the picker (when user clicks Back from
+// library) — same exit handler used by the modal's Back button.
 function exitInlineKnowledgeView() {
   const ov = document.getElementById('agtModOv');
   const body = document.getElementById('agtModBody');
   if (!ov || !body) return;
+  // If we're in library mode, step back to picker first instead of closing.
+  if (ov._kpMode === 'library') {
+    ov._kpMode = 'picker';
+    body.classList.remove('is-knowledge-host');
+    body.classList.add('is-picker-host');
+    renderNodeKnowledgePicker();
+    const eyebrow = document.getElementById('agtModEyebrowLabel');
+    const agent = getActiveAgent();
+    if (eyebrow) eyebrow.textContent = `Knowledge · for ${agent?.name || 'this agent'}`;
+    return;
+  }
+  // Otherwise exit the knowledge surface entirely.
   ov.classList.remove('is-knowledge-view');
   ov.classList.remove('is-fullscreen');
   body.classList.remove('is-knowledge-host');
-  // Restore the agent config tabs/panel — re-render is cleaner than the
-  // snapshot because it picks up any changes made via deep-links.
-  ov._configBodySnapshot = null;
+  body.classList.remove('is-picker-host');
+  ov._kpMode = null;
   renderAgentConfigPanel();
-  // Reset the eyebrow label + show the expand button again.
   const eyebrow = document.getElementById('agtModEyebrowLabel');
   if (eyebrow) eyebrow.textContent = 'Agent configuration';
   const expandBtn = document.getElementById('agtModExpand');
   if (expandBtn) expandBtn.style.display = '';
-  // Restore Fork's previous inline display (renderAgentConfigPanel will also
-  // overwrite it on the next render, so this is mostly defensive).
   const forkBtn = document.getElementById('agtModFork');
   if (forkBtn && forkBtn._previousDisplay !== undefined) {
     forkBtn.style.display = forkBtn._previousDisplay;
     delete forkBtn._previousDisplay;
   }
+}
+
+// ─ NODE KNOWLEDGE PICKER UI ────────────────────────────────────────────
+function renderNodeKnowledgePicker() {
+  const ov = document.getElementById('agtModOv');
+  const body = document.getElementById('agtModBody');
+  if (!ov || !body) return;
+  const node = getActiveNode();
+  const agent = getActiveAgent();
+  if (!node || !agent) return;
+
+  const eff = getEffectiveKnowledge(node, agent);
+  const wfPacks = packsForCurrentWorkflow();
+  // Union for the LEFT "attached" sidebar: workflow + agent + node packs/drives.
+  const allPackIds = Array.from(new Set([...wfPacks, ...eff.packIds]));
+  const allDriveIds = eff.driveIds.slice();
+  const attachedCount = allPackIds.length + allDriveIds.length;
+
+  const tab = ov._kpTab || 'packs';
+  const query = (ov._kpSearch || '').toLowerCase();
+
+  // ── LEFT: attached items ─────────────────────────────────────────────
+  const attachedRows = [];
+  allPackIds.forEach(id => {
+    const p = PACK_PREVIEWS[id]; if (!p) return;
+    const src = knowledgeSource(node, agent, 'pack', id);
+    const intent = INTENT_PALETTE[p.intent] || INTENT_PALETTE.restrict;
+    attachedRows.push({
+      kind: 'pack', id, name: p.name, sub: `${p.factsCount} fact${p.factsCount === 1 ? '' : 's'} · ${intent.label}`,
+      icoBg: 'linear-gradient(135deg, rgba(167,139,250,0.30), rgba(167,139,250,0.10))', icoColor: '#c4b5fd', icoText: 'P',
+      source: src,
+    });
+  });
+  allDriveIds.forEach(id => {
+    const d = getDriveById(id); if (!d) return;
+    const src = knowledgeSource(node, agent, 'drive', id);
+    attachedRows.push({
+      kind: 'drive', id, name: d.name, sub: `${d.docs} docs · ${d.owner}`,
+      icoBg: d.color + '33', icoColor: d.color, icoText: 'D',
+      source: src,
+    });
+  });
+
+  const attachedHtml = attachedRows.length === 0
+    ? `<div class="nkp-empty">Nothing attached yet.<br/>Pick from the right →</div>`
+    : attachedRows.map(r => {
+        const srcLabel = r.source === 'workflow' ? 'WORKFLOW'
+                       : r.source === 'agent'    ? 'AGENT'
+                       : 'NODE';
+        const srcCls = `nkp-src-${r.source}`;
+        const canDetach = r.source === 'node';
+        return `<div class="nkp-attached-row">
+          <div class="ico" style="background:${r.icoBg};color:${r.icoColor}">${r.icoText}</div>
+          <div class="body">
+            <div class="nm">${escText(r.name)} <span class="src-badge ${srcCls}">${srcLabel}</span></div>
+            <div class="sub">${escText(r.sub)}</div>
+          </div>
+          <button class="nkp-detach-btn" ${canDetach ? '' : 'disabled'}
+            onclick="detachFromNodeAndRerender('${r.kind}', '${r.id}')"
+            title="${canDetach ? 'Detach from this node' : srcLabel === 'WORKFLOW' ? 'Manage at workflow level' : 'Manage at agent level'}">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2L2 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>`;
+      }).join('');
+
+  // ── RIGHT: source tabs + filtered list ───────────────────────────────
+  const packEntries = Object.entries(PACK_PREVIEWS);
+  const filteredPacks = packEntries.filter(([id, p]) =>
+    !query || p.name.toLowerCase().includes(query) || id.toLowerCase().includes(query)
+  );
+  const filteredDrives = KNOWLEDGE_DRIVES.filter(d =>
+    !query || d.name.toLowerCase().includes(query) || d.owner.toLowerCase().includes(query)
+  );
+
+  let rightItems = '';
+  if (tab === 'packs') {
+    rightItems = filteredPacks.map(([id, p]) => {
+      const intent = INTENT_PALETTE[p.intent] || INTENT_PALETTE.restrict;
+      const isAttached = allPackIds.includes(id);
+      return `<div class="nkp-card">
+        <div class="nkp-card-ico" style="background:linear-gradient(135deg, rgba(167,139,250,0.40), rgba(167,139,250,0.15));color:#c4b5fd">${id.slice(-2)}</div>
+        <div class="nkp-card-body">
+          <div class="nkp-card-nm">${escText(p.name)}
+            <span class="pill" style="background:${intent.bg};color:${intent.color}">${intent.label}</span>
+            ${p.status === 'draft' ? `<span class="pill" style="background:rgba(253,199,0,0.16);color:#fde047">DRAFT</span>` : ''}
+          </div>
+          <div class="nkp-card-desc">${id} · ${p.factsCount} fact${p.factsCount === 1 ? '' : 's'} · ${p.status}</div>
+        </div>
+        ${isAttached
+          ? `<button class="nkp-attach-btn is-attached" disabled>✓ Attached</button>`
+          : `<button class="nkp-attach-btn" onclick="attachToNodeAndRerender('pack', '${id}')">+ Attach</button>`}
+      </div>`;
+    }).join('');
+    if (!filteredPacks.length) rightItems = `<div class="nkp-empty">No packs match "${escText(query)}".</div>`;
+  } else {
+    rightItems = filteredDrives.map(d => {
+      const isAttached = allDriveIds.includes(d.id);
+      return `<div class="nkp-card">
+        <div class="nkp-card-ico" style="background:${d.color}33;color:${d.color}">${(d.owner[0] || 'D').toUpperCase()}</div>
+        <div class="nkp-card-body">
+          <div class="nkp-card-nm">${escText(d.name)}
+            <span class="pill" style="background:rgba(255,255,255,0.06);color:var(--t3)">${d.scope.toUpperCase()}</span>
+          </div>
+          <div class="nkp-card-desc">${escText(d.desc)}</div>
+          <div class="nkp-card-meta">
+            <span>${d.docs} documents</span>
+            <span>·</span>
+            <span>Owner: ${escText(d.owner)}</span>
+          </div>
+        </div>
+        ${isAttached
+          ? `<button class="nkp-attach-btn is-attached" disabled>✓ Attached</button>`
+          : `<button class="nkp-attach-btn" onclick="attachToNodeAndRerender('drive', '${d.id}')">+ Attach</button>`}
+      </div>`;
+    }).join('');
+    if (!filteredDrives.length) rightItems = `<div class="nkp-empty">No drives match "${escText(query)}".</div>`;
+  }
+
+  body.innerHTML = `
+    <div class="nkp-shell">
+      <div class="nkp-left">
+        <div class="nkp-left-hd">
+          <span class="ttl">Attached to this node</span>
+          <span class="cnt">${attachedCount}</span>
+        </div>
+        <div class="nkp-left-list">${attachedHtml}</div>
+      </div>
+      <div class="nkp-right">
+        <div class="nkp-right-hd">
+          <button class="nkp-tab ${tab === 'packs' ? 'is-active' : ''}" onclick="switchPickerTab('packs')">
+            Knowledge Packs <span class="count">${packEntries.length}</span>
+          </button>
+          <button class="nkp-tab ${tab === 'drives' ? 'is-active' : ''}" onclick="switchPickerTab('drives')">
+            Source Drives <span class="count">${KNOWLEDGE_DRIVES.length}</span>
+          </button>
+          <div class="nkp-right-hd-search">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="3.2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 7.5L10 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <input type="text" placeholder="Filter ${tab === 'packs' ? 'packs' : 'drives'}…" value="${escAttr(query)}"
+              oninput="onPickerSearchInput(this.value)" />
+          </div>
+          <button class="nkp-open-lib" onclick="openFullKnowledgeLibrary()" title="Inspect packs in the full Knowledge Library">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M5 2H2v8h8V7M7 1h4v4M11 1L6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Full Library
+          </button>
+        </div>
+        <div class="nkp-right-body">${rightItems}</div>
+      </div>
+    </div>
+  `;
+}
+
+function switchPickerTab(tab) {
+  const ov = document.getElementById('agtModOv');
+  if (!ov) return;
+  ov._kpTab = tab;
+  renderNodeKnowledgePicker();
+}
+
+function onPickerSearchInput(value) {
+  const ov = document.getElementById('agtModOv');
+  if (!ov) return;
+  ov._kpSearch = value;
+  // Re-render — focus is on the input which gets recreated, so re-focus.
+  renderNodeKnowledgePicker();
+  const input = document.querySelector('.nkp-right-hd-search input');
+  if (input) {
+    input.focus();
+    const v = input.value;
+    input.setSelectionRange(v.length, v.length);
+  }
+}
+
+function attachToNodeAndRerender(kind, id) {
+  attachToNode(kind, id);
+  renderNodeKnowledgePicker();
+  // Surface a small toast so the user sees the attach landed.
+  const name = kind === 'pack' ? (PACK_PREVIEWS[id]?.name || id) : (getDriveById(id)?.name || id);
+  if (typeof toast === 'function') toast(`Attached "${name}" to this node`, 'success');
+}
+
+function detachFromNodeAndRerender(kind, id) {
+  detachFromNode(kind, id);
+  renderNodeKnowledgePicker();
+  if (typeof toast === 'function') toast(`Detached from this node`, 'info');
 }
 
 // Mock catalog of available tools — three categories the user toggles
