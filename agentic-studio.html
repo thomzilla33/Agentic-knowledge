@@ -11921,15 +11921,22 @@ const demoSteps = [
     title: 'Drill into an agent',
     desc:  'Scope knowledge to ONE specific node',
     sideEffect: () => {
-      // Close the slide-out so the Builder canvas is fully visible.
-      closeKnowledgeConstraint();
-      // Make sure we're on the Builder tab + the Customer Analyst node is selected.
-      const tab = [...document.querySelectorAll('.ov-tab')].find(b => b.textContent.trim() === 'Builder');
-      if (tab) switchOvTab('builder', tab);
-      setTimeout(() => selectEditNode('ag-ca'), 120);
+      // Close any iframe slide-out from the workflow-level story.
+      try { closeKnowledgeConstraint(); } catch (_) {}
+      // Make sure a network is selected (defaults to n1 — same workflow the
+      // earlier steps walked through). openBuilderView() needs currentOvId.
+      if (!currentOvId) {
+        currentOvId = 'n1';
+        selectedId  = 'n1';
+      }
+      bldrNet = NETWORKS.find(x => x.id === currentOvId) || NETWORKS[0];
+      // Enter the ACTUAL Edit mode (vBuilder view) — not the Overview's
+      // inner Builder PREVIEW tab. openBuilderView() switches the top-level
+      // view, renders the editable canvas, and auto-selects ag-ca.
+      openBuilderView();
     },
     target: { selector: '.insp-configure-btn' },
-    tipText: 'Workflow-level governance is the outer ring. Click Configure on any agent node to drill in — you can scope knowledge to THIS agent at THIS position.',
+    tipText: 'Workflow-level governance is the outer ring. Click Configure on the agent node to drill in — you can scope knowledge to THIS agent at THIS position.',
     tipSide: 'left',
   },
   {
@@ -12011,19 +12018,40 @@ function demoStop() {
   document.getElementById('demoPanel')?.classList.remove('open');
   demoClearHighlight();
   demoHideTooltip();
-  // Close any auxiliary surfaces the walkthrough may have opened so the
-  // user lands on a clean state at the end.
+  // Close auxiliary surfaces opened during the walkthrough so the user
+  // ends on a clean state — modal, edit view, slide-out all reset.
   try { closeAgentConfigModal(); } catch (_) {}
+  try {
+    const vb = document.getElementById('vBuilder');
+    if (vb && vb.classList.contains('active')) exitBuilder();
+  } catch (_) {}
+  try { closeKnowledgeConstraint(); } catch (_) {}
 }
 
 function demoGoto(idx) {
   if (idx < 0 || idx >= demoSteps.length) return;
-  // When stepping out of the node-level steps (10–15) back into the
-  // workflow-level story (1–9), close the agent-config modal so the
-  // earlier targets in the canvas are visible again.
-  const NODE_STEPS_START = 9; // 0-indexed first node-level step
+  // When stepping OUT of the node-level steps (10–15) back into the
+  // workflow-level story (1–9), close the agent-config modal AND exit
+  // the Builder edit view back to the Overview so the earlier targets
+  // (network preview, ov tabs, slide-out) are reachable again.
+  const NODE_STEPS_START = 9;                       // 0-indexed first node-level step
+  const KC_STEPS_RANGE   = { from: 4, to: 8 };      // steps 5–9 operate inside the slide-out
   if (idx < NODE_STEPS_START && demoState.idx >= NODE_STEPS_START) {
     try { closeAgentConfigModal(); } catch (_) {}
+    // exitBuilder() only does anything if we're currently in vBuilder.
+    try {
+      const vb = document.getElementById('vBuilder');
+      if (vb && vb.classList.contains('active')) exitBuilder();
+    } catch (_) {}
+    // If we're landing on a step that operates inside the Knowledge
+    // slide-out (5–9), reopen it — those steps only scroll/find inside
+    // the iframe, they don't open it themselves.
+    if (idx >= KC_STEPS_RANGE.from && idx <= KC_STEPS_RANGE.to) {
+      // openKnowledgeConstraint() needs an open network. Step 2 set it,
+      // but defensively re-pick if currentOvId is stale.
+      if (!currentOvId) selectNetwork('n1');
+      try { openKnowledgeConstraint(); } catch (_) {}
+    }
   }
   demoState.idx = idx;
   const step = demoSteps[idx];
