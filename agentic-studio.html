@@ -1958,6 +1958,390 @@ body.test-mode #vTestMode{display:flex}
 .demo-tooltip[data-side="left"]::before{
   right:-6px;top:18px;border-left:none;border-bottom:none;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   AGENT NODE BUILDER (drag + selector popover + expandable inspector)
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Draggable Agent item in the Nodes panel — subtle "pickup" affordance */
+.nl-item-drag{cursor:grab;user-select:none}
+.nl-item-drag:active{cursor:grabbing}
+.nl-item-drag.is-dragging{opacity:0.45}
+
+/* Canvas drop highlight when dragging an Agent over it */
+.bldr-ec.is-drop-target{
+  outline:2px dashed rgba(167,139,250,0.55);
+  outline-offset:-6px;
+  background:radial-gradient(ellipse at center, rgba(167,139,250,0.06) 0%, transparent 70%);
+}
+
+/* Pending node placeholder while user picks an agent from the selector */
+.bn.bn-pending{
+  border-style:dashed !important;
+  opacity:0.85;
+  animation:bn-pending-pulse 1.6s ease-in-out infinite;
+}
+@keyframes bn-pending-pulse{
+  0%, 100%{ box-shadow: 0 0 0 0 rgba(167,139,250,0); }
+  50%     { box-shadow: 0 0 0 4px rgba(167,139,250,0.18); }
+}
+
+/* Agent selector popover — appears next to the just-dropped node */
+.agent-selector{
+  position:fixed;z-index:9200;width:320px;
+  background:#0b1220;border:1px solid rgba(167,139,250,0.30);
+  border-radius:12px;
+  box-shadow:0 24px 56px rgba(0,0,0,0.65), 0 0 0 1px rgba(167,139,250,0.10);
+  display:flex;flex-direction:column;overflow:hidden;
+  max-height:480px;
+  opacity:0;transform:translateY(6px);
+  transition:opacity .18s, transform .18s;
+  pointer-events:none;
+}
+.agent-selector.open{opacity:1;transform:translateY(0);pointer-events:auto}
+.agent-selector-hd{
+  padding:10px 12px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(167,139,250,0.06);
+}
+.agent-selector-title{font-size:11px;font-weight:700;color:#c4b5fd;letter-spacing:.04em;display:flex;align-items:center;gap:6px}
+.agent-selector-close{
+  width:22px;height:22px;border-radius:6px;background:transparent;border:none;color:var(--t3);
+  cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;
+}
+.agent-selector-close:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+.agent-selector-search{
+  position:relative;padding:8px 10px 6px;border-bottom:1px solid var(--bd);
+}
+.agent-selector-search input{
+  width:100%;height:30px;padding:0 10px 0 30px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);border-radius:7px;
+  color:var(--t1);font-size:12px;outline:none;
+  transition:border-color .12s;
+}
+.agent-selector-search input:focus{border-color:rgba(167,139,250,0.50)}
+.agent-selector-search svg{
+  position:absolute;left:19px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none;
+}
+.agent-selector-list{
+  flex:1;overflow-y:auto;padding:4px;min-height:120px;
+}
+.agent-selector-row{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:8px 10px;border-radius:8px;
+  cursor:pointer;transition:background .12s;
+}
+.agent-selector-row:hover{background:rgba(167,139,250,0.08)}
+.agent-selector-row.is-disabled{opacity:0.45;cursor:not-allowed}
+.agent-selector-row.is-disabled:hover{background:transparent}
+.agent-selector-row .av{
+  width:28px;height:28px;border-radius:7px;
+  background:rgba(167,139,250,0.16);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:#c4b5fd;letter-spacing:.02em;
+  flex-shrink:0;
+  border:1px solid rgba(167,139,250,0.30);
+}
+.agent-selector-row .body{flex:1;min-width:0}
+.agent-selector-row .nm{font-size:12px;font-weight:700;color:var(--t1);line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.agent-selector-row .nm .pill{
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  padding:1px 5px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--t3);
+}
+.agent-selector-row .desc{font-size:10px;color:var(--t3);line-height:1.35;margin-top:2px}
+.agent-selector-row .tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.agent-selector-row .tag{
+  font-size:9px;color:var(--t4);background:rgba(255,255,255,0.04);
+  padding:1px 6px;border-radius:10px;border:1px solid var(--bd);
+}
+.agent-selector-empty{
+  padding:18px 12px;text-align:center;color:var(--t3);font-size:11px;
+}
+.agent-selector-ft{
+  padding:6px;border-top:1px solid var(--bd);background:rgba(255,255,255,0.02);
+}
+.agent-selector-create-btn{
+  width:100%;height:32px;padding:0 10px;border-radius:8px;
+  background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:filter .12s;
+}
+.agent-selector-create-btn:hover{filter:brightness(1.10)}
+
+/* Inspector expanded state — sidebar tabs layout (~480px wide) */
+.bldr-insp.is-expanded{width:480px !important}
+.bldr-insp.is-expanded .insp-strip-body{display:none}
+.bldr-insp.is-expanded .insp-body{padding:0;display:flex;flex-direction:row;flex:1;min-height:0;overflow:hidden}
+.bldr-insp.is-expanded .insp-node-card{display:none}
+.bldr-insp.is-expanded .insp-hd{display:none}
+.bldr-insp.is-expanded .insp-ft{display:none}
+
+.insp-cfg-tabs{
+  width:128px;flex-shrink:0;
+  border-right:1px solid var(--bd);
+  background:rgba(255,255,255,0.015);
+  overflow-y:auto;padding:6px 4px;
+}
+.insp-cfg-tab{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;margin:1px 0;border-radius:7px;
+  cursor:pointer;color:var(--t3);font-size:11px;font-weight:600;
+  transition:background .12s, color .12s;
+  border-left:2px solid transparent;
+}
+.insp-cfg-tab:hover{background:rgba(255,255,255,0.03);color:var(--t1)}
+.insp-cfg-tab.is-active{
+  background:rgba(167,139,250,0.10);
+  color:#c4b5fd;
+  border-left-color:#c4b5fd;
+}
+.insp-cfg-tab.is-locked{opacity:0.45;cursor:not-allowed}
+.insp-cfg-tab.is-locked:hover{background:transparent;color:var(--t3)}
+.insp-cfg-tab .ico{
+  width:14px;height:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+}
+.insp-cfg-tab .lbl{flex:1;min-width:0}
+.insp-cfg-tab .badge-soon{
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  background:rgba(255,255,255,0.06);color:var(--t4);
+  padding:1px 4px;border-radius:3px;
+}
+
+.insp-cfg-panel{
+  flex:1;overflow-y:auto;padding:14px 14px 18px;min-width:0;
+}
+.insp-cfg-section{margin-bottom:16px}
+.insp-cfg-label{
+  font-size:10px;font-weight:700;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.insp-cfg-help{font-size:10px;color:var(--t4);margin-top:4px;line-height:1.4}
+.insp-cfg-input,
+.insp-cfg-select,
+.insp-cfg-textarea{
+  width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  border-radius:6px;color:var(--t1);font-size:12px;outline:none;
+  font-family:inherit;
+  transition:border-color .12s;
+}
+.insp-cfg-input{height:30px;padding:0 10px}
+.insp-cfg-select{height:30px;padding:0 8px}
+.insp-cfg-textarea{padding:8px 10px;resize:vertical;min-height:72px;line-height:1.5}
+.insp-cfg-input:focus,
+.insp-cfg-select:focus,
+.insp-cfg-textarea:focus{border-color:rgba(167,139,250,0.50)}
+.insp-cfg-input-counter{font-size:10px;color:var(--t4);text-align:right;margin-top:3px}
+.insp-cfg-row{display:flex;gap:8px;align-items:center}
+.insp-cfg-row > *{flex:1;min-width:0}
+.insp-cfg-chiprow{display:flex;gap:5px;flex-wrap:wrap}
+.insp-cfg-chip{
+  height:24px;padding:0 9px;border-radius:13px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.insp-cfg-chip:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
+.insp-cfg-chip.is-active{background:rgba(167,139,250,0.16);border-color:rgba(167,139,250,0.45);color:#c4b5fd}
+
+.insp-cfg-slider-row{
+  display:flex;align-items:center;gap:10px;
+}
+.insp-cfg-slider-row input[type="range"]{
+  flex:1;height:4px;-webkit-appearance:none;appearance:none;
+  background:rgba(255,255,255,0.08);border-radius:2px;cursor:pointer;
+}
+.insp-cfg-slider-row input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:14px;height:14px;
+  background:#c4b5fd;border-radius:50%;cursor:pointer;
+  border:2px solid #0b1220;box-shadow:0 0 0 1px rgba(167,139,250,0.6);
+}
+.insp-cfg-slider-val{
+  min-width:42px;text-align:right;font-size:11px;font-weight:700;
+  color:var(--t1);font-family:ui-monospace,monospace;
+}
+
+/* Inspector header in expanded mode: agent identity strip + Save status + Fork */
+.insp-cfg-hd{
+  padding:10px 12px;border-bottom:1px solid var(--bd);
+  background:rgba(167,139,250,0.04);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.insp-cfg-hd-back{
+  width:24px;height:24px;border-radius:6px;background:transparent;border:1px solid var(--bd);
+  cursor:pointer;color:var(--t2);display:flex;align-items:center;justify-content:center;
+  transition:background .12s;
+}
+.insp-cfg-hd-back:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+.insp-cfg-hd-name{
+  flex:1;min-width:0;font-size:13px;font-weight:700;color:var(--t1);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.insp-cfg-hd-save{
+  font-size:10px;font-weight:600;color:var(--t3);
+  display:flex;align-items:center;gap:5px;
+  white-space:nowrap;
+}
+.insp-cfg-hd-save .dot{
+  width:6px;height:6px;border-radius:50%;background:var(--ok);
+}
+.insp-cfg-hd-save.saving .dot{background:var(--warn);animation:save-dot-saving 1.2s ease-in-out infinite}
+@keyframes save-dot-saving{
+  0%, 100% { opacity:0.45 }
+  50%      { opacity:1 }
+}
+.insp-cfg-hd-fork{
+  height:24px;padding:0 8px;border-radius:6px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  color:var(--t2);font-size:10px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.insp-cfg-hd-fork:hover{background:rgba(167,139,250,0.10);border-color:rgba(167,139,250,0.30);color:#c4b5fd}
+
+/* "Configure" CTA in the compact (collapsed) inspector node card */
+.insp-configure-btn{
+  height:24px;padding:0 10px;border-radius:6px;
+  background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;
+  margin-left:auto;
+  transition:filter .12s;
+}
+.insp-configure-btn:hover{filter:brightness(1.10)}
+
+/* Knowledge tab — inline pack list inside the inspector */
+.insp-knl-list{display:flex;flex-direction:column;gap:6px}
+.insp-knl-row{
+  display:flex;gap:8px;align-items:flex-start;
+  padding:8px 10px;border-radius:8px;
+  background:rgba(255,255,255,0.02);border:1px solid var(--bd);
+}
+.insp-knl-row .src-badge{
+  font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  padding:1px 5px;border-radius:3px;
+}
+.insp-knl-row .src-badge.from-workflow{background:rgba(43,127,255,0.14);color:#80AFFF;border:1px solid rgba(43,127,255,0.30)}
+.insp-knl-row .src-badge.from-node{background:rgba(167,139,250,0.14);color:#c4b5fd;border:1px solid rgba(167,139,250,0.30)}
+.insp-knl-empty{
+  padding:20px 12px;text-align:center;border:1px dashed var(--bd);border-radius:10px;
+  color:var(--t3);font-size:11px;
+}
+.insp-knl-manage{
+  width:100%;height:32px;border-radius:7px;
+  background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.30);
+  color:#c4b5fd;font-size:11px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:background .12s, filter .12s;
+}
+.insp-knl-manage:hover{background:rgba(167,139,250,0.18)}
+
+/* Tools tab — toggle list */
+.insp-tool-row{
+  display:flex;gap:10px;align-items:center;
+  padding:8px 10px;border-radius:7px;
+  background:rgba(255,255,255,0.02);border:1px solid var(--bd);
+  margin-bottom:5px;
+}
+.insp-tool-row .body{flex:1;min-width:0}
+.insp-tool-row .nm{font-size:11px;font-weight:700;color:var(--t1)}
+.insp-tool-row .desc{font-size:10px;color:var(--t3);margin-top:2px;line-height:1.4}
+.insp-tool-row .toggle{
+  width:32px;height:18px;border-radius:9px;background:rgba(255,255,255,0.08);
+  position:relative;cursor:pointer;transition:background .12s;
+  flex-shrink:0;
+}
+.insp-tool-row .toggle::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:14px;height:14px;border-radius:50%;background:#fff;
+  transition:transform .15s;
+}
+.insp-tool-row .toggle.is-on{background:rgba(167,139,250,0.55)}
+.insp-tool-row .toggle.is-on::after{transform:translateX(14px)}
+
+.insp-tool-section-hd{
+  font-size:9px;font-weight:700;color:var(--t4);
+  text-transform:uppercase;letter-spacing:.10em;
+  margin:14px 0 6px;
+}
+.insp-tool-section-hd:first-child{margin-top:0}
+
+/* Reusable "coming soon" placeholder for locked tabs */
+.insp-cfg-soon{
+  padding:36px 14px;text-align:center;color:var(--t3);
+  border:1px dashed var(--bd);border-radius:10px;
+}
+.insp-cfg-soon .ttl{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.insp-cfg-soon .sub{font-size:11px;color:var(--t3);line-height:1.5;max-width:240px;margin:0 auto}
+
+/* Fork agent dialog — centered modal triggered from the Inspector header */
+.fork-dialog-ov{
+  position:fixed;inset:0;z-index:9300;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  animation:fork-ov-in .15s ease-out;
+}
+@keyframes fork-ov-in { from{opacity:0} to{opacity:1} }
+.fork-dialog{
+  width:100%;max-width:420px;background:#0b1220;
+  border:1px solid var(--bd);border-radius:14px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(167,139,250,0.15);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:fork-dlg-in .18s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fork-dlg-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.fork-dialog-hd{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:14px 14px 12px;border-bottom:1px solid var(--bd);
+  background:rgba(167,139,250,0.05);
+}
+.fork-dialog-ico{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(167,139,250,0.16);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  color:#c4b5fd;border:1px solid rgba(167,139,250,0.30);
+}
+.fork-dialog-title{font-size:13px;font-weight:700;color:var(--t1);line-height:1.3}
+.fork-dialog-sub{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.45}
+.fork-dialog-close{
+  width:22px;height:22px;border-radius:6px;background:transparent;border:none;
+  cursor:pointer;font-size:14px;line-height:1;color:var(--t3);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.fork-dialog-close:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+.fork-dialog-body{padding:14px 14px 10px}
+.fork-dialog-label{
+  display:block;font-size:10px;font-weight:700;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;
+}
+.fork-dialog-input{
+  width:100%;height:32px;padding:0 10px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);border-radius:7px;
+  color:var(--t1);font-size:12px;outline:none;
+  transition:border-color .12s;
+}
+.fork-dialog-input:focus{border-color:rgba(167,139,250,0.55)}
+.fork-dialog-help{font-size:10px;color:var(--t4);margin-top:6px;line-height:1.4}
+.fork-dialog-ft{
+  display:flex;justify-content:flex-end;gap:8px;
+  padding:10px 14px 14px;border-top:1px solid var(--bd);
+  background:rgba(255,255,255,0.015);
+}
+.fork-dialog-btn{
+  height:30px;padding:0 14px;border-radius:7px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  color:var(--t2);font-size:11px;font-weight:700;cursor:pointer;
+  transition:background .12s, color .12s;
+}
+.fork-dialog-btn:hover{background:rgba(255,255,255,0.08);color:var(--t1)}
+.fork-dialog-btn-primary{
+  background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  border-color:transparent;color:#fff;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.fork-dialog-btn-primary:hover{filter:brightness(1.10);background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);color:#fff}
 </style>
 </head>
 <body>
@@ -2109,6 +2493,28 @@ body.test-mode #vTestMode{display:flex}
       <button class="demo-nav-btn is-primary" id="demoNextBtn" onclick="demoNav(1)">Next</button>
     </div>
   </aside>
+
+  <!-- ════ AGENT SELECTOR POPOVER ════ -->
+  <div class="agent-selector" id="agentSelector" role="dialog" aria-label="Pick an Agent">
+    <div class="agent-selector-hd">
+      <span class="agent-selector-title">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><path d="M5 10h4M7 5V3M5 3h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Pick an Agent
+      </span>
+      <button class="agent-selector-close" onclick="closeAgentSelector(true)" aria-label="Cancel">×</button>
+    </div>
+    <div class="agent-selector-search">
+      <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <input id="agentSelectorSearch" placeholder="Search by name, tag, or owner…" oninput="renderAgentSelectorList(this.value)" autocomplete="off"/>
+    </div>
+    <div class="agent-selector-list" id="agentSelectorList"></div>
+    <div class="agent-selector-ft">
+      <button class="agent-selector-create-btn" onclick="createNewAgentFromSelector()">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Create new agent
+      </button>
+    </div>
+  </div>
 
   <!-- ════ GUIDED DEMO HIGHLIGHT BOX ════ -->
   <div class="demo-highlight-box" id="demoHighlightBox"></div>
@@ -3099,7 +3505,19 @@ body.test-mode #vTestMode{display:flex}
             </div>
             <div class="nl-sechd" style="margin-top:6px">
               <span class="nl-seclbl">Agents</span>
-              <span class="nl-secbadge">2 active</span>
+              <span class="nl-secbadge">8 in catalog</span>
+            </div>
+            <!-- Generic Agent — drag this to the canvas to pick from the catalog -->
+            <div class="nl-item nl-item-drag" draggable="true" data-node-type="agent-generic"
+                 ondragstart="onAgentDragStart(event)" ondragend="onAgentDragEnd(event)"
+                 title="Drag onto canvas to add an Agent">
+              <div class="nl-ico" style="background:rgba(167,139,250,0.16);border:1px dashed rgba(167,139,250,0.5)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="var(--pur)" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><path d="M5 10h4" stroke="var(--pur)" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+              <div class="nl-info">
+                <div class="nl-nm">Agent
+                  <span class="nl-badge bn-ba" style="margin-left:5px">+</span>
+                </div>
+                <div class="nl-sub">Drag to canvas · pick from catalog</div>
+              </div>
             </div>
             <div class="nl-item" onclick="selectEditNode('ag-ca')">
               <div class="nl-ico" style="background:rgba(167,139,250,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="var(--pur)" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><path d="M5 10h4" stroke="var(--pur)" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
@@ -3154,8 +3572,25 @@ body.test-mode #vTestMode{display:flex}
             <div class="insp-node-ico">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="6" width="11" height="8" rx="1.5" stroke="var(--pur)" stroke-width="1.3"/><rect x="5.5" y="8.5" width="2" height="2" rx="1" fill="var(--pur)"/><rect x="8.5" y="8.5" width="2" height="2" rx="1" fill="var(--pur)"/><path d="M6 12h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/><path d="M8 6V3.5M6 3.5h4" stroke="var(--pur)" stroke-width="1.3" stroke-linecap="round"/></svg>
             </div>
-            <div><div class="insp-node-nm" id="inspNodeNm">Customer Analyst</div><div class="insp-node-st">Agent · Active</div></div>
-            <button class="insp-link" onclick="toast('Opening agent config…','info')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 2H2v8h8V7M7 1h4v4M11 1L6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div style="flex:1;min-width:0"><div class="insp-node-nm" id="inspNodeNm">Customer Analyst</div><div class="insp-node-st" id="inspNodeSt">Agent · Active</div></div>
+            <button class="insp-configure-btn" onclick="expandInspector(false)" title="Configure the entire agent">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="1.4" stroke="currentColor" stroke-width="1.4"/><path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.5 2.5l1 1M8.5 8.5l1 1M2.5 9.5l1-1M8.5 3.5l1-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Configure
+            </button>
+          </div>
+          <!-- ════ EXPANDED CONFIG (sidebar tabs + content) ════
+               Renders only when .bldr-insp has .is-expanded. Driven by
+               renderAgentConfigPanel() which reads the active node + agent. -->
+          <div class="insp-cfg-hd" id="inspCfgHd" style="display:none">
+            <button class="insp-cfg-hd-back" onclick="collapseInspector()" aria-label="Back to summary">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7 2L3 6l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <span class="insp-cfg-hd-name" id="inspCfgHdName">Customer Analyst</span>
+            <span class="insp-cfg-hd-save" id="inspCfgHdSave"><span class="dot"></span>Saved</span>
+            <button class="insp-cfg-hd-fork" id="inspCfgHdFork" onclick="forkCurrentAgent()" title="Clone this agent — edits stay isolated">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="3" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="9" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 4.5v1.5a1.5 1.5 0 001.5 1.5h3A1.5 1.5 0 009 6V4.5" stroke="currentColor" stroke-width="1.2"/></svg>
+              Fork
+            </button>
           </div>
           <div class="insp-body" id="inspBody">
             <div class="insp-sec">
@@ -4859,9 +5294,21 @@ function openKnowledgeConstraint() {
   // M4 — pass the current env so the slide-out picks up the workflow's
   // session-mutable state, not just the seed default.
   const env  = encodeURIComponent(getWorkflowEnv(n.id));
+  // A1.2 — optional node-level context. When the user opens the slide-out
+  // from inside an Agent's Knowledge tab, we tag the URL with `&nodeId=...`
+  // so the React side can render workflow + node packs together.
+  let nodeCtx = '';
+  if (window._knNodeContext && window._knNodeContext.nodeId) {
+    nodeCtx = `&nodeId=${encodeURIComponent(window._knNodeContext.nodeId)}`
+            + `&agentId=${encodeURIComponent(window._knNodeContext.agentId || '')}`
+            + `&agentName=${encodeURIComponent(window._knNodeContext.agentName || '')}`;
+    // One-shot — clear after consuming so subsequent workflow-only opens
+    // don't get the wrong scope.
+    window._knNodeContext = null;
+  }
   // Land on the Knowledge list with workflow params — Knowledge.jsx detects
   // workflowId/intent/env and auto-opens the Copilot modal with full context.
-  const url  = `governance-studio/?embed=1&workflowId=${id}&workflowName=${name}&intent=restrict&env=${env}#/intelligence-library/knowledge`;
+  const url  = `governance-studio/?embed=1&workflowId=${id}&workflowName=${name}&intent=restrict&env=${env}${nodeCtx}#/intelligence-library/knowledge`;
   const frame = document.getElementById('kcFrame');
   frame.src = url;
   document.getElementById('kcOverlay').classList.add('open');
@@ -5104,12 +5551,467 @@ function toggleInspPanel() {
   if (collapseBtn) collapseBtn.title = isCollapsed ? 'Expand panel' : 'Collapse panel';
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// AGENT CATALOG (Mock)
+// ────────────────────────────────────────────────────────────────────────────
+// Source of truth for every Agent that can be dragged into a workflow.
+// Each row carries identity, behavior, model, knowledge, tools, guardrails,
+// runtime config and an allowMultiInstance flag. Editing an Agent from any
+// node mutates the row here ("edit base"); the Fork action deep-clones into
+// a new row so changes are isolated.
+// ════════════════════════════════════════════════════════════════════════════
+const AGENT_CATALOG = [
+  {
+    id: 'agt-customer-analyst',
+    name: 'Customer Analyst',
+    description: 'Reads inbound customer inquiries and extracts intent, sentiment, and a recommended track.',
+    avatar: 'CA',
+    accentColor: '#A78BFA',
+    owner: { name: 'Carlos Méndez', initials: 'CM' },
+    tags: ['sales', 'analysis', 'inbound'],
+    behavior: {
+      systemPrompt: 'You are a Customer Analyst. Read inbound customer inquiries and extract:\n1. intent (renewal, churn-risk, support, expansion)\n2. sentiment (-1 to 1)\n3. recommended_track (renewal_track, retention_track, support_track, expansion_track)\n\nReturn strict JSON. Never invent data not present in the input.',
+      responseFormat: 'json',
+      tone: 'analytical',
+    },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.2, maxTokens: 1200, topP: 1.0 },
+    knowledge: { packIds: [] },
+    tools: { functionCalls: ['fetch_crm_record', 'search_history'], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: ['personal_health'], outputValidation: true },
+    runtime: { timeoutMs: 30000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.50 },
+    allowMultiInstance: true,
+    created: '2026-03-12', updated: '2026-05-08',
+    usedInWorkflows: ['n1', 'n3'],
+  },
+  {
+    id: 'agt-document-reader',
+    name: 'Document Reader',
+    description: 'Extracts structured data from PDFs, contracts, invoices and policy documents.',
+    avatar: 'DR',
+    accentColor: '#A78BFA',
+    owner: { name: 'Sarah Chen', initials: 'SC' },
+    tags: ['extraction', 'documents', 'compliance'],
+    behavior: {
+      systemPrompt: 'You are a Document Reader. Given a document, extract the requested fields and return them as JSON. Cite the source location (page/section) for every extracted value. If a field is missing, return null with a reason.',
+      responseFormat: 'json',
+      tone: 'precise',
+    },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.0, maxTokens: 2000, topP: 1.0 },
+    knowledge: { packIds: [] },
+    tools: { functionCalls: ['fetch_document', 'ocr_image'], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
+    runtime: { timeoutMs: 60000, retryPolicy: 'linear', maxRetries: 2, fallbackAgentId: null, costCapUsd: 1.00 },
+    allowMultiInstance: true,
+    created: '2026-02-20', updated: '2026-04-30',
+    usedInWorkflows: [],
+  },
+  {
+    id: 'agt-lead-qualifier',
+    name: 'Lead Qualifier',
+    description: 'Scores inbound leads against ICP + BANT and decides whether to route to SDR or AE.',
+    avatar: 'LQ',
+    accentColor: '#A78BFA',
+    owner: { name: 'Alex Rivera', initials: 'AR' },
+    tags: ['sales', 'qualification', 'icp'],
+    behavior: {
+      systemPrompt: 'You are a Lead Qualifier. Score the lead against ICP criteria + BANT (Budget, Authority, Need, Timeline). Return JSON with {qualified, score, criteria_met, routing}. Defer to attached Knowledge Packs for the canonical ICP/BANT definitions.',
+      responseFormat: 'json',
+      tone: 'decisive',
+    },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.1, maxTokens: 1500, topP: 1.0 },
+    knowledge: { packIds: ['KP-003'] },
+    tools: { functionCalls: ['check_icp', 'check_bant', 'fetch_crm_record'], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
+    runtime: { timeoutMs: 30000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.40 },
+    allowMultiInstance: true,
+    created: '2026-03-01', updated: '2026-05-10',
+    usedInWorkflows: ['n2'],
+  },
+  {
+    id: 'agt-risk-assessor',
+    name: 'Risk Assessor',
+    description: 'Detects churn risk and policy violations from account health signals.',
+    avatar: 'RA',
+    accentColor: '#A78BFA',
+    owner: { name: 'Lisa Anderson', initials: 'LA' },
+    tags: ['risk', 'churn', 'health-score'],
+    behavior: {
+      systemPrompt: 'You are a Risk Assessor. Evaluate account health signals (usage drop, support escalations, billing issues) and return a churn risk score 0-100 with the top 3 contributing factors. Never propose retention offers — that is the Retention Specialist\'s job.',
+      responseFormat: 'json',
+      tone: 'analytical',
+    },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.2, maxTokens: 1000, topP: 1.0 },
+    knowledge: { packIds: [] },
+    tools: { functionCalls: ['fetch_health_score', 'fetch_support_tickets'], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
+    runtime: { timeoutMs: 25000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.35 },
+    allowMultiInstance: true,
+    created: '2026-03-18', updated: '2026-04-22',
+    usedInWorkflows: ['n3'],
+  },
+  {
+    id: 'agt-renewal-strategist',
+    name: 'Renewal Strategist',
+    description: 'Generates personalized renewal offers respecting discount authority and ICP.',
+    avatar: 'RS',
+    accentColor: '#A78BFA',
+    owner: { name: 'Alex Rivera', initials: 'AR' },
+    tags: ['sales', 'renewals', 'pricing'],
+    behavior: {
+      systemPrompt: 'You are a Renewal Strategist. Given a qualified renewal opportunity, propose an offer (tier, discount %, term). Stay within the discount authority defined in the attached Knowledge Pack. Escalate when the requested discount exceeds the ceiling.',
+      responseFormat: 'json',
+      tone: 'persuasive',
+    },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.3, maxTokens: 1800, topP: 1.0 },
+    knowledge: { packIds: ['KP-003'] },
+    tools: { functionCalls: ['fetch_pricing_matrix', 'create_offer', 'check_discount_authority'], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
+    runtime: { timeoutMs: 45000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: 'agt-customer-analyst', costCapUsd: 0.75 },
+    allowMultiInstance: false,
+    created: '2026-04-02', updated: '2026-05-12',
+    usedInWorkflows: ['n1'],
+  },
+  {
+    id: 'agt-contract-reviewer',
+    name: 'Contract Reviewer',
+    description: 'Reviews redlines against approved legal positions and flags clauses outside policy.',
+    avatar: 'CR',
+    accentColor: '#A78BFA',
+    owner: { name: 'Sarah Chen', initials: 'SC' },
+    tags: ['legal', 'contracts', 'compliance'],
+    behavior: {
+      systemPrompt: 'You are a Contract Reviewer. Compare incoming redlines against the approved legal positions in the Knowledge Pack. Flag every clause that deviates and classify severity (low/medium/high). Never invent positions — only cite from attached sources.',
+      responseFormat: 'json',
+      tone: 'cautious',
+    },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.0, maxTokens: 2500, topP: 1.0 },
+    knowledge: { packIds: ['KP-005'] },
+    tools: { functionCalls: ['fetch_contract', 'diff_clauses', 'flag_for_legal'], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: [], outputValidation: true },
+    runtime: { timeoutMs: 90000, retryPolicy: 'linear', maxRetries: 2, fallbackAgentId: null, costCapUsd: 1.50 },
+    allowMultiInstance: false,
+    created: '2026-03-25', updated: '2026-05-05',
+    usedInWorkflows: [],
+  },
+  {
+    id: 'agt-onboarding-specialist',
+    name: 'Onboarding Specialist',
+    description: 'Personalizes onboarding sequences based on customer profile and chosen plan.',
+    avatar: 'OS',
+    accentColor: '#A78BFA',
+    owner: { name: 'David Kim', initials: 'DK' },
+    tags: ['customer-success', 'onboarding'],
+    behavior: {
+      systemPrompt: 'You are an Onboarding Specialist. Build a 30/60/90 plan based on the customer profile (size, industry, plan, integrations). Output Markdown with milestones and check-ins.',
+      responseFormat: 'text',
+      tone: 'friendly',
+    },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.5, maxTokens: 1500, topP: 1.0 },
+    knowledge: { packIds: [] },
+    tools: { functionCalls: ['create_onboarding_plan', 'schedule_check_in'], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: [], outputValidation: false },
+    runtime: { timeoutMs: 30000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.50 },
+    allowMultiInstance: true,
+    created: '2026-04-10', updated: '2026-05-01',
+    usedInWorkflows: [],
+  },
+  {
+    id: 'agt-response-generator',
+    name: 'Response Generator',
+    description: 'Drafts customer-facing responses in brand voice using approved messaging.',
+    avatar: 'RG',
+    accentColor: '#A78BFA',
+    owner: { name: 'Emma Wilson', initials: 'EW' },
+    tags: ['support', 'communication', 'brand-voice'],
+    behavior: {
+      systemPrompt: 'You are a Response Generator. Draft a reply to the customer in the brand voice defined in the Knowledge Pack. Always respect the tone guidelines and never make promises outside the pack\'s approved messaging.',
+      responseFormat: 'text',
+      tone: 'on-brand',
+    },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.4, maxTokens: 1200, topP: 1.0 },
+    knowledge: { packIds: [] },
+    tools: { functionCalls: ['fetch_brand_voice', 'send_draft_for_review'], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: [], outputValidation: false },
+    runtime: { timeoutMs: 25000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.40 },
+    allowMultiInstance: true,
+    created: '2026-03-08', updated: '2026-05-09',
+    usedInWorkflows: ['n1'],
+  },
+];
+
+function getAgentById(id) {
+  return AGENT_CATALOG.find(a => a.id === id) || null;
+}
+function getAgentsByTag(tag) {
+  return AGENT_CATALOG.filter(a => a.tags.includes(tag));
+}
+// Deep-clone helper for the Fork action so the new agent doesn't share refs.
+function cloneAgent(srcId, newName) {
+  const src = getAgentById(srcId);
+  if (!src) return null;
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = `agt-${(newName || src.name).toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${Date.now().toString(36)}`;
+  copy.name = newName || `${src.name} (Fork)`;
+  copy.created = new Date().toISOString().slice(0,10);
+  copy.updated = copy.created;
+  copy.usedInWorkflows = [];
+  AGENT_CATALOG.push(copy);
+  return copy;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// AGENT NODE BUILDER — drag-to-canvas + selector popover
+// ────────────────────────────────────────────────────────────────────────────
+// Pipeline: user grabs the generic "Agent" item from the Nodes panel, drops
+// it anywhere on the canvas. We insert a *pending* placeholder node into
+// EDIT_FLOW at the dropped position and open the agent selector popover
+// anchored to it. Picking an Agent (or creating a new one) commits the
+// pending node into a real one; cancelling removes the pending node.
+// ════════════════════════════════════════════════════════════════════════════
+let agentDragState = null;     // { type: 'agent-generic' }
+let pendingNodeIdx = null;     // index in EDIT_FLOW of the pending placeholder
+let pendingNodeId  = null;
+
+// 1. Drag start from the panel item
+function onAgentDragStart(ev) {
+  agentDragState = { type: 'agent-generic' };
+  ev.dataTransfer.effectAllowed = 'copy';
+  ev.dataTransfer.setData('text/agent-generic', '1');
+  ev.currentTarget.classList.add('is-dragging');
+  // Wire canvas drop listeners just-in-time so we don't pollute the page.
+  const canvas = document.getElementById('bldrEditCanvas');
+  if (canvas) {
+    canvas.addEventListener('dragover', onCanvasDragOver);
+    canvas.addEventListener('dragleave', onCanvasDragLeave);
+    canvas.addEventListener('drop', onCanvasDrop);
+  }
+}
+function onAgentDragEnd(ev) {
+  agentDragState = null;
+  ev.currentTarget.classList.remove('is-dragging');
+  const canvas = document.getElementById('bldrEditCanvas');
+  if (canvas) {
+    canvas.classList.remove('is-drop-target');
+    canvas.removeEventListener('dragover', onCanvasDragOver);
+    canvas.removeEventListener('dragleave', onCanvasDragLeave);
+    canvas.removeEventListener('drop', onCanvasDrop);
+  }
+}
+function onCanvasDragOver(ev) {
+  if (!agentDragState) return;
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = 'copy';
+  document.getElementById('bldrEditCanvas').classList.add('is-drop-target');
+}
+function onCanvasDragLeave(ev) {
+  // Only clear when the cursor genuinely leaves the canvas (not entering a child).
+  const c = document.getElementById('bldrEditCanvas');
+  if (c && (ev.relatedTarget == null || !c.contains(ev.relatedTarget))) {
+    c.classList.remove('is-drop-target');
+  }
+}
+function onCanvasDrop(ev) {
+  if (!agentDragState) return;
+  ev.preventDefault();
+  document.getElementById('bldrEditCanvas').classList.remove('is-drop-target');
+
+  // Choose insertion index — by default add at the end. If the user drops
+  // near an existing node, insert right after it.
+  let insertIdx = EDIT_FLOW.length;
+  const canvas = document.getElementById('bldrEditCanvas');
+  const canvasRect = canvas.getBoundingClientRect();
+  const dropX = ev.clientX - canvasRect.left;
+  for (let i = 0; i < EDIT_FLOW.length; i++) {
+    const el = canvas.querySelectorAll('.bn')[i];
+    if (!el) continue;
+    const elLeft = parseFloat(el.style.left) || 0;
+    if (dropX < elLeft + el.offsetWidth + 30) { insertIdx = i + 1; break; }
+  }
+
+  // Create the pending placeholder node and re-render the canvas.
+  pendingNodeId  = `pend-${Date.now().toString(36)}`;
+  pendingNodeIdx = insertIdx;
+  EDIT_FLOW.splice(insertIdx, 0, {
+    id: pendingNodeId, t: 'agent', agentId: null,
+    l: 'Pick an agent…', sub: 'Drag dropped here', badge: '?', _pending: true,
+  });
+  renderEditCanvas();
+  // Anchor the selector to the new node.
+  openAgentSelectorFor(pendingNodeId);
+}
+
+// ─── Selector popover ─────────────────────────────────────────────────────
+let agentSelectorReplaceId = null;  // when set, picking an agent UPDATES this
+                                    // existing node instead of committing a
+                                    // pending placeholder. Used by the
+                                    // inspector's "Change agent" flow.
+
+function openAgentSelectorFor(nodeId, opts = {}) {
+  const popover = document.getElementById('agentSelector');
+  if (!popover) return;
+  agentSelectorReplaceId = opts.replace ? nodeId : null;
+  // Anchor next to the node element on the canvas.
+  const nodeEl = [...document.querySelectorAll('#bldrEditCanvas .bn')]
+    .find(el => el.onclick && el.onclick.toString().includes(`'${nodeId}'`));
+  let top, left;
+  if (nodeEl) {
+    const r = nodeEl.getBoundingClientRect();
+    top  = Math.min(window.innerHeight - 480 - 16, r.bottom + 8);
+    left = Math.min(window.innerWidth  - 320 - 16, r.left);
+  } else {
+    top  = 120;
+    left = (window.innerWidth - 320) / 2;
+  }
+  popover.style.top  = `${Math.max(16, top)}px`;
+  popover.style.left = `${Math.max(16, left)}px`;
+  popover.classList.add('open');
+  // Reset search & render the full list.
+  const input = document.getElementById('agentSelectorSearch');
+  if (input) { input.value = ''; setTimeout(() => input.focus(), 60); }
+  renderAgentSelectorList('');
+}
+
+function closeAgentSelector(cancelled = false) {
+  document.getElementById('agentSelector')?.classList.remove('open');
+  // If user cancels with a pending node still in the flow, drop it.
+  if (cancelled && pendingNodeIdx != null && pendingNodeId != null) {
+    const idx = EDIT_FLOW.findIndex(n => n.id === pendingNodeId);
+    if (idx >= 0) EDIT_FLOW.splice(idx, 1);
+    renderEditCanvas();
+  }
+  pendingNodeIdx = null;
+  pendingNodeId  = null;
+  agentSelectorReplaceId = null;
+}
+
+function renderAgentSelectorList(query) {
+  const list = document.getElementById('agentSelectorList');
+  if (!list) return;
+  const q = (query || '').trim().toLowerCase();
+  // Identify which agents are already in this workflow (used to flag
+  // non-multi-instance dupes as disabled).
+  const usedAgentIds = new Set(
+    EDIT_FLOW.filter(n => n.t === 'agent' && n.agentId).map(n => n.agentId)
+  );
+  const filtered = AGENT_CATALOG.filter(a => {
+    if (!q) return true;
+    const hay = [a.name, a.description, a.owner?.name || '', ...(a.tags||[])].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="agent-selector-empty">No agents match "${q}". Try a different keyword, or create a new one.</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(a => {
+    const alreadyHere = usedAgentIds.has(a.id) && !a.allowMultiInstance;
+    const disabledCls = alreadyHere ? 'is-disabled' : '';
+    const title = alreadyHere ? ` title="Already in this workflow · multi-instance disabled"` : '';
+    const usedPill = a.usedInWorkflows?.length
+      ? `<span class="pill">${a.usedInWorkflows.length} workflow${a.usedInWorkflows.length === 1 ? '' : 's'}</span>`
+      : '';
+    const tags = (a.tags || []).slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
+    return `<div class="agent-selector-row ${disabledCls}" ${title}
+                 onclick="${alreadyHere ? '' : `pickAgentFromSelector('${a.id}')`}">
+      <div class="av">${a.avatar || a.name.slice(0,2).toUpperCase()}</div>
+      <div class="body">
+        <div class="nm">${a.name}${usedPill}</div>
+        <div class="desc">${a.description}</div>
+        <div class="tags">${tags}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// 2. User clicks an agent in the selector → commit the pending node.
+function pickAgentFromSelector(agentId) {
+  const agent = getAgentById(agentId);
+  if (!agent) return;
+
+  // Replace mode (used by "Change agent" later) — find the target node and update it in place.
+  if (agentSelectorReplaceId) {
+    const idx = EDIT_FLOW.findIndex(n => n.id === agentSelectorReplaceId);
+    if (idx >= 0) {
+      const newLabel = instanceLabelFor(agent, agentSelectorReplaceId);
+      EDIT_FLOW[idx] = {
+        ...EDIT_FLOW[idx],
+        agentId: agent.id,
+        l: newLabel,
+        sub: agent.description.length > 40 ? agent.description.slice(0,40) + '…' : agent.description,
+        badge: 'A',
+        _pending: false,
+      };
+    }
+    closeAgentSelector(false);
+    renderEditCanvas();
+    if (typeof toast === 'function') toast(`Swapped to ${agent.name}`, 'info');
+    return;
+  }
+
+  // Commit pending placeholder.
+  if (pendingNodeIdx == null || pendingNodeId == null) return;
+  const idx = EDIT_FLOW.findIndex(n => n.id === pendingNodeId);
+  if (idx < 0) return;
+  // Generate a stable per-node id and the visible label (with #N suffix when dupe).
+  const newNodeId = `n-agt-${agent.id.replace('agt-', '')}-${Date.now().toString(36)}`;
+  const label = instanceLabelFor(agent, newNodeId);
+  EDIT_FLOW[idx] = {
+    id: newNodeId,
+    t: 'agent',
+    agentId: agent.id,
+    l: label,
+    sub: agent.description.length > 40 ? agent.description.slice(0,40) + '…' : agent.description,
+    badge: 'A',
+  };
+  closeAgentSelector(false);
+  renderEditCanvas();
+  // Auto-select the new node so the inspector shows it.
+  selectEditNode(newNodeId);
+  if (typeof toast === 'function') toast(`${agent.name} added to canvas`, 'success');
+}
+
+// "+ Create new agent" footer button — drop straight into create-mode in the inspector.
+function createNewAgentFromSelector() {
+  // Stub: insert an empty agent into the catalog and pick it.
+  const fresh = {
+    id: `agt-new-${Date.now().toString(36)}`,
+    name: 'New Agent',
+    description: 'Click Configure to define what this agent does.',
+    avatar: 'NA',
+    accentColor: '#A78BFA',
+    owner: { name: 'You', initials: 'YO' },
+    tags: [],
+    behavior: { systemPrompt: '', responseFormat: 'text', tone: '' },
+    model: { provider: 'anthropic', version: 'claude-sonnet-4.5', temperature: 0.3, maxTokens: 1200, topP: 1.0 },
+    knowledge: { packIds: [] },
+    tools: { functionCalls: [], mcpServers: [], webhooks: [] },
+    guardrails: { piiFilter: true, topicFilters: [], outputValidation: false },
+    runtime: { timeoutMs: 30000, retryPolicy: 'exponential', maxRetries: 3, fallbackAgentId: null, costCapUsd: 0.50 },
+    allowMultiInstance: true,
+    created: new Date().toISOString().slice(0,10),
+    updated: new Date().toISOString().slice(0,10),
+    usedInWorkflows: [],
+    _isFresh: true,
+  };
+  AGENT_CATALOG.push(fresh);
+  pickAgentFromSelector(fresh.id);
+  // Slight delay then auto-open the expanded inspector in Create mode.
+  setTimeout(() => expandInspector(true), 200);
+}
+
+// Compute the visible label for a node referencing an agent. When the same
+// catalog agent already exists in the workflow, append " #N" for the new one.
+function instanceLabelFor(agent, newNodeId) {
+  const existing = EDIT_FLOW.filter(n => n.t === 'agent' && n.agentId === agent.id && n.id !== newNodeId);
+  if (existing.length === 0) return agent.name;
+  return `${agent.name} #${existing.length + 1}`;
+}
+
 // ─ Edit Canvas ─
 const EDIT_FLOW = [
   {id:'wh',t:'trigger',l:'Webhook Received',sub:'Customer inquiry received'},
-  {id:'ag-ca',t:'agent',l:'Customer Analyst',sub:'Analyzes customer inquiry',badge:'A'},
+  {id:'ag-ca',t:'agent',agentId:'agt-customer-analyst',l:'Customer Analyst',sub:'Analyzes customer inquiry',badge:'A'},
   {id:'ks',t:'rag',l:'Knowledge Space',sub:'Truth Only · Sales Playbook 2026',badge:'K'},
-  {id:'rg',t:'agent',l:'Response Generator',sub:'Generates customer response',badge:'Ag'},
+  {id:'rg',t:'agent',agentId:'agt-response-generator',l:'Response Generator',sub:'Generates customer response',badge:'Ag'},
 ];
 const EDGE_LABELS = {0:'inquiry',1:'context',2:'knowledge'};
 
@@ -5127,7 +6029,8 @@ function renderEditCanvas(net) {
       svg+=`<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="rgba(0,194,194,0.3)" stroke-width="1.5" fill="none"/>`;
       const lx=(x1+x2)/2, ly=y1-12;
       svg+=`<rect x="${lx-24}" y="${ly-9}" width="48" height="16" rx="4" fill="rgba(0,0,0,0.7)" stroke="rgba(255,255,255,0.08)"/>`;
-      svg+=`<text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Inter,sans-serif">${EDGE_LABELS[i]}</text>`;
+      const edgeLbl = EDGE_LABELS[i] || '→';
+      svg+=`<text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Inter,sans-serif">${edgeLbl}</text>`;
     }
   });
   svg+='</svg>';
@@ -5150,7 +6053,8 @@ function buildEditNode(node,x,y,w,h) {
   const bdg=badgeTxt?`<span class="bn-badge ${bdgMap[badgeTxt]||''}">${badgeTxt}</span>`:'';
   const isRag=node.t==='rag';
   const sub2=isRag?`<div style="display:flex;gap:4px;margin-bottom:4px"><span class="bn-chip bn-chip-nat">Native</span><span class="bn-chip bn-chip-ok">Active</span></div><div class="bn-kn-lbl">Truth Only</div><div class="bn-kn-pack">Sales Playbook 2026</div>`:`<div class="bn-stat">${node.sub}</div>`;
-  return `<div class="bn ${t.cls}" style="left:${x}px;top:${y}px;width:${w}px;z-index:2;cursor:pointer" onclick="selectEditNode('${node.id}')">
+  const pendingCls = node._pending ? ' bn-pending' : '';
+  return `<div class="bn ${t.cls}${pendingCls}" style="left:${x}px;top:${y}px;width:${w}px;z-index:2;cursor:pointer" onclick="selectEditNode('${node.id}')">
     <div class="bn-hd"><div class="bn-icon ${t.icoCls}">${t.ico}</div>${bdg}</div>
     <div class="bn-name">${node.l}</div>${sub2}
     <div class="bn-port bn-port-in"></div>
@@ -5169,13 +6073,716 @@ function selectEditNode(nodeId) {
     'wf-cs':{name:'CRM Sync',sub:'Workflow configuration',type:'Workflow'},
     'ag-dr':{name:'Document Reader',sub:'Agent configuration',type:'Agent'},
   };
-  const info = nodeMap[nodeId]||{name:nodeId,sub:'Node configuration',type:'Node'};
+  // Resolve from EDIT_FLOW first (covers dynamically-added agent nodes).
+  let info = nodeMap[nodeId];
+  if (!info) {
+    const flowNode = EDIT_FLOW.find(n => n.id === nodeId);
+    if (flowNode) {
+      if (flowNode.t === 'agent' && flowNode.agentId) {
+        const agent = getAgentById(flowNode.agentId);
+        info = {
+          name: flowNode.l,
+          sub: agent ? `Agent · ${agent.model.version}` : 'Agent configuration',
+          type: 'Agent',
+        };
+      } else if (flowNode._pending) {
+        info = { name: flowNode.l, sub: 'Pick an agent to continue', type: 'Agent' };
+      } else {
+        info = { name: flowNode.l, sub: flowNode.sub || 'Node configuration', type: flowNode.t };
+      }
+    }
+  }
+  info = info || { name: nodeId, sub: 'Node configuration', type: 'Node' };
   document.getElementById('inspTitle').textContent = info.name;
   document.getElementById('inspSub').textContent = info.sub;
   document.getElementById('inspNodeNm').textContent = info.name;
+  // Track the active node so the Configure CTA + inspector know what's selected.
+  activeNodeId = nodeId;
   document.querySelectorAll('#bldrEditCanvas .bn').forEach(el=>{
     el.classList.toggle('sel', el.onclick&&el.onclick.toString().includes(`'${nodeId}'`));
   });
+  // Collapse expanded inspector when switching to a non-agent node.
+  if (info.type !== 'Agent') {
+    document.getElementById('bldrInspPanel')?.classList.remove('is-expanded');
+  }
+}
+
+// Active node id for the inspector (set by selectEditNode).
+let activeNodeId = null;
+
+// ════════════════════════════════════════════════════════════════════════════
+// AGENT CONFIG INSPECTOR — expanded mode (sidebar tabs + content)
+// ────────────────────────────────────────────────────────────────────────────
+// The Inspector lives in two visual modes:
+//  - Compact (256px, default) — node card + a few config fields.
+//  - Expanded (480px, .is-expanded) — sidebar of 8 tabs + a body that swaps
+//    based on the active tab. A0+A1 implements Identity/Behavior/Model/
+//    Knowledge/Tools functional; Guardrails/Runtime/Testing show a "Coming
+//    in A2" placeholder so the structure is visible.
+// ════════════════════════════════════════════════════════════════════════════
+
+const CONFIG_TABS = [
+  { id: 'identity',   label: 'Identity',   locked: false },
+  { id: 'behavior',   label: 'Behavior',   locked: false },
+  { id: 'model',      label: 'Model',      locked: false },
+  { id: 'knowledge',  label: 'Knowledge',  locked: false },
+  { id: 'tools',      label: 'Tools',      locked: false },
+  { id: 'guardrails', label: 'Guardrails', locked: true  },
+  { id: 'runtime',    label: 'Runtime',    locked: true  },
+  { id: 'testing',    label: 'Testing',    locked: true  },
+];
+const TAB_ICONS = {
+  identity:  '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 12c0-2.5 2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  behavior:  '<svg viewBox="0 0 14 14" fill="none"><path d="M2 4h8l2 2v6H2V4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 7h6M4 9.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  model:     '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M7 1v2M7 11v2M1 7h2M11 7h2M3 3l1.4 1.4M9.6 9.6L11 11M3 11l1.4-1.4M9.6 4.4L11 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  knowledge: '<svg viewBox="0 0 14 14" fill="none"><path d="M3 2h6.5L11 3.5V12H3V2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 5.5h4M5 7.5h4M5 9.5h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  tools:     '<svg viewBox="0 0 14 14" fill="none"><path d="M8.5 2.5A3 3 0 005 5.5L2 8.5a1.5 1.5 0 002 2l3-3a3 3 0 002.5-2.5M8.5 2.5L11 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  guardrails:'<svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5L2 4v3.5C2 10.5 4 12.5 7 13c3-.5 5-2.5 5-5.5V4L7 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>',
+  runtime:   '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4.5V7l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  testing:   '<svg viewBox="0 0 14 14" fill="none"><path d="M5 1h4v3l3 5v4H2V9l3-5V1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>',
+};
+
+let activeConfigTab = 'identity';
+
+function getActiveAgent() {
+  if (!activeNodeId) return null;
+  const node = EDIT_FLOW.find(n => n.id === activeNodeId);
+  if (!node || node.t !== 'agent' || !node.agentId) return null;
+  return getAgentById(node.agentId);
+}
+
+// Open the expanded config. Optionally start on a specific tab (e.g.
+// expandInspector(true) jumps to Identity in Create mode for the freshest UX).
+function expandInspector(isCreateMode = false) {
+  const panel = document.getElementById('bldrInspPanel');
+  if (!panel) return;
+  if (!getActiveAgent()) {
+    if (typeof toast === 'function') toast('Select an agent node first', 'info');
+    return;
+  }
+  panel.classList.add('is-expanded');
+  document.getElementById('inspCfgHd').style.display = 'flex';
+  activeConfigTab = isCreateMode ? 'identity' : (activeConfigTab || 'identity');
+  renderAgentConfigPanel();
+}
+
+function collapseInspector() {
+  const panel = document.getElementById('bldrInspPanel');
+  if (!panel) return;
+  panel.classList.remove('is-expanded');
+  document.getElementById('inspCfgHd').style.display = 'none';
+  // Restore the original compact body (it was replaced when we expanded).
+  const body = document.getElementById('inspBody');
+  if (body) body.innerHTML = COMPACT_BODY_HTML;
+}
+
+// Snapshot of the original compact body so we can restore it on collapse.
+const COMPACT_BODY_HTML = `
+            <div class="insp-sec">
+              <div class="insp-sec-lbl">Input</div>
+              <div class="insp-tog-row">
+                <span class="insp-tog-lbl">Map from state</span>
+                <label class="mini-tog"><input type="checkbox" checked><div class="mini-track"><div class="mini-thumb"></div></div></label>
+              </div>
+              <div class="insp-sel-wrap">
+                <select class="insp-sel">
+                  <option>n2 · qualified_lead.summary</option>
+                  <option>n1 · webhook.payload</option>
+                  <option>n3 · enriched_profile</option>
+                </select>
+              </div>
+            </div>
+            <div class="insp-sec">
+              <div class="insp-sec-lbl">System Prompt Override</div>
+              <textarea class="insp-ta" placeholder="Leave empty to use Agent's default system prompt" oninput="document.getElementById('inspTaCnt').textContent=this.value.length+' / 2000'"></textarea>
+              <div class="insp-ta-cnt" id="inspTaCnt">0 / 2000</div>
+            </div>
+            <div class="insp-sec">
+              <div class="insp-sec-lbl">
+                Model Settings
+                <button class="insp-collapse-btn" onclick="toast('Model settings','info')">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>`;
+
+// Renders the expanded config: sidebar tabs + content. Re-runs whenever the
+// active tab changes or the agent changes so the form reflects the latest
+// AGENT_CATALOG state.
+function renderAgentConfigPanel() {
+  const agent = getActiveAgent();
+  if (!agent) return;
+  document.getElementById('inspCfgHdName').textContent = agent.name;
+  const body = document.getElementById('inspBody');
+  if (!body) return;
+  // Hide the Fork button for freshly-created agents (no point forking an empty one).
+  const forkBtn = document.getElementById('inspCfgHdFork');
+  if (forkBtn) forkBtn.style.display = agent._isFresh ? 'none' : 'inline-flex';
+
+  const tabs = CONFIG_TABS.map(t => {
+    const cls = (t.id === activeConfigTab ? 'is-active ' : '') + (t.locked ? 'is-locked' : '');
+    const onclick = t.locked ? '' : `onclick="switchConfigTab('${t.id}')"`;
+    const soonBadge = t.locked ? `<span class="badge-soon">A2</span>` : '';
+    return `<div class="insp-cfg-tab ${cls}" ${onclick} data-tab="${t.id}">
+      <span class="ico">${TAB_ICONS[t.id]||''}</span>
+      <span class="lbl">${t.label}</span>
+      ${soonBadge}
+    </div>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div class="insp-cfg-tabs">${tabs}</div>
+    <div class="insp-cfg-panel" id="inspCfgPanel">${renderConfigTabContent(activeConfigTab, agent)}</div>
+  `;
+}
+
+function switchConfigTab(tabId) {
+  activeConfigTab = tabId;
+  // Just rerender the body section without losing the panel state.
+  renderAgentConfigPanel();
+}
+
+function renderConfigTabContent(tabId, agent) {
+  if (tabId === 'identity')   return tabIdentity(agent);
+  if (tabId === 'behavior')   return tabBehavior(agent);
+  if (tabId === 'model')      return tabModel(agent);
+  if (tabId === 'knowledge')  return tabKnowledge(agent);
+  if (tabId === 'tools')      return tabTools(agent);
+  // Guardrails / Runtime / Testing — locked until A2.
+  const label = CONFIG_TABS.find(t => t.id === tabId)?.label || tabId;
+  return `<div class="insp-cfg-soon">
+    <div class="ttl">${label} — A2</div>
+    <div class="sub">Coming in the next phase. The shape is reserved so the agent definition stays consistent as we wire it up.</div>
+  </div>`;
+}
+
+// ── Tab renderers ─────────────────────────────────────────────────────────
+// Each returns the HTML for the right-side panel given the current agent.
+// All inputs call agentField() to update AGENT_CATALOG + flag the save state.
+
+const TONE_PRESETS = ['analytical', 'precise', 'persuasive', 'on-brand', 'friendly', 'cautious', 'decisive'];
+const RESPONSE_FORMATS = [
+  { id: 'text',   label: 'Text' },
+  { id: 'json',   label: 'JSON' },
+  { id: 'schema', label: 'JSON Schema' },
+];
+const MODEL_PROVIDERS = [
+  { id: 'anthropic', label: 'Anthropic', versions: ['claude-sonnet-4.5', 'claude-haiku-4.5', 'claude-opus-4.5'] },
+  { id: 'openai',    label: 'OpenAI',    versions: ['gpt-4o', 'gpt-4o-mini', 'gpt-4.1'] },
+  { id: 'google',    label: 'Google',    versions: ['gemini-2.5-pro', 'gemini-2.5-flash'] },
+];
+const OWNERS = [
+  { name: 'Alex Rivera',    initials: 'AR' },
+  { name: 'Carlos Méndez',  initials: 'CM' },
+  { name: 'Sarah Chen',     initials: 'SC' },
+  { name: 'Lisa Anderson',  initials: 'LA' },
+  { name: 'David Kim',      initials: 'DK' },
+  { name: 'Emma Wilson',    initials: 'EW' },
+  { name: 'James Park',     initials: 'JP' },
+  { name: 'You',            initials: 'YO' },
+];
+
+function tabIdentity(a) {
+  const ownerOpts = OWNERS.map(o =>
+    `<option value="${o.name}" ${o.name === a.owner?.name ? 'selected' : ''}>${o.name}</option>`
+  ).join('');
+  return `
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Name</div>
+      <input class="insp-cfg-input" value="${escAttr(a.name)}"
+        oninput="agentField('name', this.value)" maxlength="60" />
+      <div class="insp-cfg-help">Visible name in the canvas + catalog. Max 60 chars.</div>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Description</div>
+      <textarea class="insp-cfg-textarea" rows="3" maxlength="200"
+        oninput="agentField('description', this.value)">${escText(a.description)}</textarea>
+      <div class="insp-cfg-input-counter">${(a.description||'').length} / 200</div>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Avatar initials</div>
+      <input class="insp-cfg-input" value="${escAttr(a.avatar)}" maxlength="3"
+        style="width:80px;text-align:center;font-weight:700;letter-spacing:.04em;"
+        oninput="agentField('avatar', this.value.toUpperCase())" />
+      <div class="insp-cfg-help">Two-letter mark shown in the canvas + selector.</div>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Owner</div>
+      <select class="insp-cfg-select" onchange="agentField('owner', { name: this.value, initials: this.value.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() })">
+        ${ownerOpts}
+      </select>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Tags</div>
+      <input class="insp-cfg-input" value="${(a.tags||[]).join(', ')}"
+        placeholder="sales, analysis, inbound"
+        oninput="agentField('tags', this.value.split(',').map(s=>s.trim()).filter(Boolean))" />
+      <div class="insp-cfg-help">Comma-separated. Used for catalog filtering.</div>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Multi-instance</div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t2);cursor:pointer;">
+        <input type="checkbox" ${a.allowMultiInstance ? 'checked' : ''}
+          onchange="agentField('allowMultiInstance', this.checked)" />
+        Allow this agent in the same workflow more than once
+      </label>
+    </div>
+  `;
+}
+
+function tabBehavior(a) {
+  const fmtChips = RESPONSE_FORMATS.map(f =>
+    `<button class="insp-cfg-chip ${a.behavior.responseFormat === f.id ? 'is-active' : ''}"
+       onclick="agentField('behavior.responseFormat', '${f.id}')">${f.label}</button>`
+  ).join('');
+  const toneChips = TONE_PRESETS.map(t =>
+    `<button class="insp-cfg-chip ${a.behavior.tone === t ? 'is-active' : ''}"
+       onclick="agentField('behavior.tone', '${t}')">${t}</button>`
+  ).join('');
+  return `
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">System prompt
+        <span style="font-weight:600;color:var(--t4);font-size:9px">${(a.behavior.systemPrompt||'').length} chars</span>
+      </div>
+      <textarea class="insp-cfg-textarea" rows="10"
+        placeholder="You are a [role]. When given [input], do [task] and return [format]…"
+        oninput="agentField('behavior.systemPrompt', this.value)">${escText(a.behavior.systemPrompt)}</textarea>
+      <div class="insp-cfg-help">The agent's core instructions. Knowledge packs attached to this node are concatenated automatically.</div>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Response format</div>
+      <div class="insp-cfg-chiprow">${fmtChips}</div>
+      <div class="insp-cfg-help">Text for free-form replies · JSON for structured · JSON Schema for strict validation.</div>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Tone preset</div>
+      <div class="insp-cfg-chiprow">${toneChips}</div>
+      <div class="insp-cfg-help">Shorthand for the tone the agent should use. Layered on top of the system prompt.</div>
+    </div>
+  `;
+}
+
+function tabModel(a) {
+  const provider = MODEL_PROVIDERS.find(p => p.id === a.model.provider) || MODEL_PROVIDERS[0];
+  const providerOpts = MODEL_PROVIDERS.map(p =>
+    `<option value="${p.id}" ${p.id === a.model.provider ? 'selected' : ''}>${p.label}</option>`
+  ).join('');
+  const versionOpts = provider.versions.map(v =>
+    `<option value="${v}" ${v === a.model.version ? 'selected' : ''}>${v}</option>`
+  ).join('');
+  return `
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Provider</div>
+      <select class="insp-cfg-select"
+        onchange="agentField('model.provider', this.value); /* reset version to first */
+                  const p = MODEL_PROVIDERS.find(x => x.id === this.value);
+                  if (p) agentField('model.version', p.versions[0]);
+                  renderAgentConfigPanel();">
+        ${providerOpts}
+      </select>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Version</div>
+      <select class="insp-cfg-select"
+        onchange="agentField('model.version', this.value)">
+        ${versionOpts}
+      </select>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Temperature
+        <span class="insp-cfg-slider-val">${a.model.temperature.toFixed(2)}</span>
+      </div>
+      <div class="insp-cfg-slider-row">
+        <input type="range" min="0" max="1" step="0.05" value="${a.model.temperature}"
+          oninput="agentField('model.temperature', parseFloat(this.value));
+                   this.previousElementSibling?.previousElementSibling?.querySelector('.insp-cfg-slider-val')?.setAttribute('data-v', this.value);
+                   const sv = document.querySelector('.insp-cfg-section:has(input[type=range][min=\\'0\\'][max=\\'1\\']) .insp-cfg-slider-val'); if (sv) sv.textContent = parseFloat(this.value).toFixed(2);" />
+      </div>
+      <div class="insp-cfg-help">0 = deterministic · 1 = creative. Most production agents sit between 0.1 and 0.4.</div>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Max tokens
+        <span class="insp-cfg-slider-val">${a.model.maxTokens}</span>
+      </div>
+      <div class="insp-cfg-slider-row">
+        <input type="range" min="100" max="8000" step="100" value="${a.model.maxTokens}"
+          oninput="agentField('model.maxTokens', parseInt(this.value, 10));
+                   const sv = [...document.querySelectorAll('.insp-cfg-slider-val')].find(el => el.previousElementSibling == null && el.parentElement.textContent.includes('Max tokens')); if (sv) sv.textContent = this.value;" />
+      </div>
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Top-p
+        <span class="insp-cfg-slider-val">${a.model.topP.toFixed(2)}</span>
+      </div>
+      <div class="insp-cfg-slider-row">
+        <input type="range" min="0" max="1" step="0.05" value="${a.model.topP}"
+          oninput="agentField('model.topP', parseFloat(this.value));
+                   const sv = [...document.querySelectorAll('.insp-cfg-slider-val')].find(el => el.parentElement.textContent.trim().startsWith('Top-p')); if (sv) sv.textContent = parseFloat(this.value).toFixed(2);" />
+      </div>
+    </div>
+  `;
+}
+
+// Tab: Knowledge — combines packs from the active workflow with packs
+// attached to THIS specific agent node. The inline rows show provenance
+// (from workflow / from node) so the user understands the union semantics.
+// "Manage knowledge" opens the existing slide-out with `nodeId=` so the
+// React side scopes inspection to this agent.
+const PACK_PREVIEWS = {
+  // Hand-picked sample to render in the inline list. Real implementation
+  // would fetch from the same mockKnowledge source the React side uses.
+  'KP-003': { name: 'Sales Playbook Facts',     intent: 'restrict',       factsCount: 3,  status: 'active' },
+  'KP-002': { name: 'GDPR Compliance Pack',     intent: 'both',           factsCount: 2,  status: 'active' },
+  'KP-004': { name: 'Vendor SLA Registry',      intent: 'add',            factsCount: 1,  status: 'draft'  },
+  'KP-005': { name: 'Enterprise Contract Pack', intent: 'restrict',       factsCount: 6,  status: 'active' },
+  'KP-006': { name: 'Quick Pricing Reference',  intent: 'add',            factsCount: 4,  status: 'active' },
+};
+const INTENT_PALETTE = {
+  restrict: { bg: 'rgba(99,102,241,0.16)',  color: '#c4b5fd', label: 'RESTRICT' },
+  add:      { bg: 'rgba(34,211,238,0.16)',  color: '#22d3ee', label: 'EXTEND'   },
+  both:     { bg: 'rgba(43,127,255,0.16)',  color: '#80AFFF', label: 'RESTRICT + EXTEND' },
+};
+
+function packsForCurrentWorkflow() {
+  // The host workflow's pack(s) — for the demo, n1 has KP-003 attached.
+  // This mirrors mockKnowledge's `getPacksForWorkflow('n1')`.
+  return ['KP-003'];
+}
+
+function packRowHtml(packId, source) {
+  const p = PACK_PREVIEWS[packId];
+  if (!p) {
+    return `<div class="insp-knl-row">
+      <div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--t2);font-family:ui-monospace,monospace">${packId}</div>
+      <div style="font-size:10px;color:var(--t4);margin-top:2px">Pack not indexed in this prototype</div></div>
+    </div>`;
+  }
+  const intent = INTENT_PALETTE[p.intent] || INTENT_PALETTE.restrict;
+  const srcCls = source === 'workflow' ? 'from-workflow' : 'from-node';
+  const srcLbl = source === 'workflow' ? 'From workflow' : 'From node';
+  return `<div class="insp-knl-row">
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:700;color:var(--t1)">${p.name}</span>
+        <span class="src-badge ${srcCls}">${srcLbl}</span>
+      </div>
+      <div style="font-size:10px;color:var(--t3);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-family:ui-monospace,monospace">${packId}</span>
+        <span style="opacity:.4">·</span>
+        <span>${p.factsCount} ${p.factsCount === 1 ? 'fact' : 'facts'}</span>
+        <span style="opacity:.4">·</span>
+        <span class="src-badge" style="background:${intent.bg};color:${intent.color};border:1px solid ${intent.color}40">${intent.label}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function tabKnowledge(a) {
+  const workflowPacks = packsForCurrentWorkflow();
+  const nodePacks = a.knowledge?.packIds || [];
+  const total = workflowPacks.length + nodePacks.length;
+  const wfRows = workflowPacks.map(id => packRowHtml(id, 'workflow')).join('');
+  const ndRows = nodePacks.map(id => packRowHtml(id, 'node')).join('');
+  const empty = total === 0;
+  return `
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">In scope for this agent
+        <span style="font-weight:600;color:var(--t4);font-size:9px">${total} pack${total === 1 ? '' : 's'}</span>
+      </div>
+      ${empty ? `
+        <div class="insp-knl-empty">
+          <div style="font-size:18px;margin-bottom:6px">📚</div>
+          <div style="font-size:11px;color:var(--t2);font-weight:600;margin-bottom:3px">No Knowledge in scope</div>
+          <div style="font-size:10px;color:var(--t3);line-height:1.5">This agent reads the full Truth Plane by default. Attach a pack to scope what it can use.</div>
+        </div>
+      ` : `
+        <div class="insp-knl-list">${wfRows}${ndRows}</div>
+      `}
+    </div>
+
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Scoping rule</div>
+      <div class="insp-cfg-help" style="background:rgba(43,127,255,0.06);border:1px solid rgba(43,127,255,0.18);padding:10px 12px;border-radius:8px;color:var(--t2)">
+        Workflow + node packs are <strong style="color:#80AFFF">unioned</strong>. RESTRICT packs intersect (only facts in both are visible). EXTEND packs add new sources on top.
+      </div>
+    </div>
+
+    <button class="insp-knl-manage" onclick="manageKnowledgeForNode()">
+      <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M5 2H2v8h8V7M7 1h4v4M11 1L6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Manage knowledge
+    </button>
+  `;
+}
+
+// Open the existing Knowledge slide-out, passing `nodeId` so the React side
+// can show node-attached packs separate from the workflow-attached pack
+// (the union semantics live on the React side; this just hands off context).
+function manageKnowledgeForNode() {
+  const node = EDIT_FLOW.find(n => n.id === activeNodeId);
+  if (!node || !node.agentId) return;
+  if (typeof openKnowledgeConstraint !== 'function') {
+    if (typeof toast === 'function') toast('Knowledge slide-out not available here', 'warn');
+    return;
+  }
+  // Drop the agent context on `window` so openKnowledgeConstraint can append
+  // it to the iframe URL without rewriting that function's signature.
+  window._knNodeContext = { nodeId: node.id, agentId: node.agentId, agentName: getAgentById(node.agentId)?.name || '' };
+  openKnowledgeConstraint();
+}
+
+// Mock catalog of available tools — three categories the user toggles
+// per-agent. Real implementation would query the workspace's connected
+// tools service.
+const TOOL_CATALOG = {
+  functionCalls: [
+    { id: 'fetch_crm_record',         label: 'Fetch CRM record',         desc: 'Pulls a record by id from Salesforce' },
+    { id: 'search_history',           label: 'Search history',           desc: 'Vector-searches past interactions' },
+    { id: 'fetch_document',           label: 'Fetch document',           desc: 'Reads a document from connected drives' },
+    { id: 'ocr_image',                label: 'OCR image',                desc: 'Extracts text from images / scans' },
+    { id: 'check_icp',                label: 'Check ICP',                desc: 'Tests an account against the ICP rules' },
+    { id: 'check_bant',               label: 'Check BANT',               desc: 'Scores a deal against BANT criteria' },
+    { id: 'fetch_pricing_matrix',     label: 'Fetch pricing matrix',     desc: 'Returns active discount tiers' },
+    { id: 'create_offer',             label: 'Create offer',             desc: 'Drafts a renewal/expansion offer' },
+    { id: 'check_discount_authority', label: 'Check discount authority', desc: 'Validates a proposed discount % against policy' },
+    { id: 'fetch_health_score',       label: 'Fetch health score',       desc: 'Returns the latest account health score' },
+    { id: 'fetch_support_tickets',    label: 'Fetch support tickets',    desc: 'Lists recent Zendesk tickets' },
+    { id: 'fetch_contract',           label: 'Fetch contract',           desc: 'Reads a contract from Iron Clad' },
+    { id: 'diff_clauses',             label: 'Diff clauses',             desc: 'Compares incoming redlines vs approved positions' },
+    { id: 'flag_for_legal',           label: 'Flag for Legal',           desc: 'Routes the contract to legal review queue' },
+    { id: 'create_onboarding_plan',   label: 'Create onboarding plan',   desc: 'Generates a 30/60/90 plan' },
+    { id: 'schedule_check_in',        label: 'Schedule check-in',        desc: 'Creates a calendar event' },
+    { id: 'fetch_brand_voice',        label: 'Fetch brand voice',        desc: 'Pulls the latest brand voice guidelines' },
+    { id: 'send_draft_for_review',    label: 'Send draft for review',    desc: 'Routes a draft to CS Lead Slack' },
+  ],
+  mcpServers: [
+    { id: 'mcp-salesforce',  label: 'Salesforce MCP',  desc: 'CRM read/write via MCP', status: 'connected' },
+    { id: 'mcp-zendesk',     label: 'Zendesk MCP',     desc: 'Tickets + macros',       status: 'connected' },
+    { id: 'mcp-snowflake',   label: 'Snowflake MCP',   desc: 'Warehouse queries',      status: 'connected' },
+    { id: 'mcp-stripe',      label: 'Stripe MCP',      desc: 'Billing + invoices',     status: 'available' },
+    { id: 'mcp-segment',     label: 'Segment MCP',     desc: 'Event analytics',        status: 'available' },
+  ],
+  webhooks: [
+    { id: 'wh-pricing',    label: 'Pricing API',       url: 'https://api.internal/pricing/v2',     auth: 'OAuth2' },
+    { id: 'wh-compliance', label: 'Compliance webhook', url: 'https://compliance.internal/alerts',  auth: 'HMAC'   },
+  ],
+};
+
+function toolRowHtml(tool, isOn, category) {
+  const cls = isOn ? 'is-on' : '';
+  const extra = category === 'mcpServers'
+    ? `<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:1px 5px;border-radius:3px;${tool.status === 'connected' ? 'background:rgba(34,197,94,0.16);color:#4ade80' : 'background:rgba(255,255,255,0.06);color:var(--t3)'}">${tool.status}</span>`
+    : category === 'webhooks'
+      ? `<span style="font-size:9px;font-family:ui-monospace,monospace;color:var(--t3)">${tool.auth}</span>`
+      : '';
+  return `<div class="insp-tool-row">
+    <div class="body">
+      <div class="nm">${tool.label} ${extra}</div>
+      <div class="desc">${tool.desc || tool.url || ''}</div>
+    </div>
+    <div class="toggle ${cls}" onclick="toggleAgentTool('${category}', '${tool.id}', this)"></div>
+  </div>`;
+}
+
+function tabTools(a) {
+  const fnIds = new Set(a.tools?.functionCalls || []);
+  const mcpIds = new Set(a.tools?.mcpServers   || []);
+  const whIds = new Set(a.tools?.webhooks      || []);
+  const fnRows = TOOL_CATALOG.functionCalls.map(t => toolRowHtml(t, fnIds.has(t.id),  'functionCalls')).join('');
+  const mcpRows = TOOL_CATALOG.mcpServers.map(t => toolRowHtml(t, mcpIds.has(t.id), 'mcpServers')).join('');
+  const whRows = TOOL_CATALOG.webhooks.map(t   => toolRowHtml(t, whIds.has(t.id),   'webhooks')).join('');
+  const enabledCount = fnIds.size + mcpIds.size + whIds.size;
+  return `
+    <div class="insp-cfg-section">
+      <div class="insp-cfg-label">Tools enabled
+        <span style="font-weight:600;color:var(--t4);font-size:9px">${enabledCount} active</span>
+      </div>
+      <div class="insp-cfg-help">Toggle the capabilities this agent can invoke. Disabled tools are invisible to the model at runtime.</div>
+    </div>
+
+    <div class="insp-tool-section-hd">Function calls (${TOOL_CATALOG.functionCalls.length})</div>
+    ${fnRows}
+
+    <div class="insp-tool-section-hd" style="margin-top:14px">MCP servers (${TOOL_CATALOG.mcpServers.length})</div>
+    ${mcpRows}
+
+    <div class="insp-tool-section-hd" style="margin-top:14px">HTTP webhooks (${TOOL_CATALOG.webhooks.length})</div>
+    ${whRows}
+  `;
+}
+
+function toggleAgentTool(category, toolId, el) {
+  const agent = getActiveAgent();
+  if (!agent) return;
+  if (!agent.tools) agent.tools = { functionCalls: [], mcpServers: [], webhooks: [] };
+  if (!Array.isArray(agent.tools[category])) agent.tools[category] = [];
+  const arr = agent.tools[category];
+  const idx = arr.indexOf(toolId);
+  if (idx >= 0) {
+    arr.splice(idx, 1);
+    el.classList.remove('is-on');
+  } else {
+    arr.push(toolId);
+    el.classList.add('is-on');
+  }
+  // Update the counter in the label without re-rendering the whole tab.
+  const counter = document.querySelector('.insp-cfg-panel .insp-cfg-section:first-child .insp-cfg-label span');
+  if (counter) {
+    const total = (agent.tools.functionCalls||[]).length + (agent.tools.mcpServers||[]).length + (agent.tools.webhooks||[]).length;
+    counter.textContent = `${total} active`;
+  }
+  agent.updated = new Date().toISOString().slice(0,10);
+  flagSaving();
+}
+
+// ── HTML escape helpers ────────────────────────────────────────────────────
+function escAttr(s){return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function escText(s){return String(s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Auto-save with debounce
+// ────────────────────────────────────────────────────────────────────────────
+// agentField('model.temperature', 0.4) writes to AGENT_CATALOG[*] and schedules
+// a deferred save indicator flip. Path can be 'a.b.c' for nested fields.
+let saveTimer = null;
+function agentField(path, value) {
+  const agent = getActiveAgent();
+  if (!agent) return;
+  // Walk the path and assign.
+  const segs = path.split('.');
+  let ref = agent;
+  for (let i = 0; i < segs.length - 1; i++) {
+    if (ref[segs[i]] == null) ref[segs[i]] = {};
+    ref = ref[segs[i]];
+  }
+  ref[segs[segs.length - 1]] = value;
+  agent.updated = new Date().toISOString().slice(0,10);
+  // If we changed the visible name or avatar, push it to the EDIT_FLOW node
+  // labels too so the canvas reflects it.
+  if (path === 'name' || path === 'avatar') {
+    const node = EDIT_FLOW.find(n => n.id === activeNodeId);
+    if (node) {
+      if (path === 'name') {
+        node.l = instanceLabelFor(agent, node.id);
+      }
+    }
+    renderEditCanvas();
+    document.getElementById('inspCfgHdName').textContent = agent.name;
+    document.getElementById('inspNodeNm').textContent = agent.name;
+  }
+  // Visual save indicator
+  flagSaving();
+}
+
+function flagSaving() {
+  const el = document.getElementById('inspCfgHdSave');
+  if (!el) return;
+  el.classList.add('saving');
+  el.innerHTML = `<span class="dot"></span>Saving…`;
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    el.classList.remove('saving');
+    el.innerHTML = `<span class="dot"></span>Saved · just now`;
+  }, 600);
+}
+
+// Fork the active agent: deep-clone the catalog row, swap the active node
+// to point at the new agent, then re-render the canvas + config panel.
+// Uses a lightweight in-DOM prompt instead of window.prompt so the styling
+// stays consistent with the rest of the inspector.
+function forkCurrentAgent() {
+  const agent = getActiveAgent();
+  if (!agent) return;
+  openForkDialog(agent);
+}
+
+function openForkDialog(agent) {
+  // Remove any existing dialog so re-clicking doesn't stack them.
+  closeForkDialog();
+  const wrap = document.createElement('div');
+  wrap.className = 'fork-dialog-ov';
+  wrap.id = 'forkDialogOv';
+  wrap.innerHTML = `
+    <div class="fork-dialog" role="dialog" aria-label="Fork agent" onclick="event.stopPropagation()">
+      <div class="fork-dialog-hd">
+        <div class="fork-dialog-ico">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="3" cy="3" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="11" cy="3" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="11" r="1.8" stroke="currentColor" stroke-width="1.3"/><path d="M3 4.8v1.7a1.5 1.5 0 001.5 1.5h5A1.5 1.5 0 0011 6.5V4.8" stroke="currentColor" stroke-width="1.3"/><path d="M7 8v1.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="fork-dialog-title">Fork "${escAttr(agent.name)}"</div>
+          <div class="fork-dialog-sub">Clones this agent. Edits on the fork stay isolated; the base agent stays untouched.</div>
+        </div>
+        <button class="fork-dialog-close" onclick="closeForkDialog()" aria-label="Cancel">×</button>
+      </div>
+      <div class="fork-dialog-body">
+        <label class="fork-dialog-label">New agent name</label>
+        <input class="fork-dialog-input" id="forkNameInput" value="${escAttr(agent.name + ' (copy)')}"
+          autocomplete="off" maxlength="60" />
+        <div class="fork-dialog-help">Default suffix is " (copy)". Change it to whatever you'd recognise in the catalog.</div>
+      </div>
+      <div class="fork-dialog-ft">
+        <button class="fork-dialog-btn" onclick="closeForkDialog()">Cancel</button>
+        <button class="fork-dialog-btn fork-dialog-btn-primary" onclick="confirmFork()">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Create fork
+        </button>
+      </div>
+    </div>`;
+  wrap.addEventListener('click', closeForkDialog);
+  document.body.appendChild(wrap);
+  // Focus the name field after the dialog mounts so the user can edit immediately.
+  setTimeout(() => {
+    const input = document.getElementById('forkNameInput');
+    if (input) { input.focus(); input.select(); }
+  }, 50);
+  // ESC closes
+  document.addEventListener('keydown', forkDialogKey);
+}
+
+function closeForkDialog() {
+  document.getElementById('forkDialogOv')?.remove();
+  document.removeEventListener('keydown', forkDialogKey);
+}
+function forkDialogKey(e) {
+  if (e.key === 'Escape') closeForkDialog();
+  if (e.key === 'Enter') { e.preventDefault(); confirmFork(); }
+}
+
+function confirmFork() {
+  const agent = getActiveAgent();
+  if (!agent) { closeForkDialog(); return; }
+  const newName = (document.getElementById('forkNameInput')?.value || '').trim();
+  if (!newName) {
+    if (typeof toast === 'function') toast('Give the fork a name first', 'warn');
+    return;
+  }
+  const fork = cloneAgent(agent.id, newName);
+  if (!fork) { closeForkDialog(); return; }
+  // Swap the active node to reference the fork.
+  const node = EDIT_FLOW.find(n => n.id === activeNodeId);
+  if (node) {
+    node.agentId = fork.id;
+    node.l = instanceLabelFor(fork, node.id);
+    node.sub = fork.description.length > 40 ? fork.description.slice(0,40) + '…' : fork.description;
+  }
+  closeForkDialog();
+  renderEditCanvas();
+  renderAgentConfigPanel();
+  // Refresh the compact card name + the expanded header.
+  document.getElementById('inspTitle').textContent = fork.name;
+  document.getElementById('inspNodeNm').textContent = fork.name;
+  document.getElementById('inspCfgHdName').textContent = fork.name;
+  if (typeof toast === 'function') toast(`Forked → "${fork.name}" · editing the fork independently`, 'success');
 }
 
 // ─ Node icons ─
