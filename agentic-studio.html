@@ -630,18 +630,128 @@ body.builder-mode .app{padding-top:0!important}
 body.builder-mode .main{height:100vh}
 body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;background:var(--bg)}
 .bldr-topbar{height:50px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--bd);background:var(--bg2);flex-shrink:0}
-.bldr-back-btn{height:28px;padding:0 10px;border-radius:var(--r6);border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .1s;white-space:nowrap}
-.bldr-back-btn:hover{background:rgba(255,255,255,0.05)}
+/* ── Builder topbar buttons (design-system: proper affordance + hierarchy) ──
+   Levels:
+     • Back  → ghost / neutral
+     • Editing  → status pill (NOT a button — no hover/cursor)
+     • Wizard / Knowledge / Test  → secondary actions w/ accent tint + border
+     • Done  → primary CTA (solid green fill, strongest visual weight)
+     • Discard  → destructive ghost (red text + border on hover)
+*/
+.bldr-back-btn{
+  height:32px;padding:0 12px;border-radius:8px;
+  border:1px solid var(--bds);background:rgba(255,255,255,0.04);
+  color:var(--t1);font-size:12px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:background .15s ease, border-color .15s ease, color .15s ease, transform .08s ease;
+  white-space:nowrap;
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 1px 2px rgba(0,0,0,0.20);
+}
+.bldr-back-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.22)}
+.bldr-back-btn:active{transform:translateY(1px)}
+.bldr-back-btn:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(167,139,250,0.45)}
+
 .bldr-net-nm{font-size:14px;font-weight:700;color:var(--t1)}
-.bldr-draft-badge{height:20px;padding:0 7px;border-radius:var(--r20);background:rgba(255,255,255,0.08);border:1px solid var(--bd);color:var(--t2);font-size:11px;font-weight:600;line-height:20px}
+.bldr-draft-badge{
+  height:22px;padding:0 8px;border-radius:11px;
+  background:rgba(253,199,0,0.10);border:1px solid rgba(253,199,0,0.28);
+  color:var(--warn);font-size:10.5px;font-weight:700;line-height:20px;
+  text-transform:uppercase;letter-spacing:.06em;
+}
 .bldr-mode-tools{display:flex;align-items:center;gap:6px;margin-left:auto}
-.bldr-mb{height:28px;padding:0 11px;border-radius:var(--r6);border:1px solid transparent;background:transparent;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .1s;color:var(--t2)}
-.bldr-mb:hover{background:rgba(255,255,255,0.06)}
-.bldr-mb.mb-edit{background:rgba(253,199,0,0.12);border-color:rgba(253,199,0,0.28);color:var(--warn)}
-.bldr-mb.mb-wiz{background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.28);color:var(--pur)}
-.bldr-mb.mb-kn{background:rgba(5,223,114,0.10);border-color:rgba(5,223,114,0.25);color:var(--ok)}
-.bldr-mb.mb-done{background:rgba(5,223,114,0.15);border-color:rgba(5,223,114,0.35);color:var(--ok)}
-.bldr-tb-sep{width:1px;height:20px;background:var(--bd)}
+
+/* Base action button — secondary look by default */
+.bldr-mb{
+  height:32px;padding:0 13px;border-radius:8px;
+  border:1px solid var(--bds);background:rgba(255,255,255,0.04);
+  font-size:12px;font-weight:600;letter-spacing:.01em;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  color:var(--t1);
+  transition:background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .08s ease;
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 1px 2px rgba(0,0,0,0.22);
+  white-space:nowrap;
+}
+.bldr-mb:hover{
+  background:rgba(255,255,255,0.08);
+  border-color:rgba(255,255,255,0.24);
+}
+.bldr-mb:active{transform:translateY(1px)}
+.bldr-mb:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(167,139,250,0.45), 0 1px 2px rgba(0,0,0,0.22)}
+
+/* Editing — status pill, not a button */
+.bldr-mb.mb-edit{
+  background:rgba(253,199,0,0.10);
+  border-color:rgba(253,199,0,0.32);
+  color:var(--warn);
+  cursor:default;
+  box-shadow:none;
+  position:relative;padding-left:24px;
+}
+.bldr-mb.mb-edit::before{
+  content:'';position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  width:6px;height:6px;border-radius:50%;background:var(--warn);
+  box-shadow:0 0 0 3px rgba(253,199,0,0.22);
+}
+.bldr-mb.mb-edit:hover{background:rgba(253,199,0,0.10);border-color:rgba(253,199,0,0.32)}
+.bldr-mb.mb-edit:active{transform:none}
+
+/* AI Wizard — secondary purple */
+.bldr-mb.mb-wiz{
+  background:rgba(167,139,250,0.10);
+  border-color:rgba(167,139,250,0.36);
+  color:#c4b5fd;
+}
+.bldr-mb.mb-wiz:hover{
+  background:rgba(167,139,250,0.18);
+  border-color:rgba(167,139,250,0.55);
+  color:#d6c8ff;
+}
+
+/* Knowledge — secondary green */
+.bldr-mb.mb-kn{
+  background:rgba(5,223,114,0.08);
+  border-color:rgba(5,223,114,0.30);
+  color:#86efac;
+}
+.bldr-mb.mb-kn:hover{
+  background:rgba(5,223,114,0.16);
+  border-color:rgba(5,223,114,0.50);
+  color:#a7f3c8;
+}
+
+/* Done — PRIMARY CTA: solid green fill */
+.bldr-mb.mb-done{
+  background:linear-gradient(180deg, #06DA72 0%, #04B85F 100%);
+  border-color:rgba(5,223,114,0.55);
+  color:#02180c;
+  font-weight:700;
+  padding:0 16px;
+  box-shadow:0 1px 0 rgba(255,255,255,0.18) inset, 0 2px 6px rgba(5,223,114,0.32);
+}
+.bldr-mb.mb-done:hover{
+  background:linear-gradient(180deg, #08E978 0%, #05C667 100%);
+  border-color:rgba(5,223,114,0.70);
+  box-shadow:0 1px 0 rgba(255,255,255,0.22) inset, 0 3px 10px rgba(5,223,114,0.45);
+}
+.bldr-mb.mb-done:active{
+  transform:translateY(1px);
+  box-shadow:0 1px 0 rgba(255,255,255,0.12) inset, 0 1px 4px rgba(5,223,114,0.32);
+}
+
+/* Discard — destructive ghost */
+.bldr-mb.mb-disc{
+  background:transparent;
+  border-color:transparent;
+  color:var(--t2);
+  box-shadow:none;
+}
+.bldr-mb.mb-disc:hover{
+  background:rgba(255,100,103,0.10);
+  border-color:rgba(255,100,103,0.45);
+  color:var(--err);
+}
+
+.bldr-tb-sep{width:1px;height:20px;background:var(--bd);margin:0 2px}
 .bldr-body{flex:1;display:flex;overflow:hidden}
 /* Node Library */
 .nl{width:252px;flex-shrink:0;border-right:1px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;transition:width .22s cubic-bezier(.4,0,.2,1),border-color .22s}
@@ -1277,7 +1387,16 @@ body.test-mode #vTestMode{display:flex}
 .tm-br-tag.bfalse{background:rgba(255,255,255,0.06);color:var(--t3)}
 .tm-br-lbl{font-size:11px;color:var(--t3)}
 /* test mode builder button */
-.bldr-mb.mb-test{background:rgba(253,199,0,0.1);border-color:rgba(253,199,0,0.28);color:#fdc700}
+.bldr-mb.mb-test{
+  background:rgba(43,127,255,0.08);
+  border-color:rgba(43,127,255,0.36);
+  color:#7aaeff;
+}
+.bldr-mb.mb-test:hover{
+  background:rgba(43,127,255,0.16);
+  border-color:rgba(43,127,255,0.55);
+  color:#9bc4ff;
+}
 /* ── KNOWLEDGE MODAL — overlay (builder + reused by overview) ── */
 /* ── AI WIZARD PANEL ── */
 .wiz-ov{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);z-index:60;opacity:0;pointer-events:none;transition:opacity .22s}
@@ -3468,7 +3587,10 @@ body.test-mode #vTestMode{display:flex}
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5l4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Done
           </button>
-          <button class="bldr-mb" onclick="exitBuilder()">Discard</button>
+          <button class="bldr-mb mb-disc" onclick="exitBuilder()" title="Discard changes and exit">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Discard
+          </button>
         </div>
       </div>
       <div class="bldr-body">
