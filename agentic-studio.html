@@ -2107,6 +2107,46 @@ body.test-mode #vTestMode{display:flex}
   background:rgba(255,255,255,0.06);color:var(--t4);
   padding:1px 4px;border-radius:3px;
 }
+.insp-cfg-tab .lbl{position:relative;display:inline-flex;align-items:center;gap:5px}
+.override-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#A78BFA;box-shadow:0 0 0 2px rgba(167,139,250,0.18);
+  display:inline-block;flex-shrink:0;
+}
+
+/* Per-node override pill (shown inside section labels when an override is active) */
+.insp-cfg-ovrd-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  padding:2px 6px;border-radius:9px;
+  background:rgba(167,139,250,0.14);
+  border:1px solid rgba(167,139,250,0.32);
+  color:#c4b5fd;
+  margin-left:6px;
+}
+.insp-cfg-ovrd-pill::before{
+  content:'';width:5px;height:5px;border-radius:50%;background:#A78BFA;
+}
+.insp-cfg-ovrd-reset{
+  display:inline-flex;align-items:center;gap:4px;
+  height:22px;padding:0 8px;border-radius:5px;
+  background:transparent;border:1px solid var(--bd);color:var(--t3);
+  font-size:10px;font-weight:600;cursor:pointer;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.insp-cfg-ovrd-reset:hover{
+  background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.32);color:#c4b5fd;
+}
+.insp-cfg-ovrd-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:8px 10px;margin-bottom:10px;
+  background:rgba(167,139,250,0.07);
+  border:1px solid rgba(167,139,250,0.22);
+  border-radius:7px;
+  font-size:10.5px;color:#c4b5fd;line-height:1.4;
+}
+.insp-cfg-ovrd-banner .txt{flex:1;min-width:0}
+.insp-cfg-ovrd-banner .txt strong{color:#e9e2ff;font-weight:700}
 
 .insp-cfg-panel{
   flex:1;overflow-y:auto;padding:14px 14px 18px;min-width:0;
@@ -6006,6 +6046,155 @@ function instanceLabelFor(agent, newNodeId) {
   return `${agent.name} #${existing.length + 1}`;
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// PER-NODE OVERRIDES — agent node may override Tools or behavior.promptSuffix
+// ────────────────────────────────────────────────────────────────────────────
+// EDIT_FLOW agent node shape (optional):
+//   { id, t:'agent', agentId, l, sub, badge,
+//     nodeOverrides: {
+//       tools:    { functionCalls:[], mcpServers:[], webhooks:[] }, // full replace
+//       behavior: { promptSuffix: '' }                              // appended
+//     } }
+//
+// Semantics:
+//   • tools = copy-on-write: first toggle on a node copies agent.tools into
+//     nodeOverrides.tools, then mutates the override. Resetting deletes the key
+//     so the agent's base tools take over again.
+//   • promptSuffix = string appended to agent.behavior.systemPrompt at runtime
+//     for THIS node only. Setting it to empty / whitespace clears the override.
+//   • Fork: "Fork as new agent" bakes the current overrides into the new
+//     catalog agent and clears nodeOverrides on the swapped node, so the fork
+//     becomes a clean, reusable agent.
+// ════════════════════════════════════════════════════════════════════════════
+
+function getActiveNode() {
+  if (!activeNodeId) return null;
+  return EDIT_FLOW.find(n => n.id === activeNodeId) || null;
+}
+
+function getEffectiveTools(node, agent) {
+  if (node && node.nodeOverrides && node.nodeOverrides.tools) return node.nodeOverrides.tools;
+  return agent && agent.tools ? agent.tools : { functionCalls: [], mcpServers: [], webhooks: [] };
+}
+
+function hasToolsOverride(node) {
+  return !!(node && node.nodeOverrides && node.nodeOverrides.tools);
+}
+
+function getEffectivePromptSuffix(node) {
+  return (node && node.nodeOverrides && node.nodeOverrides.behavior && node.nodeOverrides.behavior.promptSuffix) || '';
+}
+
+function hasPromptSuffixOverride(node) {
+  const s = getEffectivePromptSuffix(node);
+  return typeof s === 'string' && s.trim().length > 0;
+}
+
+function countNodeOverrides(node) {
+  let n = 0;
+  if (hasToolsOverride(node)) n++;
+  if (hasPromptSuffixOverride(node)) n++;
+  return n;
+}
+
+// Returns true when the given sidebar tab has a per-node override active.
+// Used to draw the small purple dot next to the tab label.
+function tabHasOverride(node, tabId) {
+  if (!node) return false;
+  if (tabId === 'behavior') return hasPromptSuffixOverride(node);
+  if (tabId === 'tools')    return hasToolsOverride(node);
+  return false;
+}
+
+// Initialise nodeOverrides scaffolding on the active node when first needed.
+function ensureNodeOverrides(node) {
+  if (!node.nodeOverrides) node.nodeOverrides = {};
+  return node.nodeOverrides;
+}
+
+// Clear the tools override entirely. Re-renders the Tools tab so the toggles
+// snap back to the agent's base catalog state.
+function resetNodeToolsOverride() {
+  const node = getActiveNode();
+  if (!node || !node.nodeOverrides) return;
+  delete node.nodeOverrides.tools;
+  if (Object.keys(node.nodeOverrides).length === 0) delete node.nodeOverrides;
+  flagSaving();
+  renderAgentConfigPanel();
+  if (typeof toast === 'function') toast('Tools override cleared · using agent base', 'info');
+}
+
+// Clear the prompt-suffix override.
+function resetNodePromptSuffixOverride() {
+  const node = getActiveNode();
+  if (!node || !node.nodeOverrides || !node.nodeOverrides.behavior) return;
+  delete node.nodeOverrides.behavior.promptSuffix;
+  if (Object.keys(node.nodeOverrides.behavior).length === 0) delete node.nodeOverrides.behavior;
+  if (Object.keys(node.nodeOverrides).length === 0) delete node.nodeOverrides;
+  flagSaving();
+  renderAgentConfigPanel();
+  if (typeof toast === 'function') toast('Prompt suffix cleared · using agent base', 'info');
+}
+
+// Write a per-node override field. Path is dot-separated (e.g.
+// 'behavior.promptSuffix'). Empty/whitespace string deletes the key.
+function nodeOverrideField(path, value) {
+  const node = getActiveNode();
+  if (!node) return;
+  const overrides = ensureNodeOverrides(node);
+  const segs = path.split('.');
+  // Empty string for promptSuffix → clear it (and prune empty parents).
+  if (typeof value === 'string' && value.trim() === '') {
+    let ref = overrides;
+    for (let i = 0; i < segs.length - 1; i++) {
+      if (!ref[segs[i]]) { flagSaving(); return; }
+      ref = ref[segs[i]];
+    }
+    delete ref[segs[segs.length - 1]];
+    // Prune empty parent objects so countNodeOverrides stays accurate.
+    if (segs.length > 1) {
+      let parent = overrides;
+      for (let i = 0; i < segs.length - 2; i++) parent = parent[segs[i]];
+      const key = segs[segs.length - 2];
+      if (parent[key] && Object.keys(parent[key]).length === 0) delete parent[key];
+    }
+    if (Object.keys(overrides).length === 0) delete node.nodeOverrides;
+    flagSaving();
+    // Refresh the override dots in the sidebar tabs.
+    refreshTabOverrideDots();
+    return;
+  }
+  let ref = overrides;
+  for (let i = 0; i < segs.length - 1; i++) {
+    if (ref[segs[i]] == null) ref[segs[i]] = {};
+    ref = ref[segs[i]];
+  }
+  ref[segs[segs.length - 1]] = value;
+  flagSaving();
+  refreshTabOverrideDots();
+}
+
+// Updates just the override dots without re-rendering the whole panel
+// (keeps focus inside the textarea while typing).
+function refreshTabOverrideDots() {
+  const node = getActiveNode();
+  if (!node) return;
+  document.querySelectorAll('.insp-cfg-tab').forEach(el => {
+    const tabId = el.getAttribute('data-tab');
+    const has = tabHasOverride(node, tabId);
+    let dot = el.querySelector('.override-dot');
+    if (has && !dot) {
+      dot = document.createElement('span');
+      dot.className = 'override-dot';
+      dot.title = 'This tab has a node-level override';
+      const lbl = el.querySelector('.lbl');
+      if (lbl) lbl.appendChild(dot);
+    } else if (!has && dot) {
+      dot.remove();
+    }
+  });
+}
+
 // ─ Edit Canvas ─
 const EDIT_FLOW = [
   {id:'wh',t:'trigger',l:'Webhook Received',sub:'Customer inquiry received'},
@@ -6219,13 +6408,17 @@ function renderAgentConfigPanel() {
   const forkBtn = document.getElementById('inspCfgHdFork');
   if (forkBtn) forkBtn.style.display = agent._isFresh ? 'none' : 'inline-flex';
 
+  const node = getActiveNode();
   const tabs = CONFIG_TABS.map(t => {
     const cls = (t.id === activeConfigTab ? 'is-active ' : '') + (t.locked ? 'is-locked' : '');
     const onclick = t.locked ? '' : `onclick="switchConfigTab('${t.id}')"`;
     const soonBadge = t.locked ? `<span class="badge-soon">A2</span>` : '';
+    const overrideDot = tabHasOverride(node, t.id)
+      ? `<span class="override-dot" title="Node-level override active"></span>`
+      : '';
     return `<div class="insp-cfg-tab ${cls}" ${onclick} data-tab="${t.id}">
       <span class="ico">${TAB_ICONS[t.id]||''}</span>
-      <span class="lbl">${t.label}</span>
+      <span class="lbl">${t.label}${overrideDot}</span>
       ${soonBadge}
     </div>`;
   }).join('');
@@ -6344,15 +6537,46 @@ function tabBehavior(a) {
     `<button class="insp-cfg-chip ${a.behavior.tone === t ? 'is-active' : ''}"
        onclick="agentField('behavior.tone', '${t}')">${t}</button>`
   ).join('');
+
+  // ── Per-node prompt suffix (override) ───────────────────────────────────
+  const node = getActiveNode();
+  const suffix = getEffectivePromptSuffix(node);
+  const hasSuffix = hasPromptSuffixOverride(node);
+  const suffixLen = (suffix || '').length;
+  const suffixPill = hasSuffix
+    ? `<span class="insp-cfg-ovrd-pill">Node-level</span>`
+    : '';
+  const suffixResetBtn = hasSuffix
+    ? `<button class="insp-cfg-ovrd-reset" onclick="resetNodePromptSuffixOverride()" title="Clear suffix · agent base used again">↺ Reset</button>`
+    : '';
+
   return `
     <div class="insp-cfg-section">
+      <div class="insp-cfg-label">
+        <span>Per-node prompt suffix ${suffixPill}</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;color:var(--t4);font-size:9px">${suffixLen} / 800</span>
+          ${suffixResetBtn}
+        </span>
+      </div>
+      <textarea class="insp-cfg-textarea" rows="4" maxlength="800"
+        placeholder="Optional. Appended to the agent's system prompt only for this node in this workflow."
+        oninput="nodeOverrideField('behavior.promptSuffix', this.value); document.getElementById('promptSuffixCnt').textContent=this.value.length+' / 800'">${escText(suffix)}</textarea>
+      <div class="insp-cfg-help">
+        Use this when the same agent needs a slight twist in this position of the workflow — e.g.
+        "Be extra concise here" or "Output as bullet points." Leave empty to use the agent's base prompt.
+      </div>
+      <div style="display:none" id="promptSuffixCnt">${suffixLen} / 800</div>
+    </div>
+
+    <div class="insp-cfg-section">
       <div class="insp-cfg-label">System prompt
-        <span style="font-weight:600;color:var(--t4);font-size:9px">${(a.behavior.systemPrompt||'').length} chars</span>
+        <span style="font-weight:600;color:var(--t4);font-size:9px">${(a.behavior.systemPrompt||'').length} chars · base</span>
       </div>
       <textarea class="insp-cfg-textarea" rows="10"
         placeholder="You are a [role]. When given [input], do [task] and return [format]…"
         oninput="agentField('behavior.systemPrompt', this.value)">${escText(a.behavior.systemPrompt)}</textarea>
-      <div class="insp-cfg-help">The agent's core instructions. Knowledge packs attached to this node are concatenated automatically.</div>
+      <div class="insp-cfg-help">The agent's core instructions. Knowledge packs attached to this node are concatenated automatically. The per-node suffix above is appended at runtime.</div>
     </div>
 
     <div class="insp-cfg-section">
@@ -6595,19 +6819,37 @@ function toolRowHtml(tool, isOn, category) {
 }
 
 function tabTools(a) {
-  const fnIds = new Set(a.tools?.functionCalls || []);
-  const mcpIds = new Set(a.tools?.mcpServers   || []);
-  const whIds = new Set(a.tools?.webhooks      || []);
+  const node = getActiveNode();
+  const isOverride = hasToolsOverride(node);
+  const eff = getEffectiveTools(node, a);
+  const fnIds  = new Set(eff.functionCalls || []);
+  const mcpIds = new Set(eff.mcpServers   || []);
+  const whIds  = new Set(eff.webhooks     || []);
   const fnRows = TOOL_CATALOG.functionCalls.map(t => toolRowHtml(t, fnIds.has(t.id),  'functionCalls')).join('');
   const mcpRows = TOOL_CATALOG.mcpServers.map(t => toolRowHtml(t, mcpIds.has(t.id), 'mcpServers')).join('');
   const whRows = TOOL_CATALOG.webhooks.map(t   => toolRowHtml(t, whIds.has(t.id),   'webhooks')).join('');
   const enabledCount = fnIds.size + mcpIds.size + whIds.size;
+
+  // Banner appears only when this node has its own tools override active.
+  const overrideBanner = isOverride
+    ? `<div class="insp-cfg-ovrd-banner">
+        <div class="txt">
+          <strong>Modified for this node.</strong>
+          Toggling tools here edits the per-node copy. The agent's base catalog stays untouched.
+        </div>
+        <button class="insp-cfg-ovrd-reset" onclick="resetNodeToolsOverride()" title="Discard per-node changes and use the agent's base tools">↺ Reset to base</button>
+      </div>`
+    : '';
+  const labelPill = isOverride ? `<span class="insp-cfg-ovrd-pill">Node-level</span>` : '';
+
   return `
+    ${overrideBanner}
     <div class="insp-cfg-section">
-      <div class="insp-cfg-label">Tools enabled
+      <div class="insp-cfg-label">
+        <span>Tools enabled ${labelPill}</span>
         <span style="font-weight:600;color:var(--t4);font-size:9px">${enabledCount} active</span>
       </div>
-      <div class="insp-cfg-help">Toggle the capabilities this agent can invoke. Disabled tools are invisible to the model at runtime.</div>
+      <div class="insp-cfg-help">Toggle the capabilities this agent can invoke. Disabled tools are invisible to the model at runtime. ${isOverride ? '<strong style="color:#c4b5fd">Changes apply only to this node.</strong>' : '<em>First toggle creates a node-level override; the agent’s base stays clean.</em>'}</div>
     </div>
 
     <div class="insp-tool-section-hd">Function calls (${TOOL_CATALOG.functionCalls.length})</div>
@@ -6624,9 +6866,24 @@ function tabTools(a) {
 function toggleAgentTool(category, toolId, el) {
   const agent = getActiveAgent();
   if (!agent) return;
+  const node = getActiveNode();
+  if (!node) return;
   if (!agent.tools) agent.tools = { functionCalls: [], mcpServers: [], webhooks: [] };
-  if (!Array.isArray(agent.tools[category])) agent.tools[category] = [];
-  const arr = agent.tools[category];
+
+  // Copy-on-write: the first tool toggle on this node copies the agent's
+  // current tools into nodeOverrides.tools, then mutates the override.
+  const wasOverride = hasToolsOverride(node);
+  if (!wasOverride) {
+    ensureNodeOverrides(node);
+    node.nodeOverrides.tools = JSON.parse(JSON.stringify({
+      functionCalls: agent.tools.functionCalls || [],
+      mcpServers:    agent.tools.mcpServers    || [],
+      webhooks:      agent.tools.webhooks      || [],
+    }));
+  }
+  const bag = node.nodeOverrides.tools;
+  if (!Array.isArray(bag[category])) bag[category] = [];
+  const arr = bag[category];
   const idx = arr.indexOf(toolId);
   if (idx >= 0) {
     arr.splice(idx, 1);
@@ -6635,14 +6892,19 @@ function toggleAgentTool(category, toolId, el) {
     arr.push(toolId);
     el.classList.add('is-on');
   }
-  // Update the counter in the label without re-rendering the whole tab.
-  const counter = document.querySelector('.insp-cfg-panel .insp-cfg-section:first-child .insp-cfg-label span');
-  if (counter) {
-    const total = (agent.tools.functionCalls||[]).length + (agent.tools.mcpServers||[]).length + (agent.tools.webhooks||[]).length;
-    counter.textContent = `${total} active`;
-  }
-  agent.updated = new Date().toISOString().slice(0,10);
   flagSaving();
+  // If we just transitioned base → override, re-render so the banner + pill
+  // + sidebar dot appear. Otherwise just update the live counter to avoid
+  // tearing down the scroll position.
+  if (!wasOverride) {
+    renderAgentConfigPanel();
+    return;
+  }
+  // Update the "N active" counter inline.
+  const total = (bag.functionCalls||[]).length + (bag.mcpServers||[]).length + (bag.webhooks||[]).length;
+  const counters = document.querySelectorAll('.insp-cfg-panel .insp-cfg-label span');
+  counters.forEach(c => { if (/\d+\s+active/.test(c.textContent)) c.textContent = `${total} active`; });
+  refreshTabOverrideDots();
 }
 
 // ── HTML escape helpers ────────────────────────────────────────────────────
@@ -6766,14 +7028,38 @@ function confirmFork() {
     if (typeof toast === 'function') toast('Give the fork a name first', 'warn');
     return;
   }
+  const node = EDIT_FLOW.find(n => n.id === activeNodeId);
+  // Snapshot any active node-level overrides BEFORE swapping, so we can
+  // bake them into the fork's base config (per fork semantics).
+  const overrides = node && node.nodeOverrides ? JSON.parse(JSON.stringify(node.nodeOverrides)) : null;
+  const overrideCount = overrides ? countNodeOverrides(node) : 0;
+
   const fork = cloneAgent(agent.id, newName);
   if (!fork) { closeForkDialog(); return; }
-  // Swap the active node to reference the fork.
-  const node = EDIT_FLOW.find(n => n.id === activeNodeId);
+
+  // Bake overrides into the new agent's base catalog row.
+  if (overrides) {
+    if (overrides.tools) {
+      fork.tools = {
+        functionCalls: overrides.tools.functionCalls ? [...overrides.tools.functionCalls] : (fork.tools?.functionCalls || []),
+        mcpServers:    overrides.tools.mcpServers    ? [...overrides.tools.mcpServers]    : (fork.tools?.mcpServers    || []),
+        webhooks:      overrides.tools.webhooks      ? [...overrides.tools.webhooks]      : (fork.tools?.webhooks      || []),
+      };
+    }
+    if (overrides.behavior && overrides.behavior.promptSuffix) {
+      const base = fork.behavior.systemPrompt || '';
+      const sep  = base.endsWith('\n') ? '' : '\n\n';
+      fork.behavior.systemPrompt = `${base}${sep}${overrides.behavior.promptSuffix}`;
+    }
+  }
+
+  // Swap the active node to reference the fork and CLEAR overrides — they
+  // are now part of the fork's base.
   if (node) {
     node.agentId = fork.id;
     node.l = instanceLabelFor(fork, node.id);
     node.sub = fork.description.length > 40 ? fork.description.slice(0,40) + '…' : fork.description;
+    delete node.nodeOverrides;
   }
   closeForkDialog();
   renderEditCanvas();
@@ -6782,7 +7068,8 @@ function confirmFork() {
   document.getElementById('inspTitle').textContent = fork.name;
   document.getElementById('inspNodeNm').textContent = fork.name;
   document.getElementById('inspCfgHdName').textContent = fork.name;
-  if (typeof toast === 'function') toast(`Forked → "${fork.name}" · editing the fork independently`, 'success');
+  const overrideMsg = overrideCount > 0 ? ` · ${overrideCount} override${overrideCount===1?'':'s'} baked in` : '';
+  if (typeof toast === 'function') toast(`Forked → "${fork.name}"${overrideMsg}`, 'success');
 }
 
 // ─ Node icons ─
