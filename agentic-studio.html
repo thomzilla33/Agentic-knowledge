@@ -2423,6 +2423,76 @@ body.test-mode #vTestMode{display:flex}
 
 /* Body class flips when picker mode is active */
 .agt-mod-body.is-picker-host{padding:0;background:#0a0d1a}
+
+/* ── Reference Files: drop zone + file rows ───────────────────────────── */
+.nkp-dropzone{
+  display:flex;align-items:center;gap:12px;
+  padding:18px 20px;margin-bottom:14px;
+  border:1.5px dashed rgba(167,139,250,0.30);
+  border-radius:10px;
+  background:rgba(167,139,250,0.04);
+  transition:background .15s, border-color .15s;
+  cursor:pointer;
+}
+.nkp-dropzone:hover{background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.50)}
+.nkp-dropzone.is-dragover{
+  background:rgba(167,139,250,0.14);
+  border-color:rgba(167,139,250,0.70);
+  border-style:solid;
+}
+.nkp-dropzone-ico{
+  width:40px;height:40px;flex-shrink:0;border-radius:9px;
+  background:linear-gradient(135deg, rgba(167,139,250,0.25), rgba(167,139,250,0.08));
+  border:1px solid rgba(167,139,250,0.30);
+  display:flex;align-items:center;justify-content:center;color:#c4b5fd;
+}
+.nkp-dropzone-text{flex:1;min-width:0}
+.nkp-dropzone-text .ttl{font-size:12.5px;font-weight:700;color:var(--t1);line-height:1.25}
+.nkp-dropzone-text .sub{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.4}
+.nkp-dropzone-text .sub strong{color:#c4b5fd;font-weight:700}
+.nkp-dropzone input[type="file"]{display:none}
+.nkp-dropzone-btn{
+  height:30px;padding:0 13px;border-radius:7px;
+  background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.40);
+  color:#c4b5fd;font-size:11.5px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:background .12s, border-color .12s;
+  flex-shrink:0;
+}
+.nkp-dropzone-btn:hover{background:rgba(167,139,250,0.25);border-color:rgba(167,139,250,0.60)}
+
+.nkp-file-row{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;
+  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
+  border-radius:8px;margin-bottom:6px;
+  transition:background .12s, border-color .12s;
+}
+.nkp-file-row:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.10)}
+.nkp-file-ico{
+  width:32px;height:32px;flex-shrink:0;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:9px;letter-spacing:.04em;text-transform:uppercase;
+}
+.nkp-file-ico.t-pdf  {background:rgba(255,100,103,0.15);color:#FF6467}
+.nkp-file-ico.t-docx {background:rgba(43,127,255,0.16);color:#80AFFF}
+.nkp-file-ico.t-sheet{background:rgba(5,223,114,0.14);color:#34d399}
+.nkp-file-ico.t-md   {background:rgba(34,211,238,0.14);color:#22d3ee}
+.nkp-file-ico.t-txt  {background:rgba(255,255,255,0.06);color:var(--t2)}
+.nkp-file-ico.t-json {background:rgba(253,199,0,0.14);color:#fde047}
+.nkp-file-ico.t-image{background:rgba(167,139,250,0.14);color:#c4b5fd}
+.nkp-file-ico.t-file {background:rgba(255,255,255,0.06);color:var(--t2)}
+.nkp-file-body{flex:1;min-width:0}
+.nkp-file-nm{font-size:12.5px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nkp-file-meta{font-size:10.5px;color:var(--t3);margin-top:3px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.nkp-file-meta .sep{opacity:0.4}
+.nkp-file-remove{
+  width:28px;height:28px;border-radius:6px;
+  background:transparent;border:1px solid var(--bd);color:var(--t3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .1s, color .1s, border-color .1s;
+  flex-shrink:0;
+}
+.nkp-file-remove:hover{background:rgba(255,100,103,0.10);border-color:rgba(255,100,103,0.40);color:var(--err)}
 .agt-mod-overlay.is-knowledge-view .agt-mod-ft-hint{
   color:#c4b5fd;
 }
@@ -6616,7 +6686,9 @@ function hasPromptSuffixOverride(node) {
 function hasKnowledgeOverride(node) {
   const k = node && node.nodeOverrides && node.nodeOverrides.knowledge;
   if (!k) return false;
-  return (k.packIds && k.packIds.length > 0) || (k.driveIds && k.driveIds.length > 0);
+  return (k.packIds && k.packIds.length > 0)
+      || (k.driveIds && k.driveIds.length > 0)
+      || (k.refFiles && k.refFiles.length > 0);
 }
 function countNodeOverrides(node) {
   let n = 0;
@@ -6740,7 +6812,20 @@ function refreshTabOverrideDots() {
 // ─ Edit Canvas ─
 const EDIT_FLOW = [
   {id:'wh',t:'trigger',l:'Webhook Received',sub:'Customer inquiry received'},
-  {id:'ag-ca',t:'agent',agentId:'agt-customer-analyst',l:'Customer Analyst',sub:'Analyzes customer inquiry',badge:'A'},
+  {id:'ag-ca',t:'agent',agentId:'agt-customer-analyst',l:'Customer Analyst',sub:'Analyzes customer inquiry',badge:'A',
+    // Demo seed: a couple of reference files so the picker has data to show.
+    // These would normally be added via drag-drop by the workflow builder.
+    nodeOverrides: {
+      knowledge: {
+        packIds: [],
+        driveIds: [],
+        refFiles: [
+          { id: 'rf-seed-001', name: 'Q3-2026 ICP refresh notes.pdf', type: 'pdf',  size: 248320, uploaded: '2026-05-10', uploader: 'You' },
+          { id: 'rf-seed-002', name: 'Customer interview transcript.docx', type: 'docx', size: 89472, uploaded: '2026-05-12', uploader: 'You' },
+        ],
+      },
+    },
+  },
   {id:'ks',t:'rag',l:'Knowledge Space',sub:'Truth Only · Sales Playbook 2026',badge:'K'},
   {id:'rg',t:'agent',agentId:'agt-response-generator',l:'Response Generator',sub:'Generates customer response',badge:'Ag'},
 ];
@@ -7284,12 +7369,40 @@ const KNOWLEDGE_DRIVES = [
 ];
 function getDriveById(id) { return KNOWLEDGE_DRIVES.find(d => d.id === id) || null; }
 
+// ── Reference Files (per-node uploaded documents) ──
+// Stored on node.nodeOverrides.knowledge.refFiles as full objects (not just
+// ids) because they're node-scoped — no catalog to look them up in.
+// Shape: { id, name, type, size, uploaded, uploader }
+function getEffectiveReferenceFiles(node) {
+  return (node && node.nodeOverrides && node.nodeOverrides.knowledge && node.nodeOverrides.knowledge.refFiles) || [];
+}
+function hasReferenceFilesOverride(node) {
+  return getEffectiveReferenceFiles(node).length > 0;
+}
+function fileTypeFromName(name) {
+  const ext = (name.split('.').pop() || '').toLowerCase();
+  if (['pdf'].includes(ext)) return 'pdf';
+  if (['doc','docx'].includes(ext)) return 'docx';
+  if (['xls','xlsx','csv'].includes(ext)) return 'sheet';
+  if (['md','markdown'].includes(ext)) return 'md';
+  if (['txt'].includes(ext)) return 'txt';
+  if (['json'].includes(ext)) return 'json';
+  if (['png','jpg','jpeg','gif','webp'].includes(ext)) return 'image';
+  return 'file';
+}
+function formatFileSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024*1024) return `${(bytes/1024).toFixed(1)} KB`;
+  return `${(bytes/1024/1024).toFixed(1)} MB`;
+}
+
 // ── Effective knowledge resolution (agent + node-level additions) ──
 // The "attached set" for a node is the UNION of:
 //   • Agent base knowledge.packIds + knowledge.driveIds
-//   • Node-level additions: nodeOverrides.knowledge.{packIds, driveIds}
+//   • Node-level additions: nodeOverrides.knowledge.{packIds, driveIds, refFiles}
 // Workflow-level packs come from packsForCurrentWorkflow() and are merged in
-// at render time too.
+// at render time too. Reference files only live at node level (no agent or
+// workflow concept — they're context for this specific position).
 function getEffectiveKnowledge(node, agent) {
   const basePackIds  = (agent && agent.knowledge && agent.knowledge.packIds)  || [];
   const baseDriveIds = (agent && agent.knowledge && agent.knowledge.driveIds) || [];
@@ -7298,6 +7411,7 @@ function getEffectiveKnowledge(node, agent) {
   return {
     packIds:  Array.from(new Set([...basePackIds,  ...ovPackIds])),
     driveIds: Array.from(new Set([...baseDriveIds, ...ovDriveIds])),
+    refFiles: getEffectiveReferenceFiles(node),
   };
 }
 
@@ -7338,13 +7452,50 @@ function detachFromNode(kind, id) {
   if (idx < 0) return;
   arr.splice(idx, 1);
   // Prune empty objects so countNodeOverrides() stays accurate.
-  if (!node.nodeOverrides.knowledge.packIds?.length && !node.nodeOverrides.knowledge.driveIds?.length) {
-    delete node.nodeOverrides.knowledge;
-  }
-  if (node.nodeOverrides && Object.keys(node.nodeOverrides).length === 0) {
-    delete node.nodeOverrides;
-  }
+  pruneEmptyKnowledgeOverride(node);
   flagSaving();
+}
+
+// Reference files (node-scoped uploads).
+function addReferenceFile(meta) {
+  const node = getActiveNode();
+  if (!node) return null;
+  ensureNodeOverrides(node);
+  if (!node.nodeOverrides.knowledge) node.nodeOverrides.knowledge = { packIds: [], driveIds: [], refFiles: [] };
+  if (!Array.isArray(node.nodeOverrides.knowledge.refFiles)) node.nodeOverrides.knowledge.refFiles = [];
+  const file = {
+    id: 'rf-' + Date.now().toString(36) + Math.floor(Math.random()*999).toString(36),
+    name: meta.name || 'untitled',
+    type: meta.type || fileTypeFromName(meta.name || ''),
+    size: meta.size || Math.floor(50000 + Math.random()*900000),
+    uploaded: new Date().toISOString().slice(0,10),
+    uploader: meta.uploader || 'You',
+  };
+  node.nodeOverrides.knowledge.refFiles.push(file);
+  flagSaving();
+  return file;
+}
+
+function removeReferenceFile(fileId) {
+  const node = getActiveNode();
+  if (!node || !node.nodeOverrides || !node.nodeOverrides.knowledge) return;
+  const arr = node.nodeOverrides.knowledge.refFiles || [];
+  const idx = arr.findIndex(f => f.id === fileId);
+  if (idx < 0) return;
+  arr.splice(idx, 1);
+  pruneEmptyKnowledgeOverride(node);
+  flagSaving();
+}
+
+// Prune helper: keeps countNodeOverrides() accurate when all attachments are
+// removed. Removes the knowledge sub-object when empty, then prunes the
+// parent nodeOverrides when it has nothing left.
+function pruneEmptyKnowledgeOverride(node) {
+  const k = node.nodeOverrides && node.nodeOverrides.knowledge;
+  if (!k) return;
+  const empty = !(k.packIds?.length) && !(k.driveIds?.length) && !(k.refFiles?.length);
+  if (empty) delete node.nodeOverrides.knowledge;
+  if (node.nodeOverrides && Object.keys(node.nodeOverrides).length === 0) delete node.nodeOverrides;
 }
 
 function packsForCurrentWorkflow() {
@@ -7416,21 +7567,34 @@ function tabKnowledge(a) {
     </div>`;
   }).join('');
 
-  const empty = total === 0;
+  const fileRows = eff.refFiles.map(f => `
+    <div class="insp-knl-row">
+      <div class="ico" style="background:rgba(167,139,250,0.18);color:#c4b5fd;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:9px">F</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11.5px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:5px">
+          ${escText(f.name)}
+          <span class="src-badge nkp-src-node" style="font-size:8.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:3px;line-height:1.2">From node</span>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">${formatFileSize(f.size)} · uploaded ${f.uploaded}</div>
+      </div>
+    </div>`).join('');
+
+  const total2 = total + eff.refFiles.length;
+  const empty = total2 === 0;
   return `
     <div class="insp-cfg-section">
       <div class="insp-cfg-label">In scope for this agent
         <span style="font-weight:600;color:var(--t4);font-size:9px">
-          ${allPackIds.length} pack${allPackIds.length === 1 ? '' : 's'} · ${allDriveIds.length} drive${allDriveIds.length === 1 ? '' : 's'}
+          ${allPackIds.length} pack${allPackIds.length === 1 ? '' : 's'} · ${allDriveIds.length} drive${allDriveIds.length === 1 ? '' : 's'} · ${eff.refFiles.length} file${eff.refFiles.length === 1 ? '' : 's'}
         </span>
       </div>
       ${empty ? `
         <div class="insp-knl-empty">
           <div style="font-size:11px;color:var(--t2);font-weight:600;margin-bottom:3px">No Knowledge in scope</div>
-          <div style="font-size:10px;color:var(--t3);line-height:1.5">This agent reads the full Truth Plane by default. Attach a pack or drive to scope what it can use.</div>
+          <div style="font-size:10px;color:var(--t3);line-height:1.5">This agent reads the full Truth Plane by default. Attach a pack, drive, or reference file to scope what it can use.</div>
         </div>
       ` : `
-        <div class="insp-knl-list">${packRows}${driveRows}</div>
+        <div class="insp-knl-list">${packRows}${driveRows}${fileRows}</div>
       `}
     </div>
 
@@ -7573,10 +7737,11 @@ function renderNodeKnowledgePicker() {
 
   const eff = getEffectiveKnowledge(node, agent);
   const wfPacks = packsForCurrentWorkflow();
-  // Union for the LEFT "attached" sidebar: workflow + agent + node packs/drives.
+  // Union for the LEFT "attached" sidebar: workflow + agent + node packs/drives + node refFiles.
   const allPackIds = Array.from(new Set([...wfPacks, ...eff.packIds]));
   const allDriveIds = eff.driveIds.slice();
-  const attachedCount = allPackIds.length + allDriveIds.length;
+  const allRefFiles = eff.refFiles.slice();
+  const attachedCount = allPackIds.length + allDriveIds.length + allRefFiles.length;
 
   const tab = ov._kpTab || 'packs';
   const query = (ov._kpSearch || '').toLowerCase();
@@ -7600,6 +7765,15 @@ function renderNodeKnowledgePicker() {
       kind: 'drive', id, name: d.name, sub: `${d.docs} docs · ${d.owner}`,
       icoBg: d.color + '33', icoColor: d.color, icoText: 'D',
       source: src,
+    });
+  });
+  // Reference files always live at node level → always show NODE badge with
+  // an enabled detach (remove) action.
+  allRefFiles.forEach(f => {
+    attachedRows.push({
+      kind: 'file', id: f.id, name: f.name, sub: `${formatFileSize(f.size)} · ${f.uploader}`,
+      icoBg: 'rgba(167,139,250,0.18)', icoColor: '#c4b5fd', icoText: 'F',
+      source: 'node',
     });
   });
 
@@ -7634,8 +7808,59 @@ function renderNodeKnowledgePicker() {
     !query || d.name.toLowerCase().includes(query) || d.owner.toLowerCase().includes(query)
   );
 
+  const filteredFiles = allRefFiles.filter(f =>
+    !query || f.name.toLowerCase().includes(query) || (f.uploader || '').toLowerCase().includes(query)
+  );
+
   let rightItems = '';
-  if (tab === 'packs') {
+  if (tab === 'files') {
+    // Reference Files tab: dropzone + file list (no Attach buttons — files
+    // are added by upload, removed by the × on each row).
+    const dropZone = `
+      <label class="nkp-dropzone" id="nkpDropZone"
+        ondragover="onRefFileDragOver(event)"
+        ondragleave="onRefFileDragLeave(event)"
+        ondrop="onRefFileDrop(event)">
+        <input type="file" multiple onchange="onRefFileInputChange(event)" id="nkpFileInput" />
+        <div class="nkp-dropzone-ico">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 13V3M6 7l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 13v3a1 1 0 001 1h12a1 1 0 001-1v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="nkp-dropzone-text">
+          <div class="ttl">Drop files here, or click to browse</div>
+          <div class="sub">PDF · DOCX · TXT · MD · JSON · CSV · Images. <strong>Max 10 MB per file.</strong> Files are scoped to this node only — no Pack or Drive needed.</div>
+        </div>
+        <button type="button" class="nkp-dropzone-btn" onclick="document.getElementById('nkpFileInput').click(); event.stopPropagation();">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1.5v9M1.5 6h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Browse files
+        </button>
+      </label>
+    `;
+    const fileRows = filteredFiles.map(f => `
+      <div class="nkp-file-row">
+        <div class="nkp-file-ico t-${f.type}">${(f.type || 'file').slice(0,4).toUpperCase()}</div>
+        <div class="nkp-file-body">
+          <div class="nkp-file-nm" title="${escAttr(f.name)}">${escText(f.name)}</div>
+          <div class="nkp-file-meta">
+            <span>${formatFileSize(f.size)}</span>
+            <span class="sep">·</span>
+            <span>Uploaded ${f.uploaded}</span>
+            <span class="sep">·</span>
+            <span>by ${escText(f.uploader)}</span>
+          </div>
+        </div>
+        <button class="nkp-file-remove" onclick="removeReferenceFileAndRerender('${f.id}')" title="Remove from this node" aria-label="Remove file">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    `).join('');
+    const emptyMsg = !allRefFiles.length
+      ? `<div class="nkp-empty">No reference files yet.<br/>Drop files above to attach them to this node.</div>`
+      : (!filteredFiles.length ? `<div class="nkp-empty">No files match "${escText(query)}".</div>` : '');
+    rightItems = `${dropZone}${fileRows}${emptyMsg}`;
+  } else if (tab === 'packs') {
     rightItems = filteredPacks.map(([id, p]) => {
       const intent = INTENT_PALETTE[p.intent] || INTENT_PALETTE.restrict;
       const isAttached = allPackIds.includes(id);
@@ -7695,9 +7920,12 @@ function renderNodeKnowledgePicker() {
           <button class="nkp-tab ${tab === 'drives' ? 'is-active' : ''}" onclick="switchPickerTab('drives')">
             Source Drives <span class="count">${KNOWLEDGE_DRIVES.length}</span>
           </button>
+          <button class="nkp-tab ${tab === 'files' ? 'is-active' : ''}" onclick="switchPickerTab('files')">
+            Reference Files <span class="count">${allRefFiles.length}</span>
+          </button>
           <div class="nkp-right-hd-search">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="3.2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 7.5L10 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            <input type="text" placeholder="Filter ${tab === 'packs' ? 'packs' : 'drives'}…" value="${escAttr(query)}"
+            <input type="text" placeholder="Filter ${tab === 'packs' ? 'packs' : tab === 'drives' ? 'drives' : 'files'}…" value="${escAttr(query)}"
               oninput="onPickerSearchInput(this.value)" />
           </div>
           <button class="nkp-open-lib" onclick="openFullKnowledgeLibrary()" title="Inspect packs in the full Knowledge Library">
@@ -7741,9 +7969,61 @@ function attachToNodeAndRerender(kind, id) {
 }
 
 function detachFromNodeAndRerender(kind, id) {
-  detachFromNode(kind, id);
+  if (kind === 'file') {
+    removeReferenceFile(id);
+  } else {
+    detachFromNode(kind, id);
+  }
   renderNodeKnowledgePicker();
   if (typeof toast === 'function') toast(`Detached from this node`, 'info');
+}
+
+function removeReferenceFileAndRerender(fileId) {
+  removeReferenceFile(fileId);
+  renderNodeKnowledgePicker();
+  if (typeof toast === 'function') toast('File removed', 'info');
+}
+
+// ── Drag-drop + browse handlers for Reference Files ────────────────────
+// In the prototype these don't actually upload — they synthesize a file
+// record from the dropped File object's metadata (name, type, size).
+function onRefFileDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('is-dragover');
+}
+function onRefFileDragLeave(e) {
+  e.currentTarget.classList.remove('is-dragover');
+}
+function onRefFileDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('is-dragover');
+  const files = e.dataTransfer?.files;
+  if (!files || !files.length) return;
+  acceptReferenceFiles(files);
+}
+function onRefFileInputChange(e) {
+  const files = e.target.files;
+  if (!files || !files.length) return;
+  acceptReferenceFiles(files);
+  e.target.value = ''; // reset so the same filename can be re-added
+}
+function acceptReferenceFiles(fileList) {
+  const MAX = 10 * 1024 * 1024;
+  let added = 0;
+  Array.from(fileList).forEach(f => {
+    if (f.size > MAX) {
+      if (typeof toast === 'function') toast(`"${f.name}" exceeds 10 MB · skipped`, 'warn');
+      return;
+    }
+    addReferenceFile({ name: f.name, type: fileTypeFromName(f.name), size: f.size });
+    added++;
+  });
+  if (added > 0) {
+    renderNodeKnowledgePicker();
+    if (typeof toast === 'function') {
+      toast(`${added} file${added === 1 ? '' : 's'} attached to this node`, 'success');
+    }
+  }
 }
 
 // Mock catalog of available tools — three categories the user toggles
