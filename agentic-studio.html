@@ -2221,9 +2221,67 @@ body.test-mode #vTestMode{display:flex}
   box-shadow:0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(167,139,250,0.08);
   display:flex;flex-direction:column;overflow:hidden;
   transform:translateY(8px) scale(0.985);
-  transition:transform .22s cubic-bezier(.2,.8,.2,1);
+  transition:transform .22s cubic-bezier(.2,.8,.2,1), width .25s cubic-bezier(.2,.8,.2,1), height .25s cubic-bezier(.2,.8,.2,1), border-radius .2s ease;
 }
 .agt-mod-overlay.is-open .agt-mod-card{transform:translateY(0) scale(1)}
+
+/* Fullscreen takeover (header + body grow; tiny side margins so it still
+   feels like a card, not a browser-window replacement) */
+.agt-mod-overlay.is-fullscreen .agt-mod-card{
+  width:calc(100vw - 32px);
+  height:calc(100vh - 32px);
+  border-radius:10px;
+}
+.agt-mod-overlay.is-fullscreen{padding:16px}
+
+.agt-mod-hd-expand{
+  width:32px;height:32px;border-radius:8px;
+  background:transparent;border:1px solid var(--bd);color:var(--t2);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.agt-mod-hd-expand:hover{background:rgba(167,139,250,0.10);border-color:rgba(167,139,250,0.40);color:#c4b5fd}
+.agt-mod-hd-expand svg{transition:transform .15s ease}
+.agt-mod-overlay.is-fullscreen .agt-mod-hd-expand svg{transform:rotate(180deg)}
+
+/* ── Inline Knowledge Library view ──
+   When the user clicks "Manage knowledge" inside the modal, the body is
+   replaced with the embedded governance-studio Knowledge Library iframe.
+   The sidebar tabs are hidden, header gains a breadcrumb back button. */
+.agt-mod-overlay.is-knowledge-view .agt-mod-hd-meta .agt-mod-hd-eyebrow{
+  color:#c4b5fd;
+}
+.agt-mod-overlay.is-knowledge-view .agt-mod-hd-fork,
+.agt-mod-overlay.is-knowledge-view .agt-mod-hd-save{
+  display:none;
+}
+.agt-mod-hd-back{
+  height:32px;padding:0 11px;border-radius:7px;
+  background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.30);
+  color:#c4b5fd;font-size:11.5px;font-weight:600;cursor:pointer;
+  display:none;align-items:center;gap:6px;
+  transition:background .12s, border-color .12s, color .12s;
+  margin-right:4px;
+}
+.agt-mod-overlay.is-knowledge-view .agt-mod-hd-back{display:inline-flex}
+.agt-mod-hd-back:hover{background:rgba(167,139,250,0.20);border-color:rgba(167,139,250,0.55);color:#d6c8ff}
+
+.agt-mod-knowledge-frame{
+  width:100%;height:100%;border:none;background:#0a0d1a;
+  display:block;
+}
+.agt-mod-body.is-knowledge-host{
+  padding:0;background:#0a0d1a;
+}
+.agt-mod-overlay.is-knowledge-view .agt-mod-ft-hint{
+  color:#c4b5fd;
+}
+.agt-mod-overlay.is-knowledge-view .agt-mod-ft-actions .agt-mod-ft-btn:not(.agt-mod-ft-btn-primary){
+  display:none;
+}
+.agt-mod-overlay.is-knowledge-view .agt-mod-ft-actions .agt-mod-ft-btn-primary::before{
+  content:'';
+}
 
 /* Header: avatar + name + save indicator + fork + close */
 .agt-mod-hd{
@@ -4509,10 +4567,14 @@ body.test-mode #vTestMode{display:flex}
 <div class="agt-mod-overlay" id="agtModOv" role="dialog" aria-modal="true" aria-labelledby="agtModName" onclick="closeAgentConfigModal()">
   <div class="agt-mod-card" onclick="event.stopPropagation()">
     <div class="agt-mod-hd">
+      <button class="agt-mod-hd-back" id="agtModBack" onclick="exitInlineKnowledgeView()" title="Back to agent configuration">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7 2L3 6l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to agent
+      </button>
       <div class="agt-mod-hd-ico" id="agtModIco">CA</div>
       <div class="agt-mod-hd-meta">
-        <div class="agt-mod-hd-eyebrow">
-          <span>Agent configuration</span>
+        <div class="agt-mod-hd-eyebrow" id="agtModEyebrow">
+          <span id="agtModEyebrowLabel">Agent configuration</span>
           <span class="pill" id="agtModNodePill" style="display:none">Node-level overrides</span>
         </div>
         <div class="agt-mod-hd-name" id="agtModName">Customer Analyst</div>
@@ -4521,6 +4583,9 @@ body.test-mode #vTestMode{display:flex}
       <button class="agt-mod-hd-fork" id="agtModFork" onclick="forkCurrentAgent()" title="Clone this agent — edits stay isolated">
         <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="3" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="9" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 4.5v1.5a1.5 1.5 0 001.5 1.5h3A1.5 1.5 0 009 6V4.5" stroke="currentColor" stroke-width="1.2"/></svg>
         Fork
+      </button>
+      <button class="agt-mod-hd-expand" id="agtModExpand" onclick="toggleAgentConfigFullscreen()" aria-label="Expand to fullscreen" title="Expand to fullscreen">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 5V2h3M9 2h3v3M12 9v3H9M5 12H2V9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <button class="agt-mod-hd-close" onclick="closeAgentConfigModal()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -6693,6 +6758,8 @@ function closeAgentConfigModal() {
   const ov = document.getElementById('agtModOv');
   if (!ov) return;
   ov.classList.remove('is-open');
+  ov.classList.remove('is-fullscreen');         // reset to compact on next open
+  ov.classList.remove('is-knowledge-view');     // reset Library view too
   document.body.style.overflow = '';
   document.removeEventListener('keydown', onAgentConfigModalKey);
 }
@@ -6700,7 +6767,28 @@ function closeAgentConfigModal() {
 function onAgentConfigModalKey(e) {
   if (e.key === 'Escape') {
     e.preventDefault();
+    // If we're inside the inline Knowledge Library view, ESC backs out to
+    // the agent config first instead of closing the whole modal.
+    const ov = document.getElementById('agtModOv');
+    if (ov && ov.classList.contains('is-knowledge-view')) {
+      exitInlineKnowledgeView();
+      return;
+    }
     closeAgentConfigModal();
+  }
+}
+
+// Toggle the modal between compact (1180×780) and fullscreen (viewport minus
+// 32px gutters). Doesn't change content — just the surface size.
+function toggleAgentConfigFullscreen() {
+  const ov = document.getElementById('agtModOv');
+  if (!ov) return;
+  const willExpand = !ov.classList.contains('is-fullscreen');
+  ov.classList.toggle('is-fullscreen');
+  const btn = document.getElementById('agtModExpand');
+  if (btn) {
+    btn.setAttribute('aria-label', willExpand ? 'Collapse to compact' : 'Expand to fullscreen');
+    btn.setAttribute('title',      willExpand ? 'Collapse to compact' : 'Expand to fullscreen');
   }
 }
 
@@ -7096,20 +7184,81 @@ function tabKnowledge(a) {
   `;
 }
 
-// Open the existing Knowledge slide-out, passing `nodeId` so the React side
-// can show node-attached packs separate from the workflow-attached pack
-// (the union semantics live on the React side; this just hands off context).
+// "Manage knowledge" CTA inside the agent config modal.
+// Previously: opened a slide-out (kcOverlay) which stacked overlays on top of
+// the modal — modal-on-modal anti-pattern. Now: opens the governance-studio
+// Knowledge Library INLINE inside this same modal (auto-expands to fullscreen
+// for breathing room, replaces the body with the iframe, and adds a
+// breadcrumb "Back to agent" button to the header).
 function manageKnowledgeForNode() {
   const node = EDIT_FLOW.find(n => n.id === activeNodeId);
   if (!node || !node.agentId) return;
-  if (typeof openKnowledgeConstraint !== 'function') {
-    if (typeof toast === 'function') toast('Knowledge slide-out not available here', 'warn');
+  enterInlineKnowledgeView(node);
+}
+
+function enterInlineKnowledgeView(node) {
+  const ov = document.getElementById('agtModOv');
+  const body = document.getElementById('agtModBody');
+  if (!ov || !body) return;
+  const network = (typeof currentOvId !== 'undefined') ? NETWORKS.find(x => x.id === currentOvId) : null;
+  if (!network) {
+    if (typeof toast === 'function') toast('Open a workflow first', 'warn');
     return;
   }
-  // Drop the agent context on `window` so openKnowledgeConstraint can append
-  // it to the iframe URL without rewriting that function's signature.
-  window._knNodeContext = { nodeId: node.id, agentId: node.agentId, agentName: getAgentById(node.agentId)?.name || '' };
-  openKnowledgeConstraint();
+  const agent = getAgentById(node.agentId);
+  // Snapshot the agent config body so we can restore it on exit.
+  if (!ov._configBodySnapshot) ov._configBodySnapshot = body.innerHTML;
+
+  // Build the embedded Library URL with full context. Same URL the slide-out
+  // used to fetch — the React side already supports workflowId + nodeId.
+  const wfId   = encodeURIComponent(network.id);
+  const wfName = encodeURIComponent(network.name);
+  const env    = encodeURIComponent(typeof getWorkflowEnv === 'function' ? getWorkflowEnv(network.id) : 'sandbox');
+  const ndId   = encodeURIComponent(node.id);
+  const agId   = encodeURIComponent(node.agentId);
+  const agName = encodeURIComponent(agent?.name || '');
+  const url = `governance-studio/?embed=1&workflowId=${wfId}&workflowName=${wfName}&intent=restrict&env=${env}&nodeId=${ndId}&agentId=${agId}&agentName=${agName}#/intelligence-library/knowledge`;
+
+  // Swap surfaces.
+  ov.classList.add('is-knowledge-view');
+  ov.classList.add('is-fullscreen');             // auto-expand for working room
+  body.classList.add('is-knowledge-host');
+  body.innerHTML = `<iframe class="agt-mod-knowledge-frame" id="agtModKnFrame" src="${url}" title="Knowledge Library"></iframe>`;
+
+  // Header copy: keep agent name visible so user knows what they're scoping for.
+  const eyebrow = document.getElementById('agtModEyebrowLabel');
+  if (eyebrow) eyebrow.textContent = `Knowledge Library · for ${agent?.name || 'this agent'}`;
+  const expandBtn = document.getElementById('agtModExpand');
+  if (expandBtn) expandBtn.style.display = 'none';     // already fullscreen — hide
+  // Fork uses inline style for its agent._isFresh logic — clear it so the
+  // CSS rule (.is-knowledge-view .agt-mod-hd-fork{display:none}) takes effect.
+  const forkBtn = document.getElementById('agtModFork');
+  if (forkBtn) { forkBtn._previousDisplay = forkBtn.style.display; forkBtn.style.display = ''; }
+}
+
+function exitInlineKnowledgeView() {
+  const ov = document.getElementById('agtModOv');
+  const body = document.getElementById('agtModBody');
+  if (!ov || !body) return;
+  ov.classList.remove('is-knowledge-view');
+  ov.classList.remove('is-fullscreen');
+  body.classList.remove('is-knowledge-host');
+  // Restore the agent config tabs/panel — re-render is cleaner than the
+  // snapshot because it picks up any changes made via deep-links.
+  ov._configBodySnapshot = null;
+  renderAgentConfigPanel();
+  // Reset the eyebrow label + show the expand button again.
+  const eyebrow = document.getElementById('agtModEyebrowLabel');
+  if (eyebrow) eyebrow.textContent = 'Agent configuration';
+  const expandBtn = document.getElementById('agtModExpand');
+  if (expandBtn) expandBtn.style.display = '';
+  // Restore Fork's previous inline display (renderAgentConfigPanel will also
+  // overwrite it on the next render, so this is mostly defensive).
+  const forkBtn = document.getElementById('agtModFork');
+  if (forkBtn && forkBtn._previousDisplay !== undefined) {
+    forkBtn.style.display = forkBtn._previousDisplay;
+    delete forkBtn._previousDisplay;
+  }
 }
 
 // Mock catalog of available tools — three categories the user toggles
