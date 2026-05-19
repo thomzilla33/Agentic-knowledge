@@ -11808,7 +11808,6 @@ const demoSteps = [
     sideEffect: () => { demoResetToList(); },
     target: null,
     tipFixed: { top: 110, right: 270 },
-    tipLabel: 'Step 1 of 9',
     tipText: 'These are the live Agentic Networks — multi-agent workflows that run across your business. Each row has its own runs, KPIs, and triggers.',
     tipSide: 'left',
   },
@@ -11817,7 +11816,6 @@ const demoSteps = [
     desc:  'Inspect live stats without leaving the list',
     sideEffect: () => { demoResetToList(); setTimeout(() => selectNetwork('n1'), 80); },
     target: { selector: '#prevName' },
-    tipLabel: 'Step 2 of 9',
     tipText: 'Click a workflow card → preview drawer with live runs, success rate, AI summary, and recent executions.',
     tipSide: 'left',
   },
@@ -11829,7 +11827,6 @@ const demoSteps = [
       setTimeout(() => openFullView(), 80);
     },
     target: { selector: '#ovName' },
-    tipLabel: 'Step 3 of 9',
     tipText: 'The full overview is the workflow\'s live cockpit — every metric, trigger, and execution surfaced at once.',
     tipSide: 'down',
   },
@@ -11841,7 +11838,6 @@ const demoSteps = [
       if (tab) switchOvTab('builder', tab);
     },
     target: { selector: '#opBuilder' },
-    tipLabel: 'Step 4 of 9',
     tipText: 'The Builder canvas visualizes every step. Each node is a sub-workflow, agent, or tool call — from here you can constrain or extend the workflow\'s knowledge.',
     tipSide: 'left',
   },
@@ -11850,7 +11846,6 @@ const demoSteps = [
     desc:  'Inspect the attached pack with full provenance',
     sideEffect: () => { openKnowledgeConstraint(); },
     target: { selector: '#kcFrame' },
-    tipLabel: 'Step 5 of 9',
     tipText: 'The Knowledge slide-out inspects the pack constraining this workflow — what facts it can see, where they came from, and who attested them.',
     tipSide: 'left',
   },
@@ -11865,7 +11860,6 @@ const demoSteps = [
         return labels[0]?.closest('.rounded-xl') || labels[0] || null;
       },
     },
-    tipLabel: 'Step 6 of 9',
     tipText: 'When a fact in the pack has an expired attestation, the slide-out warns that production runs will halt at the governance gate until it\'s re-attested.',
     tipSide: 'left',
   },
@@ -11877,7 +11871,6 @@ const demoSteps = [
       iframe: 'kcFrame',
       find: (innerDoc) => [...innerDoc.querySelectorAll('button')].find(b => /Re-attest TF-/i.test(b.textContent)) || null,
     },
-    tipLabel: 'Step 7 of 9',
     tipText: 'Re-attest the expired fact inline — confirm dialog → next review window updates → governance gate clears, all without leaving inspection.',
     tipSide: 'left',
   },
@@ -11894,7 +11887,6 @@ const demoSteps = [
       iframe: 'kcFrame',
       find: (innerDoc) => [...innerDoc.querySelectorAll('button')].find(b => /Test workflow with this knowledge/i.test(b.textContent)) || null,
     },
-    tipLabel: 'Step 8 of 9',
     tipText: 'Run the workflow with the pack applied to see governance gates fire live. Production runs halt on expired attestation; sandbox warns but completes.',
     tipSide: 'left',
   },
@@ -11914,9 +11906,81 @@ const demoSteps = [
         return header?.parentElement?.parentElement || header?.parentElement || null;
       },
     },
-    tipLabel: 'Step 9 of 9',
     tipText: 'Every workflow execution is logged with status, env, pack version, governance event tally, and a retained trace you can re-open from here.',
     tipSide: 'left',
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // NODE-LEVEL KNOWLEDGE STORY (steps 10–15)
+  // The workflow-level governance is the "outer ring." Now drill INTO a
+  // specific agent node to show how knowledge can be layered:
+  //   WORKFLOW (the constraining pack) → AGENT (catalog defaults) → NODE
+  // (this-position-only). All 3 union into what the agent reads.
+  // ──────────────────────────────────────────────────────────────────────
+  {
+    title: 'Drill into an agent',
+    desc:  'Scope knowledge to ONE specific node',
+    sideEffect: () => {
+      // Close the slide-out so the Builder canvas is fully visible.
+      closeKnowledgeConstraint();
+      // Make sure we're on the Builder tab + the Customer Analyst node is selected.
+      const tab = [...document.querySelectorAll('.ov-tab')].find(b => b.textContent.trim() === 'Builder');
+      if (tab) switchOvTab('builder', tab);
+      setTimeout(() => selectEditNode('ag-ca'), 120);
+    },
+    target: { selector: '.insp-configure-btn' },
+    tipText: 'Workflow-level governance is the outer ring. Click Configure on any agent node to drill in — you can scope knowledge to THIS agent at THIS position.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Agent configuration',
+    desc:  'Identity · Behavior · Model · Knowledge · Tools',
+    sideEffect: () => {
+      openAgentConfigModal(false);
+      setTimeout(() => switchConfigTab('knowledge'), 100);
+    },
+    target: { selector: '[data-tab="knowledge"]' },
+    tipText: 'The agent editor opens in a roomy centered modal. Knowledge tab shows everything in scope for this agent at this node — union of workflow + agent + node.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Provenance — 3 layers',
+    desc:  'Workflow + Agent + Node, all unioned',
+    sideEffect: null,
+    target: {
+      // Highlight the first attached row showing the provenance badges.
+      selector: '#agtModBody .insp-knl-list',
+    },
+    tipText: 'Each row carries a badge: WORKFLOW (constrained by the host flow), AGENT (catalog default), or NODE (pinned here). The agent reads the union.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Node Knowledge Picker',
+    desc:  'Attach Packs, Drives, or Files in one place',
+    sideEffect: () => {
+      // Click "Manage knowledge" to open the inline picker.
+      const btn = document.querySelector('#agtModBody .insp-knl-manage');
+      if (btn) btn.click();
+    },
+    target: { selector: '.nkp-right-hd' },
+    tipText: 'One picker, three sources. No more modal-on-modal — click Manage knowledge and you get Packs, Drives, and Reference Files side by side, scoped to this node.',
+    tipSide: 'down',
+  },
+  {
+    title: 'Source Drives',
+    desc:  'Attach an org-wide repository to this node',
+    sideEffect: () => { switchPickerTab('drives'); },
+    target: { selector: '.nkp-right-body' },
+    tipText: 'Source Drives are org-wide repos — Sales, Marketing, Engineering. Attach one and the agent sees every document inside.',
+    tipSide: 'left',
+  },
+  {
+    title: 'Reference Files',
+    desc:  'Drop docs that live only on this node',
+    sideEffect: () => { switchPickerTab('files'); },
+    target: { selector: '#nkpDropZone' },
+    tipText: 'Reference Files are PDFs, DOCX, notes you pin to THIS specific node. No Pack or Drive needed — perfect for one-off context like an interview transcript or a Q3 refresh memo.',
+    tipSide: 'down',
   },
 ];
 
@@ -11947,10 +12011,20 @@ function demoStop() {
   document.getElementById('demoPanel')?.classList.remove('open');
   demoClearHighlight();
   demoHideTooltip();
+  // Close any auxiliary surfaces the walkthrough may have opened so the
+  // user lands on a clean state at the end.
+  try { closeAgentConfigModal(); } catch (_) {}
 }
 
 function demoGoto(idx) {
   if (idx < 0 || idx >= demoSteps.length) return;
+  // When stepping out of the node-level steps (10–15) back into the
+  // workflow-level story (1–9), close the agent-config modal so the
+  // earlier targets in the canvas are visible again.
+  const NODE_STEPS_START = 9; // 0-indexed first node-level step
+  if (idx < NODE_STEPS_START && demoState.idx >= NODE_STEPS_START) {
+    try { closeAgentConfigModal(); } catch (_) {}
+  }
   demoState.idx = idx;
   const step = demoSteps[idx];
   demoRenderPanel();
@@ -12072,7 +12146,11 @@ function demoClearHighlight() {
 function demoShowTooltip(step) {
   const tip = document.getElementById('demoTooltip');
   if (!tip) return;
-  document.getElementById('demoTooltipLabel').textContent = step.tipLabel || '';
+  // tipLabel is computed dynamically from the current index + total step
+  // count so adding/removing steps doesn't require updating every entry.
+  const idx = demoSteps.indexOf(step);
+  const dynLabel = `Step ${idx + 1} of ${demoSteps.length}`;
+  document.getElementById('demoTooltipLabel').textContent = step.tipLabel || dynLabel;
   document.getElementById('demoTooltipText').textContent  = step.tipText  || '';
   tip.dataset.side = step.tipSide || 'down';
 
