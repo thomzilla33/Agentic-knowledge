@@ -2921,6 +2921,292 @@ body.test-mode #vTestMode{display:flex}
   display:inline-flex;align-items:center;gap:5px;
 }
 .fork-dialog-btn-primary:hover{filter:brightness(1.10);background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);color:#fff}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TOPBAR DROPDOWNS + SEARCH MODAL + KBD MODAL (A2.1)
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Search trigger — make it look interactive */
+.tb-search{cursor:pointer}
+.tb-search input{cursor:pointer;padding-right:46px}
+.tb-search-kbd{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  font-size:10px;font-weight:600;color:var(--t4);
+  background:rgba(255,255,255,0.06);border:1px solid var(--bd);
+  border-radius:5px;padding:2px 6px;letter-spacing:.04em;pointer-events:none;
+}
+.tb-search:hover input{border-color:var(--bds)}
+
+/* Anchor for unread dot on icon buttons */
+.tb-anchor{position:relative}
+.tb-dot{
+  position:absolute;top:6px;right:6px;width:7px;height:7px;
+  border-radius:50%;background:var(--err);
+  box-shadow:0 0 0 2px rgba(10,13,26,0.95);
+  display:none;
+}
+.tb-dot.on{display:block}
+
+/* Avatar button overrides */
+button.avatar-sm{border:none;padding:0;position:relative;overflow:visible}
+button.avatar-sm:hover{filter:brightness(1.08)}
+.avatar-dot{
+  position:absolute;bottom:-1px;right:-1px;
+  width:9px;height:9px;border-radius:50%;
+  background:var(--ok);
+  box-shadow:0 0 0 2px #0a0d1a;
+}
+.avatar-dot[data-status="away"]{background:var(--warn)}
+.avatar-dot[data-status="dnd"]{background:var(--err)}
+
+/* Generic topbar dropdown */
+.tb-dd{
+  position:fixed;z-index:8500;
+  background:rgba(19,25,41,0.96);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:12px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);
+  backdrop-filter:blur(20px) saturate(1.6);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  opacity:0;transform:translateY(-6px) scale(0.97);pointer-events:none;
+  transition:opacity .14s cubic-bezier(.4,0,.2,1),transform .14s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;display:flex;flex-direction:column;
+}
+.tb-dd.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+
+.tb-dd-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;
+}
+.tb-dd-title{font-size:12px;font-weight:700;color:var(--t1);letter-spacing:.01em}
+.tb-dd-link{
+  background:none;border:none;color:var(--pri);font-size:11px;font-weight:600;
+  cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .1s;
+}
+.tb-dd-link:hover{background:rgba(43,127,255,0.10)}
+
+.tb-dd-body{flex:1;overflow-y:auto;padding:4px 0}
+
+.tb-dd-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+  transition:background .1s;color:var(--t1);
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.tb-dd-row:last-child{border-bottom:none}
+.tb-dd-row:hover{background:rgba(255,255,255,0.05)}
+.tb-dd-row-ico{
+  width:24px;height:24px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:11px;
+}
+.tb-dd-row-ico.sev-urgent{background:rgba(239,68,68,0.15);color:var(--err)}
+.tb-dd-row-ico.sev-warning{background:rgba(245,158,11,0.15);color:var(--warn)}
+.tb-dd-row-ico.sev-info{background:rgba(43,127,255,0.15);color:var(--pri)}
+.tb-dd-row-ico.sev-success{background:rgba(34,197,94,0.15);color:var(--ok)}
+.tb-dd-row-body{flex:1;min-width:0}
+.tb-dd-row-title{
+  font-size:12px;font-weight:600;color:var(--t1);
+  line-height:1.35;margin-bottom:2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.tb-dd-row-sub{font-size:10.5px;color:var(--t4)}
+.tb-dd-row-arrow{
+  opacity:0;color:var(--t3);font-size:13px;flex-shrink:0;
+  transition:opacity .12s,transform .12s;
+}
+.tb-dd-row:hover .tb-dd-row-arrow{opacity:1;transform:translateX(2px)}
+
+/* Activity dropdown specifics */
+.tb-dd-row-meta{font-size:10.5px;color:var(--t4);margin-top:2px}
+.tb-dd-row-meta .env-prod{color:#22c55e}
+.tb-dd-row-meta .env-sand{color:#f59e0b}
+
+/* Settings + Avatar menu items */
+.tb-mi{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:8px 14px;cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+  font-size:12px;color:var(--t1);font-weight:500;
+  transition:background .1s;
+}
+.tb-mi:hover{background:rgba(255,255,255,0.06)}
+.tb-mi-l{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.tb-mi-ico{width:14px;height:14px;color:var(--t3);flex-shrink:0}
+.tb-mi-r{font-size:11px;color:var(--t4);display:flex;align-items:center;gap:6px}
+.tb-mi-chevron{color:var(--t4)}
+.tb-mi-danger{color:var(--err)}
+.tb-mi-danger:hover{background:rgba(239,68,68,0.10)}
+.tb-mi-danger .tb-mi-ico{color:var(--err)}
+.tb-mi-sep{height:1px;background:rgba(255,255,255,0.06);margin:6px 0}
+
+/* Avatar menu header */
+.tb-avatar-hd{
+  display:flex;align-items:center;gap:11px;
+  padding:14px;border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.tb-avatar-hd-lg{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,#155DFC,#00C2C2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;flex-shrink:0;
+  position:relative;
+}
+.tb-avatar-hd-lg .avatar-dot{width:11px;height:11px;bottom:0;right:0;box-shadow:0 0 0 2.5px #131929}
+.tb-avatar-hd-info{flex:1;min-width:0}
+.tb-avatar-hd-name{font-size:13px;font-weight:700;color:var(--t1)}
+.tb-avatar-hd-email{font-size:11px;color:var(--t3);margin-top:1px}
+
+/* Workspace switcher (inline expand) */
+.tb-ws-list{padding:4px 0;background:rgba(0,0,0,0.18);border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04)}
+.tb-ws-item{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 14px 7px 36px;cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+  font-size:12px;color:var(--t2);transition:background .1s;
+}
+.tb-ws-item:hover{background:rgba(255,255,255,0.05);color:var(--t1)}
+.tb-ws-item.active{color:var(--t1)}
+.tb-ws-item-ico{
+  width:20px;height:20px;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.tb-ws-item-name{flex:1}
+.tb-ws-item-check{color:var(--ok);font-size:13px;font-weight:700}
+.tb-ws-item-active-label{font-size:10px;color:var(--t4);font-weight:600}
+
+/* ─── Search Modal ─── */
+.search-modal-ov{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;align-items:flex-start;justify-content:center;
+  padding-top:12vh;
+}
+.search-modal-ov.open{display:flex}
+.search-modal{
+  width:640px;max-width:92vw;height:480px;max-height:75vh;
+  background:rgba(19,25,41,0.97);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:14px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.04);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:searchModalIn .18s cubic-bezier(.4,0,.2,1);
+}
+@keyframes searchModalIn{
+  from{opacity:0;transform:translateY(-12px) scale(0.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.search-modal-hd{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;
+}
+.search-modal-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--t1);font-size:15px;font-weight:500;
+}
+.search-modal-input::placeholder{color:var(--t4)}
+.search-modal-esc{
+  font-size:10px;font-weight:600;color:var(--t4);
+  background:rgba(255,255,255,0.06);border:1px solid var(--bd);
+  border-radius:5px;padding:3px 7px;letter-spacing:.04em;flex-shrink:0;
+}
+.search-modal-tabs{
+  display:flex;gap:2px;padding:8px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;
+}
+.search-tab{
+  height:26px;padding:0 11px;border-radius:6px;border:none;
+  background:transparent;color:var(--t3);
+  font-size:11.5px;font-weight:600;cursor:pointer;
+  transition:all .1s;
+}
+.search-tab:hover{background:rgba(255,255,255,0.05);color:var(--t2)}
+.search-tab.active{background:rgba(255,255,255,0.09);color:var(--t1)}
+.search-modal-results{
+  flex:1;overflow-y:auto;padding:6px 0;
+}
+.search-result{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 16px;cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+  transition:background .1s;color:var(--t1);
+}
+.search-result:hover,.search-result.kbd-focus{background:rgba(43,127,255,0.10)}
+.search-result-ico{
+  width:30px;height:30px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.search-result-ico.cat-workflows{background:linear-gradient(135deg,#155DFC,#00C2C2)}
+.search-result-ico.cat-agents{background:linear-gradient(135deg,#A78BFA,#6366F1)}
+.search-result-ico.cat-knowledge{background:linear-gradient(135deg,#10B981,#059669)}
+.search-result-ico.cat-files{background:linear-gradient(135deg,#F59E0B,#F97316)}
+.search-result-body{flex:1;min-width:0}
+.search-result-name{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-result-sub{font-size:11px;color:var(--t4);margin-top:1px}
+.search-result-cat{
+  font-size:9.5px;font-weight:700;color:var(--t4);
+  text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 7px;border-radius:4px;
+  background:rgba(255,255,255,0.05);
+  flex-shrink:0;
+}
+.search-empty{
+  padding:40px 20px;text-align:center;color:var(--t3);font-size:12px;
+}
+.search-section-hd{
+  padding:8px 16px 4px;font-size:10px;font-weight:700;
+  color:var(--t4);text-transform:uppercase;letter-spacing:.06em;
+}
+
+/* ─── Keyboard Shortcuts Modal ─── */
+.kbd-modal-ov{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+}
+.kbd-modal-ov.open{display:flex}
+.kbd-modal{
+  width:440px;max-width:92vw;
+  background:rgba(19,25,41,0.97);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:12px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.7);
+  overflow:hidden;
+  animation:searchModalIn .18s cubic-bezier(.4,0,.2,1);
+}
+.kbd-modal-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.kbd-modal-title{font-size:13px;font-weight:700;color:var(--t1)}
+.kbd-modal-close{
+  background:none;border:none;color:var(--t3);
+  width:24px;height:24px;border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;transition:background .1s,color .1s;
+}
+.kbd-modal-close:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+.kbd-modal-body{padding:10px 0}
+.kbd-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 18px;font-size:12px;color:var(--t2);
+}
+.kbd-keys{display:flex;gap:4px}
+.kbd-row kbd{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:22px;padding:0 6px;
+  background:rgba(255,255,255,0.06);border:1px solid var(--bd);
+  border-radius:5px;font-size:10.5px;font-weight:600;color:var(--t1);
+  font-family:inherit;
+}
 </style>
 </head>
 <body>
@@ -3031,9 +3317,10 @@ body.test-mode #vTestMode{display:flex}
       </button>
     </div>
     <!-- Center: global search -->
-    <div class="tb-search">
+    <div class="tb-search" id="tbSearchTrigger" onclick="openSearchModal()">
       <svg class="tb-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-      <input placeholder="Search in AIMS-OS Platform..." />
+      <input placeholder="Search in AIMS-OS Platform..." readonly />
+      <span class="tb-search-kbd">⌘K</span>
     </div>
     <!-- Right: actions + avatar -->
     <div class="tb-right">
@@ -3041,10 +3328,63 @@ body.test-mode #vTestMode{display:flex}
         <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
         <span id="demoStartLabel">Start demo</span>
       </button>
-      <button class="icon-btn" title="Notifications"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-      <button class="icon-btn" title="Activity"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 6v2l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-      <button class="icon-btn" title="Settings"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-      <div class="avatar-sm">JJ</div>
+      <button class="icon-btn tb-anchor" id="notifBtn" title="Notifications" onclick="toggleNotifs(event)" aria-haspopup="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span class="tb-dot" id="notifDot"></span>
+      </button>
+      <button class="icon-btn tb-anchor" id="activityBtn" title="Activity" onclick="toggleActivity(event)" aria-haspopup="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 6v2l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn tb-anchor" id="settingsBtn" title="Settings" onclick="toggleSettings(event)" aria-haspopup="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+      <button class="avatar-sm tb-anchor" id="avatarBtn" type="button" onclick="toggleAvatar(event)" aria-haspopup="true">
+        JJ
+        <span class="avatar-dot" id="avatarDot" data-status="active"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════ TOPBAR DROPDOWNS ════ -->
+  <div class="tb-dd" id="ddNotifs" role="menu"></div>
+  <div class="tb-dd" id="ddActivity" role="menu"></div>
+  <div class="tb-dd" id="ddSettings" role="menu"></div>
+  <div class="tb-dd" id="ddAvatar" role="menu"></div>
+
+  <!-- ════ GLOBAL SEARCH MODAL ════ -->
+  <div class="search-modal-ov" id="searchModalOv" onclick="onSearchOvClick(event)">
+    <div class="search-modal" role="dialog" aria-label="Global search">
+      <div class="search-modal-hd">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--t3);flex-shrink:0"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <input id="searchModalInput" class="search-modal-input" placeholder="Search workflows, agents, knowledge, files..." oninput="renderSearchResults()" />
+        <span class="search-modal-esc">ESC</span>
+      </div>
+      <div class="search-modal-tabs" id="searchModalTabs">
+        <button class="search-tab active" data-cat="all" onclick="setSearchCat('all')">All</button>
+        <button class="search-tab" data-cat="workflows" onclick="setSearchCat('workflows')">Workflows</button>
+        <button class="search-tab" data-cat="agents" onclick="setSearchCat('agents')">Agents</button>
+        <button class="search-tab" data-cat="knowledge" onclick="setSearchCat('knowledge')">Knowledge</button>
+        <button class="search-tab" data-cat="files" onclick="setSearchCat('files')">Files</button>
+      </div>
+      <div class="search-modal-results" id="searchModalResults"></div>
+    </div>
+  </div>
+
+  <!-- ════ KEYBOARD SHORTCUTS MODAL ════ -->
+  <div class="kbd-modal-ov" id="kbdModalOv" onclick="onKbdOvClick(event)">
+    <div class="kbd-modal" role="dialog" aria-label="Keyboard shortcuts">
+      <div class="kbd-modal-hd">
+        <span class="kbd-modal-title">Keyboard shortcuts</span>
+        <button class="kbd-modal-close" onclick="closeKbdModal()" aria-label="Close">×</button>
+      </div>
+      <div class="kbd-modal-body">
+        <div class="kbd-row"><span>Open global search</span><span class="kbd-keys"><kbd>⌘</kbd><kbd>K</kbd></span></div>
+        <div class="kbd-row"><span>Go to Networks</span><span class="kbd-keys"><kbd>G</kbd><kbd>N</kbd></span></div>
+        <div class="kbd-row"><span>Go to Knowledge</span><span class="kbd-keys"><kbd>G</kbd><kbd>K</kbd></span></div>
+        <div class="kbd-row"><span>Go to Playbooks</span><span class="kbd-keys"><kbd>G</kbd><kbd>P</kbd></span></div>
+        <div class="kbd-row"><span>Toggle sidebar</span><span class="kbd-keys"><kbd>⌘</kbd><kbd>/</kbd></span></div>
+        <div class="kbd-row"><span>Close panel / modal</span><span class="kbd-keys"><kbd>Esc</kbd></span></div>
+      </div>
     </div>
   </div>
 
@@ -12315,6 +12655,580 @@ window.addEventListener('scroll', () => {
 
 // ── INIT ──
 renderList();
+
+// ════════════════════════════════════════════════════════════════════════════
+// TOPBAR FUNCTIONAL SURFACES (A2.1)
+// ────────────────────────────────────────────────────────────────────────────
+// 1. Cmd/Ctrl+K global search modal
+// 2. Notifications dropdown (bell)
+// 3. Activity dropdown (clock)
+// 4. Settings dropdown (gear)
+// 5. Avatar account menu (JJ)
+// Shared infra: closeAllTopbarDropdowns(), single outside-click handler,
+// single keydown handler for ESC + Cmd/Ctrl+K.
+// ════════════════════════════════════════════════════════════════════════════
+
+// ───── Mock data ─────────────────────────────────────────────────────────
+const TB_SEARCH_DATA = {
+  workflows: [
+    { name:'Customer Renewal Pipeline', sub:'Workflow · Production · v2.4' },
+    { name:'Outbound Prospecting Engine', sub:'Workflow · Production · v3.1' },
+    { name:'Churn Risk Intervention', sub:'Workflow · Sandbox · v1.7' },
+    { name:'Invoice & Collections Flow', sub:'Workflow · Sandbox · v2.0' },
+    { name:'Lead Nurture Automation', sub:'Workflow · Production · v1.3' },
+  ],
+  agents: [
+    { name:'Customer Analyst', sub:'Agent · owned by JJ · updated 2d ago' },
+    { name:'Response Generator', sub:'Agent · owned by Lisa A. · updated 5h ago' },
+    { name:'Lead Qualifier', sub:'Agent · owned by JJ · updated 1w ago' },
+    { name:'Account Researcher', sub:'Agent · owned by Mike R. · updated 3d ago' },
+    { name:'Document Reader', sub:'Agent · owned by team-ops · updated 4d ago' },
+    { name:'Email Composer', sub:'Agent · owned by JJ · updated 6h ago' },
+    { name:'Risk Analyzer', sub:'Agent · owned by Mike R. · updated 2w ago' },
+    { name:'Compliance Reviewer', sub:'Agent · owned by Lisa A. · updated 1d ago' },
+  ],
+  knowledge: [
+    { name:'Sales Playbook Facts (KP-003)', sub:'Knowledge Pack · Production · attested' },
+    { name:'GDPR Compliance Pack (KP-002)', sub:'Knowledge Pack · Production · attested' },
+    { name:'Vendor SLA Registry (KP-004)', sub:'Knowledge Pack · Sandbox · draft' },
+    { name:'Enterprise Contract Pack (KP-005)', sub:'Knowledge Pack · Production · attested' },
+    { name:'Quick Pricing Reference (KP-006)', sub:'Knowledge Pack · Sandbox · draft' },
+  ],
+  files: [
+    { name:'Q3-2026 ICP refresh notes.pdf', sub:'File · uploaded 1d ago · 2.4 MB' },
+    { name:'Customer interview transcript.docx', sub:'File · uploaded 3d ago · 88 KB' },
+    { name:'Pricing matrix v3.xlsx', sub:'File · uploaded 1w ago · 32 KB' },
+    { name:'Onboarding playbook.md', sub:'File · uploaded 2w ago · 14 KB' },
+  ],
+};
+
+const TB_NOTIFS = [
+  { sev:'urgent',  icon:'●', title:'Customer Renewal Pipeline HALTED — TF-0012 attestation overdue', time:'12 min ago' },
+  { sev:'warning', icon:'!', title:'Re-attestation due in 7 days for GDPR Compliance Pack (KP-002)', time:'2 hours ago' },
+  { sev:'info',    icon:'⤴', title:'Customer Analyst was forked by Lisa Anderson → "Customer Analyst — EU Refined"', time:'4 hours ago' },
+  { sev:'success', icon:'✓', title:'Sales Playbook Facts (KP-003) attested and promoted to Production', time:'yesterday' },
+  { sev:'info',    icon:'＋', title:'New Knowledge Drive "Customer Success" added — 18 documents indexed', time:'2 days ago' },
+  { sev:'warning', icon:'!', title:'Vendor SLA Registry (KP-004) still in draft for 14 days', time:'3 days ago' },
+];
+
+const TB_ACTIVITY = [
+  { status:'ok',   name:'Customer Renewal Pipeline',  ver:'v2.4', dur:'1m 42s', env:'Production', note:'', time:'2 min ago' },
+  { status:'err',  name:'Churn Risk Intervention',    ver:'v1.7', dur:'23s',    env:'Sandbox',    note:'halted at governance gate', time:'18 min ago' },
+  { status:'ok',   name:'Outbound Prospecting Engine',ver:'v3.1', dur:'3m 02s', env:'Production', note:'', time:'1 hour ago' },
+  { status:'ok',   name:'Customer Renewal Pipeline',  ver:'v2.4', dur:'1m 38s', env:'Production', note:'', time:'2 hours ago' },
+  { status:'warn', name:'Invoice & Collections Flow', ver:'v2.0', dur:'45s',    env:'Sandbox',    note:'with warnings', time:'3 hours ago' },
+];
+
+const TB_WORKSPACES = [
+  { id:'aims',   name:'AIMS Internal', initials:'AI', color:'linear-gradient(135deg,#155DFC,#00C2C2)', active:true  },
+  { id:'acme',   name:'AcmeCorp',      initials:'AC', color:'linear-gradient(135deg,#F59E0B,#F97316)', active:false },
+  { id:'stripe', name:'Stripe',        initials:'ST', color:'linear-gradient(135deg,#635BFF,#A78BFA)', active:false },
+];
+
+// ───── State ─────────────────────────────────────────────────────────────
+let _tbState = {
+  notifsUnread: true,
+  searchCat: 'all',
+  searchQ: '',
+  avatarStatus: 'active',     // active | away | dnd
+  themeMode: 'dark',           // dark | light
+  wsExpanded: false,
+  activeWs: 'aims',
+};
+
+// ───── Shared close ──────────────────────────────────────────────────────
+function closeAllTopbarDropdowns() {
+  ['ddNotifs','ddActivity','ddSettings','ddAvatar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('open');
+  });
+}
+function closeSearchModal() {
+  const ov = document.getElementById('searchModalOv');
+  if (ov) ov.classList.remove('open');
+}
+function closeKbdModal() {
+  const ov = document.getElementById('kbdModalOv');
+  if (ov) ov.classList.remove('open');
+}
+
+// ───── Positioning ──────────────────────────────────────────────────────
+function positionDropdown(ddEl, anchorEl, width) {
+  const r = anchorEl.getBoundingClientRect();
+  const w = width || ddEl.offsetWidth || 320;
+  let left = r.right - w;     // align right edge to anchor right
+  if (left < 8) left = 8;
+  if (left + w > window.innerWidth - 8) left = window.innerWidth - w - 8;
+  const top = r.bottom + 6;
+  ddEl.style.top = `${top}px`;
+  ddEl.style.left = `${left}px`;
+  ddEl.style.width = `${w}px`;
+}
+
+// ───── Notifications ────────────────────────────────────────────────────
+function renderNotifs() {
+  const el = document.getElementById('ddNotifs');
+  const rowsHtml = TB_NOTIFS.map((n, i) => `
+    <button class="tb-dd-row" onclick="onNotifClick(${i})">
+      <span class="tb-dd-row-ico sev-${n.sev}">${n.icon}</span>
+      <span class="tb-dd-row-body">
+        <span class="tb-dd-row-title">${escapeHtmlTb(n.title)}</span>
+        <span class="tb-dd-row-sub">${escapeHtmlTb(n.time)}</span>
+      </span>
+      <span class="tb-dd-row-arrow">→</span>
+    </button>`).join('');
+  el.style.maxHeight = '440px';
+  el.innerHTML = `
+    <div class="tb-dd-hd">
+      <span class="tb-dd-title">Notifications</span>
+      <button class="tb-dd-link" onclick="markAllNotifsRead(event)">Mark all read</button>
+    </div>
+    <div class="tb-dd-body">${rowsHtml}</div>`;
+}
+function toggleNotifs(e) {
+  e && e.stopPropagation();
+  const dd = document.getElementById('ddNotifs');
+  const wasOpen = dd.classList.contains('open');
+  closeAllTopbarDropdowns();
+  if (!wasOpen) {
+    renderNotifs();
+    positionDropdown(dd, document.getElementById('notifBtn'), 340);
+    dd.classList.add('open');
+  }
+}
+function onNotifClick(i) {
+  toast('Opening notification', 'info');
+  closeAllTopbarDropdowns();
+}
+function markAllNotifsRead(e) {
+  e && e.stopPropagation();
+  _tbState.notifsUnread = false;
+  document.getElementById('notifDot').classList.remove('on');
+  toast('All notifications marked as read', 'success');
+  closeAllTopbarDropdowns();
+}
+
+// ───── Activity ─────────────────────────────────────────────────────────
+function renderActivity() {
+  const el = document.getElementById('ddActivity');
+  const statusIco = {
+    ok:   { ch:'✓', cls:'sev-success' },
+    err:  { ch:'✕', cls:'sev-urgent'  },
+    warn: { ch:'!', cls:'sev-warning' },
+  };
+  const rowsHtml = TB_ACTIVITY.map((a, i) => {
+    const s = statusIco[a.status];
+    const envCls = a.env === 'Production' ? 'env-prod' : 'env-sand';
+    const noteStr = a.note ? ` · ${escapeHtmlTb(a.note)}` : '';
+    return `
+    <button class="tb-dd-row" onclick="onActivityClick(${i})">
+      <span class="tb-dd-row-ico ${s.cls}">${s.ch}</span>
+      <span class="tb-dd-row-body">
+        <span class="tb-dd-row-title">${escapeHtmlTb(a.name)}</span>
+        <span class="tb-dd-row-meta">${escapeHtmlTb(a.ver)} · ${escapeHtmlTb(a.dur)} · <span class="${envCls}">${escapeHtmlTb(a.env)}</span>${noteStr}</span>
+        <span class="tb-dd-row-sub">${escapeHtmlTb(a.time)}</span>
+      </span>
+      <span class="tb-dd-row-arrow">→</span>
+    </button>`;
+  }).join('');
+  el.style.maxHeight = '440px';
+  el.innerHTML = `
+    <div class="tb-dd-hd">
+      <span class="tb-dd-title">Recent activity</span>
+      <button class="tb-dd-link" onclick="onActivityViewAll(event)">View full audit log</button>
+    </div>
+    <div class="tb-dd-body">${rowsHtml}</div>`;
+}
+function toggleActivity(e) {
+  e && e.stopPropagation();
+  const dd = document.getElementById('ddActivity');
+  const wasOpen = dd.classList.contains('open');
+  closeAllTopbarDropdowns();
+  if (!wasOpen) {
+    renderActivity();
+    positionDropdown(dd, document.getElementById('activityBtn'), 360);
+    dd.classList.add('open');
+  }
+}
+function onActivityClick(i) {
+  toast('Opening run trace', 'info');
+  closeAllTopbarDropdowns();
+}
+function onActivityViewAll(e) {
+  e && e.stopPropagation();
+  toast('Opening full audit log', 'info');
+  closeAllTopbarDropdowns();
+}
+
+// ───── Settings ─────────────────────────────────────────────────────────
+function renderSettings() {
+  const el = document.getElementById('ddSettings');
+  const themeLabel = _tbState.themeMode === 'dark' ? 'Dark' : 'Light';
+  el.innerHTML = `
+    <div class="tb-dd-hd"><span class="tb-dd-title">Settings</span></div>
+    <div class="tb-dd-body" style="padding:6px 0">
+      <button class="tb-mi" onclick="onSettingsTheme(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.5 3.5l1 1M11.5 11.5l1 1M3.5 12.5l1-1M11.5 4.5l1-1"/></svg>
+          <span>Theme</span>
+        </span>
+        <span class="tb-mi-r">${themeLabel} <span class="tb-mi-chevron">›</span></span>
+      </button>
+      <button class="tb-mi" onclick="onSettingsKbd(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 7h.01M6.5 7h.01M9 7h.01M11.5 7h.01M4.5 9.5h7"/></svg>
+          <span>Keyboard shortcuts</span>
+        </span>
+        <span class="tb-mi-r"><span class="tb-mi-chevron">›</span></span>
+      </button>
+      <button class="tb-mi" onclick="onSettingsApiKeys(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="11" r="2.5"/><path d="M7 10l6-6M11 6l1.5 1.5M9.5 7.5l1 1"/></svg>
+          <span>API keys</span>
+        </span>
+      </button>
+      <button class="tb-mi" onclick="onSettingsWorkspace(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3.5" width="12" height="9" rx="1.5"/><path d="M2 6.5h12M5 3.5V2.5M11 3.5V2.5"/></svg>
+          <span>Workspace settings</span>
+        </span>
+      </button>
+      <button class="tb-mi" onclick="onSettingsHelp(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 .5c0 1-1.5 1-1.5 2M8 11.5h.01"/></svg>
+          <span>Help &amp; docs</span>
+        </span>
+      </button>
+      <div class="tb-mi-sep"></div>
+      <button class="tb-mi tb-mi-danger" onclick="onSettingsSignOut(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14H3.5A1.5 1.5 0 012 12.5v-9A1.5 1.5 0 013.5 2H6M10.5 11l3-3-3-3M13.5 8H6"/></svg>
+          <span>Sign out</span>
+        </span>
+      </button>
+    </div>`;
+}
+function toggleSettings(e) {
+  e && e.stopPropagation();
+  const dd = document.getElementById('ddSettings');
+  const wasOpen = dd.classList.contains('open');
+  closeAllTopbarDropdowns();
+  if (!wasOpen) {
+    renderSettings();
+    positionDropdown(dd, document.getElementById('settingsBtn'), 260);
+    dd.classList.add('open');
+  }
+}
+function onSettingsTheme(e) {
+  e && e.stopPropagation();
+  _tbState.themeMode = _tbState.themeMode === 'dark' ? 'light' : 'dark';
+  toast(`Theme set to ${_tbState.themeMode === 'dark' ? 'Dark' : 'Light'}`, 'info');
+  renderSettings();
+}
+function onSettingsKbd(e) {
+  e && e.stopPropagation();
+  closeAllTopbarDropdowns();
+  document.getElementById('kbdModalOv').classList.add('open');
+}
+function onSettingsApiKeys(e) {
+  e && e.stopPropagation();
+  toast('API keys management coming in v2', 'info');
+  closeAllTopbarDropdowns();
+}
+function onSettingsWorkspace(e) {
+  e && e.stopPropagation();
+  toast('Workspace settings coming soon', 'info');
+  closeAllTopbarDropdowns();
+}
+function onSettingsHelp(e) {
+  e && e.stopPropagation();
+  toast('Opening docs', 'info');
+  closeAllTopbarDropdowns();
+}
+function onSettingsSignOut(e) {
+  e && e.stopPropagation();
+  toast('Signed out (demo)', 'default');
+  closeAllTopbarDropdowns();
+}
+
+// ───── Avatar account menu ─────────────────────────────────────────────
+function renderAvatar() {
+  const el = document.getElementById('ddAvatar');
+  const statusLabel = { active:'Active', away:'Away', dnd:'Do not disturb' }[_tbState.avatarStatus];
+  const statusColor = { active:'var(--ok)', away:'var(--warn)', dnd:'var(--err)' }[_tbState.avatarStatus];
+  const themeLabel = _tbState.themeMode === 'dark' ? 'Dark' : 'Light';
+  const wsHtml = _tbState.wsExpanded ? `
+    <div class="tb-ws-list">
+      ${TB_WORKSPACES.map(w => `
+        <button class="tb-ws-item ${w.id === _tbState.activeWs ? 'active' : ''}" onclick="onAvatarPickWs('${w.id}', event)">
+          <span class="tb-ws-item-ico" style="background:${w.color}">${w.initials}</span>
+          <span class="tb-ws-item-name">${escapeHtmlTb(w.name)}</span>
+          ${w.id === _tbState.activeWs
+            ? `<span class="tb-ws-item-active-label">active</span><span class="tb-ws-item-check">✓</span>`
+            : ``}
+        </button>`).join('')}
+    </div>` : '';
+  el.innerHTML = `
+    <div class="tb-avatar-hd">
+      <div class="tb-avatar-hd-lg">JJ<span class="avatar-dot" data-status="${_tbState.avatarStatus}"></span></div>
+      <div class="tb-avatar-hd-info">
+        <div class="tb-avatar-hd-name">JJ</div>
+        <div class="tb-avatar-hd-email">jj@aimsos.ai</div>
+      </div>
+    </div>
+    <div class="tb-dd-body" style="padding:6px 0">
+      <button class="tb-mi" onclick="onAvatarToggleWs(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5l3-3 3 3M5 2v8M14 11l-3 3-3-3M11 14V6"/></svg>
+          <span>Switch workspace</span>
+        </span>
+        <span class="tb-mi-r"><span class="tb-mi-chevron">${_tbState.wsExpanded ? '▾' : '›'}</span></span>
+      </button>
+      ${wsHtml}
+      <button class="tb-mi" onclick="onAvatarCycleStatus(event)">
+        <span class="tb-mi-l">
+          <span class="tb-mi-ico" style="display:flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border-radius:50%;background:${statusColor};box-shadow:0 0 0 2px rgba(255,255,255,0.05)"></span></span>
+          <span>Status: ${statusLabel}</span>
+        </span>
+        <span class="tb-mi-r"><span class="tb-mi-chevron">↻</span></span>
+      </button>
+      <button class="tb-mi" onclick="onAvatarProfile(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5c0-2.5 2.3-4 5-4s5 1.5 5 4"/></svg>
+          <span>Profile</span>
+        </span>
+      </button>
+      <button class="tb-mi" onclick="onAvatarSupport(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 .5c0 1-1.5 1-1.5 2M8 11.5h.01"/></svg>
+          <span>Help &amp; support</span>
+        </span>
+      </button>
+      <button class="tb-mi" onclick="onAvatarTheme(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 9.5A5.5 5.5 0 016.5 3a5.5 5.5 0 106.5 6.5z"/></svg>
+          <span>Theme</span>
+        </span>
+        <span class="tb-mi-r">${themeLabel}</span>
+      </button>
+      <div class="tb-mi-sep"></div>
+      <button class="tb-mi tb-mi-danger" onclick="onAvatarSignOut(event)">
+        <span class="tb-mi-l">
+          <svg class="tb-mi-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14H3.5A1.5 1.5 0 012 12.5v-9A1.5 1.5 0 013.5 2H6M10.5 11l3-3-3-3M13.5 8H6"/></svg>
+          <span>Sign out</span>
+        </span>
+      </button>
+    </div>`;
+}
+function toggleAvatar(e) {
+  e && e.stopPropagation();
+  const dd = document.getElementById('ddAvatar');
+  const wasOpen = dd.classList.contains('open');
+  closeAllTopbarDropdowns();
+  if (!wasOpen) {
+    _tbState.wsExpanded = false;
+    renderAvatar();
+    positionDropdown(dd, document.getElementById('avatarBtn'), 300);
+    dd.classList.add('open');
+  }
+}
+function onAvatarToggleWs(e) {
+  e && e.stopPropagation();
+  _tbState.wsExpanded = !_tbState.wsExpanded;
+  renderAvatar();
+}
+function onAvatarPickWs(id, e) {
+  e && e.stopPropagation();
+  const w = TB_WORKSPACES.find(x => x.id === id);
+  _tbState.activeWs = id;
+  TB_WORKSPACES.forEach(x => x.active = (x.id === id));
+  toast(`Switched to ${w ? w.name : id} workspace`, 'success');
+  closeAllTopbarDropdowns();
+}
+function onAvatarCycleStatus(e) {
+  e && e.stopPropagation();
+  const order = ['active','away','dnd'];
+  const next = order[(order.indexOf(_tbState.avatarStatus) + 1) % order.length];
+  _tbState.avatarStatus = next;
+  const dot = document.getElementById('avatarDot');
+  if (dot) dot.setAttribute('data-status', next);
+  renderAvatar();
+}
+function onAvatarProfile(e) {
+  e && e.stopPropagation();
+  toast('Opening profile', 'info');
+  closeAllTopbarDropdowns();
+}
+function onAvatarSupport(e) {
+  e && e.stopPropagation();
+  toast('Opening support', 'info');
+  closeAllTopbarDropdowns();
+}
+function onAvatarTheme(e) {
+  e && e.stopPropagation();
+  _tbState.themeMode = _tbState.themeMode === 'dark' ? 'light' : 'dark';
+  toast(`Theme set to ${_tbState.themeMode === 'dark' ? 'Dark' : 'Light'}`, 'info');
+  renderAvatar();
+}
+function onAvatarSignOut(e) {
+  e && e.stopPropagation();
+  toast('Signed out (demo)', 'default');
+  closeAllTopbarDropdowns();
+}
+
+// ───── Global search modal ──────────────────────────────────────────────
+function openSearchModal() {
+  closeAllTopbarDropdowns();
+  const ov = document.getElementById('searchModalOv');
+  ov.classList.add('open');
+  _tbState.searchQ = '';
+  _tbState.searchCat = 'all';
+  const input = document.getElementById('searchModalInput');
+  input.value = '';
+  setSearchCat('all', true);
+  renderSearchResults();
+  setTimeout(() => input.focus(), 40);
+}
+function onSearchOvClick(e) {
+  if (e.target.id === 'searchModalOv') closeSearchModal();
+}
+function onKbdOvClick(e) {
+  if (e.target.id === 'kbdModalOv') closeKbdModal();
+}
+function setSearchCat(cat, silent) {
+  _tbState.searchCat = cat;
+  document.querySelectorAll('#searchModalTabs .search-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === cat);
+  });
+  if (!silent) renderSearchResults();
+}
+function renderSearchResults() {
+  const q = document.getElementById('searchModalInput').value.trim().toLowerCase();
+  _tbState.searchQ = q;
+  const cat = _tbState.searchCat;
+  const allCats = ['workflows','agents','knowledge','files'];
+  const cats = cat === 'all' ? allCats : [cat];
+  const results = [];
+  cats.forEach(c => {
+    TB_SEARCH_DATA[c].forEach(item => {
+      if (!q || item.name.toLowerCase().includes(q) || item.sub.toLowerCase().includes(q)) {
+        results.push({ ...item, cat:c });
+      }
+    });
+  });
+  const el = document.getElementById('searchModalResults');
+  if (results.length === 0) {
+    el.innerHTML = `<div class="search-empty">No results for "${escapeHtmlTb(q)}"</div>`;
+    return;
+  }
+  const showHeading = (!q) && cat === 'all';
+  el.innerHTML = (showHeading ? `<div class="search-section-hd">Recent</div>` : '') +
+    results.slice(0, 30).map(r => {
+      const initials = r.name.replace(/[^A-Za-z0-9 ]/g,'').split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '·';
+      const catLabel = r.cat[0].toUpperCase() + r.cat.slice(1);
+      return `
+        <button class="search-result" onclick="onSearchPick('${escapeAttrTb(r.name)}')">
+          <span class="search-result-ico cat-${r.cat}">${initials}</span>
+          <span class="search-result-body">
+            <span class="search-result-name">${highlightMatchTb(r.name, q)}</span>
+            <span class="search-result-sub">${highlightMatchTb(r.sub, q)}</span>
+          </span>
+          <span class="search-result-cat">${catLabel}</span>
+        </button>`;
+    }).join('');
+}
+function onSearchPick(name) {
+  toast(`Opening: ${name}`, 'info');
+  closeSearchModal();
+}
+
+// ───── Helpers ──────────────────────────────────────────────────────────
+function escapeHtmlTb(s) {
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function escapeAttrTb(s) {
+  return escapeHtmlTb(s).replace(/'/g,'&#39;');
+}
+function highlightMatchTb(text, q) {
+  const safe = escapeHtmlTb(text);
+  if (!q) return safe;
+  const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'ig');
+  return safe.replace(re, '<mark style="background:rgba(43,127,255,0.25);color:#fff;border-radius:2px;padding:0 1px">$1</mark>');
+}
+
+// ───── Global listeners ─────────────────────────────────────────────────
+document.addEventListener('click', (e) => {
+  // Close any open topbar dropdown if click is outside the dropdown AND outside its trigger
+  const openDds = [
+    { id:'ddNotifs',   anchor:'notifBtn' },
+    { id:'ddActivity', anchor:'activityBtn' },
+    { id:'ddSettings', anchor:'settingsBtn' },
+    { id:'ddAvatar',   anchor:'avatarBtn' },
+  ];
+  openDds.forEach(({ id, anchor }) => {
+    const dd = document.getElementById(id);
+    const an = document.getElementById(anchor);
+    if (dd && dd.classList.contains('open')) {
+      if (!dd.contains(e.target) && (!an || !an.contains(e.target))) {
+        dd.classList.remove('open');
+      }
+    }
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  // Cmd/Ctrl+K → open search modal
+  if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+    e.preventDefault();
+    openSearchModal();
+    return;
+  }
+  if (e.key === 'Escape') {
+    // Priority: search modal → kbd modal → topbar dropdowns
+    const searchOv = document.getElementById('searchModalOv');
+    if (searchOv && searchOv.classList.contains('open')) {
+      e.stopPropagation();
+      closeSearchModal();
+      return;
+    }
+    const kbdOv = document.getElementById('kbdModalOv');
+    if (kbdOv && kbdOv.classList.contains('open')) {
+      e.stopPropagation();
+      closeKbdModal();
+      return;
+    }
+    const anyDd = ['ddNotifs','ddActivity','ddSettings','ddAvatar']
+      .some(id => document.getElementById(id)?.classList.contains('open'));
+    if (anyDd) {
+      e.stopPropagation();
+      closeAllTopbarDropdowns();
+    }
+  }
+});
+
+// Reposition open dropdown on window resize
+window.addEventListener('resize', () => {
+  const map = [
+    { id:'ddNotifs',   anchor:'notifBtn',    w:340 },
+    { id:'ddActivity', anchor:'activityBtn', w:360 },
+    { id:'ddSettings', anchor:'settingsBtn', w:260 },
+    { id:'ddAvatar',   anchor:'avatarBtn',   w:300 },
+  ];
+  map.forEach(({ id, anchor, w }) => {
+    const dd = document.getElementById(id);
+    if (dd && dd.classList.contains('open')) {
+      positionDropdown(dd, document.getElementById(anchor), w);
+    }
+  });
+});
+
+// Initial state: show unread dot
+(function tbInit(){
+  const dot = document.getElementById('notifDot');
+  if (dot && _tbState.notifsUnread) dot.classList.add('on');
+})();
 </script>
 </body>
 </html>
