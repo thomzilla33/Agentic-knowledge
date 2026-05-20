@@ -2424,6 +2424,33 @@ body.test-mode #vTestMode{display:flex}
 /* Body class flips when picker mode is active */
 .agt-mod-body.is-picker-host{padding:0;background:#0a0d1a}
 
+/* ── Blast Radius badge (used in N workflows · X calls) ─────────────── */
+.blast-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:9px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.01em;line-height:1.3;
+  white-space:nowrap;flex-shrink:0;
+}
+.blast-badge .dot{
+  width:5px;height:5px;border-radius:50%;
+  background:currentColor;flex-shrink:0;
+}
+.blast-badge svg{flex-shrink:0;margin-right:-1px}
+.blast-badge.is-cold{
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  color:var(--t4);
+}
+.blast-badge.is-warm{
+  background:rgba(5,223,114,0.08);border:1px solid rgba(5,223,114,0.22);
+  color:#86efac;
+}
+.blast-badge.is-hot{
+  background:rgba(253,199,0,0.10);border:1px solid rgba(253,199,0,0.32);
+  color:#fde047;
+}
+
 /* ── Reference Files: drop zone + file rows ───────────────────────────── */
 .nkp-dropzone{
   display:flex;align-items:center;gap:12px;
@@ -7684,12 +7711,15 @@ function tabModel(a) {
 const PACK_PREVIEWS = {
   // Hand-picked sample to render in the inline list. Real implementation
   // would fetch from the same mockKnowledge source the React side uses.
-  'KP-003': { name: 'Sales Playbook Facts',     intent: 'restrict',       factsCount: 3,  status: 'active' },
-  'KP-002': { name: 'GDPR Compliance Pack',     intent: 'both',           factsCount: 2,  status: 'active' },
-  'KP-004': { name: 'Vendor SLA Registry',      intent: 'add',            factsCount: 1,  status: 'draft'  },
-  'KP-005': { name: 'Enterprise Contract Pack', intent: 'restrict',       factsCount: 6,  status: 'active' },
-  'KP-006': { name: 'Quick Pricing Reference',  intent: 'add',            factsCount: 4,  status: 'active' },
-  'KP-001': { name: 'Onboarding Knowledge',     intent: 'add',            factsCount: 5,  status: 'active' },
+  // `usage` is the BLAST RADIUS — used to visualize change risk before
+  // pushing. Per Mike: "this claim's been used 125,000 times — that's a
+  // higher-risk push than one nobody's ever touched."
+  'KP-003': { name: 'Sales Playbook Facts',     intent: 'restrict', factsCount: 3, status: 'active', usage: { workflows: 12, calls: 18420, lastUsed: '2 min ago'  } },
+  'KP-002': { name: 'GDPR Compliance Pack',     intent: 'both',     factsCount: 2, status: 'active', usage: { workflows:  8, calls:  4210, lastUsed: '1 hour ago' } },
+  'KP-004': { name: 'Vendor SLA Registry',      intent: 'add',      factsCount: 1, status: 'draft',  usage: { workflows:  0, calls:     0, lastUsed: 'never'      } },
+  'KP-005': { name: 'Enterprise Contract Pack', intent: 'restrict', factsCount: 6, status: 'active', usage: { workflows:  3, calls:   892, lastUsed: '4 hours ago'} },
+  'KP-006': { name: 'Quick Pricing Reference',  intent: 'add',      factsCount: 4, status: 'active', usage: { workflows: 24, calls: 31180, lastUsed: '12 sec ago' } },
+  'KP-001': { name: 'Onboarding Knowledge',     intent: 'add',      factsCount: 5, status: 'active', usage: { workflows:  5, calls:  1247, lastUsed: '3 hours ago'} },
 };
 const INTENT_PALETTE = {
   restrict: { bg: 'rgba(99,102,241,0.16)',  color: '#c4b5fd', label: 'RESTRICT' },
@@ -7699,15 +7729,52 @@ const INTENT_PALETTE = {
 
 // ── Source Drives mock (mirrors governance-studio's mock.js drives) ──
 // Used by the Node Knowledge Picker as a second attachable source type.
+// `usage` mirrors the PACK_PREVIEWS blast-radius shape (workflows + calls).
 const KNOWLEDGE_DRIVES = [
-  { id: 'd1', name: 'Sales Drive',       desc: 'Sales-related documents, proposals, and contracts',     owner: 'Sales',           scope: 'Company-wide', docs: 24, color: '#34d399' },
-  { id: 'd2', name: 'Marketing Drive',   desc: 'Marketing materials, campaigns, and brand assets',      owner: 'Marketing',       scope: 'Private',      docs: 24, color: '#f472b6' },
-  { id: 'd3', name: 'Engineering Drive', desc: 'Technical documentation, specifications, architecture', owner: 'Engineering',     scope: 'Private',      docs: 24, color: '#60a5fa' },
-  { id: 'd4', name: 'Product Drive',     desc: 'Product requirements, roadmaps, and feature specs',     owner: 'Product',         scope: 'Private',      docs: 24, color: '#a78bfa' },
-  { id: 'd5', name: 'HR Drive',          desc: 'Human resources policies and employee documents',       owner: 'HR',              scope: 'Private',      docs:  8, color: '#fbbf24' },
-  { id: 'd6', name: 'Customer Success',  desc: 'Case studies, support docs, customer feedback',         owner: 'Customer Success',scope: 'Company-wide', docs: 18, color: '#22d3ee' },
+  { id: 'd1', name: 'Sales Drive',       desc: 'Sales-related documents, proposals, and contracts',     owner: 'Sales',           scope: 'Company-wide', docs: 24, color: '#34d399', usage: { workflows: 18, calls: 24820, lastUsed: '8 sec ago'  } },
+  { id: 'd2', name: 'Marketing Drive',   desc: 'Marketing materials, campaigns, and brand assets',      owner: 'Marketing',       scope: 'Private',      docs: 24, color: '#f472b6', usage: { workflows:  6, calls:  3140, lastUsed: '20 min ago' } },
+  { id: 'd3', name: 'Engineering Drive', desc: 'Technical documentation, specifications, architecture', owner: 'Engineering',     scope: 'Private',      docs: 24, color: '#60a5fa', usage: { workflows:  2, calls:   148, lastUsed: '1 day ago'  } },
+  { id: 'd4', name: 'Product Drive',     desc: 'Product requirements, roadmaps, and feature specs',     owner: 'Product',         scope: 'Private',      docs: 24, color: '#a78bfa', usage: { workflows:  4, calls:   612, lastUsed: '6 hours ago'} },
+  { id: 'd5', name: 'HR Drive',          desc: 'Human resources policies and employee documents',       owner: 'HR',              scope: 'Private',      docs:  8, color: '#fbbf24', usage: { workflows:  0, calls:     0, lastUsed: 'never'      } },
+  { id: 'd6', name: 'Customer Success',  desc: 'Case studies, support docs, customer feedback',         owner: 'Customer Success',scope: 'Company-wide', docs: 18, color: '#22d3ee', usage: { workflows:  9, calls:  6730, lastUsed: '3 hours ago'} },
 ];
 function getDriveById(id) { return KNOWLEDGE_DRIVES.find(d => d.id === id) || null; }
+
+// ── Blast Radius (usage stats per knowledge source) ──
+// Per Mike: "this claim's been used 125,000 times" vs "no one's ever touched
+// it" — visualize the change risk before pushing. Heat tiers:
+//   cold = never used → safe to change
+//   warm = normal production volume → take care
+//   hot  = heavily used → push only with regression test
+function blastHeat(usage) {
+  if (!usage || !usage.calls) return 'cold';
+  if (usage.calls >= 10000) return 'hot';
+  return 'warm';
+}
+function formatCalls(n) {
+  if (!n) return '0';
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1) + 'k';
+  return n.toString();
+}
+function formatBlastBadge(usage) {
+  if (!usage) return '';
+  const heat = blastHeat(usage);
+  const wf = usage.workflows || 0;
+  const calls = usage.calls || 0;
+  // Cold state — no usage yet.
+  if (heat === 'cold') {
+    return `<span class="blast-badge is-cold" title="Never used in production yet — safe to change">
+      <span class="dot"></span>Unused
+    </span>`;
+  }
+  // Warm / hot — show the actual numbers.
+  const flameIcon = heat === 'hot'
+    ? `<svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><path d="M5 1c1 2 3 3 3 5a3 3 0 11-6 0c0-1 .5-2 1-2.5C3 4.5 4 3 5 1z"/></svg>`
+    : `<span class="dot"></span>`;
+  return `<span class="blast-badge is-${heat}" title="Used in ${wf} workflow${wf === 1 ? '' : 's'} · ${calls.toLocaleString()} production call${calls === 1 ? '' : 's'} · Last: ${usage.lastUsed || 'unknown'}">
+    ${flameIcon}${wf} wf · ${formatCalls(calls)} calls
+  </span>`;
+}
 
 // ── Reference Files (per-node uploaded documents) ──
 // Stored on node.nodeOverrides.knowledge.refFiles as full objects (not just
@@ -7864,6 +7931,7 @@ function packRowHtml(packId, source) {
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span style="font-size:12px;font-weight:700;color:var(--t1)">${p.name}</span>
         <span class="src-badge ${srcCls}">${srcLbl}</span>
+        ${formatBlastBadge(p.usage)}
       </div>
       <div style="font-size:10px;color:var(--t3);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap">
         <span style="font-family:ui-monospace,monospace">${packId}</span>
@@ -7898,9 +7966,10 @@ function tabKnowledge(a) {
     return `<div class="insp-knl-row">
       <div class="ico" style="background:${d.color}33;color:${d.color};width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px">D</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:11.5px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:5px">
+        <div style="font-size:11.5px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:5px;flex-wrap:wrap">
           ${escText(d.name)}
           <span class="src-badge ${srcCls}" style="font-size:8.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:3px;line-height:1.2">${srcLabel}</span>
+          ${formatBlastBadge(d.usage)}
         </div>
         <div style="font-size:10px;color:var(--t3);margin-top:2px">${d.docs} docs · ${escText(d.owner)} · ${d.scope}</div>
       </div>
@@ -8095,7 +8164,7 @@ function renderNodeKnowledgePicker() {
     attachedRows.push({
       kind: 'pack', id, name: p.name, sub: `${p.factsCount} fact${p.factsCount === 1 ? '' : 's'} · ${intent.label}`,
       icoBg: 'linear-gradient(135deg, rgba(167,139,250,0.30), rgba(167,139,250,0.10))', icoColor: '#c4b5fd', icoText: 'P',
-      source: src,
+      source: src, usage: p.usage,
     });
   });
   allDriveIds.forEach(id => {
@@ -8104,7 +8173,7 @@ function renderNodeKnowledgePicker() {
     attachedRows.push({
       kind: 'drive', id, name: d.name, sub: `${d.docs} docs · ${d.owner}`,
       icoBg: d.color + '33', icoColor: d.color, icoText: 'D',
-      source: src,
+      source: src, usage: d.usage,
     });
   });
   // Reference files always live at node level → always show NODE badge with
@@ -8129,7 +8198,8 @@ function renderNodeKnowledgePicker() {
           <div class="ico" style="background:${r.icoBg};color:${r.icoColor}">${r.icoText}</div>
           <div class="body">
             <div class="nm">${escText(r.name)} <span class="src-badge ${srcCls}">${srcLabel}</span></div>
-            <div class="sub">${escText(r.sub)}</div>
+            <div class="sub">${escText(r.sub)}${r.usage ? ' · ' : ''}</div>
+            ${r.usage ? `<div class="sub" style="margin-top:4px">${formatBlastBadge(r.usage)}</div>` : ''}
           </div>
           <button class="nkp-detach-btn" ${canDetach ? '' : 'disabled'}
             onclick="detachFromNodeAndRerender('${r.kind}', '${r.id}')"
@@ -8153,6 +8223,9 @@ function renderNodeKnowledgePicker() {
   );
 
   let rightItems = '';
+  // We override the pack/drive card renderers below to include the
+  // blast-radius badge — placed after the name/intent pills, before the
+  // Attach CTA, so the user sees usage volume at a glance.
   if (tab === 'files') {
     // Reference Files tab: dropzone + file list (no Attach buttons — files
     // are added by upload, removed by the × on each row).
@@ -8210,8 +8283,9 @@ function renderNodeKnowledgePicker() {
           <div class="nkp-card-nm">${escText(p.name)}
             <span class="pill" style="background:${intent.bg};color:${intent.color}">${intent.label}</span>
             ${p.status === 'draft' ? `<span class="pill" style="background:rgba(253,199,0,0.16);color:#fde047">DRAFT</span>` : ''}
+            ${formatBlastBadge(p.usage)}
           </div>
-          <div class="nkp-card-desc">${id} · ${p.factsCount} fact${p.factsCount === 1 ? '' : 's'} · ${p.status}</div>
+          <div class="nkp-card-desc">${id} · ${p.factsCount} fact${p.factsCount === 1 ? '' : 's'} · ${p.status}${p.usage && p.usage.lastUsed && p.usage.lastUsed !== 'never' ? ' · last run ' + p.usage.lastUsed : ''}</div>
         </div>
         ${isAttached
           ? `<button class="nkp-attach-btn is-attached" disabled>✓ Attached</button>`
@@ -8227,12 +8301,14 @@ function renderNodeKnowledgePicker() {
         <div class="nkp-card-body">
           <div class="nkp-card-nm">${escText(d.name)}
             <span class="pill" style="background:rgba(255,255,255,0.06);color:var(--t3)">${d.scope.toUpperCase()}</span>
+            ${formatBlastBadge(d.usage)}
           </div>
           <div class="nkp-card-desc">${escText(d.desc)}</div>
           <div class="nkp-card-meta">
             <span>${d.docs} documents</span>
             <span>·</span>
             <span>Owner: ${escText(d.owner)}</span>
+            ${d.usage && d.usage.lastUsed && d.usage.lastUsed !== 'never' ? `<span>·</span><span>last run ${d.usage.lastUsed}</span>` : ''}
           </div>
         </div>
         ${isAttached
