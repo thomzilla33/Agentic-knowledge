@@ -764,6 +764,177 @@ body{
 .lock-overlay-h{font-size:14px; font-weight:600; color:var(--t1); margin-bottom:6px}
 .lock-overlay-p{font-size:12px; color:var(--t2); margin-bottom:14px}
 
+/* Detail row — wrap on smaller screens */
+.detail-row{flex-wrap:wrap}
+.detail-meta{flex-wrap:wrap; row-gap:2px}
+.detail-actions{flex-wrap:wrap}
+
+/* mkt-card-foot — allow wrap if needed */
+.mkt-card-foot{flex-wrap:wrap; gap:6px}
+
+/* Hero stats — grid instead of flex */
+.mkt-hero-stats{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:8px 24px;
+  text-align:center;
+  max-width:640px; margin:0 auto;
+}
+.mkt-hero-stat{padding:0 4px}
+
+/* Used-in grid — responsive */
+.used-in-grid{
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Mobile menu toggle (hamburger) in topbar */
+.tb-menu-btn{
+  display:none; width:32px; height:32px;
+  border-radius:var(--r8); background:transparent; border:none;
+  color:var(--t2); cursor:pointer;
+  align-items:center; justify-content:center;
+  margin-right:4px; flex-shrink:0;
+}
+.tb-menu-btn:hover{background:var(--hover); color:var(--t1)}
+
+/* Sub-sidebar overlay backdrop (mobile/tablet) */
+.ssb-backdrop{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.55); backdrop-filter:blur(4px);
+  z-index:14; opacity:0; transition:opacity .2s;
+}
+.ssb-backdrop.open{display:block; opacity:1}
+
+/* ── Responsive breakpoints ── */
+
+/* Tablet (≤1024px): sub-sidebar becomes overlay */
+@media (max-width: 1024px){
+  .tb-menu-btn{display:flex}
+  .tb-search-btn{width:auto; flex:1 1 auto; max-width:280px}
+  .tb-context-name{max-width:140px}
+
+  .ssb{
+    position:absolute; top:0; bottom:0; left:0;
+    width:280px; z-index:15;
+    transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius:14px 0 0 14px;
+    box-shadow:8px 0 32px rgba(0,0,0,0.5);
+  }
+  .ssb.open{transform:translateX(0)}
+
+  .main{position:relative}
+
+  /* Hero compaction */
+  .mkt-hero{padding:36px 24px 32px}
+  .mkt-hero-title{font-size:26px}
+  .mkt-hero-sub{font-size:13px; margin-bottom:20px}
+
+  /* Active strip — wrap on narrower */
+  .active-strip{flex-wrap:wrap; gap:12px}
+  .active-strip-text{flex:1 1 100%}
+  .active-strip-cta{order:3}
+
+  /* Featured card stacks */
+  .featured-card{flex-direction:column; align-items:flex-start; padding:24px}
+  .featured-visual{align-self:center}
+  .logo.logo-xl{width:72px; height:72px; font-size:24px}
+  .featured-title{font-size:19px}
+
+  /* Detail page */
+  .detail-head{padding:16px 24px}
+  .detail-name{font-size:20px}
+  .detail-actions{width:100%; margin-top:8px}
+
+  /* Section paddings */
+  .mkt-section, .featured-wrap, .build-promo, .studio-filter, .cat-strip,
+  .breadcrumb, .ph, .detail-body, .section{padding-left:24px; padding-right:24px}
+  .build-promo{margin-left:24px; margin-right:24px}
+  .active-strip{margin-left:24px; margin-right:24px}
+}
+
+/* Mobile (≤720px): tighter compactions */
+@media (max-width: 720px){
+  .app{padding:60px 8px 8px 8px}
+
+  /* Topbar */
+  .tb-context-name{display:none}
+  .tb-ws-badge-name{display:none}
+  .tb-search-btn{display:none}
+  .tb-divider-v{display:none}
+  .topbar{padding:0 12px 0 8px; gap:6px}
+
+  /* Hero stats — 2 columns */
+  .mkt-hero-stats{grid-template-columns:repeat(2, 1fr); gap:14px 16px}
+  .mkt-hero{padding:28px 16px 24px}
+  .mkt-hero-title{font-size:22px}
+  .mkt-hero-sub{font-size:12.5px; margin-bottom:16px}
+  .mkt-search-input{padding:12px 14px 12px 40px; font-size:13px}
+  .mkt-search-icon{left:14px}
+
+  /* Section paddings */
+  .mkt-section, .featured-wrap, .studio-filter, .cat-strip,
+  .breadcrumb, .ph, .detail-body, .section{padding-left:16px; padding-right:16px}
+  .build-promo{margin-left:16px; margin-right:16px; padding:16px; flex-wrap:wrap}
+  .active-strip{margin-left:16px; margin-right:16px}
+  .detail-head{padding:14px 16px}
+
+  /* Section header */
+  .mkt-section-h{flex-direction:column; align-items:flex-start; gap:6px}
+  .mkt-section-title{font-size:15px}
+
+  /* Card grids — single column on mobile */
+  .mkt-grid{grid-template-columns:1fr; gap:10px}
+  .connected-grid{grid-template-columns:1fr}
+
+  /* Studio chips bigger touch target on mobile */
+  .studio-chip{width:22px; height:22px}
+  .studio-chip svg{width:13px; height:13px}
+
+  /* USED IN — single column */
+  .used-in-grid{grid-template-columns:1fr}
+
+  /* Studio filter wraps */
+  .studio-filter{padding:14px 16px 0}
+  .studio-pill{padding:5px 10px; font-size:11.5px}
+
+  /* Cat-strip — show fade mask hint */
+  .cat-strip{padding:14px 16px; gap:6px}
+  .cat-item{font-size:11.5px; padding:6px 11px}
+
+  /* Featured card — even tighter */
+  .featured-card{padding:18px; gap:14px}
+  .featured-title{font-size:17px; line-height:1.3}
+  .featured-desc{font-size:12px}
+
+  /* Detail page */
+  .detail-name{font-size:18px}
+  .ov-cols{grid-template-columns:1fr}
+  .ov-side{order:2}
+  .tabs{padding:0 16px; overflow-x:auto; gap:4px; -webkit-overflow-scrolling:touch}
+  .tab{padding:11px 10px; font-size:12.5px; flex-shrink:0}
+
+  /* Capabilities rows */
+  .cap-row{grid-template-columns:1fr; gap:6px; padding:10px}
+  .cap-row > *:not(:first-child){padding-left:0}
+
+  /* Permissions studios — single column */
+  .studio-grid{grid-template-columns:1fr}
+
+  /* Audit table — hide IP column on mobile */
+  .audit-table th:nth-child(7), .audit-table td:nth-child(7){display:none}
+  .audit-table{font-size:11px}
+  .audit-table th, .audit-table td{padding:8px}
+
+  /* Build promo */
+  .build-promo-text{flex:1 1 100%; order:2}
+  .build-promo-ico{flex-shrink:0; order:1}
+  .build-promo .btn{order:3; width:100%; justify-content:center}
+
+  /* Drawer full-width on mobile */
+  .drawer, .ai-drawer{width:100vw; max-width:100vw}
+}
+
 /* ── Marketplace hero ── */
 .mkt-hero{
   padding:56px 32px 44px; text-align:center;
@@ -775,15 +946,7 @@ body{
   width:600px; height:200px; background:radial-gradient(circle, rgba(43,127,255,0.18), transparent 70%);
   pointer-events:none; filter:blur(40px);
 }
-.mkt-hero-eyebrow{
-  display:inline-flex; align-items:center; gap:6px;
-  font-size:11px; font-weight:700; letter-spacing:.10em; text-transform:uppercase;
-  color:var(--cyan); margin-bottom:14px;
-  padding:4px 12px; border-radius:20px;
-  background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.22);
-  position:relative;
-}
-.mkt-hero-title{font-size:32px; font-weight:700; color:var(--t1); letter-spacing:-.02em; margin-bottom:10px; position:relative}
+.mkt-hero-title{font-size:32px; font-weight:700; color:var(--t1); letter-spacing:-.02em; margin-bottom:10px; position:relative; padding-top:12px}
 .mkt-hero-sub{font-size:14px; color:var(--t2); max-width:540px; margin:0 auto 26px; position:relative; line-height:1.6}
 .mkt-search-wrap{position:relative; max-width:560px; margin:0 auto 22px}
 .mkt-search-icon{position:absolute; left:18px; top:50%; transform:translateY(-50%); color:var(--t3); pointer-events:none}
@@ -797,7 +960,7 @@ body{
 }
 .mkt-search-input:focus{border-color:var(--accent); background:var(--bg2); box-shadow:0 0 0 4px rgba(43,127,255,0.16), 0 4px 20px rgba(0,0,0,0.25)}
 .mkt-search-input::placeholder{color:var(--t3)}
-.mkt-hero-stats{display:inline-flex; gap:32px; font-size:12px; color:var(--t2); flex-wrap:wrap; justify-content:center; position:relative}
+.mkt-hero-stats{font-size:12px; color:var(--t2); position:relative}
 .mkt-hero-stat strong{color:var(--t1); font-weight:700; font-size:14px; display:block; margin-bottom:1px}
 
 /* ── Category nav strip ── */
@@ -986,6 +1149,115 @@ body{
 }
 .filter-bar-left{display:flex; gap:6px; flex-wrap:wrap; flex:1}
 
+/* ── Studio-aware UX ── */
+
+/* Studio filter pills (in home, between hero stats and category strip) */
+.studio-filter{
+  display:flex; align-items:center; gap:8px;
+  padding:14px 32px 0; flex-wrap:wrap;
+}
+.studio-filter-label{
+  font-size:10px; font-weight:700; color:var(--t3);
+  text-transform:uppercase; letter-spacing:.10em;
+}
+.studio-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 12px; border-radius:20px;
+  background:var(--hover); border:1px solid var(--line);
+  cursor:pointer; font-family:inherit; font-size:12px; font-weight:600;
+  color:var(--t2); transition:background .14s, color .14s, border-color .14s, box-shadow .14s;
+}
+.studio-pill:hover{background:var(--hover-strong); color:var(--t1)}
+.studio-pill svg{width:13px; height:13px; flex-shrink:0}
+.studio-pill-count{
+  font-size:10px; font-weight:700; padding:1.5px 6px; border-radius:10px;
+  background:rgba(255,255,255,0.06); color:var(--t3); letter-spacing:.03em;
+}
+.studio-pill.active.studio-gov{background:rgba(5,223,114,0.10); color:var(--green); border-color:rgba(5,223,114,0.30)}
+.studio-pill.active.studio-gov .studio-pill-count{background:rgba(5,223,114,0.16); color:var(--green)}
+.studio-pill.active.studio-ag{background:rgba(167,139,250,0.10); color:var(--purple); border-color:rgba(167,139,250,0.30)}
+.studio-pill.active.studio-ag .studio-pill-count{background:rgba(167,139,250,0.16); color:var(--purple)}
+.studio-pill.active.studio-wf{background:rgba(43,127,255,0.10); color:var(--accent); border-color:rgba(43,127,255,0.30)}
+.studio-pill.active.studio-wf .studio-pill-count{background:rgba(43,127,255,0.16); color:var(--accent)}
+.studio-pill.active.studio-all{background:rgba(255,255,255,0.08); color:var(--t1); border-color:var(--line-strong)}
+
+/* Studio chips on cards — 3 mini badges, 1 per studio */
+.studio-chips{
+  display:inline-flex; gap:3px; align-items:center;
+}
+.studio-chip{
+  width:18px; height:18px; border-radius:4px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:transparent; border:1px dashed rgba(255,255,255,0.10);
+  color:rgba(255,255,255,0.18);
+  transition:all .14s;
+}
+.studio-chip svg{width:11px; height:11px}
+.studio-chip.active{
+  border-style:solid; border-color:transparent;
+}
+.studio-chip.idle{
+  border-style:solid; border-color:transparent;
+  opacity:.62;
+}
+.studio-chip.studio-gov.active{background:rgba(5,223,114,0.18); color:var(--green); box-shadow:0 0 8px rgba(5,223,114,0.30)}
+.studio-chip.studio-gov.idle{background:rgba(5,223,114,0.10); color:var(--green)}
+.studio-chip.studio-ag.active{background:rgba(167,139,250,0.18); color:var(--purple); box-shadow:0 0 8px rgba(167,139,250,0.30)}
+.studio-chip.studio-ag.idle{background:rgba(167,139,250,0.10); color:var(--purple)}
+.studio-chip.studio-wf.active{background:rgba(43,127,255,0.18); color:var(--accent); box-shadow:0 0 8px rgba(43,127,255,0.30)}
+.studio-chip.studio-wf.idle{background:rgba(43,127,255,0.10); color:var(--accent)}
+
+/* Used-in section on detail page */
+.used-in-wrap{
+  display:flex; flex-direction:column; gap:8px;
+  margin-top:8px;
+}
+.used-in-label{
+  font-size:10px; font-weight:700; color:var(--t3);
+  text-transform:uppercase; letter-spacing:.10em;
+}
+.used-in-grid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;
+}
+.used-in-card{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:var(--r8);
+  background:var(--bg3); border:1px solid var(--line);
+  transition:border-color .14s, background .14s;
+}
+.used-in-card.used{cursor:pointer}
+.used-in-card.used:hover{border-color:var(--line-strong); background:var(--bg2)}
+.used-in-card.unused{opacity:.55}
+.used-in-ico{
+  width:28px; height:28px; border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.used-in-ico svg{width:14px; height:14px}
+.used-in-card.studio-gov .used-in-ico{background:rgba(5,223,114,0.12); color:var(--green)}
+.used-in-card.studio-gov.used{border-left:2px solid var(--green)}
+.used-in-card.studio-ag .used-in-ico{background:rgba(167,139,250,0.12); color:var(--purple)}
+.used-in-card.studio-ag.used{border-left:2px solid var(--purple)}
+.used-in-card.studio-wf .used-in-ico{background:rgba(43,127,255,0.12); color:var(--accent)}
+.used-in-card.studio-wf.used{border-left:2px solid var(--accent)}
+.used-in-text{flex:1; min-width:0}
+.used-in-name{font-size:12.5px; font-weight:600; color:var(--t1); display:flex; align-items:center; gap:6px}
+.used-in-metric{font-size:11px; color:var(--t2); margin-top:1px}
+.used-in-detail{font-size:10px; color:var(--t3); margin-top:1px}
+
+/* Active strip — corner dots on avatars */
+.active-avatar-dots{
+  position:absolute; bottom:-3px; right:-3px;
+  display:flex; gap:2px;
+}
+.active-studio-dot{
+  width:6px; height:6px; border-radius:50%;
+  border:1.5px solid var(--bg);
+}
+.active-studio-dot.studio-gov{background:var(--green)}
+.active-studio-dot.studio-ag{background:var(--purple)}
+.active-studio-dot.studio-wf{background:var(--accent)}
+
 /* ── AI Assistant ── */
 .btn-ai{
   background:linear-gradient(135deg, #06B6D4 0%, #A78BFA 100%);
@@ -1112,6 +1384,9 @@ body{
 <!-- Topbar (full AIMS-OS shell) -->
 <header class="topbar">
   <div class="tb-left">
+    <button class="tb-menu-btn" type="button" onclick="toggleSsb()" aria-label="Toggle settings menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
     <div class="tb-context-wrap">
       <button class="tb-context" type="button" onclick="toast('App switcher — coming soon')" aria-haspopup="menu">
         <div class="tb-context-logo" style="background:var(--grad-app)">
@@ -1189,10 +1464,10 @@ body{
         <span class="sb-label">Workflows</span>
       </button>
 
-      <a class="sb-item" href="agentic-studio.html" title="Agentic Networks" aria-label="Agentic Networks">
+      <button class="sb-item" onclick="toast('Agentic Networks — coming soon')" title="Agentic Networks" aria-label="Agentic Networks">
         <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="3" r="1.8"/><circle cx="3" cy="15" r="1.8"/><circle cx="15" cy="15" r="1.8"/><path d="M9 4.8L3 13.2M9 4.8L15 13.2M3 13.2h12"/></svg></span>
         <span class="sb-label">Agentic Networks</span>
-      </a>
+      </button>
 
       <div class="sb-divider"></div>
 
@@ -1217,6 +1492,9 @@ body{
       </button>
     </div>
   </nav>
+
+  <!-- Sub-sidebar backdrop (mobile/tablet overlay) -->
+  <div class="ssb-backdrop" id="ssbBackdrop" onclick="closeSsb()"></div>
 
   <!-- Main -->
   <div class="main">
@@ -1373,9 +1651,40 @@ const CAP_META = {
 };
 
 const STUDIO_META = {
-  governance:{ label:'Governance', cls:'gov', desc:'Knowledge ingestion, truth planes, approvals' },
-  agentic:   { label:'Agentic',    cls:'ag',  desc:'Agent networks, workflows, tools' },
-  workforce: { label:'Workforce',  cls:'wf',  desc:'Comm Hub, channels, routing' }
+  governance:{
+    label:'Governance', cls:'gov', color:'#05DF72',
+    desc:'Knowledge ingestion, truth planes, approvals',
+    verb:'indexes',
+    icon:'<svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4v4C2 11.5 4.5 14 8 14.5c3.5-.5 6-3 6-6.5V4L8 1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.5 8l2 2 3.5-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  },
+  agentic:{
+    label:'Agentic', cls:'ag', color:'#A78BFA',
+    desc:'Agent networks, workflows, tools',
+    verb:'calls',
+    icon:'<svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="3" r="1.6" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="13" r="1.6" stroke="currentColor" stroke-width="1.4"/><circle cx="13" cy="13" r="1.6" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.6L3 11.4M8 4.6L13 11.4M3 13h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
+  },
+  workforce:{
+    label:'Workforce', cls:'wf', color:'#2B7FFF',
+    desc:'Comm Hub, channels, routing',
+    verb:'channels',
+    icon:'<svg viewBox="0 0 16 16" fill="none"><path d="M2 3h12v8H9l-3 2V11H2V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>'
+  }
+};
+
+// Per-integration studio usage (mock telemetry data)
+const STUDIO_USAGE = {
+  slack: { agentic:{count:47, unit:'calls/day', detail:'3 agents'}, workforce:{count:12, unit:'channels', detail:'4 routes'} },
+  github: { agentic:{count:23, unit:'calls/day', detail:'2 agents'}, governance:{count:340, unit:'docs indexed', detail:'updated 2h ago'} },
+  jira: { agentic:{count:18, unit:'calls/day', detail:'1 agent'}, workforce:{count:2, unit:'channels', detail:'1 route'} },
+  snowflake: { agentic:{count:8, unit:'queries/day', detail:'1 agent'}, governance:{count:1247, unit:'tables', detail:'updated 4h ago'} },
+  'google-workspace': { agentic:{count:64, unit:'calls/day', detail:'4 agents'}, governance:{count:892, unit:'docs indexed', detail:'updated 30m ago'} },
+  notion: { governance:{count:234, unit:'pages', detail:'updated 1h ago'}, agentic:{count:12, unit:'calls/day', detail:'1 agent'} },
+  salesforce: { agentic:{count:34, unit:'calls/day', detail:'2 agents'}, workforce:{count:5, unit:'channels', detail:'2 routes'} },
+  zendesk: { agentic:{count:0, unit:'calls/day', detail:'token expired'}, workforce:{count:0, unit:'channels', detail:'disabled'} },
+  linear: { agentic:{count:9, unit:'calls/day', detail:'1 agent'} },
+  gdrive: { governance:{count:1820, unit:'files indexed', detail:'updated 10m ago'} },
+  datadog: { agentic:{count:2, unit:'triggers/day', detail:'1 agent'}, workforce:{count:1, unit:'channels', detail:'1 route'} },
+  'internal-billing': { agentic:{count:4, unit:'calls/day', detail:'1 agent'} }
 };
 
 // Iconify 'logos' set slugs (full-color brand logos) — only for brands available.
@@ -1661,6 +1970,7 @@ const state = {
   activeCats:new Set(),
   activeCaps:new Set(),
   activeStates:new Set(),
+  activeStudio:null,
   search:'',
   detailTab:'overview',
   drawerOpen:false,
@@ -1722,6 +2032,77 @@ function toast(msg, type='success') {
 
 function findIntegration(slug){ return INTEGRATIONS.find(i=>i.slug===slug) }
 
+// Studio helpers
+function getStudioState(integration, studio) {
+  // Returns 'active' | 'idle' | 'disabled'
+  const enabled = integration.studios && integration.studios[studio];
+  if (!enabled) return 'disabled';
+  const usage = (STUDIO_USAGE[integration.slug] || {})[studio];
+  if (usage && usage.count > 0) return 'active';
+  return 'idle';
+}
+
+function studioChipsHTML(integration) {
+  const studios = ['governance','agentic','workforce'];
+  return `<div class="studio-chips">${studios.map(s => {
+    const st = getStudioState(integration, s);
+    const meta = STUDIO_META[s];
+    const usage = (STUDIO_USAGE[integration.slug] || {})[s];
+    const title = st==='disabled'
+      ? `Not enabled in ${meta.label}`
+      : st==='active'
+        ? `${meta.label} · ${usage.count} ${usage.unit}${usage.detail?' · '+usage.detail:''}`
+        : `${meta.label} · enabled, no recent usage`;
+    return `<span class="studio-chip studio-${meta.cls} ${st}" title="${escapeHtml(title)}">${meta.icon}</span>`;
+  }).join('')}</div>`;
+}
+
+function usedInHTML(integration) {
+  const studios = ['governance','agentic','workforce'];
+  return `
+    <div class="used-in-wrap">
+      <div class="used-in-label">Used in</div>
+      <div class="used-in-grid">
+        ${studios.map(s => {
+          const meta = STUDIO_META[s];
+          const st = getStudioState(integration, s);
+          const usage = (STUDIO_USAGE[integration.slug] || {})[s];
+          const klass = st==='disabled' ? 'unused' : 'used';
+          let metric = 'Not enabled';
+          let detail = '';
+          if (st==='active' && usage) {
+            metric = `<strong style="color:var(--t1)">${usage.count.toLocaleString()}</strong> ${escapeHtml(usage.unit)}`;
+            detail = usage.detail || '';
+          } else if (st==='idle') {
+            metric = 'Enabled · no recent usage';
+            detail = 'Last 7 days';
+          }
+          return `
+            <div class="used-in-card studio-${meta.cls} ${klass}" ${st!=='disabled'?`onclick="navigate('#/integrations/${integration.slug}');setDetailTab('${integration.slug}','permissions')"`:''}>
+              <div class="used-in-ico">${meta.icon}</div>
+              <div class="used-in-text">
+                <div class="used-in-name">${meta.label}</div>
+                <div class="used-in-metric">${metric}</div>
+                ${detail?`<div class="used-in-detail">${escapeHtml(detail)}</div>`:''}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function activeStudioDotsHTML(integration) {
+  const studios = ['governance','agentic','workforce'];
+  const activeStudios = studios.filter(s => getStudioState(integration, s) === 'active');
+  if (activeStudios.length === 0) return '';
+  return `<div class="active-avatar-dots">${activeStudios.map(s => {
+    const meta = STUDIO_META[s];
+    return `<span class="active-studio-dot studio-${meta.cls}" title="${escapeHtml(meta.label)}"></span>`;
+  }).join('')}</div>`;
+}
+
 /* ====================== ROUTER ====================== */
 
 function navigate(hash) {
@@ -1780,6 +2161,7 @@ function renderHome() {
 
   let filtered = INTEGRATIONS;
   if (state.activeSrc!=='all') filtered = filtered.filter(i=>i.source===state.activeSrc);
+  if (state.activeStudio) filtered = filtered.filter(i => i.studios && i.studios[state.activeStudio]);
   if (state.activeCats.size>0) filtered = filtered.filter(i=>state.activeCats.has(i.category));
   if (state.activeCaps.size>0) filtered = filtered.filter(i => i.capabilities && i.capabilities.some(c=>state.activeCaps.has(c)));
   if (state.activeStates.size>0) filtered = filtered.filter(i=>state.activeStates.has(i.connected?'connected':'not_connected'));
@@ -1788,11 +2170,10 @@ function renderHome() {
     filtered = filtered.filter(i => i.name.toLowerCase().includes(q) || (i.desc||'').toLowerCase().includes(q) || (i.vendor||'').toLowerCase().includes(q));
   }
 
-  const isFiltering = state.activeCats.size>0 || state.activeCaps.size>0 || state.activeStates.size>0 || !!state.search || state.activeSrc!=='all';
+  const isFiltering = state.activeCats.size>0 || state.activeCaps.size>0 || state.activeStates.size>0 || !!state.search || state.activeSrc!=='all' || !!state.activeStudio;
 
   $('content').innerHTML = `
     <section class="mkt-hero">
-      <span class="mkt-hero-eyebrow">Workspace · Integrations</span>
       <h1 class="mkt-hero-title">Connect your stack to AIMS-OS</h1>
       <p class="mkt-hero-sub">${total} integrations across ${CATEGORIES.length} categories. Managed once at the workspace level, consumed by Governance, Agentic and Workforce.</p>
       <div class="mkt-search-wrap">
@@ -1815,6 +2196,17 @@ function renderHome() {
       }).join('')}
     </div>
 
+    <div class="studio-filter">
+      <span class="studio-filter-label">Show:</span>
+      <button class="studio-pill studio-all ${!state.activeStudio?'active':''}" onclick="setStudio(null)">All studios <span class="studio-pill-count">${total}</span></button>
+      ${Object.keys(STUDIO_META).map(s => {
+        const meta = STUDIO_META[s];
+        const count = INTEGRATIONS.filter(it => it.studios && it.studios[s]).length;
+        const active = state.activeStudio === s;
+        return `<button class="studio-pill studio-${meta.cls} ${active?'active':''}" onclick="setStudio('${s}')">${meta.icon}${meta.label}<span class="studio-pill-count">${count}</span></button>`;
+      }).join('')}
+    </div>
+
     ${connected.length > 0 ? `
       <div class="active-strip">
         <div class="active-strip-text">
@@ -1829,6 +2221,7 @@ function renderHome() {
             <div class="active-avatar" title="${escapeHtml(i.name)} · ${i.health}" onclick="navigate('#/integrations/${i.slug}')">
               ${logo(i, 'active')}
               <span class="active-dot health-${i.health}"></span>
+              ${activeStudioDotsHTML(i)}
             </div>
           `).join('')}
           ${connected.length>7 ? `<div class="active-more">+${connected.length-7}</div>` : ''}
@@ -1943,9 +2336,14 @@ function mktCardHTML(i) {
       </div>
       <div class="mkt-card-desc">${escapeHtml(i.desc)}</div>
       <div class="mkt-card-caps">${capChips(i.capabilities||[])}</div>
-      <div class="mkt-card-foot">
-        ${stateLine}
-        <span class="mkt-card-arrow">→</span>
+      <div class="mkt-card-foot" style="justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          ${stateLine}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${studioChipsHTML(i)}
+          <span class="mkt-card-arrow">→</span>
+        </div>
       </div>
     </div>
   `;
@@ -1958,7 +2356,8 @@ function toggleCat(s){ state.activeCats.has(s) ? state.activeCats.delete(s) : st
 function toggleCap(c){ state.activeCaps.has(c) ? state.activeCaps.delete(c) : state.activeCaps.add(c); renderHome() }
 function toggleState(s){ state.activeStates.has(s) ? state.activeStates.delete(s) : state.activeStates.add(s); renderHome() }
 function setSearch(v){ state.search = v; renderHome(); setTimeout(()=>{ const inp=document.querySelector('.search-input'); if(inp){inp.focus();inp.setSelectionRange(v.length,v.length)} },0) }
-function clearFilters(){ state.activeCats.clear(); state.activeCaps.clear(); state.activeStates.clear(); state.search=''; state.activeSrc='all'; renderHome() }
+function clearFilters(){ state.activeCats.clear(); state.activeCaps.clear(); state.activeStates.clear(); state.search=''; state.activeSrc='all'; state.activeStudio=null; renderHome() }
+function setStudio(s){ state.activeStudio = (state.activeStudio===s)?null:s; renderHome() }
 
 /* ====================== DETAIL ====================== */
 
@@ -2010,6 +2409,7 @@ function paintDetail(i) {
           `}
         </div>
       </div>
+      ${usedInHTML(i)}
     </div>
 
     <div class="tabs">
@@ -3243,6 +3643,26 @@ function aiRender(text) {
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
   return html;
 }
+
+/* ====================== MOBILE SSB TOGGLE ====================== */
+
+function toggleSsb(){
+  const ssb = document.querySelector('.ssb');
+  const bd = $('ssbBackdrop');
+  if(!ssb) return;
+  const willOpen = !ssb.classList.contains('open');
+  ssb.classList.toggle('open', willOpen);
+  bd.classList.toggle('open', willOpen);
+}
+function closeSsb(){
+  document.querySelector('.ssb')?.classList.remove('open');
+  $('ssbBackdrop')?.classList.remove('open');
+}
+
+// Auto-close ssb on navigation in mobile
+window.addEventListener('hashchange', () => {
+  if (window.innerWidth <= 1024) closeSsb();
+});
 
 /* ====================== BOOT ====================== */
 
