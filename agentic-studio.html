@@ -1385,8 +1385,74 @@ body.test-mode #vTestMode{display:flex}
 .tm-type.RESUMED{background:rgba(249,115,22,0.12);color:#f97316}
 .tm-step-sub{font-size:10px;color:var(--t4);margin-top:1px}
 /* expanded detail */
-.tm-step-det{max-height:0;overflow:hidden;transition:max-height .22s ease}
-.tm-step-det.open{max-height:280px}
+.tm-step-det{max-height:0;overflow:hidden;transition:max-height .25s ease}
+.tm-step-det.open{max-height:600px}
+
+/* ── Trace step detail tabs (Overview / Input / Output / Configuration) ── */
+.tm-det-tabs{
+  display:flex;gap:2px;
+  border-bottom:1px solid var(--bd);
+  margin:8px 0 8px;padding:0 2px;
+  position:sticky;top:0;background:var(--bg2);z-index:1;
+}
+.tm-det-tab{
+  font-size:10.5px;font-weight:700;
+  padding:6px 10px;
+  color:var(--t3);
+  background:transparent;border:none;
+  border-bottom:2px solid transparent;
+  cursor:pointer;
+  margin-bottom:-1px;
+  letter-spacing:.04em;text-transform:uppercase;
+  transition:color .12s, border-color .12s;
+}
+.tm-det-tab:hover{color:var(--t1)}
+.tm-det-tab.is-active{color:var(--pri);border-bottom-color:var(--pri)}
+.tm-det-tab.is-disabled{
+  color:var(--t4);cursor:not-allowed;opacity:0.45;
+}
+.tm-det-tab.is-disabled:hover{color:var(--t4)}
+
+/* JSON viewer for Input / Output / Config tabs */
+.tm-det-jsonhd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2px 6px;
+}
+.tm-det-jsonhd-lbl{
+  font-size:9.5px;font-weight:700;letter-spacing:.08em;
+  color:var(--t4);text-transform:uppercase;
+}
+.tm-det-copy{
+  height:22px;padding:0 10px;border-radius:5px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  color:var(--t2);font-size:10px;font-weight:600;cursor:pointer;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.tm-det-copy:hover{background:rgba(43,127,255,0.10);border-color:rgba(43,127,255,0.35);color:#80AFFF}
+.tm-step-json{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;line-height:1.55;
+  white-space:pre;
+  overflow:auto;
+  background:rgba(0,0,0,0.30);
+  border:1px solid var(--bd);
+  border-radius:6px;
+  padding:10px 12px;
+  margin:0;
+  color:var(--t2);
+  max-height:380px;
+}
+.tm-step-json .json-key{color:#80AFFF}
+.tm-step-json .json-string{color:#86efac}
+.tm-step-json .json-number{color:#fde047}
+.tm-step-json .json-bool{color:#c4b5fd}
+.tm-step-json .json-null{color:var(--t4)}
+
+.tm-det-empty{
+  padding:14px 10px;text-align:center;
+  font-size:11px;color:var(--t4);
+  border:1px dashed rgba(255,255,255,0.06);border-radius:6px;
+}
 .tm-det-inner{padding:6px 0 4px;border-top:1px solid rgba(255,255,255,0.05);margin-top:6px}
 .tm-meta-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:3px 0;font-size:11px}
 .tm-meta-k{color:var(--t4);flex-shrink:0}
@@ -10425,27 +10491,163 @@ function initDriveTrees() {
 }
 
 // ── TEST MODE ──
+// Each step carries: meta (kv summary, shown in Overview tab) + input/output/config
+// (full JSON, shown in their own tabs). This is the federal-audit drill-down
+// story — every output is traceable to its input, the model that produced it,
+// and the exact config it ran under.
 const TM_STEPS = [
-  {name:'Webhook Received', type:'TRIGGER', dur:'8ms', dotClass:'success',
-   meta:[{k:'event',v:'webhook.post'},{k:'payload_size',v:'2.1 KB'},{k:'execution_id',v:'exec_a7b9c2d1'}]},
-  {name:'Extract Invoice Data', type:'W', dur:'1,103ms', dotClass:'success',
-   meta:[{k:'worker',v:'Extract Invoice Data v2'},{k:'model',v:'gemini-2.0-flash'},{k:'tokens',v:'847'},{k:'duration',v:'1,103ms'}]},
-  {name:'Classify & Route', type:'A', dur:'1,234ms', dotClass:'success', expanded:true,
-   meta:[{k:'execution_id',v:'exec_a7b9c2d1'},{k:'completed_at',v:'2024-03-27T14:18:18Z'},{k:'model',v:'gemini-2.0-flash-exp'},{k:'total_tokens',v:'1,248'},{k:'prompt_tokens',v:'980'},{k:'completion_tokens',v:'268'},{k:'duration',v:'1,234ms'}]},
-  {name:'Amount > $10k?', type:'IF', dur:'3ms', dotClass:'success',
-   branches:[{label:'true',active:true,dest:'Wait for CFO Approval'},{label:'false',active:false,dest:'Auto Approve'}],
-   meta:[{k:'condition',v:'amount > 10000'},{k:'result',v:'true'}]},
-  {name:'Wait for CFO Approval', type:'WAIT', dur:'14m', dotClass:'resumed',
-   meta:[{k:'type',v:'human_approval'},{k:'resumed_by',v:'Maria A.'},{k:'wait_duration',v:'14 min'},{k:'status',v:'approved'}]},
-  {name:'Create Payment Order', type:'W', dur:'782ms', dotClass:'success',
-   meta:[{k:'worker',v:'Create Payment Order v1'},{k:'records_created',v:'1'},{k:'duration',v:'782ms'}]},
-  {name:'Network Result', type:'OUT', dur:'2ms', dotClass:'success',
-   meta:[{k:'success',v:'true'},{k:'total_ms',v:'3,449ms'},{k:'steps_run',v:'6'}]},
+  {
+    name:'Webhook Received', type:'TRIGGER', dur:'8ms', dotClass:'success',
+    meta:[{k:'event',v:'webhook.post'},{k:'payload_size',v:'2.1 KB'},{k:'execution_id',v:'exec_a7b9c2d1'}],
+    input: { method: 'POST', path: '/webhook/invoice', headers: { 'content-type': 'application/json', 'x-vendor': 'Acme Corp', 'x-signature': 'sha256=…' } },
+    output: { event: 'webhook.post', received_at: '2024-03-27T14:18:09.412Z', payload_size: 2104, execution_id: 'exec_a7b9c2d1', source_ip: '54.218.42.18', valid: true },
+    config: { url: '/webhook/invoice', method: 'POST', auth: 'hmac_sha256', schema_validation: 'strict', rate_limit: '100/min', timeout_ms: 30000 },
+  },
+  {
+    name:'Extract Invoice Data', type:'W', dur:'1,103ms', dotClass:'success',
+    meta:[{k:'worker',v:'Extract Invoice Data v2'},{k:'model',v:'gemini-2.0-flash'},{k:'tokens',v:'847'},{k:'duration',v:'1,103ms'}],
+    input: { raw_text: 'INVOICE #INV-2024-3847\nFrom: Acme Corp\nDate: 2024-03-26\nNet 30…', source_doc: 'invoice_INV-2024-3847.pdf', mime: 'application/pdf' },
+    output: { invoice_number: 'INV-2024-3847', vendor: 'Acme Corp', amount: 24500.00, currency: 'USD', due_date: '2024-04-25', line_items: [{ desc: 'Q1 services', qty: 1, unit: 24500 }], confidence: 0.97 },
+    config: { worker_id: 'wkr_extract_invoice_v2', model: 'gemini-2.0-flash', temperature: 0.0, max_tokens: 2000, output_schema: 'invoice.v2.json', retry_policy: { max: 3, backoff: 'exponential' } },
+  },
+  {
+    name:'Classify & Route', type:'A', dur:'1,234ms', dotClass:'success', expanded:true,
+    meta:[{k:'execution_id',v:'exec_a7b9c2d1'},{k:'completed_at',v:'2024-03-27T14:18:18Z'},{k:'model',v:'gemini-2.0-flash-exp'},{k:'total_tokens',v:'1,248'},{k:'prompt_tokens',v:'980'},{k:'completion_tokens',v:'268'},{k:'duration',v:'1,234ms'}],
+    input: { invoice_number: 'INV-2024-3847', vendor: 'Acme Corp', amount: 24500.00, currency: 'USD', line_items: [{ desc: 'Q1 services', qty: 1, unit: 24500 }] },
+    output: { category: 'professional_services', urgency: 'standard', routing: 'cfo_approval_pipeline', flags: ['amount_over_threshold'], confidence: 0.94, citations: ['KP-005:fact-12', 'KP-005:fact-18'] },
+    config: { agent_id: 'agt-invoice-classifier', model: 'gemini-2.0-flash-exp', temperature: 0.2, max_tokens: 1500, tools: ['lookup_vendor', 'check_budget_remaining'], knowledge: { packs: ['KP-005'], drives: ['d1'] }, guardrails: { pii_filter: true, output_validation: true } },
+  },
+  {
+    name:'Amount > $10k?', type:'IF', dur:'3ms', dotClass:'success',
+    branches:[{label:'true',active:true,dest:'Wait for CFO Approval'},{label:'false',active:false,dest:'Auto Approve'}],
+    meta:[{k:'condition',v:'amount > 10000'},{k:'result',v:'true'}],
+    input: { amount: 24500, currency: 'USD' },
+    output: { result: true, branch_taken: 'true', next_step: 'Wait for CFO Approval' },
+    config: { expression: 'state.amount > 10000', branches: [{ label: 'true', target: 'cfo_approval' }, { label: 'false', target: 'auto_approve' }], evaluator: 'jsonpath_v1' },
+  },
+  {
+    name:'Wait for CFO Approval', type:'WAIT', dur:'14m', dotClass:'resumed',
+    meta:[{k:'type',v:'human_approval'},{k:'resumed_by',v:'Maria A.'},{k:'wait_duration',v:'14 min'},{k:'status',v:'approved'}],
+    input: { request_for: 'CFO sign-off · $24,500 · Acme Corp', urgency: 'standard', sla_hours: 24, escalation: 'CEO after 24h' },
+    output: { status: 'approved', resumed_by: 'Maria Anderson', resumed_at: '2024-03-27T14:32:11Z', wait_duration_ms: 840000, note: 'Confirmed budget allocation — Q1 services' },
+    config: { type: 'human_approval', approvers: ['cfo@aimsos.ai', 'finance-lead@aimsos.ai'], require_all: false, timeout_hours: 24, escalation_to: 'ceo@aimsos.ai', notification: ['email', 'slack'] },
+  },
+  {
+    name:'Create Payment Order', type:'W', dur:'782ms', dotClass:'success',
+    meta:[{k:'worker',v:'Create Payment Order v1'},{k:'records_created',v:'1'},{k:'duration',v:'782ms'}],
+    input: { approved_invoice: 'INV-2024-3847', amount: 24500, currency: 'USD', vendor: 'Acme Corp', approved_by: 'Maria Anderson', payment_terms: 'net_30' },
+    output: { payment_order_id: 'PO-2024-08129', status: 'created', erp_record_id: 'sap_3847291', created_at: '2024-03-27T14:32:12.103Z' },
+    config: { worker_id: 'wkr_create_payment_order_v1', target_system: 'sap_s4hana', idempotency_key: 'INV-2024-3847', retry_policy: { max: 5, backoff: 'exponential' }, timeout_ms: 15000 },
+  },
+  {
+    name:'Network Result', type:'OUT', dur:'2ms', dotClass:'success',
+    meta:[{k:'success',v:'true'},{k:'total_ms',v:'3,449ms'},{k:'steps_run',v:'6'}],
+    input: { final_state: '<all prior outputs merged>', audit_id: 'exec_a7b9c2d1' },
+    output: { success: true, payment_order_id: 'PO-2024-08129', amount_authorized: 24500, total_duration_ms: 3449, steps_executed: 6, human_touchpoints: 1, audit_url: '/audit/exec_a7b9c2d1' },
+    config: { output_schema: 'invoice_workflow_result.v1.json', notifications: { slack: '#finance-ops', email: ['finance-lead@aimsos.ai'] }, persist_audit_trail: true },
+  },
 ];
 let tmActiveStep = -1;
 let tmSimTimer = null;
 let tmTraceOpen = false;
 let tmSelectedStep = null;
+// Per-step selected detail tab ('overview' | 'input' | 'output' | 'config').
+// Persisted so re-rendering the trace list doesn't reset the user's chosen
+// tab on an expanded step.
+const tmStepTabs = {};
+
+// JSON pretty-printer with color classes for keys / strings / numbers / bools.
+// Used by the Input / Output / Configuration tabs in the expanded trace step.
+function jsonPretty(obj) {
+  let txt;
+  try { txt = JSON.stringify(obj, null, 2); }
+  catch (_) { return '<span class="json-null">(non-serializable value)</span>'; }
+  txt = txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return txt.replace(
+    /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?([eE][+-]?\d+)?)/g,
+    (match) => {
+      let cls = 'json-number';
+      if (/^"/.test(match)) cls = /:$/.test(match) ? 'json-key' : 'json-string';
+      else if (/true|false/.test(match)) cls = 'json-bool';
+      else if (/null/.test(match)) cls = 'json-null';
+      return '<span class="' + cls + '">' + match + '</span>';
+    }
+  );
+}
+
+// Copy the given object to the clipboard as pretty-printed JSON.
+function copyTraceJson(btn, kind, stepIdx) {
+  const step = TM_STEPS[stepIdx];
+  const payload = step && step[kind];
+  if (!payload) return;
+  const text = JSON.stringify(payload, null, 2);
+  navigator.clipboard?.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.textContent = orig; }, 1400);
+  }).catch(() => toast?.('Copy failed', 'error'));
+}
+
+// Switch the active detail tab for one step. Doesn't re-render the whole
+// trace list — just swaps the inner content, so other expanded steps don't
+// collapse.
+function setTraceStepTab(stepIdx, tabId, ev) {
+  if (ev) { ev.stopPropagation(); }
+  tmStepTabs[stepIdx] = tabId;
+  const det = document.querySelector(`.tm-step:nth-child(${stepIdx+1}) .tm-det-inner`);
+  if (det) det.innerHTML = renderTraceStepTabBody(stepIdx, tabId);
+  // Update the active-tab class
+  document.querySelectorAll(`.tm-step:nth-child(${stepIdx+1}) .tm-det-tab`).forEach(t => {
+    t.classList.toggle('is-active', t.getAttribute('data-tab') === tabId);
+  });
+}
+
+// Body content for a given tab on a given step. Overview shows the kv meta
+// + branches (the legacy summary); Input/Output/Config show pretty-printed
+// JSON with a Copy button.
+function renderTraceStepTabBody(stepIdx, tabId) {
+  const step = TM_STEPS[stepIdx];
+  if (!step) return '';
+  if (tabId === 'overview' || !tabId) {
+    let html = '';
+    if (step.meta) {
+      html += step.meta.map(m => `<div class="tm-meta-row"><span class="tm-meta-k">${m.k}</span><span class="tm-meta-v">${m.v}</span></div>`).join('');
+    }
+    if (step.branches) {
+      html += step.branches.map(b => `<div class="tm-branch-row"><span class="tm-br-tag b${b.label}">${b.label}</span><span class="tm-br-lbl">→ ${b.dest}</span></div>`).join('');
+    }
+    return html || '<div class="tm-det-empty">No overview metadata for this step.</div>';
+  }
+  const payload = step[tabId];
+  if (!payload) return `<div class="tm-det-empty">No ${tabId} captured for this step.</div>`;
+  return `
+    <div class="tm-det-jsonhd">
+      <span class="tm-det-jsonhd-lbl">${tabId === 'config' ? 'Captured at runtime' : tabId.toUpperCase()}</span>
+      <button class="tm-det-copy" onclick="event.stopPropagation();copyTraceJson(this,'${tabId}',${stepIdx})">Copy</button>
+    </div>
+    <pre class="tm-step-json">${jsonPretty(payload)}</pre>
+  `;
+}
+
+// Renders the tab header (Overview / Input / Output / Configuration). Tabs
+// without data are rendered disabled with a quiet pill, so the user can see
+// what dimensions exist for the step.
+function renderTraceStepTabs(stepIdx) {
+  const step = TM_STEPS[stepIdx];
+  const active = tmStepTabs[stepIdx] || 'overview';
+  const tabs = [
+    { id: 'overview', label: 'Overview', enabled: true },
+    { id: 'input',    label: 'Input',    enabled: !!step.input },
+    { id: 'output',   label: 'Output',   enabled: !!step.output },
+    { id: 'config',   label: 'Configuration', enabled: !!step.config },
+  ];
+  return `<div class="tm-det-tabs">${tabs.map(t => `
+    <button class="tm-det-tab ${active === t.id ? 'is-active' : ''} ${t.enabled ? '' : 'is-disabled'}"
+      data-tab="${t.id}"
+      ${t.enabled ? `onclick="setTraceStepTab(${stepIdx},'${t.id}',event)"` : ''}>
+      ${t.label}
+    </button>`).join('')}</div>`;
+}
 
 function openTestMode() {
   const net = bldrNet || NETWORKS.find(x=>x.id===currentOvId);
@@ -10514,13 +10716,9 @@ function renderTraceList(doneCount, currentRunning) {
     else if (i === doneCount && currentRunning) dotCls = 'running';
     const isSel = tmSelectedStep === i;
     const detOpen = isSel || (step.expanded && i < doneCount);
-    let detHtml = '';
-    if (step.meta) {
-      detHtml += step.meta.map(m=>`<div class="tm-meta-row"><span class="tm-meta-k">${m.k}</span><span class="tm-meta-v">${m.v}</span></div>`).join('');
-    }
-    if (step.branches) {
-      detHtml += step.branches.map(b=>`<div class="tm-branch-row"><span class="tm-br-tag b${b.label}">${b.label}</span><span class="tm-br-lbl">→ ${b.dest}</span></div>`).join('');
-    }
+    const activeTab = tmStepTabs[i] || 'overview';
+    const tabsHtml = renderTraceStepTabs(i);
+    const tabBodyHtml = renderTraceStepTabBody(i, activeTab);
     const isLast = i === TM_STEPS.length - 1;
     return `<div class="tm-step${isSel?' tm-sel':''}" onclick="selectTraceStep(${i})">
       <div class="tm-dot-col">
@@ -10537,7 +10735,8 @@ function renderTraceList(doneCount, currentRunning) {
           ${dotCls==='resumed'?'<span class="tm-type RESUMED">RESUMED</span>':''}
         </div>
         <div class="tm-step-det${detOpen?' open':''}">
-          <div class="tm-det-inner">${detHtml}</div>
+          ${tabsHtml}
+          <div class="tm-det-inner">${tabBodyHtml}</div>
         </div>
       </div>
     </div>`;
