@@ -9,17 +9,43 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased}
 :root{
+  /* ── Surfaces ── */
   --bg:#0a0d1a; --bg2:#0f172e; --sb:#000;
+  --bg-card:#0b1220; --bg-modal:#0c1428;
   --cb:rgba(255,255,255,0.04); --cbh:rgba(255,255,255,0.07);
   --bd:rgba(255,255,255,0.08); --bds:rgba(255,255,255,0.16);
-  --pri:#2B7FFF; --pri-bg:rgba(43,127,255,0.12); --pri-bd:rgba(43,127,255,0.30);
-  --ok:#05DF72; --ok-bg:rgba(5,223,114,0.12);
-  --err:#FF6467; --err-bg:rgba(255,100,103,0.12);
-  --warn:#FDC700; --warn-bg:rgba(253,199,0,0.12);
-  --pur:#A78BFA; --pur-bg:rgba(167,139,250,0.12);
+
+  /* ── Status palette — base + lighter variant for accents/syntax ── */
+  --pri:#2B7FFF;   --pri-bg:rgba(43,127,255,0.12);   --pri-bd:rgba(43,127,255,0.30);   --pri-lt:#80AFFF;
+  --ok:#05DF72;    --ok-bg:rgba(5,223,114,0.12);                                       --ok-lt:#86efac;
+  --err:#FF6467;   --err-bg:rgba(255,100,103,0.12);                                    --err-lt:#FF8B8E;
+  --warn:#FDC700;  --warn-bg:rgba(253,199,0,0.12);                                     --warn-lt:#fde047;
+  --pur:#A78BFA;   --pur-bg:rgba(167,139,250,0.12);                                    --pur-lt:#c4b5fd;
+  --pur-xlt:#d6c8ff;
+
+  /* ── Extended status (Logs / Trace state-level differentiation) ── */
+  --cyan:#22d3ee;    --cyan-bg:rgba(34,211,238,0.12);    --cyan-bd:rgba(34,211,238,0.30);
+  --orange:#fb923c;  --orange-bg:rgba(251,146,60,0.12);  --orange-bd:rgba(251,146,60,0.30);
+  --indigo:#6366F1;  /* "RESTRICT" intent in Knowledge Packs */
+
+  /* ── Brand (gradient stops, identity surfaces) ── */
+  --brand-teal:#00C2C2;
+  --brand-blue:#155DFC;
+
+  /* ── Drive categorical palette (Source Drives + workspace tagging) ── */
+  --drive-1:#34D399; /* sales        — green */
+  --drive-2:#f472b6; /* marketing    — pink */
+  --drive-3:#60a5fa; /* engineering  — light-blue */
+  --drive-4:#A78BFA; /* product      — purple (= --pur) */
+  --drive-5:#FBBF24; /* HR           — amber */
+  --drive-6:#22d3ee; /* customer ops — cyan  (= --cyan) */
+
+  /* ── Text tiers ── */
   --t1:rgba(255,255,255,0.90); --t2:rgba(255,255,255,0.60);
   --t3:rgba(255,255,255,0.38); --t4:rgba(255,255,255,0.22);
-  --grad:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+
+  /* ── Gradient + radii ── */
+  --grad:linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-blue) 100%);
   --r4:4px;--r6:6px;--r8:8px;--r10:10px;--r12:12px;--r20:20px;
 }
 body{background:var(--bg);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
@@ -122,7 +148,7 @@ a{text-decoration:none;color:inherit}
 }
 .sidebar:not(.sb-expanded) .sb-toggle{justify-content:center;gap:0;padding:0}
 .sidebar.sb-expanded .sb-toggle{justify-content:flex-start;padding:0 8px;gap:10px}
-.sb-toggle:hover{background:rgba(255,255,255,0.06);color:#80AFFF}
+.sb-toggle:hover{background:rgba(255,255,255,0.06);color:var(--pri-lt)}
 .sb-toggle-icon{width:18px;height:18px;flex-shrink:0;transition:transform .22s cubic-bezier(.4,0,.2,1)}
 .sidebar.sb-expanded .sb-toggle-icon{transform:rotate(180deg)}
 .sb-toggle-label{opacity:0;transition:opacity .12s}
@@ -170,7 +196,7 @@ a{text-decoration:none;color:inherit}
 .tb-right{display:flex;align-items:center;gap:4px;flex:1;justify-content:flex-end}
 .icon-btn{width:32px;height:32px;border-radius:var(--r8);background:transparent;border:none;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s,color .1s}
 .icon-btn:hover{background:rgba(255,255,255,0.07);color:var(--t2)}
-.avatar-sm{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#155DFC,#00C2C2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0}
+.avatar-sm{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--brand-blue),var(--brand-teal));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0}
 .btn-create{display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;background:var(--grad);border:none;border-radius:var(--r8);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;white-space:nowrap}
 .btn-create:hover{opacity:.9}
 
@@ -222,7 +248,7 @@ a{text-decoration:none;color:inherit}
 .sc.draft{background:var(--warn-bg);color:var(--warn)}
 /* F2.1 — workflow environment badges (mirror Truth/Sandbox Plane palette) */
 .sc.env-prod{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.30)}
-.sc.env-sandbox{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.30)}
+.sc.env-sandbox{background:rgba(245,158,11,0.12);color:var(--drive-5);border:1px solid rgba(245,158,11,0.30)}
 .sc.env-prod .sc-icon, .sc.env-sandbox .sc-icon{width:9px;height:9px}
 
 .card-desc{font-size:13px;color:var(--t2);margin-bottom:10px;line-height:1.5}
@@ -452,7 +478,7 @@ a{text-decoration:none;color:inherit}
 .ov-kn-edit-btn:hover{background:rgba(255,255,255,.07);color:var(--t1)}
 /* Primary variant — "Open Library" is the main action; "Manage" is secondary */
 .ov-kn-edit-btn.ov-kn-edit-btn-primary{
-  background:rgba(43,127,255,0.10);border-color:rgba(43,127,255,0.36);color:#80AFFF;
+  background:rgba(43,127,255,0.10);border-color:rgba(43,127,255,0.36);color:var(--pri-lt);
 }
 .ov-kn-edit-btn.ov-kn-edit-btn-primary:hover{
   background:rgba(43,127,255,0.18);border-color:rgba(43,127,255,0.55);color:#a5c6ff;
@@ -550,7 +576,7 @@ a{text-decoration:none;color:inherit}
 .bldr-sep{width:1px;height:18px;background:var(--bd)}
 .bldr-edit-btn,.bldr-test-btn,.bldr-knowledge-btn{height:28px;padding:0 12px;border-radius:var(--r6);border:1px solid var(--bds);background:transparent;color:var(--t1);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .1s,border-color .1s}
 .bldr-edit-btn:hover,.bldr-test-btn:hover,.bldr-knowledge-btn:hover{background:rgba(255,255,255,0.07)}
-.bldr-knowledge-btn{border-color:rgba(99,102,241,0.45);color:#c4b5fd}
+.bldr-knowledge-btn{border-color:rgba(99,102,241,0.45);color:var(--pur-lt)}
 .bldr-knowledge-btn:hover{background:rgba(99,102,241,0.10);border-color:rgba(99,102,241,0.65)}
 
 /* ─ Knowledge Constraint surface ─
@@ -565,19 +591,19 @@ a{text-decoration:none;color:inherit}
 .kc-overlay.open{display:block}
 .kc-overlay.kc-fullscreen{background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);pointer-events:auto}
 
-.kc-modal{position:absolute;top:16px;right:16px;bottom:16px;width:min(560px,calc(100vw - 100px));pointer-events:auto;background:#0b1220;border:1px solid rgba(255,255,255,0.10);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:-24px 0 80px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.03);transition:all .3s cubic-bezier(.4,0,.2,1);opacity:0;transform:translateX(40px)}
+.kc-modal{position:absolute;top:16px;right:16px;bottom:16px;width:min(560px,calc(100vw - 100px));pointer-events:auto;background:var(--bg-card);border:1px solid rgba(255,255,255,0.10);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:-24px 0 80px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.03);transition:all .3s cubic-bezier(.4,0,.2,1);opacity:0;transform:translateX(40px)}
 .kc-overlay.open .kc-modal{opacity:1;transform:translateX(0)}
 .kc-overlay.kc-fullscreen .kc-modal{top:24px;right:60px;bottom:24px;left:60px;width:auto;box-shadow:0 40px 120px rgba(0,0,0,0.85)}
 
 .kc-modal-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;background:rgba(255,255,255,0.02)}
 .kc-modal-title{display:flex;align-items:center;gap:11px;min-width:0}
-.kc-modal-ico{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px}
+.kc-modal-ico{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--indigo) 0%,#8B5CF6 100%);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.3px}
 .kc-modal-eyebrow{font-size:10px;font-weight:700;color:#5d6380;text-transform:uppercase;letter-spacing:.08em;margin:0 0 2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:50vw}
-.kc-modal-eyebrow .kc-wf{color:#c4b5fd;font-weight:700}
+.kc-modal-eyebrow .kc-wf{color:var(--pur-lt);font-weight:700}
 .kc-modal-h{font-size:13px;font-weight:600;color:#e8eaf2;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kc-modal-close{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:#a8a8b8;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
 .kc-modal-close:hover{background:rgba(255,255,255,0.12);color:#fff}
-#kcFrame{flex:1;width:100%;border:0;background:#0b1220;display:block}
+#kcFrame{flex:1;width:100%;border:0;background:var(--bg-card);display:block}
 .bldr-canvas-area{flex:1;display:flex;position:relative;overflow:hidden}
 .bldr-canvas{flex:1;overflow:auto;position:relative;background:radial-gradient(circle at 50% 50%,rgba(43,127,255,0.04) 0%,transparent 70%)}
 .bldr-canvas-inner{position:relative;min-width:100%;min-height:280px}
@@ -597,7 +623,7 @@ a{text-decoration:none;color:inherit}
 .bn-icon-out{background:rgba(5,223,114,0.15)}
 .bn-icon-k{background:rgba(43,127,255,0.12)}
 .bn-badge{height:18px;padding:0 6px;border-radius:4px;font-size:10px;font-weight:700;line-height:18px}
-.bn-bw{background:rgba(0,194,194,0.18);color:#00C2C2}
+.bn-bw{background:rgba(0,194,194,0.18);color:var(--brand-teal)}
 .bn-ba{background:rgba(167,139,250,0.18);color:var(--pur)}
 .bn-bout{background:rgba(5,223,114,0.18);color:var(--ok)}
 .bn-bk{background:rgba(43,127,255,0.18);color:var(--pri)}
@@ -709,19 +735,19 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .bldr-mb.mb-wiz{
   background:rgba(167,139,250,0.10);
   border-color:rgba(167,139,250,0.36);
-  color:#c4b5fd;
+  color:var(--pur-lt);
 }
 .bldr-mb.mb-wiz:hover{
   background:rgba(167,139,250,0.18);
   border-color:rgba(167,139,250,0.55);
-  color:#d6c8ff;
+  color:var(--pur-xlt);
 }
 
 /* Knowledge — secondary green */
 .bldr-mb.mb-kn{
   background:rgba(5,223,114,0.08);
   border-color:rgba(5,223,114,0.30);
-  color:#86efac;
+  color:var(--ok-lt);
 }
 .bldr-mb.mb-kn:hover{
   background:rgba(5,223,114,0.16);
@@ -860,7 +886,7 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 /* ── KNOWLEDGE MODAL ── */
 .kn-modal-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
 .kn-modal-ov.open{display:flex}
-.kn-modal{width:480px;max-height:84vh;background:#0c1428;border:1px solid var(--bds);border-radius:var(--r12);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7)}
+.kn-modal{width:480px;max-height:84vh;background:var(--bg-modal);border:1px solid var(--bds);border-radius:var(--r12);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7)}
 .kn-mhd{padding:16px 20px 13px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;justify-content:space-between}
 .kn-mhd-left{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--t1)}
 .kn-mhd-sub{font-size:12px;color:var(--t3);margin-top:2px}
@@ -982,7 +1008,7 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .pgn-rpp-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);background:rgba(255,255,255,0.05);border:1px solid var(--bd);border-radius:6px;padding:3px 8px;cursor:pointer;transition:border-color .15s,background .15s;white-space:nowrap}
 .pgn-rpp-btn:hover{background:rgba(255,255,255,0.08);border-color:var(--bds)}
 .pgn-rpp-btn svg{flex-shrink:0;opacity:.6}
-.pgn-rpp-menu{position:absolute;bottom:calc(100% + 4px);left:0;background:#0c1428;border:1px solid var(--bds);border-radius:8px;padding:4px;min-width:80px;z-index:120;display:none;flex-direction:column;gap:1px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.pgn-rpp-menu{position:absolute;bottom:calc(100% + 4px);left:0;background:var(--bg-modal);border:1px solid var(--bds);border-radius:8px;padding:4px;min-width:80px;z-index:120;display:none;flex-direction:column;gap:1px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
 .pgn-rpp-menu.open{display:flex}
 .pgn-rpp-opt{padding:7px 12px;font-size:12px;color:var(--t2);border-radius:5px;cursor:pointer;transition:background .1s;background:none;border:none;text-align:left;width:100%}
 .pgn-rpp-opt:hover{background:rgba(255,255,255,0.07)}
@@ -1012,23 +1038,23 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .lt-row.is-failed:hover{background:rgba(255,100,103,0.085)}
 .lt-row.is-auth{border-left-color:var(--warn);background:rgba(253,199,0,0.04)}
 .lt-row.is-auth:hover{background:rgba(253,199,0,0.085)}
-.lt-row.is-gate{border-left-color:#fb923c;background:rgba(251,146,60,0.04)}
+.lt-row.is-gate{border-left-color:var(--orange);background:rgba(251,146,60,0.04)}
 .lt-row.is-gate:hover{background:rgba(251,146,60,0.085)}
 .log-badge{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:20px;font-size:10px;font-weight:700;line-height:1}
 .log-badge svg{width:10px;height:10px;flex-shrink:0;display:block}
 .log-badge.success{background:var(--ok-bg);color:var(--ok)}
-.log-badge.running{background:rgba(34,211,238,0.12);color:#22d3ee}
+.log-badge.running{background:rgba(34,211,238,0.12);color:var(--cyan)}
 .log-badge.running svg{animation:lb-spin 1.2s linear infinite;transform-origin:center}
 .log-badge.failed{background:var(--err-bg);color:var(--err)}
 .log-badge.auth{background:var(--warn-bg);color:var(--warn)}
-.log-badge.partial{background:rgba(196,181,253,0.14);color:#c4b5fd}
-.log-badge.gate{background:rgba(251,146,60,0.14);color:#fb923c}
+.log-badge.partial{background:rgba(196,181,253,0.14);color:var(--pur-lt)}
+.log-badge.gate{background:rgba(251,146,60,0.14);color:var(--orange)}
 .log-badge.waiting{background:rgba(255,255,255,0.07);color:var(--t2)}
 @keyframes lb-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .log-id{font-size:12px;font-weight:700;color:var(--pri)}
 .log-init{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:20px;font-size:10px;font-weight:600;margin-left:6px}
 .log-init.schedule{background:var(--pri-bg);color:var(--pri)}
-.log-init.webhook{background:rgba(0,194,194,0.12);color:#00C2C2}
+.log-init.webhook{background:rgba(0,194,194,0.12);color:var(--brand-teal)}
 .log-init.manual{background:rgba(255,255,255,0.07);color:var(--t2)}
 .log-init.api{background:var(--pur-bg);color:var(--pur)}
 .log-err{font-size:11px;color:var(--err);display:block;margin-top:2px}
@@ -1042,9 +1068,9 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .step-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .step-dot.done{background:var(--ok)}
 .step-dot.fail{background:var(--err)}
-.step-dot.run{background:#22d3ee;animation:step-pulse 1.2s ease-in-out infinite}
+.step-dot.run{background:var(--cyan);animation:step-pulse 1.2s ease-in-out infinite}
 .step-dot.wait{background:var(--t4)}
-.step-dot.gate{background:#fb923c}
+.step-dot.gate{background:var(--orange)}
 .step-dot.auth{background:var(--warn)}
 @keyframes step-pulse{50%{opacity:.5;transform:scale(1.15)}}
 
@@ -1154,7 +1180,7 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 /* ── TRUTHPACK PREVIEW POPUP ── */
 .tp-preview-ov{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px}
 .tp-preview-ov.open{display:flex}
-.tp-preview{width:560px;height:84vh;background:#0c1428;border:1px solid var(--bds);border-radius:var(--r12);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7);animation:mpop .2s ease}
+.tp-preview{width:560px;height:84vh;background:var(--bg-modal);border:1px solid var(--bds);border-radius:var(--r12);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7);animation:mpop .2s ease}
 .tp-prev-hd{padding:16px 20px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:10px;flex-shrink:0}
 .tp-prev-ico{width:36px;height:36px;border-radius:var(--r10);background:var(--pur-bg);border:1px solid rgba(167,139,250,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tp-prev-info{flex:1}
@@ -1190,7 +1216,7 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 /* ── DRIVE PREVIEW POPUP ── */
 .drive-prev-ov{position:fixed;inset:0;z-index:750;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px}
 .drive-prev-ov.open{display:flex}
-.drive-prev{width:min(1060px,calc(100vw - 48px));height:min(80vh,calc(100vh - 48px));background:#0c1428;border:1px solid var(--bds);border-radius:var(--r12);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7);animation:mpop .2s ease;position:relative;z-index:1;isolation:isolate}
+.drive-prev{width:min(1060px,calc(100vw - 48px));height:min(80vh,calc(100vh - 48px));background:var(--bg-modal);border:1px solid var(--bds);border-radius:var(--r12);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7);animation:mpop .2s ease;position:relative;z-index:1;isolation:isolate}
 .drive-prev-hd{padding:16px 20px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:10px;flex-shrink:0}
 .drive-prev-ico{width:36px;height:36px;border-radius:var(--r10);background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .drive-prev-info{flex:1;min-width:0}
@@ -1367,18 +1393,18 @@ body.test-mode #vTestMode{display:flex}
 .tm-bc-sep{color:var(--t4)}
 .tm-bc-mode{color:var(--t1);font-weight:700}
 .tm-status-pill{display:flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:700;border:1px solid}
-.tm-status-pill.running{background:rgba(249,115,22,0.14);border-color:rgba(249,115,22,0.35);color:#f97316}
+.tm-status-pill.running{background:rgba(249,115,22,0.14);border-color:rgba(249,115,22,0.35);color:var(--orange)}
 .tm-status-pill.completed{background:rgba(5,223,114,0.1);border-color:rgba(5,223,114,0.28);color:var(--ok)}
 .tm-status-pill.failed{background:rgba(255,100,103,0.1);border-color:rgba(255,100,103,0.3);color:var(--err)}
 .tm-pill-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.tm-status-pill.running .tm-pill-dot{background:#f97316;animation:tm-blink 1.1s ease-in-out infinite}
+.tm-status-pill.running .tm-pill-dot{background:var(--orange);animation:tm-blink 1.1s ease-in-out infinite}
 .tm-status-pill.completed .tm-pill-dot{background:var(--ok)}
 @keyframes tm-blink{0%,100%{opacity:1}50%{opacity:.2}}
 .tm-tb-r{display:flex;align-items:center;gap:8px}
 .tm-edit-input-btn{height:30px;padding:0 12px;border-radius:var(--r6);border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .12s}
 .tm-edit-input-btn:hover{border-color:rgba(255,255,255,0.2);color:var(--t1);background:rgba(255,255,255,0.04)}
 .tm-run-btn{height:30px;padding:0 13px;border-radius:var(--r6);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;border:1px solid;transition:all .2s}
-.tm-run-btn.running{background:rgba(249,115,22,0.16);border-color:rgba(249,115,22,0.4);color:#f97316}
+.tm-run-btn.running{background:rgba(249,115,22,0.16);border-color:rgba(249,115,22,0.4);color:var(--orange)}
 .tm-run-btn.completed{background:rgba(5,223,114,0.08);border-color:rgba(5,223,114,0.28);color:var(--ok)}
 /* canvas area */
 .tm-canvas-area{flex:1;position:relative;overflow:hidden}
@@ -1418,7 +1444,7 @@ body.test-mode #vTestMode{display:flex}
 .tm-trace-resize:hover{background:rgba(43,127,255,0.18)}
 .tm-trace-resize:hover::after{opacity:1;background:rgba(43,127,255,0.65)}
 .tm-trace-panel.is-resizing .tm-trace-resize{background:rgba(43,127,255,0.30)}
-.tm-trace-panel.is-resizing .tm-trace-resize::after{opacity:1;background:#80AFFF}
+.tm-trace-panel.is-resizing .tm-trace-resize::after{opacity:1;background:var(--pri-lt)}
 
 /* While dragging, lock the cursor everywhere + suppress text selection */
 body.tm-trace-resizing{user-select:none;cursor:col-resize !important}
@@ -1455,10 +1481,10 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .tm-dot-col{width:32px;display:flex;flex-direction:column;align-items:center;padding:13px 0 0;flex-shrink:0}
 .tm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:all .4s}
 .tm-dot.pending{background:rgba(255,255,255,0.1)}
-.tm-dot.running{background:#f97316;box-shadow:0 0 8px rgba(249,115,22,0.6);animation:tm-blink 1s infinite}
+.tm-dot.running{background:var(--orange);box-shadow:0 0 8px rgba(249,115,22,0.6);animation:tm-blink 1s infinite}
 .tm-dot.success{background:var(--ok)}
 .tm-dot.skipped{background:rgba(255,255,255,0.15);opacity:.5}
-.tm-dot.resumed{background:#f97316}
+.tm-dot.resumed{background:var(--orange)}
 .tm-vert{width:1px;flex:1;background:rgba(255,255,255,0.07);margin-top:4px}
 .tm-step-body{flex:1;padding:10px 12px 8px 2px;min-width:0}
 .tm-step-r1{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px}
@@ -1471,9 +1497,9 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .tm-type.A{background:rgba(43,127,255,0.15);color:var(--pri)}
 .tm-type.RAG{background:rgba(43,127,255,0.12);color:var(--pri)}
 .tm-type.IF{background:rgba(255,255,255,0.07);color:var(--t3)}
-.tm-type.WAIT{background:rgba(249,115,22,0.12);color:#f97316}
+.tm-type.WAIT{background:rgba(249,115,22,0.12);color:var(--orange)}
 .tm-type.OUT{background:rgba(5,223,114,0.12);color:var(--ok)}
-.tm-type.RESUMED{background:rgba(249,115,22,0.12);color:#f97316}
+.tm-type.RESUMED{background:rgba(249,115,22,0.12);color:var(--orange)}
 .tm-step-sub{font-size:10px;color:var(--t4);margin-top:1px}
 /* expanded detail */
 .tm-step-det{max-height:0;overflow:hidden;transition:max-height .25s ease}
@@ -1519,7 +1545,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   color:var(--t2);font-size:10px;font-weight:600;cursor:pointer;
   transition:background .12s, color .12s, border-color .12s;
 }
-.tm-det-copy:hover{background:rgba(43,127,255,0.10);border-color:rgba(43,127,255,0.35);color:#80AFFF}
+.tm-det-copy:hover{background:rgba(43,127,255,0.10);border-color:rgba(43,127,255,0.35);color:var(--pri-lt)}
 .tm-step-json{
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:11px;line-height:1.55;
@@ -1533,10 +1559,10 @@ body.tm-trace-resizing iframe{pointer-events:none}
   color:var(--t2);
   max-height:380px;
 }
-.tm-step-json .json-key{color:#80AFFF}
-.tm-step-json .json-string{color:#86efac}
-.tm-step-json .json-number{color:#fde047}
-.tm-step-json .json-bool{color:#c4b5fd}
+.tm-step-json .json-key{color:var(--pri-lt)}
+.tm-step-json .json-string{color:var(--ok-lt)}
+.tm-step-json .json-number{color:var(--warn-lt)}
+.tm-step-json .json-bool{color:var(--pur-lt)}
 .tm-step-json .json-null{color:var(--t4)}
 
 .tm-det-empty{
@@ -1590,7 +1616,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .wiz-discard-btn:hover{background:rgba(255,255,255,.05)}
 #bldrKnModalOv{position:fixed;inset:0;z-index:550;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
 #bldrKnModalOv.open{display:flex}
-#bldrKnPanel{width:780px;max-height:88vh;background:#0c1428;border:1px solid var(--bds);border-radius:var(--r12);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+#bldrKnPanel{width:780px;max-height:88vh;background:var(--bg-modal);border:1px solid var(--bds);border-radius:var(--r12);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7)}
 .bkp-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 22px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .bkp-title{font-size:14px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:8px}
 .bkp-title-sub{font-size:12px;font-weight:400;color:var(--t3);margin-left:4px}
@@ -1812,7 +1838,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 /* ── TRUTHPACK / DRIVE MARKETPLACE MODAL ── */
 .tp-mkt-ov{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px 60px}
 .tp-mkt-ov.open{display:flex}
-.tp-mkt{width:calc(100vw - 120px);height:calc(100vh - 40px);background:#0b1220;border:1px solid rgba(255,255,255,.1);border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.85)}
+.tp-mkt{width:calc(100vw - 120px);height:calc(100vh - 40px);background:var(--bg-card);border:1px solid rgba(255,255,255,.1);border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.85)}
 /* Header */
 .tp-mkt-hd{display:flex;align-items:center;justify-content:space-between;padding:24px 28px 20px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .tp-mkt-hd-left{display:flex;align-items:center;gap:14px}
@@ -1868,13 +1894,13 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .tp-mkt-planes-lbl{font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .tp-mkt-plane{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid transparent}
 .tp-mkt-plane.on{background:rgba(43,127,255,.1);color:#93C5FD;border-color:rgba(43,127,255,.22)}
-.tp-mkt-plane.sandbox-on{background:rgba(167,139,250,.1);color:#C4B5FD;border-color:rgba(167,139,250,.22)}
+.tp-mkt-plane.sandbox-on{background:rgba(167,139,250,.1);color:var(--pur-lt);border-color:rgba(167,139,250,.22)}
 .tp-mkt-plane.sources-on{background:rgba(52,211,153,.09);color:#6EE7B7;border-color:rgba(52,211,153,.2)}
 .tp-mkt-plane.off{background:rgba(255,255,255,.03);color:var(--t4);border-color:rgba(255,255,255,.07)}
 .tp-mkt-plane.dis{background:transparent;color:rgba(255,255,255,.18);border-color:transparent;text-decoration:line-through;font-size:10px}
 .tp-mkt-plane-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .tp-mkt-plane.on .tp-mkt-plane-dot{background:#93C5FD}
-.tp-mkt-plane.sandbox-on .tp-mkt-plane-dot{background:#C4B5FD}
+.tp-mkt-plane.sandbox-on .tp-mkt-plane-dot{background:var(--pur-lt)}
 .tp-mkt-plane.sources-on .tp-mkt-plane-dot{background:#6EE7B7}
 .tp-mkt-plane.off .tp-mkt-plane-dot{background:var(--t4)}
 /* Drive folder mini-list */
@@ -1931,7 +1957,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .tp-mkt-tree-item:hover{background:rgba(255,255,255,.04)}
 .tp-mkt-tree-item.file{cursor:default}
 .tp-mkt-tree-item svg{flex-shrink:0;color:var(--t4)}
-.tp-mkt-tree-item.folder svg{color:#FDC700}
+.tp-mkt-tree-item.folder svg{color:var(--warn)}
 .tp-mkt-tree-nm{font-size:12px;color:var(--t2);flex:1}
 .tp-mkt-tree-cnt{font-size:11px;color:var(--t4)}
 .tp-mkt-tree-item.clickable{cursor:pointer}
@@ -1941,7 +1967,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .drv-detail-toolbar-left{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3)}
 .drv-detail-toolbar-left strong{color:var(--t1);font-size:13px}
 .drv-sel-badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:20px;background:rgba(43,127,255,.15);color:var(--pri);font-size:11px;font-weight:700;border:1px solid rgba(43,127,255,.3)}
-.drv-ai-btn{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:linear-gradient(135deg,rgba(43,127,255,.15),rgba(167,139,250,.15));border:1px solid rgba(167,139,250,.3);color:#C4B5FD;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.drv-ai-btn{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:linear-gradient(135deg,rgba(43,127,255,.15),rgba(167,139,250,.15));border:1px solid rgba(167,139,250,.3);color:var(--pur-lt);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
 .drv-ai-btn:hover{background:linear-gradient(135deg,rgba(43,127,255,.25),rgba(167,139,250,.25));color:#e0d9ff}
 .drv-ai-btn svg{flex-shrink:0}
 .drv-view-btns{display:flex;gap:3px}
@@ -1967,10 +1993,10 @@ body.tm-trace-resizing iframe{pointer-events:none}
 /* ── AI SUMMARY PANEL ── */
 .drv-ai-summary{margin:16px 20px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(43,127,255,.08),rgba(167,139,250,.06));border:1px solid rgba(167,139,250,.25);border-radius:12px;display:none;animation:mpop .2s ease}
 .drv-ai-summary.visible{display:block}
-.drv-ai-summary-hd{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#C4B5FD;margin-bottom:8px}
+.drv-ai-summary-hd{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--pur-lt);margin-bottom:8px}
 .drv-ai-summary-txt{font-size:12px;color:var(--t2);line-height:1.7}
 .drv-ai-loading{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3)}
-.drv-ai-dot{width:5px;height:5px;border-radius:50%;background:#C4B5FD;animation:aidot 1.2s ease-in-out infinite}
+.drv-ai-dot{width:5px;height:5px;border-radius:50%;background:var(--pur-lt);animation:aidot 1.2s ease-in-out infinite}
 .drv-ai-dot:nth-child(2){animation-delay:.2s}
 .drv-ai-dot:nth-child(3){animation-delay:.4s}
 @keyframes aidot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
@@ -1987,7 +2013,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .mkt-discard-btn{height:38px;padding:0 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none}
 .mkt-discard-btn.secondary{background:transparent;border:1px solid var(--bd);color:var(--t2)}
 .mkt-discard-btn.secondary:hover{background:rgba(255,255,255,.06);color:var(--t1)}
-.mkt-discard-btn.danger{background:rgba(255,100,103,.15);color:#FF6467;border:1px solid rgba(255,100,103,.3)}
+.mkt-discard-btn.danger{background:rgba(255,100,103,.15);color:var(--err);border:1px solid rgba(255,100,103,.3)}
 .mkt-discard-btn.danger:hover{background:rgba(255,100,103,.25)}
 .mkt-discard-btn.primary{background:var(--pri);color:#fff}
 .mkt-discard-btn.primary:hover{opacity:.88}
@@ -2079,7 +2105,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
    the full step list; draggable by the header so users can park it anywhere. */
 .demo-panel{
   position:fixed;top:62px;right:18px;width:210px;
-  background:#0b1220;border:1px solid var(--bd);
+  background:var(--bg-card);border:1px solid var(--bd);
   border-radius:14px;
   box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(43,127,255,0.10);
   z-index:9100;
@@ -2102,10 +2128,10 @@ body.tm-trace-resizing iframe{pointer-events:none}
   cursor:move;user-select:none;
 }
 .demo-panel-hd:hover{background:rgba(43,127,255,0.08)}
-.demo-panel-title{font-size:11px;font-weight:700;color:#80AFFF;letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+.demo-panel-title{font-size:11px;font-weight:700;color:var(--pri-lt);letter-spacing:.02em;display:flex;align-items:center;gap:6px}
 .demo-panel-title::before{
   content:'';display:inline-block;width:8px;height:8px;border-radius:50%;
-  background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  background:linear-gradient(135deg,var(--brand-teal) 0%,var(--brand-blue) 100%);
   flex-shrink:0;
 }
 .demo-panel-close{
@@ -2119,7 +2145,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   background:rgba(43,127,255,0.04);
 }
 .demo-panel-current-label{
-  font-size:9px;font-weight:700;letter-spacing:.10em;color:#80AFFF;
+  font-size:9px;font-weight:700;letter-spacing:.10em;color:var(--pri-lt);
   text-transform:uppercase;
 }
 .demo-panel-current-title{
@@ -2223,7 +2249,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .demo-step-body{min-width:0}
 .demo-step-title{font-size:11px;font-weight:700;color:var(--t1);line-height:1.25}
 .demo-step.is-done .demo-step-title{color:var(--t3)}
-.demo-step.is-current .demo-step-title{color:#80AFFF}
+.demo-step.is-current .demo-step-title{color:var(--pri-lt)}
 .demo-step-desc{font-size:10px;color:var(--t3);line-height:1.35;margin-top:1px}
 .demo-panel-ft{
   display:flex;align-items:center;justify-content:space-between;
@@ -2258,7 +2284,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 /* Tooltip card next to the highlight */
 .demo-tooltip{
   position:fixed;width:220px;z-index:9120;
-  background:#0b1220;border:1px solid var(--bd);border-radius:12px;
+  background:var(--bg-card);border:1px solid var(--bd);border-radius:12px;
   box-shadow:0 12px 32px rgba(0,0,0,0.50);
   padding:10px 12px;
   opacity:0;transform:translateY(4px);
@@ -2267,14 +2293,14 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 .demo-tooltip.is-visible{opacity:1;transform:translateY(0)}
 .demo-tooltip-label{
-  font-size:9px;font-weight:700;letter-spacing:.10em;color:#80AFFF;
+  font-size:9px;font-weight:700;letter-spacing:.10em;color:var(--pri-lt);
   text-transform:uppercase;margin-bottom:4px;
 }
 .demo-tooltip-text{font-size:11px;color:var(--t1);line-height:1.45}
 /* Arrow indicators */
 .demo-tooltip::before{
   content:'';position:absolute;width:10px;height:10px;
-  background:#0b1220;border:1px solid var(--bd);
+  background:var(--bg-card);border:1px solid var(--bd);
   transform:rotate(45deg);
 }
 .demo-tooltip[data-side="down"]::before{
@@ -2314,7 +2340,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 /* Agent selector popover — appears next to the just-dropped node */
 .agent-selector{
   position:fixed;z-index:9200;width:320px;
-  background:#0b1220;border:1px solid rgba(167,139,250,0.30);
+  background:var(--bg-card);border:1px solid rgba(167,139,250,0.30);
   border-radius:12px;
   box-shadow:0 24px 56px rgba(0,0,0,0.65), 0 0 0 1px rgba(167,139,250,0.10);
   display:flex;flex-direction:column;overflow:hidden;
@@ -2329,7 +2355,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   display:flex;align-items:center;justify-content:space-between;
   background:rgba(167,139,250,0.06);
 }
-.agent-selector-title{font-size:11px;font-weight:700;color:#c4b5fd;letter-spacing:.04em;display:flex;align-items:center;gap:6px}
+.agent-selector-title{font-size:11px;font-weight:700;color:var(--pur-lt);letter-spacing:.04em;display:flex;align-items:center;gap:6px}
 .agent-selector-close{
   width:22px;height:22px;border-radius:6px;background:transparent;border:none;color:var(--t3);
   cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;
@@ -2363,7 +2389,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   width:28px;height:28px;border-radius:7px;
   background:rgba(167,139,250,0.16);
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:800;color:#c4b5fd;letter-spacing:.02em;
+  font-size:10px;font-weight:800;color:var(--pur-lt);letter-spacing:.02em;
   flex-shrink:0;
   border:1px solid rgba(167,139,250,0.30);
 }
@@ -2387,7 +2413,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 .agent-selector-create-btn{
   width:100%;height:32px;padding:0 10px;border-radius:8px;
-  background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  background:linear-gradient(135deg,var(--brand-teal) 0%,var(--brand-blue) 100%);
   border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:6px;
   transition:filter .12s;
@@ -2446,7 +2472,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:background .12s, color .12s, border-color .12s;
 }
-.agt-mod-hd-expand:hover{background:rgba(167,139,250,0.10);border-color:rgba(167,139,250,0.40);color:#c4b5fd}
+.agt-mod-hd-expand:hover{background:rgba(167,139,250,0.10);border-color:rgba(167,139,250,0.40);color:var(--pur-lt)}
 .agt-mod-hd-expand svg{transition:transform .15s ease}
 .agt-mod-overlay.is-fullscreen .agt-mod-hd-expand svg{transform:rotate(180deg)}
 
@@ -2455,7 +2481,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
    replaced with the embedded governance-studio Knowledge Library iframe.
    The sidebar tabs are hidden, header gains a breadcrumb back button. */
 .agt-mod-overlay.is-knowledge-view .agt-mod-hd-meta .agt-mod-hd-eyebrow{
-  color:#c4b5fd;
+  color:var(--pur-lt);
 }
 .agt-mod-overlay.is-knowledge-view .agt-mod-hd-fork,
 .agt-mod-overlay.is-knowledge-view .agt-mod-hd-save{
@@ -2464,20 +2490,20 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .agt-mod-hd-back{
   height:32px;padding:0 11px;border-radius:7px;
   background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.30);
-  color:#c4b5fd;font-size:11.5px;font-weight:600;cursor:pointer;
+  color:var(--pur-lt);font-size:11.5px;font-weight:600;cursor:pointer;
   display:none;align-items:center;gap:6px;
   transition:background .12s, border-color .12s, color .12s;
   margin-right:4px;
 }
 .agt-mod-overlay.is-knowledge-view .agt-mod-hd-back{display:inline-flex}
-.agt-mod-hd-back:hover{background:rgba(167,139,250,0.20);border-color:rgba(167,139,250,0.55);color:#d6c8ff}
+.agt-mod-hd-back:hover{background:rgba(167,139,250,0.20);border-color:rgba(167,139,250,0.55);color:var(--pur-xlt)}
 
 .agt-mod-knowledge-frame{
-  width:100%;height:100%;border:none;background:#0a0d1a;
+  width:100%;height:100%;border:none;background:var(--bg);
   display:block;
 }
 .agt-mod-body.is-knowledge-host{
-  padding:0;background:#0a0d1a;
+  padding:0;background:var(--bg);
 }
 
 /* ──────────────────────────────────────────────────────────────────────
@@ -2487,7 +2513,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
    • Right: source tabs (Packs / Drives) with filterable rows + Attach btn
    ────────────────────────────────────────────────────────────────────── */
 .nkp-shell{
-  display:flex;width:100%;height:100%;min-height:0;background:#0a0d1a;
+  display:flex;width:100%;height:100%;min-height:0;background:var(--bg);
 }
 .nkp-left{
   width:280px;flex-shrink:0;
@@ -2504,7 +2530,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   color:var(--t3);
 }
 .nkp-left-hd .cnt{
-  font-size:10px;font-weight:700;color:#c4b5fd;
+  font-size:10px;font-weight:700;color:var(--pur-lt);
   background:rgba(167,139,250,0.14);padding:2px 7px;border-radius:9px;
 }
 .nkp-left-list{flex:1;overflow-y:auto;padding:8px 8px}
@@ -2526,9 +2552,9 @@ body.tm-trace-resizing iframe{pointer-events:none}
   font-size:8.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
   padding:1px 5px;border-radius:3px;line-height:1.2;
 }
-.nkp-src-workflow{background:rgba(43,127,255,0.16);color:#80AFFF}
-.nkp-src-agent   {background:rgba(167,139,250,0.16);color:#c4b5fd}
-.nkp-src-node    {background:rgba(34,211,238,0.16);color:#22d3ee}
+.nkp-src-workflow{background:rgba(43,127,255,0.16);color:var(--pri-lt)}
+.nkp-src-agent   {background:rgba(167,139,250,0.16);color:var(--pur-lt)}
+.nkp-src-node    {background:rgba(34,211,238,0.16);color:var(--cyan)}
 .nkp-detach-btn{
   width:24px;height:24px;border-radius:5px;
   background:transparent;border:1px solid var(--bd);color:var(--t3);
@@ -2559,14 +2585,14 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 .nkp-tab:hover{background:rgba(255,255,255,0.04);color:var(--t1)}
 .nkp-tab.is-active{
-  background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.32);color:#c4b5fd;
+  background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.32);color:var(--pur-lt);
 }
 .nkp-tab .count{
   font-size:10px;font-weight:700;
   background:rgba(255,255,255,0.06);color:var(--t3);
   padding:1px 6px;border-radius:8px;
 }
-.nkp-tab.is-active .count{background:rgba(167,139,250,0.22);color:#c4b5fd}
+.nkp-tab.is-active .count{background:rgba(167,139,250,0.22);color:var(--pur-lt)}
 .nkp-right-hd-search{
   flex:1;margin-left:6px;display:flex;align-items:center;gap:6px;
   background:rgba(255,255,255,0.04);border:1px solid var(--bd);
@@ -2580,7 +2606,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .nkp-open-lib{
   height:30px;padding:0 11px;border-radius:6px;
   background:rgba(43,127,255,0.10);border:1px solid rgba(43,127,255,0.32);
-  color:#80AFFF;font-size:11.5px;font-weight:600;cursor:pointer;
+  color:var(--pri-lt);font-size:11.5px;font-weight:600;cursor:pointer;
   display:inline-flex;align-items:center;gap:6px;
   transition:background .12s, border-color .12s, color .12s;
 }
@@ -2628,7 +2654,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .nkp-attach-btn.is-attached:hover{background:transparent}
 
 /* Body class flips when picker mode is active */
-.agt-mod-body.is-picker-host{padding:0;background:#0a0d1a}
+.agt-mod-body.is-picker-host{padding:0;background:var(--bg)}
 
 /* ── Blast Radius badge (used in N workflows · X calls) ─────────────── */
 .blast-badge{
@@ -2650,11 +2676,11 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 .blast-badge.is-warm{
   background:rgba(5,223,114,0.08);border:1px solid rgba(5,223,114,0.22);
-  color:#86efac;
+  color:var(--ok-lt);
 }
 .blast-badge.is-hot{
   background:rgba(253,199,0,0.10);border:1px solid rgba(253,199,0,0.32);
-  color:#fde047;
+  color:var(--warn-lt);
 }
 
 /* ── Reference Files: drop zone + file rows ───────────────────────────── */
@@ -2677,17 +2703,17 @@ body.tm-trace-resizing iframe{pointer-events:none}
   width:40px;height:40px;flex-shrink:0;border-radius:9px;
   background:linear-gradient(135deg, rgba(167,139,250,0.25), rgba(167,139,250,0.08));
   border:1px solid rgba(167,139,250,0.30);
-  display:flex;align-items:center;justify-content:center;color:#c4b5fd;
+  display:flex;align-items:center;justify-content:center;color:var(--pur-lt);
 }
 .nkp-dropzone-text{flex:1;min-width:0}
 .nkp-dropzone-text .ttl{font-size:12.5px;font-weight:700;color:var(--t1);line-height:1.25}
 .nkp-dropzone-text .sub{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.4}
-.nkp-dropzone-text .sub strong{color:#c4b5fd;font-weight:700}
+.nkp-dropzone-text .sub strong{color:var(--pur-lt);font-weight:700}
 .nkp-dropzone input[type="file"]{display:none}
 .nkp-dropzone-btn{
   height:30px;padding:0 13px;border-radius:7px;
   background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.40);
-  color:#c4b5fd;font-size:11.5px;font-weight:700;cursor:pointer;
+  color:var(--pur-lt);font-size:11.5px;font-weight:700;cursor:pointer;
   display:inline-flex;align-items:center;gap:6px;
   transition:background .12s, border-color .12s;
   flex-shrink:0;
@@ -2706,13 +2732,13 @@ body.tm-trace-resizing iframe{pointer-events:none}
   display:flex;align-items:center;justify-content:center;
   font-weight:700;font-size:9px;letter-spacing:.04em;text-transform:uppercase;
 }
-.nkp-file-ico.t-pdf  {background:rgba(255,100,103,0.15);color:#FF6467}
-.nkp-file-ico.t-docx {background:rgba(43,127,255,0.16);color:#80AFFF}
+.nkp-file-ico.t-pdf  {background:rgba(255,100,103,0.15);color:var(--err)}
+.nkp-file-ico.t-docx {background:rgba(43,127,255,0.16);color:var(--pri-lt)}
 .nkp-file-ico.t-sheet{background:rgba(5,223,114,0.14);color:#34d399}
-.nkp-file-ico.t-md   {background:rgba(34,211,238,0.14);color:#22d3ee}
+.nkp-file-ico.t-md   {background:rgba(34,211,238,0.14);color:var(--cyan)}
 .nkp-file-ico.t-txt  {background:rgba(255,255,255,0.06);color:var(--t2)}
-.nkp-file-ico.t-json {background:rgba(253,199,0,0.14);color:#fde047}
-.nkp-file-ico.t-image{background:rgba(167,139,250,0.14);color:#c4b5fd}
+.nkp-file-ico.t-json {background:rgba(253,199,0,0.14);color:var(--warn-lt)}
+.nkp-file-ico.t-image{background:rgba(167,139,250,0.14);color:var(--pur-lt)}
 .nkp-file-ico.t-file {background:rgba(255,255,255,0.06);color:var(--t2)}
 .nkp-file-body{flex:1;min-width:0}
 .nkp-file-nm{font-size:12.5px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2727,7 +2753,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 .nkp-file-remove:hover{background:rgba(255,100,103,0.10);border-color:rgba(255,100,103,0.40);color:var(--err)}
 .agt-mod-overlay.is-knowledge-view .agt-mod-ft-hint{
-  color:#c4b5fd;
+  color:var(--pur-lt);
 }
 .agt-mod-overlay.is-knowledge-view .agt-mod-ft-actions .agt-mod-ft-btn:not(.agt-mod-ft-btn-primary){
   display:none;
@@ -2749,7 +2775,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   background:linear-gradient(135deg, rgba(167,139,250,0.20), rgba(167,139,250,0.06));
   border:1px solid rgba(167,139,250,0.30);
   display:flex;align-items:center;justify-content:center;
-  color:#c4b5fd;font-weight:700;font-size:12px;letter-spacing:.04em;
+  color:var(--pur-lt);font-weight:700;font-size:12px;letter-spacing:.04em;
 }
 .agt-mod-hd-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .agt-mod-hd-eyebrow{
@@ -2758,7 +2784,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 .agt-mod-hd-eyebrow .pill{
   font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;
-  background:rgba(167,139,250,0.14);border:1px solid rgba(167,139,250,0.32);color:#c4b5fd;
+  background:rgba(167,139,250,0.14);border:1px solid rgba(167,139,250,0.32);color:var(--pur-lt);
   letter-spacing:.04em;
 }
 .agt-mod-hd-name{font-size:16px;font-weight:700;color:var(--t1);line-height:1.2}
@@ -2775,11 +2801,11 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .agt-mod-hd-fork{
   height:30px;padding:0 11px;border-radius:7px;
   background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.34);
-  color:#c4b5fd;font-size:11.5px;font-weight:600;cursor:pointer;
+  color:var(--pur-lt);font-size:11.5px;font-weight:600;cursor:pointer;
   display:inline-flex;align-items:center;gap:6px;
   transition:background .12s, border-color .12s, color .12s;
 }
-.agt-mod-hd-fork:hover{background:rgba(167,139,250,0.20);border-color:rgba(167,139,250,0.55);color:#d6c8ff}
+.agt-mod-hd-fork:hover{background:rgba(167,139,250,0.20);border-color:rgba(167,139,250,0.55);color:var(--pur-xlt)}
 .agt-mod-hd-close{
   width:32px;height:32px;border-radius:8px;
   background:transparent;border:1px solid var(--bd);color:var(--t2);
@@ -2864,8 +2890,8 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .insp-cfg-tab:hover{background:rgba(255,255,255,0.03);color:var(--t1)}
 .insp-cfg-tab.is-active{
   background:rgba(167,139,250,0.10);
-  color:#c4b5fd;
-  border-left-color:#c4b5fd;
+  color:var(--pur-lt);
+  border-left-color:var(--pur-lt);
 }
 .insp-cfg-tab.is-locked{opacity:0.45;cursor:not-allowed}
 .insp-cfg-tab.is-locked:hover{background:transparent;color:var(--t3)}
@@ -2881,7 +2907,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .insp-cfg-tab .lbl{position:relative;display:inline-flex;align-items:center;gap:5px}
 .override-dot{
   width:6px;height:6px;border-radius:50%;
-  background:#A78BFA;box-shadow:0 0 0 2px rgba(167,139,250,0.18);
+  background:var(--pur);box-shadow:0 0 0 2px rgba(167,139,250,0.18);
   display:inline-block;flex-shrink:0;
 }
 
@@ -2892,11 +2918,11 @@ body.tm-trace-resizing iframe{pointer-events:none}
   padding:2px 6px;border-radius:9px;
   background:rgba(167,139,250,0.14);
   border:1px solid rgba(167,139,250,0.32);
-  color:#c4b5fd;
+  color:var(--pur-lt);
   margin-left:6px;
 }
 .insp-cfg-ovrd-pill::before{
-  content:'';width:5px;height:5px;border-radius:50%;background:#A78BFA;
+  content:'';width:5px;height:5px;border-radius:50%;background:var(--pur);
 }
 .insp-cfg-ovrd-reset{
   display:inline-flex;align-items:center;gap:4px;
@@ -2906,7 +2932,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   transition:background .12s, color .12s, border-color .12s;
 }
 .insp-cfg-ovrd-reset:hover{
-  background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.32);color:#c4b5fd;
+  background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.32);color:var(--pur-lt);
 }
 .insp-cfg-ovrd-banner{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -2914,7 +2940,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   background:rgba(167,139,250,0.07);
   border:1px solid rgba(167,139,250,0.22);
   border-radius:7px;
-  font-size:10.5px;color:#c4b5fd;line-height:1.4;
+  font-size:10.5px;color:var(--pur-lt);line-height:1.4;
 }
 .insp-cfg-ovrd-banner .txt{flex:1;min-width:0}
 .insp-cfg-ovrd-banner .txt strong{color:#e9e2ff;font-weight:700}
@@ -2955,7 +2981,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   transition:background .12s, color .12s, border-color .12s;
 }
 .insp-cfg-chip:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
-.insp-cfg-chip.is-active{background:rgba(167,139,250,0.16);border-color:rgba(167,139,250,0.45);color:#c4b5fd}
+.insp-cfg-chip.is-active{background:rgba(167,139,250,0.16);border-color:rgba(167,139,250,0.45);color:var(--pur-lt)}
 
 .insp-cfg-slider-row{
   display:flex;align-items:center;gap:10px;
@@ -2966,8 +2992,8 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 .insp-cfg-slider-row input[type="range"]::-webkit-slider-thumb{
   -webkit-appearance:none;appearance:none;width:14px;height:14px;
-  background:#c4b5fd;border-radius:50%;cursor:pointer;
-  border:2px solid #0b1220;box-shadow:0 0 0 1px rgba(167,139,250,0.6);
+  background:var(--pur-lt);border-radius:50%;cursor:pointer;
+  border:2px solid var(--bg-card);box-shadow:0 0 0 1px rgba(167,139,250,0.6);
 }
 .insp-cfg-slider-val{
   min-width:42px;text-align:right;font-size:11px;font-weight:700;
@@ -3010,12 +3036,12 @@ body.tm-trace-resizing iframe{pointer-events:none}
   display:inline-flex;align-items:center;gap:4px;
   transition:background .12s, color .12s, border-color .12s;
 }
-.insp-cfg-hd-fork:hover{background:rgba(167,139,250,0.10);border-color:rgba(167,139,250,0.30);color:#c4b5fd}
+.insp-cfg-hd-fork:hover{background:rgba(167,139,250,0.10);border-color:rgba(167,139,250,0.30);color:var(--pur-lt)}
 
 /* "Configure" CTA in the compact (collapsed) inspector node card */
 .insp-configure-btn{
   height:24px;padding:0 10px;border-radius:6px;
-  background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  background:linear-gradient(135deg,var(--brand-teal) 0%,var(--brand-blue) 100%);
   border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;
   display:inline-flex;align-items:center;gap:4px;
   margin-left:auto;
@@ -3034,9 +3060,9 @@ body.tm-trace-resizing iframe{pointer-events:none}
   font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
   padding:1px 5px;border-radius:3px;
 }
-.insp-knl-row .src-badge.from-workflow{background:rgba(43,127,255,0.14);color:#80AFFF;border:1px solid rgba(43,127,255,0.30)}
+.insp-knl-row .src-badge.from-workflow{background:rgba(43,127,255,0.14);color:var(--pri-lt);border:1px solid rgba(43,127,255,0.30)}
 .insp-knl-row .src-badge.from-agent{background:rgba(34,211,238,0.14);color:#67e8f9;border:1px solid rgba(34,211,238,0.30)}
-.insp-knl-row .src-badge.from-node{background:rgba(167,139,250,0.14);color:#c4b5fd;border:1px solid rgba(167,139,250,0.30)}
+.insp-knl-row .src-badge.from-node{background:rgba(167,139,250,0.14);color:var(--pur-lt);border:1px solid rgba(167,139,250,0.30)}
 .insp-knl-empty{
   padding:20px 12px;text-align:center;border:1px dashed var(--bd);border-radius:10px;
   color:var(--t3);font-size:11px;
@@ -3044,7 +3070,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 .insp-knl-manage{
   width:100%;height:32px;border-radius:7px;
   background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.30);
-  color:#c4b5fd;font-size:11px;font-weight:700;cursor:pointer;
+  color:var(--pur-lt);font-size:11px;font-weight:700;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:5px;
   transition:background .12s, filter .12s;
 }
@@ -3097,7 +3123,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 @keyframes fork-ov-in { from{opacity:0} to{opacity:1} }
 .fork-dialog{
-  width:100%;max-width:420px;background:#0b1220;
+  width:100%;max-width:420px;background:var(--bg-card);
   border:1px solid var(--bd);border-radius:14px;
   box-shadow:0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(167,139,250,0.15);
   display:flex;flex-direction:column;overflow:hidden;
@@ -3113,7 +3139,7 @@ body.tm-trace-resizing iframe{pointer-events:none}
   width:30px;height:30px;border-radius:8px;
   background:rgba(167,139,250,0.16);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  color:#c4b5fd;border:1px solid rgba(167,139,250,0.30);
+  color:var(--pur-lt);border:1px solid rgba(167,139,250,0.30);
 }
 .fork-dialog-title{font-size:13px;font-weight:700;color:var(--t1);line-height:1.3}
 .fork-dialog-sub{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.45}
@@ -3149,11 +3175,11 @@ body.tm-trace-resizing iframe{pointer-events:none}
 }
 .fork-dialog-btn:hover{background:rgba(255,255,255,0.08);color:var(--t1)}
 .fork-dialog-btn-primary{
-  background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  background:linear-gradient(135deg,var(--brand-teal) 0%,var(--brand-blue) 100%);
   border-color:transparent;color:#fff;
   display:inline-flex;align-items:center;gap:5px;
 }
-.fork-dialog-btn-primary:hover{filter:brightness(1.10);background:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);color:#fff}
+.fork-dialog-btn-primary:hover{filter:brightness(1.10);background:linear-gradient(135deg,var(--brand-teal) 0%,var(--brand-blue) 100%);color:#fff}
 
 /* ════════════════════════════════════════════════════════════════════════════
    TOPBAR DROPDOWNS + SEARCH MODAL + KBD MODAL (A2.1)
@@ -3187,7 +3213,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
   position:absolute;bottom:-1px;right:-1px;
   width:9px;height:9px;border-radius:50%;
   background:var(--ok);
-  box-shadow:0 0 0 2px #0a0d1a;
+  box-shadow:0 0 0 2px var(--bg);
 }
 .avatar-dot[data-status="away"]{background:var(--warn)}
 .avatar-dot[data-status="dnd"]{background:var(--err)}
@@ -3282,7 +3308,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
 }
 .tb-avatar-hd-lg{
   width:40px;height:40px;border-radius:50%;
-  background:linear-gradient(135deg,#155DFC,#00C2C2);
+  background:linear-gradient(135deg,var(--brand-blue),var(--brand-teal));
   display:flex;align-items:center;justify-content:center;
   font-size:14px;font-weight:700;color:#fff;flex-shrink:0;
   position:relative;
@@ -3376,8 +3402,8 @@ button.avatar-sm:hover{filter:brightness(1.08)}
   display:flex;align-items:center;justify-content:center;
   font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
 }
-.search-result-ico.cat-workflows{background:linear-gradient(135deg,#155DFC,#00C2C2)}
-.search-result-ico.cat-agents{background:linear-gradient(135deg,#A78BFA,#6366F1)}
+.search-result-ico.cat-workflows{background:linear-gradient(135deg,var(--brand-blue),var(--brand-teal))}
+.search-result-ico.cat-agents{background:linear-gradient(135deg,var(--pur),var(--indigo))}
 .search-result-ico.cat-knowledge{background:linear-gradient(135deg,#10B981,#059669)}
 .search-result-ico.cat-files{background:linear-gradient(135deg,#F59E0B,#F97316)}
 .search-result-body{flex:1;min-width:0}
@@ -3533,7 +3559,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
             <svg class="studio-item-badge" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8l3.5 3.5 5.5-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
           <a class="studio-item" href="governance-studio/" role="menuitem">
-            <div class="studio-item-ico" style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)">GS</div>
+            <div class="studio-item-ico" style="background:linear-gradient(135deg,var(--indigo) 0%,#8B5CF6 100%)">GS</div>
             <div class="studio-item-info">
               <div class="studio-item-name">Governance Studio</div>
               <div class="studio-item-desc">Policies &amp; knowledge</div>
@@ -3822,12 +3848,12 @@ button.avatar-sm:hover{filter:brightness(1.08)}
             <div class="det-section">
               <div class="det-hd">Network Composition</div>
               <div class="comp-row">
-                <div class="comp-ico" style="background:#155DFC">W</div>
+                <div class="comp-ico" style="background:var(--brand-blue)">W</div>
                 <span class="comp-lbl">Agentic Workflows</span>
                 <span class="comp-n" id="detWf">–</span>
               </div>
               <div class="comp-row">
-                <div class="comp-ico" style="background:#A78BFA">A</div>
+                <div class="comp-ico" style="background:var(--pur)">A</div>
                 <span class="comp-lbl">Agents</span>
                 <span class="comp-n" id="detAg">–</span>
               </div>
@@ -4281,7 +4307,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
                 <div class="lt-col-state"><span class="log-badge gate"><svg viewBox="0 0 10 10" fill="none"><rect x="2.4" y="2" width="1.6" height="6" rx="0.4" fill="currentColor"/><rect x="6" y="2" width="1.6" height="6" rx="0.4" fill="currentColor"/></svg>Human Gate</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2288</span><span class="log-init manual">Manual</span></div>
-                  <span class="log-err" style="color:#fb923c">Waiting for approval from Sales Manager <a class="log-action" onclick="event.stopPropagation(); toast('Approval flow opened','success')">Approve →</a></span>
+                  <span class="log-err" style="color:var(--orange)">Waiting for approval from Sales Manager <a class="log-action" onclick="event.stopPropagation(); toast('Approval flow opened','success')">Approve →</a></span>
                 </div>
                 <div class="lt-col-started"><span class="log-started">Apr 29, 08:40</span></div>
                 <div class="lt-col-dur"><span class="log-dur">22m 18s</span></div>
@@ -4301,7 +4327,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
                 <div class="lt-col-state"><span class="log-badge partial"><svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.4" stroke="currentColor" stroke-width="1" fill="none"/><path d="M5 1.6a3.4 3.4 0 0 1 0 6.8z" fill="currentColor"/></svg>Partial</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2287</span><span class="log-init schedule">Schedule</span></div>
-                  <span class="log-err" style="color:#c4b5fd">CRM Sync skipped — duplicate record detected</span>
+                  <span class="log-err" style="color:var(--pur-lt)">CRM Sync skipped — duplicate record detected</span>
                 </div>
                 <div class="lt-col-started"><span class="log-started">Apr 29, 08:00</span></div>
                 <div class="lt-col-dur"><span class="log-dur">1m 48s</span></div>
@@ -4310,7 +4336,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
                   <div class="log-prog-steps">
                     <div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div>
                     <div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div>
-                    <div class="step-dot fail" style="background:#c4b5fd"></div><div class="step-dot done"></div>
+                    <div class="step-dot fail" style="background:var(--pur-lt)"></div><div class="step-dot done"></div>
                   </div>
                 </div>
               </div>
@@ -4691,15 +4717,15 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               <span class="nl-secbadge">3 active</span>
             </div>
             <div class="nl-item" onclick="selectEditNode('wf-lq')">
-              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="#00C2C2" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="var(--brand-teal)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Lead Qualification<span class="nl-badge bn-bw" style="margin-left:5px">W</span></div><div class="nl-sub">In: customer_data → Out: qualified_lead</div></div>
             </div>
             <div class="nl-item" onclick="selectEditNode('wf-de')">
-              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="#00C2C2" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="var(--brand-teal)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Data Enrichment<span class="nl-badge bn-bw" style="margin-left:5px">W</span></div><div class="nl-sub">In: lead_id → Out: enriched_profile</div></div>
             </div>
             <div class="nl-item" onclick="selectEditNode('wf-cs')">
-              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="#00C2C2" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="var(--brand-teal)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">CRM Sync<span class="nl-badge bn-bw" style="margin-left:5px">W</span></div><div class="nl-sub">In: enriched_profile → Out: crm_record_id</div></div>
             </div>
             <div class="nl-sechd" style="margin-top:6px">
@@ -5278,7 +5304,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
           <span class="mkt-chk-box"></span><span class="mkt-plane-dot" style="background:#93C5FD"></span><span class="mkt-chk-lbl">Truth Plane</span>
         </button>
         <button class="mkt-chk-item" data-plane="sandbox" onclick="toggleTpMktPlane('sandbox',this)">
-          <span class="mkt-chk-box"></span><span class="mkt-plane-dot" style="background:#C4B5FD"></span><span class="mkt-chk-lbl">Sandbox Plane</span>
+          <span class="mkt-chk-box"></span><span class="mkt-plane-dot" style="background:var(--pur-lt)"></span><span class="mkt-chk-lbl">Sandbox Plane</span>
         </button>
         <button class="mkt-chk-item" data-plane="sources" onclick="toggleTpMktPlane('sources',this)">
           <span class="mkt-chk-box"></span><span class="mkt-plane-dot" style="background:#6EE7B7"></span><span class="mkt-chk-lbl">Sources Plane</span>
@@ -5528,7 +5554,7 @@ const NETWORKS = [
     aiText:'This network monitors Salesforce for closed deals and runs daily to score renewal accounts, generate tailored offers and route them through a multi-step approval chain before sending to the customer.',
     owner:{init:'CM',name:'Carlos Méndez — Revenue Operations'},
     schedule:'Weekdays 09:00', schedExtra:'+1', runs:47, rate:97.5, workflows:1, inputs:'Customer object', outputs:'Offer + CRM update',
-    category:'RevOps', catColor:'#2B7FFF', version:'v2.4', created:'Jan 14, 2026', updated:'Today, 2h ago (Mar 30 10:22)',
+    category:'RevOps', catColor:'var(--pri)', version:'v2.4', created:'Jan 14, 2026', updated:'Today, 2h ago (Mar 30 10:22)',
     workflows_n:6, agents_n:3, nodes:9,
     triggers:[
       {type:'scheduled',label:'Scheduled',detail:'Cron: 0 9 * * MON-FRI · COT',next:'Next: Tomorrow 09:00'},
@@ -5560,7 +5586,7 @@ const NETWORKS = [
     aiText:'Continuously scans your CRM for accounts matching ICP criteria, enriches contact data via integrated sources, and auto-generates personalized outreach sequences routed to the right SDR.',
     owner:{init:'AR',name:'Ana Rodríguez — Sales'},
     schedule:'Weekdays 08:00', schedExtra:'+2', runs:83, rate:95.2, workflows:3, inputs:'Customer object', outputs:'Offer + CRM update',
-    category:'Sales', catColor:'#05DF72', version:'v1.8', created:'Feb 3, 2026', updated:'1d ago',
+    category:'Sales', catColor:'var(--ok)', version:'v1.8', created:'Feb 3, 2026', updated:'1d ago',
     workflows_n:3, agents_n:4, nodes:11,
     triggers:[{type:'scheduled',label:'Scheduled',detail:'Cron: 0 8 * * MON-FRI · COT',next:'Next: Tomorrow 08:00'}],
     recentRuns:[
@@ -5577,7 +5603,7 @@ const NETWORKS = [
     aiText:'Monitors account health scores and usage patterns to identify at-risk customers early, automatically triggering the right playbook and alerting account managers for timely intervention.',
     owner:{init:'MT',name:'Miguel Torres — Customer Success'},
     schedule:'health.score.dropped', schedExtra:'+1', runs:12, rate:100, workflows:2, inputs:'Customer object', outputs:'Offer + CRM update',
-    category:'Customer Success', catColor:'#A78BFA', version:'v3.1', created:'Mar 1, 2026', updated:'4m ago',
+    category:'Customer Success', catColor:'var(--pur)', version:'v3.1', created:'Mar 1, 2026', updated:'4m ago',
     workflows_n:2, agents_n:2, nodes:7,
     triggers:[{type:'event',label:'Event',detail:'Source: Health Score Engine · Condition: score < 60',next:'health.score.dropped'}],
     recentRuns:[
@@ -5594,7 +5620,7 @@ const NETWORKS = [
     aiText:'Failed: Integration with payment gateway returned 503. Last successful run was 3d ago. Check the Stripe webhook configuration.',
     owner:{init:'LV',name:'Lucía Vargas — Finance'},
     schedule:'Weekdays 07:00', schedExtra:'', runs:14, rate:85.7, workflows:1, inputs:'Customer object', outputs:'Offer + CRM update',
-    category:'Finance', catColor:'#FDC700', version:'v1.1', created:'Mar 15, 2026', updated:'3d ago',
+    category:'Finance', catColor:'var(--warn)', version:'v1.1', created:'Mar 15, 2026', updated:'3d ago',
     workflows_n:1, agents_n:1, nodes:5,
     triggers:[{type:'scheduled',label:'Scheduled',detail:'Cron: 0 7 * * MON-FRI · COT',next:'Paused — error state'}],
     recentRuns:[
@@ -5611,7 +5637,7 @@ const NETWORKS = [
     aiText:'Inactive since Apr 17. Last deactivated manually by Daniel K. Network was performing at 98.1% success rate before deactivation.',
     owner:{init:'DK',name:'Daniel Kamau — Marketing'},
     schedule:'Mon 10:00 (paused)', schedExtra:'', runs:0, rate:98.1, workflows:0, inputs:'', outputs:'',
-    category:'Marketing', catColor:'#FF6467', version:'v2.0', created:'Jan 28, 2026', updated:'12d ago',
+    category:'Marketing', catColor:'var(--err)', version:'v2.0', created:'Jan 28, 2026', updated:'12d ago',
     workflows_n:4, agents_n:2, nodes:6,
     triggers:[],
     recentRuns:[],
@@ -5625,7 +5651,7 @@ const NETWORKS = [
     aiText:'Draft network in progress. Configure triggers and connect required agents to activate.',
     owner:{init:'SR',name:'Sofia Reyes — Customer Success'},
     schedule:'On signup event', schedExtra:'', runs:0, rate:0, workflows:0, inputs:'New customer', outputs:'Onboarding complete',
-    category:'Customer Success', catColor:'#A78BFA', version:'v0.1', created:'Apr 29, 2026', updated:'2h ago',
+    category:'Customer Success', catColor:'var(--pur)', version:'v0.1', created:'Apr 29, 2026', updated:'2h ago',
     workflows_n:0, agents_n:0, nodes:0,
     triggers:[],
     recentRuns:[],
@@ -5835,10 +5861,10 @@ function openFullView() {
   document.getElementById('ovAiText').textContent = n.aiText;
   // Metrics
   document.getElementById('ovMetrics').innerHTML = [
-    {ico:'#2B7FFF',icob:15,l:'Total Executions',v:n.metrics.exec,delta:n.metrics.exec?`↑ ${Math.floor(n.metrics.exec*0.16)} this week`:'No runs yet',cls:''},
-    {ico:'#05DF72',icob:12,l:'Success Rate',v:n.metrics.rate?n.metrics.rate+'%':'–',delta:n.metrics.rate?'↑ 1.2% vs last week':'',cls:'g'},
-    {ico:'#FDC700',icob:12,l:'Avg Duration',v:n.metrics.dur,delta:n.metrics.dur!=='–'?'0.8s faster':'',cls:''},
-    {ico:'#FF6467',icob:12,l:'Failures',v:n.metrics.fail,delta:n.metrics.fail?`${n.metrics.fail>0?n.metrics.fail:0} fewer this week`:'None this week',cls:n.metrics.fail>0?'r':''},
+    {ico:'var(--pri)',icob:15,l:'Total Executions',v:n.metrics.exec,delta:n.metrics.exec?`↑ ${Math.floor(n.metrics.exec*0.16)} this week`:'No runs yet',cls:''},
+    {ico:'var(--ok)',icob:12,l:'Success Rate',v:n.metrics.rate?n.metrics.rate+'%':'–',delta:n.metrics.rate?'↑ 1.2% vs last week':'',cls:'g'},
+    {ico:'var(--warn)',icob:12,l:'Avg Duration',v:n.metrics.dur,delta:n.metrics.dur!=='–'?'0.8s faster':'',cls:''},
+    {ico:'var(--err)',icob:12,l:'Failures',v:n.metrics.fail,delta:n.metrics.fail?`${n.metrics.fail>0?n.metrics.fail:0} fewer this week`:'None this week',cls:n.metrics.fail>0?'r':''},
   ].map(m=>`<div class="ov-m">
     <div class="ov-m-ico" style="background:rgba(${hexToRgb(m.ico)},${m.icob/100})">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6" stroke="${m.ico}" stroke-width="1.5"/></svg>
@@ -6239,7 +6265,7 @@ function renderRdFlow(status) {
     ? ['ok','ok','ok','ok','run','wait','wait']
     : ['ok','ok','ok','ok','ok','ok','ok'];
 
-  const iconColors = {trigger:'var(--warn)',agent:'var(--pur)',rag:'var(--pri)',workflow:'#00C2C2',output:'var(--ok)'};
+  const iconColors = {trigger:'var(--warn)',agent:'var(--pur)',rag:'var(--pri)',workflow:'var(--brand-teal)',output:'var(--ok)'};
   const icoBg = {trigger:'rgba(253,199,0,0.15)',agent:'rgba(167,139,250,0.15)',rag:'rgba(43,127,255,0.15)',workflow:'rgba(0,194,194,0.15)',output:'rgba(5,223,114,0.15)'};
 
   RD_NODES.forEach((n,i)=>{
@@ -6443,10 +6469,10 @@ function appendFinalMsg() {
   if(inputArea) inputArea.style.display = 'none';
 
   const nodes = [
-    {name:'Trigger', kind:'Webhook', bg:'rgba(43,127,255,.18)', bc:'rgba(43,127,255,.35)', ico:'<path d="M13 10a4 4 0 01-4 4H6a4 4 0 010-8 4 4 0 014-3.874" stroke="#2B7FFF" stroke-width="1.4" stroke-linecap="round"/><path d="M12 2l3 3-3 3" stroke="#2B7FFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'},
+    {name:'Trigger', kind:'Webhook', bg:'rgba(43,127,255,.18)', bc:'rgba(43,127,255,.35)', ico:'<path d="M13 10a4 4 0 01-4 4H6a4 4 0 010-8 4 4 0 014-3.874" stroke="var(--pri)" stroke-width="1.4" stroke-linecap="round"/><path d="M12 2l3 3-3 3" stroke="var(--pri)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'},
     {name:'AI Agent', kind:'Decision', bg:'rgba(167,139,250,.18)', bc:'rgba(167,139,250,.35)', ico:'<path d="M8 2l1.5 3.5L13 7l-3.5 1.5L8 12l-1.5-3.5L3 7l3.5-1.5L8 2z" stroke="var(--pur)" stroke-width="1.3" stroke-linejoin="round"/>'},
-    {name:'Process', kind:'Action', bg:'rgba(52,211,153,.15)', bc:'rgba(52,211,153,.3)', ico:'<rect x="3" y="3" width="7" height="9" rx="1.5" stroke="#34D399" stroke-width="1.4"/><path d="M10 7h2a1 1 0 011 1v5a1 1 0 01-1 1H8a1 1 0 01-1-1v-1" stroke="#34D399" stroke-width="1.4" stroke-linecap="round"/>'},
-    {name:'Notify', kind:'Output', bg:'rgba(251,191,36,.15)', bc:'rgba(251,191,36,.3)', ico:'<path d="M12 15a3 3 0 01-6 0" stroke="#FBBF24" stroke-width="1.4" stroke-linecap="round"/><path d="M6 9a3 3 0 016 0c0 3 1 4 1 4H5s1-1 1-4" stroke="#FBBF24" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'}
+    {name:'Process', kind:'Action', bg:'rgba(52,211,153,.15)', bc:'rgba(52,211,153,.3)', ico:'<rect x="3" y="3" width="7" height="9" rx="1.5" stroke="var(--drive-1)" stroke-width="1.4"/><path d="M10 7h2a1 1 0 011 1v5a1 1 0 01-1 1H8a1 1 0 01-1-1v-1" stroke="var(--drive-1)" stroke-width="1.4" stroke-linecap="round"/>'},
+    {name:'Notify', kind:'Output', bg:'rgba(251,191,36,.15)', bc:'rgba(251,191,36,.3)', ico:'<path d="M12 15a3 3 0 01-6 0" stroke="var(--drive-5)" stroke-width="1.4" stroke-linecap="round"/><path d="M6 9a3 3 0 016 0c0 3 1 4 1 4H5s1-1 1-4" stroke="var(--drive-5)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'}
   ];
 
   const nodesHTML = nodes.map((n, i) => `
@@ -6619,10 +6645,10 @@ function appendWizFinalMsg() {
   if (inputArea) inputArea.style.display = 'none';
 
   const suggestions = [
-    { ico: '<path d="M13 10a4 4 0 01-4 4H6a4 4 0 010-8 4 4 0 014-3.874" stroke="#2B7FFF" stroke-width="1.4" stroke-linecap="round"/><path d="M12 2l3 3-3 3" stroke="#2B7FFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>', label: 'Trigger', detail: triggerLabel, color: '#2B7FFF', bg: 'rgba(43,127,255,.12)', bc: 'rgba(43,127,255,.25)' },
-    { ico: '<path d="M8 2l1.5 3.5L13 7l-3.5 1.5L8 12l-1.5-3.5L3 7l3.5-1.5L8 2z" stroke="#A78BFA" stroke-width="1.3" stroke-linejoin="round"/>', label: 'AI Agent', detail: 'Decision & routing', color: '#A78BFA', bg: 'rgba(167,139,250,.12)', bc: 'rgba(167,139,250,.25)' },
-    { ico: '<rect x="3" y="3" width="7" height="9" rx="1.5" stroke="#34D399" stroke-width="1.4"/><path d="M10 7h2a1 1 0 011 1v4H9v-1" stroke="#34D399" stroke-width="1.3" stroke-linecap="round"/>', label: 'Process', detail: goalLabel.split(' ').slice(0,3).join(' '), color: '#34D399', bg: 'rgba(52,211,153,.12)', bc: 'rgba(52,211,153,.25)' },
-    { ico: '<path d="M12 15a3 3 0 01-6 0" stroke="#FBBF24" stroke-width="1.4" stroke-linecap="round"/><path d="M6 9a3 3 0 016 0c0 3 1 4 1 4H5s1-1 1-4" stroke="#FBBF24" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>', label: 'Output', detail: outputLabel.split(' ').slice(0,3).join(' '), color: '#FBBF24', bg: 'rgba(251,191,36,.12)', bc: 'rgba(251,191,36,.25)' },
+    { ico: '<path d="M13 10a4 4 0 01-4 4H6a4 4 0 010-8 4 4 0 014-3.874" stroke="var(--pri)" stroke-width="1.4" stroke-linecap="round"/><path d="M12 2l3 3-3 3" stroke="var(--pri)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>', label: 'Trigger', detail: triggerLabel, color: 'var(--pri)', bg: 'rgba(43,127,255,.12)', bc: 'rgba(43,127,255,.25)' },
+    { ico: '<path d="M8 2l1.5 3.5L13 7l-3.5 1.5L8 12l-1.5-3.5L3 7l3.5-1.5L8 2z" stroke="var(--pur)" stroke-width="1.3" stroke-linejoin="round"/>', label: 'AI Agent', detail: 'Decision & routing', color: 'var(--pur)', bg: 'rgba(167,139,250,.12)', bc: 'rgba(167,139,250,.25)' },
+    { ico: '<rect x="3" y="3" width="7" height="9" rx="1.5" stroke="var(--drive-1)" stroke-width="1.4"/><path d="M10 7h2a1 1 0 011 1v4H9v-1" stroke="var(--drive-1)" stroke-width="1.3" stroke-linecap="round"/>', label: 'Process', detail: goalLabel.split(' ').slice(0,3).join(' '), color: 'var(--drive-1)', bg: 'rgba(52,211,153,.12)', bc: 'rgba(52,211,153,.25)' },
+    { ico: '<path d="M12 15a3 3 0 01-6 0" stroke="var(--drive-5)" stroke-width="1.4" stroke-linecap="round"/><path d="M6 9a3 3 0 016 0c0 3 1 4 1 4H5s1-1 1-4" stroke="var(--drive-5)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>', label: 'Output', detail: outputLabel.split(' ').slice(0,3).join(' '), color: 'var(--drive-5)', bg: 'rgba(251,191,36,.12)', bc: 'rgba(251,191,36,.25)' },
   ];
 
   const nodesHTML = suggestions.map((s, i) => `
@@ -6984,7 +7010,7 @@ const AGENT_CATALOG = [
     name: 'Customer Analyst',
     description: 'Reads inbound customer inquiries and extracts intent, sentiment, and a recommended track.',
     avatar: 'CA',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'Carlos Méndez', initials: 'CM' },
     tags: ['sales', 'analysis', 'inbound'],
     behavior: {
@@ -7006,7 +7032,7 @@ const AGENT_CATALOG = [
     name: 'Document Reader',
     description: 'Extracts structured data from PDFs, contracts, invoices and policy documents.',
     avatar: 'DR',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'Sarah Chen', initials: 'SC' },
     tags: ['extraction', 'documents', 'compliance'],
     behavior: {
@@ -7028,7 +7054,7 @@ const AGENT_CATALOG = [
     name: 'Lead Qualifier',
     description: 'Scores inbound leads against ICP + BANT and decides whether to route to SDR or AE.',
     avatar: 'LQ',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'Alex Rivera', initials: 'AR' },
     tags: ['sales', 'qualification', 'icp'],
     behavior: {
@@ -7050,7 +7076,7 @@ const AGENT_CATALOG = [
     name: 'Risk Assessor',
     description: 'Detects churn risk and policy violations from account health signals.',
     avatar: 'RA',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'Lisa Anderson', initials: 'LA' },
     tags: ['risk', 'churn', 'health-score'],
     behavior: {
@@ -7072,7 +7098,7 @@ const AGENT_CATALOG = [
     name: 'Renewal Strategist',
     description: 'Generates personalized renewal offers respecting discount authority and ICP.',
     avatar: 'RS',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'Alex Rivera', initials: 'AR' },
     tags: ['sales', 'renewals', 'pricing'],
     behavior: {
@@ -7094,7 +7120,7 @@ const AGENT_CATALOG = [
     name: 'Contract Reviewer',
     description: 'Reviews redlines against approved legal positions and flags clauses outside policy.',
     avatar: 'CR',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'Sarah Chen', initials: 'SC' },
     tags: ['legal', 'contracts', 'compliance'],
     behavior: {
@@ -7116,7 +7142,7 @@ const AGENT_CATALOG = [
     name: 'Onboarding Specialist',
     description: 'Personalizes onboarding sequences based on customer profile and chosen plan.',
     avatar: 'OS',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'David Kim', initials: 'DK' },
     tags: ['customer-success', 'onboarding'],
     behavior: {
@@ -7138,7 +7164,7 @@ const AGENT_CATALOG = [
     name: 'Response Generator',
     description: 'Drafts customer-facing responses in brand voice using approved messaging.',
     avatar: 'RG',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'Emma Wilson', initials: 'EW' },
     tags: ['support', 'communication', 'brand-voice'],
     behavior: {
@@ -7395,7 +7421,7 @@ function createNewAgentFromSelector() {
     name: 'New Agent',
     description: 'Click Configure to define what this agent does.',
     avatar: 'NA',
-    accentColor: '#A78BFA',
+    accentColor: 'var(--pur)',
     owner: { name: 'You', initials: 'YO' },
     tags: [],
     behavior: { systemPrompt: '', responseFormat: 'text', tone: '' },
@@ -8140,9 +8166,9 @@ const PACK_PREVIEWS = {
   'KP-001': { name: 'Onboarding Knowledge',     intent: 'add',      factsCount: 5, status: 'active', usage: { workflows:  5, calls:  1247, lastUsed: '3 hours ago'} },
 };
 const INTENT_PALETTE = {
-  restrict: { bg: 'rgba(99,102,241,0.16)',  color: '#c4b5fd', label: 'RESTRICT' },
-  add:      { bg: 'rgba(34,211,238,0.16)',  color: '#22d3ee', label: 'EXTEND'   },
-  both:     { bg: 'rgba(43,127,255,0.16)',  color: '#80AFFF', label: 'RESTRICT + EXTEND' },
+  restrict: { bg: 'rgba(99,102,241,0.16)',  color: 'var(--pur-lt)', label: 'RESTRICT' },
+  add:      { bg: 'rgba(34,211,238,0.16)',  color: 'var(--cyan)', label: 'EXTEND'   },
+  both:     { bg: 'rgba(43,127,255,0.16)',  color: 'var(--pri-lt)', label: 'RESTRICT + EXTEND' },
 };
 
 // ── Source Drives mock (mirrors governance-studio's mock.js drives) ──
@@ -8150,11 +8176,11 @@ const INTENT_PALETTE = {
 // `usage` mirrors the PACK_PREVIEWS blast-radius shape (workflows + calls).
 const KNOWLEDGE_DRIVES = [
   { id: 'd1', name: 'Sales Drive',       desc: 'Sales-related documents, proposals, and contracts',     owner: 'Sales',           scope: 'Company-wide', docs: 24, color: '#34d399', usage: { workflows: 18, calls: 24820, lastUsed: '8 sec ago'  } },
-  { id: 'd2', name: 'Marketing Drive',   desc: 'Marketing materials, campaigns, and brand assets',      owner: 'Marketing',       scope: 'Private',      docs: 24, color: '#f472b6', usage: { workflows:  6, calls:  3140, lastUsed: '20 min ago' } },
-  { id: 'd3', name: 'Engineering Drive', desc: 'Technical documentation, specifications, architecture', owner: 'Engineering',     scope: 'Private',      docs: 24, color: '#60a5fa', usage: { workflows:  2, calls:   148, lastUsed: '1 day ago'  } },
+  { id: 'd2', name: 'Marketing Drive',   desc: 'Marketing materials, campaigns, and brand assets',      owner: 'Marketing',       scope: 'Private',      docs: 24, color: 'var(--drive-2)', usage: { workflows:  6, calls:  3140, lastUsed: '20 min ago' } },
+  { id: 'd3', name: 'Engineering Drive', desc: 'Technical documentation, specifications, architecture', owner: 'Engineering',     scope: 'Private',      docs: 24, color: 'var(--drive-3)', usage: { workflows:  2, calls:   148, lastUsed: '1 day ago'  } },
   { id: 'd4', name: 'Product Drive',     desc: 'Product requirements, roadmaps, and feature specs',     owner: 'Product',         scope: 'Private',      docs: 24, color: '#a78bfa', usage: { workflows:  4, calls:   612, lastUsed: '6 hours ago'} },
-  { id: 'd5', name: 'HR Drive',          desc: 'Human resources policies and employee documents',       owner: 'HR',              scope: 'Private',      docs:  8, color: '#fbbf24', usage: { workflows:  0, calls:     0, lastUsed: 'never'      } },
-  { id: 'd6', name: 'Customer Success',  desc: 'Case studies, support docs, customer feedback',         owner: 'Customer Success',scope: 'Company-wide', docs: 18, color: '#22d3ee', usage: { workflows:  9, calls:  6730, lastUsed: '3 hours ago'} },
+  { id: 'd5', name: 'HR Drive',          desc: 'Human resources policies and employee documents',       owner: 'HR',              scope: 'Private',      docs:  8, color: 'var(--drive-5)', usage: { workflows:  0, calls:     0, lastUsed: 'never'      } },
+  { id: 'd6', name: 'Customer Success',  desc: 'Case studies, support docs, customer feedback',         owner: 'Customer Success',scope: 'Company-wide', docs: 18, color: 'var(--cyan)', usage: { workflows:  9, calls:  6730, lastUsed: '3 hours ago'} },
 ];
 function getDriveById(id) { return KNOWLEDGE_DRIVES.find(d => d.id === id) || null; }
 
@@ -8396,7 +8422,7 @@ function tabKnowledge(a) {
 
   const fileRows = eff.refFiles.map(f => `
     <div class="insp-knl-row">
-      <div class="ico" style="background:rgba(167,139,250,0.18);color:#c4b5fd;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:9px">F</div>
+      <div class="ico" style="background:rgba(167,139,250,0.18);color:var(--pur-lt);width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:9px">F</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:11.5px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:5px">
           ${escText(f.name)}
@@ -8428,7 +8454,7 @@ function tabKnowledge(a) {
     <div class="insp-cfg-section">
       <div class="insp-cfg-label">Scoping rule</div>
       <div class="insp-cfg-help" style="background:rgba(43,127,255,0.06);border:1px solid rgba(43,127,255,0.18);padding:10px 12px;border-radius:8px;color:var(--t2)">
-        Workflow + agent + node sources are <strong style="color:#80AFFF">unioned</strong>. RESTRICT packs intersect (only facts in both are visible). EXTEND packs and drives add new sources on top.
+        Workflow + agent + node sources are <strong style="color:var(--pri-lt)">unioned</strong>. RESTRICT packs intersect (only facts in both are visible). EXTEND packs and drives add new sources on top.
       </div>
     </div>
 
@@ -8581,7 +8607,7 @@ function renderNodeKnowledgePicker() {
     const intent = INTENT_PALETTE[p.intent] || INTENT_PALETTE.restrict;
     attachedRows.push({
       kind: 'pack', id, name: p.name, sub: `${p.factsCount} fact${p.factsCount === 1 ? '' : 's'} · ${intent.label}`,
-      icoBg: 'linear-gradient(135deg, rgba(167,139,250,0.30), rgba(167,139,250,0.10))', icoColor: '#c4b5fd', icoText: 'P',
+      icoBg: 'linear-gradient(135deg, rgba(167,139,250,0.30), rgba(167,139,250,0.10))', icoColor: 'var(--pur-lt)', icoText: 'P',
       source: src, usage: p.usage,
     });
   });
@@ -8599,7 +8625,7 @@ function renderNodeKnowledgePicker() {
   allRefFiles.forEach(f => {
     attachedRows.push({
       kind: 'file', id: f.id, name: f.name, sub: `${formatFileSize(f.size)} · ${f.uploader}`,
-      icoBg: 'rgba(167,139,250,0.18)', icoColor: '#c4b5fd', icoText: 'F',
+      icoBg: 'rgba(167,139,250,0.18)', icoColor: 'var(--pur-lt)', icoText: 'F',
       source: 'node',
     });
   });
@@ -8696,11 +8722,11 @@ function renderNodeKnowledgePicker() {
       const intent = INTENT_PALETTE[p.intent] || INTENT_PALETTE.restrict;
       const isAttached = allPackIds.includes(id);
       return `<div class="nkp-card">
-        <div class="nkp-card-ico" style="background:linear-gradient(135deg, rgba(167,139,250,0.40), rgba(167,139,250,0.15));color:#c4b5fd">${id.slice(-2)}</div>
+        <div class="nkp-card-ico" style="background:linear-gradient(135deg, rgba(167,139,250,0.40), rgba(167,139,250,0.15));color:var(--pur-lt)">${id.slice(-2)}</div>
         <div class="nkp-card-body">
           <div class="nkp-card-nm">${escText(p.name)}
             <span class="pill" style="background:${intent.bg};color:${intent.color}">${intent.label}</span>
-            ${p.status === 'draft' ? `<span class="pill" style="background:rgba(253,199,0,0.16);color:#fde047">DRAFT</span>` : ''}
+            ${p.status === 'draft' ? `<span class="pill" style="background:rgba(253,199,0,0.16);color:var(--warn-lt)">DRAFT</span>` : ''}
             ${formatBlastBadge(p.usage)}
           </div>
           <div class="nkp-card-desc">${id} · ${p.factsCount} fact${p.factsCount === 1 ? '' : 's'} · ${p.status}${p.usage && p.usage.lastUsed && p.usage.lastUsed !== 'never' ? ' · last run ' + p.usage.lastUsed : ''}</div>
@@ -8944,7 +8970,7 @@ function tabTools(a) {
         <span>Tools enabled ${labelPill}</span>
         <span style="font-weight:600;color:var(--t4);font-size:9px">${enabledCount} active</span>
       </div>
-      <div class="insp-cfg-help">Toggle the capabilities this agent can invoke. Disabled tools are invisible to the model at runtime. ${isOverride ? '<strong style="color:#c4b5fd">Changes apply only to this node.</strong>' : '<em>First toggle creates a node-level override; the agent’s base stays clean.</em>'}</div>
+      <div class="insp-cfg-help">Toggle the capabilities this agent can invoke. Disabled tools are invisible to the model at runtime. ${isOverride ? '<strong style="color:var(--pur-lt)">Changes apply only to this node.</strong>' : '<em>First toggle creates a node-level override; the agent’s base stays clean.</em>'}</div>
     </div>
 
     <div class="insp-tool-section-hd">Function calls (${TOOL_CATALOG.functionCalls.length})</div>
@@ -9187,7 +9213,7 @@ function confirmFork() {
 
 // ─ Node icons ─
 const trigIco=()=>`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L5.5 7.5H9L5 13" stroke="var(--warn)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const wfIco=()=>`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="#00C2C2" stroke-width="1.2" stroke-linecap="round"/></svg>`;
+const wfIco=()=>`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="var(--brand-teal)" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="var(--brand-teal)" stroke-width="1.2" stroke-linecap="round"/></svg>`;
 const agIco=()=>`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="var(--pur)" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><path d="M5 10h4" stroke="var(--pur)" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/></svg>`;
 const ragIco=()=>`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="3.5" stroke="var(--pri)" stroke-width="1.2"/><path d="M8.5 8.5L12 12" stroke="var(--pri)" stroke-width="1.5" stroke-linecap="round"/></svg>`;
 const outIco=()=>`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--ok)" stroke-width="1.2"/><path d="M4.5 7L6.5 9L9.5 5" stroke="var(--ok)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -9348,7 +9374,7 @@ const DRV_MKT_CATALOG = [
     ]},
     {id:'drv-gov-gc', name:'Governance Charter.pdf', type:'file'},
   ]},
-  {id:'drv-prod', name:'Product Documentation Drive', cat:'Product', catBg:'rgba(43,127,255,.12)', catColor:'#2B7FFF', folders:2, docs:8, previewKey:'product',
+  {id:'drv-prod', name:'Product Documentation Drive', cat:'Product', catBg:'rgba(43,127,255,.12)', catColor:'var(--pri)', folders:2, docs:8, previewKey:'product',
    folderList:['API Documentation','Release Notes'],
    desc:'API documentation, product specs, release notes and technical integration guides.',
    sub:'2 folders · 8 documents',
@@ -9365,7 +9391,7 @@ const DRV_MKT_CATALOG = [
     ]},
     {id:'drv-prod-spec', name:'Product Spec v3.2.pdf', type:'file'},
   ]},
-  {id:'drv-sales', name:'Sales Enablement Drive', cat:'Sales', catBg:'rgba(5,223,114,.1)', catColor:'#05DF72', folders:3, docs:11, previewKey:'sales',
+  {id:'drv-sales', name:'Sales Enablement Drive', cat:'Sales', catBg:'rgba(5,223,114,.1)', catColor:'var(--ok)', folders:3, docs:11, previewKey:'sales',
    folderList:['Battle Cards','Case Studies','Pitch Decks'],
    desc:'Battle cards, case studies, pitch decks and competitive intelligence for the sales team.',
    sub:'3 folders · 11 documents',
@@ -9380,7 +9406,7 @@ const DRV_MKT_CATALOG = [
     ]},
     {id:'drv-sales-deck', name:'Pitch Deck Q1 2026.pptx', type:'file'},
   ]},
-  {id:'drv-legal', name:'Legal & Contracts Drive', cat:'Legal', catBg:'rgba(255,100,103,.12)', catColor:'#FF6467', folders:2, docs:6, previewKey:'legal',
+  {id:'drv-legal', name:'Legal & Contracts Drive', cat:'Legal', catBg:'rgba(255,100,103,.12)', catColor:'var(--err)', folders:2, docs:6, previewKey:'legal',
    folderList:['NDAs & Templates','MSA Library'],
    desc:'Contract templates, NDA agreements, terms of service and legal compliance documents.',
    sub:'2 folders · 6 documents',
@@ -9396,7 +9422,7 @@ const DRV_MKT_CATALOG = [
     {id:'drv-legal-pp', name:'Privacy Policy 2026.pdf', type:'file'},
     {id:'drv-legal-dpa', name:'Data Processing Agreement.docx', type:'file'},
   ]},
-  {id:'drv-hr', name:'HR Resources Drive', cat:'HR', catBg:'rgba(167,139,250,.12)', catColor:'#A78BFA', folders:4, docs:18, previewKey:'governance',
+  {id:'drv-hr', name:'HR Resources Drive', cat:'HR', catBg:'rgba(167,139,250,.12)', catColor:'var(--pur)', folders:4, docs:18, previewKey:'governance',
    folderList:['Onboarding','Job Descriptions','Performance Reviews','Benefits'],
    desc:'Onboarding materials, job descriptions, performance review templates and benefits documentation.',
    sub:'4 folders · 18 documents',
@@ -9429,7 +9455,7 @@ const DRV_MKT_CATALOG = [
     {id:'drv-hr-org', name:'Org Chart May 2026.pdf', type:'file'},
     {id:'drv-hr-handbook', name:'Employee Handbook v5.pdf', type:'file'},
   ]},
-  {id:'drv-fin', name:'Finance & Reporting Drive', cat:'Finance', catBg:'rgba(253,199,0,.1)', catColor:'#FDC700', folders:2, docs:9, previewKey:'product',
+  {id:'drv-fin', name:'Finance & Reporting Drive', cat:'Finance', catBg:'rgba(253,199,0,.1)', catColor:'var(--warn)', folders:2, docs:9, previewKey:'product',
    folderList:['Budget Templates','Financial Reports'],
    desc:'Budget templates, financial reports, expense policies and forecasting models.',
    sub:'2 folders · 9 documents',
@@ -9476,7 +9502,7 @@ const DRV_MKT_CATALOG = [
     {id:'drv-ops-master', name:'Operations Master Index.md', type:'file'},
     {id:'drv-ops-contacts', name:'Escalation Contacts.xlsx', type:'file'},
   ]},
-  {id:'drv-mkt', name:'Marketing Assets Drive', cat:'Sales', catBg:'rgba(5,223,114,.1)', catColor:'#05DF72', folders:2, docs:10, previewKey:'sales',
+  {id:'drv-mkt', name:'Marketing Assets Drive', cat:'Sales', catBg:'rgba(5,223,114,.1)', catColor:'var(--ok)', folders:2, docs:10, previewKey:'sales',
    folderList:['Brand Assets','Campaign Briefs'],
    desc:'Brand assets, campaign briefs, content calendars and go-to-market playbooks.',
    sub:'2 folders · 10 documents',
@@ -9498,7 +9524,7 @@ const DRV_MKT_CATALOG = [
     {id:'drv-mkt-readme', name:'Marketing Readme.md', type:'file'},
     {id:'drv-mkt-cal', name:'Content Calendar Q2 2026.xlsx', type:'file'},
   ]},
-  {id:'drv-eng', name:'Engineering Docs Drive', cat:'Product', catBg:'rgba(43,127,255,.12)', catColor:'#2B7FFF', folders:4, docs:22, previewKey:'product',
+  {id:'drv-eng', name:'Engineering Docs Drive', cat:'Product', catBg:'rgba(43,127,255,.12)', catColor:'var(--pri)', folders:4, docs:22, previewKey:'product',
    folderList:['Architecture','Coding Standards','Deployment Guides','System Design'],
    desc:'Architecture diagrams, coding standards, deployment guides and system design documents.',
    sub:'4 folders · 22 documents',
@@ -9649,15 +9675,15 @@ let drvCurrentFolderPath = [];
 
 // ── FILE TYPE CONFIG ──
 const FILE_TYPE_CFG = {
-  pdf:  {color:'#FF6467', bg:'rgba(255,100,103,.15)', label:'PDF',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
-  docx: {color:'#2B7FFF', bg:'rgba(43,127,255,.15)',  label:'DOCX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
-  doc:  {color:'#2B7FFF', bg:'rgba(43,127,255,.15)',  label:'DOC',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
-  xlsx: {color:'#05DF72', bg:'rgba(5,223,114,.12)',   label:'XLSX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
-  xls:  {color:'#05DF72', bg:'rgba(5,223,114,.12)',   label:'XLS',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
-  pptx: {color:'#FDC700', bg:'rgba(253,199,0,.12)',   label:'PPTX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
-  md:   {color:'#A78BFA', bg:'rgba(167,139,250,.12)', label:'MD',   icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  pdf:  {color:'var(--err)', bg:'rgba(255,100,103,.15)', label:'PDF',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  docx: {color:'var(--pri)', bg:'rgba(43,127,255,.15)',  label:'DOCX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  doc:  {color:'var(--pri)', bg:'rgba(43,127,255,.15)',  label:'DOC',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  xlsx: {color:'var(--ok)', bg:'rgba(5,223,114,.12)',   label:'XLSX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  xls:  {color:'var(--ok)', bg:'rgba(5,223,114,.12)',   label:'XLS',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  pptx: {color:'var(--warn)', bg:'rgba(253,199,0,.12)',   label:'PPTX', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  md:   {color:'var(--pur)', bg:'rgba(167,139,250,.12)', label:'MD',   icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
   zip:  {color:'#94A3B8', bg:'rgba(148,163,184,.12)', label:'ZIP',  icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
-  yaml: {color:'#34D399', bg:'rgba(52,211,153,.12)',  label:'YAML', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
+  yaml: {color:'var(--drive-1)', bg:'rgba(52,211,153,.12)',  label:'YAML', icon:'M3 1.5h5.5l3 3V12H3V1.5z'},
 };
 function getFileType(name) {
   const ext = (name||'').split('.').pop().toLowerCase();
@@ -9790,7 +9816,7 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
     return '<div class="tp-mkt-tree-item '+(isFolder?'folder':'file')+'"'+navAttr+'>'
       +'<div class="tp-mkt-tree-check '+checkCls+'" onclick="event.stopPropagation();drvToggleItem(\''+c.id+'\',\''+driveId+'\','+isFolder+')">'+checkIcon+'</div>'
       +(isFolder
-        ? '<svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="#FDC700" stroke-width="1.3" stroke-linejoin="round"/></svg>'
+        ? '<svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M1 3.5h5l1 1.5h6v7H1V3.5z" stroke="var(--warn)" stroke-width="1.3" stroke-linejoin="round"/></svg>'
         : '<svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5l3 3V12H3V1.5z" stroke="'+ft.color+'" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V5h3" stroke="'+ft.color+'" stroke-width="1.2"/></svg>')
       +'<span class="tp-mkt-tree-nm" style="flex:1">'+c.name+'</span>'
       + fileBadge
@@ -9817,7 +9843,7 @@ function renderDrvMktDetailPanel(driveId, folderPath) {
     const isFolder = c.type==='folder';
     const isSel = drvSelectedItems.has(c.id);
     const ft = isFolder ? null : getFileType(c.name);
-    const iconColor = isFolder ? '#FDC700' : ft.color;
+    const iconColor = isFolder ? 'var(--warn)' : ft.color;
     const iconBg = isFolder ? 'rgba(253,199,0,.12)' : ft.bg;
     const newPath = [...(folderPath||[]), {id:c.id, name:c.name}];
     const navAttr = isFolder ? ' onclick="drvItemNav(event,\''+driveId+'\',\''+encodeURIComponent(JSON.stringify(newPath))+'\')"' : '';
@@ -10122,11 +10148,11 @@ function renderDrvMktGrid(query) {
   };
   const CAT_TEXT = {
     'Governance & Policy':'#94A3B8',
-    'Product':'#2B7FFF',
-    'Sales':'#05DF72',
-    'Legal':'#FF6467',
-    'HR':'#A78BFA',
-    'Finance':'#FDC700',
+    'Product':'var(--pri)',
+    'Sales':'var(--ok)',
+    'Legal':'var(--err)',
+    'HR':'var(--pur)',
+    'Finance':'var(--warn)',
   };
 
   const FOLDER_ICO = '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="3" width="11" height="7.5" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M0.5 5.2h11" stroke="currentColor" stroke-width="0.8"/><path d="M2.5 3V2.8a1.2 1.2 0 011.2-1.2H5l1 1.4" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>';
@@ -10209,7 +10235,7 @@ let tpMktSort = 'name';
 let tpMktPlanesFilter = new Set();
 
 const TP_MKT_CATALOG = [
-  {id:'finance-2024', name:'Finance Playbook 2024', tag:'Finance', tagColor:'#FDC700', tagBg:'rgba(253,199,0,0.15)', facts:31, claims:8, docs:5,
+  {id:'finance-2024', name:'Finance Playbook 2024', tag:'Finance', tagColor:'var(--warn)', tagBg:'rgba(253,199,0,0.15)', facts:31, claims:8, docs:5,
    planes:{truth:'on', sandbox:'on', sources:'dis'},
    desc:'Finance policies, expense rules, budget approvals and accounting procedures for FY2024.'},
   {id:'support-q2', name:'Support Playbook Q2', tag:'Customer Service', tagColor:'var(--pri)', tagBg:'rgba(43,127,255,0.18)', facts:24, claims:5, docs:3,
@@ -10381,7 +10407,7 @@ function renderTpMktDetailPanel(packId) {
 
   const PLANE_INFO = {
     truth:   {label:'Truth Plane',   dotOn:'#93C5FD',  cls:'on'},
-    sandbox: {label:'Sandbox Plane', dotOn:'#C4B5FD',  cls:'sandbox-on'},
+    sandbox: {label:'Sandbox Plane', dotOn:'var(--pur-lt)',  cls:'sandbox-on'},
     sources: {label:'Sources Plane', dotOn:'#6EE7B7',  cls:'sources-on'},
   };
   const planes = d.planes || {};
@@ -10441,7 +10467,7 @@ function renderTpMktDetailPanel(packId) {
       </div>
       <div class="tp-mkt-detail-sec">
         <div class="tp-mkt-detail-sec-hd"><span>Claims (Sandbox)</span><span class="tp-mkt-detail-sec-cnt">${d._claimsCnt||d.claims?.length||0} items</span></div>
-        ${listItems(d.claims, d._claimsCnt, '#C4B5FD', 'tpDetailClaims')}
+        ${listItems(d.claims, d._claimsCnt, 'var(--pur-lt)', 'tpDetailClaims')}
       </div>
       <div class="tp-mkt-detail-sec">
         <div class="tp-mkt-detail-sec-hd"><span>Documents / Sources</span><span class="tp-mkt-detail-sec-cnt">${d._docsCnt||d.docs?.length||0} items</span></div>
@@ -10573,11 +10599,11 @@ function renderTpMktGrid(query) {
   }
   countEl.textContent = 'Showing ' + filtered.length + ' pack' + (filtered.length !== 1 ? 's' : '');
 
-  function resolveColor(v, hex) { return v.replace('var(--ok)',hex==='hex'?'#05DF72':'rgba(5,223,114,.35)').replace('var(--pri)',hex==='hex'?'#2B7FFF':'rgba(43,127,255,.35)').replace('var(--pur)',hex==='hex'?'#A78BFA':'rgba(167,139,250,.35)').replace('var(--err)',hex==='hex'?'#FF6467':'rgba(255,100,103,.35)'); }
+  function resolveColor(v, hex) { return v.replace('var(--ok)',hex==='hex'?'var(--ok)':'rgba(5,223,114,.35)').replace('var(--pri)',hex==='hex'?'var(--pri)':'rgba(43,127,255,.35)').replace('var(--pur)',hex==='hex'?'var(--pur)':'rgba(167,139,250,.35)').replace('var(--err)',hex==='hex'?'var(--err)':'rgba(255,100,103,.35)'); }
 
   const PLANE_INFO = {
     truth:   {cls:'on',         dot:'#93C5FD', label:'Truth'},
-    sandbox: {cls:'sandbox-on', dot:'#C4B5FD', label:'Sandbox'},
+    sandbox: {cls:'sandbox-on', dot:'var(--pur-lt)', label:'Sandbox'},
     sources: {cls:'sources-on', dot:'#6EE7B7', label:'Sources'},
   };
 
@@ -10685,7 +10711,7 @@ const driveSelected = new Set();
 const driveExpanded = new Set();
 
 const dtDriveIco = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8.5" rx="1.5" stroke="var(--pur)" stroke-width="1.2"/><path d="M1.5 6.5h11" stroke="var(--pur)" stroke-width="1.1"/><path d="M4 1.5h3l1 2H4V1.5z" stroke="var(--pur)" stroke-width="1.2"/></svg>`;
-const dtFolderIco = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.5 4.5h11v7.5a1 1 0 01-1 1h-9a1 1 0 01-1-1V4.5z" stroke="#f97316" stroke-width="1.1" stroke-linejoin="round"/><path d="M1.5 4.5V3a1 1 0 011-1h3l1.5 1.5" stroke="#f97316" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const dtFolderIco = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.5 4.5h11v7.5a1 1 0 01-1 1h-9a1 1 0 01-1-1V4.5z" stroke="var(--orange)" stroke-width="1.1" stroke-linejoin="round"/><path d="M1.5 4.5V3a1 1 0 011-1h3l1.5 1.5" stroke="var(--orange)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const dtFileIco  = `<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 1.5h5.5L11 4v8.5H3V1.5z" stroke="var(--t3)" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.5 1.5V4H11" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const dtEyeIco  = `<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2.5-4.5 6-4.5S13 7 13 7s-2.5 4.5-6 4.5S1 7 1 7z" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="1.8" fill="currentColor"/></svg>`;
 const dtChevIco = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 4l2 2 2-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -11308,7 +11334,7 @@ function buildKmAddedRow(tp, removeCallback, readOnly) {
   const PLANE_META = {
     truth:{label:'Truth Plane',desc:'Verified facts and FAQs — 100% confidence. Used for grounded, authoritative responses.',bg:'rgba(43,127,255,.15)',bc:'rgba(43,127,255,.3)',ico:'<path d="M8 2l1.5 3.5L13 7l-3.5 1.5L8 12l-1.5-3.5L3 7l3.5-1.5L8 2z" stroke="var(--pri)" stroke-width="1.3" stroke-linejoin="round"/>'},
     sandbox:{label:'Sandbox Plane',desc:'Unverified claims and drafts — 80% confidence. Exploratory responses and emerging knowledge.',bg:'rgba(167,139,250,.14)',bc:'rgba(167,139,250,.28)',ico:'<path d="M3 12l3-3m0 0l2-5 2 5 3 3M6 9h6" stroke="var(--pur)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>'},
-    sources:{label:'Sources Plane',desc:'Raw documents and reference material — 60% confidence. Used for citation and deep lookups.',bg:'rgba(52,211,153,.12)',bc:'rgba(52,211,153,.25)',ico:'<path d="M3 2h8l3 3v9H3V2z" stroke="#34D399" stroke-width="1.3" stroke-linejoin="round"/><path d="M11 2v3h3" stroke="#34D399" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>'}
+    sources:{label:'Sources Plane',desc:'Raw documents and reference material — 60% confidence. Used for citation and deep lookups.',bg:'rgba(52,211,153,.12)',bc:'rgba(52,211,153,.25)',ico:'<path d="M3 2h8l3 3v9H3V2z" stroke="var(--drive-1)" stroke-width="1.3" stroke-linejoin="round"/><path d="M11 2v3h3" stroke="var(--drive-1)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>'}
   };
   const planeRows = Object.entries(tp.planes).map(([key,state])=>{
     const m = PLANE_META[key];
@@ -11907,7 +11933,7 @@ function switchKnPanelTab(tab, btn) {
 
 // ── TRUTHPACK PICKER ──
 const TP_CATALOG = [
-  {id:'finance-2024', name:'Finance Playbook 2024', tag:'Finance', tagColor:'#FDC700', tagBg:'rgba(253,199,0,0.15)', facts:31, claims:8, docs:5,
+  {id:'finance-2024', name:'Finance Playbook 2024', tag:'Finance', tagColor:'var(--warn)', tagBg:'rgba(253,199,0,0.15)', facts:31, claims:8, docs:5,
    planes:{truth:{enabled:true,on:true},sandbox:{enabled:true,on:false},sources:{enabled:false,on:false}}},
   {id:'support-q2', name:'Support Playbook Q2', tag:'Customer Service', tagColor:'var(--pri)', tagBg:'rgba(43,127,255,0.18)', facts:24, claims:5, docs:3,
    planes:{truth:{enabled:true,on:true},sandbox:{enabled:true,on:true},sources:{enabled:false,on:false}}},
@@ -12129,7 +12155,7 @@ const TP_DATA = {
   },
   'finance-2024': {
     name: 'Finance Playbook 2024',
-    tag: 'Finance', tagColor: '#FDC700', tagBg: 'rgba(253,199,0,0.15)',
+    tag: 'Finance', tagColor: 'var(--warn)', tagBg: 'rgba(253,199,0,0.15)',
     desc: 'Approved financial policies, budget thresholds, and approval workflows for FY2024. Managed by the Finance Operations team.',
     summary: 'Provides agents with verified approval thresholds, vendor contract requirements, and budget escalation rules for FY2024. One sandbox claim (Q3 budget reallocation) is pending board approval and should not influence automated decisions until confirmed.',
     facts: [
@@ -13465,9 +13491,9 @@ const TB_ACTIVITY = [
 ];
 
 const TB_WORKSPACES = [
-  { id:'aims',   name:'AIMS Internal', initials:'AI', color:'linear-gradient(135deg,#155DFC,#00C2C2)', active:true  },
+  { id:'aims',   name:'AIMS Internal', initials:'AI', color:'linear-gradient(135deg,var(--brand-blue),var(--brand-teal))', active:true  },
   { id:'acme',   name:'AcmeCorp',      initials:'AC', color:'linear-gradient(135deg,#F59E0B,#F97316)', active:false },
-  { id:'stripe', name:'Stripe',        initials:'ST', color:'linear-gradient(135deg,#635BFF,#A78BFA)', active:false },
+  { id:'stripe', name:'Stripe',        initials:'ST', color:'linear-gradient(135deg,#635BFF,var(--pur))', active:false },
 ];
 
 // ───── State ─────────────────────────────────────────────────────────────
