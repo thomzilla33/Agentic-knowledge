@@ -1343,9 +1343,50 @@ body.test-mode #vTestMode{display:flex}
 .tm-trace-chev{font-size:14px;transition:transform .25s;display:inline-block}
 .tm-trace-btn.open .tm-trace-chev{transform:rotate(180deg)}
 /* execution trace panel */
-.tm-trace-panel{position:absolute;top:0;right:0;bottom:0;width:304px;background:#0a0d19;border-left:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);z-index:10}
+.tm-trace-panel{position:absolute;top:0;right:0;bottom:0;width:304px;min-width:280px;max-width:95vw;background:#0a0d19;border-left:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1), width .22s cubic-bezier(.4,0,.2,1);z-index:10}
 .tm-trace-panel.open{transform:translateX(0)}
-.tm-trace-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0}
+/* While the user is dragging the resize handle, suppress the width
+   transition so the panel tracks the cursor 1:1 (no easing lag). */
+.tm-trace-panel.is-resizing{transition:transform .25s cubic-bezier(.4,0,.2,1)}
+
+/* Maximized state — toggled by the ⛶ button in the header */
+.tm-trace-panel.is-maximized{width:min(92vw, 1280px) !important}
+
+/* Left-edge resize handle: thin invisible bar, becomes blue on hover/drag */
+.tm-trace-resize{
+  position:absolute;left:0;top:0;bottom:0;
+  width:5px;cursor:col-resize;background:transparent;z-index:12;
+  transition:background .15s;
+}
+.tm-trace-resize::after{
+  content:'';position:absolute;left:1px;top:50%;
+  transform:translateY(-50%);
+  width:2px;height:36px;border-radius:2px;
+  background:rgba(255,255,255,0.18);
+  opacity:0;transition:opacity .15s, background .15s;
+}
+.tm-trace-resize:hover{background:rgba(43,127,255,0.18)}
+.tm-trace-resize:hover::after{opacity:1;background:rgba(43,127,255,0.65)}
+.tm-trace-panel.is-resizing .tm-trace-resize{background:rgba(43,127,255,0.30)}
+.tm-trace-panel.is-resizing .tm-trace-resize::after{opacity:1;background:#80AFFF}
+
+/* While dragging, lock the cursor everywhere + suppress text selection */
+body.tm-trace-resizing{user-select:none;cursor:col-resize !important}
+body.tm-trace-resizing iframe{pointer-events:none}
+
+/* Expand button (header) — same vibe as the agent modal's expand ⛶ */
+.tm-trace-expand{
+  background:none;border:none;color:var(--t3);cursor:pointer;
+  padding:2px 6px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:5px;transition:color .12s, background .12s;
+  margin-right:2px;
+}
+.tm-trace-expand:hover{color:var(--t1);background:rgba(255,255,255,0.05)}
+.tm-trace-expand svg{transition:transform .18s}
+.tm-trace-panel.is-maximized .tm-trace-expand svg{transform:rotate(180deg)}
+
+.tm-trace-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;gap:4px}
 .tm-trace-title{font-size:13px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:7px}
 .tm-trace-cnt{font-size:11px;font-weight:700;background:rgba(255,255,255,0.07);color:var(--t3);padding:1px 7px;border-radius:10px}
 .tm-trace-x{background:none;border:none;color:var(--t3);cursor:pointer;font-size:20px;line-height:1;padding:0 3px;transition:color .1s}
@@ -4775,11 +4816,16 @@ button.avatar-sm:hover{filter:brightness(1.08)}
 
         <!-- Execution Trace panel -->
         <div class="tm-trace-panel" id="tmTracePanel">
+          <!-- Left-edge resize handle: drag to widen/narrow the panel -->
+          <div class="tm-trace-resize" id="tmTraceResize" onmousedown="onTraceResizeStart(event)" title="Drag to resize"></div>
           <div class="tm-trace-hd">
             <div class="tm-trace-title">
               Execution Trace
               <span class="tm-trace-cnt" id="tmTraceCnt">0/0</span>
             </div>
+            <button class="tm-trace-expand" id="tmTraceExpandBtn" onclick="toggleTraceMax()" title="Expand to fullscreen" aria-label="Toggle expand">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 5V2h3M9 2h3v3M12 9v3H9M5 12H2V9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
             <button class="tm-trace-x" onclick="toggleExecTrace()">›</button>
           </div>
           <div class="tm-trace-fb">
@@ -10669,6 +10715,7 @@ function openTestMode() {
   document.getElementById('tmTracePanel').classList.remove('open');
   document.getElementById('tmTraceBtn').classList.remove('open');
   document.getElementById('tmTraceCnt').textContent = '0/'+TM_STEPS.length;
+  restoreTraceWidth();
   renderTraceList(0);
   renderTestCanvas(net);
   document.body.classList.add('test-mode');
@@ -10686,6 +10733,99 @@ function toggleExecTrace() {
   tmTraceOpen = !tmTraceOpen;
   document.getElementById('tmTracePanel').classList.toggle('open', tmTraceOpen);
   document.getElementById('tmTraceBtn').classList.toggle('open', tmTraceOpen);
+}
+
+// ── Trace panel: drag-to-resize + expand to fullscreen ────────────────
+// User can grab the left edge to widen the panel (col-resize cursor) or
+// click the ⛶ button in the header to toggle a maximized state. The
+// user-chosen width is persisted in localStorage so it survives reload
+// and the next time openTestMode runs.
+const TM_TRACE_MIN_W   = 280;
+const TM_TRACE_MAX_W   = () => Math.floor(window.innerWidth * 0.92);
+const TM_TRACE_DEF_W   = 304;
+let tmTraceMaximized   = false;
+let tmTraceResizing    = false;
+let tmTraceResizeStartX = 0;
+let tmTraceResizeStartW = 0;
+
+function onTraceResizeStart(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const panel = document.getElementById('tmTracePanel');
+  if (!panel) return;
+  tmTraceResizing = true;
+  tmTraceResizeStartX = e.clientX;
+  tmTraceResizeStartW = panel.offsetWidth;
+  panel.classList.add('is-resizing');
+  document.body.classList.add('tm-trace-resizing');
+  document.addEventListener('mousemove', onTraceResizeMove);
+  document.addEventListener('mouseup', onTraceResizeEnd);
+}
+function onTraceResizeMove(e) {
+  if (!tmTraceResizing) return;
+  // Panel anchored to the RIGHT — dragging LEFT (negative dx) expands it.
+  const dx  = tmTraceResizeStartX - e.clientX;
+  const min = TM_TRACE_MIN_W;
+  const max = TM_TRACE_MAX_W();
+  const w   = Math.max(min, Math.min(max, tmTraceResizeStartW + dx));
+  const panel = document.getElementById('tmTracePanel');
+  panel.style.width = w + 'px';
+  // Once the user manually resizes, the panel is no longer "maximized"
+  // — drop the class so the expand button icon flips back too.
+  if (tmTraceMaximized) {
+    tmTraceMaximized = false;
+    panel.classList.remove('is-maximized');
+  }
+}
+function onTraceResizeEnd() {
+  if (!tmTraceResizing) return;
+  tmTraceResizing = false;
+  document.body.classList.remove('tm-trace-resizing');
+  const panel = document.getElementById('tmTracePanel');
+  panel.classList.remove('is-resizing');
+  document.removeEventListener('mousemove', onTraceResizeMove);
+  document.removeEventListener('mouseup',   onTraceResizeEnd);
+  // Persist the manual width so future opens restore it.
+  try { localStorage.setItem('tmTraceWidth', panel.style.width || ''); } catch (_) {}
+}
+
+function toggleTraceMax() {
+  const panel = document.getElementById('tmTracePanel');
+  if (!panel) return;
+  const btn = document.getElementById('tmTraceExpandBtn');
+  tmTraceMaximized = !tmTraceMaximized;
+  if (tmTraceMaximized) {
+    panel.classList.add('is-maximized');
+    panel.style.width = '';                            // let CSS handle the maximized width
+    if (btn) btn.setAttribute('title', 'Collapse to compact');
+  } else {
+    panel.classList.remove('is-maximized');
+    // Restore prior width (last manual drag, or default).
+    let saved = '';
+    try { saved = localStorage.getItem('tmTraceWidth') || ''; } catch (_) {}
+    panel.style.width = saved || (TM_TRACE_DEF_W + 'px');
+    if (btn) btn.setAttribute('title', 'Expand to fullscreen');
+  }
+}
+
+// Apply any persisted user width. Called from openTestMode so each new
+// test run honours the user's preferred panel size.
+function restoreTraceWidth() {
+  const panel = document.getElementById('tmTracePanel');
+  if (!panel) return;
+  let saved = '';
+  try { saved = localStorage.getItem('tmTraceWidth') || ''; } catch (_) {}
+  if (saved) {
+    // Clamp against the current viewport (user may have resized window).
+    const px = parseInt(saved, 10);
+    if (!isNaN(px)) {
+      const w = Math.max(TM_TRACE_MIN_W, Math.min(TM_TRACE_MAX_W(), px));
+      panel.style.width = w + 'px';
+    }
+  }
+  // Reset maximized state on each open.
+  tmTraceMaximized = false;
+  panel.classList.remove('is-maximized');
 }
 function runNextStep(idx) {
   if (idx >= TM_STEPS.length) {
