@@ -992,23 +992,39 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .pgn-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--bd);background:rgba(255,255,255,0.05);cursor:pointer;color:var(--t2);transition:background .15s,border-color .15s,opacity .15s}
 .pgn-btn:hover:not(:disabled){border-color:var(--bds);background:rgba(255,255,255,0.09)}
 .pgn-btn:disabled{opacity:.3;cursor:not-allowed}
-.lt-head{display:flex;align-items:center;gap:0;padding:0 18px;height:34px;border-bottom:1px solid var(--bd);background:rgba(255,255,255,0.02);flex-shrink:0}
-.lt-h{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
-.lt-col-state{width:100px;flex-shrink:0}
+.lt-head{display:flex;align-items:center;gap:0;padding:0 18px;height:34px;border-bottom:1px solid var(--bd);background:var(--bg2);flex-shrink:0;position:sticky;top:0;z-index:2}
+.lt-h{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;display:inline-flex;align-items:center;gap:4px}
+.lt-h.sortable{cursor:pointer;user-select:none;transition:color .1s}
+.lt-h.sortable:hover{color:var(--t1)}
+.lt-h .sort-tri{opacity:.45;font-size:8px;line-height:1;display:inline-block;transform:translateY(-1px)}
+.lt-col-check{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.lt-col-check input{width:13px;height:13px;cursor:pointer;accent-color:var(--pri);margin:0}
+.lt-col-state{width:118px;flex-shrink:0}
 .lt-col-id{flex:1;min-width:140px}
 .lt-col-started{width:110px;flex-shrink:0}
 .lt-col-dur{width:72px;flex-shrink:0}
 .lt-col-prog{flex:1;min-width:180px}
-.lt-row{display:flex;align-items:center;gap:0;padding:0 18px;min-height:46px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background .1s}
-.lt-row:hover{background:rgba(255,255,255,0.025)}
+.lt-row{display:flex;align-items:center;gap:0;padding:0 18px;min-height:46px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background .12s, border-left-color .12s;border-left:3px solid transparent;outline:none}
+.lt-row:hover{background:rgba(43,127,255,0.05);border-left-color:rgba(43,127,255,0.4)}
+.lt-row:focus-visible{box-shadow:inset 0 0 0 2px var(--pri);background:rgba(43,127,255,0.06)}
 .lt-row:last-child{border-bottom:none}
-.log-badge{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:20px;font-size:10px;font-weight:700}
+.lt-row.is-failed{border-left-color:var(--err);background:rgba(255,100,103,0.04)}
+.lt-row.is-failed:hover{background:rgba(255,100,103,0.085)}
+.lt-row.is-auth{border-left-color:var(--warn);background:rgba(253,199,0,0.04)}
+.lt-row.is-auth:hover{background:rgba(253,199,0,0.085)}
+.lt-row.is-gate{border-left-color:#fb923c;background:rgba(251,146,60,0.04)}
+.lt-row.is-gate:hover{background:rgba(251,146,60,0.085)}
+.log-badge{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:20px;font-size:10px;font-weight:700;line-height:1}
+.log-badge svg{width:10px;height:10px;flex-shrink:0;display:block}
 .log-badge.success{background:var(--ok-bg);color:var(--ok)}
-.log-badge.partial{background:var(--warn-bg);color:var(--warn)}
+.log-badge.running{background:rgba(34,211,238,0.12);color:#22d3ee}
+.log-badge.running svg{animation:lb-spin 1.2s linear infinite;transform-origin:center}
 .log-badge.failed{background:var(--err-bg);color:var(--err)}
-.log-badge.running{background:var(--pri-bg);color:var(--pri)}
-.log-badge.gate{background:var(--pur-bg);color:var(--pur)}
+.log-badge.auth{background:var(--warn-bg);color:var(--warn)}
+.log-badge.partial{background:rgba(196,181,253,0.14);color:#c4b5fd}
+.log-badge.gate{background:rgba(251,146,60,0.14);color:#fb923c}
 .log-badge.waiting{background:rgba(255,255,255,0.07);color:var(--t2)}
+@keyframes lb-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .log-id{font-size:12px;font-weight:700;color:var(--pri)}
 .log-init{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:20px;font-size:10px;font-weight:600;margin-left:6px}
 .log-init.schedule{background:var(--pri-bg);color:var(--pri)}
@@ -1016,6 +1032,8 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .log-init.manual{background:rgba(255,255,255,0.07);color:var(--t2)}
 .log-init.api{background:var(--pur-bg);color:var(--pur)}
 .log-err{font-size:11px;color:var(--err);display:block;margin-top:2px}
+.log-action{display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:1px 7px;border-radius:20px;border:1px solid currentColor;background:transparent;font-size:10px;font-weight:700;cursor:pointer;text-decoration:none;opacity:.85;transition:opacity .12s, background .12s;vertical-align:middle}
+.log-action:hover{opacity:1;background:rgba(255,255,255,0.06)}
 .log-started{font-size:12px;color:var(--t2)}
 .log-dur{font-size:12px;font-weight:600;color:var(--t1)}
 .log-prog-wrap{}
@@ -1024,8 +1042,40 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .step-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .step-dot.done{background:var(--ok)}
 .step-dot.fail{background:var(--err)}
-.step-dot.run{background:var(--pri)}
+.step-dot.run{background:#22d3ee;animation:step-pulse 1.2s ease-in-out infinite}
 .step-dot.wait{background:var(--t4)}
+.step-dot.gate{background:#fb923c}
+.step-dot.auth{background:var(--warn)}
+@keyframes step-pulse{50%{opacity:.5;transform:scale(1.15)}}
+
+/* Bulk action bar */
+.logs-bulkbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:8px 18px;background:linear-gradient(180deg,rgba(43,127,255,0.16) 0%,rgba(43,127,255,0.10) 100%);border-bottom:1px solid rgba(43,127,255,0.32);box-shadow:0 2px 10px rgba(0,0,0,0.28);flex-shrink:0}
+.bulkbar-cnt{font-size:12px;color:var(--t1);font-weight:600;margin-right:6px}
+.bulkbar-cnt b{font-weight:800}
+.bulkbar-btn{height:26px;padding:0 11px;border-radius:var(--r6);border:1px solid var(--bd);background:rgba(255,255,255,0.06);color:var(--t1);font-size:11px;font-weight:700;cursor:pointer;transition:background .12s,border-color .12s,opacity .15s;display:inline-flex;align-items:center;gap:4px}
+.bulkbar-btn:hover{background:rgba(255,255,255,0.12);border-color:var(--bds)}
+.bulkbar-btn.primary{background:var(--pri);border-color:var(--pri);color:#fff}
+.bulkbar-btn.primary:hover{opacity:.9;background:var(--pri)}
+
+/* Stuck chip */
+.lchip.stuck{color:var(--warn);border-color:rgba(253,199,0,0.25)}
+.lchip.stuck.active{background:var(--warn-bg);border-color:rgba(253,199,0,0.4)}
+
+/* Filtered banner */
+.logs-filtered-banner{display:none;align-items:center;gap:8px;padding:6px 18px;background:rgba(43,127,255,0.06);border-bottom:1px solid rgba(43,127,255,0.18);font-size:12px;color:var(--t2);flex-shrink:0}
+.logs-filtered-banner.show{display:flex}
+.logs-filtered-clr{margin-left:6px;background:none;border:none;color:var(--pri);font-size:12px;font-weight:700;cursor:pointer;padding:0 2px}
+.logs-filtered-clr:hover{text-decoration:underline}
+
+/* Empty state */
+.lt-empty{display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--t3);font-size:13px;text-align:center}
+.lt-empty.show{display:flex}
+.lt-empty button{height:28px;padding:0 12px;border-radius:var(--r6);border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;transition:background .1s}
+.lt-empty button:hover{background:rgba(255,255,255,0.06)}
+
+/* Run-detail trace button */
+.rd-trace{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 12px;background:var(--pri-bg);border:1px solid var(--pri-bd);border-radius:var(--r6);color:var(--pri);font-size:12px;font-weight:700;cursor:pointer;transition:background .1s;white-space:nowrap;margin-right:6px}
+.rd-trace:hover{background:rgba(43,127,255,0.18)}
 
 /* Run detail slide-out */
 .run-detail-ov{position:absolute;inset:0;background:rgba(0,0,0,0.45);z-index:80;opacity:0;pointer-events:none;transition:opacity .22s}
@@ -4089,16 +4139,17 @@ button.avatar-sm:hover{filter:brightness(1.08)}
                 <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
                 <input placeholder="Search runs, IDs, initiators…"/>
               </div>
-              <div class="logs-fchips">
-                <button class="lchip active" onclick="setLChip(this)">All 22</button>
-                <button class="lchip ok" onclick="setLChip(this)">Success 7</button>
-                <button class="lchip err" onclick="setLChip(this)">Failed 5</button>
-                <button class="lchip run" onclick="setLChip(this)">Running 4</button>
-                <button class="lchip warn" onclick="setLChip(this)">Human Gate 2</button>
-                <button class="lchip" onclick="setLChip(this)">Waiting 4</button>
+              <div class="logs-fchips" id="logsFchips">
+                <button class="lchip active" data-lchip="all" onclick="setLChip(this)">All 22</button>
+                <button class="lchip ok" data-lchip="success" onclick="setLChip(this)">Success 7</button>
+                <button class="lchip err" data-lchip="failed" onclick="setLChip(this)">Failed 5</button>
+                <button class="lchip run" data-lchip="running" onclick="setLChip(this)">Running 4</button>
+                <button class="lchip warn" data-lchip="gate" onclick="setLChip(this)">Human Gate 2</button>
+                <button class="lchip stuck" data-lchip="stuck" onclick="setLChip(this)">Stuck 2</button>
+                <button class="lchip" data-lchip="waiting" onclick="setLChip(this)">Waiting 4</button>
               </div>
               <div class="logs-meta">
-                <span class="logs-total">1,891 total runs</span>
+                <span class="logs-total" id="logsTotal">1,891 total runs</span>
                 <button class="logs-date" onclick="toast('Date range picker','info')">
                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="1" stroke="currentColor" stroke-width="1.1"/><path d="M4 1v2M8 1v2M1 5h10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
                   Apr 1 – Apr 29
@@ -4117,29 +4168,54 @@ button.avatar-sm:hover{filter:brightness(1.08)}
             <!-- Alert bar -->
             <div class="logs-alert">
               <span class="logs-alert-lbl">Active alerts:</span>
-              <button class="alert-chip err" onclick="toast('3 failed runs','error')">3 failed</button>
-              <button class="alert-chip warn" onclick="toast('2 human gates pending','info')">2 human gates pending</button>
-              <button class="alert-chip warn" onclick="toast('2 stuck >30 min','info')">2 stuck &gt;30 min</button>
-              <button class="alert-chip run" onclick="toast('4 running now','info')">4 running</button>
+              <button class="alert-chip err" onclick="alertFilter('failed', 3)">3 failed</button>
+              <button class="alert-chip warn" onclick="alertFilter('gate', 2)">2 human gates pending</button>
+              <button class="alert-chip warn" onclick="alertFilter('stuck', 2)">2 stuck &gt;30 min</button>
+              <button class="alert-chip run" onclick="alertFilter('running', 4)">4 running</button>
               <div class="alert-actions">
-                <button class="alert-btn retry" onclick="toast('Retrying all failed…','info')">Retry all failed</button>
-                <button class="alert-btn remind" onclick="toast('Reminders sent','info')">Send reminders</button>
+                <button class="alert-btn retry" id="alertRetryAllBtn" onclick="alertRetryAll(this)">Retry all failed</button>
+                <button class="alert-btn remind" onclick="alertSendReminders()">Send reminders</button>
               </div>
+            </div>
+
+            <!-- Filtered banner -->
+            <div class="logs-filtered-banner" id="logsFilteredBanner">
+              <span id="logsFilteredText">Showing 0 filtered runs</span>
+              <button class="logs-filtered-clr" onclick="clearLogFilter()">Clear ×</button>
+            </div>
+
+            <!-- Bulk action bar -->
+            <div class="logs-bulkbar" id="logsBulkbar" style="display:none">
+              <span class="bulkbar-cnt"><b>0</b> selected</span>
+              <button class="bulkbar-btn primary" onclick="bulkRetry()">↻ Retry selected</button>
+              <button class="bulkbar-btn" onclick="bulkMarkResolved()">✓ Mark resolved</button>
+              <button class="bulkbar-btn" onclick="bulkExport()">↓ Export selected</button>
+              <button class="bulkbar-btn" onclick="bulkClear()">Cancel</button>
             </div>
 
             <!-- Table -->
             <div class="logs-table">
               <div style="display:flex" class="lt-head">
-                <div class="lt-h lt-col-state">State</div>
-                <div class="lt-h lt-col-id">ID / Initiator</div>
-                <div class="lt-h lt-col-started">Started</div>
-                <div class="lt-h lt-col-dur">Duration</div>
+                <div class="lt-h lt-col-check">
+                  <input type="checkbox" class="master" aria-label="Select all rows" onclick="event.stopPropagation()" onchange="toggleAllRowChecks(this)">
+                </div>
+                <div class="lt-h lt-col-state sortable" onclick="toast('Sort by State','info')">State <span class="sort-tri">▾</span></div>
+                <div class="lt-h lt-col-id sortable" onclick="toast('Sort by ID','info')">ID / Initiator <span class="sort-tri">▾</span></div>
+                <div class="lt-h lt-col-started sortable" onclick="toast('Sort by Started','info')">Started <span class="sort-tri">▾</span></div>
+                <div class="lt-h lt-col-dur sortable" onclick="toast('Sort by Duration','info')">Duration <span class="sort-tri">▾</span></div>
                 <div class="lt-h lt-col-prog">Progress</div>
               </div>
 
+              <!-- Empty state placeholder -->
+              <div class="lt-empty" id="ltEmpty">
+                <span>No runs match the current filter.</span>
+                <button onclick="clearLogFilter()">Clear filters</button>
+              </div>
+
               <!-- Row 1 — Success -->
-              <div class="lt-row" onclick="openRunDetail('run-2291','success')">
-                <div class="lt-col-state"><span class="log-badge success">● Success</span></div>
+              <div class="lt-row" tabindex="0" role="button" aria-label="Run #2291 — Success" onclick="openRunDetail('run-2291','success')" onkeydown="handleRowKey(event,'run-2291','success')">
+                <div class="lt-col-check"><input type="checkbox" class="lt-row-check" aria-label="Select run #2291" onclick="event.stopPropagation()" onchange="onRowCheckChange(event)"></div>
+                <div class="lt-col-state"><span class="log-badge success"><svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.2" fill="currentColor"/></svg>Success</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2291</span><span class="log-init schedule">Schedule</span></div>
                 </div>
@@ -4161,8 +4237,9 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               </div>
 
               <!-- Row 2 — Running -->
-              <div class="lt-row" onclick="openRunDetail('run-2290','running')">
-                <div class="lt-col-state"><span class="log-badge running">● Running</span></div>
+              <div class="lt-row" tabindex="0" role="button" aria-label="Run #2290 — Running" onclick="openRunDetail('run-2290','running')" onkeydown="handleRowKey(event,'run-2290','running')">
+                <div class="lt-col-check"><input type="checkbox" class="lt-row-check" aria-label="Select run #2290" onclick="event.stopPropagation()" onchange="onRowCheckChange(event)"></div>
+                <div class="lt-col-state"><span class="log-badge running"><svg viewBox="0 0 10 10" fill="none"><path d="M5 1.2a3.8 3.8 0 1 1-3.8 3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>Running</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2290</span><span class="log-init webhook">Webhook</span></div>
                 </div>
@@ -4179,11 +4256,12 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               </div>
 
               <!-- Row 3 — Failed -->
-              <div class="lt-row" onclick="openRunDetail('run-2289','failed')">
-                <div class="lt-col-state"><span class="log-badge failed">● Failed</span></div>
+              <div class="lt-row is-failed" tabindex="0" role="button" aria-label="Run #2289 — Failed" onclick="openRunDetail('run-2289','failed')" onkeydown="handleRowKey(event,'run-2289','failed')">
+                <div class="lt-col-check"><input type="checkbox" class="lt-row-check" aria-label="Select run #2289" onclick="event.stopPropagation()" onchange="onRowCheckChange(event)"></div>
+                <div class="lt-col-state"><span class="log-badge failed"><svg viewBox="0 0 10 10" fill="none"><path d="M2.2 2.2L7.8 7.8M7.8 2.2L2.2 7.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Failed</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2289</span><span class="log-init api">API</span></div>
-                  <span class="log-err">Step 3 timeout: Knowledge Space unreachable after 30s</span>
+                  <span class="log-err">Step 3 timeout: Knowledge Space unreachable after 30s <a class="log-action" onclick="event.stopPropagation(); toast('Retrying run #2289…','info')">↻ Retry →</a></span>
                 </div>
                 <div class="lt-col-started"><span class="log-started">Apr 29, 08:55</span></div>
                 <div class="lt-col-dur"><span class="log-dur">30s</span></div>
@@ -4198,11 +4276,12 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               </div>
 
               <!-- Row 4 — Human Gate -->
-              <div class="lt-row" onclick="openRunDetail('run-2288','gate')">
-                <div class="lt-col-state"><span class="log-badge gate">⏸ Human Gate</span></div>
+              <div class="lt-row is-gate" tabindex="0" role="button" aria-label="Run #2288 — Human Gate" onclick="openRunDetail('run-2288','gate')" onkeydown="handleRowKey(event,'run-2288','gate')">
+                <div class="lt-col-check"><input type="checkbox" class="lt-row-check" aria-label="Select run #2288" onclick="event.stopPropagation()" onchange="onRowCheckChange(event)"></div>
+                <div class="lt-col-state"><span class="log-badge gate"><svg viewBox="0 0 10 10" fill="none"><rect x="2.4" y="2" width="1.6" height="6" rx="0.4" fill="currentColor"/><rect x="6" y="2" width="1.6" height="6" rx="0.4" fill="currentColor"/></svg>Human Gate</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2288</span><span class="log-init manual">Manual</span></div>
-                  <span class="log-err" style="color:var(--pur)">Waiting for approval from Sales Manager</span>
+                  <span class="log-err" style="color:#fb923c">Waiting for approval from Sales Manager <a class="log-action" onclick="event.stopPropagation(); toast('Approval flow opened','success')">Approve →</a></span>
                 </div>
                 <div class="lt-col-started"><span class="log-started">Apr 29, 08:40</span></div>
                 <div class="lt-col-dur"><span class="log-dur">22m 18s</span></div>
@@ -4210,18 +4289,19 @@ button.avatar-sm:hover{filter:brightness(1.08)}
                   <div class="log-prog-lbl">4 of 8 steps</div>
                   <div class="log-prog-steps">
                     <div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div>
-                    <div class="step-dot done"></div><div class="step-dot wait" style="background:var(--pur);opacity:.5"></div>
+                    <div class="step-dot done"></div><div class="step-dot gate"></div>
                     <div class="step-dot wait"></div><div class="step-dot wait"></div><div class="step-dot wait"></div>
                   </div>
                 </div>
               </div>
 
               <!-- Row 5 — Partial -->
-              <div class="lt-row" onclick="openRunDetail('run-2287','partial')">
-                <div class="lt-col-state"><span class="log-badge partial">◑ Partial</span></div>
+              <div class="lt-row" tabindex="0" role="button" aria-label="Run #2287 — Partial" onclick="openRunDetail('run-2287','partial')" onkeydown="handleRowKey(event,'run-2287','partial')">
+                <div class="lt-col-check"><input type="checkbox" class="lt-row-check" aria-label="Select run #2287" onclick="event.stopPropagation()" onchange="onRowCheckChange(event)"></div>
+                <div class="lt-col-state"><span class="log-badge partial"><svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.4" stroke="currentColor" stroke-width="1" fill="none"/><path d="M5 1.6a3.4 3.4 0 0 1 0 6.8z" fill="currentColor"/></svg>Partial</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2287</span><span class="log-init schedule">Schedule</span></div>
-                  <span class="log-err" style="color:var(--warn)">CRM Sync skipped — duplicate record detected</span>
+                  <span class="log-err" style="color:#c4b5fd">CRM Sync skipped — duplicate record detected</span>
                 </div>
                 <div class="lt-col-started"><span class="log-started">Apr 29, 08:00</span></div>
                 <div class="lt-col-dur"><span class="log-dur">1m 48s</span></div>
@@ -4230,24 +4310,25 @@ button.avatar-sm:hover{filter:brightness(1.08)}
                   <div class="log-prog-steps">
                     <div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div>
                     <div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div>
-                    <div class="step-dot fail" style="background:var(--warn)"></div><div class="step-dot done"></div>
+                    <div class="step-dot fail" style="background:#c4b5fd"></div><div class="step-dot done"></div>
                   </div>
                 </div>
               </div>
 
               <!-- Row 6 — Auth Error -->
-              <div class="lt-row" onclick="openRunDetail('run-2286','failed')">
-                <div class="lt-col-state"><span class="log-badge failed">● Auth Error</span></div>
+              <div class="lt-row is-auth" tabindex="0" role="button" aria-label="Run #2286 — Auth Error" onclick="openRunDetail('run-2286','auth')" onkeydown="handleRowKey(event,'run-2286','auth')">
+                <div class="lt-col-check"><input type="checkbox" class="lt-row-check" aria-label="Select run #2286" onclick="event.stopPropagation()" onchange="onRowCheckChange(event)"></div>
+                <div class="lt-col-state"><span class="log-badge auth"><svg viewBox="0 0 10 10" fill="none"><path d="M5 1.4L9.2 8.6H0.8L5 1.4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" fill="none"/><rect x="4.55" y="4.2" width="0.9" height="2.2" rx="0.4" fill="currentColor"/><circle cx="5" cy="7.3" r="0.55" fill="currentColor"/></svg>Auth Error</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2286</span><span class="log-init webhook">Webhook</span></div>
-                  <span class="log-err">403 Forbidden: CRM API token expired</span>
+                  <span class="log-err" style="color:var(--warn)">403 Forbidden: CRM API token expired <a class="log-action" onclick="event.stopPropagation(); toast('Reauthenticate CRM connector','info')">↻ Reauth</a></span>
                 </div>
                 <div class="lt-col-started"><span class="log-started">Apr 28, 23:45</span></div>
                 <div class="lt-col-dur"><span class="log-dur">4s</span></div>
                 <div class="lt-col-prog">
                   <div class="log-prog-lbl">1 of 8 steps</div>
                   <div class="log-prog-steps">
-                    <div class="step-dot fail"></div><div class="step-dot wait"></div><div class="step-dot wait"></div>
+                    <div class="step-dot auth"></div><div class="step-dot wait"></div><div class="step-dot wait"></div>
                     <div class="step-dot wait"></div><div class="step-dot wait"></div><div class="step-dot wait"></div>
                     <div class="step-dot wait"></div><div class="step-dot wait"></div>
                   </div>
@@ -4255,8 +4336,9 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               </div>
 
               <!-- Row 7 — Success -->
-              <div class="lt-row" onclick="openRunDetail('run-2285','success')">
-                <div class="lt-col-state"><span class="log-badge success">● Success</span></div>
+              <div class="lt-row" tabindex="0" role="button" aria-label="Run #2285 — Success" onclick="openRunDetail('run-2285','success')" onkeydown="handleRowKey(event,'run-2285','success')">
+                <div class="lt-col-check"><input type="checkbox" class="lt-row-check" aria-label="Select run #2285" onclick="event.stopPropagation()" onchange="onRowCheckChange(event)"></div>
+                <div class="lt-col-state"><span class="log-badge success"><svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.2" fill="currentColor"/></svg>Success</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2285</span><span class="log-init schedule">Schedule</span></div>
                 </div>
@@ -4273,8 +4355,9 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               </div>
 
               <!-- Row 8 — Waiting -->
-              <div class="lt-row" onclick="openRunDetail('run-2284','waiting')">
-                <div class="lt-col-state"><span class="log-badge waiting">○ Waiting</span></div>
+              <div class="lt-row" tabindex="0" role="button" aria-label="Run #2284 — Waiting" onclick="openRunDetail('run-2284','waiting')" onkeydown="handleRowKey(event,'run-2284','waiting')">
+                <div class="lt-col-check"><input type="checkbox" class="lt-row-check" aria-label="Select run #2284" onclick="event.stopPropagation()" onchange="onRowCheckChange(event)"></div>
+                <div class="lt-col-state"><span class="log-badge waiting"><svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>Waiting</span></div>
                 <div class="lt-col-id">
                   <div><span class="log-id">#2284</span><span class="log-init schedule">Schedule</span></div>
                   <span class="log-err" style="color:var(--t3)">Queued — awaiting upstream dependency</span>
@@ -4299,19 +4382,19 @@ button.avatar-sm:hover{filter:brightness(1.08)}
                 Rows per page:
                 <div class="pgn-rpp-wrap">
                   <button class="pgn-rpp-btn" onclick="togglePgnMenu(event)" id="pgnRppBtn">
-                    <span id="pgnRppVal">8</span>
+                    <span id="pgnRppVal">25</span>
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   </button>
                   <div class="pgn-rpp-menu" id="pgnRppMenu">
-                    <button class="pgn-rpp-opt active" onclick="pgnSetRows(8,this)">8</button>
+                    <button class="pgn-rpp-opt" onclick="pgnSetRows(8,this)">8</button>
                     <button class="pgn-rpp-opt" onclick="pgnSetRows(15,this)">15</button>
-                    <button class="pgn-rpp-opt" onclick="pgnSetRows(25,this)">25</button>
+                    <button class="pgn-rpp-opt active" onclick="pgnSetRows(25,this)">25</button>
                     <button class="pgn-rpp-opt" onclick="pgnSetRows(50,this)">50</button>
                     <button class="pgn-rpp-opt" onclick="pgnSetRows(100,this)">100</button>
                   </div>
                 </div>
               </div>
-              <span class="pgn-range" id="pgnRange">1 – 8 of 1,891 items</span>
+              <span class="pgn-range" id="pgnRange">1 – 25 of 1,891 items</span>
               <div class="pgn-nav">
                 <button class="pgn-btn" id="pgnPrev" onclick="pgnGo(-1)" disabled title="Previous page">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -4329,6 +4412,10 @@ button.avatar-sm:hover{filter:brightness(1.08)}
                 <div class="rd-hd">
                   <div class="rd-hd-row1">
                     <span class="rd-id" id="rdRunId">Run #2291</span>
+                    <button class="rd-trace" onclick="openTraceFromRun()" title="Open the Execution Trace panel for this run">
+                      <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2v8h8M4 8l2-3 1.5 2 2-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Open Execution Trace →
+                    </button>
                     <button class="rd-open" onclick="toast('Opening full view','info')">
                       <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M5 2H2v8h8V7M7 1h4v4M11 1L6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       Open full view
@@ -5858,7 +5945,7 @@ function switchOvTab(tab, btn) {
 
 // ── PAGINATION ──
 let pgnPage = 1;
-let pgnRowsPerPage = 8;
+let pgnRowsPerPage = 25;
 const PGN_TOTAL = 1891;
 const PGN_ROWS_OPTS = [8, 15, 25, 50, 100];
 
@@ -5906,9 +5993,170 @@ document.addEventListener('click', () => {
 });
 
 // ── LOGS ──
+// Map a filter key to the row .lt-row qualifier. 'all' shows everything; 'stuck' is mock-mapped to gate+auth rows.
+const L_FILTER_ROW_MATCH = {
+  all:     () => true,
+  success: (row) => !!row.querySelector('.log-badge.success'),
+  failed:  (row) => !!row.querySelector('.log-badge.failed') || !!row.querySelector('.log-badge.auth'),
+  running: (row) => !!row.querySelector('.log-badge.running'),
+  gate:    (row) => !!row.querySelector('.log-badge.gate'),
+  waiting: (row) => !!row.querySelector('.log-badge.waiting'),
+  stuck:   (row) => row.classList.contains('is-gate') || row.classList.contains('is-auth'),
+};
+
 function setLChip(el) {
   document.querySelectorAll('.lchip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
+  applyLogFilter();
+}
+
+function applyLogFilter() {
+  const active = document.querySelector('.lchip.active');
+  const key = active ? (active.dataset.lchip || 'all') : 'all';
+  const match = L_FILTER_ROW_MATCH[key] || L_FILTER_ROW_MATCH.all;
+  const rows = document.querySelectorAll('#opLogs .lt-row');
+  let visible = 0;
+  rows.forEach(r => {
+    const show = key === 'all' ? true : match(r);
+    r.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  // Empty state
+  const empty = document.getElementById('ltEmpty');
+  if (empty) empty.classList.toggle('show', visible === 0);
+  // Banner + total toggle
+  const banner = document.getElementById('logsFilteredBanner');
+  const total  = document.getElementById('logsTotal');
+  if (key === 'all') {
+    if (banner) banner.classList.remove('show');
+    if (total)  total.style.display = '';
+  } else {
+    if (banner) {
+      banner.classList.add('show');
+      const t = document.getElementById('logsFilteredText');
+      if (t) t.textContent = `Showing ${visible} filtered run${visible===1?'':'s'}`;
+    }
+    if (total)  total.style.display = 'none';
+  }
+  // Scroll table to top
+  const tbl = document.querySelector('#opLogs .logs-table');
+  if (tbl) tbl.scrollTop = 0;
+}
+
+function clearLogFilter() {
+  const all = document.querySelector('.lchip[data-lchip="all"]');
+  if (all) setLChip(all);
+}
+
+function alertFilter(key /*, count */) {
+  const chip = document.querySelector('.lchip[data-lchip="'+key+'"]');
+  if (chip) setLChip(chip);
+}
+
+function alertRetryAll(btn) {
+  toast('Queued 3 failed runs for retry', 'success');
+  if (!btn) return;
+  btn.disabled = true;
+  const prev = btn.style.opacity;
+  btn.style.opacity = '0.45';
+  btn.style.pointerEvents = 'none';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.style.opacity = prev || '';
+    btn.style.pointerEvents = '';
+  }, 2000);
+}
+
+function alertSendReminders() {
+  toast('Reminders sent to Sales Manager, Operations Lead', 'success');
+}
+
+// ── BULK ACTIONS ──
+function onRowCheckChange(e) {
+  if (e) e.stopPropagation();
+  updateBulkBar();
+}
+function updateBulkBar() {
+  const checked = document.querySelectorAll('#opLogs .lt-row-check:checked').length;
+  const bar = document.getElementById('logsBulkbar');
+  if (!bar) return;
+  if (checked > 0) {
+    bar.style.display = 'flex';
+    const cnt = bar.querySelector('.bulkbar-cnt b');
+    if (cnt) cnt.textContent = checked;
+  } else {
+    bar.style.display = 'none';
+  }
+  // Sync master checkbox state
+  const all = document.querySelectorAll('#opLogs .lt-row-check').length;
+  const master = document.querySelector('#opLogs .lt-col-check input.master');
+  if (master) {
+    master.checked = (checked > 0 && checked === all);
+    master.indeterminate = (checked > 0 && checked < all);
+  }
+}
+function bulkRetry() {
+  const n = document.querySelectorAll('#opLogs .lt-row-check:checked').length;
+  toast(`Queued ${n} run${n===1?'':'s'} for retry`, 'success');
+  bulkClear();
+}
+function bulkMarkResolved() {
+  const n = document.querySelectorAll('#opLogs .lt-row-check:checked').length;
+  toast(`Marked ${n} run${n===1?'':'s'} as resolved`, 'success');
+  bulkClear();
+}
+function bulkExport() {
+  const n = document.querySelectorAll('#opLogs .lt-row-check:checked').length;
+  toast(`Exporting ${n} run${n===1?'':'s'} as CSV…`, 'info');
+}
+function bulkClear() {
+  document.querySelectorAll('#opLogs .lt-row-check').forEach(c => { c.checked = false; });
+  const master = document.querySelector('#opLogs .lt-col-check input.master');
+  if (master) { master.checked = false; master.indeterminate = false; }
+  updateBulkBar();
+}
+function toggleAllRowChecks(cb) {
+  document.querySelectorAll('#opLogs .lt-row-check').forEach(c => {
+    if (c.closest('.lt-row') && c.closest('.lt-row').style.display !== 'none') {
+      c.checked = cb.checked;
+    }
+  });
+  updateBulkBar();
+}
+
+// Row keyboard activation
+function handleRowKey(e, runId, status) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    // Don't trigger if the focus is on a checkbox or inline action
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'A' || tag === 'BUTTON') return;
+    e.preventDefault();
+    openRunDetail(runId, status);
+  }
+}
+
+// Open Execution Trace from the run-detail header (reuses Test Mode trace panel)
+function openTraceFromRun() {
+  closeRunDetail();
+  if (typeof openTestMode === 'function') {
+    setTimeout(openTestMode, 120);
+  } else {
+    toast('Execution Trace unavailable','info');
+  }
+}
+
+// Inline SVG for log-badge state icons (10x10 viewBox).
+function logBadgeIcon(status) {
+  switch (status) {
+    case 'success': return '<svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.2" fill="currentColor"/></svg>';
+    case 'running': return '<svg viewBox="0 0 10 10" fill="none"><path d="M5 1.2a3.8 3.8 0 1 1-3.8 3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>';
+    case 'failed':  return '<svg viewBox="0 0 10 10" fill="none"><path d="M2.2 2.2L7.8 7.8M7.8 2.2L2.2 7.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+    case 'auth':    return '<svg viewBox="0 0 10 10" fill="none"><path d="M5 1.4L9.2 8.6H0.8L5 1.4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" fill="none"/><rect x="4.55" y="4.2" width="0.9" height="2.2" rx="0.4" fill="currentColor"/><circle cx="5" cy="7.3" r="0.55" fill="currentColor"/></svg>';
+    case 'partial': return '<svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.4" stroke="currentColor" stroke-width="1" fill="none"/><path d="M5 1.6a3.4 3.4 0 0 1 0 6.8z" fill="currentColor"/></svg>';
+    case 'gate':    return '<svg viewBox="0 0 10 10" fill="none"><rect x="2.4" y="2" width="1.6" height="6" rx="0.4" fill="currentColor"/><rect x="6" y="2" width="1.6" height="6" rx="0.4" fill="currentColor"/></svg>';
+    case 'waiting': return '<svg viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>';
+    default: return '';
+  }
 }
 
 const RD_NODES = [
@@ -5925,10 +6173,11 @@ function openRunDetail(runId, status) {
   const panel = document.getElementById('runDetailPanel');
   const ov    = document.getElementById('runDetailOv');
   document.getElementById('rdRunId').textContent = 'Run ' + runId.replace('run-','#');
-  const badgeMap = {success:'success',failed:'failed',running:'running',gate:'gate',partial:'partial',waiting:'waiting'};
-  const lblMap   = {success:'Success',failed:'Failed',running:'Running',gate:'Human Gate',partial:'Partial',waiting:'Waiting'};
+  const badgeMap = {success:'success',failed:'failed',running:'running',gate:'gate',partial:'partial',waiting:'waiting',auth:'auth'};
+  const lblMap   = {success:'Success',failed:'Failed',running:'Running',gate:'Human Gate',partial:'Partial',waiting:'Waiting',auth:'Auth Error'};
+  const badgeCls = badgeMap[status] || 'waiting';
   document.getElementById('rdMeta').innerHTML =
-    `<span class="log-badge ${badgeMap[status]||'waiting'}">${lblMap[status]||status}</span>`;
+    `<span class="log-badge ${badgeCls}">${logBadgeIcon(badgeCls)}${lblMap[status]||status}</span>`;
   document.getElementById('rdCtxId').textContent = runId.replace('run-','#');
   document.getElementById('rdCtxStatus').textContent = lblMap[status]||status;
   const summaries = {
@@ -5938,6 +6187,7 @@ function openRunDetail(runId, status) {
     gate:'Run is paused at a Human Gate. Waiting for approval from Sales Manager before routing to the renewal track.',
     partial:'Run completed with a warning. CRM Sync was skipped due to a duplicate record. All other steps completed successfully.',
     waiting:'Run is queued and waiting for an upstream dependency to resolve before execution begins.',
+    auth:'Run failed at step 1 due to an authentication error. The CRM API token returned 403 Forbidden. Reauthenticate the connector and retry the run.',
   };
   document.getElementById('rdAiSummary').textContent = summaries[status] || summaries.success;
   // reset tabs
