@@ -1471,6 +1471,137 @@ html.persona-user [data-admin-only]{display:none !important}
   .gate-banner-actions{align-self:flex-end}
 }
 
+
+/* ──────────────────────────────────────────────────────────
+   REQUEST FORM (admin asks for a new integration)
+   ────────────────────────────────────────────────────────── */
+.req-form{padding:32px 32px 60px; max-width:880px; margin:0 auto}
+.req-form-hero{margin-bottom:28px}
+.req-form-title{font-size:30px; font-weight:800; color:var(--t1); letter-spacing:-.02em; margin:8px 0 8px}
+.req-form-sub{font-size:14px; color:var(--t2); line-height:1.55; max-width:620px}
+
+.req-form-card{
+  background:var(--bg2); border:1px solid var(--line); border-radius:12px;
+  overflow:hidden;
+}
+.req-form-section{padding:24px 28px; border-bottom:1px solid var(--line)}
+.req-form-section:last-of-type{border-bottom:none}
+.req-form-section-h{
+  display:flex; gap:14px; align-items:flex-start;
+  margin-bottom:18px;
+}
+.req-form-section-n{
+  width:26px; height:26px; border-radius:50%;
+  background:rgba(6,182,212,0.12); color:var(--cyan);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; flex-shrink:0;
+  border:1px solid rgba(6,182,212,0.30);
+}
+.req-form-section-t{font-size:15px; font-weight:700; color:var(--t1); letter-spacing:.01em}
+.req-form-section-d{font-size:12.5px; color:var(--t3); margin-top:3px; line-height:1.5}
+.req-form-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.req-form-grid .field-group{margin-bottom:0}
+@media (max-width:680px){.req-form-grid{grid-template-columns:1fr}}
+
+.req-textarea{
+  min-height:100px; padding-top:12px; padding-bottom:12px;
+  font-family:inherit; line-height:1.5; resize:vertical;
+}
+
+.req-radio-row{display:flex; gap:8px; flex-wrap:wrap}
+.req-radio{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 12px; border:1px solid var(--line); border-radius:7px;
+  cursor:pointer; font-size:12.5px; color:var(--t1);
+  background:rgba(255,255,255,0.02);
+  transition:border-color .12s, background .12s;
+}
+.req-radio:hover{border-color:var(--line-strong); background:rgba(255,255,255,0.04)}
+.req-radio.selected{border-color:var(--cyan); background:rgba(6,182,212,0.07); color:var(--cyan)}
+.req-radio input[type=radio]{accent-color:var(--cyan); margin:0}
+
+.req-check-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:4px}
+.req-check{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 12px; border:1px solid var(--line); border-radius:7px;
+  cursor:pointer; font-size:12.5px; color:var(--t2);
+  background:rgba(255,255,255,0.02);
+  transition:border-color .12s, background .12s, color .12s;
+}
+.req-check:hover{border-color:var(--line-strong)}
+.req-check.selected{border-color:var(--green); background:rgba(5,223,114,0.06); color:var(--green)}
+.req-check input[type=checkbox]{accent-color:var(--green); margin:0}
+
+.req-form-footer{
+  display:flex; align-items:center; justify-content:flex-end; gap:12px;
+  padding:20px 28px;
+  background:rgba(255,255,255,0.02); border-top:1px solid var(--line);
+}
+
+/* Success state */
+.req-success{
+  padding:60px 32px; text-align:center; max-width:560px; margin:0 auto;
+}
+.req-success-ic{
+  width:64px; height:64px; border-radius:50%;
+  background:rgba(5,223,114,0.16); color:var(--green);
+  display:inline-flex; align-items:center; justify-content:center;
+  margin-bottom:18px;
+  border:1.5px solid rgba(5,223,114,0.36);
+}
+.req-success-title{font-size:24px; font-weight:800; color:var(--t1); margin-bottom:6px; letter-spacing:-.01em}
+.req-success-sub{font-size:13px; color:var(--t2); margin-bottom:18px}
+.req-success-body{font-size:14px; color:var(--t2); line-height:1.6; margin-bottom:26px}
+.req-success-actions{display:flex; gap:12px; justify-content:center; align-items:center}
+.req-success-actions a{text-decoration:none}
+
+/* ──────────────────────────────────────────────────────────
+   REQUEST INBOX
+   ────────────────────────────────────────────────────────── */
+.req-list{padding:8px 24px 32px; display:flex; flex-direction:column; gap:6px}
+.req-row{
+  display:grid; grid-template-columns:170px 1fr 200px 110px 140px; gap:16px;
+  align-items:center; padding:14px 14px 14px 18px;
+  background:var(--bg2); border:1px solid var(--line); border-radius:10px;
+  cursor:pointer; transition:border-color .15s, background .15s;
+}
+.req-row:hover{border-color:var(--line-strong); background:var(--hover-strong)}
+
+.req-row-status{display:flex; flex-direction:column; gap:5px; align-items:flex-start}
+.req-status-chip{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:10.5px; font-weight:700; padding:3px 8px 3px 7px;
+  border-radius:20px; line-height:1; border:1px solid; white-space:nowrap;
+  letter-spacing:.01em;
+}
+.req-status-dot{width:6px; height:6px; border-radius:50%; box-shadow:0 0 0 2px color-mix(in srgb, currentColor 14%, transparent)}
+.req-priority-tag{
+  font-size:9.5px; font-weight:800; padding:2px 6px; border-radius:8px;
+  background:rgba(239,68,68,0.10); color:var(--red); border:1px solid rgba(239,68,68,0.22);
+  text-transform:uppercase; letter-spacing:.05em; line-height:1;
+}
+
+.req-row-main{min-width:0}
+.req-row-name{font-size:14px; font-weight:700; color:var(--t1); margin-bottom:3px}
+.req-row-sub{font-size:12px; color:var(--t2); line-height:1.5; margin-bottom:5px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
+.req-row-meta{display:flex; gap:6px; flex-wrap:wrap; font-size:11px; color:var(--t3)}
+
+.req-row-owner{display:flex; align-items:center; gap:10px; min-width:0}
+.req-row-owner-text{font-size:11.5px; color:var(--t1); line-height:1.4; min-width:0}
+.req-row-owner-sub{font-size:10.5px; color:var(--t3); margin-top:1px}
+
+.req-row-quote{text-align:right}
+.req-quote-amt{font-size:14px; font-weight:800; color:var(--green); letter-spacing:-.01em}
+.req-quote-eta{font-size:11px; color:var(--t3); margin-top:1px}
+.req-quote-pending{font-size:11px; color:var(--t3); font-style:italic}
+
+.req-row-action{display:flex; justify-content:flex-end}
+
+@media (max-width:980px){
+  .req-row{grid-template-columns:1fr; gap:10px}
+  .req-row-owner, .req-row-quote{display:none}
+}
+
 /* ── Build your own promo card ── */
 .build-promo{
   margin:8px 32px 24px; padding:20px 24px;
@@ -3025,10 +3156,10 @@ html.theme-light .theme-icon-moon{display:block}
             <span class="ssb-item-badge ssb-badge-soon">Soon</span>
           </button>
 
-          <button class="ssb-item disabled" data-admin-only data-route="requests" title="Requests inbox — Coming soon">
+          <button class="ssb-item" data-admin-only data-route="requests" title="Integration requests">
             <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 5l6 4 6-4"/></svg></span>
             <span class="ssb-item-label">Requests</span>
-            <span class="ssb-item-badge ssb-badge-soon">Soon</span>
+            <span class="ssb-item-alert" id="reqAlertDot" title="Pending requests"></span>
           </button>
         </div>
 
@@ -3542,6 +3673,19 @@ const INTEGRATIONS = [
     capabilities:['knowledge'], authMethods:['oauth','apikey'], source:'official', connected:false
   },
 
+  { slug:'spreadsheet', name:'Spreadsheet', vendor:'AIMS-OS native', category:'data', color:'#10B981',
+    desc:'Drop a CSV or XLSX, or forward an email with an attachment. AIMS parses the headers and creates a table.',
+    capabilities:['data_sync'], authMethods:['manual'], source:'official',
+    multiTenant:true, kind:'spreadsheet',
+    useCases:[
+      'A vendor sends a weekly Excel with leads or inventory: forward to your AIMS email address and it lands as a table.',
+      'Drop a one-off CSV to bootstrap a workflow without writing an API integration.',
+      'Map columns by name and type. AIMS auto-detects schema and notifies on drift when columns change.'
+    ],
+    connected:true, health:'healthy', lastRun:'4 hours ago', errors24h:0,
+    connectedBy:{name:'Carlos Tovar',initials:'CT'}, connectedAt:'2 weeks ago',
+    studios:{governance:true,agentic:true,workforce:false}, allowPersonal:true
+  },
   // CRM (3)
   { slug:'salesforce', name:'Salesforce', vendor:'Salesforce.com', category:'crm', color:'#00A1E0',
     desc:'Read accounts, opportunities, contacts and trigger workflows.',
@@ -4013,6 +4157,320 @@ function navigate(hash) {
   window.location.hash = hash;
 }
 
+
+/* ====================== REQUEST FLOW (orchestration thesis) ====================== */
+
+// Form state held in module scope so it survives re-renders
+let requestFormState = {
+  step: 0,                // 0 = form, 1 = success
+  requester: 'Thomas González',
+  dept: 'Product',
+  tenant: 'this',
+  businessOwner: 'Thomas González',
+  useCase: '',
+  integrationName: '',
+  vendorName: '',
+  actionTypes: { read: true, write: false, push: false },
+  hasPII: 'no',
+  hasFinancial: 'no',
+  hasCompliance: 'no',
+  timeline: 'quarter',
+  estimatedUsers: '10'
+};
+
+function renderRequestForm() {
+  const s = requestFormState;
+  if (s.step === 1) {
+    // Success state after submit
+    $('content').innerHTML = `
+      <div class="breadcrumb">
+        <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
+        <a href="#/integrations">Data Studio</a><span class="crumb-sep">›</span>
+        <a href="#/integrations">Connections</a><span class="crumb-sep">›</span>
+        <span class="crumb-current">Request integration</span>
+      </div>
+      <div class="req-success">
+        <div class="req-success-ic"><svg width="32" height="32" viewBox="0 0 16 16" fill="none"><path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h1 class="req-success-title">Your request was submitted</h1>
+        <p class="req-success-sub">Ticket <strong>REQ-${String(REQUESTS.length+1).padStart(3,'0')}</strong> · ${escapeHtml(s.integrationName || 'New integration')} · ETA review in 24h</p>
+        <p class="req-success-body">The AIMS managed services team will review your request and reach out with a scope and quote within one business day. You can track progress in the Requests inbox.</p>
+        <div class="req-success-actions">
+          <a class="btn btn-primary" href="#/requests">Go to Requests inbox →</a>
+          <a class="btn btn-ghost btn-sm" href="#/integrations" onclick="requestFormState.step=0">Back to Connections</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  $('content').innerHTML = `
+    <div class="breadcrumb">
+      <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
+      <a href="#/integrations">Data Studio</a><span class="crumb-sep">›</span>
+      <a href="#/integrations">Connections</a><span class="crumb-sep">›</span>
+      <span class="crumb-current">Request integration</span>
+    </div>
+    <div class="req-form">
+      <div class="req-form-hero">
+        <span class="mkt-hero-eyebrow-tag" style="margin-bottom:10px">Data Studio · Requests</span>
+        <h1 class="req-form-title">Request a new integration</h1>
+        <p class="req-form-sub">Tell us what you need and why. The AIMS managed services team will respond within one business day with scope, timeline and a price quote.</p>
+      </div>
+
+      <div class="req-form-card">
+        <div class="req-form-section">
+          <div class="req-form-section-h">
+            <div class="req-form-section-n">1</div>
+            <div>
+              <div class="req-form-section-t">Who is asking, and for whom</div>
+              <div class="req-form-section-d">Helps us route the ticket and decide who owns this connector after activation.</div>
+            </div>
+          </div>
+          <div class="req-form-grid">
+            <div class="field-group">
+              <label class="field-label">Requester</label>
+              <input class="input" type="text" value="${escapeHtml(s.requester)}" oninput="requestFormState.requester=this.value" readonly/>
+              <div class="field-help">Detected from your session.</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Department</label>
+              <select class="input" onchange="requestFormState.dept=this.value">
+                ${['Product','Engineering','Sales','Marketing','Customer Success','Finance','HR','Other'].map(d=>`<option ${s.dept===d?'selected':''}>${d}</option>`).join('')}
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Scope</label>
+              <div class="req-radio-row">
+                <label class="req-radio ${s.tenant==='this'?'selected':''}"><input type="radio" name="tenant" ${s.tenant==='this'?'checked':''} onchange="requestFormState.tenant='this';renderRequestForm()"/><span>This tenant only</span></label>
+                <label class="req-radio ${s.tenant==='org'?'selected':''}"><input type="radio" name="tenant" ${s.tenant==='org'?'checked':''} onchange="requestFormState.tenant='org';renderRequestForm()"/><span>Org-wide</span></label>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Business owner after activation</label>
+              <input class="input" type="text" placeholder="Who will be responsible?" value="${escapeHtml(s.businessOwner)}" oninput="requestFormState.businessOwner=this.value"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="req-form-section">
+          <div class="req-form-section-h">
+            <div class="req-form-section-n">2</div>
+            <div>
+              <div class="req-form-section-t">What are you trying to do</div>
+              <div class="req-form-section-d">Be specific about the workflow or agent that will use this integration.</div>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Business intent</label>
+            <textarea class="input req-textarea" placeholder="e.g. The SDR team just moved from Outreach to SalesLoft. We need to pull engagement data into our pipeline forecast workflow so the Ramp Reps agent can prioritize follow-ups by intent score." oninput="requestFormState.useCase=this.value">${escapeHtml(s.useCase)}</textarea>
+          </div>
+        </div>
+
+        <div class="req-form-section">
+          <div class="req-form-section-h">
+            <div class="req-form-section-n">3</div>
+            <div>
+              <div class="req-form-section-t">Source system</div>
+              <div class="req-form-section-d">What product are you connecting and what does it need to do.</div>
+            </div>
+          </div>
+          <div class="req-form-grid">
+            <div class="field-group">
+              <label class="field-label">Integration name</label>
+              <input class="input" type="text" placeholder="e.g. SalesLoft" value="${escapeHtml(s.integrationName)}" oninput="requestFormState.integrationName=this.value"/>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Vendor</label>
+              <input class="input" type="text" placeholder="e.g. SalesLoft, Inc." value="${escapeHtml(s.vendorName)}" oninput="requestFormState.vendorName=this.value"/>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Action types needed</label>
+            <div class="req-check-row">
+              <label class="req-check ${s.actionTypes.read?'selected':''}"><input type="checkbox" ${s.actionTypes.read?'checked':''} onchange="requestFormState.actionTypes.read=this.checked;renderRequestForm()"/><span>Read</span></label>
+              <label class="req-check ${s.actionTypes.write?'selected':''}"><input type="checkbox" ${s.actionTypes.write?'checked':''} onchange="requestFormState.actionTypes.write=this.checked;renderRequestForm()"/><span>Write</span></label>
+              <label class="req-check ${s.actionTypes.push?'selected':''}"><input type="checkbox" ${s.actionTypes.push?'checked':''} onchange="requestFormState.actionTypes.push=this.checked;renderRequestForm()"/><span>Push (webhooks)</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="req-form-section">
+          <div class="req-form-section-h">
+            <div class="req-form-section-n">4</div>
+            <div>
+              <div class="req-form-section-t">Data sensitivity</div>
+              <div class="req-form-section-d">Drives our compliance review and data residency configuration.</div>
+            </div>
+          </div>
+          <div class="req-form-grid">
+            ${[
+              { key:'hasPII', label:'Contains PII (personal data)?' },
+              { key:'hasFinancial', label:'Contains financial data?' },
+              { key:'hasCompliance', label:'Has compliance requirements (SOC2, HIPAA, GDPR)?' }
+            ].map(field=>`
+              <div class="field-group">
+                <label class="field-label">${field.label}</label>
+                <div class="req-radio-row">
+                  ${['no','maybe','yes'].map(v=>`<label class="req-radio ${s[field.key]===v?'selected':''}"><input type="radio" name="${field.key}" ${s[field.key]===v?'checked':''} onchange="requestFormState.${field.key}='${v}';renderRequestForm()"/><span>${v.charAt(0).toUpperCase()+v.slice(1)}</span></label>`).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="req-form-section">
+          <div class="req-form-section-h">
+            <div class="req-form-section-n">5</div>
+            <div>
+              <div class="req-form-section-t">Timeline and scale</div>
+              <div class="req-form-section-d">Helps us prioritize the queue and decide whether to ship a standard or custom connector.</div>
+            </div>
+          </div>
+          <div class="req-form-grid">
+            <div class="field-group">
+              <label class="field-label">When do you need this?</label>
+              <select class="input" onchange="requestFormState.timeline=this.value">
+                ${[['urgent','Urgent — blocking a launch'],['2 weeks','Next two weeks'],['quarter','This quarter'],['no rush','No rush']].map(([v,l])=>`<option value="${v}" ${s.timeline===v?'selected':''}>${l}</option>`).join('')}
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Estimated number of users</label>
+              <input class="input" type="number" min="1" placeholder="10" value="${escapeHtml(s.estimatedUsers)}" oninput="requestFormState.estimatedUsers=this.value"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="req-form-footer">
+          <a class="btn btn-ghost btn-sm" href="#/integrations">Cancel</a>
+          <button class="btn btn-primary" onclick="submitRequest()">Submit request →</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function submitRequest() {
+  const s = requestFormState;
+  if (!s.integrationName.trim() || !s.useCase.trim()) {
+    toast('Please fill in the integration name and business intent', 'error');
+    return;
+  }
+  // Add to mock REQUESTS for demo
+  REQUESTS.unshift({
+    id: 'req-' + String(REQUESTS.length+1).padStart(3,'0'),
+    status: 'pending_review', priority: s.timeline==='urgent'?'high':'medium', age: 'just now',
+    requester: { name: s.requester, initials: s.requester.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(), dept: s.dept, tenant: s.tenant==='this'?'Contoso · '+s.dept:'Contoso · Org-wide' },
+    integration: s.integrationName, vendor: s.vendorName, isStandard: false,
+    actionTypes: Object.keys(s.actionTypes).filter(k=>s.actionTypes[k]),
+    hasPII: s.hasPII==='yes', hasFinancial: s.hasFinancial==='yes',
+    timeline: s.timeline, estimatedUsers: parseInt(s.estimatedUsers,10) || 1,
+    businessIntent: s.useCase, requestedAt: 'just now', quote: null
+  });
+  requestFormState.step = 1;
+  renderRequestForm();
+}
+
+function renderRequestsInbox() {
+  const counts = {
+    pending_review: REQUESTS.filter(r => r.status==='pending_review').length,
+    in_review: REQUESTS.filter(r => r.status==='in_review').length,
+    quoted: REQUESTS.filter(r => r.status==='quoted').length,
+    in_progress: REQUESTS.filter(r => r.status==='in_progress').length,
+    done: REQUESTS.filter(r => r.status==='done').length,
+    rejected: REQUESTS.filter(r => r.status==='rejected').length
+  };
+  const activeCount = counts.pending_review + counts.in_review;
+
+  $('content').innerHTML = `
+    <div class="breadcrumb">
+      <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
+      <a href="#/integrations">Data Studio</a><span class="crumb-sep">›</span>
+      <span class="crumb-current">Requests</span>
+    </div>
+    <section class="op-hero">
+      <div class="op-hero-left">
+        <div class="op-hero-eyebrow">
+          <span class="op-mode-tag">Inbox</span>
+          <span class="op-hero-sub">Integration requests from your workspace</span>
+        </div>
+        <h1 class="op-hero-title">${activeCount > 0 ? `<span style="color:var(--amber)">${activeCount}</span> request${activeCount===1?'':'s'} waiting on you` : 'No pending requests'}</h1>
+        <p class="op-hero-desc">Review, scope, quote and approve integration requests from members. The AIMS managed services team picks up everything that passes admin review.</p>
+      </div>
+      <div class="op-hero-right">
+        <div class="op-kpi"><div class="op-kpi-n" style="color:var(--amber)">${counts.pending_review}</div><div class="op-kpi-l">Pending</div></div>
+        <div class="op-kpi"><div class="op-kpi-n" style="color:var(--purple)">${counts.quoted}</div><div class="op-kpi-l">Quoted</div></div>
+        <div class="op-kpi"><div class="op-kpi-n" style="color:var(--cyan)">${counts.in_progress}</div><div class="op-kpi-l">In progress</div></div>
+        <div class="op-kpi"><div class="op-kpi-n" style="color:var(--green)">${counts.done}</div><div class="op-kpi-l">Delivered</div></div>
+      </div>
+    </section>
+
+    <div class="op-tabs" role="tablist">
+      <button class="op-tab active" onclick="toast('Filter coming soon')"><span>All</span><span class="op-tab-count op-tab-count-neutral">${REQUESTS.length}</span></button>
+      <button class="op-tab" onclick="toast('Filter coming soon')"><span>Pending</span><span class="op-tab-count op-tab-count-warn">${counts.pending_review}</span></button>
+      <button class="op-tab" onclick="toast('Filter coming soon')"><span>Quoted</span><span class="op-tab-count op-tab-count-neutral">${counts.quoted}</span></button>
+      <button class="op-tab" onclick="toast('Filter coming soon')"><span>In progress</span><span class="op-tab-count op-tab-count-neutral">${counts.in_progress}</span></button>
+      <button class="op-tab" onclick="toast('Filter coming soon')"><span>Done</span><span class="op-tab-count op-tab-count-ok">${counts.done}</span></button>
+      <span style="flex:1"></span>
+      <a class="btn btn-primary btn-sm" href="#/request" style="text-decoration:none">+ New request</a>
+    </div>
+
+    <div class="req-list">
+      ${REQUESTS.map(requestRowHTML).join('')}
+    </div>
+  `;
+}
+
+function requestRowHTML(r) {
+  const meta = REQUEST_STATUS_META[r.status] || REQUEST_STATUS_META.pending_review;
+  const actionLabel = {
+    pending_review: 'Review',
+    in_review: 'Open review',
+    quoted: 'Approve quote',
+    in_progress: 'Track progress',
+    done: 'View delivery',
+    rejected: 'View notes'
+  }[r.status] || 'Open';
+  return `
+    <div class="req-row" onclick="toast('Detail panel — coming soon. The full thread + form summary lives here.')">
+      <div class="req-row-status">
+        <span class="req-status-chip" style="background:${meta.bg};color:${meta.color};border-color:${meta.border}">
+          <span class="req-status-dot" style="background:${meta.color}"></span>${meta.label}
+        </span>
+        ${r.priority === 'high' ? '<span class="req-priority-tag">High priority</span>' : ''}
+      </div>
+      <div class="req-row-main">
+        <div class="req-row-name">${escapeHtml(r.integration)}</div>
+        <div class="req-row-sub">${escapeHtml(r.businessIntent.slice(0, 130))}${r.businessIntent.length>130?'…':''}</div>
+        <div class="req-row-meta">
+          <span>${escapeHtml(r.vendor)}</span>
+          <span class="op-dot">·</span>
+          <span>${r.actionTypes.join(' + ')}</span>
+          ${r.hasPII?'<span class="op-dot">·</span><span style="color:var(--amber)">PII</span>':''}
+          ${r.hasFinancial?'<span class="op-dot">·</span><span style="color:var(--amber)">Financial</span>':''}
+        </div>
+      </div>
+      <div class="req-row-owner">
+        <span class="op-row-avatar" title="Requested by ${escapeHtml(r.requester.name)}">${escapeHtml(r.requester.initials)}</span>
+        <div class="req-row-owner-text">
+          <div>${escapeHtml(r.requester.name)}</div>
+          <div class="req-row-owner-sub">${escapeHtml(r.requester.dept)} · ${escapeHtml(r.age)}</div>
+        </div>
+      </div>
+      <div class="req-row-quote">
+        ${r.quote ? `
+          <div class="req-quote">
+            <div class="req-quote-amt">$${r.quote.amount.toLocaleString()}</div>
+            <div class="req-quote-eta">${r.quote.etaWeeks}w ETA</div>
+          </div>
+        ` : `<div class="req-quote-pending">Awaiting quote</div>`}
+      </div>
+      <div class="req-row-action">
+        <button class="op-cta op-cta-${r.status==='pending_review'?'warn':r.status==='done'?'ok':'neutral'}" onclick="event.stopPropagation();toast('${actionLabel} — flow coming soon')">${actionLabel}<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  `;
+}
+
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'integrations';
   const parts = hash.split('/');
@@ -4020,7 +4478,7 @@ function route() {
   // Sub-sidebar active state
   document.querySelectorAll('.ssb-item').forEach(b=>b.classList.remove('active'));
   const ssbMap = {
-    'integrations':'integrations', 'audit':'audit', 'build':'integrations',
+    'integrations':'integrations', 'audit':'audit', 'build':'integrations', 'request':'integrations', 'requests':'requests',
     'personal':'personal'
   };
   const baseRoute = parts[0];
@@ -4043,6 +4501,10 @@ function route() {
     renderBuildSDK();
   } else if (parts[0]==='build') {
     renderBuildChooser();
+  } else if (parts[0]==='request') {
+    renderRequestForm();
+  } else if (parts[0]==='requests') {
+    renderRequestsInbox();
   } else if (parts[0]==='personal' && parts[2]) {
     renderPersonalDetail(parts[2]);
   } else if (parts[0]==='personal') {
@@ -4183,6 +4645,15 @@ function renderHome() {
           <div class="build-promo-desc">Connect internal APIs with the no-code Webhook builder, import an OpenAPI spec, or write with the TypeScript/Python SDK.</div>
         </div>
         <button class="btn btn-ghost btn-sm">Get started →</button>
+      </div>
+
+      <div class="build-promo" style="background:linear-gradient(135deg, rgba(253,199,0,0.05) 0%, rgba(6,182,212,0.05) 100%);border-color:rgba(253,199,0,0.30)" onclick="navigate('#/request')">
+        <div class="build-promo-ico" style="background:rgba(253,199,0,0.10); color:var(--amber)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <div class="build-promo-text">
+          <div class="build-promo-title">Need something custom? Request it from the AIMS team.</div>
+          <div class="build-promo-desc">Submit a structured request with timeline, scope and compliance flags. The managed services team responds within one business day with a quote.</div>
+        </div>
+        <button class="btn btn-ghost btn-sm">Request →</button>
       </div>
     ` : ''}
 
@@ -5903,6 +6374,19 @@ function renderBuildChooser() {
           </div>
         </div>
 
+        <div class="method-card" onclick="toast('Spreadsheet upload — prototype in v2 Preview')">
+          <div class="method-ico spreadsheet" style="background:rgba(16,185,129,0.10);color:#10B981;border-color:rgba(16,185,129,0.28)"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.2" stroke="currentColor" stroke-width="1.4"/><path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <div class="method-name">From spreadsheet</div>
+          <div class="method-desc">Drop a CSV or XLSX file. AIMS reads the headers, infers types and generates a table definition automatically.</div>
+          <div class="method-meta">
+            <div class="m">Best for · <strong>One-off datasets, vendor weekly reports</strong></div>
+          </div>
+          <div class="method-meta">
+            <div class="m">⏱ <strong>30 sec</strong></div>
+            <div class="m">📐 <strong>No-code</strong></div>
+          </div>
+        </div>
+
         <div class="method-card" onclick="navigate('#/build/sdk')">
           <div class="method-ico sdk"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M5 4l-3 4 3 4M11 4l3 4-3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="method-name">Code SDK</div>
@@ -7031,6 +7515,80 @@ function fieldMappingFor(slug) {
   return MOCK_FIELD_MAPPING[slug] || MOCK_FIELD_MAPPING.default;
 }
 
+
+// Mock request inbox (orchestration thesis: someone has to ask for a new integration)
+const REQUESTS = [
+  {
+    id: 'req-001', status: 'pending_review', priority: 'high', age: '2 hours ago',
+    requester: { name: 'María González', initials: 'MG', dept: 'Sales Operations', tenant: 'Contoso · Sales' },
+    integration: 'Sales Loft', vendor: 'SalesLoft, Inc.', isStandard: false,
+    actionTypes: ['read', 'write'], hasPII: true, hasFinancial: false,
+    timeline: '2 weeks', estimatedUsers: 24,
+    businessIntent: 'We just moved the SDR team from Outreach to SalesLoft. Need to pull engagement data into our pipeline forecast workflow so the Ramp Reps agent can prioritize follow-ups by intent score.',
+    requestedAt: '2026-05-22 09:14',
+    quote: null
+  },
+  {
+    id: 'req-002', status: 'pending_review', priority: 'medium', age: '6 hours ago',
+    requester: { name: 'Edgardo Sierra', initials: 'ES', dept: 'Engineering', tenant: 'Contoso · Org-wide' },
+    integration: 'Datadog', vendor: 'Datadog, Inc.', isStandard: true,
+    actionTypes: ['read', 'write'], hasPII: false, hasFinancial: false,
+    timeline: 'urgent', estimatedUsers: 8,
+    businessIntent: 'On-call alerts need to route through the Incident Commander agent to spin up an investigation workflow automatically when SEV-1 fires.',
+    requestedAt: '2026-05-22 05:01',
+    quote: null
+  },
+  {
+    id: 'req-003', status: 'quoted', priority: 'medium', age: '1 day ago',
+    requester: { name: 'Diana Pérez', initials: 'DP', dept: 'Customer Success', tenant: 'Contoso · CS' },
+    integration: 'Gainsight', vendor: 'Gainsight Inc.', isStandard: false,
+    actionTypes: ['read'], hasPII: true, hasFinancial: true,
+    timeline: 'quarter', estimatedUsers: 40,
+    businessIntent: 'Sync customer health scores into Helix so the Renewal Risk agent can flag at-risk accounts 60 days before renewal.',
+    requestedAt: '2026-05-21 14:22',
+    quote: { amount: 18500, etaWeeks: 4, notes: 'Custom connector. Includes 2 health score schemas + writeback to Salesforce.' }
+  },
+  {
+    id: 'req-004', status: 'in_progress', priority: 'high', age: '3 days ago',
+    requester: { name: 'Thomas González', initials: 'TG', dept: 'Product', tenant: 'Contoso · Org-wide' },
+    integration: 'Stripe', vendor: 'Stripe, Inc.', isStandard: true,
+    actionTypes: ['read', 'write'], hasPII: true, hasFinancial: true,
+    timeline: '2 weeks', estimatedUsers: 6,
+    businessIntent: 'Need to expose invoice + subscription state to the Finance agent so it can answer revenue questions without engineers running queries.',
+    requestedAt: '2026-05-19 11:05',
+    quote: { amount: 4200, etaWeeks: 2, notes: 'Standard connector, just needs PII review.' }
+  },
+  {
+    id: 'req-005', status: 'done', priority: 'low', age: '2 weeks ago',
+    requester: { name: 'Sebastian Blandon', initials: 'SB', dept: 'Engineering', tenant: 'Contoso · Org-wide' },
+    integration: 'PagerDuty', vendor: 'PagerDuty, Inc.', isStandard: true,
+    actionTypes: ['read', 'write'], hasPII: false, hasFinancial: false,
+    timeline: 'no rush', estimatedUsers: 12,
+    businessIntent: 'Sync on-call schedules with Helix so the Standby agent knows who to ping.',
+    requestedAt: '2026-05-08 10:30',
+    quote: { amount: 2800, etaWeeks: 1, notes: 'Standard connector. Delivered May 14.' }
+  },
+  {
+    id: 'req-006', status: 'rejected', priority: 'low', age: '3 weeks ago',
+    requester: { name: 'Carlos Tovar', initials: 'CT', dept: 'Marketing', tenant: 'Contoso · Marketing' },
+    integration: 'Wistia', vendor: 'Wistia, Inc.', isStandard: false,
+    actionTypes: ['read'], hasPII: true, hasFinancial: false,
+    timeline: 'no rush', estimatedUsers: 3,
+    businessIntent: 'Pull video engagement metrics for the Demand Gen dashboard.',
+    requestedAt: '2026-05-01 16:45',
+    quote: null, rejectionReason: 'Use case overlaps with existing HubSpot integration. Surfacing same metrics through HubSpot avoids duplicating costs.'
+  }
+];
+
+const REQUEST_STATUS_META = {
+  pending_review: { label: 'Pending review', color: 'var(--amber)',  bg: 'rgba(253,199,0,0.10)',  border: 'rgba(253,199,0,0.28)' },
+  in_review:      { label: 'In review',      color: 'var(--cyan)',   bg: 'rgba(6,182,212,0.10)',  border: 'rgba(6,182,212,0.28)' },
+  quoted:         { label: 'Quoted',         color: 'var(--purple)', bg: 'rgba(167,139,250,0.10)',border: 'rgba(167,139,250,0.28)' },
+  in_progress:    { label: 'In progress',    color: 'var(--cyan)',   bg: 'rgba(6,182,212,0.10)',  border: 'rgba(6,182,212,0.28)' },
+  done:           { label: 'Done',           color: 'var(--green)',  bg: 'rgba(5,223,114,0.10)',  border: 'rgba(5,223,114,0.28)' },
+  rejected:       { label: 'Rejected',       color: 'var(--red)',    bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.28)' }
+};
+
 // Engineering brief §8 — Data Sync activation opens the pipe, but data doesn't flow until customer verifies mapping in Helix Data Studio
 const HELIX_DEFAULT_MAPPINGS = {
   s3: { event:'object_created', fields:[
@@ -7158,6 +7716,7 @@ document.querySelectorAll('.ssb-item:not(.disabled)').forEach(b => {
     if (r==='integrations') navigate('#/integrations');
     else if (r==='audit') navigate('#/audit');
     else if (r==='personal') navigate('#/personal');
+    else if (r==='requests') navigate('#/requests');
   });
 });
 document.querySelectorAll('.ssb-item.disabled').forEach(b => {
@@ -7169,6 +7728,14 @@ document.querySelectorAll('.ssb-item.disabled').forEach(b => {
 
 // Paint shell controls (mode toggle + persona pill) on initial load
 paintShellControls();
+
+// Paint requests pending indicator
+(function paintRequestsAlert(){
+  const dot = document.getElementById('reqAlertDot');
+  if (!dot) return;
+  const pending = REQUESTS.filter(r => r.status==='pending_review').length;
+  dot.style.display = pending > 0 ? '' : 'none';
+})();
 
 route();
 </script>
