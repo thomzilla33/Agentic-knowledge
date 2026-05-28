@@ -3620,6 +3620,12 @@ html.theme-light .theme-icon-moon{display:block}
 }
 .dist-filter:hover{border-color:var(--line-strong);color:var(--t1)}
 .dist-filter.is-active{background:rgba(43,127,255,0.08);border-color:rgba(43,127,255,0.40);color:var(--blue)}
+.dist-filter.is-warn{background:rgba(245,158,11,0.10);border-color:rgba(245,158,11,0.40);color:var(--amber)}
+.dist-filter.is-warn.is-active{background:rgba(245,158,11,0.20);border-color:rgba(245,158,11,0.60)}
+.dist-filter-badge{
+  font-size:10px;font-weight:800;padding:0 6px;border-radius:99px;
+  background:rgba(255,255,255,0.10);color:inherit;
+}
 
 .dist-table-wrap{
   border:1px solid var(--line);border-radius:12px;overflow:hidden;
@@ -3792,6 +3798,462 @@ html.theme-light .theme-icon-moon{display:block}
   font-size:11px;color:var(--t3);line-height:1.5;
 }
 .ws-foot b{color:var(--t2)}
+
+
+/* ============ OWNERSHIP (formal owner per integration) ============ */
+.owner-pill{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:5px 10px 5px 5px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:99px;
+  font-family:inherit;cursor:pointer;
+  transition:border-color .12s, background .12s;
+}
+.owner-pill:hover{background:rgba(43,127,255,0.06);border-color:rgba(43,127,255,0.40)}
+.owner-pill.is-unassigned{border-style:dashed;color:var(--t3)}
+.owner-pill.is-unassigned:hover{color:var(--blue)}
+.owner-pill-avatar{
+  width:24px;height:24px;border-radius:50%;
+  color:#fff;font-size:10.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;letter-spacing:.02em;
+}
+.owner-pill-avatar-empty{
+  background:transparent;color:var(--t3);
+  border:1px dashed var(--line-strong);
+  font-size:12px;font-weight:600;
+}
+.owner-pill-label{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+.owner-pill-l{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)}
+.owner-pill-name{font-size:12px;font-weight:700;color:var(--t1)}
+.owner-pill.is-unassigned .owner-pill-name{color:var(--t2)}
+.owner-pill-caret{color:var(--t3);margin-left:3px;transition:transform .15s}
+.owner-pill[aria-expanded="true"] .owner-pill-caret{transform:rotate(180deg)}
+
+/* Reassign popover */
+.owner-picker-backdrop{
+  position:fixed;inset:0;z-index:240;
+  background:transparent;
+  display:none;
+}
+.owner-picker-backdrop.is-open{display:block}
+.owner-picker{
+  position:fixed;z-index:241;
+  width:300px;
+  background:#0c1428;
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:12px;
+  box-shadow:0 20px 48px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(43,127,255,0.10);
+  padding:8px 0;
+  display:none;
+  animation:ownerPickerIn .18s cubic-bezier(.2,.8,.2,1);
+}
+.owner-picker.is-open{display:block}
+@keyframes ownerPickerIn{
+  from{opacity:0;transform:translateY(-4px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.owner-picker-h{
+  padding:8px 14px 6px;
+  font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--t3);
+}
+.owner-picker-row{
+  display:flex;align-items:center;gap:11px;width:100%;
+  padding:9px 14px;
+  background:transparent;border:none;
+  text-align:left;cursor:pointer;
+  font-family:inherit;color:inherit;
+  transition:background .12s;
+}
+.owner-picker-row:hover{background:rgba(43,127,255,0.07)}
+.owner-picker-row.is-selected{background:rgba(43,127,255,0.10)}
+.owner-picker-avatar{
+  width:30px;height:30px;border-radius:50%;
+  color:#fff;font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.owner-picker-avatar.is-empty{
+  background:transparent;border:1px dashed var(--line-strong);
+  color:var(--t3);font-size:14px;font-weight:600;
+}
+.owner-picker-body{flex:1;min-width:0}
+.owner-picker-name{font-size:12.5px;font-weight:700;color:var(--t1);line-height:1.2}
+.owner-picker-role{font-size:10.5px;color:var(--t3);margin-top:2px}
+.owner-picker-check{color:var(--blue);flex-shrink:0}
+.owner-picker-divider{height:1px;background:rgba(255,255,255,0.06);margin:6px 0}
+
+
+/* ============ USAGE TAB + IMPACT ANALYSIS ============ */
+.usage-impact{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;
+}
+@media (max-width:840px){.usage-impact{grid-template-columns:repeat(2,1fr)}}
+.usage-impact-tile{
+  padding:12px 14px;
+  background:rgba(255,255,255,0.025);
+  border:1px solid var(--line);border-radius:11px;
+}
+.usage-impact-tile.is-empty{opacity:.55}
+.usage-impact-l{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.usage-impact-ic{
+  width:24px;height:24px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.usage-impact-ic.t-wf      { background:rgba(43,127,255,0.12); color:var(--blue);    border:1px solid rgba(43,127,255,0.32) }
+.usage-impact-ic.t-agent   { background:rgba(167,139,250,0.12);color:var(--purple);  border:1px solid rgba(167,139,250,0.32) }
+.usage-impact-ic.t-network { background:rgba(245,158,11,0.12); color:var(--amber);   border:1px solid rgba(245,158,11,0.32) }
+.usage-impact-ic.t-widget  { background:rgba(16,185,129,0.12); color:var(--green);   border:1px solid rgba(16,185,129,0.32) }
+.usage-impact-l-t{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--t3)}
+.usage-impact-v{font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.01em;line-height:1}
+.usage-impact-s{font-size:11px;color:var(--t3);margin-top:4px}
+
+.usage-list{display:flex;flex-direction:column;gap:8px}
+.usage-row{
+  display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
+  padding:11px 14px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--line);border-radius:10px;
+  transition:background .12s, border-color .12s;
+}
+.usage-row:hover{background:rgba(255,255,255,0.035);border-color:var(--line-strong)}
+.usage-row-ic{
+  width:36px;height:36px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.usage-row-ic.t-workflow{background:rgba(43,127,255,0.10); color:var(--blue);    border:1px solid rgba(43,127,255,0.32)}
+.usage-row-ic.t-agent   {background:rgba(167,139,250,0.10);color:var(--purple);  border:1px solid rgba(167,139,250,0.32)}
+.usage-row-ic.t-network {background:rgba(245,158,11,0.10); color:var(--amber);   border:1px solid rgba(245,158,11,0.32)}
+.usage-row-ic.t-widget  {background:rgba(16,185,129,0.10); color:var(--green);   border:1px solid rgba(16,185,129,0.32)}
+.usage-row-body{min-width:0}
+.usage-row-name{font-size:13px;font-weight:700;color:var(--t1);line-height:1.2}
+.usage-row-meta{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-size:11px;color:var(--t3);margin-top:3px;
+}
+.usage-row-meta .usage-row-tag{
+  font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  padding:1.5px 7px;border-radius:99px;
+}
+.usage-row-meta .usage-row-tag.t-workflow{background:rgba(43,127,255,0.12); color:var(--blue);    border:1px solid rgba(43,127,255,0.30)}
+.usage-row-meta .usage-row-tag.t-agent   {background:rgba(167,139,250,0.12);color:var(--purple);  border:1px solid rgba(167,139,250,0.30)}
+.usage-row-meta .usage-row-tag.t-network {background:rgba(245,158,11,0.12); color:var(--amber);   border:1px solid rgba(245,158,11,0.30)}
+.usage-row-meta .usage-row-tag.t-widget  {background:rgba(16,185,129,0.12); color:var(--green);   border:1px solid rgba(16,185,129,0.30)}
+.usage-row-action{
+  background:transparent;border:1px solid var(--line);
+  color:var(--t3);font-family:inherit;font-size:11px;font-weight:600;
+  padding:5px 10px;border-radius:6px;cursor:pointer;
+  transition:border-color .12s, color .12s;
+}
+.usage-row-action:hover{border-color:var(--line-strong);color:var(--t1)}
+
+.usage-empty{
+  padding:40px 24px;text-align:center;color:var(--t3);
+  border:1px dashed var(--line-strong);border-radius:10px;
+  background:rgba(255,255,255,0.015);
+}
+.usage-empty-t{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:5px}
+.usage-empty-d{font-size:12px;line-height:1.5;max-width:420px;margin:0 auto}
+
+/* Impact modal (disconnect confirmation) */
+.impact-modal-overlay{
+  position:fixed;inset:0;z-index:280;
+  background:rgba(4,8,18,0.72);backdrop-filter:blur(5px);
+  display:none;align-items:center;justify-content:center;
+  padding:24px;animation:obFade .18s ease-out;
+}
+.impact-modal-overlay.is-open{display:flex}
+.impact-modal{
+  width:100%;max-width:560px;max-height:90vh;
+  background:#0c1428;
+  border:1px solid rgba(239,68,68,0.32);
+  border-radius:14px;
+  box-shadow:0 32px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(239,68,68,0.10);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:obSlide .22s cubic-bezier(.2,.8,.2,1);
+}
+.impact-modal-h{
+  padding:18px 22px;
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px;
+}
+.impact-modal-h-ic{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(239,68,68,0.14);color:#fca5a5;
+  border:1px solid rgba(239,68,68,0.32);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.impact-modal-h-text{flex:1;min-width:0}
+.impact-modal-h-t{font-size:15px;font-weight:800;color:var(--t1);letter-spacing:-.01em;line-height:1.3}
+.impact-modal-h-d{font-size:11.5px;color:var(--t2);margin-top:3px;line-height:1.45}
+.impact-modal-body{
+  flex:1;overflow-y:auto;padding:20px 22px;
+}
+.impact-summary{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px;
+}
+.impact-summary-tile{
+  padding:9px 11px;
+  background:rgba(239,68,68,0.05);
+  border:1px solid rgba(239,68,68,0.22);
+  border-radius:8px;text-align:center;
+}
+.impact-summary-v{font-size:18px;font-weight:800;color:#fca5a5;line-height:1}
+.impact-summary-l{font-size:9.5px;font-weight:700;color:var(--t3);margin-top:4px;letter-spacing:.04em;text-transform:uppercase}
+.impact-list-h{
+  font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--t3);margin-bottom:8px;
+}
+.impact-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto}
+.impact-list .usage-row{padding:9px 12px}
+.impact-modal-f{
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  padding:14px 22px;
+  border-top:1px solid var(--line);
+  background:rgba(255,255,255,0.015);
+}
+.impact-modal-f .btn-danger{background:#ef4444;color:#fff;border:none}
+.impact-modal-f .btn-danger:hover{background:#dc2626}
+
+
+/* ============ PUBLISH WORKFLOW ============ */
+.lc-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 9px;border-radius:99px;
+  font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  margin-left:8px;vertical-align:middle;
+}
+.lc-badge-dot{width:6px;height:6px;border-radius:50%}
+.lc-badge.is-draft     { background:rgba(255,255,255,0.04); color:var(--t3); border:1px solid var(--line) }
+.lc-badge.is-draft .lc-badge-dot{ background:var(--t3) }
+.lc-badge.is-staged    { background:rgba(245,158,11,0.10); color:var(--amber); border:1px solid rgba(245,158,11,0.32) }
+.lc-badge.is-staged .lc-badge-dot{ background:var(--amber) }
+.lc-badge.is-published { background:rgba(16,185,129,0.10); color:var(--green); border:1px solid rgba(16,185,129,0.32) }
+.lc-badge.is-published .lc-badge-dot{ background:var(--green) }
+.lc-badge.is-archived  { background:rgba(255,255,255,0.02); color:var(--t3); border:1px dashed var(--line); opacity:.7 }
+
+.publish-card{
+  display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;
+  padding:16px 18px;margin-bottom:16px;
+  background:linear-gradient(135deg, rgba(43,127,255,0.05) 0%, rgba(167,139,250,0.04) 100%);
+  border:1px solid rgba(43,127,255,0.28);
+  border-radius:12px;
+}
+.publish-card.is-published{
+  background:linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(43,127,255,0.03) 100%);
+  border-color:rgba(16,185,129,0.32);
+}
+.publish-card-l{flex:1;min-width:300px}
+.publish-card-h{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.publish-card-ic{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.publish-card-ic.is-draft     { background:rgba(255,255,255,0.05); color:var(--t2); border:1px solid var(--line) }
+.publish-card-ic.is-staged    { background:rgba(245,158,11,0.12); color:var(--amber); border:1px solid rgba(245,158,11,0.32) }
+.publish-card-ic.is-published { background:rgba(16,185,129,0.12); color:var(--green); border:1px solid rgba(16,185,129,0.32) }
+.publish-card-t{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:-.01em}
+.publish-card-d{font-size:11.5px;color:var(--t2);line-height:1.55;max-width:560px}
+.publish-card-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.publish-card-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 13px;border-radius:8px;
+  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
+  transition:transform .12s, box-shadow .12s;
+}
+.publish-card-btn.is-primary{
+  background:linear-gradient(135deg, #2B7FFF 0%, #1E63CC 100%);
+  color:#fff;border:none;
+  box-shadow:0 6px 18px -6px rgba(43,127,255,0.55);
+}
+.publish-card-btn.is-primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px -6px rgba(43,127,255,0.65)}
+.publish-card-btn.is-secondary{
+  background:transparent;color:var(--t2);
+  border:1px solid var(--line-strong);
+}
+.publish-card-btn.is-secondary:hover{border-color:var(--blue);color:var(--blue)}
+
+.publish-progress{
+  display:flex;align-items:center;gap:0;margin-top:14px;
+}
+.publish-step{
+  display:flex;align-items:center;gap:7px;
+  flex:1;min-width:0;
+  padding:6px 11px;
+  font-size:11px;font-weight:700;color:var(--t3);
+  border-radius:8px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--line);
+}
+.publish-step.is-active{
+  background:rgba(43,127,255,0.10);color:var(--blue);
+  border-color:rgba(43,127,255,0.42);
+}
+.publish-step.is-done{
+  background:rgba(16,185,129,0.08);color:var(--green);
+  border-color:rgba(16,185,129,0.32);
+}
+.publish-step-num{
+  width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;
+  background:rgba(255,255,255,0.05);color:var(--t3);
+  border:1px solid var(--line);flex-shrink:0;
+}
+.publish-step.is-active .publish-step-num{background:var(--blue);color:#fff;border-color:var(--blue)}
+.publish-step.is-done   .publish-step-num{background:var(--green);color:#fff;border-color:var(--green)}
+.publish-step-arrow{color:var(--t3);margin:0 4px;flex-shrink:0}
+
+.publish-approvers{
+  display:flex;flex-direction:column;gap:6px;margin-top:14px;
+  padding:11px 13px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--line);border-radius:9px;
+}
+.publish-approvers-h{
+  font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--t3);margin-bottom:4px;
+}
+.publish-approver-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:11.5px;
+}
+.publish-approver-l{display:flex;align-items:center;gap:8px;color:var(--t2)}
+.publish-approver-l b{color:var(--t1);font-weight:600}
+.publish-approver-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2px 8px;border-radius:99px;
+  font-size:10px;font-weight:700;
+}
+.publish-approver-status.is-approved{background:rgba(16,185,129,0.10);color:var(--green);border:1px solid rgba(16,185,129,0.32)}
+.publish-approver-status.is-pending{background:rgba(245,158,11,0.10);color:var(--amber);border:1px solid rgba(245,158,11,0.32)}
+
+
+/* ============ WIDGETS LIBRARY (Admin Studio surface) ============ */
+.wg-wrap{padding:24px 28px;max-width:1320px;margin:0 auto}
+.wg-h{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+  margin-bottom:18px;flex-wrap:wrap;
+}
+.wg-h-l{flex:1;min-width:280px}
+.wg-h-eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:10px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;
+  color:var(--green);margin-bottom:8px;
+}
+.wg-h-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(16,185,129,0.18)}
+.wg-h-title{font-size:24px;font-weight:800;color:var(--t1);letter-spacing:-.02em;line-height:1.18;margin-bottom:6px}
+.wg-h-desc{font-size:13px;color:var(--t2);line-height:1.55;max-width:640px}
+.wg-counts{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.wg-count{
+  display:inline-flex;flex-direction:column;align-items:flex-start;
+  padding:10px 14px;background:rgba(255,255,255,0.025);
+  border:1px solid var(--line);border-radius:10px;min-width:96px;
+}
+.wg-count-v{font-size:20px;font-weight:800;color:var(--t1);line-height:1;letter-spacing:-.01em}
+.wg-count-v.is-amber{color:var(--amber)}
+.wg-count-v.is-green{color:var(--green)}
+.wg-count-l{font-size:10.5px;font-weight:600;color:var(--t3);margin-top:5px;letter-spacing:.02em}
+
+.wg-toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-bottom:16px;padding:10px 14px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--line);border-radius:10px;
+}
+.wg-search{
+  flex:1;min-width:220px;display:flex;align-items:center;gap:8px;
+  padding:7px 11px;background:#070e1c;border:1px solid var(--line);border-radius:8px;
+}
+.wg-search svg{color:var(--t3);flex-shrink:0}
+.wg-search input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--t1);font-family:inherit;font-size:12.5px;
+}
+.wg-search input::placeholder{color:var(--t3)}
+.wg-filter{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 11px;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--t2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  transition:border-color .12s, color .12s;
+}
+.wg-filter:hover{border-color:var(--line-strong);color:var(--t1)}
+.wg-filter.is-active{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.40);color:var(--green)}
+.wg-filter-badge{
+  font-size:10px;font-weight:800;padding:0 6px;border-radius:99px;
+  background:rgba(255,255,255,0.10);color:inherit;
+}
+
+.wg-grid{
+  display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;
+}
+.wg-card{
+  display:flex;flex-direction:column;gap:10px;
+  padding:16px 16px 14px;
+  background:rgba(255,255,255,0.025);
+  border:1px solid var(--line);border-radius:12px;
+  transition:border-color .14s, background .14s, transform .12s;
+}
+.wg-card:hover{border-color:var(--line-strong);background:rgba(255,255,255,0.04);transform:translateY(-2px)}
+.wg-card.is-blocked{opacity:.78}
+.wg-card-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.wg-card-type{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 9px;border-radius:99px;
+  font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+}
+.wg-card-type.t-chart  { background:rgba(43,127,255,0.10);  color:var(--blue);   border:1px solid rgba(43,127,255,0.32) }
+.wg-card-type.t-table  { background:rgba(6,182,212,0.10);   color:var(--cyan);   border:1px solid rgba(6,182,212,0.32) }
+.wg-card-type.t-kpi    { background:rgba(167,139,250,0.10); color:var(--purple); border:1px solid rgba(167,139,250,0.32) }
+.wg-card-type.t-funnel { background:rgba(245,158,11,0.10);  color:var(--amber);  border:1px solid rgba(245,158,11,0.32) }
+.wg-card-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2.5px 9px;border-radius:99px;
+  font-size:10.5px;font-weight:700;
+}
+.wg-card-status-dot{width:6px;height:6px;border-radius:50%}
+.wg-card-status.is-installed{background:rgba(16,185,129,0.10);color:var(--green);border:1px solid rgba(16,185,129,0.32)}
+.wg-card-status.is-installed .wg-card-status-dot{background:var(--green)}
+.wg-card-status.is-available{background:rgba(43,127,255,0.08);color:var(--blue);border:1px solid rgba(43,127,255,0.32)}
+.wg-card-status.is-available .wg-card-status-dot{background:var(--blue)}
+.wg-card-status.is-blocked{background:rgba(245,158,11,0.10);color:var(--amber);border:1px solid rgba(245,158,11,0.32)}
+.wg-card-status.is-blocked .wg-card-status-dot{background:var(--amber)}
+
+.wg-card-name{font-size:14px;font-weight:800;color:var(--t1);letter-spacing:-.01em;line-height:1.3}
+.wg-card-desc{font-size:12px;color:var(--t2);line-height:1.5}
+.wg-card-integ{display:flex;align-items:center;gap:7px;margin-top:6px}
+.wg-card-integ-l{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--t3)}
+.wg-card-integ-logos{display:inline-flex;align-items:center;gap:4px}
+.wg-card-integ-logo{
+  width:22px;height:22px;border-radius:6px;background:#fff;padding:3px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,0.10);
+}
+.wg-card-integ-logo img{width:100%;height:100%;object-fit:contain}
+.wg-card-integ-logo.is-missing{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.32);color:var(--amber);font-size:9px;font-weight:800;padding:0}
+.wg-card-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:9px;
+  margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);
+}
+.wg-card-meta{font-size:10.5px;color:var(--t3)}
+.wg-card-cta{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 12px;border-radius:7px;
+  font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;
+  transition:transform .12s, background .12s;
+}
+.wg-card-cta.is-install{background:rgba(43,127,255,0.12);color:var(--blue);border:1px solid rgba(43,127,255,0.36)}
+.wg-card-cta.is-install:hover{background:rgba(43,127,255,0.20);transform:translateY(-1px)}
+.wg-card-cta.is-open{background:transparent;color:var(--t2);border:1px solid var(--line-strong)}
+.wg-card-cta.is-open:hover{border-color:var(--green);color:var(--green)}
+.wg-card-cta.is-blocked{background:transparent;color:var(--t3);border:1px dashed var(--line-strong);cursor:not-allowed}
+
+.wg-empty{
+  grid-column:1/-1;text-align:center;padding:40px 24px;color:var(--t3);
+  font-size:12.5px;line-height:1.55;
+  border:1px dashed var(--line-strong);border-radius:10px;background:rgba(255,255,255,0.015);
+}
 
 </style>
 </head>
@@ -4012,6 +4474,11 @@ html.theme-light .theme-icon-moon{display:block}
             <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>
             <span class="ssb-item-label">Distribution</span>
           </button>
+
+          <button class="ssb-item" data-admin-only data-route="widgets" title="Workspace widget templates">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="4" rx="1"/><rect x="9" y="2" width="5" height="6" rx="1"/><rect x="2" y="8" width="5" height="6" rx="1"/><rect x="8" y="10" width="6" height="4" rx="1"/></svg></span>
+            <span class="ssb-item-label">Widgets</span>
+          </button>
         </div>
 
         <div class="ssb-group">
@@ -4151,6 +4618,29 @@ html.theme-light .theme-icon-moon{display:block}
 <div class="tour-popover" id="tourPopover"></div>
 
 <!-- Toasts -->
+
+
+<!-- Impact analysis modal (disconnect confirmation) -->
+<div class="impact-modal-overlay" id="impactModalOverlay" onclick="if(event.target===this)closeImpactModal()">
+  <div class="impact-modal" role="dialog" aria-labelledby="impactModalTitle">
+    <header class="impact-modal-h">
+      <div class="impact-modal-h-ic">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      </div>
+      <div class="impact-modal-h-text">
+        <div class="impact-modal-h-t" id="impactModalTitle">Confirm disconnect</div>
+        <div class="impact-modal-h-d" id="impactModalSub">Impact analysis</div>
+      </div>
+    </header>
+    <div class="impact-modal-body" id="impactModalBody"></div>
+    <footer class="impact-modal-f" id="impactModalFooter"></footer>
+  </div>
+</div>
+
+<!-- Owner reassign popover (shared, positioned dynamically) -->
+<div class="owner-picker-backdrop" id="ownerPickerBackdrop" onclick="closeOwnerPicker()"></div>
+<div class="owner-picker" id="ownerPicker" role="dialog" aria-label="Transfer ownership"></div>
+
 <div class="toast-container" id="toasts"></div>
 
 <script>
@@ -4730,15 +5220,21 @@ const INTEGRATIONS = [
     capabilities:['tools'], authMethods:['apikey'], source:'private',
     connected:true, health:'healthy', lastRun:'12 min ago', errors24h:0,
     connectedBy:{name:'Diana Pérez',initials:'DP'}, connectedAt:'10 days ago',
-    studios:{governance:false,agentic:true,workforce:false}, allowPersonal:false
+    studios:{governance:false,agentic:true,workforce:false}, allowPersonal:false,
+    lifecycle:'published', publishedAt:'8 days ago', publishedBy:'Alex Park', version:'v1.2',
+    approvers:[{name:'Alex Park',role:'Finance Ops',status:'approved',at:'8 days ago'},{name:'Diana Pérez',role:'IT Security',status:'approved',at:'8 days ago'}]
   },
   { slug:'customer-db', name:'Customer DB Reporter', vendor:'Built by your workspace', category:'custom', color:'#A78BFA',
     desc:'Read-only access to the customer Postgres reporting replica.',
-    capabilities:['knowledge','tools'], authMethods:['apikey'], source:'private', connected:false
+    capabilities:['knowledge','tools'], authMethods:['apikey'], source:'private', connected:false,
+    lifecycle:'staged', stagedAt:'3 days ago', stagedBy:'Carlos Tovar', version:'v0.4-rc',
+    approvers:[{name:'Diana Pérez',role:'IT Security',status:'pending',at:null},{name:'Carlos Tovar',role:'Eng Manager',status:'approved',at:'3 days ago'}]
   },
   { slug:'ops-monitor', name:'Slack #ai-ops monitor', vendor:'Built by your workspace', category:'custom', color:'#4A154B',
     desc:'Listens to #ai-ops and triggers an agent on critical alerts.',
-    capabilities:['triggers'], authMethods:['oauth'], source:'private', connected:false
+    capabilities:['triggers'], authMethods:['oauth'], source:'private', connected:false,
+    lifecycle:'draft', draftedAt:'5 hours ago', draftedBy:'Thomas González', version:'v0.1',
+    approvers:[]
   }
 ];
 
@@ -5451,6 +5947,8 @@ function renderDistribution() {
 
   // Counts (on the full connected set, not filtered)
   const totalConn = connected.length;
+  const workingCount = connected.filter(i => distStatusBucketOf(i) === 'working').length;
+  const needsCount   = connected.filter(i => distStatusBucketOf(i) === 'needs').length;
   let exposedAll = 0, unexposedAll = 0;
   connected.forEach(i => {
     const dist = getDistribution(i.slug);
@@ -5464,15 +5962,14 @@ function renderDistribution() {
   const html = `
     <div class="dist-wrap">
       <div class="breadcrumb">
-        <a href="#/integrations">Admin Studio</a><span class="crumb-sep">›</span>
         <span class="crumb-current">Distribution</span>
       </div>
 
       <header class="dist-h">
         <div class="dist-h-l">
           <div class="dist-h-eyebrow"><span class="dist-h-eyebrow-dot"></span>Admin Studio &middot; Distribution control</div>
-          <h1 class="dist-h-title">Where each integration is exposed</h1>
-          <p class="dist-h-desc">One place to control which downstream surfaces can use each authenticated integration. Toggling a cell here updates the integration's availability for that surface across the workspace.</p>
+          <h1 class="dist-h-title">Where each integration shows up</h1>
+          <p class="dist-h-desc">Control which downstream surfaces can use each connected integration. Toggling a cell updates availability across the whole workspace.</p>
         </div>
         <div class="dist-counts">
           <div class="dist-count"><div class="dist-count-v">${totalConn}</div><div class="dist-count-l">Connected</div></div>
@@ -5484,11 +5981,11 @@ function renderDistribution() {
       <div class="dist-toolbar">
         <label class="dist-search">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="M14 14l-3-3"/></svg>
-          <input id="distSearchInput" type="text" placeholder="Search by integration or vendor..." value="${escapeHtml(_distFilters.search)}" oninput="distSearchInput(this.value)"/>
+          <input id="distSearchInput" type="text" placeholder="Search integrations..." value="${escapeHtml(_distFilters.search)}" oninput="distSearchInput(this.value)"/>
         </label>
-        <button class="dist-filter ${_distFilters.status==='all'?'is-active':''}" onclick="distSetFilter('status','all')">All</button>
-        <button class="dist-filter ${_distFilters.status==='working'?'is-active':''}" onclick="distSetFilter('status','working')">Working</button>
-        <button class="dist-filter ${_distFilters.status==='needs'?'is-active':''}" onclick="distSetFilter('status','needs')">Needs attention</button>
+        <button class="dist-filter ${_distFilters.status==='all'?'is-active':''}" onclick="distSetFilter('status','all')">All <span class="dist-filter-badge">${totalConn}</span></button>
+        <button class="dist-filter ${_distFilters.status==='working'?'is-active':''}" onclick="distSetFilter('status','working')">Working <span class="dist-filter-badge">${workingCount}</span></button>
+        ${needsCount > 0 ? `<button class="dist-filter is-warn ${_distFilters.status==='needs'?'is-active':''}" onclick="distSetFilter('status','needs')">Needs attention <span class="dist-filter-badge">${needsCount}</span></button>` : ''}
       </div>
 
       <div class="dist-table-wrap">
@@ -5509,7 +6006,8 @@ function renderDistribution() {
                 const dist = getDistribution(i.slug);
                 const bucket = distStatusBucketOf(i);
                 const label = distStatusLabelOf(i);
-                const owner = i.connectedBy ? i.connectedBy.name : 'Unassigned';
+                const ownerObj = getOwner(i.slug);
+                const owner = ownerObj ? ownerObj.name : (i.connectedBy ? i.connectedBy.name : 'Unassigned');
                 return `
                   <tr>
                     <td>
@@ -5527,10 +6025,12 @@ function renderDistribution() {
                     </td>
                     <td class="dist-row-status">
                       <span class="dist-status b-${bucket}">
-                        <span class="dist-status-dot"></span>${escapeHtml(label)}
+                        ${bucket === 'working' ? `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1px"><path d="M2 6l3 3 5-7"/></svg>` : bucket === 'needs' ? `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:1px"><circle cx="6" cy="6" r="4.5"/><path d="M6 4v2.5M6 8.2h.01"/></svg>` : `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:1px"><circle cx="6" cy="6" r="4"/></svg>`}${escapeHtml(label)}
                       </span>
                     </td>
-                    <td class="dist-row-owner">${escapeHtml(owner)}</td>
+                    <td class="dist-row-owner">${ownerObj
+                      ? `<span style="display:inline-flex;align-items:center;gap:7px"><span class="owner-pill-avatar" style="background:${ownerObj.color};width:20px;height:20px;font-size:9px">${escapeHtml(ownerObj.initials)}</span>${escapeHtml(ownerObj.name)}</span>`
+                      : `<span style="color:var(--t3)">${escapeHtml(owner)}</span>`}</td>
                     ${DIST_SURFACES.map(s => {
                       const v = dist[s.id];
                       if (v === 'na') {
@@ -5541,7 +6041,7 @@ function renderDistribution() {
                         <button class="dist-toggle ${isOn?'is-on':'is-off'}" onclick="toggleDistribution('${i.slug}','${s.id}')" title="${isOn ? 'Available — click to disable' : 'Disabled — click to enable'} for ${escapeHtml(s.name)}">
                           ${isOn
                             ? '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6l3 3 5-7"/></svg> Available'
-                            : '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="4"/></svg> Off'}
+                            : '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="4"/></svg> Disabled'}
                         </button>
                       </td>`;
                     }).join('')}
@@ -5565,6 +6065,197 @@ function renderDistribution() {
   }
 }
 
+
+
+/* ============ WIDGETS LIBRARY (downstream consumer surface) ============ */
+const MOCK_WIDGET_TEMPLATES = [
+  { id:'wt-pipeline',    name:'Pipeline Health',        desc:'Open deals by stage with revenue projections and at-risk flags.',           type:'chart',  category:'sales',       integrations:['salesforce','hubspot'],   installed:true,  views7d:412 },
+  { id:'wt-cs-sla',      name:'CS SLA Tracker',         desc:'Open tickets ranked by SLA breach risk. Auto-routes critical to on-call.', type:'table',  category:'support',     integrations:['zendesk','salesforce'],  installed:true,  views7d:89  },
+  { id:'wt-eng-velocity',name:'Engineering Velocity',   desc:'PR throughput, cycle time, and review latency across active repos.',        type:'chart',  category:'engineering', integrations:['github','linear'],        installed:true,  views7d:127 },
+  { id:'wt-mrr-monthly', name:'Monthly Recurring Rev.', desc:'MRR + churn rate + new-business waterfall for the current month.',          type:'kpi',    category:'finance',     integrations:['stripe','salesforce'],   installed:false, views7d:0   },
+  { id:'wt-payment-fail',name:'Payment Failures',       desc:'Daily failed payments grouped by reason. Critical-card flags surface up.',  type:'table',  category:'finance',     integrations:['stripe'],                installed:false, views7d:0   },
+  { id:'wt-lead-funnel', name:'Lead Source Funnel',     desc:'Conversion by acquisition channel with stage-by-stage drop-off.',            type:'funnel', category:'marketing',   integrations:['hubspot','segment'],     installed:false, views7d:0   },
+  { id:'wt-campaign-roi',name:'Campaign ROI',           desc:'Marketing spend vs attributed revenue. Per-campaign payback period.',       type:'chart',  category:'marketing',   integrations:['mixpanel','hubspot','stripe'], installed:false, views7d:0 },
+  { id:'wt-team-pulse',  name:'Team Pulse',             desc:'Slack activity volume + reaction sentiment per workspace channel.',         type:'kpi',    category:'team',        integrations:['slack'],                 installed:false, views7d:0   },
+  { id:'wt-error-radar', name:'Error Radar',            desc:'GitHub issues paired with Snowflake error events. Spot regressions fast.', type:'chart',  category:'engineering', integrations:['github','snowflake'],    installed:false, views7d:0   },
+  { id:'wt-onboard',     name:'Onboarding Funnel',      desc:'New users → activated. Cohort-by-week conversion with feature drop-offs.', type:'funnel', category:'product',     integrations:['mixpanel','hubspot'],    installed:false, views7d:0   }
+];
+
+const WG_CATEGORIES = [
+  { id:'all',         label:'All' },
+  { id:'sales',       label:'Sales' },
+  { id:'marketing',   label:'Marketing' },
+  { id:'finance',     label:'Finance' },
+  { id:'support',     label:'Support' },
+  { id:'engineering', label:'Engineering' },
+  { id:'product',     label:'Product' },
+  { id:'team',        label:'Team' }
+];
+
+let _wgFilters = { search:'', category:'all' };
+
+function wgSetFilter(key, value) {
+  _wgFilters[key] = value;
+  renderWidgetsLibrary();
+}
+function wgSearchInput(value) {
+  _wgFilters.search = (value || '').toLowerCase();
+  renderWidgetsLibrary();
+}
+
+// A widget's status is derived from Distribution availability:
+// - installed:true → 'installed'
+// - else if all required integrations are exposed to 'widgets' surface → 'available'
+// - else → 'blocked'
+function widgetStatus(w) {
+  if (w.installed) return 'installed';
+  const missing = w.integrations.filter(slug => {
+    const integ = INTEGRATIONS.find(i => i.slug === slug);
+    if (!integ || !integ.connected) return true;  // not even connected
+    if (typeof getDistribution === 'function') {
+      const dist = getDistribution(slug);
+      if (dist.widgets === false) return true;
+    }
+    return false;
+  });
+  if (missing.length > 0) return 'blocked';
+  return 'available';
+}
+
+function widgetMissingIntegrations(w) {
+  return w.integrations.filter(slug => {
+    const integ = INTEGRATIONS.find(i => i.slug === slug);
+    if (!integ || !integ.connected) return true;
+    if (typeof getDistribution === 'function') {
+      const dist = getDistribution(slug);
+      if (dist.widgets === false) return true;
+    }
+    return false;
+  });
+}
+
+function wgTypeIcon(type) {
+  if (type === 'chart')  return '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13h12M3 11l3-3 3 2 5-5"/></svg>';
+  if (type === 'table')  return '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 7h12M2 11h12M6 3v10M10 3v10"/></svg>';
+  if (type === 'kpi')    return '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 2"/></svg>';
+  if (type === 'funnel') return '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h12l-4 5v4l-4 1V8L2 3z"/></svg>';
+  return '';
+}
+
+function widgetInstallToggle(widgetId) {
+  const w = MOCK_WIDGET_TEMPLATES.find(x => x.id === widgetId);
+  if (!w) return;
+  const missing = widgetMissingIntegrations(w);
+  if (!w.installed && missing.length > 0) {
+    const missingNames = missing.map(s => {
+      const i = INTEGRATIONS.find(x => x.slug === s);
+      return i ? i.name : s;
+    });
+    toast('Cannot install — missing ' + missingNames.join(', ') + '. Enable in Distribution.');
+    return;
+  }
+  w.installed = !w.installed;
+  w.views7d = w.installed ? Math.max(1, Math.floor(Math.random()*50)) : 0;
+  toast(w.name + ' ' + (w.installed ? 'installed' : 'uninstalled'));
+  renderWidgetsLibrary();
+}
+
+function renderWidgetsLibrary() {
+  const total = MOCK_WIDGET_TEMPLATES.length;
+  const installedCount = MOCK_WIDGET_TEMPLATES.filter(w => w.installed).length;
+  const blockedCount = MOCK_WIDGET_TEMPLATES.filter(w => widgetStatus(w) === 'blocked').length;
+
+  const q = _wgFilters.search;
+  const cat = _wgFilters.category;
+  const filtered = MOCK_WIDGET_TEMPLATES.filter(w => {
+    if (cat !== 'all' && w.category !== cat) return false;
+    if (!q) return true;
+    return (w.name.toLowerCase().indexOf(q) !== -1)
+        || (w.desc.toLowerCase().indexOf(q) !== -1)
+        || w.integrations.some(s => {
+             const i = INTEGRATIONS.find(x => x.slug === s);
+             return i && i.name.toLowerCase().indexOf(q) !== -1;
+           });
+  });
+
+  $('content').innerHTML = `
+    <div class="wg-wrap">
+      <div class="breadcrumb">
+        <span class="crumb-current">Widgets</span>
+      </div>
+
+      <header class="wg-h">
+        <div class="wg-h-l">
+          <div class="wg-h-eyebrow"><span class="wg-h-eyebrow-dot"></span>Admin Studio &middot; Widgets library</div>
+          <h1 class="wg-h-title">Widget templates</h1>
+          <p class="wg-h-desc">Pre-built dashboards and cards that consume your connected integrations. Install the ones you already have — the rest stay greyed out until their required integrations are connected and exposed via <a href="#/distribution" style="color:var(--cyan);text-decoration:none">Distribution</a>.</p>
+        </div>
+        <div class="wg-counts">
+          <div class="wg-count"><div class="wg-count-v">${total}</div><div class="wg-count-l">Available</div></div>
+          <div class="wg-count"><div class="wg-count-v is-green">${installedCount}</div><div class="wg-count-l">Installed</div></div>
+          <div class="wg-count"><div class="wg-count-v is-amber">${blockedCount}</div><div class="wg-count-l">Blocked</div></div>
+        </div>
+      </header>
+
+      <div class="wg-toolbar">
+        <label class="wg-search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="M14 14l-3-3"/></svg>
+          <input type="text" placeholder="Search widgets..." value="${escapeHtml(_wgFilters.search)}" oninput="wgSearchInput(this.value)"/>
+        </label>
+        ${WG_CATEGORIES.map(cat => {
+          const count = cat.id === 'all' ? MOCK_WIDGET_TEMPLATES.length : MOCK_WIDGET_TEMPLATES.filter(w => w.category === cat.id).length;
+          return `<button class="wg-filter ${_wgFilters.category===cat.id?'is-active':''}" onclick="wgSetFilter('category','${cat.id}')">${escapeHtml(cat.label)} <span class="wg-filter-badge">${count}</span></button>`;
+        }).join('')}
+      </div>
+
+      <div class="wg-grid">
+        ${filtered.length === 0 ? `
+          <div class="wg-empty">No widgets match the current filters.</div>
+        ` : filtered.map(w => {
+          const st = widgetStatus(w);
+          const missing = widgetMissingIntegrations(w);
+          const statusLabel = st === 'installed' ? 'Installed' : (st === 'available' ? 'Ready to install' : 'Blocked');
+          return `
+            <div class="wg-card ${st === 'blocked' ? 'is-blocked' : ''}">
+              <div class="wg-card-h">
+                <span class="wg-card-type t-${w.type}">${wgTypeIcon(w.type)} ${escapeHtml(w.type)}</span>
+                <span class="wg-card-status is-${st}">${st === 'installed' ? `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1px"><path d="M2 6l3 3 5-7"/></svg>` : st === 'available' ? `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1px"><path d="M6 1.5v6M3 4.5l3 3 3-3M2 10.5h8"/></svg>` : `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:1px"><circle cx="6" cy="6" r="4.5"/><line x1="3" y1="9" x2="9" y2="3"/></svg>`}${escapeHtml(statusLabel)}</span>
+              </div>
+              <div class="wg-card-name">${escapeHtml(w.name)}</div>
+              <div class="wg-card-desc">${escapeHtml(w.desc)}</div>
+              <div class="wg-card-integ">
+                <span class="wg-card-integ-l">Needs</span>
+                <span class="wg-card-integ-logos">
+                  ${w.integrations.map(slug => {
+                    const integ = INTEGRATIONS.find(i => i.slug === slug);
+                    const isMissing = missing.indexOf(slug) !== -1;
+                    const brand = LOGO_SLUGS[slug];
+                    if (isMissing) {
+                      return `<span class="wg-card-integ-logo is-missing" title="${escapeHtml((integ && integ.name) || slug)} — not exposed to widgets">!</span>`;
+                    }
+                    if (brand) {
+                      return `<span class="wg-card-integ-logo" title="${escapeHtml((integ && integ.name) || slug)}"><img src="https://api.iconify.design/logos:${brand}.svg" alt="${escapeHtml((integ && integ.name) || slug)}" loading="lazy"/></span>`;
+                    }
+                    return `<span class="wg-card-integ-logo" style="background:${(integ && integ.color) || '#1f2a44'};color:#fff;font-size:9px;font-weight:800" title="${escapeHtml((integ && integ.name) || slug)}">${escapeHtml(((integ && integ.name) || slug).slice(0,2).toUpperCase())}</span>`;
+                  }).join('')}
+                </span>
+              </div>
+              <div class="wg-card-foot">
+                <span class="wg-card-meta">${w.installed ? (w.views7d + ' views / 7d') : (w.category[0].toUpperCase() + w.category.slice(1))}</span>
+                ${st === 'installed'
+                  ? `<button class="wg-card-cta is-open" onclick="toast('Open ${escapeHtml(w.name)} — out of scope for this prototype')">Open &rarr;</button>`
+                  : st === 'available'
+                  ? `<button class="wg-card-cta is-install" onclick="widgetInstallToggle('${w.id}')">Install</button>`
+                  : `<button class="wg-card-cta is-blocked" disabled title="${escapeHtml(missing.map(s => { const i = INTEGRATIONS.find(x=>x.slug===s); return (i&&i.name)||s; }).join(', '))} not available to widgets — open Distribution to fix.">Blocked</button>`}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'integrations';
   const parts = hash.split('/');
@@ -5574,6 +6265,7 @@ function route() {
   const ssbMap = {
     'integrations':'integrations', 'audit':'audit', 'build':'integrations', 'request':'integrations', 'requests':'requests',
     'distribution':'distribution',
+    'widgets':'widgets',
     'personal':'personal'
   };
   const baseRoute = parts[0];
@@ -5602,6 +6294,8 @@ function route() {
     renderRequestsInbox();
   } else if (parts[0]==='distribution') {
     renderDistribution();
+  } else if (parts[0]==='widgets') {
+    renderWidgetsLibrary();
   } else if (parts[0]==='personal' && parts[2]) {
     renderPersonalDetail(parts[2]);
   } else if (parts[0]==='personal') {
@@ -6338,8 +7032,8 @@ function detailWorkspaces(integ) {
               <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2.5" width="5" height="5" rx="1"/><rect x="9.5" y="2.5" width="5" height="5" rx="1"/><rect x="1.5" y="8.5" width="5" height="5" rx="1"/><rect x="9.5" y="8.5" width="5" height="5" rx="1"/></svg>
             </span>
             <div>
-              <div class="ws-hero-t">${escapeHtml(integ.name)} is available in <b>${enabledCount}</b> of <b>${total}</b> workspaces</div>
-              <div class="ws-hero-d">Toggling a workspace off removes <b>${escapeHtml(integ.name)}</b> from its catalog, its agents, and its workflows. Users with active sessions are not interrupted but won't be able to start new ones until re-enabled.</div>
+              <div class="ws-hero-t">Enabled in <b>${enabledCount}</b> of <b>${total}</b> workspaces</div>
+              <div class="ws-hero-d">Turning a workspace off hides <b>${escapeHtml(integ.name)}</b> from its catalog, its agents, and its workflows. People mid-session aren't kicked out, but no new sessions can start until you re-enable.</div>
             </div>
           </div>
           <div class="ws-hero-actions">
@@ -6366,7 +7060,7 @@ function detailWorkspaces(integ) {
                   </div>
                 </div>
                 <span class="ws-row-status ${on ? 'is-on' : 'is-off'}">
-                  <span class="ws-status-dot"></span>${on ? 'Available' : 'Disabled'}
+                  ${on ? `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1px"><path d="M2 6l3 3 5-7"/></svg>` : `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:1px"><circle cx="6" cy="6" r="4"/></svg>`}${on ? 'Available' : 'Disabled'}
                 </span>
                 <button class="ws-switch ${on ? 'is-on' : ''}" onclick="toggleWorkspaceForIntegration('${integ.slug}','${w.id}')" aria-label="${on ? 'Disable' : 'Enable'} ${escapeHtml(integ.name)} for ${escapeHtml(w.name)}" role="switch" aria-checked="${on}"></button>
               </div>
@@ -6375,12 +7069,498 @@ function detailWorkspaces(integ) {
         </div>
 
         <div class="ws-foot">
-          <b>Note:</b> Workspace availability is independent from <a href="#/integrations/${integ.slug}" onclick="setDetailTab('${integ.slug}','permissions');return false" style="color:var(--cyan);text-decoration:none">role permissions</a>. Even in enabled workspaces, individual users still need the right role to access ${escapeHtml(integ.name)}. To control downstream surfaces (Data Studio, Agent Studio, etc.), see <a href="#/distribution" style="color:var(--cyan);text-decoration:none">Distribution</a>.
+          <b>Note:</b> Workspace availability is separate from <a href="#/integrations/${integ.slug}" onclick="setDetailTab('${integ.slug}','permissions');return false" style="color:var(--cyan);text-decoration:none">role permissions</a> — people in enabled workspaces still need the right role. For downstream surfaces (Data Studio, Agent Studio, etc.), use <a href="#/distribution" style="color:var(--cyan);text-decoration:none">Distribution</a>.
         </div>
 
       </div>
     </section>
   `;
+}
+
+
+
+/* ============ FORMAL OWNERSHIP ============ */
+const MOCK_OWNERS = [
+  { id:'tg', name:'Thomas González', initials:'TG', color:'#06B6D4', role:'Platform Lead',    dept:'Platform'    },
+  { id:'mg', name:'María González',  initials:'MG', color:'#A78BFA', role:'Sales Ops Lead',   dept:'Sales'       },
+  { id:'ct', name:'Carlos Tovar',    initials:'CT', color:'#10B981', role:'Eng Manager',      dept:'Engineering' },
+  { id:'sc', name:'Sarah Chen',      initials:'SC', color:'#FDC700', role:'Customer Success', dept:'CS'          },
+  { id:'ap', name:'Alex Park',       initials:'AP', color:'#EF4444', role:'Finance Ops',      dept:'Finance'     },
+  { id:'dp', name:'Diana Pérez',     initials:'DP', color:'#F472B6', role:'IT Security',      dept:'Security'    }
+];
+
+// Default integration owner by slug. Falls back to matching connectedBy.name when missing.
+const OWNER_DEFAULTS = {
+  'slack':       'mg', 'teams':     'ct', 'gsheets':   'tg', 'gmail':     'tg',
+  'gcal':        'tg', 'salesforce':'mg', 'hubspot':   'mg', 'snowflake': 'ct',
+  'github':      'ct', 'stripe':    'ap', 'zendesk':   'sc', 'mongodb':   'ct',
+  'notion':      'tg', 'airtable':  'mg', 'bigquery':  'ct', 'segment':   'mg',
+  'mixpanel':    'mg', 's3':        'ct', 'linear':    'ct', 'jira':      'ct'
+};
+
+let OWNER_OVERRIDES = (function(){
+  try {
+    const raw = localStorage.getItem('aims_owner_overrides');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {};
+})();
+
+function persistOwnerOverrides() {
+  try { localStorage.setItem('aims_owner_overrides', JSON.stringify(OWNER_OVERRIDES)); } catch(e){}
+}
+
+function getOwner(slug) {
+  if (slug in OWNER_OVERRIDES) {
+    const id = OWNER_OVERRIDES[slug];
+    if (id === null) return null;  // explicit Unassigned
+    return MOCK_OWNERS.find(o => o.id === id) || null;
+  }
+  if (slug in OWNER_DEFAULTS) {
+    return MOCK_OWNERS.find(o => o.id === OWNER_DEFAULTS[slug]) || null;
+  }
+  // Fallback: match connectedBy.name when present
+  const integ = INTEGRATIONS.find(i => i.slug === slug);
+  if (integ && integ.connectedBy) {
+    const match = MOCK_OWNERS.find(o => o.name === integ.connectedBy.name);
+    if (match) return match;
+  }
+  return null;
+}
+
+function ownerPillHtml(slug) {
+  const owner = getOwner(slug);
+  if (!owner) {
+    return `
+      <button class="owner-pill is-unassigned" onclick="openOwnerPicker('${slug}', event)" aria-haspopup="dialog">
+        <span class="owner-pill-avatar owner-pill-avatar-empty">?</span>
+        <span class="owner-pill-label">
+          <span class="owner-pill-l">Owner</span>
+          <span class="owner-pill-name">Unassigned · assign</span>
+        </span>
+        <svg class="owner-pill-caret" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg>
+      </button>
+    `;
+  }
+  return `
+    <button class="owner-pill" onclick="openOwnerPicker('${slug}', event)" aria-haspopup="dialog" title="Owned by ${escapeHtml(owner.name)} · ${escapeHtml(owner.role)}">
+      <span class="owner-pill-avatar" style="background:${owner.color}">${escapeHtml(owner.initials)}</span>
+      <span class="owner-pill-label">
+        <span class="owner-pill-l">Owner</span>
+        <span class="owner-pill-name">${escapeHtml(owner.name)}</span>
+      </span>
+      <svg class="owner-pill-caret" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg>
+    </button>
+  `;
+}
+
+let _ownerPickerSlug = null;
+
+function openOwnerPicker(slug, evt) {
+  if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+  _ownerPickerSlug = slug;
+  const current = getOwner(slug);
+  const picker = document.getElementById('ownerPicker');
+  const backdrop = document.getElementById('ownerPickerBackdrop');
+  picker.innerHTML = `
+    <div class="owner-picker-h">Transfer ownership</div>
+    ${MOCK_OWNERS.map(o => `
+      <button class="owner-picker-row ${current && current.id === o.id ? 'is-selected' : ''}" onclick="reassignOwner('${slug}','${o.id}')">
+        <span class="owner-picker-avatar" style="background:${o.color}">${escapeHtml(o.initials)}</span>
+        <span class="owner-picker-body">
+          <span class="owner-picker-name">${escapeHtml(o.name)}</span>
+          <span class="owner-picker-role">${escapeHtml(o.role)} · ${escapeHtml(o.dept)}</span>
+        </span>
+        ${current && current.id === o.id ? '<svg class="owner-picker-check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8l4 4 6-8"/></svg>' : ''}
+      </button>
+    `).join('')}
+    <div class="owner-picker-divider"></div>
+    <button class="owner-picker-row" onclick="reassignOwner('${slug}', null)">
+      <span class="owner-picker-avatar is-empty">—</span>
+      <span class="owner-picker-body">
+        <span class="owner-picker-name">Unassigned</span>
+        <span class="owner-picker-role">No formal owner</span>
+      </span>
+      ${current === null ? '<svg class="owner-picker-check" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8l4 4 6-8"/></svg>' : ''}
+    </button>
+  `;
+  // Position the picker near the clicked pill
+  const btn = evt ? evt.currentTarget : null;
+  if (btn) {
+    const r = btn.getBoundingClientRect();
+    const popW = 300;
+    const popH = Math.min(420, MOCK_OWNERS.length * 50 + 80);
+    let top = r.bottom + 6;
+    let left = r.left;
+    // Clamp inside viewport
+    if (left + popW > window.innerWidth - 12) left = window.innerWidth - popW - 12;
+    if (left < 12) left = 12;
+    if (top + popH > window.innerHeight - 12) top = r.top - popH - 6;
+    picker.style.top = top + 'px';
+    picker.style.left = left + 'px';
+    btn.setAttribute('aria-expanded', 'true');
+  } else {
+    picker.style.top = '50%';
+    picker.style.left = '50%';
+    picker.style.transform = 'translate(-50%, -50%)';
+  }
+  backdrop.classList.add('is-open');
+  picker.classList.add('is-open');
+}
+
+function closeOwnerPicker() {
+  const picker = document.getElementById('ownerPicker');
+  const backdrop = document.getElementById('ownerPickerBackdrop');
+  if (picker) picker.classList.remove('is-open');
+  if (backdrop) backdrop.classList.remove('is-open');
+  document.querySelectorAll('.owner-pill[aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
+  _ownerPickerSlug = null;
+}
+
+function reassignOwner(slug, ownerId) {
+  const integ = INTEGRATIONS.find(i => i.slug === slug);
+  const prev = getOwner(slug);
+  OWNER_OVERRIDES[slug] = ownerId;
+  persistOwnerOverrides();
+  const newOwner = ownerId ? MOCK_OWNERS.find(o => o.id === ownerId) : null;
+  const prevLabel = prev ? prev.name : 'Unassigned';
+  const newLabel = newOwner ? newOwner.name : 'Unassigned';
+  if (typeof toast === 'function' && integ) {
+    toast(integ.name + ' ownership: ' + prevLabel + ' → ' + newLabel);
+  }
+  closeOwnerPicker();
+  if (integ) paintDetail(integ);
+  // If currently on Distribution surface, re-render that too
+  if (location.hash.indexOf('distribution') !== -1 && typeof renderDistribution === 'function') {
+    renderDistribution();
+  }
+}
+
+// Close picker on ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('ownerPicker') && document.getElementById('ownerPicker').classList.contains('is-open')) {
+    closeOwnerPicker();
+  }
+});
+
+
+
+/* ============ CONSUMERS (workflows / agents / networks / widgets) ============ */
+const MOCK_CONSUMERS = [
+  // Workflows
+  { id:'wf-1', type:'workflow', name:'New lead → Salesforce + Slack alert', owner:'María González',
+    integrations:['salesforce','slack'], lastActivity:'4 min ago', metricLabel:'runs / 7d', metricValue:142 },
+  { id:'wf-2', type:'workflow', name:'Failed payment escalation', owner:'Alex Park',
+    integrations:['stripe','slack','gmail'], lastActivity:'2 hours ago', metricLabel:'runs / 7d', metricValue:18 },
+  { id:'wf-3', type:'workflow', name:'GitHub PR review notification', owner:'Carlos Tovar',
+    integrations:['github','slack'], lastActivity:'12 min ago', metricLabel:'runs / 7d', metricValue:87 },
+  { id:'wf-4', type:'workflow', name:'CS ticket auto-routing', owner:'Sarah Chen',
+    integrations:['zendesk','slack'], lastActivity:'9 min ago', metricLabel:'runs / 7d', metricValue:64 },
+  { id:'wf-5', type:'workflow', name:'Daily revenue report', owner:'Alex Park',
+    integrations:['stripe','gsheets'], lastActivity:'18 hours ago', metricLabel:'runs / 7d', metricValue:7 },
+  { id:'wf-6', type:'workflow', name:'Inbound demo request → Calendar invite', owner:'María González',
+    integrations:['hubspot','gcal','gmail'], lastActivity:'1 hour ago', metricLabel:'runs / 7d', metricValue:32 },
+
+  // Agents
+  { id:'ag-1', type:'agent', name:'Sales Triage Agent', owner:'María González',
+    integrations:['salesforce','hubspot','slack'], lastActivity:'continuous', metricLabel:'active users', metricValue:24 },
+  { id:'ag-2', type:'agent', name:'Support Resolution Agent', owner:'Sarah Chen',
+    integrations:['zendesk','slack','notion'], lastActivity:'continuous', metricLabel:'active users', metricValue:11 },
+  { id:'ag-3', type:'agent', name:'Eng Standup Agent', owner:'Carlos Tovar',
+    integrations:['github','slack','notion'], lastActivity:'continuous', metricLabel:'active users', metricValue:18 },
+  { id:'ag-4', type:'agent', name:'Renewals Agent', owner:'Alex Park',
+    integrations:['salesforce','hubspot','stripe'], lastActivity:'continuous', metricLabel:'active users', metricValue:6 },
+
+  // Networks
+  { id:'net-1', type:'network', name:'Customer Onboarding Network', owner:'Sarah Chen',
+    integrations:['hubspot','salesforce','slack','zendesk'], lastActivity:'continuous', metricLabel:'agents in net', metricValue:4 },
+  { id:'net-2', type:'network', name:'Incident Response Network', owner:'Carlos Tovar',
+    integrations:['github','slack','snowflake'], lastActivity:'continuous', metricLabel:'agents in net', metricValue:3 },
+
+  // Widgets / Dashboards
+  { id:'wg-1', type:'widget', name:'Pipeline Health Dashboard', owner:'María González',
+    integrations:['salesforce','hubspot'], lastActivity:'5 min ago', metricLabel:'views / 7d', metricValue:412 },
+  { id:'wg-2', type:'widget', name:'CS SLA Tracker', owner:'Sarah Chen',
+    integrations:['zendesk','salesforce'], lastActivity:'8 min ago', metricLabel:'views / 7d', metricValue:89 },
+  { id:'wg-3', type:'widget', name:'Eng Velocity Dashboard', owner:'Carlos Tovar',
+    integrations:['github','linear'], lastActivity:'18 min ago', metricLabel:'views / 7d', metricValue:127 }
+];
+
+function getConsumersForIntegration(slug) {
+  return MOCK_CONSUMERS.filter(con => con.integrations.indexOf(slug) !== -1);
+}
+
+function getImpactSummary(slug) {
+  const cons = getConsumersForIntegration(slug);
+  return {
+    total: cons.length,
+    workflows: cons.filter(c => c.type === 'workflow').length,
+    agents: cons.filter(c => c.type === 'agent').length,
+    networks: cons.filter(c => c.type === 'network').length,
+    widgets: cons.filter(c => c.type === 'widget').length,
+    consumers: cons
+  };
+}
+
+function consumerTypeLabel(type) {
+  return ({ workflow:'Workflow', agent:'Agent', network:'Agentic Network', widget:'Widget' })[type] || type;
+}
+
+function consumerIconSvg(type) {
+  if (type === 'workflow') {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6h7M6 8.5v7M18 8.5v7M8.5 18h7"/></svg>';
+  }
+  if (type === 'agent') {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="2"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><path d="M12 3v3M5 18l-2 3M19 18l2 3"/></svg>';
+  }
+  if (type === 'network') {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="14" r="2"/><circle cx="19" cy="14" r="2"/><circle cx="12" cy="20" r="2"/><path d="M12 7v11M10.5 6l-4 6.5M13.5 6l4 6.5M7 14.5l4 4.5M17 14.5l-4 4.5"/></svg>';
+  }
+  if (type === 'widget') {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>';
+  }
+  return '';
+}
+
+function usageRowHtml(con) {
+  return `
+    <div class="usage-row">
+      <span class="usage-row-ic t-${con.type}">${consumerIconSvg(con.type)}</span>
+      <div class="usage-row-body">
+        <div class="usage-row-name">${escapeHtml(con.name)}</div>
+        <div class="usage-row-meta">
+          <span class="usage-row-tag t-${con.type}">${escapeHtml(consumerTypeLabel(con.type))}</span>
+          <span>Owner: <b style="color:var(--t1);font-weight:600">${escapeHtml(con.owner)}</b></span>
+          <span class="dot">·</span>
+          <span>${escapeHtml(String(con.metricValue))} ${escapeHtml(con.metricLabel)}</span>
+          <span class="dot">·</span>
+          <span>Last activity ${escapeHtml(con.lastActivity)}</span>
+        </div>
+      </div>
+      <button class="usage-row-action" onclick="toast('Open ' + decodeURIComponent('${encodeURIComponent(con.name)}') + ' — out of scope for this prototype')">Open ↗</button>
+    </div>
+  `;
+}
+
+function detailUsage(integ) {
+  if (!integ) return '';
+  const imp = getImpactSummary(integ.slug);
+  return `
+    <section class="ov-widget">
+      <header class="ov-widget-h">
+        <h3 class="ov-widget-title">Where this integration is used</h3>
+        <span class="ov-widget-meta">${imp.total === 0 ? 'No consumers' : imp.total + ' consumer' + (imp.total === 1 ? '' : 's') + ' depend on ' + escapeHtml(integ.name)}</span>
+      </header>
+      <div class="ov-widget-body">
+
+        <div class="usage-impact">
+          <div class="usage-impact-tile ${imp.workflows === 0 ? 'is-empty' : ''}">
+            <div class="usage-impact-l"><span class="usage-impact-ic t-wf">${consumerIconSvg('workflow')}</span><span class="usage-impact-l-t">Workflows</span></div>
+            <div class="usage-impact-v">${imp.workflows}</div>
+            <div class="usage-impact-s">automation triggers</div>
+          </div>
+          <div class="usage-impact-tile ${imp.agents === 0 ? 'is-empty' : ''}">
+            <div class="usage-impact-l"><span class="usage-impact-ic t-agent">${consumerIconSvg('agent')}</span><span class="usage-impact-l-t">Agents</span></div>
+            <div class="usage-impact-v">${imp.agents}</div>
+            <div class="usage-impact-s">callable as tools</div>
+          </div>
+          <div class="usage-impact-tile ${imp.networks === 0 ? 'is-empty' : ''}">
+            <div class="usage-impact-l"><span class="usage-impact-ic t-network">${consumerIconSvg('network')}</span><span class="usage-impact-l-t">Networks</span></div>
+            <div class="usage-impact-v">${imp.networks}</div>
+            <div class="usage-impact-s">multi-agent flows</div>
+          </div>
+          <div class="usage-impact-tile ${imp.widgets === 0 ? 'is-empty' : ''}">
+            <div class="usage-impact-l"><span class="usage-impact-ic t-widget">${consumerIconSvg('widget')}</span><span class="usage-impact-l-t">Widgets</span></div>
+            <div class="usage-impact-v">${imp.widgets}</div>
+            <div class="usage-impact-s">dashboards & cards</div>
+          </div>
+        </div>
+
+        ${imp.total === 0 ? `
+          <div class="usage-empty">
+            <div class="usage-empty-t">Not used by anything yet</div>
+            <div class="usage-empty-d">No workflows, agents, networks, or widgets depend on <b style="color:var(--t1)">${escapeHtml(integ.name)}</b>. If this is intentional, consider archiving the integration to keep the catalog clean.</div>
+          </div>
+        ` : `
+          <div class="usage-list">
+            ${imp.consumers.map(usageRowHtml).join('')}
+          </div>
+        `}
+
+      </div>
+    </section>
+  `;
+}
+
+/* ============ DISCONNECT IMPACT MODAL ============ */
+let _impactModalCallback = null;
+
+function openImpactModal(slug, onConfirm) {
+  const integ = INTEGRATIONS.find(i => i.slug === slug);
+  if (!integ) return;
+  const imp = getImpactSummary(slug);
+  _impactModalCallback = onConfirm || null;
+
+  $('impactModalTitle').textContent = 'Disconnect ' + integ.name + '?';
+  $('impactModalSub').textContent = imp.total === 0
+    ? 'No active consumers — safe to disconnect.'
+    : 'Impact analysis · ' + imp.total + ' consumer' + (imp.total === 1 ? '' : 's') + ' affected';
+
+  const body = `
+    <div style="font-size:12.5px;color:var(--t2);line-height:1.6;margin-bottom:14px">
+      ${imp.total === 0
+        ? `<b style="color:var(--t1)">${escapeHtml(integ.name)}</b> isn't used anywhere yet. Disconnecting is safe — credentials get revoked and the integration moves to Not connected.`
+        : `Revokes credentials and stops data flow. These consumers break immediately:`}
+    </div>
+    ${imp.total > 0 ? `
+      <div class="impact-summary">
+        <div class="impact-summary-tile"><div class="impact-summary-v">${imp.workflows}</div><div class="impact-summary-l">Workflows</div></div>
+        <div class="impact-summary-tile"><div class="impact-summary-v">${imp.agents}</div><div class="impact-summary-l">Agents</div></div>
+        <div class="impact-summary-tile"><div class="impact-summary-v">${imp.networks}</div><div class="impact-summary-l">Networks</div></div>
+        <div class="impact-summary-tile"><div class="impact-summary-v">${imp.widgets}</div><div class="impact-summary-l">Widgets</div></div>
+      </div>
+      <div class="impact-list-h">Affected consumers</div>
+      <div class="impact-list">
+        ${imp.consumers.map(usageRowHtml).join('')}
+      </div>
+    ` : ''}
+  `;
+  $('impactModalBody').innerHTML = body;
+
+  $('impactModalFooter').innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="closeImpactModal()">Cancel</button>
+    <button class="btn btn-danger btn-sm" onclick="confirmImpactModal()">${imp.total === 0 ? 'Disconnect' : 'Disconnect anyway'}</button>
+  `;
+
+  $('impactModalOverlay').classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeImpactModal() {
+  $('impactModalOverlay').classList.remove('is-open');
+  document.body.style.overflow = '';
+  _impactModalCallback = null;
+}
+
+function confirmImpactModal() {
+  const cb = _impactModalCallback;
+  closeImpactModal();
+  if (typeof cb === 'function') cb();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('impactModalOverlay') && document.getElementById('impactModalOverlay').classList.contains('is-open')) {
+    closeImpactModal();
+  }
+});
+
+
+
+/* ============ PUBLISH LIFECYCLE ============ */
+const LC_STAGES = ['draft', 'staged', 'published'];
+
+function lcBadgeHtml(integ) {
+  if (!integ || !integ.lifecycle || integ.source === 'official') return '';
+  const lc = integ.lifecycle;
+  const labels = { draft:'Draft', staged:'Staged', published:'Published', archived:'Archived' };
+  return `<span class="lc-badge is-${lc}"><span class="lc-badge-dot"></span>${labels[lc] || lc}${integ.version ? ' &middot; ' + escapeHtml(integ.version) : ''}</span>`;
+}
+
+function publishCardHtml(integ) {
+  if (!integ || integ.source === 'official') return '';
+  const lc = integ.lifecycle || 'draft';
+  const stageIdx = Math.max(0, LC_STAGES.indexOf(lc));
+
+  let iconSvg, title, desc, action;
+  if (lc === 'draft') {
+    iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
+    title = 'Draft — finish setup to send for review';
+    desc = 'An internal integration in progress. When the build is done and tests pass, move to <b>Staged</b> so reviewers can sign off before it goes live for the workspace.';
+    action = `<button class="publish-card-btn is-primary" onclick="advanceLifecycle('${integ.slug}','staged')">Move to staged &rarr;</button>`;
+  } else if (lc === 'staged') {
+    const pending = (integ.approvers || []).filter(a => a.status === 'pending').length;
+    iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>';
+    title = pending > 0 ? `Awaiting ${pending} approval${pending===1?'':'s'} before publish` : 'All approvals in — ready to publish';
+    desc = `Staged ${integ.stagedAt ? escapeHtml(integ.stagedAt) : 'recently'} by <b>${escapeHtml(integ.stagedBy || 'workspace admin')}</b>. Tests are passing on dry-run data. Once approvers sign off, publish to make it available for any workspace to install.`;
+    action = pending > 0
+      ? `<button class="publish-card-btn is-secondary" onclick="toast('Reminder sent to ' + ${pending} + ' pending approver' + (${pending}===1?'':'s'))">Remind approvers</button><button class="publish-card-btn is-primary" onclick="advanceLifecycle('${integ.slug}','published')">Publish anyway &rarr;</button>`
+      : `<button class="publish-card-btn is-primary" onclick="advanceLifecycle('${integ.slug}','published')">Publish to library &rarr;</button>`;
+  } else if (lc === 'published') {
+    iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-12"/></svg>';
+    title = `Published ${integ.publishedAt ? escapeHtml(integ.publishedAt) : ''} &middot; ${escapeHtml(integ.version || 'v1.0')}`;
+    desc = `Live in the workspace library. Published by <b>${escapeHtml(integ.publishedBy || 'workspace admin')}</b>. Any workspace can install it (Distribution rules still apply). Re-stage to roll back while you iterate.`;
+    action = `<button class="publish-card-btn is-secondary" onclick="advanceLifecycle('${integ.slug}','staged')">Re-stage for changes</button>`;
+  } else {
+    return '';
+  }
+
+  const approvers = (integ.approvers || []);
+  const approversHtml = approvers.length === 0 ? '' : `
+    <div class="publish-approvers">
+      <div class="publish-approvers-h">Approvers</div>
+      ${approvers.map(a => `
+        <div class="publish-approver-row">
+          <div class="publish-approver-l"><b>${escapeHtml(a.name)}</b><span style="color:var(--t3)">&middot; ${escapeHtml(a.role)}</span></div>
+          <span class="publish-approver-status is-${a.status}">${a.status === 'approved' ? '✓ Approved' : '◐ Pending'}${a.at ? ' &middot; ' + escapeHtml(a.at) : ''}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  return `
+    <div class="publish-card ${lc === 'published' ? 'is-published' : ''}">
+      <div class="publish-card-l">
+        <div class="publish-card-h">
+          <span class="publish-card-ic is-${lc}">${iconSvg}</span>
+          <div class="publish-card-t">${title}</div>
+        </div>
+        <div class="publish-card-d">${desc}</div>
+
+        <div class="publish-progress">
+          <div class="publish-step ${stageIdx === 0 ? 'is-active' : stageIdx > 0 ? 'is-done' : ''}">
+            <span class="publish-step-num">${stageIdx > 0 ? '✓' : '1'}</span>
+            <span>Draft</span>
+          </div>
+          <span class="publish-step-arrow">→</span>
+          <div class="publish-step ${stageIdx === 1 ? 'is-active' : stageIdx > 1 ? 'is-done' : ''}">
+            <span class="publish-step-num">${stageIdx > 1 ? '✓' : '2'}</span>
+            <span>Staged &middot; approval</span>
+          </div>
+          <span class="publish-step-arrow">→</span>
+          <div class="publish-step ${stageIdx === 2 ? 'is-active' : ''}">
+            <span class="publish-step-num">${stageIdx >= 2 ? '✓' : '3'}</span>
+            <span>Published</span>
+          </div>
+        </div>
+
+        ${approversHtml}
+      </div>
+      <div class="publish-card-actions">${action}</div>
+    </div>
+  `;
+}
+
+function advanceLifecycle(slug, target) {
+  const i = INTEGRATIONS.find(x => x.slug === slug);
+  if (!i) return;
+  const prev = i.lifecycle || 'draft';
+  i.lifecycle = target;
+  if (target === 'staged') {
+    i.stagedAt = 'just now';
+    i.stagedBy = (getOwner(slug) && getOwner(slug).name) || 'workspace admin';
+  }
+  if (target === 'published') {
+    i.publishedAt = 'just now';
+    i.publishedBy = (getOwner(slug) && getOwner(slug).name) || 'workspace admin';
+    // Bump version on publish
+    const v = (i.version || 'v0.1').match(/v(\d+)\.(\d+)/);
+    if (v) {
+      i.version = 'v' + (parseInt(v[1])+(prev==='staged'?0:1)) + '.' + (parseInt(v[2])+1);
+    }
+  }
+  const labels = { draft:'Draft', staged:'Staged', published:'Published' };
+  toast(i.name + ': ' + labels[prev] + ' → ' + labels[target]);
+  paintDetail(i);
 }
 
 function renderDetail(slug) {
@@ -6543,7 +7723,7 @@ function paintDetail(i) {
       <div class="detail-row">
         ${logo(i, 'lg')}
         <div class="detail-text">
-          <div class="detail-name">${escapeHtml(i.name)} ${srcBadge(i)}</div>
+          <div class="detail-name">${escapeHtml(i.name)} ${srcBadge(i)} ${lcBadgeHtml(i)}</div>
           <div class="detail-vendor">${escapeHtml(i.vendor||'')} · ${escapeHtml(cat?cat.label:'')}</div>
           ${i.connected ? `
             <div class="detail-meta">
@@ -6552,6 +7732,7 @@ function paintDetail(i) {
               <span class="sep">·</span><span>Connected by ${escapeHtml(i.connectedBy.name)} · ${escapeHtml(i.connectedAt)}</span>
               <span class="sep">·</span><span>${i.authMethods.includes('oauth')?'OAuth 2.0':i.authMethods[0]==='apikey'?'API key':'Service account'}</span>
             </div>
+            <div style="margin-top:10px">${ownerPillHtml(i.slug)}</div>
           ` : `
             <div class="detail-meta"><span>Not connected · ${i.authMethods.map(a=>a==='oauth'?'OAuth 2.0':a==='apikey'?'API key':'Service account').join(' · ')}</span></div>
           `}
@@ -6571,10 +7752,12 @@ function paintDetail(i) {
       </div>
     </div>
 
+    ${publishCardHtml(i)}
+
     <div class="tabs">
       ${(state.persona === 'user'
           ? ['overview','capabilities']
-          : ['overview','capabilities','permissions','workspaces','activity']
+          : ['overview','capabilities','permissions','workspaces','usage','activity']
         ).map(t => `<button class="tab ${state.detailTab===t?'active':''}" onclick="setDetailTab('${i.slug}','${t}')">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
     </div>
 
@@ -6583,6 +7766,7 @@ function paintDetail(i) {
       ${state.detailTab==='capabilities' ? detailCapabilities(i) : ''}
       ${state.detailTab==='permissions' ? detailPermissions(i) : ''}
       ${state.detailTab==='workspaces' ? detailWorkspaces(i) : ''}
+      ${state.detailTab==='usage' ? detailUsage(i) : ''}
       ${state.detailTab==='activity' ? detailProviderActivity(i) : ''}
     </div>
   `;
@@ -7647,10 +8831,18 @@ function togglePersonalAllow(slug) {
   const i = findIntegration(slug); i.allowPersonal = !i.allowPersonal; paintDetail(i);
 }
 function disconnect(slug) {
-  if(!confirm('Disconnect this integration? This will revoke credentials.')) return;
   const i = findIntegration(slug);
-  i.connected = false; i.health = null;
-  toast(`${i.name} disconnected`, 'success'); paintDetail(i);
+  if (!i) return;
+  openImpactModal(slug, function() {
+    i.connected = false; i.health = null;
+    const imp = getImpactSummary(slug);
+    if (imp.total > 0) {
+      toast(`${i.name} disconnected — ${imp.total} consumer${imp.total === 1 ? '' : 's'} now blocked`, 'success');
+    } else {
+      toast(`${i.name} disconnected`, 'success');
+    }
+    paintDetail(i);
+  });
 }
 
 /* ====================== CONNECT DRAWER ====================== */
