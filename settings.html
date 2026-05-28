@@ -85,6 +85,36 @@ body{
   box-shadow:0 1px 0 rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.08) inset;
 }
 .tb-mode-btn.active svg{color:#001318}
+/* Operate active state uses amber instead of cyan — signals triage/monitoring */
+.tb-mode-btn[data-mode="operate"].active{
+  background:var(--amber); color:#1a0f00;
+}
+.tb-mode-btn[data-mode="operate"].active svg{color:#1a0f00}
+/* Amber accent on the topbar when in Operate mode — visible across all pages */
+html.mode-operate .topbar{
+  border-bottom-color:rgba(253,199,0,0.22);
+  box-shadow:0 1px 0 rgba(253,199,0,0.10);
+}
+html.mode-operate .topbar::after{
+  content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background:linear-gradient(90deg, transparent 0%, rgba(253,199,0,0.40) 50%, transparent 100%);
+  pointer-events:none;
+}
+/* Mode-operate row above content (sticky strip with subtle amber tint) */
+.mode-banner{
+  display:none;
+  position:sticky; top:0; z-index:4;
+  padding:6px 16px;
+  background:rgba(253,199,0,0.06);
+  border-bottom:1px solid rgba(253,199,0,0.18);
+  font-size:11px; color:var(--amber); font-weight:600;
+  letter-spacing:.02em;
+  text-align:center;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
+html.mode-operate .mode-banner{display:block}
+.mode-banner-dot{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--amber); margin-right:8px; vertical-align:middle; animation:mode-pulse 1.8s ease-in-out infinite}
+@keyframes mode-pulse{0%,100%{opacity:.5}50%{opacity:1}}
 .tb-mode-btn svg{color:currentColor}
 .tb-mode-badge{
   display:inline-flex; align-items:center; justify-content:center;
@@ -1915,6 +1945,265 @@ html.theme-light .btn-primary.btn-outline{color:var(--cyan); border-color:rgba(6
 }
 .ov-widget-foot .btn-ghost{justify-content:flex-start}
 
+
+/* ── Instance Capabilities: flat row list inside a widget ── */
+.inst-cap-list{display:flex; flex-direction:column; gap:1px}
+.inst-cap-row{
+  display:grid; grid-template-columns:1fr auto auto; gap:14px;
+  align-items:center;
+  padding:11px 12px;
+  background:var(--bg3); border-radius:8px;
+  font-size:12.5px;
+  transition:background .12s;
+}
+.inst-cap-row:hover{background:var(--hover-strong)}
+.inst-cap-name{font-family:'SF Mono', Menlo, monospace; font-size:12px; color:var(--t1); font-weight:600}
+.inst-cap-meta{font-size:11px; color:var(--t3); text-align:right}
+.inst-cap-desc{font-size:11.5px; color:var(--t2); line-height:1.4; margin-top:2px; font-family:inherit; font-weight:400}
+.inst-cap-text{min-width:0}
+.inst-cap-count{
+  font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;
+  background:rgba(6,182,212,0.08); color:var(--cyan);
+  border:1px solid rgba(6,182,212,0.22); letter-spacing:.02em; line-height:1;
+}
+.inst-cap-row-mcp .inst-cap-name{font-family:inherit; font-size:12.5px}
+
+
+
+/* Auth method selection groups (Sprint 5 follow-up) */
+.auth-group-label{
+  font-size:10.5px; font-weight:800; color:var(--t3);
+  text-transform:uppercase; letter-spacing:.06em;
+  margin-bottom:8px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   AUTH PATTERN HERO (Sprint 5)
+   Per-pattern visual differentiation for the wizard auth step.
+   Communicates identity model, credential, refresh, and flow at a glance.
+   ────────────────────────────────────────────────────────── */
+.auth-hero{
+  background:var(--bg2); border:1px solid var(--line); border-radius:12px;
+  padding:16px 18px; margin-bottom:18px;
+  overflow:hidden;
+}
+.auth-hero-top{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.auth-identity-badge{
+  display:inline-flex; align-items:center; gap:5px; height:22px; padding:0 10px;
+  font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.05em;
+  border-radius:11px; line-height:1;
+}
+.auth-id-personal{background:rgba(43,127,255,0.12); color:var(--accent); border:1px solid rgba(43,127,255,0.30)}
+.auth-id-service{background:rgba(167,139,250,0.12); color:var(--purple); border:1px solid rgba(167,139,250,0.30)}
+.auth-id-per_user{background:rgba(6,182,212,0.12); color:var(--cyan); border:1px solid rgba(6,182,212,0.30)}
+.auth-id-mixed{background:rgba(253,199,0,0.12); color:var(--amber); border:1px solid rgba(253,199,0,0.30)}
+.auth-identity-desc{font-size:12px; color:var(--t2); font-weight:500}
+
+/* Flow diagram (3 nodes + arrows) */
+.auth-flow{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  padding:14px; margin-bottom:14px;
+  background:rgba(255,255,255,0.02); border-radius:10px;
+  justify-content:center;
+}
+.auth-flow-node{
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  min-width:64px;
+  color:var(--t1);
+}
+.auth-flow-node svg{color:var(--t2); transition:color .15s}
+.auth-flow-l{font-size:10px; color:var(--t3); font-weight:600; letter-spacing:.02em; text-align:center}
+.auth-flow-arrow{color:var(--t3); font-size:14px; font-weight:600}
+.auth-flow-arrow-back{font-size:13px; opacity:.7}
+
+.auth-flow-user svg{color:var(--accent)}
+.auth-flow-provider .logo{margin:0}
+.auth-flow-aims{}
+.auth-flow-key, .auth-flow-token{align-items:center}
+.auth-key-snippet{
+  font-family:'SF Mono',Menlo,monospace; font-size:11px;
+  background:rgba(167,139,250,0.10); color:var(--purple);
+  padding:5px 8px; border-radius:5px;
+  border:1px solid rgba(167,139,250,0.22);
+}
+.auth-flow-token .auth-key-snippet{background:rgba(5,223,114,0.10); color:var(--green); border-color:rgba(5,223,114,0.22)}
+.auth-flow-file svg{color:var(--purple)}
+.auth-flow-creds svg{color:var(--accent)}
+.auth-flow-exchange{color:var(--cyan)}
+.auth-flow-users{align-items:center}
+.auth-user-dot{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:24px; height:24px; border-radius:50%; color:#fff;
+  font-size:10px; font-weight:800;
+  border:2px solid var(--bg2);
+}
+
+/* Manual flow uses numbered steps instead of nodes */
+.auth-flow-step{
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  min-width:64px;
+}
+.auth-flow-num{
+  width:26px; height:26px; border-radius:50%;
+  background:rgba(253,199,0,0.14); color:var(--amber);
+  border:1.5px solid rgba(253,199,0,0.36);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:800;
+}
+
+/* Facts grid: 3 columns */
+.auth-facts{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  padding-top:12px; border-top:1px solid var(--line);
+  margin-bottom:0;
+}
+.auth-fact-k{font-size:9.5px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px}
+.auth-fact-v{font-size:12px; color:var(--t1); font-weight:600; line-height:1.4}
+
+/* How it works collapsible */
+.auth-howit{margin-top:12px; padding-top:12px; border-top:1px solid var(--line)}
+.auth-howit summary{
+  font-size:11.5px; font-weight:700; color:var(--cyan);
+  cursor:pointer; user-select:none;
+  display:inline-flex; align-items:center; gap:6px;
+  list-style:none;
+}
+.auth-howit summary::-webkit-details-marker{display:none}
+.auth-howit summary::before{
+  content:'▸'; display:inline-block; transition:transform .15s; font-size:10px;
+}
+.auth-howit[open] summary::before{transform:rotate(90deg)}
+.auth-howit ol{margin:10px 0 0; padding-left:20px}
+.auth-howit li{font-size:12px; color:var(--t2); line-height:1.55; margin-bottom:4px}
+
+/* Pattern-specific accent tinting on the hero border */
+.auth-hero-oauth{border-color:color-mix(in srgb, var(--accent) 22%, var(--line))}
+.auth-hero-apikey{border-color:color-mix(in srgb, var(--purple) 22%, var(--line))}
+.auth-hero-service{border-color:color-mix(in srgb, var(--purple) 22%, var(--line))}
+.auth-hero-basic{border-color:color-mix(in srgb, var(--accent) 18%, var(--line))}
+.auth-hero-per_user{border-color:color-mix(in srgb, var(--cyan) 22%, var(--line))}
+.auth-hero-manual{border-color:color-mix(in srgb, var(--amber) 22%, var(--line))}
+
+@media (max-width:520px){
+  .auth-facts{grid-template-columns:1fr; gap:8px}
+  .auth-flow{gap:4px}
+  .auth-flow-arrow{font-size:12px}
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   SIMPLIFIED CATALOG TOOLBAR (Sprint 6 / Edgardo feedback)
+   "Esto de filtros es una alucinación · ya en el Figma debería
+   ser simples". Goes from 5 rows to 3 visible rows + active
+   chips. Removes the verbose row-prefix labels (Source / Studio /
+   Capability / State) in favor of grouped chip rails with dot
+   separators.
+   ────────────────────────────────────────────────────────── */
+.catalog-toolbar-simple{
+  padding:12px 14px 10px;
+  gap:8px;
+}
+.catalog-toolbar-simple .ct-header{
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  margin-bottom:0;
+}
+.catalog-toolbar-simple .ct-header .ct-search{flex:1; max-width:380px; min-width:200px}
+.catalog-toolbar-simple .ct-row{padding-top:6px; border-top:none}
+
+/* Categories single-row scroller */
+.ct-row-cats{padding:6px 0 4px}
+.ct-pills-scroll{
+  display:flex; gap:6px; flex-wrap:nowrap;
+  overflow-x:auto; padding-bottom:4px; margin-bottom:-4px;
+  scrollbar-width:thin;
+  scroll-behavior:smooth;
+}
+.ct-pills-scroll::-webkit-scrollbar{height:5px}
+.ct-pills-scroll::-webkit-scrollbar-track{background:transparent}
+.ct-pills-scroll::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px}
+.ct-pills-scroll::-webkit-scrollbar-thumb:hover{background:var(--line-strong)}
+.ct-pills-scroll .ct-cat{flex-shrink:0}
+
+/* Compact filter rail */
+.ct-row-mini{
+  display:flex; flex-wrap:wrap; gap:6px 4px; align-items:center;
+}
+.ct-mini-group{display:inline-flex; gap:4px; flex-wrap:wrap; align-items:center}
+.ct-sep-dot{
+  color:var(--t3); font-size:10px; opacity:.6;
+  padding:0 2px; user-select:none; flex-shrink:0;
+}
+.ct-clear-all{
+  margin-left:auto; padding:5px 11px;
+  background:transparent; border:1px solid transparent;
+  color:var(--t3); cursor:pointer; font-family:inherit;
+  font-size:11.5px; font-weight:600; border-radius:6px;
+  transition:color .12s, background .12s, border-color .12s;
+}
+.ct-clear-all:hover{color:var(--red); background:rgba(239,68,68,0.06); border-color:rgba(239,68,68,0.20)}
+
+@media (max-width:780px){
+  .catalog-toolbar-simple .ct-header{flex-wrap:wrap; gap:8px}
+  .catalog-toolbar-simple .ct-search{max-width:none; flex:1 1 100%; order:3}
+  .ct-row-mini{gap:4px 2px}
+  .ct-sep-dot{display:none}
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   STUDIO SWITCHER DROPDOWN (P1 from design critique)
+   Click the topbar studio name to switch surfaces.
+   ────────────────────────────────────────────────────────── */
+.studio-switcher{
+  position:absolute; top:calc(100% + 8px); left:0; z-index:60;
+  min-width:340px; max-width:380px;
+  background:var(--bg2); border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 18px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.02);
+  padding:6px;
+  opacity:0; transform:translateY(-4px) scale(.98);
+  pointer-events:none;
+  transition:opacity .15s ease, transform .15s ease;
+}
+.studio-switcher.open{opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
+.studio-switcher-h{
+  padding:10px 12px 8px;
+  font-size:10.5px; font-weight:800; color:var(--t3);
+  text-transform:uppercase; letter-spacing:.08em;
+}
+.studio-switcher-item{
+  display:flex; align-items:center; gap:11px;
+  padding:9px 10px; border-radius:8px;
+  text-decoration:none; color:var(--t1);
+  transition:background .12s;
+}
+.studio-switcher-item:hover{background:var(--hover)}
+.studio-switcher-item.active{background:var(--hover-strong)}
+.studio-switcher-ico{
+  width:30px; height:30px; border-radius:7px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.studio-switcher-text{flex:1; min-width:0}
+.studio-switcher-name{font-size:13px; font-weight:700; color:var(--t1); line-height:1.3}
+.studio-switcher-desc{font-size:11px; color:var(--t3); margin-top:2px; line-height:1.4}
+.studio-switcher-current{
+  font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:8px;
+  background:rgba(6,182,212,0.10); color:var(--cyan);
+  border:1px solid rgba(6,182,212,0.22);
+  text-transform:uppercase; letter-spacing:.05em; line-height:1;
+  flex-shrink:0;
+}
+.studio-switcher-arrow{color:var(--t3); font-size:14px; flex-shrink:0; padding-right:4px}
+.studio-switcher-foot{
+  padding:8px 12px 6px; margin-top:4px;
+  font-size:10.5px; color:var(--t3); line-height:1.4;
+  border-top:1px solid var(--line);
+}
+
 /* ── Build your own promo card ── */
 .build-promo{
   margin:8px 32px 24px; padding:20px 24px;
@@ -3280,6 +3569,230 @@ html.theme-light .theme-icon-moon{display:block}
 .ai-send:hover{transform:scale(1.05)}
 .ai-send:disabled{opacity:.35; cursor:not-allowed; transform:scale(1)}
 .ai-footer-hint{font-size:10px; color:var(--t3); text-align:center; margin-top:8px}
+
+/* ============ DISTRIBUTION (Admin Studio matrix) ============ */
+.dist-wrap{ padding:24px 28px; max-width:1320px; margin:0 auto }
+.dist-h{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+  margin-bottom:18px;flex-wrap:wrap;
+}
+.dist-h-l{flex:1;min-width:280px}
+.dist-h-eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:10px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:8px;
+}
+.dist-h-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,0.18)}
+.dist-h-title{font-size:24px;font-weight:800;color:var(--t1);letter-spacing:-.02em;line-height:1.18;margin-bottom:6px}
+.dist-h-desc{font-size:13px;color:var(--t2);line-height:1.55;max-width:640px}
+.dist-counts{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.dist-count{
+  display:inline-flex;flex-direction:column;align-items:flex-start;
+  padding:10px 14px;background:rgba(255,255,255,0.025);
+  border:1px solid var(--line);border-radius:10px;min-width:96px;
+}
+.dist-count-v{font-size:20px;font-weight:800;color:var(--t1);line-height:1;letter-spacing:-.01em}
+.dist-count-v.is-amber{color:var(--amber)}
+.dist-count-v.is-green{color:var(--green)}
+.dist-count-l{font-size:10.5px;font-weight:600;color:var(--t3);margin-top:5px;letter-spacing:.02em}
+
+.dist-toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-bottom:16px;padding:10px 14px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--line);border-radius:10px;
+}
+.dist-search{
+  flex:1;min-width:220px;display:flex;align-items:center;gap:8px;
+  padding:7px 11px;background:#070e1c;border:1px solid var(--line);border-radius:8px;
+}
+.dist-search svg{color:var(--t3);flex-shrink:0}
+.dist-search input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--t1);font-family:inherit;font-size:12.5px;
+}
+.dist-search input::placeholder{color:var(--t3)}
+.dist-filter{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 11px;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--t2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  transition:border-color .12s, color .12s;
+}
+.dist-filter:hover{border-color:var(--line-strong);color:var(--t1)}
+.dist-filter.is-active{background:rgba(43,127,255,0.08);border-color:rgba(43,127,255,0.40);color:var(--blue)}
+
+.dist-table-wrap{
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  background:#0a1228;
+}
+.dist-table-scroll{overflow-x:auto}
+.dist-table{
+  width:100%;min-width:1080px;border-collapse:collapse;
+}
+.dist-table thead th{
+  position:sticky;top:0;z-index:1;
+  background:rgba(255,255,255,0.03);
+  border-bottom:1px solid var(--line);
+  font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--t3);text-align:left;padding:11px 14px;
+}
+.dist-table thead th.dist-th-surface{text-align:center;width:130px}
+.dist-table tbody td{
+  padding:0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  vertical-align:middle;
+}
+.dist-table tbody tr:last-child td{border-bottom:none}
+.dist-table tbody tr{transition:background .12s}
+.dist-table tbody tr:hover{background:rgba(255,255,255,0.018)}
+.dist-row-name{
+  display:flex;align-items:center;gap:11px;
+  padding:12px 14px;cursor:pointer;
+}
+.dist-row-logo{
+  width:32px;height:32px;border-radius:8px;background:#fff;padding:5px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.dist-row-logo img{width:100%;height:100%;object-fit:contain}
+.dist-row-name-t{font-size:13px;font-weight:700;color:var(--t1);line-height:1.2}
+.dist-row-name-s{font-size:11px;color:var(--t3);margin-top:2px}
+.dist-row-status{padding:0 14px}
+.dist-row-owner{padding:0 14px;font-size:11.5px;color:var(--t2)}
+.dist-row-cell{padding:8px 6px;text-align:center}
+
+.dist-toggle{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:6px 11px;border-radius:7px;
+  background:transparent;border:1px solid var(--line);
+  font-family:inherit;font-size:11px;font-weight:700;
+  color:var(--t3);cursor:pointer;min-width:96px;
+  transition:background .12s, border-color .12s, color .12s, transform .12s;
+}
+.dist-toggle:hover{transform:translateY(-1px)}
+.dist-toggle.is-on{
+  background:rgba(16,185,129,0.10);color:var(--green);
+  border-color:rgba(16,185,129,0.42);
+}
+.dist-toggle.is-on:hover{background:rgba(16,185,129,0.16);border-color:rgba(16,185,129,0.6)}
+.dist-toggle.is-off{
+  background:rgba(255,255,255,0.02);color:var(--t3);
+  border-color:var(--line);
+}
+.dist-toggle.is-off:hover{background:rgba(255,255,255,0.04);color:var(--t2);border-color:var(--line-strong)}
+.dist-toggle.is-na{
+  background:transparent;color:var(--t3);
+  border-color:rgba(255,255,255,0.06);border-style:dashed;
+  cursor:not-allowed;opacity:.55;
+}
+.dist-toggle.is-na:hover{transform:none}
+
+/* Status pill reused — minimal restyle */
+.dist-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2.5px 9px;border-radius:99px;
+  font-size:10.5px;font-weight:700;
+}
+.dist-status-dot{width:6px;height:6px;border-radius:50%}
+.dist-status.b-working { background:rgba(16,185,129,0.10); color:var(--green);  border:1px solid rgba(16,185,129,0.32) }
+.dist-status.b-working .dist-status-dot{background:var(--green)}
+.dist-status.b-needs   { background:rgba(253,199,0,0.10);  color:var(--amber);  border:1px solid rgba(253,199,0,0.32) }
+.dist-status.b-needs .dist-status-dot{background:var(--amber)}
+.dist-status.b-inactive{ background:rgba(255,255,255,0.03);color:var(--t3);     border:1px solid var(--line) }
+.dist-status.b-inactive .dist-status-dot{background:var(--t3)}
+
+.dist-empty{
+  padding:40px 24px;text-align:center;color:var(--t3);
+  font-size:12.5px;line-height:1.55;
+}
+
+
+/* ============ WORKSPACE AVAILABILITY (integration detail tab) ============ */
+.ws-hero{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;padding:14px 16px;margin-bottom:14px;flex-wrap:wrap;
+  background:linear-gradient(135deg, rgba(43,127,255,0.06) 0%, rgba(167,139,250,0.05) 100%);
+  border:1px solid rgba(43,127,255,0.30);
+  border-radius:11px;
+}
+.ws-hero-l{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.ws-hero-ic{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(43,127,255,0.16);color:var(--blue);
+  border:1px solid rgba(43,127,255,0.32);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.ws-hero-t{font-size:13.5px;font-weight:700;color:var(--t1);letter-spacing:-.01em}
+.ws-hero-d{font-size:11.5px;color:var(--t2);margin-top:3px;line-height:1.4}
+.ws-hero-d b{color:var(--t1)}
+.ws-hero-actions{display:flex;gap:7px;flex-shrink:0;flex-wrap:wrap}
+.ws-hero-cta{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 11px;border-radius:7px;
+  background:transparent;border:1px solid var(--line-strong);
+  color:var(--t2);font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;
+  transition:border-color .12s, color .12s, background .12s;
+}
+.ws-hero-cta:hover{border-color:rgba(43,127,255,0.55);color:var(--blue);background:rgba(43,127,255,0.06)}
+.ws-hero-cta.is-danger:hover{border-color:rgba(239,68,68,0.55);color:#fca5a5;background:rgba(239,68,68,0.06)}
+
+.ws-list{display:flex;flex-direction:column;gap:8px}
+.ws-row{
+  display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;
+  padding:12px 14px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--line);border-radius:10px;
+  transition:background .12s, border-color .12s, opacity .14s;
+}
+.ws-row.is-disabled{opacity:.55}
+.ws-row-ic{
+  width:36px;height:36px;border-radius:8px;
+  color:#fff;font-weight:800;font-size:13px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.ws-row-body{min-width:0}
+.ws-row-name{font-size:13px;font-weight:700;color:var(--t1);line-height:1.2}
+.ws-row-meta{
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  font-size:11px;color:var(--t3);margin-top:3px;
+}
+.ws-row-meta .dot{color:var(--t3)}
+.ws-row-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:99px;
+  font-size:10.5px;font-weight:700;
+}
+.ws-row-status.is-on { background:rgba(16,185,129,0.10); color:var(--green); border:1px solid rgba(16,185,129,0.32) }
+.ws-row-status.is-on .ws-status-dot{background:var(--green)}
+.ws-row-status.is-off{ background:rgba(255,255,255,0.03);color:var(--t3); border:1px solid var(--line) }
+.ws-row-status.is-off .ws-status-dot{background:var(--t3)}
+.ws-status-dot{width:6px;height:6px;border-radius:50%}
+
+.ws-switch{
+  position:relative;width:38px;height:22px;border-radius:99px;
+  background:var(--line-strong);cursor:pointer;flex-shrink:0;
+  border:none;outline:none;padding:0;
+  transition:background .15s;
+}
+.ws-switch::after{
+  content:'';position:absolute;
+  width:16px;height:16px;border-radius:50%;
+  background:#fff;top:3px;left:3px;
+  transition:transform .14s cubic-bezier(.2,.8,.2,1);
+  box-shadow:0 2px 5px rgba(0,0,0,0.3);
+}
+.ws-switch.is-on{background:var(--green)}
+.ws-switch.is-on::after{transform:translateX(16px)}
+.ws-switch:focus-visible{box-shadow:0 0 0 3px rgba(43,127,255,0.35)}
+
+.ws-foot{
+  margin-top:14px;padding:10px 12px;
+  background:rgba(255,255,255,0.02);
+  border:1px dashed var(--line);
+  border-radius:9px;
+  font-size:11px;color:var(--t3);line-height:1.5;
+}
+.ws-foot b{color:var(--t2)}
+
 </style>
 </head>
 <body>
@@ -3291,7 +3804,7 @@ html.theme-light .theme-icon-moon{display:block}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
     <div class="tb-context-wrap">
-      <button class="tb-context" type="button" onclick="toast('App switcher — coming soon')" aria-haspopup="menu">
+      <button class="tb-context" type="button" onclick="event.stopPropagation();toggleStudioSwitcher()" aria-haspopup="menu" aria-expanded="false" id="tbContextBtn">
         <div class="tb-context-logo" style="background:var(--grad-app)">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="1.6" fill="#fff"/>
@@ -3302,9 +3815,44 @@ html.theme-light .theme-icon-moon{display:block}
             <path d="M4 4L7 7M12 4L9 7M4 12L7 9M12 12L9 9" stroke="#fff" stroke-width="1.1" stroke-linecap="round"/>
           </svg>
         </div>
-        <span class="tb-context-name">Settings</span>
+        <span class="tb-context-name">Admin Studio</span>
         <svg class="tb-context-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+      <div class="studio-switcher" id="studioSwitcher" role="menu" aria-hidden="true">
+        <div class="studio-switcher-h">Switch surface</div>
+      <a href="settings.html" class="studio-switcher-item active" data-surface="admin">
+        <div class="studio-switcher-ico" style="background:rgba(6,182,212,0.10);color:#06B6D4;border:1px solid rgba(6,182,212,0.22)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg>
+        </div>
+        <div class="studio-switcher-text">
+          <div class="studio-switcher-name">Admin Studio · Integrations</div>
+          <div class="studio-switcher-desc">Authenticate and govern credentials</div>
+        </div>
+        <span class="studio-switcher-current">Current</span>
+      </a>
+      <a href="data-studio.html" class="studio-switcher-item" data-surface="data">
+        <div class="studio-switcher-ico" style="background:rgba(16,185,129,0.10);color:#10B981;border:1px solid rgba(16,185,129,0.22)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10"/></svg>
+        </div>
+        <div class="studio-switcher-text">
+          <div class="studio-switcher-name">Data Studio</div>
+          <div class="studio-switcher-desc">Map data flow into AIMS tables</div>
+        </div>
+        <span class="studio-switcher-arrow">↗</span>
+      </a>
+      <a href="agent-tools.html" class="studio-switcher-item" data-surface="agent">
+        <div class="studio-switcher-ico" style="background:rgba(167,139,250,0.10);color:#A78BFA;border:1px solid rgba(167,139,250,0.22)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="4.5" width="4" height="3" rx=".8"/><rect x="6.5" y="1.5" width="4" height="3" rx=".8"/><rect x="6.5" y="7.5" width="4" height="3" rx=".8"/><path d="M5.5 6h1M5.5 3H6a.5.5 0 01.5.5v1"/></svg>
+        </div>
+        <div class="studio-switcher-text">
+          <div class="studio-switcher-name">Agent Studio · Tools</div>
+          <div class="studio-switcher-desc">Configure tools and wrappers for agents</div>
+        </div>
+        <span class="studio-switcher-arrow">↗</span>
+      </a>
+        <div class="studio-switcher-foot">Cross-functional — same workspace, three views</div>
+      </div>
+
     </div>
 
     <!-- Mode toggle (Browse / Operate) — orchestration thesis -->
@@ -3360,6 +3908,9 @@ html.theme-light .theme-icon-moon{display:block}
     </div>
   </div>
 </header>
+
+<!-- Operate-mode strip (only visible when html.mode-operate) -->
+<div class="mode-banner"><span class="mode-banner-dot"></span>Operate mode · monitoring the data infrastructure</div>
 
 <!-- App layout: sidebar + main -->
 <div class="app">
@@ -3441,32 +3992,14 @@ html.theme-light .theme-icon-moon{display:block}
       <!-- Scrollable nav -->
       <div class="ssb-scroll">
 
-        <!-- Data Studio — control plane for the workspace's data infrastructure -->
+        <!-- Integrations — the marketplace + activation surface of Admin Studio -->
         <div class="ssb-group">
-          <div class="ssb-grp-h"><span class="ssb-grp-label">Data Studio</span></div>
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Integrations</span></div>
 
           <button class="ssb-item" data-route="integrations">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg></span>
-            <span class="ssb-item-label">Connections</span>
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg></span>
+            <span class="ssb-item-label">Integrations</span>
             <span class="ssb-item-alert" title="1 integration failing"></span>
-          </button>
-
-          <button class="ssb-item disabled" data-route="tables" title="Tables — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10" stroke-linecap="round"/></svg></span>
-            <span class="ssb-item-label">Tables</span>
-            <span class="ssb-item-badge ssb-badge-soon">Soon</span>
-          </button>
-
-          <button class="ssb-item disabled" data-route="mappings" title="Field mappings — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="4" height="3" rx=".6"/><rect x="2" y="10" width="4" height="3" rx=".6"/><rect x="10" y="3" width="4" height="3" rx=".6"/><rect x="10" y="10" width="4" height="3" rx=".6"/><path d="M6 4.5h2v7h2M6 11.5h2v-7h2"/></svg></span>
-            <span class="ssb-item-label">Field mappings</span>
-            <span class="ssb-item-badge ssb-badge-soon">Soon</span>
-          </button>
-
-          <button class="ssb-item disabled" data-route="schema" title="Schema versions — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="4.5" cy="4" r="1.8"/><circle cx="4.5" cy="12" r="1.8"/><circle cx="11.5" cy="8" r="1.8"/><path d="M4.5 5.8v4.4M6.2 4.6l4.1 2.6M6.2 11.4l4.1-2.6"/></svg></span>
-            <span class="ssb-item-label">Schema versions</span>
-            <span class="ssb-item-badge ssb-badge-soon">Soon</span>
           </button>
 
           <button class="ssb-item" data-admin-only data-route="requests" title="Integration requests">
@@ -3474,6 +4007,25 @@ html.theme-light .theme-icon-moon{display:block}
             <span class="ssb-item-label">Requests</span>
             <span class="ssb-item-alert" id="reqAlertDot" title="Pending requests"></span>
           </button>
+
+          <button class="ssb-item" data-admin-only data-route="distribution" title="Control where integrations are exposed">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>
+            <span class="ssb-item-label">Distribution</span>
+          </button>
+        </div>
+
+        <div class="ssb-group">
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Cross-functional</span></div>
+          <a class="ssb-item" href="data-studio.html" style="text-decoration:none">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10"/></svg></span>
+            <span class="ssb-item-label">Data Studio</span>
+            <span style="font-size:11px; color:var(--t3); margin-left:auto">↗</span>
+          </a>
+          <a class="ssb-item" href="agent-tools.html" style="text-decoration:none">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="4.5" width="4" height="3" rx=".8"/><rect x="6.5" y="1.5" width="4" height="3" rx=".8"/><rect x="6.5" y="7.5" width="4" height="3" rx=".8"/></svg></span>
+            <span class="ssb-item-label">Agent Studio · Tools</span>
+            <span style="font-size:11px; color:var(--t3); margin-left:auto">↗</span>
+          </a>
         </div>
 
         <div class="ssb-group">
@@ -4405,26 +4957,29 @@ function mcpToolsHTML(integration) {
   if (!tools || tools.length === 0) return '';
   const active = tools.filter(t => t.active).length;
   return `
-    <div class="mcp-tools" style="margin-top:14px">
-      <div class="mcp-tools-h">
-        <span class="cap-chip cap-mcp">${CAP_META.mcp.icon}<span>MCP</span></span>
-        <div class="mcp-tools-h-title">Granular tool activation</div>
-        <div class="mcp-tools-h-info">${active} of ${tools.length} activated</div>
-      </div>
-      ${tools.map(t => `
-        <div class="mcp-tool-row">
-          <div style="flex:1">
-            <div class="mcp-tool-row-name">${escapeHtml(t.name)}</div>
-            <div class="mcp-tool-row-desc">${escapeHtml(t.desc)}</div>
-          </div>
-          <span class="mcp-tool-row-count">${t.toolCount} tools</span>
-          <div class="toggle ${t.active?'on':''}" onclick="toast('${t.active?'Disabled':'Enabled'} ${escapeHtml(t.name)}')"></div>
+    <section class="ov-widget">
+      <header class="ov-widget-h">
+        <h3 class="ov-widget-title">
+          <span class="cap-chip cap-mcp" style="margin-right:4px">${CAP_META.mcp.icon}<span>MCP — granular tools</span></span>
+        </h3>
+        <span class="ov-widget-meta"><strong style="color:var(--t1)">${active}</strong> of ${tools.length} activated</span>
+      </header>
+      <div class="ov-widget-body">
+        <p style="font-size:12px; color:var(--t2); line-height:1.5; margin:0 0 12px">Agents only see the tools you've activated below. Activating ${escapeHtml(integration.name)}'s MCP server does not grant access to the whole bundle by default.</p>
+        <div class="inst-cap-list">
+          ${tools.map(t => `
+            <div class="inst-cap-row inst-cap-row-mcp">
+              <div class="inst-cap-text">
+                <div class="inst-cap-name">${escapeHtml(t.name)}</div>
+                <div class="inst-cap-desc">${escapeHtml(t.desc)}</div>
+              </div>
+              <span class="inst-cap-count">${t.toolCount} tools</span>
+              <div class="toggle ${t.active?'on':''}" onclick="toast('${t.active?'Disabled':'Enabled'} ${escapeHtml(t.name)}')"></div>
+            </div>
+          `).join('')}
         </div>
-      `).join('')}
-      <div style="font-size:11px; color:var(--t3); padding:6px 4px 0; line-height:1.5">
-        ℹ Agents only see the tools you've activated above. Activating ${escapeHtml(integration.name)}'s MCP doesn't grant access to the whole bundle.
       </div>
-    </div>
+    </section>
   `;
 }
 
@@ -4503,9 +5058,7 @@ function renderRequestForm() {
     // Success state after submit
     $('content').innerHTML = `
       <div class="breadcrumb">
-        <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
-        <a href="#/integrations">Data Studio</a><span class="crumb-sep">›</span>
-        <a href="#/integrations">Connections</a><span class="crumb-sep">›</span>
+        <a href="#/integrations">Integrations</a><span class="crumb-sep">›</span>
         <span class="crumb-current">Request integration</span>
       </div>
       <div class="req-success">
@@ -4524,14 +5077,12 @@ function renderRequestForm() {
 
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
-      <a href="#/integrations">Data Studio</a><span class="crumb-sep">›</span>
-      <a href="#/integrations">Connections</a><span class="crumb-sep">›</span>
+      <a href="#/integrations">Integrations</a><span class="crumb-sep">›</span>
       <span class="crumb-current">Request integration</span>
     </div>
     <div class="req-form">
       <div class="req-form-hero">
-        <span class="mkt-hero-eyebrow-tag" style="margin-bottom:10px">Data Studio · Requests</span>
+        <span class="mkt-hero-eyebrow-tag" style="margin-bottom:10px">Integrations · Request</span>
         <h1 class="req-form-title">Request a new integration</h1>
         <p class="req-form-sub">Tell us what you need and why. The AIMS managed services team will respond within one business day with scope, timeline and a price quote.</p>
       </div>
@@ -4702,8 +5253,6 @@ function renderRequestsInbox() {
 
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
-      <a href="#/integrations">Data Studio</a><span class="crumb-sep">›</span>
       <span class="crumb-current">Requests</span>
     </div>
     <section class="op-hero">
@@ -4790,6 +5339,232 @@ function requestRowHTML(r) {
   `;
 }
 
+
+
+/* ============ DISTRIBUTION CONTROL (Admin Studio surface) ============ */
+const DIST_SURFACES = [
+  { id:'data_studio',  name:'Data Studio',     desc:'Field mapping + sync',          caps:['data_sync'] },
+  { id:'agent_studio', name:'Agent Studio',    desc:'Tools agents call',             caps:['tools','triggers'] },
+  { id:'workflows',    name:'Workflows',       desc:'Workflow builder',              caps:['tools','triggers','channels'] },
+  { id:'widgets',      name:'Widgets & Cards', desc:'Dashboards and reports',        caps:['data_sync'] },
+  { id:'ai_assistant', name:'AI Assistant',    desc:'Chat context',                  caps:['tools','channels'] }
+];
+
+// Defaults policy:
+// - If the integration HAS a capability the surface consumes, the surface is
+//   AVAILABLE by default (true).
+// - If the integration LACKS the capability, the surface is N/A (cell shown
+//   as dashed/disabled).
+// - Admins override per-cell; overrides persist to localStorage.
+function distCapMatch(integ, surface) {
+  if (!integ || !integ.capabilities) return false;
+  return surface.caps.some(cap => integ.capabilities.indexOf(cap) !== -1);
+}
+
+let DIST_OVERRIDES = (function(){
+  try {
+    const raw = localStorage.getItem('aims_dist_overrides');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  // Seed a couple of demo overrides so the matrix has visible state diversity
+  return {
+    'salesforce': { ai_assistant: false, widgets: false },
+    'snowflake':  { ai_assistant: true,  workflows: false },
+    'github':     { widgets: false }
+  };
+})();
+
+function persistDistOverrides() {
+  try { localStorage.setItem('aims_dist_overrides', JSON.stringify(DIST_OVERRIDES)); } catch(e){}
+}
+
+function getDistribution(slug) {
+  const integ = INTEGRATIONS.find(i => i.slug === slug);
+  if (!integ) return {};
+  const ov = DIST_OVERRIDES[slug] || {};
+  const out = {};
+  DIST_SURFACES.forEach(s => {
+    if (!distCapMatch(integ, s)) {
+      out[s.id] = 'na';
+    } else if (s.id in ov) {
+      out[s.id] = !!ov[s.id];
+    } else {
+      out[s.id] = true; // default available if capability matches
+    }
+  });
+  return out;
+}
+
+function toggleDistribution(slug, surfaceId) {
+  const integ = INTEGRATIONS.find(i => i.slug === slug);
+  const surface = DIST_SURFACES.find(s => s.id === surfaceId);
+  if (!integ || !surface) return;
+  if (!distCapMatch(integ, surface)) return; // N/A is not toggleable
+  const cur = getDistribution(slug)[surfaceId];
+  const next = !cur;
+  if (!DIST_OVERRIDES[slug]) DIST_OVERRIDES[slug] = {};
+  DIST_OVERRIDES[slug][surfaceId] = next;
+  persistDistOverrides();
+  renderDistribution();
+  if (typeof toast === 'function') {
+    toast(integ.name + ' ' + (next ? 'enabled' : 'disabled') + ' for ' + surface.name);
+  }
+}
+
+let _distFilters = { search: '', status: 'all' /* all | working | needs | inactive */ };
+
+function distSetFilter(key, value) {
+  _distFilters[key] = value;
+  renderDistribution();
+}
+
+function distSearchInput(value) {
+  _distFilters.search = (value || '').toLowerCase();
+  renderDistribution(true /* preserveFocus */);
+}
+
+function distStatusBucketOf(integ) {
+  // Borrow from STATUS_META — fall back to simple inference.
+  if (!integ) return 'inactive';
+  if (integ.connected && integ.health === 'failed') return 'needs';
+  if (integ.connected && integ.health === 'degraded') return 'needs';
+  if (integ.connected) return 'working';
+  return 'inactive';
+}
+
+function distStatusLabelOf(integ) {
+  if (!integ) return 'Not connected';
+  if (integ.connected && integ.health === 'failed') return 'Auth failed';
+  if (integ.connected && integ.health === 'degraded') return 'Needs attention';
+  if (integ.connected) return 'Working';
+  return 'Not connected';
+}
+
+function renderDistribution() {
+  const connected = INTEGRATIONS.filter(i => i.connected);
+  const q = _distFilters.search;
+  const filtered = connected.filter(i => {
+    if (q && !((i.name || '').toLowerCase().indexOf(q) !== -1 || (i.vendor || '').toLowerCase().indexOf(q) !== -1)) return false;
+    if (_distFilters.status === 'all') return true;
+    return distStatusBucketOf(i) === _distFilters.status;
+  });
+
+  // Counts (on the full connected set, not filtered)
+  const totalConn = connected.length;
+  let exposedAll = 0, unexposedAll = 0;
+  connected.forEach(i => {
+    const dist = getDistribution(i.slug);
+    const ids = DIST_SURFACES.map(s => s.id).filter(id => dist[id] !== 'na');
+    if (ids.length === 0) { unexposedAll++; return; }
+    const onCount = ids.filter(id => dist[id] === true).length;
+    if (onCount === ids.length) exposedAll++;
+    if (onCount === 0) unexposedAll++;
+  });
+
+  const html = `
+    <div class="dist-wrap">
+      <div class="breadcrumb">
+        <a href="#/integrations">Admin Studio</a><span class="crumb-sep">›</span>
+        <span class="crumb-current">Distribution</span>
+      </div>
+
+      <header class="dist-h">
+        <div class="dist-h-l">
+          <div class="dist-h-eyebrow"><span class="dist-h-eyebrow-dot"></span>Admin Studio &middot; Distribution control</div>
+          <h1 class="dist-h-title">Where each integration is exposed</h1>
+          <p class="dist-h-desc">One place to control which downstream surfaces can use each authenticated integration. Toggling a cell here updates the integration's availability for that surface across the workspace.</p>
+        </div>
+        <div class="dist-counts">
+          <div class="dist-count"><div class="dist-count-v">${totalConn}</div><div class="dist-count-l">Connected</div></div>
+          <div class="dist-count"><div class="dist-count-v is-green">${exposedAll}</div><div class="dist-count-l">Exposed to all</div></div>
+          <div class="dist-count"><div class="dist-count-v is-amber">${unexposedAll}</div><div class="dist-count-l">Unexposed</div></div>
+        </div>
+      </header>
+
+      <div class="dist-toolbar">
+        <label class="dist-search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="M14 14l-3-3"/></svg>
+          <input id="distSearchInput" type="text" placeholder="Search by integration or vendor..." value="${escapeHtml(_distFilters.search)}" oninput="distSearchInput(this.value)"/>
+        </label>
+        <button class="dist-filter ${_distFilters.status==='all'?'is-active':''}" onclick="distSetFilter('status','all')">All</button>
+        <button class="dist-filter ${_distFilters.status==='working'?'is-active':''}" onclick="distSetFilter('status','working')">Working</button>
+        <button class="dist-filter ${_distFilters.status==='needs'?'is-active':''}" onclick="distSetFilter('status','needs')">Needs attention</button>
+      </div>
+
+      <div class="dist-table-wrap">
+        <div class="dist-table-scroll">
+          <table class="dist-table">
+            <thead>
+              <tr>
+                <th style="min-width:260px">Integration</th>
+                <th style="min-width:140px">Status</th>
+                <th style="min-width:140px">Owner</th>
+                ${DIST_SURFACES.map(s => `<th class="dist-th-surface" title="${escapeHtml(s.desc)}">${escapeHtml(s.name)}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.length === 0 ? `
+                <tr><td colspan="${3 + DIST_SURFACES.length}"><div class="dist-empty">No integrations match the current filters.</div></td></tr>
+              ` : filtered.map(i => {
+                const dist = getDistribution(i.slug);
+                const bucket = distStatusBucketOf(i);
+                const label = distStatusLabelOf(i);
+                const owner = i.connectedBy ? i.connectedBy.name : 'Unassigned';
+                return `
+                  <tr>
+                    <td>
+                      <div class="dist-row-name" onclick="navigate('#/integrations/${i.slug}')">
+                        <div class="dist-row-logo" style="${LOGO_SLUGS[i.slug] ? '' : `background:${i.color || '#1f2a44'}`}">
+                          ${LOGO_SLUGS[i.slug]
+                            ? `<img src="https://api.iconify.design/logos:${LOGO_SLUGS[i.slug]}.svg" alt="${escapeHtml(i.name)}" loading="lazy"/>`
+                            : `<span style="font-weight:800;color:#fff;font-size:11px">${escapeHtml((i.name||'?').slice(0,2).toUpperCase())}</span>`}
+                        </div>
+                        <div>
+                          <div class="dist-row-name-t">${escapeHtml(i.name)}</div>
+                          <div class="dist-row-name-s">${escapeHtml(i.vendor || '')}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="dist-row-status">
+                      <span class="dist-status b-${bucket}">
+                        <span class="dist-status-dot"></span>${escapeHtml(label)}
+                      </span>
+                    </td>
+                    <td class="dist-row-owner">${escapeHtml(owner)}</td>
+                    ${DIST_SURFACES.map(s => {
+                      const v = dist[s.id];
+                      if (v === 'na') {
+                        return `<td class="dist-row-cell"><button class="dist-toggle is-na" disabled title="${escapeHtml(i.name)} does not support ${escapeHtml(s.name)} (missing capability)">N/A</button></td>`;
+                      }
+                      const isOn = v === true;
+                      return `<td class="dist-row-cell">
+                        <button class="dist-toggle ${isOn?'is-on':'is-off'}" onclick="toggleDistribution('${i.slug}','${s.id}')" title="${isOn ? 'Available — click to disable' : 'Disabled — click to enable'} for ${escapeHtml(s.name)}">
+                          ${isOn
+                            ? '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6l3 3 5-7"/></svg> Available'
+                            : '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="4"/></svg> Off'}
+                        </button>
+                      </td>`;
+                    }).join('')}
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  $('content').innerHTML = html;
+
+  // Restore focus on search if it was the active element when we re-rendered
+  const input = document.getElementById('distSearchInput');
+  if (input && _distFilters.search) {
+    // Move caret to end after re-paint
+    setTimeout(() => { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }, 0);
+  }
+}
+
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'integrations';
   const parts = hash.split('/');
@@ -4798,6 +5573,7 @@ function route() {
   document.querySelectorAll('.ssb-item').forEach(b=>b.classList.remove('active'));
   const ssbMap = {
     'integrations':'integrations', 'audit':'audit', 'build':'integrations', 'request':'integrations', 'requests':'requests',
+    'distribution':'distribution',
     'personal':'personal'
   };
   const baseRoute = parts[0];
@@ -4824,6 +5600,8 @@ function route() {
     renderRequestForm();
   } else if (parts[0]==='requests') {
     renderRequestsInbox();
+  } else if (parts[0]==='distribution') {
+    renderDistribution();
   } else if (parts[0]==='personal' && parts[2]) {
     renderPersonalDetail(parts[2]);
   } else if (parts[0]==='personal') {
@@ -4995,74 +5773,65 @@ function renderHome() {
 
     <div class="mkt-section" id="catalogSection">
 
-      <div class="catalog-toolbar" id="catalogToolbar">
-        <!-- Header: title + count + sort + search -->
+      <div class="catalog-toolbar catalog-toolbar-simple" id="catalogToolbar">
+        <!-- Row 1: title + count + search + sort -->
         <div class="ct-header">
           <div class="ct-title-group">
-            <div class="ct-title">${isFiltering ? 'Filtered results' : 'Browse all integrations'}</div>
+            <div class="ct-title">${isFiltering ? 'Filtered results' : 'Browse all'}</div>
             <div class="ct-count" id="ctCount">${filtered.length}</div>
-            <div class="ct-header-sort">
-              <button class="ct-header-sort-btn ${(state.sortBy||'popular')==='popular'?'active':''}" onclick="setSort('popular')">Popular</button>
-              <button class="ct-header-sort-btn ${state.sortBy==='alphabetical'?'active':''}" onclick="setSort('alphabetical')">A–Z</button>
-              <button class="ct-header-sort-btn ${state.sortBy==='recent'?'active':''}" onclick="setSort('recent')">Recent</button>
-            </div>
           </div>
           <div class="ct-search">
             <svg class="ct-search-ic" width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            <input type="text" placeholder="Search Slack, Salesforce, Snowflake…" value="${escapeHtml(state.search)}" oninput="setSearch(this.value)"/>
+            <input type="text" placeholder="Search integrations…" value="${escapeHtml(state.search)}" oninput="setSearch(this.value)"/>
+          </div>
+          <div class="ct-header-sort">
+            <button class="ct-header-sort-btn ${(state.sortBy||'popular')==='popular'?'active':''}" onclick="setSort('popular')">Popular</button>
+            <button class="ct-header-sort-btn ${state.sortBy==='alphabetical'?'active':''}" onclick="setSort('alphabetical')">A–Z</button>
+            <button class="ct-header-sort-btn ${state.sortBy==='recent'?'active':''}" onclick="setSort('recent')">Recent</button>
           </div>
         </div>
 
         <!-- Active filter chips (only when filtering) -->
         ${activeChipsHTML()}
 
-        <!-- Source tabs + Build your own -->
-        <div class="ct-row">
-          <span class="ct-label">Source</span>
-          <div class="ct-tabs">
-            ${['all','official','partner','private'].map(s => {
-              const count = s==='all' ? total : INTEGRATIONS.filter(i=>i.source===s).length;
-              const label = s==='all' ? 'All' : s.charAt(0).toUpperCase()+s.slice(1);
-              return `<button class="ct-tab ${state.activeSrc===s?'active':''}" onclick="setSrc('${s}')">${label} <span class="ct-tab-count">${count}</span></button>`;
-            }).join('')}
-          </div>
-          <span class="ct-sep-v"></span>
-          <a class="ct-build-link" href="#/build">+ Build your own</a>
-        </div>
-
-        <!-- Studio filter (NEW position — integrated into toolbar) -->
-        <div class="ct-row">
-          <span class="ct-label">Studio</span>
-          <button class="ct-mini ${!state.activeStudio?'active':''}" style="${!state.activeStudio?'background:rgba(43,127,255,0.10);border-color:rgba(43,127,255,0.30);color:var(--accent)':''}" onclick="setStudio(null)">All <span style="opacity:.6;font-size:10px;margin-left:3px">${total}</span></button>
-          ${Object.keys(STUDIO_META).map(s => {
-            const meta = STUDIO_META[s];
-            const count = INTEGRATIONS.filter(it => it.studios && it.studios[s]).length;
-            const active = state.activeStudio === s;
-            const style = active ? `background:color-mix(in srgb, ${meta.color} 12%, transparent);border-color:color-mix(in srgb, ${meta.color} 35%, transparent);color:${meta.color}` : '';
-            return `<button class="ct-mini ${active?'active':''}" style="${style}" onclick="setStudio('${s}')"><span style="display:inline-flex;color:${active?meta.color:'inherit'};margin-right:4px;vertical-align:middle">${meta.icon}</span>${escapeHtml(meta.label)} <span style="opacity:.6;font-size:10px;margin-left:3px">${count}</span></button>`;
-          }).join('')}
-        </div>
-
-        <!-- Categories — top 5 + More -->
-        <div class="ct-row">
-          <span class="ct-label">Category</span>
-          <div class="ct-pills">
-            ${(state.catMoreOpen ? CATEGORIES : CATEGORIES.slice(0, 5)).map(c => {
+        <!-- Row 2: Categories — single horizontal scrolling pill rail -->
+        <div class="ct-row ct-row-cats">
+          <div class="ct-pills ct-pills-scroll">
+            ${CATEGORIES.map(c => {
               const active = state.activeCats.has(c.slug);
               return `<button class="ct-cat ${active?'active':''}" style="--cat-color:${c.color}" onclick="toggleCat('${c.slug}')"><span class="ct-cat-ico" style="color:${c.color}">${c.icon}</span>${escapeHtml(c.label)}</button>`;
             }).join('')}
-            ${CATEGORIES.length > 5 ? `<button class="ct-cat-more ${state.catMoreOpen?'open':''}" onclick="toggleCatMore()">${state.catMoreOpen?'Less ▴':`More <span style="opacity:.6">${CATEGORIES.length-5}</span> ▾`}</button>` : ''}
           </div>
         </div>
 
-        <!-- Refinements: capability + state -->
-        <div class="ct-row">
-          <span class="ct-label">Capability</span>
-          ${CAP_TYPES.map(k => `<button class="ct-mini cap-${k} ${state.activeCaps.has(k)?'active':''}" onclick="toggleCap('${k}')">${escapeHtml(CAP_META[k].label)}</button>`).join('')}
-          <span class="ct-sep-v"></span>
-          <span class="ct-label">State</span>
-          <button class="ct-mini state-on ${state.activeStates.has('connected')?'active':''}" onclick="toggleState('connected')">Connected</button>
-          <button class="ct-mini state-off ${state.activeStates.has('not_connected')?'active':''}" onclick="toggleState('not_connected')">Not connected</button>
+        <!-- Row 3: Compact filter rail (capability · state · studio · source) -->
+        <div class="ct-row ct-row-mini">
+          <div class="ct-mini-group" data-group="capability">
+            ${CAP_TYPES.map(k => `<button class="ct-mini cap-${k} ${state.activeCaps.has(k)?'active':''}" onclick="toggleCap('${k}')">${escapeHtml(CAP_META[k].label)}</button>`).join('')}
+          </div>
+          <span class="ct-sep-dot">·</span>
+          <div class="ct-mini-group" data-group="state">
+            <button class="ct-mini state-on ${state.activeStates.has('connected')?'active':''}" onclick="toggleState('connected')">Connected</button>
+            <button class="ct-mini state-off ${state.activeStates.has('not_connected')?'active':''}" onclick="toggleState('not_connected')">Not connected</button>
+          </div>
+          <span class="ct-sep-dot">·</span>
+          <div class="ct-mini-group" data-group="studio">
+            ${Object.keys(STUDIO_META).map(s => {
+              const meta = STUDIO_META[s];
+              const active = state.activeStudio === s;
+              const style = active ? `background:color-mix(in srgb, ${meta.color} 12%, transparent);border-color:color-mix(in srgb, ${meta.color} 35%, transparent);color:${meta.color}` : '';
+              return `<button class="ct-mini ${active?'active':''}" style="${style}" onclick="setStudio('${active ? 'null' : s}')"><span style="display:inline-flex;color:${active?meta.color:'inherit'};margin-right:4px;vertical-align:middle">${meta.icon}</span>${escapeHtml(meta.label)}</button>`;
+            }).join('')}
+          </div>
+          <span class="ct-sep-dot">·</span>
+          <div class="ct-mini-group" data-group="source">
+            ${['official','partner','private'].map(s => {
+              const active = state.activeSrc === s;
+              const label = s.charAt(0).toUpperCase()+s.slice(1);
+              return `<button class="ct-mini ${active?'active':''}" onclick="setSrc('${active ? 'all' : s}')">${label}</button>`;
+            }).join('')}
+          </div>
+          ${isFiltering ? `<button class="ct-clear-all" onclick="clearFilters()">Clear all</button>` : ''}
         </div>
       </div>
 
@@ -5268,7 +6037,6 @@ function renderIntegratedHome(connected) {
 
   $('content').innerHTML = `
     <section class="mkt-hero" style="padding-bottom:28px">
-      <div class="mkt-hero-eyebrow"><span class="mkt-hero-eyebrow-tag">Data Studio · Connections</span></div>
       <h1 class="mkt-hero-title">${connected.length} integration${connected.length===1?'':'s'} active in this workspace</h1>
       <p class="mkt-hero-sub">${totalInstances} instance${totalInstances===1?'':'s'} across ${Object.keys(grouped).length} ${Object.keys(grouped).length===1?'category':'categories'}.${withIssues > 0 ? ` <strong style="color:var(--amber)">${withIssues} need your attention.</strong>` : ''} Find what your team is already using before connecting something new.</p>
       <div class="mkt-search-wrap">
@@ -5412,7 +6180,11 @@ function toggleCap(c){ state.activeCaps.has(c) ? state.activeCaps.delete(c) : st
 function toggleState(s){ state.activeStates.has(s) ? state.activeStates.delete(s) : state.activeStates.add(s); renderHome() }
 function setSearch(v){ state.search = v; renderHome(); setTimeout(()=>{ const inp=document.querySelector('.search-input'); if(inp){inp.focus();inp.setSelectionRange(v.length,v.length)} },0) }
 function clearFilters(){ state.activeCats.clear(); state.activeCaps.clear(); state.activeStates.clear(); state.search=''; state.activeSrc='all'; state.activeStudio=null; renderHome() }
-function setStudio(s){ state.activeStudio = (state.activeStudio===s)?null:s; renderHome() }
+function setStudio(s){
+  if (s === 'null') s = null;
+  state.activeStudio = (state.activeStudio===s)?null:s;
+  renderHome();
+}
 function setSort(s){ state.sortBy = s; renderHome() }
 function toggleCatMore(){ state.catMoreOpen = !state.catMoreOpen; renderHome() }
 
@@ -5463,6 +6235,153 @@ function activeChipsHTML() {
 }
 
 /* ====================== DETAIL ====================== */
+
+
+
+/* ============ WORKSPACES (multi-workspace per tenant) ============ */
+const MOCK_WORKSPACES = [
+  { id:'sales', name:'Sales Team',       color:'#06B6D4', members:124, owner:'María González',  desc:'Pipeline + outbound' },
+  { id:'eng',   name:'Engineering',      color:'#A78BFA', members:87,  owner:'Carlos Tovar',     desc:'Product + platform' },
+  { id:'cs',    name:'Customer Success', color:'#FDC700', members:56,  owner:'Sarah Chen',       desc:'Support + onboarding' },
+  { id:'fin',   name:'Finance',          color:'#10B981', members:18,  owner:'Alex Park',        desc:'Billing + reporting' },
+  { id:'mkt',   name:'Marketing',        color:'#EF4444', members:32,  owner:'Thomas González',  desc:'Campaigns + lifecycle' }
+];
+
+// Per-integration default workspace availability. Falls back to "all workspaces"
+// when an integration isn't listed.
+const WORKSPACE_DEFAULTS = {
+  'slack':       ['sales','eng','cs','fin','mkt'],
+  'teams':       ['eng','fin'],
+  'gmail':       ['sales','cs','mkt'],
+  'gsheets':     ['sales','eng','cs','fin','mkt'],
+  'gcal':        ['sales','eng','cs','fin','mkt'],
+  'salesforce':  ['sales','cs'],
+  'hubspot':     ['sales','mkt'],
+  'snowflake':   ['eng','fin'],
+  'github':      ['eng'],
+  'stripe':      ['fin'],
+  'zendesk':     ['cs'],
+  'mongodb':     ['eng'],
+  'notion':      ['sales','eng','cs','fin','mkt'],
+  'airtable':    ['mkt','sales'],
+  'bigquery':    ['eng','fin'],
+  'segment':     ['mkt','eng'],
+  'mixpanel':    ['mkt','eng'],
+  's3':          ['eng','fin']
+};
+
+let WORKSPACE_OVERRIDES = (function(){
+  try {
+    const raw = localStorage.getItem('aims_workspace_overrides');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {};
+})();
+
+function persistWorkspaceOverrides() {
+  try { localStorage.setItem('aims_workspace_overrides', JSON.stringify(WORKSPACE_OVERRIDES)); } catch(e){}
+}
+
+function getWorkspacesForIntegration(slug) {
+  if (slug in WORKSPACE_OVERRIDES) return WORKSPACE_OVERRIDES[slug];
+  if (slug in WORKSPACE_DEFAULTS) return WORKSPACE_DEFAULTS[slug].slice();
+  return MOCK_WORKSPACES.map(w => w.id);
+}
+
+function isWorkspaceEnabled(slug, wsId) {
+  return getWorkspacesForIntegration(slug).indexOf(wsId) !== -1;
+}
+
+function toggleWorkspaceForIntegration(slug, wsId) {
+  const current = getWorkspacesForIntegration(slug);
+  const idx = current.indexOf(wsId);
+  const next = current.slice();
+  if (idx === -1) next.push(wsId);
+  else next.splice(idx, 1);
+  WORKSPACE_OVERRIDES[slug] = next;
+  persistWorkspaceOverrides();
+  const ws = MOCK_WORKSPACES.find(w => w.id === wsId);
+  const integ = INTEGRATIONS.find(i => i.slug === slug);
+  if (ws && integ && typeof toast === 'function') {
+    toast(integ.name + ' ' + (idx === -1 ? 'enabled' : 'disabled') + ' for ' + ws.name);
+  }
+  paintDetail(integ);
+}
+
+function workspaceBulkEnable(slug, enable) {
+  const ids = enable ? MOCK_WORKSPACES.map(w => w.id) : [];
+  WORKSPACE_OVERRIDES[slug] = ids;
+  persistWorkspaceOverrides();
+  const integ = INTEGRATIONS.find(i => i.slug === slug);
+  if (integ && typeof toast === 'function') {
+    toast(integ.name + ' ' + (enable ? 'enabled' : 'disabled') + ' for all workspaces');
+  }
+  paintDetail(integ);
+}
+
+function detailWorkspaces(integ) {
+  if (!integ) return '';
+  const enabled = getWorkspacesForIntegration(integ.slug);
+  const total = MOCK_WORKSPACES.length;
+  const enabledCount = enabled.length;
+  return `
+    <section class="ov-widget">
+      <header class="ov-widget-h">
+        <h3 class="ov-widget-title">Workspace availability</h3>
+        <span class="ov-widget-meta">Tenant-wide control · who can see this integration</span>
+      </header>
+      <div class="ov-widget-body">
+
+        <div class="ws-hero">
+          <div class="ws-hero-l">
+            <span class="ws-hero-ic">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2.5" width="5" height="5" rx="1"/><rect x="9.5" y="2.5" width="5" height="5" rx="1"/><rect x="1.5" y="8.5" width="5" height="5" rx="1"/><rect x="9.5" y="8.5" width="5" height="5" rx="1"/></svg>
+            </span>
+            <div>
+              <div class="ws-hero-t">${escapeHtml(integ.name)} is available in <b>${enabledCount}</b> of <b>${total}</b> workspaces</div>
+              <div class="ws-hero-d">Toggling a workspace off removes <b>${escapeHtml(integ.name)}</b> from its catalog, its agents, and its workflows. Users with active sessions are not interrupted but won't be able to start new ones until re-enabled.</div>
+            </div>
+          </div>
+          <div class="ws-hero-actions">
+            <button class="ws-hero-cta is-danger" onclick="workspaceBulkEnable('${integ.slug}', false)">Disable all</button>
+            <button class="ws-hero-cta" onclick="workspaceBulkEnable('${integ.slug}', true)">Enable all</button>
+          </div>
+        </div>
+
+        <div class="ws-list">
+          ${MOCK_WORKSPACES.map(w => {
+            const on = isWorkspaceEnabled(integ.slug, w.id);
+            const initials = w.name.split(/\s+/).map(s => s[0]).slice(0,2).join('').toUpperCase();
+            return `
+              <div class="ws-row ${on ? '' : 'is-disabled'}">
+                <span class="ws-row-ic" style="background:${w.color}">${initials}</span>
+                <div class="ws-row-body">
+                  <div class="ws-row-name">${escapeHtml(w.name)}</div>
+                  <div class="ws-row-meta">
+                    <span>${w.members} members</span>
+                    <span class="dot">·</span>
+                    <span>${escapeHtml(w.desc)}</span>
+                    <span class="dot">·</span>
+                    <span>Owner: ${escapeHtml(w.owner)}</span>
+                  </div>
+                </div>
+                <span class="ws-row-status ${on ? 'is-on' : 'is-off'}">
+                  <span class="ws-status-dot"></span>${on ? 'Available' : 'Disabled'}
+                </span>
+                <button class="ws-switch ${on ? 'is-on' : ''}" onclick="toggleWorkspaceForIntegration('${integ.slug}','${w.id}')" aria-label="${on ? 'Disable' : 'Enable'} ${escapeHtml(integ.name)} for ${escapeHtml(w.name)}" role="switch" aria-checked="${on}"></button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="ws-foot">
+          <b>Note:</b> Workspace availability is independent from <a href="#/integrations/${integ.slug}" onclick="setDetailTab('${integ.slug}','permissions');return false" style="color:var(--cyan);text-decoration:none">role permissions</a>. Even in enabled workspaces, individual users still need the right role to access ${escapeHtml(integ.name)}. To control downstream surfaces (Data Studio, Agent Studio, etc.), see <a href="#/distribution" style="color:var(--cyan);text-decoration:none">Distribution</a>.
+        </div>
+
+      </div>
+    </section>
+  `;
+}
 
 function renderDetail(slug) {
   const i = findIntegration(slug);
@@ -5613,11 +6532,7 @@ function paintDetail(i) {
   const cat = CATEGORIES.find(c=>c.slug===i.category);
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a>
-      <span class="crumb-sep">›</span>
-      <a href="#/integrations">Data Studio</a>
-      <span class="crumb-sep">›</span>
-      <a href="#/integrations">Connections</a>
+      <a href="#/integrations">Integrations</a>
       <span class="crumb-sep">›</span>
       <span class="crumb-current">${escapeHtml(i.name)}</span>
     </div>
@@ -5659,7 +6574,7 @@ function paintDetail(i) {
     <div class="tabs">
       ${(state.persona === 'user'
           ? ['overview','capabilities']
-          : ['overview','capabilities','permissions','activity']
+          : ['overview','capabilities','permissions','workspaces','activity']
         ).map(t => `<button class="tab ${state.detailTab===t?'active':''}" onclick="setDetailTab('${i.slug}','${t}')">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
     </div>
 
@@ -5667,6 +6582,7 @@ function paintDetail(i) {
       ${state.detailTab==='overview' ? detailOverview(i) : ''}
       ${state.detailTab==='capabilities' ? detailCapabilities(i) : ''}
       ${state.detailTab==='permissions' ? detailPermissions(i) : ''}
+      ${state.detailTab==='workspaces' ? detailWorkspaces(i) : ''}
       ${state.detailTab==='activity' ? detailProviderActivity(i) : ''}
     </div>
   `;
@@ -5690,11 +6606,7 @@ function renderInstanceDetail(slug, instId) {
 
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a>
-      <span class="crumb-sep">›</span>
-      <a href="#/integrations">Data Studio</a>
-      <span class="crumb-sep">›</span>
-      <a href="#/integrations">Connections</a>
+      <a href="#/integrations">Integrations</a>
       <span class="crumb-sep">›</span>
       <a href="#/integrations/${i.slug}">${escapeHtml(i.name)}</a>
       <span class="crumb-sep">›</span>
@@ -5820,34 +6732,67 @@ function instanceBasicHTML(i, inst) {
 
 function instanceCapsHTML(i, inst) {
   const groups = [
-    { type:'tool', label:'Tool', items:inst.activeCaps?.tool||[] },
-    { type:'data_sync', label:'Data Sync', items:inst.activeCaps?.data_sync||[] },
-    { type:'mcp', label:'MCP', items:inst.activeCaps?.mcp||[] }
+    { type:'tool',      label:'Tools',     items:inst.activeCaps?.tool||[],
+      desc:'Functions an agent can call directly on this instance.' },
+    { type:'data_sync', label:'Data Sync', items:inst.activeCaps?.data_sync||[],
+      desc:'Events from the provider that get mapped into your AIMS tables. Mapping is configured in Data Studio.' },
+    { type:'mcp',       label:'MCP',       items:inst.activeCaps?.mcp||[],
+      desc:'Granular agent skills exposed by the MCP server. Activate individually below.' }
   ];
-  return groups.map(g => {
-    const meta = CAP_META[g.type];
-    return `
-      <div class="cap-grp">
-        <div class="cap-grp-head">
-          <div class="cap-grp-icon ${meta.cls}" style="color:${meta.color};background:rgba(255,255,255,0.04)">${meta.icon}</div>
-          <div class="cap-grp-title">${meta.label}</div>
-          <div class="cap-grp-count">${g.items.length} active</div>
-        </div>
-        <div class="cap-grp-body">
-          ${g.items.length===0
-            ? `<div class="cap-row" style="grid-template-columns:1fr"><div class="cap-row-desc">No ${meta.label} capabilities enabled on this instance.</div></div>`
-            : g.items.map(item => `
-              <div class="cap-row">
-                <div class="cap-row-name">${escapeHtml(item)}</div>
-                <div class="cap-row-desc">Active on this instance</div>
-                <div class="cap-row-scope"></div>
-                <div class="toggle on" onclick="toast('Disabled ${escapeHtml(item)}')"></div>
-              </div>
-            `).join('')}
-        </div>
+
+  const totalActive = groups.reduce((s, g) => s + g.items.length, 0);
+  const totalAvailable = (i.capabilities || []).length;
+
+  // Intro banner — sets expectations: this is where activation happens per-instance.
+  const intro = `
+    <div class="cap-readonly-banner" style="background:rgba(16,185,129,0.06); border-color:rgba(16,185,129,0.28)">
+      <div class="cap-readonly-banner-ic" style="background:rgba(16,185,129,0.18); color:var(--emerald)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12l3 3 5-5 4 4 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
+      <div class="cap-readonly-banner-body">
+        <div class="cap-readonly-banner-t">Activate capabilities for ${escapeHtml(inst.name)}</div>
+        <div class="cap-readonly-banner-d">Toggles here only affect this instance. <strong style="color:var(--t1)">${totalActive}</strong> capabilities are active across the 3 types. For Data Sync mapping, hand off to <a href="data-studio.html#/connections/${i.slug}" style="color:var(--emerald);text-decoration:none">Data Studio →</a></div>
+      </div>
+    </div>
+  `;
+
+  const capWidgets = groups.map(g => {
+    const meta = CAP_META[g.type];
+    const isDataSync = g.type === 'data_sync';
+    const dsLink = isDataSync && g.items.length > 0
+      ? `<a href="data-studio.html#/connections/${i.slug}" style="font-size:11.5px;color:var(--emerald);text-decoration:none;font-weight:600">Open mapping in Data Studio →</a>`
+      : '';
+
+    return `
+      <section class="ov-widget">
+        <header class="ov-widget-h">
+          <h3 class="ov-widget-title">
+            <span class="cap-chip ${meta.cls}" style="margin-right:4px">${meta.icon}<span>${meta.label}</span></span>
+          </h3>
+          <div class="ov-widget-actions">
+            <span class="ov-widget-meta"><strong style="color:var(--t1)">${g.items.length}</strong> active${g.items.length > 0 ? ` of ${g.items.length}` : ''}</span>
+            ${dsLink}
+          </div>
+        </header>
+        <div class="ov-widget-body">
+          <p style="font-size:12px; color:var(--t2); line-height:1.5; margin:0 0 12px">${escapeHtml(g.desc)}</p>
+          ${g.items.length === 0
+            ? `<div class="empty" style="padding:24px;background:var(--bg3);border-radius:8px;text-align:center"><div class="empty-p" style="font-size:12px;color:var(--t3)">No ${meta.label} capabilities enabled on this instance.</div></div>`
+            : `<div class="inst-cap-list">
+                ${g.items.map(item => `
+                  <div class="inst-cap-row">
+                    <div class="inst-cap-name">${escapeHtml(item)}</div>
+                    <div class="inst-cap-meta">Active on this instance</div>
+                    <div class="toggle on" onclick="toast('Disabled ${escapeHtml(item)} on ${escapeHtml(inst.name)}')"></div>
+                  </div>
+                `).join('')}
+              </div>`}
+        </div>
+      </section>
     `;
-  }).join('') + mcpToolsHTML(i);
+  }).join('');
+
+  return intro + capWidgets + mcpToolsHTML(i);
 }
 
 function instanceAuthHTML(i, inst) {
@@ -6741,6 +7686,154 @@ function closeDrawer() {
   $('drawer').classList.remove('open');
 }
 
+
+// Visual differentiation per auth pattern (Sprint 5 / Edgardo feedback).
+// Each pattern gets a hero with identity badge + facts grid + compact flow diagram.
+function authPatternHero(integration, pattern) {
+  const i = integration;
+  const presets = {
+    oauth: {
+      identity:'personal',  identityLabel:'You',           identityDesc:'Sign in as a person',
+      stored:'Refresh token', refresh:'Automatic',         bestFor:'SaaS apps with user-level data',
+      diagram:`
+        <div class="auth-flow-node auth-flow-user"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M5 19c0-3 3-5 7-5s7 2 7 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="auth-flow-l">You</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-provider">${logo(i, 'sm')}<span class="auth-flow-l">${escapeHtml(i.name)}</span></div>
+        <span class="auth-flow-arrow auth-flow-arrow-back">↩</span>
+        <div class="auth-flow-node auth-flow-aims">${aimsBadge()}<span class="auth-flow-l">AIMS</span></div>
+      `,
+      howItWorks: [
+        `Click Continue to open ${escapeHtml(i.name)} in a popup.`,
+        `Authorize as yourself with your own ${escapeHtml(i.name)} account.`,
+        `AIMS receives a refresh token. We rotate it on schedule.`,
+        `Tool calls are attributed to you in audit logs.`
+      ]
+    },
+    apikey: {
+      identity:'service',   identityLabel:'Service',       identityDesc:'No human identity',
+      stored:'Long-lived API token', refresh:'Manual (rotate when stale)', bestFor:'Server-to-server, no user context needed',
+      diagram:`
+        <div class="auth-flow-node auth-flow-provider">${logo(i, 'sm')}<span class="auth-flow-l">${escapeHtml(i.name)}</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-key"><code class="auth-key-snippet">sk_live_•••</code><span class="auth-flow-l">API token</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-aims">${aimsBadge()}<span class="auth-flow-l">AIMS</span></div>
+      `,
+      howItWorks: [
+        `Generate an API token in your ${escapeHtml(i.name)} admin settings.`,
+        `Paste it below — AIMS stores it encrypted in your tenant vault.`,
+        `All tool calls run as the same service identity, not as any user.`,
+        `Rotate the token periodically from your ${escapeHtml(i.name)} dashboard.`
+      ]
+    },
+    service: {
+      identity:'service',   identityLabel:'Service account', identityDesc:'Server-to-server, signed JWT',
+      stored:'JSON key file (private key)', refresh:'Per-request JWT, key signed', bestFor:'Cloud APIs (Google, AWS, Azure)',
+      diagram:`
+        <div class="auth-flow-node auth-flow-provider">${logo(i, 'sm')}<span class="auth-flow-l">${escapeHtml(i.name)}</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-file"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 3h9l5 5v13H5V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><text x="12" y="17" font-family="monospace" font-size="5" text-anchor="middle" fill="currentColor">JSON</text></svg><span class="auth-flow-l">key file</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-aims">${aimsBadge()}<span class="auth-flow-l">AIMS</span></div>
+      `,
+      howItWorks: [
+        `Create a service account in the provider's admin console.`,
+        `Download the JSON key file and upload it below.`,
+        `AIMS signs each request with the private key (no token stored).`,
+        `Delete the service account in the provider to revoke access.`
+      ]
+    },
+    basic: {
+      identity:'service',   identityLabel:'Service (via your account)', identityDesc:'Token exchange flow',
+      stored:'Rotating token (password not stored)', refresh:'Every 24h, automatic', bestFor:'Legacy systems with no OAuth or API keys',
+      diagram:`
+        <div class="auth-flow-node auth-flow-creds"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="3" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="13" width="18" height="3" rx="1" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="7.5" r=".8" fill="currentColor"/><circle cx="6" cy="14.5" r=".8" fill="currentColor"/></svg><span class="auth-flow-l">User + pass</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-exchange"><span style="font-size:18px">⇄</span><span class="auth-flow-l">exchange</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-token"><code class="auth-key-snippet">tok_•••</code><span class="auth-flow-l">token</span></div>
+      `,
+      howItWorks: [
+        `Provide your ${escapeHtml(i.name)} username and password below.`,
+        `AIMS exchanges them for a rotating token, then forgets the password.`,
+        `The token is automatically refreshed every 24 hours.`,
+        `Your password never leaves the AIMS exchange step.`
+      ]
+    },
+    per_user: {
+      identity:'per_user',  identityLabel:'Each end user',  identityDesc:'Per-user OAuth on first use',
+      stored:'Per-user tokens (isolated)', refresh:'Per-user, on demand', bestFor:'Tools that should respect user-level permissions',
+      diagram:`
+        <div class="auth-flow-node auth-flow-users">
+          <div style="display:flex;align-items:center;gap:-4px"><span class="auth-user-dot" style="background:#A78BFA">M</span><span class="auth-user-dot" style="background:#06B6D4;margin-left:-6px">E</span><span class="auth-user-dot" style="background:#FDC700;margin-left:-6px">T</span></div>
+          <span class="auth-flow-l">Each user</span>
+        </div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-provider">${logo(i, 'sm')}<span class="auth-flow-l">${escapeHtml(i.name)}</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-node auth-flow-aims">${aimsBadge()}<span class="auth-flow-l">AIMS</span></div>
+      `,
+      howItWorks: [
+        `Add ${escapeHtml(i.name)} once here at the workspace level.`,
+        `First time a user invokes it, AIMS shows them a consent prompt.`,
+        `They authorize with their own ${escapeHtml(i.name)} session.`,
+        `Tool calls run as that user; permissions follow what they granted.`
+      ]
+    },
+    manual: {
+      identity:'mixed',     identityLabel:'Provider-specific', identityDesc:'Multi-step external setup',
+      stored:'Client ID + Secret + custom config', refresh:'Provider-specific', bestFor:'Providers without OAuth or clean API keys',
+      diagram:`
+        <div class="auth-flow-step"><span class="auth-flow-num">1</span><span class="auth-flow-l">Create app</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-step"><span class="auth-flow-num">2</span><span class="auth-flow-l">Whitelist IPs</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-step"><span class="auth-flow-num">3</span><span class="auth-flow-l">Configure</span></div>
+        <span class="auth-flow-arrow">→</span>
+        <div class="auth-flow-step"><span class="auth-flow-num">4</span><span class="auth-flow-l">Paste creds</span></div>
+      `,
+      howItWorks: [
+        `Follow the numbered checklist below — most steps happen outside AIMS.`,
+        `Some require external whitelisting or admin actions in the provider.`,
+        `Use the video walkthrough for the trickier steps.`,
+        `Paste the final credentials at the end to complete activation.`
+      ]
+    }
+  };
+
+  const p = presets[pattern];
+  if (!p) return '';
+
+  return `
+    <div class="auth-hero auth-hero-${pattern}">
+      <div class="auth-hero-top">
+        <span class="auth-identity-badge auth-id-${p.identity}">${escapeHtml(p.identityLabel)}</span>
+        <span class="auth-identity-desc">${escapeHtml(p.identityDesc)}</span>
+      </div>
+      <div class="auth-flow">
+        ${p.diagram}
+      </div>
+      <div class="auth-facts">
+        <div class="auth-fact"><div class="auth-fact-k">Stored</div><div class="auth-fact-v">${escapeHtml(p.stored)}</div></div>
+        <div class="auth-fact"><div class="auth-fact-k">Refresh</div><div class="auth-fact-v">${escapeHtml(p.refresh)}</div></div>
+        <div class="auth-fact"><div class="auth-fact-k">Best for</div><div class="auth-fact-v">${escapeHtml(p.bestFor)}</div></div>
+      </div>
+      <details class="auth-howit">
+        <summary>How it works</summary>
+        <ol>
+          ${p.howItWorks.map(h => `<li>${h}</li>`).join('')}
+        </ol>
+      </details>
+    </div>
+  `;
+}
+
+// Small AIMS-OS badge used inside the auth flow diagrams
+function aimsBadge() {
+  return `<div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2B7FFF,#A78BFA);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:900;letter-spacing:-.02em">AI</div>`;
+}
+
+
 function paintDrawer() {
   const s = state.drawerState; if(!s) return;
   const i = s.integration;
@@ -6751,7 +7844,7 @@ function paintDrawer() {
 
   if (s.step === 0) {
     body = `
-      <div class="drawer-step-h">Step 1 of 6 · Name your instance</div>
+      <div class="drawer-step-h">Step 1 of 7 · Name your instance</div>
       <div class="drawer-step-title">Name and describe this ${escapeHtml(i.name)} instance</div>
       <p style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">
         You can activate ${escapeHtml(i.name)} multiple times — for example one for production, one for dev, one for analytics. Each <strong style="color:var(--t1)">instance</strong> has its own credentials, status, and audit log.
@@ -6791,25 +7884,47 @@ function paintDrawer() {
   }
 
   else if (s.step === 1) {
+    // Split patterns into "Recommended by this provider" (declared in authMethods)
+    // and "Other patterns available". Both groups render the same auth-card.
+    // Edgardo: "la definición de cuál variante usa cada integración es configuración,
+    // pero el flujo visual de cada tipo sí debés prototiparlo."
+    const allPatterns = ['oauth', 'apikey', 'service', 'basic', 'per_user', 'manual'];
+    const recommended = i.authMethods.filter(m => allPatterns.includes(m));
+    const others = allPatterns.filter(m => !i.authMethods.includes(m));
+
+    const renderCard = (m) => {
+      const pattern = AUTH_PATTERNS[m]; if (!pattern) return '';
+      const sel = s.authMethod===m ? 'selected' : '';
+      const isRecommended = i.authMethods.includes(m);
+      return `
+        <div class="auth-card ${sel}" onclick="selectAuth('${m}')">
+          <div class="auth-card-h">
+            <span class="auth-name"><span style="margin-right:5px">${pattern.icon}</span>${escapeHtml(pattern.label)}</span>
+            ${isRecommended && pattern.badge ? `<span class="badge">${escapeHtml(pattern.badge)}</span>` : ''}
+            ${!isRecommended ? `<span class="badge" style="background:rgba(148,163,184,0.10);color:var(--t3);border-color:var(--line)">Alternative</span>` : ''}
+          </div>
+          <div class="auth-card-desc">${escapeHtml(pattern.desc)}</div>
+        </div>
+      `;
+    };
+
     body = `
-      <div class="drawer-step-h">Step 2 of 6 · Authentication method</div>
+      <div class="drawer-step-h">Step 2 of 7 · Authentication method</div>
       <div class="drawer-step-title">Choose how to connect to ${escapeHtml(i.name)}</div>
       <p style="font-size:11.5px;color:var(--t3);margin-bottom:14px;font-style:italic;line-height:1.55">
-        ⚙ Methods below are declared by the provider's metadata. The form on the next step renders from the chosen pattern's UI schema — no custom code per provider (engineering brief §10).
+        ⚙ Each pattern below renders from its own UI schema on the next step — no custom code per provider (engineering brief §10).
       </p>
-      ${i.authMethods.map(m => {
-        const pattern = AUTH_PATTERNS[m]; if (!pattern) return '';
-        const sel = s.authMethod===m ? 'selected' : '';
-        return `
-          <div class="auth-card ${sel}" onclick="selectAuth('${m}')">
-            <div class="auth-card-h">
-              <span class="auth-name"><span style="margin-right:5px">${pattern.icon}</span>${escapeHtml(pattern.label)}</span>
-              ${pattern.badge?`<span class="badge">${escapeHtml(pattern.badge)}</span>`:''}
-            </div>
-            <div class="auth-card-desc">${escapeHtml(pattern.desc)}</div>
-          </div>
-        `;
-      }).join('')}
+
+      ${recommended.length > 0 ? `
+        <div class="auth-group-label">Recommended for ${escapeHtml(i.name)}</div>
+        ${recommended.map(renderCard).join('')}
+      ` : ''}
+
+      ${others.length > 0 ? `
+        <div class="auth-group-label" style="margin-top:18px">Other auth patterns supported by AIMS-OS</div>
+        <p style="font-size:11px;color:var(--t3);margin-bottom:10px;line-height:1.5">${escapeHtml(i.name)} did not declare these in its provider metadata, but you can still pick one — useful when the provider's recommended flow does not match your security requirements.</p>
+        ${others.map(renderCard).join('')}
+      ` : ''}
     `;
     footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm" onclick="drawerNext()">Continue →</button>`;
   }
@@ -6817,8 +7932,9 @@ function paintDrawer() {
   else if (s.step === 2) {
     if (s.authMethod==='oauth') {
       body = `
-        <div class="drawer-step-h">Step 2 of 6 · OAuth 2.0</div>
+        <div class="drawer-step-h">Step 3 of 7 · OAuth 2.0</div>
         <div class="drawer-step-title">Authorize with ${escapeHtml(i.name)}</div>
+        ${authPatternHero(i, 'oauth')}
         ${s.authenticated ? `
           <div class="connected-panel">
             <strong>✓ Connected as AIMS Workspace</strong>
@@ -6839,8 +7955,9 @@ function paintDrawer() {
     }
     else if (s.authMethod==='apikey') {
       body = `
-        <div class="drawer-step-h">Step 2 of 6 · API token</div>
+        <div class="drawer-step-h">Step 3 of 7 · API token</div>
         <div class="drawer-step-title">Paste your ${escapeHtml(i.name)} token</div>
+        ${authPatternHero(i, 'apikey')}
         <div class="field-group">
           <label class="field-label">${escapeHtml(i.name)} token</label>
           <input class="input" type="password" placeholder="xoxb-1234-abcd-…" value="${escapeHtml(s.apiKey)}" oninput="state.drawerState.apiKey=this.value;state.drawerState.apiKeyValid=false;paintDrawer();setTimeout(()=>{document.querySelector('.drawer input').focus()},0)"/>
@@ -6860,8 +7977,9 @@ function paintDrawer() {
     }
     else if (s.authMethod==='service') {
       body = `
-        <div class="drawer-step-h">Step 2 of 6 · Service account</div>
+        <div class="drawer-step-h">Step 3 of 7 · Service account</div>
         <div class="drawer-step-title">Upload your service account key</div>
+        ${authPatternHero(i, 'service')}
         <div class="field-group">
           ${s.authenticated ? `
             <div class="connected-panel"><strong>✓ Key validated</strong>Project: aims-prod · Account: ai-agent@aims.iam.gserviceaccount.com</div>
@@ -6879,9 +7997,9 @@ function paintDrawer() {
     else if (s.authMethod==='basic') {
       // Engineering brief §9 — Username/password → token
       body = `
-        <div class="drawer-step-h">Step 2 of 6 · Username + password</div>
+        <div class="drawer-step-h">Step 3 of 7 · Username + password</div>
         <div class="drawer-step-title">Provide credentials for ${escapeHtml(i.name)}</div>
-        <p style="font-size:12px;color:var(--t2);margin-bottom:14px">We'll exchange your credentials for a token and refresh it on schedule. Your password is never stored — only the rotating token.</p>
+        ${authPatternHero(i, 'basic')}
         <div class="field-group">
           <label class="field-label">Username</label>
           <input class="input" type="text" placeholder="user@company.com"/>
@@ -6903,11 +8021,9 @@ function paintDrawer() {
     else if (s.authMethod==='per_user') {
       // Engineering brief §9 — Per-user authentication
       body = `
-        <div class="drawer-step-h">Step 2 of 6 · Per-user authentication</div>
+        <div class="drawer-step-h">Step 3 of 7 · Per-user authentication</div>
         <div class="drawer-step-title">Each user will sign in individually</div>
-        <p style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">
-          With this pattern, the integration is <strong style="color:var(--t1)">added once</strong> here, but each end user must authenticate before they can use it. Tool calls then run under the user's identity — preserving the principle of least privilege.
-        </p>
+        ${authPatternHero(i, 'per_user')}
         <div class="connected-panel" style="background:rgba(43,127,255,0.06);border-color:rgba(43,127,255,0.20);color:var(--accent);margin:0">
           <strong>How it works</strong>
           1. AIMS-OS shows a consent prompt to the user the first time an agent tries to use ${escapeHtml(i.name)}<br>
@@ -6927,11 +8043,9 @@ function paintDrawer() {
       // Engineering brief §13.6 — "Design for the ugliest provider"
       const steps = AUTH_PATTERNS.manual.schema.steps;
       body = `
-        <div class="drawer-step-h">Step 2 of 6 · Manual setup</div>
+        <div class="drawer-step-h">Step 3 of 7 · Manual setup</div>
         <div class="drawer-step-title">Multi-step setup for ${escapeHtml(i.name)}</div>
-        <p style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">
-          This provider requires a few external steps before we can connect. Follow the checklist below — we've included a video walkthrough for the trickier parts.
-        </p>
+        ${authPatternHero(i, 'manual')}
         <a href="${AUTH_PATTERNS.manual.schema.video}" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--cyan);text-decoration:none;margin-bottom:14px" onclick="event.preventDefault();toast('Video walkthrough — coming soon')">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2v12l10-6L3 2z" fill="currentColor"/></svg>
           Watch 3-minute walkthrough
@@ -6964,7 +8078,7 @@ function paintDrawer() {
 
   else if (s.step === 3) {
     body = `
-      <div class="drawer-step-h">Step 3 of 6 · Choose capabilities</div>
+      <div class="drawer-step-h">Step 4 of 7 · Choose capabilities</div>
       <div class="drawer-step-title">What can ${escapeHtml(i.name)} do for you?</div>
       <p style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">
         Activate only what you need. You can change this later from the instance's <strong>Capabilities</strong> tab. Anything turned off here cannot be used by any agent in your tenant.
@@ -6989,7 +8103,7 @@ function paintDrawer() {
 
   else if (s.step === 4) {
     body = `
-      <div class="drawer-step-h">Step 4 of 6 · Initial scope</div>
+      <div class="drawer-step-h">Step 5 of 7 · Initial scope</div>
       <div class="drawer-step-title">Where should this integration be available?</div>
       <div class="field-group">
         ${Object.keys(STUDIO_META).map(k=>`
@@ -7206,10 +8320,6 @@ function renderAudit() {
 
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a>
-      <span class="crumb-sep">›</span>
-      <span>Workspace</span>
-      <span class="crumb-sep">›</span>
       <span class="crumb-current">Audit log</span>
     </div>
 
@@ -7301,11 +8411,7 @@ function toggleAuditExpand(idx) { auditFilters.expanded = auditFilters.expanded=
 function renderBuildChooser() {
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a>
-      <span class="crumb-sep">›</span>
-      <a href="#/integrations">Data Studio</a>
-      <span class="crumb-sep">›</span>
-      <a href="#/integrations">Connections</a>
+      <a href="#/integrations">Integrations</a>
       <span class="crumb-sep">›</span>
       <span class="crumb-current">Build your own</span>
     </div>
@@ -7383,7 +8489,7 @@ function renderBuildWebhook() {
   const steps = ['Basics','Authentication','Define actions','Capabilities','Test & Preview','Publish'];
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a>
+      <a href="#/integrations">Integrations</a>
       <span class="crumb-sep">›</span>
       <a href="#/build">Build your own</a>
       <span class="crumb-sep">›</span>
@@ -7522,7 +8628,7 @@ function publishWebhook() {
 function renderBuildOpenAPI() {
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
+      <a href="#/integrations">Integrations</a><span class="crumb-sep">›</span>
       <a href="#/build">Build your own</a><span class="crumb-sep">›</span>
       <span class="crumb-current">Import OpenAPI</span>
     </div>
@@ -7580,7 +8686,7 @@ function simulateOpenAPI() {
 function renderBuildSDK() {
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
+      <a href="#/integrations">Integrations</a><span class="crumb-sep">›</span>
       <a href="#/build">Build your own</a><span class="crumb-sep">›</span>
       <span class="crumb-current">Code SDK</span>
     </div>
@@ -7641,10 +8747,6 @@ function renderPersonal() {
   ];
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a>
-      <span class="crumb-sep">›</span>
-      <span>Personal</span>
-      <span class="crumb-sep">›</span>
       <span class="crumb-current">My Integrations</span>
     </div>
 
@@ -7700,7 +8802,6 @@ function renderPersonalDetail(slug) {
   const i = findIntegration(slug); if(!i){ renderNotFound(slug); return }
   $('content').innerHTML = `
     <div class="breadcrumb">
-      <a href="#/integrations">Settings</a><span class="crumb-sep">›</span>
       <a href="#/personal">My Integrations</a><span class="crumb-sep">›</span>
       <span class="crumb-current">${escapeHtml(i.name)}</span>
     </div>
@@ -7964,68 +9065,102 @@ function aiRender(text) {
 
 const TOUR_STEPS = [
   {
-    title:'Welcome to AIMS-OS Integrations',
-    body:'This is the workspace surface for connecting every external tool — Slack, Salesforce, Snowflake, GitHub, anything. Let\'s take a 90-second tour. Use <strong>← →</strong> or the buttons below to navigate.',
-    route:'#/integrations'
+    title:'Welcome to AIMS-OS',
+    body:'You are in <strong>Admin Studio · Integrations</strong> — one of three cross-functional surfaces. We will walk through it, then point you to Data Studio and Agent Studio. About 3 minutes. Use <strong>← →</strong> or the buttons below.',
+    route:'#/integrations',
+    mode:'browse',
+    persona:'admin'
   },
   {
-    title:'Active in your workspace',
-    body:'See what\'s already connected at a glance. Each avatar shows real-time health: <strong>green</strong> = healthy, <strong>amber</strong> = degraded, <strong>red</strong> = failed. Hover to see which studios use it.',
+    title:'Three studios, one workspace',
+    body:'Click the <strong>Admin Studio</strong> name in the topbar to open the studio switcher. The three surfaces filter the same integrations by what they expose: Admin authenticates · Data Studio maps the data flow · Agent Studio configures Tools.',
     route:'#/integrations',
-    target:'.active-strip'
+    target:'#tbContextBtn',
+    openSwitcher:true
   },
   {
-    title:'One smart filter toolbar',
-    body:'Filter by <strong>Studio</strong>, <strong>Source</strong>, <strong>Category</strong>, or <strong>Capability</strong>. Active filters appear as removable chips at top. Sort and search live in the header.',
+    title:'Two modes inside Admin Studio',
+    body:'<strong>Browse</strong> is for discovery (the catalog and active connections). <strong>Operate</strong> is for triage (status of your data infrastructure). End-users default to Browse, admins to Operate.',
     route:'#/integrations',
+    target:'#tbModeToggle'
+  },
+  {
+    title:'Operate mode signals everywhere',
+    body:'When you switch to Operate, the topbar gets an amber accent line and this strip appears. No matter how deep you navigate (instances, wizards, audit), you always know you are operating, not browsing.',
+    route:'#/integrations',
+    mode:'operate',
+    target:'.mode-banner',
+    scrollToTarget:true
+  },
+  {
+    title:'Triage view: Needs Attention first',
+    body:'Operate landing has 3 KPIs: Working, Needs attention, Inactive. The default tab is <strong>Needs Attention</strong> so issues surface immediately.',
+    route:'#/integrations',
+    mode:'operate',
+    target:'.op-hero',
+    scrollToTarget:true
+  },
+  {
+    title:'Already integrated vs Marketplace',
+    body:'Back in Browse, the home has two tabs. <strong>Already integrated</strong> shows what your workspace has, grouped by category. <strong>Marketplace</strong> is the full catalog. Search filters both.',
+    route:'#/integrations',
+    mode:'browse',
+    target:'.home-tabs'
+  },
+  {
+    title:'Simplified filter toolbar',
+    body:'Categories live on a single horizontal scroller. Other filters (capability, state, studio, source) sit on one chip rail with dot separators — no more verbose row labels.',
+    route:'#/integrations',
+    mode:'browse',
     target:'#catalogToolbar',
     scrollToTarget:true
   },
   {
-    title:'Provider ≠ Instance',
-    body:'A provider can be activated <strong>multiple times</strong>. Notice S3 has 3 instances — Production, Dev, Analytics — each with its own credentials, status, and audit trail. This is core to the model.',
-    route:'#/integrations/s3',
-    target:'.inst-section',
-    scrollToTarget:true
-  },
-  {
-    title:'Per-instance management',
-    body:'Click any instance to manage it. Five tabs: <code>Basic Info</code> · <code>Capabilities</code> · <code>Authentication</code> · <code>Logs</code> · <code>Audit</code>. Notice this S3 — Analytics is "partially configured" — Helix Data Studio mapping pending.',
-    route:'#/integrations/s3/instances/s3-analytics',
-    target:'.tabs'
-  },
-  {
-    title:'Cascading governance',
-    body:'Permissions cascade: <strong>Integration → Workflow → Agent</strong>. Each layer can restrict (never expand) what the layer above allows. This is what Mike asked for after the early MCP experiment.',
+    title:'Provider detail is a catalog view',
+    body:'Capabilities at provider level are read-only — they describe what the integration offers. Activation happens per <strong>instance</strong>. Each instance has its own credentials, capabilities, logs and audit.',
     route:'#/integrations/slack',
-    detailTab:'permissions',
-    target:'.gov-layers',
+    target:'.detail-head',
     scrollToTarget:true
   },
   {
-    title:'Used in studios',
-    body:'See real usage per studio: <strong>47 calls/day</strong> in Agentic, <strong>1,247 tables</strong> indexed in Governance, etc. Answers the "where is this used?" question instantly.',
-    route:'#/integrations/snowflake',
-    target:'.used-in-wrap',
+    title:'Gate banner — hand off to Data Studio',
+    body:'Salesforce has schema drift. The amber gate banner names the issue and offers a cross-link to <strong>Data Studio</strong> where the field mapping resolution lives. Cross-functional surfaces in action.',
+    route:'#/integrations/salesforce',
+    target:'.gate-banner',
     scrollToTarget:true
   },
   {
-    title:'Ask AI about any integration',
-    body:'Context-aware AI. It knows the integration\'s current state, scopes, capabilities. Ask "how do I connect this securely?" or "what can agents do with this?" — answers are tailored, not generic.',
-    route:'#/integrations/slack',
-    target:'.btn-ai'
-  },
-  {
-    title:'Schema-driven activation',
-    body:'When you connect a provider, the wizard renders the auth form <strong>from a schema</strong> — no custom code per provider. 6 steps: name → auth method → authenticate → choose capabilities → scope → confirm.',
+    title:'Six auth patterns to choose from',
+    body:'Click Connect on any integration. Step 2 shows the 6 patterns: OAuth, API token, Service account, Username+password, Per-user, Manual. Each has its own identity model (personal vs service vs per-user) and a visual flow diagram on step 3.',
     route:'#/integrations/teams',
-    target:'.btn-primary',
+    target:'.detail-actions .btn-primary',
     pulse:true
   },
   {
-    title:'That\'s the tour',
-    body:'You\'ve seen the core model. Explore freely now — every card is clickable, every filter is live. Full documentation at <code>/docs/DEMO.md</code> in the repo. Welcome to AIMS-OS Integrations.',
-    route:'#/integrations'
+    title:'Request what we do not have',
+    body:'End users can request a new integration. The form has 5 sections — requester, business intent, source system, data sensitivity, timeline. Goes to a managed services queue.',
+    route:'#/integrations',
+    mode:'browse',
+    target:'.build-promo:nth-of-type(2)',
+    scrollToTarget:true
+  },
+  {
+    title:'Requests inbox',
+    body:'The other side of the request flow. Admins see all pending requests with priority, age, business intent and PII flags. Approve, quote, reject inline.',
+    route:'#/requests',
+    target:'.op-hero'
+  },
+  {
+    title:'Admin vs End-user persona',
+    body:'The persona pill switches between admin and end-user views. End-users do not see audit logs or the requests inbox. Activation buttons become Request buttons when they hit a connection that is not authenticated.',
+    route:'#/integrations',
+    target:'#tbPersonaBtn'
+  },
+  {
+    title:'Continue in Data Studio & Agent Studio',
+    body:'Open the studio switcher again to jump to <strong>Data Studio</strong> (field mapping, schema drift resolution) or <strong>Agent Studio · Tools</strong> (raw tools and pre-configured wrappers). Both have their own walkthroughs to explore.<br><br>Full docs at <code>/docs/DEMO.md</code>.',
+    route:'#/integrations',
+    mode:'browse'
   }
 ];
 
@@ -8046,6 +9181,9 @@ function endTour() {
   $('tourOverlay').classList.remove('active');
   $('tourSpotlight').classList.remove('active');
   $('tourPopover').classList.remove('active');
+  // Close studio switcher if the tour left it open
+  const switcher = document.getElementById('studioSwitcher');
+  if (switcher) { switcher.classList.remove('open'); switcher.setAttribute('aria-hidden', 'true'); }
 }
 
 function tourNext() {
@@ -8066,9 +9204,34 @@ function paintTourStep() {
   const isFirst = tourState.stepIndex === 0;
   const isLast = tourState.stepIndex === TOUR_STEPS.length - 1;
 
+  // Apply mode + persona overrides BEFORE route
+  if (step.mode && state.mode !== step.mode) {
+    state.mode = step.mode;
+    try { localStorage.setItem('aims_mode', step.mode); } catch(e){}
+    document.documentElement.classList.toggle('mode-operate', step.mode === 'operate');
+    paintModeToggle();
+  }
+  if (step.persona && state.persona !== step.persona) {
+    state.persona = step.persona;
+    try { localStorage.setItem('aims_persona', step.persona); } catch(e){}
+    paintPersonaPill();
+  }
+  // Studio switcher action (open dropdown when step highlights it)
+  const switcher = document.getElementById('studioSwitcher');
+  if (switcher) {
+    if (step.openSwitcher) {
+      switcher.classList.add('open');
+      switcher.setAttribute('aria-hidden', 'false');
+    } else if (switcher.classList.contains('open')) {
+      switcher.classList.remove('open');
+      switcher.setAttribute('aria-hidden', 'true');
+    }
+  }
   // Navigate route if needed
   if (step.route && location.hash !== step.route) {
     location.hash = step.route;
+  } else if (step.route && step.mode) {
+    route();
   }
   // Set detail tab if needed (after route)
   if (step.detailTab) {
@@ -8215,6 +9378,7 @@ function setMode(mode) {
   if (state.mode === mode) return;
   state.mode = mode;
   try { localStorage.setItem('aims_mode', mode); } catch(e){}
+  document.documentElement.classList.toggle('mode-operate', mode === 'operate');
   paintModeToggle();
   // Reset to home when switching modes so the user sees the new surface
   if (location.hash.startsWith('#/integrations') && location.hash.split('/').length <= 2) {
@@ -8274,6 +9438,7 @@ function paintPersonaPill() {
 
 // Paint mode + persona controls on initial load
 function paintShellControls() {
+  document.documentElement.classList.toggle('mode-operate', state.mode === 'operate');
   paintModeToggle();
   paintPersonaPill();
 }
@@ -8709,6 +9874,39 @@ document.querySelectorAll('.ssb-item.disabled').forEach(b => {
 });
 
 // Paint shell controls (mode toggle + persona pill) on initial load
+
+function toggleStudioSwitcher() {
+  const el = document.getElementById('studioSwitcher');
+  const btn = document.getElementById('tbContextBtn');
+  if (!el) return;
+  const isOpen = el.classList.toggle('open');
+  if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  el.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+}
+
+document.addEventListener('click', (e) => {
+  const sw = document.getElementById('studioSwitcher');
+  if (!sw || !sw.classList.contains('open')) return;
+  if (!e.target.closest('#studioSwitcher') && !e.target.closest('#tbContextBtn')) {
+    sw.classList.remove('open');
+    sw.setAttribute('aria-hidden', 'true');
+    const btn = document.getElementById('tbContextBtn');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const sw = document.getElementById('studioSwitcher');
+  if (sw && sw.classList.contains('open')) {
+    sw.classList.remove('open');
+    sw.setAttribute('aria-hidden', 'true');
+    const btn = document.getElementById('tbContextBtn');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+
 paintShellControls();
 
 // Paint requests pending indicator
@@ -8717,6 +9915,25 @@ paintShellControls();
   if (!dot) return;
   const pending = REQUESTS.filter(r => r.status==='pending_review').length;
   dot.style.display = pending > 0 ? '' : 'none';
+})();
+
+// Honor ?request=<name> URL param coming from Data Studio request CTA.
+// Pre-fills the integration name on the request form, then navigates to it.
+(function honorRequestParam(){
+  try {
+    const url = new URL(window.location.href);
+    const requested = url.searchParams.get('request');
+    if (requested !== null) {
+      requestFormState.integrationName = requested || '';
+      // Clean the URL so reload does not re-trigger
+      url.searchParams.delete('request');
+      window.history.replaceState({}, '', url.pathname + (url.search || '') + (url.hash || '#/request'));
+      // Force route to the form
+      if (!location.hash.startsWith('#/request')) {
+        location.hash = '#/request';
+      }
+    }
+  } catch(e){}
 })();
 
 route();
