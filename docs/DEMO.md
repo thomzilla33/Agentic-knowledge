@@ -10,7 +10,7 @@
 
 The **Settings → Integrations** surface for AIMS-OS. It's the place where workspace admins connect external tools (Slack, Salesforce, Snowflake, GitHub, etc.) and configure how agents, workflows, and studios consume them.
 
-This prototype implements the model described in the internal engineering brief by Sebastian Blandon (SVP Engineering) and Edgardo Sierra (Chief Architect). The shape of the UI deliberately mirrors the shape of the backend so that nothing gets lost in translation.
+This prototype implements the model described in the internal engineering brief by Thomas González (SVP Engineering) and Edgardo Sierra (Chief Architect). The shape of the UI deliberately mirrors the shape of the backend so that nothing gets lost in translation.
 
 **Status:** Design prototype, not production code. All data is mocked in-memory.
 
@@ -291,7 +291,7 @@ The Marketplace also lets workspaces add their **own private providers** — giv
 
 ## 17. Coverage vs the Engineering Brief
 
-The internal brief by Sebastian Blandon + Edgardo Sierra has 13 main sections + 6 product questions. This prototype covers:
+The internal brief by Thomas González + Edgardo Sierra has 13 main sections + 6 product questions. This prototype covers:
 
 | § | Concept | Status |
 |---|---|---|
@@ -341,7 +341,7 @@ That covers the architectural model + the polish layer + the AI moments + the wo
 After a working session with Mike Dullea (founder), the prototype was rotated around an explicit thesis:
 
 > Integrations is the **control plane** for an agentic data infrastructure, not just a marketplace.
-> Data Studio (Sebastian) does the deep field mapping. Integrations orchestrates the lifecycle, surfaces system truth, and gatekeeps usage.
+> Data Studio (Thomas) does the deep field mapping. Integrations orchestrates the lifecycle, surfaces system truth, and gatekeeps usage.
 
 ### 3 decisions locked
 
@@ -383,14 +383,14 @@ Each card shows only the bucket chip. The specific state is surfaced inside the 
 The sub-sidebar now has a dedicated **Data Studio** section containing:
 
 - **Connections** (the surface this prototype builds out, the former "Integrations")
-- **Tables** (coming soon, will host Sebastian's table definitions)
+- **Tables** (coming soon, will host Thomas's table definitions)
 - **Field mappings** (coming soon, the auto-map + custom-flag UI)
 - **Schema versions** (coming soon, history per table)
 - **Requests** (live, see below)
 
 Breadcrumbs are now `Settings > Data Studio > Connections > [integration]` instead of the previous `Settings > Integrations > [integration]`. The Browse home hero gained a `Data Studio · Connections` eyebrow that frames the marketplace as one of Data Studio's surfaces, not a standalone product.
 
-This locks the architectural decision from the founder session: **Integrations is the control plane of Data Studio, not a sibling**. Sebastian's field mapping engine lives in Data Studio; this prototype is what hands off to it.
+This locks the architectural decision from the founder session: **Integrations is the control plane of Data Studio, not a sibling**. Thomas's field mapping engine lives in Data Studio; this prototype is what hands off to it.
 
 ### Connect → Map (wizard step 6 of 7)
 
@@ -517,4 +517,289 @@ This was deliberate — the prototype is meant to be inspectable, hackable, and 
 
 ---
 
-*This file documents the design prototype, not the production implementation. For the engineering brief that defines the backend model, contact Sebastian Blandon (SVP Engineering) or Edgardo Sierra (Chief Architect).*
+*This file documents the design prototype, not the production implementation. For the engineering brief that defines the backend model, contact Thomas González (SVP Engineering) or Edgardo Sierra (Chief Architect).*
+
+## 22. What's new since the May 2026 founder session
+
+Sections 19-21 captured the orchestration thesis sprint. Everything below
+landed after — and is in the public prototype.
+
+| Sprint | Surfaces added | Spec / commit ref |
+|---|---|---|
+| Data Studio · Tables | Library + detail (split layout, 6-tab rail, per-field inspector with 4 sub-tabs, auto-versioning, custom field defs, multi-source) | Tasks #93-98 · ~Tables Phase 1-3 + Prio 1+2 + 6 quick wins |
+| Data Studio · Templates | Library + create + detail tree editor + 4-tab rule inspector + sandboxed expression evaluator + cascade preview + versions + apply-to picker | Tasks #99-103 · Templates Phase 1-5 |
+| Tenant onboarding | 8-step welcome flow (3 phases) at `#/onboarding` with first-run gating + skip path + return-to-onboarding from wizard | Tasks #104-105, F1-F3 |
+| Mike thesis closure | Field Mappings surface (`#/mappings`) + Schema Versions surface (`#/schema`) | Tasks #106-107 |
+| Shell alignment | `agentic-studio.html` imported as canonical reference + `docs/SHELL_PATTERN.md` spec + topbar/left-nav normalization | Tasks #112-113 |
+| View improvement sweep | 12 surfaces aligned to canonical hero pattern (heroes, cards, tabs, modal, content panels) | Tasks #117-127 |
+| Iconography hygiene | All emoji-as-icons replaced with SVG (Templates group icons, onboarding hero, auth methods, audit actors, AI chips) | Tasks #111, design critique pass |
+| Mike thesis fix | Admin default mode → Operate (was Browse) | Task #128 |
+
+---
+
+## 23. Data Studio · Tables surface
+
+> Lives in `data-studio.html`. Spec adapted from `TableDefinitions_Documentation.pdf` (Option B — no industry presets, multi-source as documented extension).
+
+The destination layer for everything that comes through Connections. A Table
+is a structured set of rows that agents can query, fed by **one or more
+connections** (e.g. `customer` from HubSpot + Salesforce).
+
+### Where to see it
+
+- Sidebar → **Tables** (formerly badge "Soon", now live)
+- Library at `#/tables` shows the new hero with KPI cards (Tables / Total rows / Errors) + filter pills + per-source filter chips + grid
+- Click any card to land on the detail page
+
+### What the detail does
+
+Split layout: **field list on the left**, **6-tab right rail**:
+
+- **Field** (default) — per-field inspector with 4 sub-tabs
+  - **Basics:** display name, data type, primary key, nullable, indexed, description
+  - **Validation:** declared validations + add new rule (regex, enum, range, etc.)
+  - **Transformation:** transforms applied at ingest (lower, trim, format), drag-to-reorder
+  - **Custom:** values for tenant-defined custom field defs
+- **Sync** — per-source state (status, last sync, events/hr, errors), pause/resume/trigger now, retention controls, sparkline of last 10 sync durations
+- **Conn** — source connections feeding this table, per-source actions (Re-auth, Remove from table)
+- **Used by** — mock template references using this Table×Field (populated from `MOCK_TEMPLATE_LINES`)
+- **Versions** — auto-versioning with 2.5s debounce, restore with backup, schema diff modal before restore
+- **Custom fields** — tenant-defined custom field defs (text / number / select / boolean, scoped to fields or both)
+
+### What's wired end-to-end
+
+- Search within fields (with U<n> usage flag)
+- Drag-to-reorder transformations
+- Schema diff between versions (added / removed / modified columns)
+- Cascade preview when deleting a field that's referenced
+- Sync timing sparkline
+- Telemetry: `tables_detail_viewed`, `field_inspector_*`, `sync_*`, etc.
+
+### What's still open (engineering team)
+
+Documented in commit messages — bulk ops on fields, field categorization,
+per-field sync history, retention controls in UI, real ingestion engine,
+backend persistence.
+
+---
+
+## 24. Data Studio · Templates (rule packs)
+
+> Re-anchored from the original `TableDefinitions` spec (which described composite financial reporting templates) to a model that fits AIMS-OS: **reusable validation + transformation rule packs**. Sites → workspaces, composite lines → rules, source mapping → applied Table×Field list.
+
+### Where to see it
+
+- Sidebar → **Templates**
+- Library at `#/templates` shows the canonical hero (Packs / Applied / Custom / Unapplied KPI cards) + search + 4 system seed packs
+
+### Three seed packs
+
+| Pack | Domain | Rules |
+|---|---|---|
+| Email & contact data quality | Contact | Format checks, normalization, disposable email filter |
+| Currency & financial values | Financial | Non-negative, sanity bound, decimal rounding |
+| PII & data privacy | Privacy | SSN/CC detection, redaction |
+| Starter pack | General | Empty skeleton with one example rule |
+
+### What you can do
+
+- **Library:** filter by source (System / Cloned / Custom) + domain · search · delete (with safety rails) · click any card to open
+- **Create:** starting-point picker (clone a system pack or build from scratch) + name + description + domain
+- **Detail editor:** split layout with **recursive tree** (groups → rules) on the left and **4-tab rail** on the right
+  - **Inspect** (when a node is selected): rule editor with 4 sub-tabs
+    - **Basics:** name, description, ruleType (Validation/Transformation/Enrichment) segmented, severity (Err/Warn/Info), applies-to field type, enabled toggle, tags
+    - **Expression:** mono textarea with live structural validator (balanced parens, recognized functions, `value` reference required) + collapsible functions reference panel
+    - **Examples:** sample values seeded per field type, each evaluated against the expression via sandboxed `new Function(...)`. Pass/fail for validations, output preview for transformations.
+    - **Custom:** tenant-defined custom field def values per rule
+  - **Versions:** auto-version on every mutation (debounced 2.5s), restore with backup, full timeline
+  - **Usage:** list of {tableName, fieldName} where the pack is applied + 2-step "Apply to a field" picker that reads from real `getAllTables()` output
+  - **Settings:** custom field defs CRUD (text / number / select / boolean, scoped to rule / group / both)
+
+### What's clean
+
+- System packs are read-only — Clone & edit CTA in the header creates a custom copy
+- Modal system replaces all browser `confirm()` calls
+- Delete a group with children shows cascade preview (the affected sub-nodes)
+- Telemetry on every meaningful action
+
+---
+
+## 25. Mike thesis closure — Field Mappings + Schema Versions
+
+Two surfaces Mike asked for in the May 2026 session that were left as
+`renderPlaceholder()` stubs. Built and shipped.
+
+### `#/mappings` — Cross-connection field mappings
+
+> Tenant-wide aggregation of the wizard step 6 "peanut butter cup" handoff.
+
+- Walks `DS_CONNECTIONS` + `obState.lastCompleted` and flattens every source field across every connection into a unified inventory
+- 5 buckets: auto / needs review / accepted / custom (created) / skipped
+- KPI strip with semantic tints
+- Search by source field, target field, or connection
+- Filter pills by status + per-connection sub-pills
+- Grouped by connection (Salesforce / Stripe / GitHub / etc.)
+- **Resolve** action on each "Needs review" row → opens drawer with 3 radio options (Accept AI suggestion with confidence, Create new field, Skip)
+- Decisions persisted to `aims_ds_field_mapping_decisions` + mutated in-memory `DS_CONNECTIONS[slug].events[i].custom[j].decision`
+
+### `#/schema` — Schema versions timeline
+
+> Tenant-wide aggregator of every Table version captured anywhere in the system.
+
+- Reads from `tableVersions[tableName]` (populated by the Tables Phase 3+ auto-versioning system)
+- Flat timeline newest-first, grouped into Today / Yesterday / This week / This month / Older
+- KPI strip: Total versions / This week / This month / Tables touched
+- Filter by date range + per-table filter pills (auto-built)
+- Search by label / table / author
+- Click any row → navigates to that Table's detail with the Versions tab pre-selected for one-click restore
+
+---
+
+## 26. Tenant onboarding — the 8-step welcome
+
+> Lives at `#/onboarding` in `data-studio.html`. Replaces the previous placeholder. The flow is the first thing a fresh tenant sees on first run.
+
+### The flow
+
+**Phase 1 — Tenant setup (first-run only):**
+
+1. **Welcome** — step list preview + "Have ready" checklist
+2. **Organization** — name, primary industry, size, primary contact (name / role / email) with email-format validation
+3. **Starter setup** — pick from 4 cards: Data-quality first / Governance first / Agentic first / Minimal
+4. **Workspace grouping** — pick strategy (by department / region / function / flat) + tag chips editable
+
+**Phase 2 — Per workspace:**
+
+5. **Workspace profile** — name, group, region, owner contact
+6. **Connect data** — opens the existing 6-screen Connect Data wizard inline (Category → Connector → Auth → Preview → Mapping → Sync). On Done, returns to onboarding step 6 with success state.
+7. **Apply templates** — reads real Tables from `getAllTables()`, suggests real Templates from `tplLibrary` via field-name heuristics with confidence scoring. Accept actually mutates `tpl.appliedTo`.
+
+**Phase 3:**
+
+8. **Done** — hero with summary stats + 4 next-step cards (Add another workspace, Open Data Studio, Open Admin Studio, Invite team [disabled])
+
+### Add-workspace flow
+
+Skips Phase 1 — starts at step 5 (Workspace profile) and runs 4 steps.
+
+### First-run gating (F1)
+
+A fresh user landing on `#/templates` or `#/tables` is auto-redirected to
+`#/onboarding`. The landing has a "Skip — I'll explore on my own" CTA that
+sets `tonbState.skipped = true` and never gates again.
+
+### Wizard return-to-onboarding (F2)
+
+The Connect Data wizard's Done screen shows a primary "Continue tenant
+onboarding →" CTA when launched from the onboarding flow (instead of the
+default "Open Data Studio dashboard"). Closing the wizard modal mid-Done
+also routes back to `/onboarding`.
+
+### Tour (F3)
+
+The Data Studio guided tour (sidebar "Take the guided tour") now walks
+through 18 steps including the 4 new surfaces and the tenant onboarding
+landing.
+
+---
+
+## 27. Design system alignment
+
+After May 2026, the prototype drifted: each studio reinvented its shell,
+~50 pill/tag/badge classes accumulated, and heroes used inconsistent
+spacing and colors. This sprint pulled it back together.
+
+### Source of truth: agentic-studio.html
+
+The canonical AIMS-OS shell pattern lives in `agentic-studio.html`
+(imported from the internal CLAUDE mirror in this sprint). Spec is
+documented in [`docs/SHELL_PATTERN.md`](SHELL_PATTERN.md) — covers
+sidebar (52→220px collapsible with labels), topbar (ctx-menu, gear-menu,
+notif-menu, avatar-menu primitives), CSS variables (`--shell-*`),
+theming, and a migration checklist.
+
+### View improvement sweep (12 surfaces)
+
+Every prominent hero / card / tab / modal aligned to the same DS palette:
+
+| Layer | Surfaces aligned |
+|---|---|
+| Heroes (8) | Operate (Admin), Integration detail (Admin), Templates library (Data), Connections home (Data), Requests inbox (Admin), Tables library (Data), Field Mappings (Data), Schema Versions (Data) |
+| Cards | Marketplace integration cards (`.mkt-card`) |
+| Tabs | Generic `.tabs` / `.tab` primitive |
+| Content | Integration detail Overview tab (capability cards, used-in list, side kv panel) |
+| Modal | Connect Data wizard modal |
+
+Consistent tokens applied across all 12:
+
+- **Color palette:** `#34d39c` (ok) · `#fbbf24` (warn) · `#7ed3f7` (cyan accent) · `#cda5ff` (purple) · `#ff7d7d` (red) · `--t3` (idle)
+- **Alphas:** 0.04 / 0.06 / 0.08 / 0.28 for backgrounds / borders / tinted surfaces
+- **Green pulse dot:** `#10b981` + `0 0 0 2px rgba(16,185,129,0.18)` ring — used for "Updated just now" timestamps
+- **Title scale:** 26-28px hero, 24px detail
+- **Primary CTA gradient:** amber for "Resolve N issues →" / cyan for "+ New"
+
+### Iconography hygiene
+
+The earlier design-critique pass removed every emoji-as-UI-icon:
+
+- 10 Templates group icons (💰📊👥🏢...) → SVG stroke 14×14
+- Onboarding hero ✨ + 🎉 → branded SVGs
+- Sync history ✓ / ✕ → SVG check/cross
+- 6 auth method icons in wizard step 2 → SVG (lock / key / doc / user / users / clipboard)
+- 8 AI assistant suggestion chips → SVG
+- aria-label added to icon-only buttons
+
+Emojis in conversational content (AI chat bodies, toasts) intentionally
+kept — they're text content, not icons.
+
+### Mike thesis fix — admin default mode
+
+`docs/DEMO.md` section 19 said *"End users default to Browse; admins
+default to Operate."* The implementation was defaulting everyone to
+Browse. Fixed: fresh admin now lands on Operate (triage view, "N need
+attention" hero) on first run. Explicit user choice via localStorage is
+always respected.
+
+---
+
+## 28. Extended demo script v2 (10-12 minutes)
+
+Updated walkthrough including the new surfaces.
+
+1. Open `index.html` → click **Data Studio** card → land on `#/onboarding`
+   (if no `aims_ds_tenant_onboarding_v1` in localStorage)
+2. Walk through 8 onboarding steps:
+   - Welcome → Organization → Starter setup → Workspace grouping →
+     Workspace profile → Connect data ("Continue with mock data") →
+     Apply templates → Done
+3. From Done → click **"Open Data Studio"** → land on `#/connections`
+4. Browse: cards in Active state, click **Salesforce** → connection detail
+5. Sidebar → **Tables** → click `customer` → see split layout with right rail
+   - Click any field → inspect across 4 sub-tabs
+   - Versions tab → see auto-versioning timeline
+6. Sidebar → **Templates** → click `Email & contact data quality` (read-only system pack) → **Clone & edit →**
+   - Rename via inline click → edit description
+   - Click any rule → 4 sub-tabs (Basics / Expression / Examples / Custom)
+   - Examples tab: see real pass/fail evaluation
+   - Usage tab → **Apply to a field** → 2-step picker → apply
+7. Sidebar → **Field mappings** → see cross-connection inventory
+   - Filter to "Needs review" → click **Resolve** on any custom field
+   - Pick "Accept AI suggestion" → confirm
+8. Sidebar → **Schema versions** → see the timeline aggregating all Table
+   edits made today, grouped by Today / Yesterday / This week
+9. Switch to **Admin Studio** via the studio switcher dropdown (top-left)
+10. Click **Operate** in the topbar mode toggle (admin default) — see
+    "N need attention" hero + KPI cards + primary CTA "Resolve N issues →"
+11. Click the primary CTA → filter to needs-attention bucket → click a row
+    → integration detail with the new eyebrow row + pill meta
+12. Top-right **gear icon** — toggle theme dark/light
+
+End result: every surface in the prototype touched in 12 minutes.
+
+---
+
+*Last updated: 2026-05-29*
+*Working tree: 18+ commits since the May 2026 founder session covering
+Tables, Templates, Tenant onboarding, Field Mappings, Schema Versions,
+shell alignment, 12 view improvements, iconography normalization, and
+the admin default mode fix.*

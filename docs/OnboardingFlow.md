@@ -312,4 +312,4 @@ The onboarding wizard adds ~1,500 lines to that total (~27% of the file).
 
 ---
 
-*For the engineering brief that defines the production model, contact Sebastian Blandon (SVP Engineering) or Edgardo Sierra (Chief Architect). For the original `OnboardingFlow.jsx` artifact this is adapted from, see `OnboardingFlow_Documentation.pdf` on the design team's Notion.*
+*For the engineering brief that defines the production model, contact Thomas González (SVP Engineering) or Edgardo Sierra (Chief Architect). For the original `OnboardingFlow.jsx` artifact this is adapted from, see `OnboardingFlow_Documentation.pdf` on the design team's Notion.*
