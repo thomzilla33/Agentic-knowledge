@@ -794,11 +794,66 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .nl.nl-collapsed{width:44px}
 .nl.nl-collapsed .nl-swrap,.nl.nl-collapsed .nl-tabs,.nl.nl-collapsed .nl-body,.nl.nl-collapsed .nl-title{display:none}
 .nl.nl-collapsed .nl-hd{justify-content:center;padding:10px 0}
-.nl-strip-body{display:none;flex-direction:column;align-items:center;gap:2px;padding:0 0 12px}
+.nl-strip-body{display:none;flex-direction:column;align-items:center;gap:2px;padding:0 0 12px;overflow-y:auto;flex:1;min-height:0}
 .nl.nl-collapsed .nl-strip-body{display:flex}
-.nl-strip-ico{width:32px;height:32px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:color .15s,background .15s}
+.nl-strip-ico{
+  position:relative;
+  width:32px;height:32px;border-radius:var(--r8);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:color .15s,background .15s,transform .08s;
+  flex-shrink:0;
+}
 .nl-strip-ico:hover{color:var(--t1)!important;background:rgba(255,255,255,0.07)}
+.nl-strip-ico:active{transform:scale(0.94)}
+.nl-strip-ico.is-drag{cursor:grab}
+.nl-strip-ico.is-drag:active{cursor:grabbing}
+.nl-strip-ico.is-dragging{opacity:0.45}
+/* Dashed border variant for the generic-Agent drop target affordance */
+.nl-strip-ico.is-generic{
+  background:rgba(167,139,250,0.10);
+  border:1px dashed rgba(167,139,250,0.45);
+}
+.nl-strip-ico.is-generic:hover{background:rgba(167,139,250,0.18);border-color:rgba(167,139,250,0.70)}
+
+/* Section label inside the collapsed strip — tiny 1-2 letter pill that
+   marks the start of each group (N = Native, W = Workflows, A = Agents). */
+.nl-strip-grp{
+  font-size:8.5px;font-weight:700;letter-spacing:.10em;
+  color:var(--t4);text-transform:uppercase;
+  margin:6px 0 2px;line-height:1;
+  user-select:none;flex-shrink:0;
+}
+
+/* Horizontal divider between groups in the strip */
 .nl-strip-sep{width:20px;height:1px;background:rgba(255,255,255,0.07);margin:3px 0;flex-shrink:0}
+
+/* Custom flyout tooltip — positioned by JS on mouseenter. Body is appended
+   to .app so it can escape the panel's overflow:hidden. */
+.nl-strip-tip{
+  position:fixed;z-index:9500;
+  background:#0c1428;border:1px solid var(--bds);
+  border-radius:var(--r6);padding:7px 10px;
+  box-shadow:0 6px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,127,255,0.06);
+  pointer-events:none;
+  opacity:0;transform:translateX(-4px);transition:opacity .12s ease, transform .12s ease;
+  max-width:240px;
+}
+.nl-strip-tip.is-open{opacity:1;transform:translateX(0)}
+.nl-strip-tip-nm{font-size:12px;font-weight:700;color:var(--t1);line-height:1.2;white-space:nowrap}
+.nl-strip-tip-sub{font-size:10.5px;color:var(--t3);margin-top:3px;line-height:1.3}
+.nl-strip-tip-drag{
+  display:inline-flex;align-items:center;gap:4px;
+  margin-top:5px;font-size:9.5px;font-weight:700;
+  color:var(--pri-lt);letter-spacing:.04em;text-transform:uppercase;
+}
+.nl-strip-tip-drag svg{flex-shrink:0}
+/* Arrow on the left edge of the tooltip */
+.nl-strip-tip::before{
+  content:'';position:absolute;left:-5px;top:50%;
+  transform:translateY(-50%) rotate(45deg);
+  width:8px;height:8px;
+  background:#0c1428;border-left:1px solid var(--bds);border-bottom:1px solid var(--bds);
+}
 .nl-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 16px 9px}
 .nl-title{font-size:14px;font-weight:700;color:var(--t1)}
 .nl-collapse-btn{background:none;border:none;color:var(--t3);cursor:pointer;padding:3px;border-radius:var(--r4);transition:color .1s,background .1s;display:flex;align-items:center;justify-content:center}
@@ -4927,24 +4982,59 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" id="nlCollapseIco"><path d="M8.5 2.5L4.5 7l4 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="2" x2="2" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
             </button>
           </div>
-          <!-- Collapsed strip hints (visible only when Nodes panel is collapsed) -->
-          <div class="nl-strip-body">
-            <div class="nl-strip-sep"></div>
-            <div class="nl-strip-ico" title="Trigger nodes" onclick="toggleNodesPanel()" style="color:var(--warn)">
+          <!-- Collapsed strip — mirrors every item in the expanded list with
+               its own SVG, a rich hover tooltip (name + subtitle), and drag-
+               and-drop support for items that have it in the expanded panel.
+               Click on an item does the same thing as click on its expanded
+               counterpart. -->
+          <div class="nl-strip-body" id="nlStripBody"
+               onmouseover="nlStripHoverTip(event)"
+               onmouseout="nlStripHideTip(event)">
+
+            <div class="nl-strip-grp">N</div>
+            <div class="nl-strip-ico" data-nm="Trigger" data-sub="Starts the network" onclick="toast('Trigger node added','info')" style="color:var(--warn)">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L5.5 7.5H9L5 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div class="nl-strip-ico" title="Agent nodes" onclick="toggleNodesPanel()" style="color:var(--pur)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2.5" y="5" width="9" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="5.2" cy="8.5" r=".9" fill="currentColor"/><circle cx="8.8" cy="8.5" r=".9" fill="currentColor"/></svg>
+            <div class="nl-strip-ico" data-nm="Condition" data-sub="If / else branching" onclick="toast('Condition node added','info')" style="color:var(--pri)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M3 6l4-4 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div class="nl-strip-ico" title="Action nodes" onclick="toggleNodesPanel()" style="color:var(--pri)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2.5 2.5 3-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="nl-strip-ico" data-nm="Action" data-sub="HTTP, transform, store" onclick="toast('Action node added','info')" style="color:var(--ok)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div class="nl-strip-sep"></div>
-            <div class="nl-strip-ico" title="Logic &amp; conditions" onclick="toggleNodesPanel()" style="color:var(--ok)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4.5h4.5L9 7l-2.5 2.5H2M9 7h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="nl-strip-ico" data-nm="Wait for Event" data-sub="Pause until event arrives" onclick="toast('Wait node added','info')" style="color:var(--warn)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5V7l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
             </div>
-            <div class="nl-strip-ico" title="Integrations" onclick="toggleNodesPanel()" style="color:var(--t2)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="8" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M6 4h2M6 10h2M4 6v2M10 6v2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+            <div class="nl-strip-ico" data-nm="Output" data-sub="Declares final result" onclick="toast('Output node added','info')" style="color:var(--ok)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7L6.5 9L9.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <div class="nl-strip-grp">W</div>
+            <div class="nl-strip-ico" data-nm="Lead Qualification" data-sub="In: customer_data → Out: qualified_lead" onclick="selectEditNode('wf-lq')" style="color:var(--brand-teal)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="nl-strip-ico" data-nm="Data Enrichment" data-sub="In: lead_id → Out: enriched_profile" onclick="selectEditNode('wf-de')" style="color:var(--brand-teal)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="nl-strip-ico" data-nm="CRM Sync" data-sub="In: enriched_profile → Out: crm_record_id" onclick="selectEditNode('wf-cs')" style="color:var(--brand-teal)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+
+            <div class="nl-strip-grp">A</div>
+            <!-- Generic Agent — same drag handlers as the expanded item so
+                 the user can grab the icon from the collapsed strip and drop
+                 it on the canvas to add an Agent node. -->
+            <div class="nl-strip-ico is-drag is-generic"
+                 draggable="true" data-node-type="agent-generic"
+                 data-nm="Agent" data-sub="Drag to canvas · pick from catalog" data-drag="1"
+                 ondragstart="onAgentDragStart(event)" ondragend="onAgentDragEnd(event)"
+                 style="color:var(--pur)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><path d="M5 10h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="nl-strip-ico" data-nm="Customer Analyst" data-sub="Analyzes customer behavior" onclick="selectEditNode('ag-ca')" style="color:var(--pur)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><path d="M5 10h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="nl-strip-ico" data-nm="Document Reader" data-sub="Extracts data from docs" onclick="selectEditNode('ag-dr')" style="color:var(--pur)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><path d="M5 10h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
             </div>
           </div>
           <div class="nl-swrap"><input class="nl-sinp" placeholder="Search nodes…"/></div>
@@ -7242,6 +7332,58 @@ function toggleNodesPanel() {
       : '<path d="M8.5 2.5L4.5 7l4 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="2" x2="2" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>';
   }
   if (collapseBtn) collapseBtn.title = isCollapsed ? 'Expand panel' : 'Collapse panel';
+  // Hide any open strip tooltip when toggling.
+  nlStripHideTip();
+}
+
+// ── Collapsed Nodes strip — rich hover tooltip (name + subtitle) ──
+// Floats to the right of the hovered icon. Body-appended so it escapes the
+// panel's overflow:hidden. Reused across all .nl-strip-ico elements via
+// event delegation on .nl-strip-body.
+let _nlStripTipEl = null;
+function nlStripTipEl() {
+  if (_nlStripTipEl) return _nlStripTipEl;
+  const el = document.createElement('div');
+  el.className = 'nl-strip-tip';
+  el.innerHTML = '<div class="nl-strip-tip-nm"></div><div class="nl-strip-tip-sub"></div><div class="nl-strip-tip-drag" style="display:none"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><circle cx="2.5" cy="2.5" r="1" fill="currentColor"/><circle cx="7.5" cy="2.5" r="1" fill="currentColor"/><circle cx="2.5" cy="7.5" r="1" fill="currentColor"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor"/></svg>Drag to canvas</div>';
+  document.body.appendChild(el);
+  _nlStripTipEl = el;
+  return el;
+}
+function nlStripHoverTip(ev) {
+  const ico = ev.target.closest('.nl-strip-ico');
+  if (!ico) return;
+  const nm  = ico.getAttribute('data-nm');
+  const sub = ico.getAttribute('data-sub') || '';
+  const drag = ico.hasAttribute('data-drag');
+  if (!nm) return;
+  const tip = nlStripTipEl();
+  tip.querySelector('.nl-strip-tip-nm').textContent  = nm;
+  tip.querySelector('.nl-strip-tip-sub').textContent = sub;
+  tip.querySelector('.nl-strip-tip-drag').style.display = drag ? 'inline-flex' : 'none';
+  // Position to the right of the icon, vertically centered
+  const r = ico.getBoundingClientRect();
+  tip.style.left = (r.right + 10) + 'px';
+  tip.style.top  = (r.top + r.height/2 - tip.offsetHeight/2) + 'px';
+  // Re-measure after content swap to recenter vertically
+  requestAnimationFrame(() => {
+    tip.style.top = (r.top + r.height/2 - tip.offsetHeight/2) + 'px';
+  });
+  tip.classList.add('is-open');
+}
+function nlStripHideTip(ev) {
+  // When leaving the strip-body, hide; but ignore mouseout into a child.
+  if (ev && ev.relatedTarget && ev.currentTarget && ev.currentTarget.contains(ev.relatedTarget)) {
+    // moving between icons inside the body — keep tip open, just update
+    // by triggering hover on the new target
+    const newIco = ev.relatedTarget.closest && ev.relatedTarget.closest('.nl-strip-ico');
+    if (newIco) {
+      // Re-fire as hover on the new ico
+      nlStripHoverTip({ target: newIco });
+      return;
+    }
+  }
+  if (_nlStripTipEl) _nlStripTipEl.classList.remove('is-open');
 }
 
 function toggleInspPanel() {
