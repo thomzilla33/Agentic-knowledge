@@ -827,7 +827,7 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .nl-sub{font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nl-badge{height:16px;padding:0 5px;border-radius:3px;font-size:10px;font-weight:700;line-height:16px;flex-shrink:0}
 /* Edit canvas area */
-.bldr-edit-area{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.bldr-edit-area{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
 .bldr-warn{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(253,199,0,0.07);border-bottom:1px solid rgba(253,199,0,0.18);flex-shrink:0}
 .bldr-warn-ic{flex-shrink:0;color:var(--warn)}
 .bldr-warn-txt{flex:1;font-size:12px;color:var(--warn)}
@@ -837,7 +837,32 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .bldr-warn-x{background:none;border:none;color:var(--warn);opacity:.5;cursor:pointer;font-size:16px;line-height:1;padding:2px}
 .bldr-ec{flex:1;position:relative;overflow:auto;background:var(--bg)}
 /* Inspector */
-.bldr-insp{width:296px;flex-shrink:0;border-left:1px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;transition:width .22s cubic-bezier(.4,0,.2,1),border-color .22s}
+.bldr-insp{width:296px;min-width:280px;max-width:80vw;flex-shrink:0;border-left:1px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;transition:width .22s cubic-bezier(.4,0,.2,1),border-color .22s;position:relative}
+.bldr-insp.is-resizing{transition:border-color .22s}
+
+/* Left-edge drag handle (mirrors the Trace slide-out pattern from A2.6) */
+.bldr-insp-resize{
+  position:absolute;left:0;top:0;bottom:0;
+  width:5px;cursor:col-resize;background:transparent;z-index:12;
+  transition:background .15s;
+}
+.bldr-insp-resize::after{
+  content:'';position:absolute;left:1px;top:50%;
+  transform:translateY(-50%);
+  width:2px;height:36px;border-radius:2px;
+  background:rgba(255,255,255,0.18);
+  opacity:0;transition:opacity .15s, background .15s;
+}
+.bldr-insp-resize:hover{background:rgba(43,127,255,0.18)}
+.bldr-insp-resize:hover::after{opacity:1;background:rgba(43,127,255,0.65)}
+.bldr-insp.is-resizing .bldr-insp-resize{background:rgba(43,127,255,0.30)}
+.bldr-insp.is-resizing .bldr-insp-resize::after{opacity:1;background:var(--pri-lt)}
+/* Hide the handle when the panel is fully collapsed (44px strip) */
+.bldr-insp.insp-collapsed .bldr-insp-resize{display:none}
+
+/* While dragging, lock cursor everywhere + suppress text selection */
+body.bldr-insp-resizing{user-select:none;cursor:col-resize !important}
+body.bldr-insp-resizing iframe{pointer-events:none}
 .bldr-insp.insp-collapsed{width:44px}
 .bldr-insp.insp-collapsed .insp-body,.bldr-insp.insp-collapsed .insp-node-card,.bldr-insp.insp-collapsed .insp-row>div:first-child{display:none}
 .bldr-insp.insp-collapsed .insp-hd{padding:10px 0;border-bottom-color:transparent;display:flex;flex-direction:column;align-items:center}
@@ -5003,6 +5028,8 @@ button.avatar-sm:hover{filter:brightness(1.08)}
         </div>
         <!-- Inspector -->
         <div class="bldr-insp" id="bldrInspPanel">
+          <!-- Left-edge drag-to-resize handle (mirrors trace slide-out pattern from A2.6) -->
+          <div class="bldr-insp-resize" id="bldrInspResize" onmousedown="onInspResizeStart(event)" title="Drag to resize"></div>
           <div class="insp-hd">
             <div class="insp-row">
               <div style="min-width:0;flex:1">
@@ -12157,6 +12184,80 @@ function restoreTraceWidth() {
   tmTraceMaximized = false;
   panel.classList.remove('is-maximized');
 }
+
+// ── Inspector panel: drag-to-resize from the left edge ────────────────
+// Same UX pattern as the Trace slide-out resize. User grabs the 5px-wide
+// handle on the panel's left edge and drags to widen/narrow. The chosen
+// width is persisted in localStorage('bldrInspWidth') so it survives
+// reloads. Re-clamped against viewport on each restore.
+const BLDR_INSP_MIN_W = 280;
+// Cap so the canvas area keeps at least ~200px breathing room. Nodes panel
+// is ~250px; leave 200px for the canvas → max = viewport − 450.
+const BLDR_INSP_MAX_W = () => Math.max(400, window.innerWidth - 450);
+const BLDR_INSP_DEF_W = 296;
+let bldrInspResizing    = false;
+let bldrInspResizeStartX = 0;
+let bldrInspResizeStartW = 0;
+
+function onInspResizeStart(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const panel = document.getElementById('bldrInspPanel');
+  if (!panel) return;
+  // Don't allow resize when the panel is in collapsed strip mode.
+  if (panel.classList.contains('insp-collapsed')) return;
+  bldrInspResizing = true;
+  bldrInspResizeStartX = e.clientX;
+  bldrInspResizeStartW = panel.offsetWidth;
+  panel.classList.add('is-resizing');
+  document.body.classList.add('bldr-insp-resizing');
+  document.addEventListener('mousemove', onInspResizeMove);
+  document.addEventListener('mouseup',   onInspResizeEnd);
+}
+function onInspResizeMove(e) {
+  if (!bldrInspResizing) return;
+  // Panel anchored to the RIGHT — dragging LEFT (negative dx) expands it.
+  const dx  = bldrInspResizeStartX - e.clientX;
+  const min = BLDR_INSP_MIN_W;
+  const max = BLDR_INSP_MAX_W();
+  const w   = Math.max(min, Math.min(max, bldrInspResizeStartW + dx));
+  const panel = document.getElementById('bldrInspPanel');
+  // Use flex-basis (not width) because the panel sits in a flex-row container
+  // — `width` gets ignored by the flex algorithm in this container, but
+  // `flex-basis` sizes the item authoritatively when flex-grow/shrink are 0.
+  panel.style.flexBasis = w + 'px';
+  panel.style.width = w + 'px';   // belt + suspenders for fallback paths
+}
+function onInspResizeEnd() {
+  if (!bldrInspResizing) return;
+  bldrInspResizing = false;
+  document.body.classList.remove('bldr-insp-resizing');
+  const panel = document.getElementById('bldrInspPanel');
+  panel.classList.remove('is-resizing');
+  document.removeEventListener('mousemove', onInspResizeMove);
+  document.removeEventListener('mouseup',   onInspResizeEnd);
+  // Persist the chosen width (read from offsetWidth so clamps are baked in).
+  try { localStorage.setItem('bldrInspWidth', panel.offsetWidth + 'px'); } catch (_) {}
+}
+
+// Apply any persisted user width on page load. Clamps against viewport.
+function restoreInspWidth() {
+  const panel = document.getElementById('bldrInspPanel');
+  if (!panel) return;
+  let saved = '';
+  try { saved = localStorage.getItem('bldrInspWidth') || ''; } catch (_) {}
+  if (saved) {
+    const px = parseInt(saved, 10);
+    if (!isNaN(px)) {
+      const w = Math.max(BLDR_INSP_MIN_W, Math.min(BLDR_INSP_MAX_W(), px));
+      panel.style.flexBasis = w + 'px';
+      panel.style.width = w + 'px';
+    }
+  }
+}
+// Run on DOMContentLoaded so the layout snaps to the saved width before paint.
+document.addEventListener('DOMContentLoaded', restoreInspWidth);
+
 function runNextStep(idx) {
   if (idx >= TM_STEPS.length) {
     // all done — mark completed
