@@ -918,8 +918,8 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 /* While dragging, lock cursor everywhere + suppress text selection */
 body.bldr-insp-resizing{user-select:none;cursor:col-resize !important}
 body.bldr-insp-resizing iframe{pointer-events:none}
-.bldr-insp.insp-collapsed{width:44px}
-.bldr-insp.insp-collapsed .insp-body,.bldr-insp.insp-collapsed .insp-node-card,.bldr-insp.insp-collapsed .insp-row>div:first-child{display:none}
+.bldr-insp.insp-collapsed{width:44px !important;min-width:44px !important;max-width:44px !important;flex-basis:44px !important}
+.bldr-insp.insp-collapsed .insp-body,.bldr-insp.insp-collapsed .insp-node-card,.bldr-insp.insp-collapsed .insp-row>div:first-child,.bldr-insp.insp-collapsed .insp-ft{display:none}
 .bldr-insp.insp-collapsed .insp-hd{padding:10px 0;border-bottom-color:transparent;display:flex;flex-direction:column;align-items:center}
 .bldr-insp.insp-collapsed .insp-row{justify-content:center}
 .insp-strip-body{display:none;flex-direction:column;align-items:center;gap:2px;padding:0 0 12px}
@@ -7391,6 +7391,32 @@ function toggleInspPanel() {
   const collapseBtn = document.getElementById('inspCollapseBtn');
   if (!panel) return;
   const isCollapsed = panel.classList.toggle('insp-collapsed');
+  // ── BUG FIX (A3.7) ─────────────────────────────────────────────────
+  // When collapsing, strip the inline flex-basis/width set by the A3.5
+  // resize handlers so the `.insp-collapsed { width: 44px }` CSS rule
+  // can take effect. Stash the values on a data attr so we can restore
+  // them on expand.
+  if (isCollapsed) {
+    if (panel.style.flexBasis) panel.dataset.savedFlexBasis = panel.style.flexBasis;
+    if (panel.style.width)     panel.dataset.savedWidth     = panel.style.width;
+    panel.style.flexBasis = '';
+    panel.style.width     = '';
+  } else {
+    // Restore the user's resized width (from data attr or localStorage).
+    let restoreW = panel.dataset.savedWidth || panel.dataset.savedFlexBasis || '';
+    if (!restoreW) {
+      try { restoreW = localStorage.getItem('bldrInspWidth') || ''; } catch (_) {}
+    }
+    if (restoreW) {
+      panel.style.flexBasis = restoreW;
+      panel.style.width     = restoreW;
+    }
+    delete panel.dataset.savedFlexBasis;
+    delete panel.dataset.savedWidth;
+  }
+  // Render the type-aware section icons in the strip (only matters when
+  // collapsing, but harmless to re-render on expand).
+  if (isCollapsed) renderInspStrip();
   // Flip the icon direction
   const ico = document.getElementById('inspCollapseIco');
   if (ico) {
@@ -7399,6 +7425,79 @@ function toggleInspPanel() {
       : '<path d="M5.5 2.5L9.5 7l-4 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>';
   }
   if (collapseBtn) collapseBtn.title = isCollapsed ? 'Expand panel' : 'Collapse panel';
+}
+
+// Render the icons in the collapsed Inspector strip based on the ACTIVE
+// node type's sections (Input / Configuration / Output / Advanced) and a
+// shortcut to Configure. Each icon is a section jump-link: click expands
+// the panel AND opens that section.
+function renderInspStrip() {
+  const strip = document.querySelector('#bldrInspPanel .insp-strip-body');
+  if (!strip) return;
+  const node = (typeof getActiveNode === 'function') ? getActiveNode() : null;
+  const cfg  = (node && typeof NODE_TYPE_CONFIG !== 'undefined') ? NODE_TYPE_CONFIG[node.t] : null;
+  // Section icon SVG paths — keyed by section id
+  const SECTION_ICOS = {
+    input:    '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M2 7h7M2 10h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
+    config:   '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.7 2.7l1 1M10.3 10.3l1 1M2.7 11.3l1-1M10.3 3.7l1-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    output:   '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4l10 0M2 7l10 0M2 10l5 0M9 10l2 0M11 8l2 2-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    advanced: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L2 4v3.5C2 10.5 4 12.5 7 13c3-.5 5-2.5 5-5.5V4L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+  };
+  const SECTION_LABELS = {
+    input: 'Input mapping', config: 'Configuration', output: 'Output', advanced: 'Advanced',
+  };
+  const SECTION_COLORS = {
+    input: 'var(--t2)', config: 'var(--pri)', output: 'var(--ok)', advanced: 'var(--err)',
+  };
+  if (!cfg) {
+    // Fallback: legacy 4-icon strip for unknown node types.
+    strip.innerHTML = `
+      <div class="nl-strip-sep"></div>
+      <div class="insp-strip-ico" title="Expand inspector" onclick="toggleInspPanel()" style="color:var(--t2)">${SECTION_ICOS.input}</div>
+    `;
+    return;
+  }
+  // Build one icon per section that has at least 1 field for this node type.
+  const sections = ['input','config','output','advanced'];
+  const items = sections
+    .filter(s => Array.isArray(cfg.sections?.[s]) && cfg.sections[s].length > 0)
+    .map(s => `
+      <div class="insp-strip-ico"
+           data-nm="${SECTION_LABELS[s]}"
+           data-sub="${cfg.sections[s].length} field${cfg.sections[s].length === 1 ? '' : 's'}"
+           onclick="expandInspectorToSection('${s}')"
+           style="color:${SECTION_COLORS[s]}">
+        ${SECTION_ICOS[s]}
+      </div>
+    `).join('');
+  // Plus a "Configure" shortcut that opens the full modal (type-aware).
+  const configureIco = `
+    <div class="insp-strip-ico"
+         data-nm="Configure"
+         data-sub="Open full configuration"
+         onclick="openNodeConfigModal(activeNodeId); toggleInspPanel();"
+         style="color:var(--pur)">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  `;
+  strip.innerHTML = `<div class="nl-strip-sep"></div>${items}${configureIco}`;
+  // Wire the same hover tooltip we built in A3.6.
+  strip.onmouseover = nlStripHoverTip;
+  strip.onmouseout  = nlStripHideTip;
+}
+
+// Expand the inspector AND auto-open the requested section's accordion.
+function expandInspectorToSection(secId) {
+  const panel = document.getElementById('bldrInspPanel');
+  if (panel && panel.classList.contains('insp-collapsed')) toggleInspPanel();
+  // Wait for the expand transition, then ensure the section is open.
+  setTimeout(() => {
+    const sec = document.querySelector(`#bldrInspPanel .insp-cfg-sec[data-sec="${secId}"]`);
+    if (sec && !sec.classList.contains('is-open')) {
+      sec.classList.add('is-open');
+    }
+    sec?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, 260);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
