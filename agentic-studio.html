@@ -883,6 +883,243 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .insp-apply{flex:1;height:33px;border-radius:var(--r6);border:none;background:var(--pri);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
 .insp-apply:hover{opacity:.9}
 
+/* ── Type-aware Inspector (A3.1 / A3.2) ──
+   Collapsible sections inside the compact inspector body. Each section
+   has a clickable header (chevron + label + counter pill + dirty dot)
+   and an animated body that opens/closes on click. State is persisted
+   in sessionStorage per (nodeId, section). */
+.insp-cfg-sec{margin:8px 12px 0;border:1px solid var(--bd);border-radius:8px;background:rgba(255,255,255,0.018);overflow:hidden}
+.insp-cfg-sec + .insp-cfg-sec{margin-top:6px}
+.insp-cfg-sec-hd{
+  display:flex;align-items:center;gap:8px;padding:9px 11px;
+  cursor:pointer;user-select:none;
+  transition:background .12s;
+}
+.insp-cfg-sec-hd:hover{background:rgba(255,255,255,0.03)}
+.insp-cfg-sec-hd:focus{outline:none;background:rgba(167,139,250,0.06)}
+.insp-cfg-sec-hd:focus-visible{box-shadow:inset 0 0 0 1px rgba(167,139,250,0.45)}
+.insp-cfg-sec-chev{
+  width:11px;height:11px;color:var(--t3);flex-shrink:0;
+  transition:transform .18s ease;
+}
+.insp-cfg-sec.is-open > .insp-cfg-sec-hd .insp-cfg-sec-chev{transform:rotate(90deg)}
+.insp-cfg-sec-lbl{
+  flex:1;min-width:0;font-size:10px;font-weight:700;
+  color:var(--t2);text-transform:uppercase;letter-spacing:.06em;
+  display:flex;align-items:center;gap:6px;
+}
+.insp-cfg-sec.is-open > .insp-cfg-sec-hd .insp-cfg-sec-lbl{color:var(--t1)}
+.insp-cfg-sec-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--pur);
+  display:none;
+}
+.insp-cfg-sec.has-dirty > .insp-cfg-sec-hd .insp-cfg-sec-dot{display:inline-block}
+.insp-cfg-sec-pill{
+  font-size:9.5px;font-weight:700;color:var(--t3);
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  padding:1px 6px;border-radius:9px;line-height:1.3;
+}
+.insp-cfg-sec.has-dirty > .insp-cfg-sec-hd .insp-cfg-sec-pill{
+  color:var(--pur-lt);background:rgba(167,139,250,0.10);border-color:rgba(167,139,250,0.30);
+}
+.insp-cfg-sec-err{
+  font-size:9.5px;font-weight:700;color:var(--err-lt);
+  background:var(--err-bg);border:1px solid rgba(255,100,103,0.30);
+  padding:1px 6px;border-radius:9px;line-height:1.3;
+}
+.insp-cfg-sec-bd{
+  max-height:0;overflow:hidden;
+  transition:max-height .22s ease;
+}
+.insp-cfg-sec.is-open > .insp-cfg-sec-bd{
+  max-height:1400px;
+}
+.insp-cfg-sec-inner{padding:4px 12px 12px}
+
+/* Field rows inside compact inspector */
+.ins-fld{margin-bottom:10px}
+.ins-fld:last-child{margin-bottom:0}
+.ins-fld-lbl{
+  font-size:11px;font-weight:600;color:var(--t2);
+  margin-bottom:5px;display:flex;align-items:center;gap:4px;
+}
+.ins-fld-lbl .req{color:var(--err)}
+.ins-fld-help{font-size:10px;color:var(--t4);margin-top:3px;line-height:1.4}
+.ins-fld-err{font-size:10px;color:var(--err-lt);margin-top:3px}
+.ins-fld-input,
+.ins-fld-select,
+.ins-fld-textarea,
+.ins-fld-code{
+  width:100%;background:var(--cb);border:1px solid var(--bd);
+  border-radius:var(--r6);padding:0 10px;color:var(--t1);font-size:12px;
+  outline:none;font-family:inherit;transition:border-color .12s;
+  box-sizing:border-box;
+}
+.ins-fld-input{height:30px}
+.ins-fld-select{height:30px;appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'><path d='M2 4l3 3 3-3' stroke='%23888' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 9px center;padding-right:24px;
+}
+.ins-fld-textarea{padding:8px 10px;min-height:64px;resize:vertical;line-height:1.5}
+.ins-fld-code{height:30px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px}
+.ins-fld-input:focus,
+.ins-fld-select:focus,
+.ins-fld-textarea:focus,
+.ins-fld-code:focus{border-color:rgba(167,139,250,0.45)}
+.ins-fld-input.is-invalid,
+.ins-fld-select.is-invalid,
+.ins-fld-textarea.is-invalid,
+.ins-fld-code.is-invalid{border-color:var(--err);background:rgba(255,100,103,0.04)}
+.ins-fld-num{display:flex;align-items:center;gap:8px}
+.ins-fld-num .suffix{font-size:10px;color:var(--t4)}
+.ins-fld-slider-row{display:flex;align-items:center;gap:10px}
+.ins-fld-slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;
+  background:rgba(255,255,255,0.08);border-radius:2px;outline:none;cursor:pointer}
+.ins-fld-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:13px;height:13px;border-radius:50%;
+  background:var(--pur);border:2px solid var(--bg2);cursor:pointer;
+}
+.ins-fld-slider::-moz-range-thumb{
+  width:13px;height:13px;border-radius:50%;
+  background:var(--pur);border:2px solid var(--bg2);cursor:pointer;
+}
+.ins-fld-slider-val{
+  min-width:36px;text-align:right;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
+  color:var(--pur-lt);font-weight:600;
+}
+.ins-fld-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ins-fld-toggle{
+  position:relative;width:30px;height:16px;border-radius:8px;
+  background:rgba(255,255,255,0.10);cursor:pointer;
+  transition:background .15s;flex-shrink:0;
+}
+.ins-fld-toggle.is-on{background:var(--pur)}
+.ins-fld-toggle::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:12px;height:12px;border-radius:50%;background:#fff;
+  transition:transform .15s ease;
+}
+.ins-fld-toggle.is-on::after{transform:translateX(14px)}
+.ins-fld-chips{display:flex;flex-wrap:wrap;gap:5px}
+.ins-fld-chip{
+  height:24px;padding:0 9px;border-radius:5px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:5px;
+  transition:background .12s, border-color .12s, color .12s;
+}
+.ins-fld-chip:hover{background:rgba(255,255,255,0.06);color:var(--t1)}
+.ins-fld-chip.is-active{
+  background:rgba(167,139,250,0.16);border-color:rgba(167,139,250,0.40);color:var(--pur-lt);
+}
+.ins-fld-json{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
+  color:var(--t2);background:var(--cb);border:1px solid var(--bd);
+  border-radius:var(--r6);padding:8px 10px;line-height:1.5;
+  max-height:120px;overflow:auto;white-space:pre;
+}
+.ins-fld-kv{display:flex;flex-direction:column;gap:5px}
+.ins-fld-kv-row{display:flex;gap:5px;align-items:center}
+.ins-fld-kv-row input{
+  flex:1;height:26px;background:var(--cb);border:1px solid var(--bd);
+  border-radius:var(--r4);padding:0 8px;color:var(--t1);font-size:11.5px;
+  outline:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  box-sizing:border-box;
+}
+.ins-fld-kv-row input:focus{border-color:rgba(167,139,250,0.45)}
+.ins-fld-kv-rm{
+  width:22px;height:22px;border-radius:4px;
+  background:transparent;border:1px solid var(--bd);color:var(--t3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:13px;line-height:1;flex-shrink:0;
+}
+.ins-fld-kv-rm:hover{background:rgba(255,100,103,0.10);color:var(--err);border-color:rgba(255,100,103,0.30)}
+.ins-fld-kv-add{
+  align-self:flex-start;
+  height:24px;padding:0 9px;border-radius:5px;
+  background:rgba(167,139,250,0.08);border:1px dashed rgba(167,139,250,0.30);
+  color:var(--pur-lt);font-size:11px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.ins-fld-kv-add:hover{background:rgba(167,139,250,0.14);border-style:solid}
+.ins-fld-ms{
+  display:flex;flex-direction:column;gap:4px;
+}
+.ins-fld-ms-row{
+  display:flex;align-items:center;gap:8px;padding:5px 8px;
+  background:rgba(255,255,255,0.025);border:1px solid var(--bd);
+  border-radius:var(--r4);cursor:pointer;
+  transition:background .12s;
+}
+.ins-fld-ms-row:hover{background:rgba(255,255,255,0.045)}
+.ins-fld-ms-row.is-on{background:rgba(167,139,250,0.10);border-color:rgba(167,139,250,0.32)}
+.ins-fld-ms-row .lbl{flex:1;font-size:11.5px;color:var(--t1)}
+.ins-fld-ms-row .chk{
+  width:14px;height:14px;border-radius:3px;border:1px solid var(--bd);
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  color:transparent;
+}
+.ins-fld-ms-row.is-on .chk{background:var(--pur);border-color:var(--pur);color:#fff}
+
+.insp-fallback{
+  padding:18px 16px;text-align:center;color:var(--t3);font-size:12px;line-height:1.6;
+}
+.insp-fallback strong{color:var(--t1);display:block;margin-bottom:5px;font-size:13px}
+.insp-fallback pre{
+  margin-top:10px;text-align:left;font-size:10.5px;
+  background:rgba(0,0,0,0.30);border:1px solid var(--bd);border-radius:var(--r6);
+  padding:8px 10px;color:var(--t2);max-height:200px;overflow:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+.insp-broken-banner{
+  margin:10px 12px;padding:10px 11px;border-radius:8px;
+  background:var(--err-bg);border:1px solid rgba(255,100,103,0.30);
+  display:flex;align-items:center;gap:9px;
+}
+.insp-broken-banner .txt{flex:1;font-size:11.5px;color:var(--err-lt);line-height:1.4}
+.insp-broken-banner .txt strong{color:#fff;display:block;font-weight:700;margin-bottom:1px}
+.insp-broken-banner .fix-btn{
+  height:26px;padding:0 9px;border-radius:5px;
+  background:rgba(255,100,103,0.18);border:1px solid rgba(255,100,103,0.40);
+  color:#fff;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;
+}
+.insp-broken-banner .fix-btn:hover{background:rgba(255,100,103,0.28)}
+
+.insp-empty-hint{
+  padding:36px 18px;text-align:center;color:var(--t3);font-size:12px;line-height:1.6;
+}
+.insp-empty-hint .ico{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bd);
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--t4);margin-bottom:8px;
+}
+
+/* Per-type accent overrides for the insp-node-ico card. The default color
+   is var(--pur) (Agent). When the node is a different type, JS toggles a
+   data-type attribute on the card. */
+.insp-node-card[data-type="trigger"] .insp-node-ico{background:var(--warn-bg);color:var(--warn)}
+.insp-node-card[data-type="agent"]   .insp-node-ico{background:var(--pur-bg); color:var(--pur)}
+.insp-node-card[data-type="rag"]     .insp-node-ico{background:var(--ok-bg);  color:var(--ok)}
+.insp-node-card[data-type="workflow"].insp-node-ico,
+.insp-node-card[data-type="workflow"] .insp-node-ico{background:rgba(43,127,255,0.14);color:var(--pri-lt)}
+.insp-node-card[data-type="condition"] .insp-node-ico{background:rgba(43,127,255,0.14);color:var(--pri-lt)}
+.insp-node-card[data-type="action"]    .insp-node-ico{background:var(--cyan-bg); color:var(--cyan)}
+.insp-node-card[data-type="wait"]      .insp-node-ico{background:var(--orange-bg);color:var(--orange)}
+.insp-node-card[data-type="output"]    .insp-node-ico{background:var(--ok-bg);  color:var(--ok)}
+
+/* "View N more" affordance at the bottom of a section when it's been
+   capped to 3 compact fields. */
+.insp-view-more{
+  margin-top:6px;font-size:11px;font-weight:600;
+  color:var(--pur-lt);background:none;border:none;cursor:pointer;
+  padding:4px 0;display:inline-flex;align-items:center;gap:4px;
+}
+.insp-view-more:hover{color:var(--pur-xlt);text-decoration:underline}
+
 /* ── KNOWLEDGE MODAL ── */
 .kn-modal-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
 .kn-modal-ov.open{display:flex}
@@ -4798,7 +5035,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="6" width="11" height="8" rx="1.5" stroke="var(--pur)" stroke-width="1.3"/><rect x="5.5" y="8.5" width="2" height="2" rx="1" fill="var(--pur)"/><rect x="8.5" y="8.5" width="2" height="2" rx="1" fill="var(--pur)"/><path d="M6 12h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/><path d="M8 6V3.5M6 3.5h4" stroke="var(--pur)" stroke-width="1.3" stroke-linecap="round"/></svg>
             </div>
             <div style="flex:1;min-width:0"><div class="insp-node-nm" id="inspNodeNm">Customer Analyst</div><div class="insp-node-st" id="inspNodeSt">Agent · Active</div></div>
-            <button class="insp-configure-btn" onclick="expandInspector(false)" title="Configure the entire agent">
+            <button class="insp-configure-btn" onclick="openNodeConfigModal(activeNodeId)" title="Open full configuration">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="1.4" stroke="currentColor" stroke-width="1.4"/><path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.5 2.5l1 1M8.5 8.5l1 1M2.5 9.5l1-1M8.5 3.5l1-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
               Configure
             </button>
@@ -7622,7 +7859,9 @@ function refreshTabOverrideDots() {
 
 // ─ Edit Canvas ─
 const EDIT_FLOW = [
-  {id:'wh',t:'trigger',l:'Webhook Received',sub:'Customer inquiry received'},
+  {id:'wh',t:'trigger',l:'Webhook Received',sub:'Customer inquiry received',
+    config: { triggerType: 'webhook', endpoint: '/webhook/invoice', auth: 'hmac', rateLimit: 100, timeoutMs: 30000 },
+  },
   {id:'ag-ca',t:'agent',agentId:'agt-customer-analyst',l:'Customer Analyst',sub:'Analyzes customer inquiry',badge:'A',
     // Demo seed: a couple of reference files so the picker has data to show.
     // These would normally be added via drag-drop by the workflow builder.
@@ -7636,10 +7875,807 @@ const EDIT_FLOW = [
         ],
       },
     },
+    config: { mapFromState: 'n1.webhook.payload', model: 'inherit' },
   },
-  {id:'ks',t:'rag',l:'Knowledge Space',sub:'Truth Only · Sales Playbook 2026',badge:'K'},
-  {id:'rg',t:'agent',agentId:'agt-response-generator',l:'Response Generator',sub:'Generates customer response',badge:'Ag'},
+  {id:'ks',t:'rag',l:'Knowledge Space',sub:'Truth Only · Sales Playbook 2026',badge:'K',
+    config: { query: 'state.qualified_lead.summary', packs: ['KP-003'], drives: ['d1'], topK: 5, rerank: true, minSimilarity: 0.7 },
+  },
+  {id:'rg',t:'agent',agentId:'agt-response-generator',l:'Response Generator',sub:'Generates customer response',badge:'Ag',
+    config: { mapFromState: 'n3.enriched_profile', model: 'inherit' },
+  },
 ];
+
+// ════════════════════════════════════════════════════════════════════════════
+// TYPE-AWARE INSPECTOR (A3.1 + A3.2 + A3.3 + A3.4)
+// ────────────────────────────────────────────────────────────────────────────
+// Until now, the inspector body was hardcoded for the "agent" type. Now every
+// node type owns its own:
+//   • avatar/color/label  (NODE_TYPE_CONFIG)
+//   • compact section field list (NODE_TYPE_CONFIG.sections)
+//   • modal tab list      (NODE_TYPE_CONFIG.modalTabs)
+//   • per-field renderer  (FIELD_RENDERERS, keyed by type)
+// Field values live on node.config[key]. Auto-save plumbs through
+// setNodeFieldValue → flagSaving().
+// ════════════════════════════════════════════════════════════════════════════
+
+const NODE_TYPE_CONFIG = {
+  trigger:  { avatar: '⚡', color: 'var(--warn)',     label: 'Trigger',
+              sections: { input: [], config: ['triggerType','endpoint','auth','rateLimit','timeoutMs'], output: [] },
+              modalTabs: ['Source','Authentication','Schema','Rate limits','Logs','Testing'] },
+  agent:    { avatar: 'A',  color: 'var(--pur)',      label: 'Agent',
+              sections: { input: ['mapFromState'], config: ['systemPrompt','model'], output: [] },
+              modalTabs: ['Identity','Behavior','Model','Knowledge','Tools','Guardrails','Runtime','Testing'] },
+  rag:      { avatar: '📚', color: 'var(--ok)',       label: 'Knowledge / RAG',
+              sections: { input: ['query'], config: ['packs','drives','topK','rerank','minSimilarity'], output: [] },
+              modalTabs: ['Sources','Retrieval','Reranking','Filters','Prompt template','Testing'] },
+  workflow: { avatar: '⊞',  color: 'var(--pri-lt)',   label: 'Sub-Workflow',
+              sections: { input: ['inputMapping'], config: ['workflowRef','errorHandling','timeoutMs'], output: ['outputMapping'] },
+              modalTabs: ['Reference','Input mapping','Output mapping','Error handling','Timeout','Testing'] },
+  condition:{ avatar: '?',  color: 'var(--pri-lt)',   label: 'Condition',
+              sections: { input: [], config: ['expression','branches','defaultBranch'], output: [] },
+              modalTabs: ['Expression','Branches','Default','Testing'] },
+  action:   { avatar: '✦',  color: 'var(--cyan)',     label: 'Action',
+              sections: { input: ['inputMapping'], config: ['actionType','endpoint','auth','idempotencyKey'], output: [] },
+              modalTabs: ['Action','Endpoint / Function','Auth','Input mapping','Retry policy','Testing'] },
+  wait:     { avatar: '⏸',  color: 'var(--orange)',   label: 'Wait',
+              sections: { input: [], config: ['waitType','resumeOn','timeoutHours','escalateTo'], output: [] },
+              modalTabs: ['Type','Resume condition','Timeout','Escalation','Testing'] },
+  output:   { avatar: '→',  color: 'var(--ok)',       label: 'Output',
+              sections: { input: [], config: ['outputSchema','notifications','persistAuditTrail','webhookCallback'], output: [] },
+              modalTabs: ['Schema','Notifications','Persistence','Webhooks','Testing'] },
+};
+
+const FIELD_DEFS = {
+  // Trigger
+  triggerType:   { label: 'Trigger type', type: 'select', options: [{v:'webhook',l:'Webhook'},{v:'schedule',l:'Schedule'},{v:'manual',l:'Manual'},{v:'api',l:'API'}], required: true, help: 'How this workflow starts.' },
+  endpoint:      { label: 'Endpoint / Cron / Topic', type: 'text', placeholder: '/webhook/invoice' },
+  auth:          { label: 'Authentication', type: 'select', options: [{v:'none',l:'None'},{v:'hmac',l:'HMAC SHA256'},{v:'bearer',l:'Bearer token'},{v:'oauth2',l:'OAuth 2.0'}] },
+  rateLimit:     { label: 'Rate limit (req/min)', type: 'number', min:0, max:10000, placeholder: '100' },
+  timeoutMs:     { label: 'Timeout (ms)', type: 'number', min:0, max:120000, step:1000, placeholder: '30000' },
+  // Agent
+  mapFromState:  { label: 'Map from state', type: 'select', options:[{v:'n2.qualified_lead.summary',l:'n2 · qualified_lead.summary'},{v:'n1.webhook.payload',l:'n1 · webhook.payload'},{v:'n3.enriched_profile',l:'n3 · enriched_profile'}] },
+  systemPrompt:  { label: 'System prompt override', type: 'textarea', placeholder: "Leave empty to use Agent's default" },
+  model:         { label: 'Model settings', type: 'select', options:[{v:'inherit',l:'Inherit from agent'},{v:'gpt-4o',l:'gpt-4o'},{v:'gemini-2.0-flash',l:'gemini-2.0-flash'},{v:'claude-sonnet-4.5',l:'claude-sonnet-4.5'}] },
+  // RAG
+  query:         { label: 'Query mapping', type: 'text', placeholder: 'state.user_question', required: true },
+  packs:         { label: 'Knowledge Packs', type: 'multi-select', options: [{v:'KP-003',l:'Sales Playbook Facts'},{v:'KP-002',l:'GDPR Compliance'},{v:'KP-005',l:'Enterprise Contract Pack'}] },
+  drives:        { label: 'Source Drives',   type: 'multi-select', options: [{v:'d1',l:'Sales Drive'},{v:'d2',l:'Marketing Drive'},{v:'d3',l:'Engineering Drive'}] },
+  topK:          { label: 'Top-K results', type: 'slider', min:1, max:50, step:1 },
+  rerank:        { label: 'Re-rank results', type: 'toggle' },
+  minSimilarity: { label: 'Min similarity', type: 'slider', min:0, max:1, step:0.05 },
+  // Workflow
+  workflowRef:   { label: 'Workflow', type: 'select', options:[{v:'wf-lq',l:'Lead Qualification'},{v:'wf-de',l:'Data Enrichment'},{v:'wf-cs',l:'CRM Sync'}], required: true },
+  errorHandling: { label: 'Error handling', type: 'select', options:[{v:'retry',l:'Retry with backoff'},{v:'fallback',l:'Use fallback workflow'},{v:'fail-fast',l:'Fail fast'}] },
+  inputMapping:  { label: 'Input mapping', type: 'kv', help: 'Map state keys → workflow input.' },
+  outputMapping: { label: 'Output mapping', type: 'kv', help: 'Map workflow output → state.' },
+  // Condition
+  expression:    { label: 'Condition expression', type: 'code', placeholder: 'state.amount > 10000', required: true },
+  branches:      { label: 'Branches', type: 'chips', options:[{v:'true',l:'true'},{v:'false',l:'false'}] },
+  defaultBranch: { label: 'Default branch', type: 'select', options:[{v:'true',l:'true'},{v:'false',l:'false'}] },
+  // Action
+  actionType:    { label: 'Action type', type: 'select', options:[{v:'http',l:'HTTP request'},{v:'transform',l:'Transform'},{v:'store',l:'Store'}], required: true },
+  idempotencyKey:{ label: 'Idempotency key', type: 'text', placeholder: '{{state.execution_id}}' },
+  // Wait
+  waitType:      { label: 'Wait type', type: 'select', options:[{v:'human',l:'Human approval'},{v:'event',l:'Event'},{v:'duration',l:'Duration'}], required: true },
+  resumeOn:      { label: 'Resume condition', type: 'text', placeholder: 'event.type === "approved"' },
+  timeoutHours:  { label: 'Timeout (hours)', type: 'number', min:0, max:168 },
+  escalateTo:    { label: 'Escalate to', type: 'text', placeholder: 'cfo@aimsos.ai' },
+  // Output
+  outputSchema:  { label: 'Output schema', type: 'select', options:[{v:'json',l:'JSON'},{v:'text',l:'Text'},{v:'custom',l:'Custom schema'}] },
+  notifications: { label: 'Notifications', type: 'multi-select', options:[{v:'slack',l:'Slack'},{v:'email',l:'Email'},{v:'webhook',l:'Webhook'}] },
+  persistAuditTrail: { label: 'Persist audit trail', type: 'toggle' },
+  webhookCallback: { label: 'Webhook callback', type: 'url', placeholder: 'https://…' },
+};
+
+// Section labels (with capitalisation for the headers)
+const SECTION_LABELS = { input: 'Input', config: 'Configuration', output: 'Output', advanced: 'Advanced' };
+
+// Read the current value for a field on a node. Falls back to undefined.
+function getNodeFieldValue(node, key) {
+  if (!node || !node.config) return undefined;
+  return node.config[key];
+}
+
+// Write a value to node.config[key] and trigger the save indicator. Does NOT
+// re-render the inspector (lets the input keep focus while typing). Caller
+// can opt into a section re-render by passing { rerender: true }.
+function setNodeFieldValue(nodeId, key, value, opts = {}) {
+  const node = (typeof EDIT_FLOW !== 'undefined' && EDIT_FLOW) ? EDIT_FLOW.find(n => n.id === nodeId) : null;
+  if (!node) return;
+  if (!node.config) node.config = {};
+  // Strip empty strings so "has value" checks reflect reality.
+  if (value === '' || value === null || (Array.isArray(value) && value.length === 0)) {
+    delete node.config[key];
+  } else {
+    node.config[key] = value;
+  }
+  flagSaving();
+  // Sync section dirty-dot indicators
+  refreshSectionDirtyDots();
+  if (opts.rerender) renderNodeInspector(nodeId);
+}
+
+// HTML-escape helper that's safe even before the rest of the script defines escText/escAttr
+function _ie(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function _iea(s){ return _ie(s).replace(/"/g, '&quot;'); }
+
+// ── FIELD_RENDERERS ──
+// Each renderer receives (node, key, def) and returns HTML for the row.
+// All inputs auto-save via setNodeFieldValue(nodeId, key, value).
+const FIELD_RENDERERS = {
+  text(node, key, def) {
+    const v = getNodeFieldValue(node, key) ?? '';
+    const invalid = def.required && !v ? ' is-invalid' : '';
+    const req = def.required ? '<span class="req">*</span>' : '';
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}${req}</div>
+      <input class="ins-fld-input${invalid}" type="text" value="${_iea(v)}"
+        placeholder="${_iea(def.placeholder||'')}"
+        oninput="setNodeFieldValue('${node.id}','${key}', this.value)" />
+      ${def.help ? `<div class="ins-fld-help">${_ie(def.help)}</div>` : ''}
+    </div>`;
+  },
+  url(node, key, def) {
+    const v = getNodeFieldValue(node, key) ?? '';
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}</div>
+      <input class="ins-fld-input" type="url" value="${_iea(v)}"
+        placeholder="${_iea(def.placeholder||'https://…')}"
+        oninput="setNodeFieldValue('${node.id}','${key}', this.value)" />
+      ${def.help ? `<div class="ins-fld-help">${_ie(def.help)}</div>` : ''}
+    </div>`;
+  },
+  textarea(node, key, def) {
+    const v = getNodeFieldValue(node, key) ?? '';
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}</div>
+      <textarea class="ins-fld-textarea" rows="4"
+        placeholder="${_iea(def.placeholder||'')}"
+        oninput="setNodeFieldValue('${node.id}','${key}', this.value)">${_ie(v)}</textarea>
+    </div>`;
+  },
+  number(node, key, def) {
+    const v = getNodeFieldValue(node, key);
+    const val = (v === undefined || v === null) ? '' : v;
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}</div>
+      <input class="ins-fld-input" type="number" value="${_iea(val)}"
+        ${def.min!=null?`min="${def.min}"`:''} ${def.max!=null?`max="${def.max}"`:''} ${def.step!=null?`step="${def.step}"`:''}
+        placeholder="${_iea(def.placeholder||'')}"
+        oninput="setNodeFieldValue('${node.id}','${key}', this.value===''?null:Number(this.value))" />
+    </div>`;
+  },
+  slider(node, key, def) {
+    const v = getNodeFieldValue(node, key);
+    const min = def.min ?? 0, max = def.max ?? 1, step = def.step ?? 0.05;
+    const cur = (v === undefined || v === null) ? min : v;
+    const valDisplay = (step < 1) ? Number(cur).toFixed(2) : String(cur);
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}</div>
+      <div class="ins-fld-slider-row">
+        <input class="ins-fld-slider" type="range"
+          min="${min}" max="${max}" step="${step}" value="${cur}"
+          oninput="setNodeFieldValue('${node.id}','${key}', Number(this.value)); this.nextElementSibling.textContent = (${step}<1?Number(this.value).toFixed(2):this.value);" />
+        <span class="ins-fld-slider-val">${valDisplay}</span>
+      </div>
+    </div>`;
+  },
+  toggle(node, key, def) {
+    const v = !!getNodeFieldValue(node, key);
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-toggle-row">
+        <span class="ins-fld-lbl" style="margin-bottom:0">${_ie(def.label)}</span>
+        <div class="ins-fld-toggle ${v?'is-on':''}" role="switch" aria-checked="${v}" tabindex="0"
+          onclick="const on=!this.classList.contains('is-on'); this.classList.toggle('is-on',on); this.setAttribute('aria-checked',on); setNodeFieldValue('${node.id}','${key}', on)"
+          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"></div>
+      </div>
+    </div>`;
+  },
+  select(node, key, def) {
+    const v = getNodeFieldValue(node, key) ?? '';
+    const invalid = def.required && !v ? ' is-invalid' : '';
+    const req = def.required ? '<span class="req">*</span>' : '';
+    const opts = (def.options||[]).map(o =>
+      `<option value="${_iea(o.v)}" ${o.v === v ? 'selected':''}>${_ie(o.l)}</option>`
+    ).join('');
+    const placeholder = !v ? `<option value="" disabled ${!v?'selected':''}>Select…</option>` : '';
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}${req}</div>
+      <select class="ins-fld-select${invalid}"
+        onchange="setNodeFieldValue('${node.id}','${key}', this.value)">
+        ${placeholder}${opts}
+      </select>
+    </div>`;
+  },
+  'multi-select'(node, key, def) {
+    const selected = getNodeFieldValue(node, key) || [];
+    const rows = (def.options||[]).map(o => {
+      const on = selected.includes(o.v);
+      return `<div class="ins-fld-ms-row ${on?'is-on':''}" data-val="${_iea(o.v)}"
+        onclick="(function(el,nid,k,val){
+          const node=EDIT_FLOW.find(n=>n.id===nid); if(!node) return;
+          const cur=(node.config&&node.config[k])?[...node.config[k]]:[];
+          const i=cur.indexOf(val); if(i>=0) cur.splice(i,1); else cur.push(val);
+          el.classList.toggle('is-on', cur.includes(val));
+          setNodeFieldValue(nid,k,cur);
+        })(this,'${node.id}','${key}','${_iea(o.v)}')">
+        <span class="chk">
+          <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="lbl">${_ie(o.l)}</span>
+      </div>`;
+    }).join('');
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}</div>
+      <div class="ins-fld-ms">${rows}</div>
+    </div>`;
+  },
+  chips(node, key, def) {
+    const selected = getNodeFieldValue(node, key) || [];
+    const chips = (def.options||[]).map(o => {
+      const on = selected.includes(o.v);
+      return `<button class="ins-fld-chip ${on?'is-active':''}" type="button"
+        onclick="(function(el,nid,k,val){
+          const node=EDIT_FLOW.find(n=>n.id===nid); if(!node) return;
+          const cur=(node.config&&node.config[k])?[...node.config[k]]:[];
+          const i=cur.indexOf(val); if(i>=0) cur.splice(i,1); else cur.push(val);
+          el.classList.toggle('is-active', cur.includes(val));
+          setNodeFieldValue(nid,k,cur);
+        })(this,'${node.id}','${key}','${_iea(o.v)}')">${_ie(o.l)}</button>`;
+    }).join('');
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}</div>
+      <div class="ins-fld-chips">${chips}</div>
+    </div>`;
+  },
+  code(node, key, def) {
+    const v = getNodeFieldValue(node, key) ?? '';
+    const invalid = def.required && !v ? ' is-invalid' : '';
+    const req = def.required ? '<span class="req">*</span>' : '';
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}${req}</div>
+      <input class="ins-fld-code${invalid}" type="text" value="${_iea(v)}"
+        placeholder="${_iea(def.placeholder||'')}" spellcheck="false"
+        oninput="setNodeFieldValue('${node.id}','${key}', this.value)" />
+    </div>`;
+  },
+  json(node, key, def) {
+    const v = getNodeFieldValue(node, key);
+    let pretty;
+    try { pretty = JSON.stringify(v ?? {}, null, 2); }
+    catch { pretty = String(v ?? ''); }
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}</div>
+      <pre class="ins-fld-json">${_ie(pretty)}</pre>
+    </div>`;
+  },
+  kv(node, key, def) {
+    const obj = getNodeFieldValue(node, key) || {};
+    const entries = Object.entries(obj);
+    const rows = entries.map(([k,val], i) => `
+      <div class="ins-fld-kv-row">
+        <input type="text" value="${_iea(k)}" placeholder="key"
+          oninput="(function(nid,fk,idx,nk){
+            const node=EDIT_FLOW.find(n=>n.id===nid); if(!node) return;
+            const cur=node.config&&node.config[fk]?{...node.config[fk]}:{};
+            const keys=Object.keys(cur); const oldKey=keys[idx];
+            const val=cur[oldKey]; delete cur[oldKey];
+            if(nk) cur[nk]=val;
+            setNodeFieldValue(nid,fk,cur);
+          })('${node.id}','${key}',${i},this.value)" />
+        <input type="text" value="${_iea(val)}" placeholder="value"
+          oninput="(function(nid,fk,idx,nv){
+            const node=EDIT_FLOW.find(n=>n.id===nid); if(!node) return;
+            const cur=node.config&&node.config[fk]?{...node.config[fk]}:{};
+            const k=Object.keys(cur)[idx]; if(k!=null){cur[k]=nv; setNodeFieldValue(nid,fk,cur);}
+          })('${node.id}','${key}',${i},this.value)" />
+        <button class="ins-fld-kv-rm" type="button" title="Remove"
+          onclick="(function(nid,fk,idx){
+            const node=EDIT_FLOW.find(n=>n.id===nid); if(!node) return;
+            const cur=node.config&&node.config[fk]?{...node.config[fk]}:{};
+            const k=Object.keys(cur)[idx]; if(k!=null) delete cur[k];
+            setNodeFieldValue(nid,fk,cur,{rerender:true});
+          })('${node.id}','${key}',${i})">×</button>
+      </div>`).join('');
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}</div>
+      <div class="ins-fld-kv">
+        ${rows || '<div class="ins-fld-help" style="margin-top:0">No mappings yet.</div>'}
+        <button class="ins-fld-kv-add" type="button"
+          onclick="(function(nid,fk){
+            const node=EDIT_FLOW.find(n=>n.id===nid); if(!node) return;
+            const cur=node.config&&node.config[fk]?{...node.config[fk]}:{};
+            let i=1; while(('newKey'+i) in cur) i++;
+            cur['newKey'+i]='';
+            setNodeFieldValue(nid,fk,cur,{rerender:true});
+          })('${node.id}','${key}')">+ Add mapping</button>
+      </div>
+      ${def.help ? `<div class="ins-fld-help">${_ie(def.help)}</div>` : ''}
+    </div>`;
+  },
+};
+
+function renderField(node, key) {
+  const def = FIELD_DEFS[key];
+  if (!def) return `<div class="ins-fld-help">Unknown field: ${_ie(key)}</div>`;
+  const renderer = FIELD_RENDERERS[def.type];
+  if (!renderer) return `<div class="ins-fld-help">No renderer for type: ${_ie(def.type)}</div>`;
+  return renderer(node, key, def);
+}
+
+// Persistence: per-(node,section) open/closed state in sessionStorage.
+function sectionStateKey(nodeId, section){ return `insp.sec.${nodeId}.${section}`; }
+function getSectionOpen(nodeId, section, defaultOpen) {
+  try {
+    const v = sessionStorage.getItem(sectionStateKey(nodeId, section));
+    if (v === '1') return true;
+    if (v === '0') return false;
+  } catch {}
+  return !!defaultOpen;
+}
+function setSectionOpen(nodeId, section, open) {
+  try { sessionStorage.setItem(sectionStateKey(nodeId, section), open ? '1' : '0'); } catch {}
+}
+
+// Toggle a collapsible section. Called from the section header click handler.
+function toggleInspSection(nodeId, section, ev) {
+  if (ev) ev.preventDefault();
+  const header = (ev && ev.currentTarget) || document.querySelector(`.insp-cfg-sec[data-nodeid="${nodeId}"][data-sec="${section}"] .insp-cfg-sec-hd`);
+  const sec = header ? header.closest('.insp-cfg-sec') : document.querySelector(`.insp-cfg-sec[data-nodeid="${nodeId}"][data-sec="${section}"]`);
+  if (!sec) return;
+  const open = !sec.classList.contains('is-open');
+  sec.classList.toggle('is-open', open);
+  setSectionOpen(nodeId, section, open);
+}
+
+// Count fields in a section that have a value (used for the dirty dot + pill)
+function countFieldsWithValue(node, fieldKeys) {
+  if (!node || !node.config) return 0;
+  let n = 0;
+  for (const k of fieldKeys) {
+    const v = node.config[k];
+    if (v == null) continue;
+    if (Array.isArray(v) && v.length === 0) continue;
+    if (typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 0) continue;
+    if (typeof v === 'string' && v === '') continue;
+    n++;
+  }
+  return n;
+}
+function countRequiredErrors(node, fieldKeys) {
+  let n = 0;
+  for (const k of fieldKeys) {
+    const def = FIELD_DEFS[k];
+    if (!def || !def.required) continue;
+    const v = getNodeFieldValue(node, k);
+    if (v == null || v === '' || (Array.isArray(v) && v.length === 0)) n++;
+  }
+  return n;
+}
+
+function refreshSectionDirtyDots() {
+  const node = getActiveNode();
+  if (!node) return;
+  const cfg = NODE_TYPE_CONFIG[node.t];
+  if (!cfg) return;
+  for (const sec of Object.keys(cfg.sections || {})) {
+    const keys = cfg.sections[sec] || [];
+    const cnt = countFieldsWithValue(node, keys);
+    const errs = countRequiredErrors(node, keys);
+    const el = document.querySelector(`.insp-cfg-sec[data-nodeid="${node.id}"][data-sec="${sec}"]`);
+    if (!el) continue;
+    el.classList.toggle('has-dirty', cnt > 0);
+    const pill = el.querySelector('.insp-cfg-sec-pill');
+    if (pill) pill.textContent = `${cnt} / ${keys.length}`;
+    const errPill = el.querySelector('.insp-cfg-sec-err');
+    if (errPill) {
+      if (errs > 0) {
+        errPill.style.display = 'inline-block';
+        errPill.textContent = `${errs} ${errs===1?'error':'errors'}`;
+      } else {
+        errPill.style.display = 'none';
+      }
+    }
+  }
+}
+
+function renderInspSection(node, sectionId, fieldKeys, opts = {}) {
+  const labelText = SECTION_LABELS[sectionId] || sectionId;
+  const isConfig = sectionId === 'config';
+  const open = getSectionOpen(node.id, sectionId, isConfig);
+  const valueCount = countFieldsWithValue(node, fieldKeys);
+  const errCount = countRequiredErrors(node, fieldKeys);
+  const compactLimit = 3;
+  const visibleKeys = (fieldKeys.length > compactLimit) ? fieldKeys.slice(0, compactLimit) : fieldKeys;
+  const hiddenCount = fieldKeys.length - visibleKeys.length;
+  const fieldsHtml = visibleKeys.map(k => renderField(node, k)).join('');
+  const viewMore = hiddenCount > 0
+    ? `<button class="insp-view-more" type="button" onclick="openNodeConfigModal('${node.id}','${sectionId}')">View ${hiddenCount} more in editor →</button>`
+    : '';
+  return `
+    <div class="insp-cfg-sec ${open?'is-open':''} ${valueCount>0?'has-dirty':''}"
+         data-nodeid="${node.id}" data-sec="${sectionId}">
+      <div class="insp-cfg-sec-hd" role="button" tabindex="0"
+        onclick="toggleInspSection('${node.id}','${sectionId}',event)"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleInspSection('${node.id}','${sectionId}',event);}">
+        <svg class="insp-cfg-sec-chev" viewBox="0 0 10 10" fill="none"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="insp-cfg-sec-lbl">
+          ${_ie(labelText)}
+          <span class="insp-cfg-sec-dot" title="Has values"></span>
+        </span>
+        <span class="insp-cfg-sec-err" style="${errCount>0?'':'display:none'}">${errCount} ${errCount===1?'error':'errors'}</span>
+        <span class="insp-cfg-sec-pill">${valueCount} / ${fieldKeys.length}</span>
+      </div>
+      <div class="insp-cfg-sec-bd">
+        <div class="insp-cfg-sec-inner">
+          ${fieldsHtml || '<div class="ins-fld-help">No fields in this section.</div>'}
+          ${viewMore}
+        </div>
+      </div>
+    </div>`;
+}
+
+// Avatars rendered inside the inspector node card icon.
+function nodeTypeAvatarSvg(type) {
+  switch(type) {
+    case 'trigger':
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9 1L3 9h4l-1 6 6-8H8l1-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+    case 'agent':
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="6" width="11" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="5.5" y="8.5" width="2" height="2" rx="1" fill="currentColor"/><rect x="8.5" y="8.5" width="2" height="2" rx="1" fill="currentColor"/><path d="M6 12h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M8 6V3.5M6 3.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+    case 'rag':
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l1.5 1.5V13H3V2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5 6h6M5 8.5h6M5 11h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
+    case 'workflow':
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5.5" width="5" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="2.5" width="5" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M7 7.5h1M8 7.5v-3h1M8 7.5v3.5h1" stroke="currentColor" stroke-width="1.2"/></svg>';
+    case 'condition':
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v3.5M8 14v-1M14 8h-1.5M3.5 8H2M8 5.5l4 2.5-4 2.5-4-2.5 4-2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+    case 'action':
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.8 4.4L14 6.7l-3.3 2.9L11.6 14 8 11.7 4.4 14l.9-4.4L2 6.7l4.2-.8L8 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+    case 'wait':
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 4.5V8l2.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    case 'output':
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    default:
+      return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/></svg>';
+  }
+}
+
+// ── Type-aware Inspector renderer ──
+// Renders the entire compact inspector body for the given node. Updates the
+// header title/sub, the inline node card, and replaces the hardcoded body
+// with a list of collapsible sections + per-field renderers.
+function renderNodeInspector(nodeId) {
+  const body = document.getElementById('inspBody');
+  if (!body) return;
+  // Empty state when there's no active node.
+  if (!nodeId) {
+    body.innerHTML = `<div class="insp-empty-hint">
+      <div class="ico"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/></svg></div>
+      <div><strong style="color:var(--t2);font-weight:700">No node selected</strong></div>
+      <div style="margin-top:4px;color:var(--t4);font-size:11px">Click a node in the canvas to configure it.</div>
+    </div>`;
+    return;
+  }
+  const node = EDIT_FLOW.find(n => n.id === nodeId);
+  if (!node) {
+    body.innerHTML = `<div class="insp-empty-hint">
+      <div class="ico">!</div>
+      <strong style="color:var(--t2)">Node not found</strong>
+      <div style="margin-top:4px;color:var(--t4);font-size:11px">This node may have been deleted.</div>
+    </div>`;
+    return;
+  }
+  const cfg = NODE_TYPE_CONFIG[node.t];
+
+  // Sync the card header: avatar/color/label
+  const card = document.querySelector('.insp-node-card');
+  const cardIco = document.querySelector('.insp-node-card .insp-node-ico');
+  const stLbl = document.getElementById('inspNodeSt');
+  const nmLbl = document.getElementById('inspNodeNm');
+  const titleEl = document.getElementById('inspTitle');
+  const subEl = document.getElementById('inspSub');
+
+  if (card) card.setAttribute('data-type', node.t || 'unknown');
+  if (cardIco) cardIco.innerHTML = nodeTypeAvatarSvg(node.t);
+  if (nmLbl) nmLbl.textContent = node.l || node.id;
+  if (titleEl) titleEl.textContent = node.l || node.id;
+
+  // For agent nodes, defer to existing path for the sub-label.
+  if (node.t === 'agent') {
+    const agent = node.agentId ? getAgentById(node.agentId) : null;
+    if (subEl) subEl.textContent = agent ? `Agent · ${agent.model?.version || 'Active'}` : 'Agent configuration';
+    if (stLbl) stLbl.textContent = agent ? `Agent · Active` : `Agent · Broken reference`;
+  } else if (cfg) {
+    if (subEl) subEl.textContent = `${cfg.label} configuration`;
+    if (stLbl) stLbl.textContent = `${cfg.label} · Active`;
+  } else {
+    if (subEl) subEl.textContent = `${node.t || 'Unknown'} configuration`;
+    if (stLbl) stLbl.textContent = `${node.t || 'Unknown'} · Active`;
+  }
+
+  // Unknown type fallback
+  if (!cfg) {
+    let raw;
+    try { raw = JSON.stringify(node, null, 2); } catch { raw = String(node); }
+    body.innerHTML = `<div class="insp-fallback">
+      <strong>Configuration not yet defined</strong>
+      No section schema exists for node type <code>${_ie(node.t)}</code>.
+      <pre>${_ie(raw)}</pre>
+    </div>`;
+    return;
+  }
+
+  // Broken agentId banner
+  let bannerHtml = '';
+  if (node.t === 'agent' && node.agentId && typeof getAgentById === 'function' && !getAgentById(node.agentId)) {
+    bannerHtml = `<div class="insp-broken-banner">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L13 12H1L7 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 6v3M7 10v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <div class="txt"><strong>Agent reference broken</strong>The catalog no longer has this agent.</div>
+      <button class="fix-btn" onclick="openAgentSelectorForReplace('${node.id}')">Pick replacement</button>
+    </div>`;
+  }
+
+  // Build the section list.
+  const sections = cfg.sections || {};
+  const order = ['input', 'config', 'output', 'advanced'];
+  const sectionsHtml = order
+    .filter(k => Array.isArray(sections[k]) && sections[k].length > 0)
+    .map(k => renderInspSection(node, k, sections[k]))
+    .join('');
+
+  body.innerHTML = bannerHtml + (sectionsHtml || `<div class="insp-empty-hint">
+    <div class="ico">·</div>
+    <strong style="color:var(--t2)">No configuration required</strong>
+    <div style="margin-top:4px;color:var(--t4);font-size:11px">This node type works out of the box.</div>
+  </div>`);
+}
+
+// Helper used by the broken-reference banner. Tries to reuse the existing
+// agent selector popover when available; falls back to a toast.
+function openAgentSelectorForReplace(nodeId) {
+  try {
+    if (typeof openAgentSelector === 'function') { openAgentSelector(nodeId, { replace: true }); return; }
+  } catch {}
+  if (typeof toast === 'function') toast('Open the agent selector to pick a replacement', 'info');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PER-TYPE CONFIGURE MODAL (A3.3)
+// ────────────────────────────────────────────────────────────────────────────
+// Dispatcher: for the `agent` type, defer to the legacy Agent Modal (8 tabs)
+// untouched. For every other type, mount the same #agtModOv overlay with a
+// type-specific sidebar of tabs and tab bodies rendered from FIELD_DEFS.
+// ════════════════════════════════════════════════════════════════════════════
+
+let activeTypedTab = '';
+
+// Default tab → field-key map per type/tab. When a tab doesn't have an
+// explicit field set, we surface a "Coming soon" or related-context body.
+const TYPED_TAB_FIELDS = {
+  trigger: {
+    'Source':         ['triggerType','endpoint'],
+    'Authentication': ['auth'],
+    'Schema':         [],     // raw JSON dump
+    'Rate limits':    ['rateLimit','timeoutMs'],
+    'Logs':           [],     // mock recent runs
+    'Testing':        [],     // mock send-test-event
+  },
+  rag: {
+    'Sources':         ['packs','drives'],
+    'Retrieval':       ['query','topK'],
+    'Reranking':       ['rerank','minSimilarity'],
+    'Filters':         [],
+    'Prompt template': [],
+    'Testing':         [],
+  },
+  workflow: {
+    'Reference':       ['workflowRef'],
+    'Input mapping':   ['inputMapping'],
+    'Output mapping':  ['outputMapping'],
+    'Error handling':  ['errorHandling'],
+    'Timeout':         ['timeoutMs'],
+    'Testing':         [],
+  },
+  condition: {
+    'Expression':  ['expression'],
+    'Branches':    ['branches'],
+    'Default':     ['defaultBranch'],
+    'Testing':     [],
+  },
+  action: {
+    'Action':              ['actionType'],
+    'Endpoint / Function': ['endpoint'],
+    'Auth':                ['auth'],
+    'Input mapping':       ['inputMapping'],
+    'Retry policy':        ['idempotencyKey'],
+    'Testing':             [],
+  },
+  wait: {
+    'Type':              ['waitType'],
+    'Resume condition':  ['resumeOn'],
+    'Timeout':           ['timeoutHours'],
+    'Escalation':        ['escalateTo'],
+    'Testing':           [],
+  },
+  output: {
+    'Schema':         ['outputSchema'],
+    'Notifications':  ['notifications'],
+    'Persistence':    ['persistAuditTrail'],
+    'Webhooks':       ['webhookCallback'],
+    'Testing':        [],
+  },
+};
+
+// Map common tab labels → section ids so the inspector "View more" link can
+// pre-select the right tab when launching the modal.
+function tabIdForSection(type, section) {
+  const tabs = (NODE_TYPE_CONFIG[type] && NODE_TYPE_CONFIG[type].modalTabs) || [];
+  if (section === 'input')   return tabs.find(t => /input|source|reference|expression|retrieval/i.test(t)) || tabs[0];
+  if (section === 'config')  return tabs[0];
+  if (section === 'output')  return tabs.find(t => /output|schema/i.test(t)) || tabs[0];
+  if (section === 'advanced')return tabs[tabs.length - 1] || tabs[0];
+  return tabs[0];
+}
+
+// Dispatcher: open the right modal based on node.t. For agent → existing
+// Agent Modal. For everything else → typed modal.
+function openNodeConfigModal(nodeId, preferSection) {
+  const id = nodeId || activeNodeId;
+  if (!id) {
+    if (typeof toast === 'function') toast('Select a node first', 'info');
+    return;
+  }
+  const node = EDIT_FLOW.find(n => n.id === id);
+  if (!node) return;
+  if (node.t === 'agent') {
+    // Preserve legacy behaviour
+    return openAgentConfigModal(false);
+  }
+  return openTypedNodeModal(id, node.t, preferSection);
+}
+
+function openTypedNodeModal(nodeId, type, preferSection) {
+  const ov = document.getElementById('agtModOv');
+  if (!ov) return;
+  const node = EDIT_FLOW.find(n => n.id === nodeId);
+  if (!node) return;
+  const cfg = NODE_TYPE_CONFIG[type];
+  if (!cfg) {
+    if (typeof toast === 'function') toast(`No modal defined for type "${type}"`, 'warn');
+    return;
+  }
+  // Pre-pick the tab from the section the user clicked, if any.
+  const tabs = cfg.modalTabs || [];
+  activeTypedTab = (preferSection ? tabIdForSection(type, preferSection) : tabs[0]) || tabs[0];
+  ov.classList.add('is-open');
+  ov.dataset.nodeType = type;
+  ov.dataset.nodeId = nodeId;
+  document.body.style.overflow = 'hidden';
+  document.addEventListener('keydown', onAgentConfigModalKey);
+  renderTypedNodeModal();
+  setTimeout(() => {
+    const first = ov.querySelector('input, textarea, select, .ins-fld-ms-row, .ins-fld-toggle');
+    if (first && typeof first.focus === 'function') first.focus({preventScroll:true});
+  }, 80);
+}
+
+function renderTypedNodeModal() {
+  const ov = document.getElementById('agtModOv');
+  if (!ov) return;
+  const type = ov.dataset.nodeType;
+  const nodeId = ov.dataset.nodeId;
+  const node = EDIT_FLOW.find(n => n.id === nodeId);
+  const cfg = NODE_TYPE_CONFIG[type];
+  if (!node || !cfg) return;
+
+  // ── Header: avatar + label + name ──
+  const nameEl = document.getElementById('agtModName');
+  if (nameEl) nameEl.textContent = node.l || cfg.label;
+  const icoEl = document.getElementById('agtModIco');
+  if (icoEl) {
+    icoEl.innerHTML = nodeTypeAvatarSvg(type);
+    icoEl.style.color = cfg.color;
+    icoEl.style.background = `color-mix(in srgb, ${cfg.color} 14%, transparent)`;
+    icoEl.style.borderColor = `color-mix(in srgb, ${cfg.color} 32%, transparent)`;
+  }
+  const eyebrowLbl = document.getElementById('agtModEyebrowLabel');
+  if (eyebrowLbl) eyebrowLbl.textContent = `${cfg.label} configuration`;
+  // Hide Agent-specific Fork button for non-agent types
+  const forkBtn = document.getElementById('agtModFork');
+  if (forkBtn) forkBtn.style.display = 'none';
+  // Hide node-override pill (agent-specific concept)
+  const nodePill = document.getElementById('agtModNodePill');
+  if (nodePill) nodePill.style.display = 'none';
+
+  // ── Body: sidebar tabs + content ──
+  const body = document.getElementById('agtModBody');
+  if (!body) return;
+  const tabs = cfg.modalTabs || [];
+  const tabsHtml = tabs.map(t => {
+    const isActive = t === activeTypedTab;
+    return `<div class="insp-cfg-tab ${isActive?'is-active':''}" data-tab="${_iea(t)}"
+      onclick="switchTypedTab('${_iea(t)}')">
+      <span class="ico"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2.5" stroke="currentColor" stroke-width="1.2"/></svg></span>
+      <span class="lbl">${_ie(t)}</span>
+    </div>`;
+  }).join('');
+  body.innerHTML = `
+    <div class="insp-cfg-tabs">${tabsHtml}</div>
+    <div class="insp-cfg-panel" id="inspCfgPanel">${renderTypedTabBody(type, activeTypedTab, node)}</div>
+  `;
+}
+
+function switchTypedTab(tabName) {
+  activeTypedTab = tabName;
+  renderTypedNodeModal();
+}
+
+// Render the content of a single tab for a typed node modal. By default
+// we pull the field list from TYPED_TAB_FIELDS and stamp each via FIELD_DEFS.
+// Special cases (Schema, Logs, Testing, etc.) get a stylised mock body.
+function renderTypedTabBody(type, tab, node) {
+  const fields = (TYPED_TAB_FIELDS[type] && TYPED_TAB_FIELDS[type][tab]) || [];
+  // Field-driven path
+  if (fields.length > 0) {
+    return `<div style="padding:6px 4px">
+      ${fields.map(k => renderField(node, k)).join('')}
+    </div>`;
+  }
+  // Cosmetic / mock tab bodies
+  if (tab === 'Schema') {
+    return `<div class="ins-fld" data-fld="schema">
+      <div class="ins-fld-lbl">JSON Schema (read-only preview)</div>
+      <pre class="ins-fld-json">${_ie(JSON.stringify({type:'object',properties:{id:{type:'string'},payload:{type:'object'}}}, null, 2))}</pre>
+      <div class="ins-fld-help">Schema editor coming in the next phase. Fields will be inferred from recent payloads.</div>
+    </div>`;
+  }
+  if (tab === 'Logs') {
+    const rows = [
+      { t: '2026-06-10 14:22', s: '200', m: 'Webhook accepted' },
+      { t: '2026-06-10 14:18', s: '200', m: 'Webhook accepted' },
+      { t: '2026-06-10 13:52', s: '401', m: 'HMAC signature mismatch' },
+    ];
+    return `<div style="padding:6px 4px">
+      <div class="ins-fld-lbl" style="margin-bottom:8px">Recent invocations</div>
+      ${rows.map(r => `<div style="display:flex;gap:10px;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.025);border:1px solid var(--bd);border-radius:6px;margin-bottom:5px;font-size:11.5px">
+        <span style="color:var(--t4);font-family:ui-monospace,Menlo,monospace">${r.t}</span>
+        <span style="font-weight:700;color:${r.s==='200'?'var(--ok-lt)':'var(--err-lt)'}">${r.s}</span>
+        <span style="color:var(--t2)">${r.m}</span>
+      </div>`).join('')}
+    </div>`;
+  }
+  if (tab === 'Testing') {
+    return `<div style="padding:8px 4px">
+      <div class="ins-fld-lbl" style="margin-bottom:8px">Send a test event</div>
+      <textarea class="ins-fld-textarea" rows="6" placeholder='{"sample": "payload"}'></textarea>
+      <button onclick="toast('Test event dispatched','success')" style="margin-top:8px;height:30px;padding:0 14px;border-radius:6px;background:var(--pur);border:none;color:#fff;font-size:11.5px;font-weight:700;cursor:pointer">Send test</button>
+    </div>`;
+  }
+  if (tab === 'Filters') {
+    return `<div class="ins-fld" data-fld="filters">
+      <div class="ins-fld-lbl">Source filters</div>
+      <div class="ins-fld-help">No filters defined. Add filters to scope retrieval to specific drives, regions, or document types.</div>
+    </div>`;
+  }
+  if (tab === 'Prompt template') {
+    return `<div class="ins-fld" data-fld="promptTemplate">
+      <div class="ins-fld-lbl">Prompt template</div>
+      <textarea class="ins-fld-textarea" rows="6" placeholder="Use {{query}} and {{context}} as placeholders. Defaults to the system template."></textarea>
+      <div class="ins-fld-help">Leave empty to use the system default.</div>
+    </div>`;
+  }
+  // Generic placeholder
+  return `<div class="insp-cfg-soon">
+    <div class="ttl">${_ie(tab)}</div>
+    <div class="sub">This tab will be wired up in the next phase. The structure is reserved so behaviour stays consistent as we expand.</div>
+  </div>`;
+}
+
+// Generalise the existing fullscreen toggle so it works for typed modals too
+// (the existing toggleAgentConfigFullscreen still works — this is a thin alias
+// for clarity at typed call sites).
+function toggleNodeConfigFullscreen() { return toggleAgentConfigFullscreen(); }
+
+
 const EDGE_LABELS = {0:'inquiry',1:'context',2:'knowledge'};
 
 function renderEditCanvas(net) {
@@ -7732,6 +8768,11 @@ function selectEditNode(nodeId) {
   if (info.type !== 'Agent') {
     document.getElementById('bldrInspPanel')?.classList.remove('is-expanded');
   }
+  // Re-render the type-aware inspector body for the active node. Falls back
+  // gracefully if the renderer isn't available yet.
+  try {
+    if (typeof renderNodeInspector === 'function') renderNodeInspector(nodeId);
+  } catch (err) { console.error('renderNodeInspector failed', err); }
 }
 
 // Active node id for the inspector (set by selectEditNode).
@@ -7814,6 +8855,10 @@ function closeAgentConfigModal() {
   ov.classList.remove('is-open');
   ov.classList.remove('is-fullscreen');         // reset to compact on next open
   ov.classList.remove('is-knowledge-view');     // reset Library view too
+  // Clear any typed-modal markers so a subsequent agent open doesn't think
+  // it's still in typed-mode.
+  delete ov.dataset.nodeType;
+  delete ov.dataset.nodeId;
   document.body.style.overflow = '';
   document.removeEventListener('keydown', onAgentConfigModalKey);
 }
@@ -7876,7 +8921,16 @@ function renderAgentConfigPanel() {
   const nameEl = document.getElementById('agtModName');
   if (nameEl) nameEl.textContent = agent.name;
   const icoEl  = document.getElementById('agtModIco');
-  if (icoEl)  icoEl.textContent = (agent.avatar || agent.name.slice(0,2)).toUpperCase();
+  if (icoEl)  {
+    // Reset any inline styles the typed modal may have applied previously.
+    icoEl.style.color = '';
+    icoEl.style.background = '';
+    icoEl.style.borderColor = '';
+    icoEl.textContent = (agent.avatar || agent.name.slice(0,2)).toUpperCase();
+  }
+  // Restore the default eyebrow label
+  const eyebrowLbl = document.getElementById('agtModEyebrowLabel');
+  if (eyebrowLbl) eyebrowLbl.textContent = 'Agent configuration';
   // Hide the Fork button for freshly-created agents (no point forking an empty one).
   const forkBtn = document.getElementById('agtModFork');
   if (forkBtn) forkBtn.style.display = agent._isFresh ? 'none' : 'inline-flex';
