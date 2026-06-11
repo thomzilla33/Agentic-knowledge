@@ -10562,10 +10562,40 @@ function showRunBanner({ target, success, elapsed, nodesRun }) {
     <span class="brb-kv">time <strong>${elapsed}s</strong></span>
     <button class="brb-clear" onclick="clearRunState()">Clear</button>
   `;
+  // A4.8: keep the run summary clear of the warn banner — if the
+  // "missing tools" warning is visible, drop the banner below it so the two
+  // never overlap horizontally.
+  positionRunBanner(banner);
   // Use a short timeout so the CSS transition can latch even when the banner
   // was just created in the same frame.
   setTimeout(() => banner.classList.add('is-open'), 30);
 }
+
+// Compute a safe top offset for the run banner so it dodges the warn banner
+// + canvas warning strip when those are present.
+function positionRunBanner(banner) {
+  if (!banner) return;
+  const warn = document.getElementById('bldrWarnBanner');
+  const parent = banner.parentElement;
+  if (!warn || !parent) { banner.style.top = '18px'; return; }
+  // offsetParent === null when the element is display:none / detached.
+  const warnVisible = warn.offsetParent !== null && warn.offsetHeight > 0;
+  if (!warnVisible) { banner.style.top = '18px'; return; }
+  const parentRect = parent.getBoundingClientRect();
+  const warnRect   = warn.getBoundingClientRect();
+  const offset     = Math.max(18, (warnRect.bottom - parentRect.top) + 10);
+  banner.style.top = offset + 'px';
+}
+
+// If the warn banner gets dismissed while the run banner is open, slide the
+// run banner back up. Wire once.
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.bldr-warn-x')) return;
+  const banner = document.getElementById('bldrRunBanner');
+  if (banner && banner.classList.contains('is-open')) {
+    setTimeout(() => positionRunBanner(banner), 0);
+  }
+}, true);
 
 function selectEditNode(nodeId) {
   const nodeMap = {
