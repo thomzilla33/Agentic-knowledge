@@ -1069,6 +1069,134 @@ body.canvas-compact .bldr-mb.mb-cmpt{
 .canvas-svg path.is-rt-skipped{stroke-dasharray:3 4}
 
 /* ════════════════════════════════════════════════════════════════════════
+   A4.10 — DELETE node affordance in the inspector
+   ════════════════════════════════════════════════════════════════════════ */
+.insp-delete-btn{
+  width:30px;height:30px;flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid transparent;color:var(--t3);
+  border-radius:7px;cursor:pointer;margin-right:4px;
+  transition:background .12s, border-color .12s, color .12s;
+}
+.insp-delete-btn:hover{background:rgba(255,100,103,0.10);border-color:rgba(255,100,103,0.42);color:var(--err)}
+
+/* ════════════════════════════════════════════════════════════════════════
+   A4.11 — "+" add-next-node affordance + Make-style picker modal
+   ════════════════════════════════════════════════════════════════════════ */
+/* Per-node + button — floats to the right of the node card, between the
+   output port and the next node. Visible on hover; on touch / small canvas
+   it stays always visible. */
+.bn-add-port{
+  position:absolute;right:-22px;top:50%;transform:translateY(-50%);
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(43,127,255,0.18);border:1px solid rgba(43,127,255,0.55);
+  color:var(--pri-lt);cursor:pointer;z-index:4;
+  opacity:0;pointer-events:none;
+  transition:opacity .12s ease, transform .12s ease, background .12s ease;
+  box-shadow:0 2px 6px rgba(0,0,0,0.32);
+}
+.bn:hover > .bn-add-port,
+.bn.sel    > .bn-add-port,
+.bn-add-port:hover{opacity:1;pointer-events:auto}
+.bn-add-port:hover{background:rgba(43,127,255,0.32);border-color:rgba(43,127,255,0.85);transform:translateY(-50%) scale(1.08)}
+.bn-add-port:active{transform:translateY(-50%) scale(0.95)}
+
+/* Hide the + while dragging a node — keeps the canvas clean during reposition */
+body.is-bn-dragging .bn-add-port{display:none}
+
+/* Add-node picker — Make.com style: left categories + right list */
+.anm-overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.62);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  opacity:0;pointer-events:none;transition:opacity .18s ease;
+}
+.anm-overlay.is-open{opacity:1;pointer-events:auto}
+.anm-modal{
+  width:min(720px, 100%);height:min(540px, 88vh);
+  background:#0a1322;border:1px solid var(--bds);border-radius:14px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(43,127,255,0.06);
+  display:flex;overflow:hidden;
+  transform:translateY(8px) scale(0.985);transition:transform .18s ease;
+}
+.anm-overlay.is-open .anm-modal{transform:none}
+
+/* Left category sidebar */
+.anm-side{
+  width:188px;flex-shrink:0;
+  border-right:1px solid var(--bd);
+  padding:14px 10px;display:flex;flex-direction:column;gap:2px;
+  background:rgba(255,255,255,0.015);
+}
+.anm-cat{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:7px;
+  background:transparent;border:none;cursor:pointer;
+  color:var(--t2);font-size:12.5px;font-weight:600;letter-spacing:.01em;
+  text-align:left;transition:background .12s, color .12s;
+}
+.anm-cat:hover{background:rgba(255,255,255,0.05);color:var(--t1)}
+.anm-cat.is-active{
+  background:rgba(167,139,250,0.14);color:var(--pur-lt);
+}
+.anm-cat-ico{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:currentColor}
+
+.anm-side-ft{margin-top:auto;padding-top:10px;border-top:1px solid var(--bd)}
+.anm-side-ft .anm-cat{color:var(--t3);font-size:11px;font-weight:500}
+
+/* Right content */
+.anm-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.anm-hd{
+  padding:14px 16px 10px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:10px;
+}
+.anm-search-wrap{flex:1;position:relative}
+.anm-search{
+  width:100%;height:34px;padding:0 12px 0 34px;border-radius:8px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bds);
+  color:var(--t1);font-size:12.5px;font-family:inherit;
+}
+.anm-search:focus{outline:none;background:rgba(43,127,255,0.06);border-color:rgba(43,127,255,0.55);
+  box-shadow:0 0 0 2px rgba(43,127,255,0.18)}
+.anm-search-ico{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  color:var(--t3);pointer-events:none;display:inline-flex;
+}
+.anm-hd-close{
+  width:30px;height:30px;border-radius:7px;
+  background:transparent;border:1px solid transparent;color:var(--t3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .12s, border-color .12s, color .12s;flex-shrink:0;
+}
+.anm-hd-close:hover{background:rgba(255,255,255,0.06);border-color:var(--bds);color:var(--t1)}
+
+.anm-body{flex:1;overflow-y:auto;padding:8px 0}
+.anm-cat-hd{
+  padding:10px 18px 6px;font-size:10.5px;font-weight:700;
+  color:var(--t3);text-transform:uppercase;letter-spacing:.06em;
+}
+.anm-row{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 18px;cursor:pointer;
+  transition:background .10s ease;
+}
+.anm-row:hover{background:rgba(43,127,255,0.08)}
+.anm-row-ico{
+  width:34px;height:34px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.anm-row-ico svg{display:block}
+.anm-row-nm{font-size:13px;font-weight:600;color:var(--t1);line-height:1.2}
+.anm-row-sub{font-size:11.5px;color:var(--t3);margin-top:1px;line-height:1.3}
+.anm-row-info{flex:1;min-width:0}
+.anm-row-chev{color:var(--t4);opacity:0;transition:opacity .12s ease}
+.anm-row:hover .anm-row-chev{opacity:1;color:var(--pri-lt)}
+.anm-empty{padding:30px 24px;text-align:center;color:var(--t3);font-size:12.5px}
+
+/* ════════════════════════════════════════════════════════════════════════
    A4.3 — EDGE CONFIG MODAL (centered, w/ rule builder)
    ════════════════════════════════════════════════════════════════════════ */
 .edm-overlay{
@@ -5803,6 +5931,9 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="6" width="11" height="8" rx="1.5" stroke="var(--pur)" stroke-width="1.3"/><rect x="5.5" y="8.5" width="2" height="2" rx="1" fill="var(--pur)"/><rect x="8.5" y="8.5" width="2" height="2" rx="1" fill="var(--pur)"/><path d="M6 12h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/><path d="M8 6V3.5M6 3.5h4" stroke="var(--pur)" stroke-width="1.3" stroke-linecap="round"/></svg>
             </div>
             <div style="flex:1;min-width:0"><div class="insp-node-nm" id="inspNodeNm">Customer Analyst</div><div class="insp-node-st" id="inspNodeSt">Agent · Active</div></div>
+            <button class="insp-delete-btn" onclick="bldrDeleteNode(activeNodeId)" title="Delete node (Delete key)" aria-label="Delete this node">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 3h7M4.5 3V2l.5-.5h2l.5.5v1M3.5 3l.5 7h4l.5-7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
             <button class="insp-configure-btn" onclick="openNodeConfigModal(activeNodeId)" title="Open full configuration">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="1.4" stroke="currentColor" stroke-width="1.4"/><path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.5 2.5l1 1M8.5 8.5l1 1M2.5 9.5l1-1M8.5 3.5l1-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
               Configure
@@ -6433,6 +6564,58 @@ button.avatar-sm:hover{filter:brightness(1.08)}
 
 <!-- Toast -->
 <div class="toast-ctr" id="toastCtr"></div>
+
+<!-- ════ ADD-NODE PICKER MODAL (A4.11) ════
+     Triggered by the per-node "+" button. Make-style: categories on the
+     left, searchable list on the right. Picking a row creates a new node
+     to the right of the source and auto-wires an edge. -->
+<div class="anm-overlay" id="anmOv" role="dialog" aria-modal="true" aria-labelledby="anmTtl" onclick="closeAddNodeModal()">
+  <div class="anm-modal" onclick="event.stopPropagation()">
+    <div class="anm-side">
+      <button class="anm-cat" data-cat="starred" onclick="anmSetCategory('starred')">
+        <span class="anm-cat-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5l1.6 3.4 3.6.5-2.6 2.5.6 3.6L7 9.7l-3.2 1.8.6-3.6L1.8 5.4l3.6-.5L7 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></span>
+        Starred
+      </button>
+      <button class="anm-cat is-active" data-cat="all" onclick="anmSetCategory('all')">
+        <span class="anm-cat-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="4.5" height="4.5" rx="0.8" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1.5" width="4.5" height="4.5" rx="0.8" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="8" width="4.5" height="4.5" rx="0.8" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="4.5" height="4.5" rx="0.8" stroke="currentColor" stroke-width="1.2"/></svg></span>
+        All apps
+      </button>
+      <button class="anm-cat" data-cat="native" onclick="anmSetCategory('native')">
+        <span class="anm-cat-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L5.5 7.5H9L5 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        Built-in nodes
+      </button>
+      <button class="anm-cat" data-cat="workflows" onclick="anmSetCategory('workflows')">
+        <span class="anm-cat-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+        Sub-workflows
+      </button>
+      <button class="anm-cat" data-cat="agents" onclick="anmSetCategory('agents')">
+        <span class="anm-cat-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><path d="M7 5V3M5 3h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+        Agents
+      </button>
+      <div class="anm-side-ft">
+        <button class="anm-cat" onclick="toast('Feedback channel coming soon','info')">
+          <span class="anm-cat-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10v6H8l-2 3v-3H2V3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></span>
+          Share feedback
+        </button>
+      </div>
+    </div>
+    <div class="anm-main">
+      <div class="anm-hd">
+        <div class="anm-search-wrap">
+          <span class="anm-search-ico"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9 9l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+          <input id="anmSearch" class="anm-search" type="text" placeholder="Search all apps or modules…"
+            oninput="anmRenderList()" autocomplete="off"/>
+        </div>
+        <button class="anm-hd-close" onclick="closeAddNodeModal()" aria-label="Close">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="anm-body" id="anmBody">
+        <!-- Populated by anmRenderList() -->
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ════ EDGE CONFIG MODAL (A4.3) ════
      Centered modal for configuring a connection (edge). Holds the label,
@@ -8792,6 +8975,56 @@ function onLibraryCanvasDragLeave(ev) {
   }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// A4.10 — DELETE NODE
+// ────────────────────────────────────────────────────────────────────────────
+// Removes the node from EDIT_FLOW, drops any edges that touched it, clears
+// activeNodeId if it pointed at the deleted node, fires flagSaving, and
+// re-renders. Refuses to delete the last remaining node so the canvas never
+// goes empty in this prototype.
+// ════════════════════════════════════════════════════════════════════════════
+function bldrDeleteNode(nodeId, opts = {}) {
+  if (!nodeId) return;
+  const idx = EDIT_FLOW.findIndex(n => n.id === nodeId);
+  if (idx < 0) return;
+  if (EDIT_FLOW.length <= 1) {
+    toast('Keep at least one node — drop a replacement first', 'warn');
+    return;
+  }
+  const node = EDIT_FLOW[idx];
+  // Drop the node
+  EDIT_FLOW.splice(idx, 1);
+  // Drop edges that touched it
+  EDIT_EDGES = EDIT_EDGES.filter(e => e.source !== nodeId && e.target !== nodeId);
+  // Clear active selection if this was the active node
+  if (activeNodeId === nodeId) {
+    activeNodeId = null;
+    // Try to select an adjacent node so the inspector doesn't go empty
+    const fallback = EDIT_FLOW[idx] || EDIT_FLOW[idx - 1] || EDIT_FLOW[0];
+    if (fallback) {
+      // Defer the selection until after the canvas re-render
+      setTimeout(() => selectEditNode(fallback.id), 0);
+    }
+  }
+  flagSaving();
+  if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+  if (!opts.silent) toast(`Deleted ${node.l || node.id}`, 'info');
+}
+
+// Keyboard shortcut: Delete / Backspace removes the active node when the
+// user isn't typing in an input/textarea or editing an inline name.
+document.addEventListener('keydown', (e) => {
+  if (!document.body.classList.contains('builder-mode')) return;
+  if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+  const tag = (e.target && e.target.tagName) || '';
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (e.target && e.target.isContentEditable)) return;
+  // Don't fire while a modal is open
+  if (document.querySelector('.agt-mod-overlay.is-open, .edm-overlay.is-open, .anm-overlay.is-open')) return;
+  if (!activeNodeId) return;
+  e.preventDefault();
+  bldrDeleteNode(activeNodeId);
+});
+
 function onLibraryCanvasDrop(ev) {
   if (!libraryDragState) return;
   ev.preventDefault();
@@ -8820,6 +9053,141 @@ function onLibraryCanvasDrop(ev) {
   };
   EDIT_FLOW.push(newNode);
   flagSaving();
+  if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+  selectEditNode(newId);
+  toast(`Added ${spec.l}`, 'ok');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// A4.11 — ADD-NODE PICKER MODAL
+// ────────────────────────────────────────────────────────────────────────────
+// Per-node "+" → centered picker (Make-style: categories on left, list on
+// right). Picking a row creates a new node placed to the right of the
+// source, auto-wires source→new with a default edge, and closes the modal.
+// ════════════════════════════════════════════════════════════════════════════
+
+const ANM_CATEGORIES = {
+  'starred':   { label: 'Starred',         filter: k => /^(trigger|condition|agt-customer-analyst|wf-lq)$/.test(k) },
+  'all':       { label: 'All apps',        filter: () => true },
+  'native':    { label: 'Built-in nodes',  filter: (k, s) => /^(trigger|condition|action|wait|output)$/.test(k) || s.t === 'rag' },
+  'workflows': { label: 'Sub-workflows',   filter: (k, s) => s.t === 'workflow' },
+  'agents':    { label: 'Agents',          filter: (k, s) => s.t === 'agent' },
+};
+
+let anmSourceNodeId = null;
+let anmActiveCat = 'all';
+
+function openAddNodeModal(sourceNodeId) {
+  anmSourceNodeId = sourceNodeId;
+  anmActiveCat = 'all';
+  // Visually mark "All apps" active in the side; the rest get cleared
+  document.querySelectorAll('.anm-cat').forEach(b => b.classList.toggle('is-active', b.dataset.cat === 'all'));
+  const search = document.getElementById('anmSearch');
+  if (search) { search.value = ''; setTimeout(() => search.focus(), 50); }
+  anmRenderList();
+  document.getElementById('anmOv').classList.add('is-open');
+  document.addEventListener('keydown', anmEscClose);
+}
+
+function anmEscClose(e) { if (e.key === 'Escape') closeAddNodeModal(); }
+
+function closeAddNodeModal() {
+  document.getElementById('anmOv').classList.remove('is-open');
+  document.removeEventListener('keydown', anmEscClose);
+  anmSourceNodeId = null;
+}
+
+function anmSetCategory(cat) {
+  anmActiveCat = cat;
+  document.querySelectorAll('.anm-cat').forEach(b => b.classList.toggle('is-active', b.dataset.cat === cat));
+  anmRenderList();
+}
+
+// Build the icon block for a spec — provider logo if the spec ships one,
+// otherwise the per-type-color rounded square with the node-type icon.
+function anmIconFor(specKey, spec) {
+  const provHtml = (spec.provider && typeof getProviderLogo === 'function') ? getProviderLogo(spec.provider) : null;
+  if (provHtml) return `<div class="anm-row-ico">${provHtml.replace('class="bn-prov-logo"', 'class="bn-prov-logo" style="width:34px;height:34px"')}</div>`;
+  const iconMap = {
+    trigger:   { bg: 'rgba(253,199,0,0.16)',  ico: typeof trigIco === 'function' ? trigIco() : '' },
+    condition: { bg: 'rgba(43,127,255,0.16)', ico: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M3 6l4-4 4 4" stroke="var(--pri)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+    action:    { bg: 'rgba(5,223,114,0.16)',  ico: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="var(--ok)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+    wait:      { bg: 'rgba(252,113,38,0.16)', ico: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--orange)" stroke-width="1.3"/><path d="M7 4.5V7l2 1.5" stroke="var(--orange)" stroke-width="1.3" stroke-linecap="round"/></svg>' },
+    output:    { bg: 'rgba(5,223,114,0.16)',  ico: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--ok)" stroke-width="1.3"/><path d="M4.5 7L6.5 9L9.5 5" stroke="var(--ok)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+    workflow:  { bg: 'rgba(0,194,194,0.16)',  ico: typeof wfIco === 'function' ? wfIco() : '' },
+    agent:     { bg: 'rgba(167,139,250,0.16)', ico: typeof agIco === 'function' ? agIco() : '' },
+    rag:       { bg: 'rgba(43,127,255,0.16)', ico: typeof ragIco === 'function' ? ragIco() : '' },
+  };
+  const tt = iconMap[spec.t] || iconMap.action;
+  return `<div class="anm-row-ico" style="background:${tt.bg}">${tt.ico}</div>`;
+}
+
+function anmRenderList() {
+  const body = document.getElementById('anmBody');
+  if (!body) return;
+  const q = (document.getElementById('anmSearch')?.value || '').trim().toLowerCase();
+  const cat = ANM_CATEGORIES[anmActiveCat] || ANM_CATEGORIES.all;
+  const entries = Object.entries(NODE_LIBRARY_SPECS).filter(([key, spec]) => {
+    if (!cat.filter(key, spec)) return false;
+    if (!q) return true;
+    const hay = `${spec.l} ${spec.action || ''} ${spec.sub || ''} ${spec.t}`.toLowerCase();
+    return hay.includes(q);
+  });
+  if (!entries.length) {
+    body.innerHTML = `<div class="anm-empty">Nothing matches “${_ie(q)}”.</div>`;
+    return;
+  }
+  const headerLabel = q ? `Search results · ${entries.length}` : cat.label;
+  body.innerHTML = `<div class="anm-cat-hd">${_ie(headerLabel)}</div>` + entries.map(([key, spec]) => `
+    <div class="anm-row" onclick="anmPick('${key}')">
+      ${anmIconFor(key, spec)}
+      <div class="anm-row-info">
+        <div class="anm-row-nm">${_ie(spec.l)}</div>
+        <div class="anm-row-sub">${_ie(spec.action || spec.sub || spec.t)}</div>
+      </div>
+      <div class="anm-row-chev">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4 2.5l3.5 3.5L4 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+  `).join('');
+}
+
+function anmPick(specKey) {
+  const spec = NODE_LIBRARY_SPECS[specKey];
+  if (!spec) return;
+  const src = anmSourceNodeId ? EDIT_FLOW.find(n => n.id === anmSourceNodeId) : null;
+  const NW = 192, NH = 82, GAP = 60;
+
+  // Place the new node to the right of the source — slot a sibling below
+  // if there's already a node at the target position.
+  let baseX = (src ? src.x + NW + GAP : 100);
+  let baseY = (src ? src.y : 100);
+  while (EDIT_FLOW.some(n => Math.abs(n.x - baseX) < 20 && Math.abs(n.y - baseY) < 20)) {
+    baseY += NH + 32;
+  }
+  const typePrefix = (spec.t || 'n').slice(0, 2);
+  const newId = `${typePrefix}-${Date.now().toString(36)}`;
+  const newNode = {
+    ...spec,
+    config: spec.config ? JSON.parse(JSON.stringify(spec.config)) : {},
+    id: newId,
+    x: Math.max(0, baseX),
+    y: Math.max(0, baseY),
+  };
+  EDIT_FLOW.push(newNode);
+  // Auto-wire source → new
+  if (src) {
+    EDIT_EDGES.push({
+      id: `e-${src.id}-${newId}`,
+      source: src.id,
+      target: newId,
+      label: '→',
+      output: '',
+      condition: { active: false, joinOp: 'AND', rules: [] },
+    });
+  }
+  flagSaving();
+  closeAddNodeModal();
   if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
   selectEditNode(newId);
   toast(`Added ${spec.l}`, 'ok');
@@ -10360,6 +10728,9 @@ function buildEditNode(node,x,y,w,h) {
     ${sub2}
     <div class="bn-port bn-port-in"></div>
     <div class="bn-port bn-port-out"></div>
+    <button class="bn-add-port" onclick="event.stopPropagation(); openAddNodeModal('${node.id}')" aria-label="Add next node" title="Add a node after this one">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
   </div>`;
 }
 
