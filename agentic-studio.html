@@ -622,6 +622,22 @@ a{text-decoration:none;color:inherit}
 .bn-icon-rag{background:rgba(43,127,255,0.15)}
 .bn-icon-out{background:rgba(5,223,114,0.15)}
 .bn-icon-k{background:rgba(43,127,255,0.12)}
+/* A4.2: Provider logo block — same footprint as .bn-icon, branded background */
+.bn-prov-logo{
+  width:26px;height:26px;border-radius:var(--r6);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,0.06) inset, 0 1px 2px rgba(0,0,0,0.20);
+}
+.bn-prov-logo svg{display:block}
+/* A4.2: Technical action line — read-only, smaller weight than the name */
+.bn-act{
+  font-size:10.5px;color:var(--t3);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.01em;line-height:1.3;
+  margin-bottom:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
 .bn-badge{height:18px;padding:0 6px;border-radius:4px;font-size:10px;font-weight:700;line-height:18px}
 .bn-bw{background:rgba(0,194,194,0.18);color:var(--brand-teal)}
 .bn-ba{background:rgba(167,139,250,0.18);color:var(--pur)}
@@ -788,6 +804,450 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 }
 
 .bldr-tb-sep{width:1px;height:20px;background:var(--bd);margin:0 2px}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   A4.1 — HEADER RESTRUCTURE: ENTITY vs FLOW
+   Two-row header that mirrors the conceptual model:
+     Row 1 (.bldr-entity-row) → the Agentic Network entity (Publish, Active)
+     Row 2 (.bldr-subbar)     → the Flow being edited (Draft, Test, Density)
+   The user can answer at a glance: "what entity am I in?" and "what version
+   am I editing/testing?"
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Entity row ─────────────────────────────────────────────────────────── */
+.bldr-entity-row{height:54px;border-bottom:1px solid var(--bd)}
+.bldr-entity{display:flex;align-items:baseline;gap:8px;min-width:0}
+.bldr-entity-kind{
+  font-size:9.5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;
+  color:var(--t4);padding:3px 6px;border-radius:var(--r4);
+  background:rgba(43,127,255,0.10);border:1px solid rgba(43,127,255,0.25);
+  color:var(--pri-lt);line-height:1;align-self:center;
+}
+.bldr-entity-nm{font-size:14.5px;font-weight:700;color:var(--t1);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
+.bldr-entity-ver{font-size:11px;font-weight:600;color:var(--t3);font-variant-numeric:tabular-nums}
+
+/* Entity state pill — clickable, reflects production status */
+.bldr-state-pill{
+  height:28px;padding:0 11px 0 9px;border-radius:14px;
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(5,223,114,0.10);border:1px solid rgba(5,223,114,0.32);
+  color:var(--ok-lt);font-size:11.5px;font-weight:700;letter-spacing:.02em;
+  cursor:pointer;transition:filter .15s ease, transform .08s ease;
+  margin-left:4px;
+}
+.bldr-state-pill:hover{filter:brightness(1.10)}
+.bldr-state-pill:active{transform:translateY(1px)}
+.bldr-state-pill .bep-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--ok);
+  box-shadow:0 0 0 3px rgba(5,223,114,0.18);
+}
+.bldr-state-pill .bep-chev{opacity:.65;margin-left:1px}
+.bldr-state-pill .bep-lbl{line-height:1}
+
+/* State variants */
+.bldr-state-pill.is-active   {background:rgba(5,223,114,0.10);border-color:rgba(5,223,114,0.32);color:var(--ok-lt)}
+.bldr-state-pill.is-active   .bep-dot{background:var(--ok);    box-shadow:0 0 0 3px rgba(5,223,114,0.18)}
+.bldr-state-pill.is-running  {background:rgba(43,127,255,0.10);border-color:rgba(43,127,255,0.32);color:var(--pri-lt)}
+.bldr-state-pill.is-running  .bep-dot{background:var(--pri);  box-shadow:0 0 0 3px rgba(43,127,255,0.18); animation:pulse-soft 1.6s ease-in-out infinite}
+.bldr-state-pill.is-error    {background:rgba(255,100,103,0.10);border-color:rgba(255,100,103,0.32);color:var(--err)}
+.bldr-state-pill.is-error    .bep-dot{background:var(--err);  box-shadow:0 0 0 3px rgba(255,100,103,0.18)}
+.bldr-state-pill.is-inactive {background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.14);color:var(--t3)}
+.bldr-state-pill.is-inactive .bep-dot{background:var(--t4);   box-shadow:0 0 0 3px rgba(255,255,255,0.04)}
+.bldr-state-pill.is-draft    {background:rgba(253,199,0,0.10);border-color:rgba(253,199,0,0.32);color:var(--warn)}
+.bldr-state-pill.is-draft    .bep-dot{background:var(--warn); box-shadow:0 0 0 3px rgba(253,199,0,0.18)}
+
+@keyframes pulse-soft{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* Entity-level actions — the "what does it do to production?" group */
+.bldr-entity-acts{margin-left:auto;display:flex;align-items:center;gap:6px}
+
+/* Publish CTA — primary visual weight, blue (mirrors product nav primary) */
+.bldr-mb.mb-pub{
+  background:linear-gradient(180deg, #2B7FFF 0%, #155DFC 100%);
+  border-color:rgba(43,127,255,0.55);
+  color:#fff;
+  font-weight:700;
+  padding:0 14px 0 12px;
+  box-shadow:0 1px 0 rgba(255,255,255,0.18) inset, 0 2px 8px rgba(43,127,255,0.34);
+}
+.bldr-mb.mb-pub:hover{
+  background:linear-gradient(180deg, #4193FF 0%, #2B7FFF 100%);
+  border-color:rgba(43,127,255,0.75);
+  box-shadow:0 1px 0 rgba(255,255,255,0.22) inset, 0 3px 12px rgba(43,127,255,0.48);
+}
+.bldr-mb.mb-pub:active{
+  transform:translateY(1px);
+  box-shadow:0 1px 0 rgba(255,255,255,0.10) inset, 0 1px 4px rgba(43,127,255,0.32);
+}
+.bldr-mb.mb-pub:disabled,
+.bldr-mb.mb-pub.is-clean{
+  background:rgba(255,255,255,0.05);
+  border-color:var(--bds);color:var(--t3);
+  box-shadow:none;cursor:default;
+}
+.bldr-mb.mb-pub.is-clean:hover{filter:none}
+.bldr-pub-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  background:rgba(0,0,0,0.32);color:#fff;font-size:10px;font-weight:700;
+  margin-left:2px;line-height:1;
+}
+.bldr-mb.mb-pub.is-clean .bldr-pub-count{display:none}
+
+/* ── Flow row (subbar) ──────────────────────────────────────────────────── */
+.bldr-subbar{
+  height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;
+  border-bottom:1px solid var(--bd);
+  background:linear-gradient(180deg, rgba(255,255,255,0.015) 0%, rgba(0,0,0,0.18) 100%);
+  flex-shrink:0;
+}
+
+/* Editing-draft indicator — always tells you what you're touching */
+.bldr-flow-state{
+  display:flex;align-items:center;gap:7px;
+  font-size:11.5px;color:var(--t2);
+  padding:5px 10px;border-radius:var(--r6);
+  background:rgba(253,199,0,0.08);border:1px solid rgba(253,199,0,0.22);
+}
+.bldr-flow-state .bfs-icon{color:var(--warn);display:inline-flex}
+.bldr-flow-state .bfs-mode{color:var(--warn);font-weight:700;letter-spacing:.02em}
+.bldr-flow-state .bfs-sep{color:var(--t4);opacity:.6}
+.bldr-flow-state .bfs-save{color:var(--t3);font-weight:500;font-size:11px}
+
+/* Flow density toggle */
+.bldr-mb.mb-cmpt{
+  background:rgba(255,255,255,0.03);
+  border-color:var(--bds);color:var(--t2);
+}
+.bldr-mb.mb-cmpt:hover{background:rgba(255,255,255,0.07);color:var(--t1)}
+body.canvas-compact .bldr-mb.mb-cmpt{
+  background:rgba(43,127,255,0.14);
+  border-color:rgba(43,127,255,0.42);
+  color:var(--pri-lt);
+}
+
+/* Flow-action right group */
+.bldr-flow-acts{margin-left:auto;display:flex;align-items:center;gap:6px;position:relative}
+
+/* Test split-button */
+.bldr-test-split{display:inline-flex;align-items:stretch;position:relative}
+.bldr-mb.bldr-test-main{
+  background:linear-gradient(180deg, rgba(43,127,255,0.18) 0%, rgba(43,127,255,0.12) 100%);
+  border-color:rgba(43,127,255,0.42);
+  color:var(--pri-lt);
+  border-top-right-radius:0;border-bottom-right-radius:0;
+  padding-right:10px;border-right:none;font-weight:700;
+}
+.bldr-mb.bldr-test-main:hover{
+  background:linear-gradient(180deg, rgba(43,127,255,0.30) 0%, rgba(43,127,255,0.20) 100%);
+  border-color:rgba(43,127,255,0.66);
+  color:#cfe1ff;
+}
+.bldr-mb.bldr-test-arrow{
+  width:24px;padding:0;border-top-left-radius:0;border-bottom-left-radius:0;
+  background:linear-gradient(180deg, rgba(43,127,255,0.14) 0%, rgba(43,127,255,0.08) 100%);
+  border-color:rgba(43,127,255,0.42);
+  color:var(--pri-lt);
+  position:relative;
+}
+.bldr-mb.bldr-test-arrow::before{
+  content:'';position:absolute;left:0;top:6px;bottom:6px;width:1px;background:rgba(43,127,255,0.32);
+}
+.bldr-mb.bldr-test-arrow:hover{background:rgba(43,127,255,0.22);color:#cfe1ff}
+
+/* PROD-targeting variant — orange warning paint to signal "live system" */
+.bldr-test-split.is-prod .bldr-mb.bldr-test-main{
+  background:linear-gradient(180deg, rgba(252,113,38,0.22) 0%, rgba(252,113,38,0.12) 100%);
+  border-color:rgba(252,113,38,0.50);
+  color:var(--orange-lt);
+}
+.bldr-test-split.is-prod .bldr-mb.bldr-test-main:hover{
+  background:linear-gradient(180deg, rgba(252,113,38,0.35) 0%, rgba(252,113,38,0.22) 100%);
+  border-color:rgba(252,113,38,0.74);
+  color:#ffd5b8;
+}
+.bldr-test-split.is-prod .bldr-mb.bldr-test-arrow{
+  background:rgba(252,113,38,0.14);border-color:rgba(252,113,38,0.50);color:var(--orange-lt);
+}
+.bldr-test-split.is-prod .bldr-mb.bldr-test-arrow::before{background:rgba(252,113,38,0.42)}
+
+/* Test target dropdown */
+.bldr-test-menu{
+  position:absolute;top:calc(100% + 6px);right:0;
+  width:264px;background:#0c1428;border:1px solid var(--bds);
+  border-radius:var(--r8);padding:5px;z-index:600;
+  box-shadow:0 12px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(43,127,255,0.06);
+}
+.bldr-test-menu[hidden]{display:none}
+.btm-opt{
+  display:block;width:100%;text-align:left;padding:9px 11px;border-radius:var(--r6);
+  background:transparent;border:none;color:var(--t1);cursor:pointer;
+  transition:background .12s ease;
+}
+.btm-opt:hover{background:rgba(255,255,255,0.05)}
+.btm-row{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700}
+.btm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.btm-dot.draft{background:var(--pri);box-shadow:0 0 0 3px rgba(43,127,255,0.16)}
+.btm-dot.prod {background:var(--orange);box-shadow:0 0 0 3px rgba(252,113,38,0.18)}
+.btm-nm{flex:1;letter-spacing:.01em}
+.btm-chk{color:var(--ok);font-size:13px;font-weight:700}
+.btm-chk:empty{display:none}
+.btm-sub{font-size:10.5px;color:var(--t3);margin-top:3px;line-height:1.35;padding-left:16px}
+.btm-sep{height:1px;background:var(--bd);margin:4px 8px}
+
+/* Exit-builder button — neutral ghost, no longer primary */
+.bldr-mb.mb-done{
+  background:rgba(255,255,255,0.04);
+  border-color:var(--bds);
+  color:var(--t2);
+  font-weight:600;
+  padding:0 13px;
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 1px 2px rgba(0,0,0,0.20);
+}
+.bldr-mb.mb-done:hover{
+  background:rgba(255,255,255,0.08);
+  border-color:rgba(255,255,255,0.24);
+  color:var(--t1);
+  filter:none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   A4.3 — EDGE LABELS (clickable connection chips on the canvas)
+   The label is the readable name of the connection — the user clicks it to
+   open the edge config modal with the rule builder. The complexity stays
+   behind the modal; the canvas surfaces only the label + a filter glyph
+   when a condition is active.
+   ════════════════════════════════════════════════════════════════════════ */
+.ed-lbl{
+  position:absolute;transform:translate(-50%, -50%);
+  display:inline-flex;align-items:center;gap:5px;
+  height:22px;padding:0 9px;border-radius:11px;
+  background:#0c1428;border:1px solid var(--bds);
+  color:var(--t3);font-size:10.5px;font-weight:600;letter-spacing:.01em;
+  font-family:Inter,sans-serif;line-height:1;
+  cursor:pointer;z-index:3;
+  transition:background .12s, border-color .12s, color .12s, transform .08s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.40);white-space:nowrap;
+}
+.ed-lbl:hover{background:#10182c;border-color:rgba(43,127,255,0.42);color:var(--t1)}
+.ed-lbl:active{transform:translate(-50%, -50%) scale(0.96)}
+.ed-lbl.is-cond{
+  background:rgba(252,113,38,0.10);
+  border-color:rgba(252,113,38,0.42);
+  color:var(--orange-lt);
+}
+.ed-lbl.is-cond:hover{
+  background:rgba(252,113,38,0.18);
+  border-color:rgba(252,113,38,0.62);
+  color:#ffd5b8;
+}
+.ed-lbl.is-taken{
+  background:rgba(5,223,114,0.12);
+  border-color:rgba(5,223,114,0.45);
+  color:var(--ok-lt);
+}
+.ed-lbl-txt{line-height:1}
+.ed-lbl-cond{display:inline-flex;color:inherit}
+
+/* SVG edge path runtime states */
+.canvas-svg path.is-rt-taken  {filter:drop-shadow(0 0 4px rgba(5,223,114,0.45))}
+.canvas-svg path.is-rt-skipped{stroke-dasharray:3 4}
+
+/* ════════════════════════════════════════════════════════════════════════
+   A4.3 — EDGE CONFIG MODAL (centered, w/ rule builder)
+   ════════════════════════════════════════════════════════════════════════ */
+.edm-overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.62);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  opacity:0;pointer-events:none;transition:opacity .18s ease;
+}
+.edm-overlay.is-open{opacity:1;pointer-events:auto}
+.edm-modal{
+  width:min(620px, 100%);max-height:88vh;
+  background:#0a1322;border:1px solid var(--bds);border-radius:14px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(43,127,255,0.06);
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:translateY(8px) scale(0.985);transition:transform .18s ease;
+}
+.edm-overlay.is-open .edm-modal{transform:none}
+.edm-hd{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 18px;border-bottom:1px solid var(--bd);
+  background:linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+}
+.edm-hd-ico{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(252,113,38,0.16);color:var(--orange-lt);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.edm-hd-txt{flex:1;min-width:0}
+.edm-hd-ttl{font-size:14px;font-weight:700;color:var(--t1);line-height:1.2}
+.edm-hd-sub{font-size:11.5px;color:var(--t3);margin-top:2px;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.edm-hd-close{
+  width:30px;height:30px;border-radius:8px;
+  background:transparent;border:1px solid transparent;color:var(--t3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .12s, border-color .12s, color .12s;
+}
+.edm-hd-close:hover{background:rgba(255,255,255,0.06);border-color:var(--bds);color:var(--t1)}
+
+.edm-body{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:16px}
+.edm-fld{display:flex;flex-direction:column;gap:6px}
+.edm-fld-lbl{font-size:10.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.edm-fld-help{font-size:11px;color:var(--t4);line-height:1.4}
+.edm-inp{
+  width:100%;height:34px;padding:0 11px;border-radius:7px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bds);
+  color:var(--t1);font-size:12.5px;font-family:inherit;
+  transition:background .12s, border-color .12s, box-shadow .12s;
+}
+.edm-inp:focus{outline:none;background:rgba(43,127,255,0.06);border-color:rgba(43,127,255,0.55);
+  box-shadow:0 0 0 2px rgba(43,127,255,0.18)}
+
+.edm-cond-tog{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:11px 13px;border-radius:9px;
+  background:rgba(255,255,255,0.025);border:1px solid var(--bds);
+}
+.edm-cond-tog-txt{font-size:12.5px;font-weight:700;color:var(--t1)}
+.edm-cond-tog-sub{font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4}
+
+.edm-join{display:flex;gap:6px;align-items:center}
+.edm-join-pill{
+  height:24px;padding:0 11px;border-radius:12px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--bds);
+  color:var(--t3);font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  cursor:pointer;transition:background .12s, color .12s, border-color .12s;
+}
+.edm-join-pill.is-on{
+  background:rgba(43,127,255,0.18);border-color:rgba(43,127,255,0.55);color:var(--pri-lt);
+}
+
+.edm-rules{display:flex;flex-direction:column;gap:8px}
+.edm-rule{
+  display:grid;grid-template-columns:1fr 130px 1fr 28px;gap:7px;
+  align-items:center;
+}
+.edm-rule .edm-inp{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.edm-rule-rm{
+  width:28px;height:28px;border-radius:6px;
+  background:transparent;border:1px solid transparent;color:var(--t3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.edm-rule-rm:hover{background:rgba(255,100,103,0.10);border-color:rgba(255,100,103,0.32);color:var(--err)}
+
+.edm-add-rule{
+  width:max-content;align-self:flex-start;
+  height:30px;padding:0 12px;border-radius:7px;
+  background:rgba(43,127,255,0.10);border:1px dashed rgba(43,127,255,0.45);
+  color:var(--pri-lt);font-size:11.5px;font-weight:700;letter-spacing:.01em;
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:background .12s, border-color .12s;
+}
+.edm-add-rule:hover{background:rgba(43,127,255,0.18);border-color:rgba(43,127,255,0.70)}
+
+.edm-ft{
+  display:flex;justify-content:space-between;gap:8px;align-items:center;
+  padding:12px 18px;border-top:1px solid var(--bd);
+  background:linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.015) 100%);
+}
+.edm-ft-meta{font-size:11px;color:var(--t3)}
+.edm-ft-actions{display:flex;gap:8px}
+.edm-btn{
+  height:32px;padding:0 14px;border-radius:7px;
+  border:1px solid var(--bds);background:rgba(255,255,255,0.04);
+  color:var(--t1);font-size:12px;font-weight:600;cursor:pointer;
+  transition:background .12s, border-color .12s, color .12s;
+}
+.edm-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.20)}
+.edm-btn-pri{
+  background:linear-gradient(180deg, #2B7FFF 0%, #155DFC 100%);
+  border-color:rgba(43,127,255,0.55);color:#fff;font-weight:700;
+  box-shadow:0 1px 0 rgba(255,255,255,0.18) inset, 0 2px 8px rgba(43,127,255,0.30);
+}
+.edm-btn-pri:hover{
+  background:linear-gradient(180deg, #4193FF 0%, #2B7FFF 100%);
+  border-color:rgba(43,127,255,0.75);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   A4.5 — NODE RUNTIME STATE COLORS + RUN SUMMARY
+   ════════════════════════════════════════════════════════════════════════ */
+.bn[data-rt="success"]{border-color:rgba(5,223,114,0.55); box-shadow:0 0 0 1px rgba(5,223,114,0.32), 0 4px 14px rgba(5,223,114,0.18)}
+.bn[data-rt="error"]  {border-color:rgba(255,100,103,0.65); box-shadow:0 0 0 1px rgba(255,100,103,0.32), 0 4px 14px rgba(255,100,103,0.18)}
+.bn[data-rt="warning"]{border-color:rgba(253,199,0,0.65); box-shadow:0 0 0 1px rgba(253,199,0,0.32), 0 4px 14px rgba(253,199,0,0.18)}
+.bn[data-rt="running"]{border-color:rgba(43,127,255,0.70); box-shadow:0 0 0 1px rgba(43,127,255,0.35), 0 4px 18px rgba(43,127,255,0.32); animation:rt-pulse 1.2s ease-in-out infinite}
+.bn[data-rt="not_executed"]{opacity:.45}
+.bn[data-rt="not_executed"] .bn-name{color:var(--t3)}
+
+@keyframes rt-pulse{
+  0%,100%{box-shadow:0 0 0 1px rgba(43,127,255,0.35), 0 4px 18px rgba(43,127,255,0.32)}
+  50%   {box-shadow:0 0 0 1px rgba(43,127,255,0.55), 0 6px 26px rgba(43,127,255,0.48)}
+}
+
+/* Tiny corner state chip on the node card */
+.bn-rt-chip{
+  position:absolute;top:-7px;right:-7px;
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#02180c;
+  box-shadow:0 2px 6px rgba(0,0,0,0.40);
+  border:2px solid var(--bg2);
+  z-index:5;
+}
+.bn-rt-chip.rt-success{background:var(--ok)}
+.bn-rt-chip.rt-error  {background:var(--err);color:#fff}
+.bn-rt-chip.rt-warning{background:var(--warn);color:#1a1a1a}
+.bn-rt-chip.rt-running{background:var(--pri);color:#fff}
+
+/* Run summary banner — appears at the top of the canvas after a test run */
+.bldr-run-banner{
+  position:absolute;left:50%;top:18px;transform:translateX(-50%);
+  display:flex;align-items:center;gap:14px;
+  padding:10px 14px;border-radius:10px;
+  background:rgba(5,223,114,0.10);border:1px solid rgba(5,223,114,0.40);
+  color:var(--ok-lt);font-size:11.5px;font-weight:600;
+  box-shadow:0 4px 18px rgba(0,0,0,0.40);z-index:8;
+  white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;
+}
+.bldr-run-banner.is-open{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.bldr-run-banner.is-prod{background:rgba(252,113,38,0.10);border-color:rgba(252,113,38,0.40);color:var(--orange-lt)}
+.bldr-run-banner.is-error{background:rgba(255,100,103,0.10);border-color:rgba(255,100,103,0.40);color:var(--err)}
+.bldr-run-banner .brb-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(255,255,255,0.06)}
+.bldr-run-banner .brb-kv{display:flex;align-items:center;gap:6px;color:var(--t2);font-weight:500}
+.bldr-run-banner .brb-kv strong{color:var(--t1);font-weight:700}
+.bldr-run-banner .brb-sep{width:1px;height:12px;background:var(--bd)}
+.bldr-run-banner .brb-clear{
+  height:22px;padding:0 9px;border-radius:5px;
+  background:rgba(255,255,255,0.06);border:1px solid var(--bds);
+  color:var(--t2);font-size:10.5px;font-weight:600;cursor:pointer;
+}
+.bldr-run-banner .brb-clear:hover{background:rgba(255,255,255,0.12);color:var(--t1)}
+
+/* ── Canvas compact mode (A4.4) ─────────────────────────────────────────── */
+body.canvas-compact .bn{height:auto!important;min-height:36px;padding:7px 10px}
+body.canvas-compact .bn .bn-stat,
+body.canvas-compact .bn .bn-chip,
+body.canvas-compact .bn .bn-kn-lbl,
+body.canvas-compact .bn .bn-kn-pack,
+body.canvas-compact .bn .bn-act{display:none!important}
+body.canvas-compact .bn-name{margin-top:0;font-size:11.5px}
+body.canvas-compact .bn-hd{margin-bottom:0}
+
+/* ── Inactive-entity overlay: gray canvas, allow editing (A4.1) ─────────── */
+body.entity-inactive .bldr-edit-canvas-wrap,
+body.entity-inactive #bldrEditCanvas{filter:grayscale(.55) opacity(.78)}
+body.entity-inactive #bldrEditCanvas .bn{box-shadow:none}
+body.entity-inactive .bldr-flow-state{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.10)}
+body.entity-inactive .bldr-flow-state .bfs-mode,
+body.entity-inactive .bldr-flow-state .bfs-icon{color:var(--t3)}
+
 .bldr-body{flex:1;display:flex;overflow:hidden}
 /* Node Library */
 .nl{width:252px;flex-shrink:0;border-right:1px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;transition:width .22s cubic-bezier(.4,0,.2,1),border-color .22s}
@@ -863,9 +1323,29 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .nl.nl-collapsed ~ .bldr-edit-area .nl-expand-strip{display:flex}
 .panel-expand-btn{width:20px;height:52px;background:var(--bg2);border:1px solid var(--bd);border-left:none;border-radius:0 var(--r8) var(--r8) 0;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .1s,background .1s}
 .panel-expand-btn:hover{color:var(--t1);background:rgba(255,255,255,0.06)}
-.nl-swrap{padding:0 12px 8px}
-.nl-sinp{width:100%;height:32px;background:rgba(255,255,255,0.05);border:1px solid var(--bd);border-radius:var(--r8);padding:0 10px;color:var(--t1);font-size:12px;outline:none}
+.nl-swrap{padding:0 12px 8px;position:relative}
+.nl-sinp{width:100%;height:32px;background:rgba(255,255,255,0.05);border:1px solid var(--bd);border-radius:var(--r8);padding:0 28px 0 10px;color:var(--t1);font-size:12px;outline:none;transition:border-color .12s,background .12s}
 .nl-sinp::placeholder{color:var(--t3)}
+.nl-sinp:focus{border-color:var(--pri-bd);background:rgba(255,255,255,0.07)}
+/* Clear (×) button — only visible when there's a query */
+.nl-sclr{
+  position:absolute;right:18px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;border:none;border-radius:50%;
+  background:rgba(255,255,255,0.08);color:var(--t2);
+  font-size:13px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .12s,color .12s;
+}
+.nl-sclr:hover{background:rgba(255,255,255,0.18);color:var(--t1)}
+/* Empty state when no results match — rendered after the .nl-body items */
+.nl-empty{
+  margin:14px 16px;padding:16px 12px;text-align:center;
+  border:1px dashed var(--bd);border-radius:var(--r8);
+  font-size:11.5px;color:var(--t3);line-height:1.5;
+}
+.nl-empty strong{color:var(--t1);font-weight:700}
+/* Highlighted match inside .nl-nm / .nl-sub */
+.nl-item mark{background:rgba(43,127,255,0.20);color:var(--pri-lt);padding:0 1px;border-radius:2px}
 .nl-tabs{display:flex;gap:2px;padding:0 12px 8px}
 .nl-tab{height:26px;padding:0 10px;border-radius:var(--r6);border:none;background:transparent;color:var(--t3);font-size:12px;font-weight:600;cursor:pointer;transition:all .1s}
 .nl-tab:hover{background:rgba(255,255,255,0.05);color:var(--t2)}
@@ -1050,6 +1530,25 @@ body.bldr-insp-resizing iframe{pointer-events:none}
 .ins-fld-select.is-invalid,
 .ins-fld-textarea.is-invalid,
 .ins-fld-code.is-invalid{border-color:var(--err);background:rgba(255,100,103,0.04)}
+
+/* Date / Datetime input — native picker styled for dark theme. The
+   ::-webkit-calendar-picker-indicator is the small calendar glyph the
+   browser adds; recolor it via the invert/sepia filter chain so it
+   contrasts on dark. */
+.ins-fld-date{
+  color-scheme:dark;
+  font-family:inherit;
+  cursor:text;
+}
+.ins-fld-date::-webkit-calendar-picker-indicator{
+  filter:invert(0.7) sepia(0.1) hue-rotate(180deg) saturate(2);
+  cursor:pointer;opacity:0.7;transition:opacity .12s;
+}
+.ins-fld-date::-webkit-calendar-picker-indicator:hover{opacity:1}
+.ins-fld-date::-webkit-datetime-edit{color:var(--t1)}
+.ins-fld-date::-webkit-datetime-edit-fields-wrapper{color:var(--t1)}
+.ins-fld-date::-webkit-datetime-edit-text{color:var(--t3);padding:0 2px}
+.ins-fld-date:empty,.ins-fld-date:not(:focus):invalid{color:var(--t4)}
 .ins-fld-num{display:flex;align-items:center;gap:8px}
 .ins-fld-num .suffix{font-size:10px;color:var(--t4)}
 .ins-fld-slider-row{display:flex;align-items:center;gap:10px}
@@ -1181,6 +1680,26 @@ body.bldr-insp-resizing iframe{pointer-events:none}
 /* Per-type accent overrides for the insp-node-ico card. The default color
    is var(--pur) (Agent). When the node is a different type, JS toggles a
    data-type attribute on the card. */
+/* A4.2: When the inspector icon is showing a branded provider logo, the
+   type-color background gets in the way. Strip it and let the brand swatch
+   carry the visual weight. */
+.insp-node-ico.has-prov{background:transparent!important;padding:0}
+.insp-node-ico.has-prov .bn-prov-logo{width:32px;height:32px;border-radius:var(--r8)}
+.insp-node-ico.has-prov .bn-prov-logo svg{width:18px;height:18px}
+
+/* A4.2: Editable contextual name — subtle affordance until interacted with.
+   On hover, surfaces a faint outline so the user knows it's interactive. */
+.insp-node-nm[contenteditable="true"]{
+  outline:none;cursor:text;
+  border-radius:4px;padding:1px 4px;margin-left:-4px;
+  transition:background .12s ease, box-shadow .12s ease;
+}
+.insp-node-nm[contenteditable="true"]:hover{background:rgba(255,255,255,0.04)}
+.insp-node-nm[contenteditable="true"]:focus{
+  background:rgba(43,127,255,0.10);
+  box-shadow:0 0 0 1px rgba(43,127,255,0.45);
+}
+
 .insp-node-card[data-type="trigger"] .insp-node-ico{background:var(--warn-bg);color:var(--warn)}
 .insp-node-card[data-type="agent"]   .insp-node-ico{background:var(--pur-bg); color:var(--pur)}
 .insp-node-card[data-type="rag"]     .insp-node-ico{background:var(--ok-bg);  color:var(--ok)}
@@ -4937,39 +5456,100 @@ button.avatar-sm:hover{filter:brightness(1.08)}
 
     <!-- ═══ VIEW: BUILDER (EDIT MODE) ═══ -->
     <div id="vBuilder" class="view">
-      <div class="bldr-topbar">
-        <button class="bldr-back-btn" onclick="exitBuilder()">
+      <!-- ── HEADER ROW 1: ENTITY (Agentic Network) ──────────────────────────
+           Per A4.1: entity-level actions (Activate/Deactivate/Publish) live at
+           the top — they apply to the *whole network*, not the current flow.
+           The state pill is the source of truth for "what's running in prod".
+      -->
+      <div class="bldr-topbar bldr-entity-row">
+        <button class="bldr-back-btn" onclick="exitBuilder()" title="Back to network overview">
           <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Back
         </button>
-        <span class="bldr-net-nm" id="bldrNetNm">–</span>
-        <span class="bldr-draft-badge">Draft</span>
-        <div class="bldr-mode-tools">
-          <button class="bldr-mb mb-edit">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 9l1.5-1.5 3-3L8 3l1 1-1.5 1.5-3 3L3 10l-1-1z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 2l3 3" stroke="currentColor" stroke-width="1.2"/></svg>
-            Editing
+        <div class="bldr-entity">
+          <span class="bldr-entity-kind">Agentic Network</span>
+          <span class="bldr-entity-nm" id="bldrNetNm">–</span>
+          <span class="bldr-entity-ver" id="bldrNetVer">v3.2</span>
+        </div>
+        <button class="bldr-state-pill" id="bldrEntityState" onclick="toggleEntityActive()"
+                aria-label="Toggle entity state" title="Click to activate/deactivate the network">
+          <span class="bep-dot"></span>
+          <span class="bep-lbl">Active</span>
+          <svg class="bep-chev" width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2.5 4l2.5 2.5L7.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="bldr-entity-acts">
+          <button class="bldr-mb mb-pub" id="bldrPubBtn" onclick="bldrPublish()" title="Publish this draft to production">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 2v6M3 5l3-3 3 3M2 10h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Publish changes
+            <span class="bldr-pub-count" id="bldrPubCount">3</span>
           </button>
+        </div>
+      </div>
 
-          <button class="bldr-mb mb-wiz" onclick="openWizard()">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1.5l1.1 2.6L10 5.1 7.4 7 8.5 10 6 8.5 3.5 10l1.1-3L2 5.1l2.9-.9L6 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-            AI Wizard
-          </button>
+      <!-- ── HEADER ROW 2: FLOW (this draft) ─────────────────────────────────
+           Per A4.1: flow-level actions live in their own bar. The version
+           the user is currently editing/testing is *always* visible.
+      -->
+      <div class="bldr-subbar">
+        <div class="bldr-flow-state" id="bldrFlowState">
+          <span class="bfs-icon" aria-hidden="true">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 9l1.5-1.5 3-3L8 3l1 1-1.5 1.5-3 3L3 10l-1-1z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="bfs-mode">Editing draft</span>
+          <span class="bfs-sep">·</span>
+          <span class="bfs-save" id="bldrDraftSave">Saved · just now</span>
+        </div>
+
+        <div class="bldr-tb-sep"></div>
+
+        <!-- Canvas density toggle (A4.4) -->
+        <button class="bldr-mb mb-cmpt" id="bldrDensityBtn" onclick="toggleCanvasDensity()" title="Toggle compact view (B)">
+          <svg id="bldrDensityIco" width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="2" width="9" height="2.2" rx="0.6" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="5.4" width="9" height="2.2" rx="0.6" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="8.8" width="9" height="1.8" rx="0.6" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span id="bldrDensityLbl">Compact</span>
+        </button>
+
+        <button class="bldr-mb mb-wiz" onclick="openWizard()">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1.5l1.1 2.6L10 5.1 7.4 7 8.5 10 6 8.5 3.5 10l1.1-3L2 5.1l2.9-.9L6 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          AI Wizard
+        </button>
+
+        <button class="bldr-mb mb-kn" onclick="openBldrKnPanel()">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 1.5h7v9h-7V1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 4h3M4.5 6h3M4.5 8h1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+          Knowledge
+        </button>
+
+        <div class="bldr-flow-acts">
+          <!-- Test split-button: primary action tests the DRAFT; menu lets you
+               switch to testing the live PRODUCTION version with a clear
+               "you're touching live" warning state. -->
+          <div class="bldr-test-split" id="bldrTestSplit">
+            <button class="bldr-mb bldr-test-main" id="bldrTestMain" onclick="bldrTestActive()" title="Run this draft against test inputs">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3.5 2.5v7L9.5 6L3.5 2.5z" fill="currentColor"/></svg>
+              <span id="bldrTestLbl">Test draft</span>
+            </button>
+            <button class="bldr-mb bldr-test-arrow" id="bldrTestArrow" onclick="bldrTestMenuToggle(event)" aria-label="Choose test target">
+              <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2.5 4l2.5 2.5L7.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="bldr-test-menu" id="bldrTestMenu" hidden>
+              <button class="btm-opt" data-tgt="draft" onclick="bldrSetTestTarget('draft')">
+                <div class="btm-row"><span class="btm-dot draft"></span><span class="btm-nm">Test draft</span><span class="btm-chk" id="btmChkDraft">✓</span></div>
+                <div class="btm-sub">Runs against your in-edit changes. Safe.</div>
+              </button>
+              <div class="btm-sep"></div>
+              <button class="btm-opt" data-tgt="prod" onclick="bldrSetTestTarget('prod')">
+                <div class="btm-row"><span class="btm-dot prod"></span><span class="btm-nm">Test production</span><span class="btm-chk" id="btmChkProd"></span></div>
+                <div class="btm-sub">Runs against the published version. Uses live tools.</div>
+              </button>
+            </div>
+          </div>
+
           <div class="bldr-tb-sep"></div>
-          <button class="bldr-mb mb-kn" onclick="openBldrKnPanel()">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 1.5h7v9h-7V1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 4h3M4.5 6h3M4.5 8h1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
-            Knowledge
-          </button>
-          <button class="bldr-mb mb-test" onclick="openTestMode()">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 9h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-            Test
+          <button class="bldr-mb mb-disc" onclick="bldrDiscardDraft()" title="Discard all draft changes">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 3h7M4.5 3V2l.5-.5h2l.5.5v1M3.5 3l.5 7h4l.5-7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Discard draft
           </button>
           <button class="bldr-mb mb-done" onclick="exitBuilder()">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5l4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Done
-          </button>
-          <button class="bldr-mb mb-disc" onclick="exitBuilder()" title="Discard changes and exit">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            Discard
+            Exit builder
           </button>
         </div>
       </div>
@@ -5037,7 +5617,11 @@ button.avatar-sm:hover{filter:brightness(1.08)}
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="currentColor"/><path d="M5 10h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
             </div>
           </div>
-          <div class="nl-swrap"><input class="nl-sinp" placeholder="Search nodes…"/></div>
+          <div class="nl-swrap">
+            <input class="nl-sinp" id="nlSinp" placeholder="Search nodes…"
+              oninput="filterNodeLibrary(this.value)" aria-label="Search nodes" />
+            <button class="nl-sclr" id="nlSclr" onclick="filterNodeLibrary('')" aria-label="Clear search" style="display:none">×</button>
+          </div>
           <div class="nl-tabs">
             <button class="nl-tab active">Suggested</button>
             <button class="nl-tab" onclick="this.parentNode.querySelectorAll('.nl-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">All</button>
@@ -5782,6 +6366,71 @@ button.avatar-sm:hover{filter:brightness(1.08)}
 
 <!-- Toast -->
 <div class="toast-ctr" id="toastCtr"></div>
+
+<!-- ════ EDGE CONFIG MODAL (A4.3) ════
+     Centered modal for configuring a connection (edge). Holds the label,
+     output mapping, optional condition with multiple rules joined by
+     AND/OR. The canvas only shows the label — the complexity lives here.
+     Opened by openEdgeConfigModal(edgeId). -->
+<div class="edm-overlay" id="edmOv" role="dialog" aria-modal="true" aria-labelledby="edmTtl" onclick="closeEdgeConfigModal()">
+  <div class="edm-modal" onclick="event.stopPropagation()">
+    <div class="edm-hd">
+      <div class="edm-hd-ico">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10L9 9v4L7 12V9L3 4z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="edm-hd-txt">
+        <div class="edm-hd-ttl" id="edmTtl">Connection</div>
+        <div class="edm-hd-sub" id="edmSub">–</div>
+      </div>
+      <button class="edm-hd-close" onclick="closeEdgeConfigModal()" aria-label="Close">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="edm-body">
+      <div class="edm-fld">
+        <div class="edm-fld-lbl">Label · shown on canvas</div>
+        <input id="edmLabel" class="edm-inp" type="text" placeholder="e.g. New customer" maxlength="40"/>
+        <div class="edm-fld-help">Keep it short — the canvas reads cleaner when labels are 1–3 words.</div>
+      </div>
+
+      <div class="edm-fld">
+        <div class="edm-fld-lbl">Output mapping · technical</div>
+        <input id="edmOutput" class="edm-inp" type="text" placeholder="state.upstream_result" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace"/>
+        <div class="edm-fld-help">Dotted path of the upstream node's output that gets passed to the next node.</div>
+      </div>
+
+      <div class="edm-cond-tog">
+        <div>
+          <div class="edm-cond-tog-txt">Gate this connection with a condition</div>
+          <div class="edm-cond-tog-sub">When off, every upstream result flows through. When on, the rules below must evaluate to true.</div>
+        </div>
+        <label class="mini-tog"><input type="checkbox" id="edmCondActive" onchange="edmToggleCondActive()"><div class="mini-track"><div class="mini-thumb"></div></div></label>
+      </div>
+
+      <div id="edmCondBlock" style="display:none;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="edm-fld-lbl" style="margin:0">Rules</div>
+          <div class="edm-join">
+            <button class="edm-join-pill" id="edmJoinAnd" onclick="edmSetJoin('AND')">AND</button>
+            <button class="edm-join-pill" id="edmJoinOr"  onclick="edmSetJoin('OR')">OR</button>
+          </div>
+        </div>
+        <div class="edm-rules" id="edmRules"></div>
+        <button class="edm-add-rule" onclick="edmAddRule()">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Add rule
+        </button>
+      </div>
+    </div>
+    <div class="edm-ft">
+      <div class="edm-ft-meta" id="edmMeta">–</div>
+      <div class="edm-ft-actions">
+        <button class="edm-btn" onclick="closeEdgeConfigModal()">Cancel</button>
+        <button class="edm-btn edm-btn-pri" onclick="saveEdgeConfig()">Save connection</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ════ AGENT CONFIG MODAL ════
      Centered, large working surface for configuring an agent node.
@@ -7188,18 +7837,198 @@ function openBuilderView() {
   document.getElementById('bldrNetNm').textContent = bldrNet.name;
   showView('vBuilder');
   document.body.classList.add('builder-mode');
+  // Seed entity-level state from the network. The status pill is the source
+  // of truth for "what's running in prod"; updating it does NOT change what
+  // the user sees in the editing canvas — per A4.1 we never block edit.
+  setEntityState(bldrNet.status || 'inactive');
+  // Restore canvas density preference (A4.4)
+  try {
+    if (sessionStorage.getItem('bldrCanvasDensity') === 'compact') {
+      document.body.classList.add('canvas-compact');
+      const lbl = document.getElementById('bldrDensityLbl');
+      if (lbl) lbl.textContent = 'Expanded';
+    }
+  } catch (e) { /* sessionStorage may be unavailable */ }
+  // Restore last-chosen test target (A4.1)
+  try {
+    const tgt = sessionStorage.getItem('bldrTestTarget') || 'draft';
+    bldrSetTestTarget(tgt, /*silent*/ true);
+  } catch (e) { bldrSetTestTarget('draft', true); }
+  // Reset save indicator
+  const save = document.getElementById('bldrDraftSave');
+  if (save) save.textContent = 'Saved · just now';
   renderEditCanvas(bldrNet);
   selectEditNode('ag-ca');
 }
 
 function exitBuilder() {
   document.body.classList.remove('builder-mode');
+  document.body.classList.remove('entity-inactive');
   showView('vOverview');
   const ovContent = document.querySelector('.ov-content');
   if(ovContent) ovContent.classList.add('bldr-mode');
   const builderTab = document.querySelectorAll('.ov-tab')[1];
   switchOvTab('builder', builderTab);
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// A4.1 — ENTITY-LEVEL ACTIONS + FLOW-LEVEL ACTIONS
+// ────────────────────────────────────────────────────────────────────────────
+// Per the architect's feedback: Activate/Deactivate/Publish are properties of
+// the *entity* (the Agentic Network) and live in the top header. Test/Edit/
+// Discard are properties of the *flow* being edited and live in the sub-bar.
+// We track which version the user is testing ('draft' | 'prod') so the run
+// experience can be unambiguous.
+// ════════════════════════════════════════════════════════════════════════════
+
+let bldrTestTarget = 'draft';  // 'draft' | 'prod'
+const ENTITY_STATE_LABELS = {
+  active:   'Active',
+  running:  'Running',
+  error:    'Error',
+  inactive: 'Inactive',
+  draft:    'Draft',
+};
+
+// Update the entity state pill + canvas styling. Inactive grays the canvas
+// (without blocking edits — explicit per the feedback).
+function setEntityState(state) {
+  const pill = document.getElementById('bldrEntityState');
+  if (!pill) return;
+  const known = ENTITY_STATE_LABELS[state] ? state : 'inactive';
+  pill.classList.remove('is-active','is-running','is-error','is-inactive','is-draft');
+  pill.classList.add('is-' + known);
+  const lbl = pill.querySelector('.bep-lbl');
+  if (lbl) lbl.textContent = ENTITY_STATE_LABELS[known];
+  // Gray the canvas when entity is inactive — but editing still works
+  document.body.classList.toggle('entity-inactive', known === 'inactive');
+  if (bldrNet) bldrNet.status = known;
+}
+
+// Click the state pill to toggle active/inactive. Demo-only — real publish
+// flow would prompt for confirmation if there are pending invocations.
+function toggleEntityActive() {
+  if (!bldrNet) return;
+  const next = (bldrNet.status === 'active' || bldrNet.status === 'running') ? 'inactive' : 'active';
+  setEntityState(next);
+  toast(`Network ${next === 'active' ? 'activated' : 'deactivated'}`, next === 'active' ? 'ok' : 'info');
+}
+
+// Publish the draft → production. In a real impl this would push the
+// draft's flow definition to the live env, increment the version, and clear
+// the pending-changes count. Demo: animate the count down + show toast.
+function bldrPublish() {
+  const btn = document.getElementById('bldrPubBtn');
+  const count = document.getElementById('bldrPubCount');
+  if (btn && btn.classList.contains('is-clean')) {
+    toast('Nothing to publish — no draft changes', 'info');
+    return;
+  }
+  toast('Publishing draft to production…', 'info');
+  setTimeout(() => {
+    if (count) count.textContent = '0';
+    if (btn)   btn.classList.add('is-clean');
+    // Bump the version label so it's visibly clear we shipped
+    const ver = document.getElementById('bldrNetVer');
+    if (ver) {
+      const m = (ver.textContent || 'v3.2').match(/^v(\d+)\.(\d+)$/);
+      if (m) ver.textContent = `v${m[1]}.${parseInt(m[2], 10) + 1}`;
+    }
+    toast('Draft published · network running on new version', 'ok');
+  }, 900);
+}
+
+// Discard the draft → reverts everything to the last published version.
+// Real impl would confirm; demo skips the dialog.
+function bldrDiscardDraft() {
+  toast('Draft discarded — reverted to published version', 'info');
+  // Reset publish count to a fresh non-zero baseline (mock)
+  const count = document.getElementById('bldrPubCount');
+  const btn = document.getElementById('bldrPubBtn');
+  if (count) count.textContent = '3';
+  if (btn)   btn.classList.remove('is-clean');
+}
+
+// Test split-button — primary click runs whichever target is selected.
+// A4.5: trigger the canvas-level simulation directly so the user sees the
+// path light up on the actual workflow. The old slide-over (openTestMode)
+// is still reachable from elsewhere but no longer the default action — the
+// architect feedback explicitly asked for "execution shown on the canvas".
+function bldrTestActive() {
+  if (bldrTestTarget === 'prod') {
+    toast('Running on PRODUCTION version — live tools in scope', 'warn');
+  } else {
+    toast('Running draft — sandboxed, no production side-effects', 'info');
+  }
+  if (typeof runFlowSimulation === 'function') {
+    runFlowSimulation(bldrTestTarget);
+  } else if (typeof openTestMode === 'function') {
+    openTestMode();
+  }
+}
+
+// Open / close the test target dropdown.
+function bldrTestMenuToggle(ev) {
+  if (ev) ev.stopPropagation();
+  const menu = document.getElementById('bldrTestMenu');
+  if (!menu) return;
+  const isOpen = !menu.hasAttribute('hidden');
+  if (isOpen) { menu.setAttribute('hidden', ''); }
+  else {
+    menu.removeAttribute('hidden');
+    // Close on outside click — single bind, removed on close.
+    const off = (e) => {
+      if (!menu.contains(e.target) && e.target.id !== 'bldrTestArrow') {
+        menu.setAttribute('hidden', '');
+        document.removeEventListener('click', off, true);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', off, true), 0);
+  }
+}
+
+// Pick which version Test will hit. Updates the button label, the colored
+// warning style, and the checkmark in the menu. Persists to sessionStorage.
+function bldrSetTestTarget(target, silent) {
+  bldrTestTarget = (target === 'prod') ? 'prod' : 'draft';
+  const split = document.getElementById('bldrTestSplit');
+  const lbl   = document.getElementById('bldrTestLbl');
+  const chkD  = document.getElementById('btmChkDraft');
+  const chkP  = document.getElementById('btmChkProd');
+  if (split) split.classList.toggle('is-prod', bldrTestTarget === 'prod');
+  if (lbl)   lbl.textContent = bldrTestTarget === 'prod' ? 'Test production' : 'Test draft';
+  if (chkD)  chkD.textContent = bldrTestTarget === 'draft' ? '✓' : '';
+  if (chkP)  chkP.textContent = bldrTestTarget === 'prod'  ? '✓' : '';
+  // Close the menu after a pick
+  const menu = document.getElementById('bldrTestMenu');
+  if (menu) menu.setAttribute('hidden', '');
+  try { sessionStorage.setItem('bldrTestTarget', bldrTestTarget); } catch (e) {}
+  if (!silent) {
+    toast(bldrTestTarget === 'prod'
+          ? 'Test target → production (live tools will be called)'
+          : 'Test target → draft (sandboxed)',
+          bldrTestTarget === 'prod' ? 'warn' : 'info');
+  }
+}
+
+// A4.4 — Toggle the canvas density. Persists across reloads.
+function toggleCanvasDensity() {
+  const on = !document.body.classList.contains('canvas-compact');
+  document.body.classList.toggle('canvas-compact', on);
+  const lbl = document.getElementById('bldrDensityLbl');
+  if (lbl) lbl.textContent = on ? 'Expanded' : 'Compact';
+  try { sessionStorage.setItem('bldrCanvasDensity', on ? 'compact' : 'expanded'); } catch (e) {}
+}
+
+// Keyboard shortcut: "B" toggles canvas density (any non-input focus)
+document.addEventListener('keydown', (e) => {
+  if (!document.body.classList.contains('builder-mode')) return;
+  if (e.key !== 'b' && e.key !== 'B') return;
+  const tag = (e.target && e.target.tagName) || '';
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (e.target && e.target.isContentEditable)) return;
+  e.preventDefault();
+  toggleCanvasDensity();
+});
 
 // ─ Preview Canvas ─
 function renderPreviewCanvas(net) {
@@ -7384,6 +8213,98 @@ function nlStripHideTip(ev) {
     }
   }
   if (_nlStripTipEl) _nlStripTipEl.classList.remove('is-open');
+}
+
+// ── Node Library: live search across all categories (A3.9) ──
+// Filters .nl-item rows by case-insensitive substring match against their
+// .nl-nm + .nl-sub. Section headers (.nl-sechd) auto-hide when none of
+// their following items match. Highlights matches with <mark>. Renders an
+// empty state if no items match.
+function filterNodeLibrary(query) {
+  const body = document.querySelector('#nodesPanel .nl-body');
+  const input = document.getElementById('nlSinp');
+  const clearBtn = document.getElementById('nlSclr');
+  if (!body) return;
+  const q = (query || '').trim().toLowerCase();
+  // Keep the input in sync (when called from the × button)
+  if (input && input.value !== query) input.value = query;
+  if (clearBtn) clearBtn.style.display = q ? 'flex' : 'none';
+  // Remove any prior empty-state placeholder before re-filtering
+  body.querySelector('.nl-empty')?.remove();
+
+  // Iterate every child of .nl-body. Track the running section so we can
+  // hide a section header that has no visible matches.
+  let currentSectionEl = null;
+  let currentSectionHits = 0;
+  let totalHits = 0;
+  const sections = []; // [{ headerEl, count }]
+  const children = [...body.children];
+  for (const el of children) {
+    if (el.classList.contains('nl-sechd')) {
+      // Close out the previous section
+      if (currentSectionEl) sections.push({ headerEl: currentSectionEl, count: currentSectionHits });
+      currentSectionEl = el;
+      currentSectionHits = 0;
+      continue;
+    }
+    if (!el.classList.contains('nl-item')) continue;
+    const nmEl  = el.querySelector('.nl-nm');
+    const subEl = el.querySelector('.nl-sub');
+    // Cache ORIGINAL on first run — capture the badge HTML separately so we
+    // don't duplicate its text content via .textContent on re-render.
+    if (nmEl && !nmEl.dataset.origText) {
+      const badge = nmEl.querySelector('.nl-badge');
+      const badgeHtml = badge ? badge.outerHTML : '';
+      // Get pure text by cloning + removing the badge from the clone
+      const clone = nmEl.cloneNode(true);
+      clone.querySelectorAll('.nl-badge').forEach(b => b.remove());
+      nmEl.dataset.origText  = clone.textContent.trim();
+      nmEl.dataset.origBadge = badgeHtml;
+    }
+    if (subEl && !subEl.dataset.origText) {
+      subEl.dataset.origText = subEl.textContent;
+    }
+    const nm  = (nmEl?.dataset.origText  || '');
+    const sub = (subEl?.dataset.origText || '');
+    const matches = !q || nm.toLowerCase().includes(q) || sub.toLowerCase().includes(q);
+    el.style.display = matches ? '' : 'none';
+    if (matches) {
+      currentSectionHits++; totalHits++;
+      const badgeHtml = nmEl?.dataset.origBadge || '';
+      if (q) {
+        if (nmEl)  nmEl.innerHTML  = _hlMatch(nmEl.dataset.origText,  q) + badgeHtml;
+        if (subEl) subEl.innerHTML = _hlMatch(subEl.dataset.origText, q);
+      } else {
+        if (nmEl)  nmEl.innerHTML  = _ie(nmEl.dataset.origText)  + badgeHtml;
+        if (subEl) subEl.innerHTML = _ie(subEl.dataset.origText);
+      }
+    }
+  }
+  // Close out the last section
+  if (currentSectionEl) sections.push({ headerEl: currentSectionEl, count: currentSectionHits });
+  // Hide/show section headers based on whether their group has hits.
+  for (const { headerEl, count } of sections) {
+    headerEl.style.display = (count === 0 && q) ? 'none' : '';
+  }
+  // Empty state — no item matched
+  if (q && totalHits === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'nl-empty';
+    empty.innerHTML = `No nodes match <strong>"${_ie(query)}"</strong>.<br/><button class="ov-kn-edit-btn" style="margin-top:8px" onclick="filterNodeLibrary('')">Clear search</button>`;
+    body.appendChild(empty);
+  }
+}
+
+// Highlight occurrences of `q` (case-insensitive) inside `text` with <mark>.
+// Escapes HTML before injection so we don't open an XSS hole via the search
+// query or the item label.
+function _hlMatch(text, q) {
+  if (!q) return _ie(text);
+  const escaped = _ie(text);
+  // Build a case-insensitive regex; escape regex meta-chars in q.
+  const safeQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(${safeQ})`, 'ig');
+  return escaped.replace(re, '<mark>$1</mark>');
 }
 
 function toggleInspPanel() {
@@ -8126,11 +9047,15 @@ function refreshTabOverrideDots() {
 }
 
 // ─ Edit Canvas ─
+// A4.2 — Node identity split:
+//   l       → contextual name (editable, user-renameable in the inspector)
+//   action  → technical action (read-only; describes WHAT the node does)
+//   provider→ optional provider id used by getProviderLogo() for branded icons
 const EDIT_FLOW = [
-  {id:'wh',t:'trigger',l:'Webhook Received',sub:'Customer inquiry received',
+  {id:'wh',t:'trigger',l:'Webhook Received',action:'Webhook listener',sub:'Customer inquiry received',
     config: { triggerType: 'webhook', endpoint: '/webhook/invoice', auth: 'hmac', rateLimit: 100, timeoutMs: 30000 },
   },
-  {id:'ag-ca',t:'agent',agentId:'agt-customer-analyst',l:'Customer Analyst',sub:'Analyzes customer inquiry',badge:'A',
+  {id:'ag-ca',t:'agent',agentId:'agt-customer-analyst',l:'Customer Analyst',action:'gpt-4o agent',provider:'openai',sub:'Analyzes customer inquiry',badge:'A',
     // Demo seed: a couple of reference files so the picker has data to show.
     // These would normally be added via drag-drop by the workflow builder.
     nodeOverrides: {
@@ -8145,13 +9070,66 @@ const EDIT_FLOW = [
     },
     config: { mapFromState: 'n1.webhook.payload', model: 'inherit' },
   },
-  {id:'ks',t:'rag',l:'Knowledge Space',sub:'Truth Only · Sales Playbook 2026',badge:'K',
+  {id:'ks',t:'rag',l:'Knowledge Space',action:'Knowledge retrieval',sub:'Truth Only · Sales Playbook 2026',badge:'K',
     config: { query: 'state.qualified_lead.summary', packs: ['KP-003'], drives: ['d1'], topK: 5, rerank: true, minSimilarity: 0.7 },
   },
-  {id:'rg',t:'agent',agentId:'agt-response-generator',l:'Response Generator',sub:'Generates customer response',badge:'Ag',
+  {id:'rg',t:'agent',agentId:'agt-response-generator',l:'Response Generator',action:'claude-sonnet-4.5 agent',provider:'anthropic',sub:'Generates customer response',badge:'Ag',
     config: { mapFromState: 'n3.enriched_profile', model: 'inherit' },
   },
 ];
+
+// ════════════════════════════════════════════════════════════════════════════
+// A4.2 — PROVIDER LOGOS
+// Branded logos for known external providers. When a node carries a provider
+// id that matches an entry here, the node card swaps its internal icon for
+// the branded mark. Otherwise getProviderLogo() returns null and we fall
+// back to the type-specific internal icon (trigIco / agIco / ragIco / …).
+//
+// We embed minimal SVG paths inline rather than fetching from a CDN so the
+// single-file prototype stays self-contained and offline-capable. Logos are
+// simplified — they keep the brand recognizability without legal exposure
+// for an internal demo.
+// ════════════════════════════════════════════════════════════════════════════
+const PROVIDER_LOGOS = {
+  openai: {
+    label: 'OpenAI',
+    bg:    '#10A37F',
+    svg:   '<svg viewBox="0 0 24 24" width="14" height="14" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062l-4.831 2.787a4.504 4.504 0 0 1-6.15-1.642zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0L4.014 13.81a4.504 4.504 0 0 1-1.674-6.151v.237zm16.597 3.855-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365 2.602-1.5 2.607 1.5v3l-2.607 1.5-2.602-1.5z"/></svg>',
+  },
+  anthropic: {
+    label: 'Anthropic',
+    bg:    '#D97757',
+    svg:   '<svg viewBox="0 0 24 24" width="14" height="14" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M13.827 3.52h3.603L24 20h-3.603zm-7.258 0h3.767L16.906 20h-3.674l-1.343-3.461H5.017l-1.344 3.461H0zm.875 9.984h4.017l-2.008-5.172z"/></svg>',
+  },
+  google: {
+    label: 'Google',
+    bg:    '#fff',
+    svg:   '<svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M23 12.27c0-.78-.07-1.53-.2-2.27H12v4.51h6.16c-.27 1.4-1.07 2.59-2.28 3.39v2.82h3.69C21.7 18.79 23 15.79 23 12.27z"/><path fill="#34A853" d="M12 23c3.08 0 5.66-1.02 7.55-2.77l-3.69-2.82c-1.02.69-2.34 1.1-3.86 1.1-2.97 0-5.49-2-6.39-4.69H1.83v2.94A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.61 13.82c-.23-.69-.36-1.42-.36-2.18s.13-1.49.36-2.18V6.52H1.83a11 11 0 0 0 0 9.96z"/><path fill="#EA4335" d="M12 5.27c1.68 0 3.18.58 4.36 1.71l3.27-3.27C17.65 1.94 15.08 1 12 1A11 11 0 0 0 1.83 6.52L5.61 9.46c.9-2.69 3.42-4.19 6.39-4.19z"/></svg>',
+  },
+  slack: {
+    label: 'Slack',
+    bg:    '#fff',
+    svg:   '<svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><path fill="#E01E5A" d="M5.042 15.165a2.528 2.528 0 1 1-2.52-2.523h2.52zm1.273 0a2.528 2.528 0 0 1 5.054 0v6.31a2.528 2.528 0 0 1-5.054 0z"/><path fill="#36C5F0" d="M8.834 5.042a2.528 2.528 0 1 1 2.521-2.52v2.52zm0 1.273a2.528 2.528 0 0 1 0 5.054H2.521a2.528 2.528 0 1 1 0-5.054z"/><path fill="#2EB67D" d="M18.956 8.834a2.528 2.528 0 1 1 2.522 2.521h-2.522zm-1.272 0a2.528 2.528 0 0 1-5.054 0V2.522a2.528 2.528 0 0 1 5.054 0z"/><path fill="#ECB22E" d="M15.165 18.956a2.528 2.528 0 1 1-2.521 2.521v-2.521zm0-1.272a2.528 2.528 0 0 1 0-5.054h6.313a2.528 2.528 0 0 1 0 5.054z"/></svg>',
+  },
+  github: {
+    label: 'GitHub',
+    bg:    '#1a1e22',
+    svg:   '<svg viewBox="0 0 24 24" width="14" height="14" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
+  },
+  notion: {
+    label: 'Notion',
+    bg:    '#fff',
+    svg:   '<svg viewBox="0 0 24 24" width="14" height="14" fill="#000" xmlns="http://www.w3.org/2000/svg"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.327L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.083.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06C.42 18.42 0 17.673 0 16.787V2.667c0-.839.374-1.54 1.936-1.632z"/></svg>',
+  },
+};
+
+// Returns the HTML for a provider logo (or null if no match), with brand bg.
+function getProviderLogo(provider) {
+  if (!provider) return null;
+  const p = PROVIDER_LOGOS[provider.toLowerCase()];
+  if (!p) return null;
+  return `<div class="bn-prov-logo" style="background:${p.bg}" title="${p.label}">${p.svg}</div>`;
+}
 
 // ════════════════════════════════════════════════════════════════════════════
 // TYPE-AWARE INSPECTOR (A3.1 + A3.2 + A3.3 + A3.4)
@@ -8168,7 +9146,7 @@ const EDIT_FLOW = [
 
 const NODE_TYPE_CONFIG = {
   trigger:  { avatar: '⚡', color: 'var(--warn)',     label: 'Trigger',
-              sections: { input: [], config: ['triggerType','endpoint','auth','rateLimit','timeoutMs'], output: [] },
+              sections: { input: [], config: ['triggerType','endpoint','auth','rateLimit','timeoutMs'], output: [], advanced: ['scheduleStart','scheduleEnd'] },
               modalTabs: ['Source','Authentication','Schema','Rate limits','Logs','Testing'] },
   agent:    { avatar: 'A',  color: 'var(--pur)',      label: 'Agent',
               sections: { input: ['mapFromState'], config: ['systemPrompt','model'], output: [] },
@@ -8186,10 +9164,10 @@ const NODE_TYPE_CONFIG = {
               sections: { input: ['inputMapping'], config: ['actionType','endpoint','auth','idempotencyKey'], output: [] },
               modalTabs: ['Action','Endpoint / Function','Auth','Input mapping','Retry policy','Testing'] },
   wait:     { avatar: '⏸',  color: 'var(--orange)',   label: 'Wait',
-              sections: { input: [], config: ['waitType','resumeOn','timeoutHours','escalateTo'], output: [] },
+              sections: { input: [], config: ['waitType','resumeOn','timeoutHours','escalateTo'], output: [], advanced: ['resumeAtTime'] },
               modalTabs: ['Type','Resume condition','Timeout','Escalation','Testing'] },
   output:   { avatar: '→',  color: 'var(--ok)',       label: 'Output',
-              sections: { input: [], config: ['outputSchema','notifications','persistAuditTrail','webhookCallback'], output: [] },
+              sections: { input: [], config: ['outputSchema','notifications','persistAuditTrail','webhookCallback'], output: [], advanced: ['retentionUntil'] },
               modalTabs: ['Schema','Notifications','Persistence','Webhooks','Testing'] },
 };
 
@@ -8233,6 +9211,12 @@ const FIELD_DEFS = {
   notifications: { label: 'Notifications', type: 'multi-select', options:[{v:'slack',l:'Slack'},{v:'email',l:'Email'},{v:'webhook',l:'Webhook'}] },
   persistAuditTrail: { label: 'Persist audit trail', type: 'toggle' },
   webhookCallback: { label: 'Webhook callback', type: 'url', placeholder: 'https://…' },
+
+  // ── Date / Datetime fields (A3.8) ────────────────────────────────────
+  scheduleStart: { label: 'Activate from', type: 'date',  help: 'Workflow stays inactive until this date.' },
+  scheduleEnd:   { label: 'Deactivate after', type: 'date', help: 'Workflow auto-suspends after this date.' },
+  resumeAtTime:  { label: 'Resume at', type: 'datetime', help: 'Exact wall-clock time to resume the workflow.' },
+  retentionUntil:{ label: 'Retain audit trail until', type: 'date', help: 'Older runs are deleted past this date.' },
 };
 
 // Section labels (with capitalisation for the headers)
@@ -8289,6 +9273,34 @@ const FIELD_RENDERERS = {
       <div class="ins-fld-lbl">${_ie(def.label)}</div>
       <input class="ins-fld-input" type="url" value="${_iea(v)}"
         placeholder="${_iea(def.placeholder||'https://…')}"
+        oninput="setNodeFieldValue('${node.id}','${key}', this.value)" />
+      ${def.help ? `<div class="ins-fld-help">${_ie(def.help)}</div>` : ''}
+    </div>`;
+  },
+  // Date renderer — native <input type="date"> styled for the dark theme.
+  // Value format: 'YYYY-MM-DD'. Required validation: empty + required → red border.
+  date(node, key, def) {
+    const v = getNodeFieldValue(node, key) ?? '';
+    const invalid = def.required && !v ? ' is-invalid' : '';
+    const req = def.required ? '<span class="req">*</span>' : '';
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}${req}</div>
+      <input class="ins-fld-input ins-fld-date${invalid}" type="date" value="${_iea(v)}"
+        ${def.min!=null?`min="${_iea(def.min)}"`:''} ${def.max!=null?`max="${_iea(def.max)}"`:''}
+        oninput="setNodeFieldValue('${node.id}','${key}', this.value)" />
+      ${def.help ? `<div class="ins-fld-help">${_ie(def.help)}</div>` : ''}
+    </div>`;
+  },
+  // Datetime renderer — native <input type="datetime-local">. Value format:
+  // 'YYYY-MM-DDTHH:mm'. Browser provides a calendar+time picker; we only style.
+  datetime(node, key, def) {
+    const v = getNodeFieldValue(node, key) ?? '';
+    const invalid = def.required && !v ? ' is-invalid' : '';
+    const req = def.required ? '<span class="req">*</span>' : '';
+    return `<div class="ins-fld" data-fld="${key}">
+      <div class="ins-fld-lbl">${_ie(def.label)}${req}</div>
+      <input class="ins-fld-input ins-fld-date${invalid}" type="datetime-local" value="${_iea(v)}"
+        ${def.min!=null?`min="${_iea(def.min)}"`:''} ${def.max!=null?`max="${_iea(def.max)}"`:''}
         oninput="setNodeFieldValue('${node.id}','${key}', this.value)" />
       ${def.help ? `<div class="ins-fld-help">${_ie(def.help)}</div>` : ''}
     </div>`;
@@ -8643,22 +9655,67 @@ function renderNodeInspector(nodeId) {
   const subEl = document.getElementById('inspSub');
 
   if (card) card.setAttribute('data-type', node.t || 'unknown');
-  if (cardIco) cardIco.innerHTML = nodeTypeAvatarSvg(node.t);
-  if (nmLbl) nmLbl.textContent = node.l || node.id;
+  // A4.2: prefer provider logo if available; fall back to per-type SVG avatar.
+  if (cardIco) {
+    const provHtml = getProviderLogo(node.provider);
+    if (provHtml) {
+      // Embed the provider logo inside the existing icon container so the
+      // overall card spacing stays identical to the non-branded path.
+      cardIco.innerHTML = provHtml;
+      cardIco.classList.add('has-prov');
+    } else {
+      cardIco.innerHTML = nodeTypeAvatarSvg(node.t);
+      cardIco.classList.remove('has-prov');
+    }
+  }
+  // A4.2: Contextual name (editable). The blur handler writes back to node.l
+  // and triggers a re-render so the canvas card name stays in sync.
+  if (nmLbl) {
+    nmLbl.textContent = node.l || node.id;
+    nmLbl.setAttribute('contenteditable', 'true');
+    nmLbl.setAttribute('spellcheck', 'false');
+    nmLbl.setAttribute('title', 'Click to rename — contextual name');
+    nmLbl.dataset.nodeId = node.id;
+    nmLbl.onblur = function () {
+      const txt = (this.textContent || '').trim();
+      const n = EDIT_FLOW.find(x => x.id === this.dataset.nodeId);
+      if (!n) return;
+      const next = txt || (n.l || n.id);
+      this.textContent = next;
+      if (next !== n.l) {
+        n.l = next;
+        flagSaving();
+        // Keep the inspector's tall title in sync with the contextual name
+        const titleEl2 = document.getElementById('inspTitle');
+        if (titleEl2) titleEl2.textContent = next;
+        if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+      }
+    };
+    nmLbl.onkeydown = function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+      if (e.key === 'Escape') {
+        const n = EDIT_FLOW.find(x => x.id === this.dataset.nodeId);
+        if (n) this.textContent = n.l || n.id;
+        this.blur();
+      }
+    };
+  }
   if (titleEl) titleEl.textContent = node.l || node.id;
 
-  // For agent nodes, defer to existing path for the sub-label.
+  // A4.2: status line is now the *technical action* (read-only). Agents merge
+  // the catalog model version; everything else uses node.action (with
+  // type-label fallback). The "Active / Broken reference" status moves to a
+  // pill via the broken-banner block below.
+  const provLabel = node.provider && PROVIDER_LOGOS[node.provider.toLowerCase()] ? PROVIDER_LOGOS[node.provider.toLowerCase()].label + ' · ' : '';
+  let actionTxt;
   if (node.t === 'agent') {
     const agent = node.agentId ? getAgentById(node.agentId) : null;
-    if (subEl) subEl.textContent = agent ? `Agent · ${agent.model?.version || 'Active'}` : 'Agent configuration';
-    if (stLbl) stLbl.textContent = agent ? `Agent · Active` : `Agent · Broken reference`;
-  } else if (cfg) {
-    if (subEl) subEl.textContent = `${cfg.label} configuration`;
-    if (stLbl) stLbl.textContent = `${cfg.label} · Active`;
+    actionTxt = node.action || (agent ? `${agent.model?.version || 'Agent'} agent` : 'Agent');
   } else {
-    if (subEl) subEl.textContent = `${node.t || 'Unknown'} configuration`;
-    if (stLbl) stLbl.textContent = `${node.t || 'Unknown'} · Active`;
+    actionTxt = node.action || (cfg ? cfg.label : (node.t || 'Unknown'));
   }
+  if (subEl) subEl.textContent = `${provLabel}${actionTxt}`;
+  if (stLbl) stLbl.textContent = `${provLabel}${actionTxt}`;
 
   // Unknown type fallback
   if (!cfg) {
@@ -8944,30 +10001,118 @@ function renderTypedTabBody(type, tab, node) {
 function toggleNodeConfigFullscreen() { return toggleAgentConfigFullscreen(); }
 
 
-const EDGE_LABELS = {0:'inquiry',1:'context',2:'knowledge'};
+// ════════════════════════════════════════════════════════════════════════════
+// A4.3 — EDGE DATA MODEL
+// ────────────────────────────────────────────────────────────────────────────
+// Conditions live on the *edge* (connection), not on the node. Each edge has
+// a readable label that displays on the canvas, and an optional condition
+// with multiple rules joined by AND/OR. The condition's complexity is hidden
+// behind a modal — the canvas surfaces only the label.
+//
+// Shape:
+//   { id, source, target, label, output?, condition?: { active, joinOp, rules: [{lhs, op, rhs}] } }
+// ════════════════════════════════════════════════════════════════════════════
+const CONDITION_OPS = [
+  { v: 'eq',    l: 'equals',          rhs: true  },
+  { v: 'neq',   l: 'does not equal',  rhs: true  },
+  { v: 'contains',  l: 'contains',    rhs: true  },
+  { v: 'ncontains', l: 'does not contain', rhs: true  },
+  { v: 'gt',    l: 'is greater than', rhs: true  },
+  { v: 'lt',    l: 'is less than',    rhs: true  },
+  { v: 'exists',    l: 'exists',      rhs: false },
+  { v: 'nexists',   l: 'does not exist', rhs: false },
+];
+
+let EDIT_EDGES = [
+  {
+    id: 'e-wh-ca', source: 'wh', target: 'ag-ca',
+    label: 'New inquiry', output: 'webhook.payload',
+    condition: { active: true, joinOp: 'AND', rules: [
+      { lhs: 'state.customer.is_new', op: 'eq', rhs: 'true' },
+    ]},
+  },
+  {
+    id: 'e-ca-ks', source: 'ag-ca', target: 'ks',
+    label: 'Needs context', output: 'analyst.summary',
+    condition: { active: false, joinOp: 'AND', rules: [] },
+  },
+  {
+    id: 'e-ks-rg', source: 'ks', target: 'rg',
+    label: 'Knowledge ready', output: 'rag.results',
+    condition: { active: false, joinOp: 'AND', rules: [] },
+  },
+];
+
+function getEdgeById(id) { return EDIT_EDGES.find(e => e.id === id); }
+function findEdgeBySrcTgt(srcId, tgtId) { return EDIT_EDGES.find(e => e.source === srcId && e.target === tgtId); }
+
+// Pretty-print the rules for tooltip ("amount > 10000 AND user.is_premium = true").
+function describeEdgeCondition(edge) {
+  if (!edge || !edge.condition || !edge.condition.active) return '';
+  const rules = edge.condition.rules || [];
+  if (!rules.length) return '';
+  const join = edge.condition.joinOp === 'OR' ? ' OR ' : ' AND ';
+  return rules.map(r => {
+    const op = CONDITION_OPS.find(o => o.v === r.op);
+    const opLbl = op ? op.l : r.op;
+    return op && !op.rhs ? `${r.lhs} ${opLbl}` : `${r.lhs} ${opLbl} ${r.rhs}`;
+  }).join(join);
+}
 
 function renderEditCanvas(net) {
   const canvas = document.getElementById('bldrEditCanvas');
   const flow = EDIT_FLOW;
   const NW=192, NH=82, GX=60, SX=52, topY=100, canH=280;
   const totalW = SX + flow.length*(NW+GX) + 60;
-  let svg = `<svg class="canvas-svg" width="${totalW}" height="${canH}" style="z-index:1">`;
-  flow.forEach((_,i)=>{
-    if(i<flow.length-1){
-      const x1=SX+i*(NW+GX)+NW+4, y1=topY+NH/2;
-      const x2=SX+(i+1)*(NW+GX)-4, y2=y1;
-      const mx=(x1+x2)/2;
-      svg+=`<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="rgba(0,194,194,0.3)" stroke-width="1.5" fill="none"/>`;
-      const lx=(x1+x2)/2, ly=y1-12;
-      svg+=`<rect x="${lx-24}" y="${ly-9}" width="48" height="16" rx="4" fill="rgba(0,0,0,0.7)" stroke="rgba(255,255,255,0.08)"/>`;
-      const edgeLbl = EDGE_LABELS[i] || '→';
-      svg+=`<text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Inter,sans-serif">${edgeLbl}</text>`;
-    }
+
+  // Build a lookup of node id → {x, y} so we can resolve edges by id.
+  const positions = {};
+  flow.forEach((n, i) => { positions[n.id] = { x: SX + i*(NW+GX), y: topY }; });
+
+  // SVG: draw all edges from EDIT_EDGES. Each edge label is clickable —
+  // opens the edge config modal. Edges with no condition show the bare
+  // output label; edges with an active condition show the label + a small
+  // filter icon to signal "this connection is gated".
+  let svg = `<svg class="canvas-svg" width="${totalW}" height="${canH}" style="z-index:1;pointer-events:none">`;
+  let labelOverlays = '';
+  const drawEdges = EDIT_EDGES.length
+    ? EDIT_EDGES
+    // Fallback: if EDIT_EDGES wasn't seeded, walk adjacency.
+    : flow.slice(0, -1).map((n, i) => ({ id: `e-${n.id}-${flow[i+1].id}`, source: n.id, target: flow[i+1].id, label: '→' }));
+  drawEdges.forEach((edge) => {
+    const s = positions[edge.source], t = positions[edge.target];
+    if (!s || !t) return;
+    const x1=s.x+NW+4, y1=s.y+NH/2;
+    const x2=t.x-4,    y2=t.y+NH/2;
+    const mx=(x1+x2)/2;
+    const isActive = edge.condition && edge.condition.active && (edge.condition.rules||[]).length > 0;
+    const stroke = edge.runtime === 'taken'
+      ? 'var(--ok)'
+      : edge.runtime === 'skipped'
+        ? 'rgba(255,255,255,0.12)'
+        : (isActive ? 'rgba(252,113,38,0.55)' : 'rgba(0,194,194,0.3)');
+    const strokeW = edge.runtime === 'taken' ? 2.5 : 1.5;
+    svg += `<path data-edge="${edge.id}" d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="${stroke}" stroke-width="${strokeW}" fill="none" class="${edge.runtime ? 'is-rt-' + edge.runtime : ''}"/>`;
+    // Build an HTML overlay for the label so it's clickable, theme-able,
+    // and supports an icon. Sit above the canvas with pointer-events:auto.
+    const lx = (x1+x2)/2, ly = y1 - 12;
+    const lbl = _ie(edge.label || edge.output || '→');
+    const condBadge = isActive
+      ? `<span class="ed-lbl-cond" title="${_iea(describeEdgeCondition(edge))}">
+           <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 3h8L7 7v3L5 9V7L2 3z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+         </span>`
+      : '';
+    labelOverlays += `<button class="ed-lbl ${isActive ? 'is-cond' : ''} ${edge.runtime === 'taken' ? 'is-taken' : ''}"
+        style="left:${lx}px;top:${ly}px"
+        onclick="openEdgeConfigModal('${edge.id}')"
+        title="Configure this connection">
+        <span class="ed-lbl-txt">${lbl}</span>${condBadge}
+      </button>`;
   });
   svg+='</svg>';
   const nodes = flow.map((node,i)=>buildEditNode(node,SX+i*(NW+GX),topY,NW,NH)).join('');
   canvas.style.cssText=`position:relative;width:${totalW}px;height:${canH}px;`;
-  canvas.innerHTML = svg + nodes;
+  canvas.innerHTML = svg + nodes + labelOverlays;
 }
 
 function buildEditNode(node,x,y,w,h) {
@@ -8982,15 +10127,276 @@ function buildEditNode(node,x,y,w,h) {
   const badgeTxt=node.badge||'';
   const bdgMap={W:'bn-bw',A:'bn-ba',Ag:'bn-bag',K:'bn-bk',OUT:'bn-bout'};
   const bdg=badgeTxt?`<span class="bn-badge ${bdgMap[badgeTxt]||''}">${badgeTxt}</span>`:'';
+  // A4.2: Provider logo takes precedence over internal icon when available.
+  // The internal icon stays as the fallback so unknown providers / native
+  // nodes (Condition, Action, Wait, Output, RAG, Trigger) still render.
+  const provLogo = getProviderLogo(node.provider);
+  const iconBlock = provLogo
+    ? provLogo
+    : `<div class="bn-icon ${t.icoCls}">${t.ico}</div>`;
+  // A4.2: Technical action — read-only line beneath the name. Falls back to
+  // the type label when a node hasn't yet been migrated to the new shape.
+  const actionLabel = node.action || t.typeLabel || node.t;
+  const actionLine  = `<div class="bn-act" title="Technical action — read-only">${_ie(actionLabel)}</div>`;
   const isRag=node.t==='rag';
-  const sub2=isRag?`<div style="display:flex;gap:4px;margin-bottom:4px"><span class="bn-chip bn-chip-nat">Native</span><span class="bn-chip bn-chip-ok">Active</span></div><div class="bn-kn-lbl">Truth Only</div><div class="bn-kn-pack">Sales Playbook 2026</div>`:`<div class="bn-stat">${node.sub}</div>`;
+  const sub2=isRag?`<div style="display:flex;gap:4px;margin-bottom:4px"><span class="bn-chip bn-chip-nat">Native</span><span class="bn-chip bn-chip-ok">Active</span></div><div class="bn-kn-lbl">Truth Only</div><div class="bn-kn-pack">Sales Playbook 2026</div>`:`<div class="bn-stat">${_ie(node.sub || '')}</div>`;
   const pendingCls = node._pending ? ' bn-pending' : '';
-  return `<div class="bn ${t.cls}${pendingCls}" style="left:${x}px;top:${y}px;width:${w}px;z-index:2;cursor:pointer" onclick="selectEditNode('${node.id}')">
-    <div class="bn-hd"><div class="bn-icon ${t.icoCls}">${t.ico}</div>${bdg}</div>
-    <div class="bn-name">${node.l}</div>${sub2}
+  // A4.5: runtime state — colors the node + adds a corner chip after a test run.
+  const rt = node.runtimeState || '';
+  const rtAttr = rt ? ` data-rt="${rt}"` : '';
+  const rtChip = rt && rt !== 'not_executed'
+    ? `<span class="bn-rt-chip rt-${rt}" title="Last run: ${rt}">${
+        rt === 'success' ? '✓' : rt === 'error' ? '!' : rt === 'warning' ? '⚠' : '·'
+      }</span>`
+    : '';
+  return `<div class="bn ${t.cls}${pendingCls}"${rtAttr} style="left:${x}px;top:${y}px;width:${w}px;z-index:2;cursor:pointer" onclick="selectEditNode('${node.id}')">
+    ${rtChip}
+    <div class="bn-hd">${iconBlock}${bdg}</div>
+    <div class="bn-name">${_ie(node.l)}</div>
+    ${actionLine}
+    ${sub2}
     <div class="bn-port bn-port-in"></div>
     <div class="bn-port bn-port-out"></div>
   </div>`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// A4.3 — EDGE CONFIG MODAL handlers
+// ────────────────────────────────────────────────────────────────────────────
+// All edits operate on a working copy (edmDraft) so the user can cancel
+// without bleed-over. Save commits back to EDIT_EDGES and re-renders.
+// ════════════════════════════════════════════════════════════════════════════
+
+let edmActiveEdgeId = null;
+let edmDraft = null;
+
+function openEdgeConfigModal(edgeId) {
+  const edge = getEdgeById(edgeId);
+  if (!edge) return;
+  edmActiveEdgeId = edgeId;
+  // Deep clone so Cancel works correctly
+  edmDraft = JSON.parse(JSON.stringify(edge));
+  if (!edmDraft.condition) edmDraft.condition = { active: false, joinOp: 'AND', rules: [] };
+  if (!Array.isArray(edmDraft.condition.rules)) edmDraft.condition.rules = [];
+
+  // Header
+  const src = EDIT_FLOW.find(n => n.id === edge.source);
+  const tgt = EDIT_FLOW.find(n => n.id === edge.target);
+  document.getElementById('edmTtl').textContent = `${(src && src.l) || edge.source} → ${(tgt && tgt.l) || edge.target}`;
+  document.getElementById('edmSub').textContent = `Connection between two flow nodes`;
+  document.getElementById('edmMeta').textContent = `Edge ${edge.id}`;
+
+  // Fields
+  document.getElementById('edmLabel').value  = edmDraft.label || '';
+  document.getElementById('edmOutput').value = edmDraft.output || '';
+  document.getElementById('edmCondActive').checked = !!edmDraft.condition.active;
+
+  edmRenderJoin();
+  edmRenderRules();
+  edmToggleCondBlock();
+
+  document.getElementById('edmOv').classList.add('is-open');
+  // ESC to close
+  document.addEventListener('keydown', edmEscClose);
+}
+
+function edmEscClose(e) {
+  if (e.key === 'Escape') closeEdgeConfigModal();
+}
+
+function closeEdgeConfigModal() {
+  document.getElementById('edmOv').classList.remove('is-open');
+  document.removeEventListener('keydown', edmEscClose);
+  edmActiveEdgeId = null;
+  edmDraft = null;
+}
+
+function edmToggleCondActive() {
+  if (!edmDraft) return;
+  edmDraft.condition.active = !!document.getElementById('edmCondActive').checked;
+  // Seed an empty rule when turning on for the first time
+  if (edmDraft.condition.active && !edmDraft.condition.rules.length) {
+    edmDraft.condition.rules.push({ lhs: '', op: 'eq', rhs: '' });
+    edmRenderRules();
+  }
+  edmToggleCondBlock();
+}
+
+function edmToggleCondBlock() {
+  const on = edmDraft && edmDraft.condition.active;
+  document.getElementById('edmCondBlock').style.display = on ? 'flex' : 'none';
+}
+
+function edmSetJoin(op) {
+  if (!edmDraft) return;
+  edmDraft.condition.joinOp = op === 'OR' ? 'OR' : 'AND';
+  edmRenderJoin();
+}
+
+function edmRenderJoin() {
+  if (!edmDraft) return;
+  const isAnd = edmDraft.condition.joinOp !== 'OR';
+  document.getElementById('edmJoinAnd').classList.toggle('is-on', isAnd);
+  document.getElementById('edmJoinOr' ).classList.toggle('is-on', !isAnd);
+}
+
+function edmRenderRules() {
+  const wrap = document.getElementById('edmRules');
+  if (!wrap || !edmDraft) return;
+  const rules = edmDraft.condition.rules || [];
+  if (!rules.length) {
+    wrap.innerHTML = `<div style="font-size:11.5px;color:var(--t4);padding:8px 4px">No rules yet — click "Add rule" to gate this connection.</div>`;
+    return;
+  }
+  wrap.innerHTML = rules.map((r, i) => {
+    const opOpts = CONDITION_OPS.map(o => `<option value="${o.v}" ${o.v===r.op?'selected':''}>${o.l}</option>`).join('');
+    const opMeta = CONDITION_OPS.find(o => o.v === r.op);
+    const rhsHidden = opMeta && !opMeta.rhs;
+    return `<div class="edm-rule" data-idx="${i}">
+      <input class="edm-inp" type="text" placeholder="state.field.path" value="${_iea(r.lhs || '')}" onchange="edmUpdateRule(${i}, 'lhs', this.value)"/>
+      <select class="edm-inp" onchange="edmUpdateRule(${i}, 'op', this.value); edmRenderRules()">${opOpts}</select>
+      <input class="edm-inp" type="text" placeholder="${rhsHidden ? '—' : 'value'}" value="${_iea(r.rhs || '')}" ${rhsHidden?'disabled style="opacity:.45"':''} onchange="edmUpdateRule(${i}, 'rhs', this.value)"/>
+      <button class="edm-rule-rm" onclick="edmRemoveRule(${i})" aria-label="Remove rule" title="Remove rule">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function edmAddRule() {
+  if (!edmDraft) return;
+  edmDraft.condition.rules.push({ lhs: '', op: 'eq', rhs: '' });
+  edmRenderRules();
+}
+
+function edmRemoveRule(idx) {
+  if (!edmDraft) return;
+  edmDraft.condition.rules.splice(idx, 1);
+  edmRenderRules();
+}
+
+function edmUpdateRule(idx, field, value) {
+  if (!edmDraft) return;
+  const r = edmDraft.condition.rules[idx];
+  if (!r) return;
+  r[field] = value;
+}
+
+function saveEdgeConfig() {
+  if (!edmDraft || !edmActiveEdgeId) return;
+  const idx = EDIT_EDGES.findIndex(e => e.id === edmActiveEdgeId);
+  if (idx < 0) { closeEdgeConfigModal(); return; }
+  // Pull final values from the form (in case they weren't blurred yet)
+  edmDraft.label  = document.getElementById('edmLabel').value.trim() || edmDraft.label;
+  edmDraft.output = document.getElementById('edmOutput').value.trim() || edmDraft.output;
+  // If condition is "active" but has no rules, treat as inactive
+  if (edmDraft.condition.active && !(edmDraft.condition.rules || []).length) {
+    edmDraft.condition.active = false;
+  }
+  EDIT_EDGES[idx] = edmDraft;
+  flagSaving();
+  closeEdgeConfigModal();
+  if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+  toast('Connection saved', 'ok');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// A4.5 — RUN SIMULATION + STATUS COLORS + PATH HIGHLIGHTING
+// ────────────────────────────────────────────────────────────────────────────
+// Replaces the previous no-op openTestMode() trigger with a sequential
+// animation that walks the flow, marking each node as it executes. Nodes
+// pick up data-rt="running" → "success" (or "error" on the seeded failure
+// step). Edges that were taken get the .is-taken / runtime="taken" paint.
+//
+// The runtime state lives on each EDIT_FLOW node as `runtimeState`. Clearing
+// the run wipes those fields and re-renders. Re-entering test mode picks up
+// where you left off if you haven't cleared.
+// ════════════════════════════════════════════════════════════════════════════
+
+let runSimAbort = null;
+
+function clearRunState() {
+  EDIT_FLOW.forEach(n => { delete n.runtimeState; });
+  EDIT_EDGES.forEach(e => { delete e.runtime; });
+  const banner = document.getElementById('bldrRunBanner');
+  if (banner) banner.classList.remove('is-open');
+  if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+}
+
+async function runFlowSimulation(target) {
+  // Reset previous run state
+  EDIT_FLOW.forEach(n => { delete n.runtimeState; n.runtimeState = 'not_executed'; });
+  EDIT_EDGES.forEach(e => { delete e.runtime; });
+  if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+
+  const totalNodes = EDIT_FLOW.length;
+  const t0 = performance.now();
+  let aborted = false;
+  runSimAbort = () => { aborted = true; };
+
+  for (let i = 0; i < totalNodes; i++) {
+    if (aborted) break;
+    const node = EDIT_FLOW[i];
+    // Mark running
+    node.runtimeState = 'running';
+    if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+    await new Promise(r => setTimeout(r, 640));
+    if (aborted) break;
+    // Seeded demo: the 2nd-to-last node may fail when testing PROD
+    const willFail = (target === 'prod' && i === totalNodes - 2);
+    node.runtimeState = willFail ? 'error' : 'success';
+    // Mark the inbound edge as taken
+    if (i > 0) {
+      const prev = EDIT_FLOW[i - 1];
+      const edge = findEdgeBySrcTgt(prev.id, node.id);
+      if (edge) edge.runtime = willFail ? 'skipped' : 'taken';
+    }
+    if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+    if (willFail) break;
+    await new Promise(r => setTimeout(r, 280));
+  }
+
+  // Mark unreached nodes as not_executed
+  EDIT_FLOW.forEach(n => { if (!n.runtimeState || n.runtimeState === 'running') n.runtimeState = 'not_executed'; });
+  if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+
+  // Show summary banner
+  const elapsed = ((performance.now() - t0) / 1000).toFixed(2);
+  const failed = EDIT_FLOW.some(n => n.runtimeState === 'error');
+  showRunBanner({
+    target,
+    success: !failed,
+    elapsed,
+    nodesRun: EDIT_FLOW.filter(n => n.runtimeState === 'success' || n.runtimeState === 'error').length,
+  });
+  runSimAbort = null;
+}
+
+function showRunBanner({ target, success, elapsed, nodesRun }) {
+  let banner = document.getElementById('bldrRunBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'bldrRunBanner';
+    banner.className = 'bldr-run-banner';
+    const canvasWrap = document.getElementById('bldrEditCanvas')?.parentElement;
+    if (canvasWrap) canvasWrap.appendChild(banner);
+  }
+  banner.classList.toggle('is-prod', target === 'prod' && success);
+  banner.classList.toggle('is-error', !success);
+  banner.innerHTML = `
+    <span class="brb-dot"></span>
+    <strong>${success ? 'Run succeeded' : 'Run failed at step'}</strong>
+    <span class="brb-sep"></span>
+    <span class="brb-kv">target <strong>${target === 'prod' ? 'production' : 'draft'}</strong></span>
+    <span class="brb-sep"></span>
+    <span class="brb-kv">nodes <strong>${nodesRun}/${EDIT_FLOW.length}</strong></span>
+    <span class="brb-sep"></span>
+    <span class="brb-kv">time <strong>${elapsed}s</strong></span>
+    <button class="brb-clear" onclick="clearRunState()">Clear</button>
+  `;
+  // Use a short timeout so the CSS transition can latch even when the banner
+  // was just created in the same frame.
+  setTimeout(() => banner.classList.add('is-open'), 30);
 }
 
 function selectEditNode(nodeId) {
@@ -10398,22 +11804,38 @@ function agentField(path, value) {
 
 function flagSaving() {
   // The save indicator now lives in the modal header; mirror to the legacy
-  // inspector indicator too in case something still observes it.
-  const targets = [
+  // inspector indicator too in case something still observes it. A4.1 adds
+  // the Builder sub-bar draft indicator — text-only (no dot wrapper).
+  const dotTargets = [
     document.getElementById('agtModSave'),
     document.getElementById('inspCfgHdSave'),
   ].filter(Boolean);
-  if (!targets.length) return;
-  targets.forEach(el => {
+  const draftBar = document.getElementById('bldrDraftSave');
+  if (!dotTargets.length && !draftBar) return;
+  dotTargets.forEach(el => {
     el.classList.add('saving');
     el.innerHTML = `<span class="dot"></span>Saving…`;
   });
+  if (draftBar) draftBar.textContent = 'Saving…';
+  // When the user makes a change, the published version diverges → re-arm
+  // the Publish CTA so they know there's something to ship.
+  const pubBtn = document.getElementById('bldrPubBtn');
+  const pubCnt = document.getElementById('bldrPubCount');
+  if (pubBtn && pubBtn.classList.contains('is-clean')) {
+    pubBtn.classList.remove('is-clean');
+    if (pubCnt) pubCnt.textContent = '1';
+  } else if (pubCnt) {
+    // Increment count silently (capped — UI just needs to look alive)
+    const n = parseInt(pubCnt.textContent || '0', 10) || 0;
+    if (n < 99) pubCnt.textContent = String(n + 1);
+  }
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    targets.forEach(el => {
+    dotTargets.forEach(el => {
       el.classList.remove('saving');
       el.innerHTML = `<span class="dot"></span>Saved · just now`;
     });
+    if (draftBar) draftBar.textContent = 'Saved · just now';
   }, 600);
 }
 
