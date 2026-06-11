@@ -669,9 +669,28 @@ body.is-bn-dragging .ed-lbl{pointer-events:none;opacity:.7}
 .bn-rag-lbl{font-size:11px;color:var(--pri);font-weight:600;margin-top:3px}
 .bn-kn-lbl{font-size:11px;color:var(--ok);font-weight:600;margin-top:3px}
 .bn-kn-pack{font-size:11px;color:var(--t3)}
-.bn-port{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--bg2);border:2px solid rgba(255,255,255,0.22)}
-.bn-port-out{right:-5px;top:50%;transform:translateY(-50%)}
+.bn-port{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--bg2);border:2px solid rgba(255,255,255,0.22);transition:transform .12s, background .12s, border-color .12s, box-shadow .12s}
+.bn-port-out{right:-5px;top:50%;transform:translateY(-50%);cursor:crosshair}
 .bn-port-in{left:-5px;top:50%;transform:translateY(-50%)}
+/* A4.12: Output port becomes the connector handle — visible on node hover,
+   grows under the cursor to feel grabbable, paints accent on drag. */
+.bn:hover .bn-port-out{
+  background:var(--pri);border-color:rgba(43,127,255,0.85);
+  box-shadow:0 0 0 3px rgba(43,127,255,0.18);
+}
+.bn-port-out:hover{transform:translateY(-50%) scale(1.4)}
+/* While a connection is being drawn, raise the input ports as drop targets. */
+body.is-connecting .bn-port-in{
+  background:var(--ok);border-color:rgba(5,223,114,0.85);
+  box-shadow:0 0 0 4px rgba(5,223,114,0.20);
+}
+body.is-connecting .bn.is-connect-target{
+  box-shadow:0 0 0 2px rgba(5,223,114,0.55), 0 8px 28px rgba(5,223,114,0.32);
+  border-color:rgba(5,223,114,0.65);
+}
+body.is-connecting,
+body.is-connecting *{cursor:crosshair!important}
+body.is-connecting .bn-add-port{display:none}
 .canvas-svg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible}
 /* Node info side panel (preview mode) */
 .bn-side-panel{width:0;overflow:hidden;border-left:1px solid transparent;background:var(--bg2);display:flex;flex-direction:column;transition:width .2s,border-color .2s;flex-shrink:0}
@@ -10968,6 +10987,12 @@ const NODE_DIM = { w: 192, h: 82 };
 function initNodeDragHandlers() {
   const canvas = document.getElementById('bldrEditCanvas');
   if (!canvas) return;
+  // A4.12: wire output-port → target-node connectors once per render.
+  canvas.querySelectorAll('.bn-port-out').forEach((portEl) => {
+    if (portEl.__connectWired) return;
+    portEl.__connectWired = true;
+    portEl.addEventListener('mousedown', onPortConnectStart);
+  });
   canvas.querySelectorAll('.bn').forEach((nodeEl) => {
     if (nodeEl.__dragWired) return;
     nodeEl.__dragWired = true;
@@ -11048,6 +11073,121 @@ function initNodeDragHandlers() {
       }
     }, true);
   });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// A4.12 — MANUAL CONNECT: drag from output port to target node
+// ────────────────────────────────────────────────────────────────────────────
+// Mousedown on a .bn-port-out anchors a temporary SVG path. mousemove draws
+// it toward the cursor. mouseup either commits a new edge (if landed on a
+// different .bn) or cancels. Prevents self-loops + duplicate edges.
+// ════════════════════════════════════════════════════════════════════════════
+let connectDragState = null;
+
+function onPortConnectStart(ev) {
+  if (ev.button !== 0) return;
+  const portEl = ev.currentTarget;
+  const nodeEl = portEl.closest('.bn');
+  if (!nodeEl) return;
+  const m = (nodeEl.getAttribute('onclick') || '').match(/selectEditNode\('([^']+)'\)/);
+  const sourceId = m && m[1];
+  if (!sourceId) return;
+  const sourceNode = EDIT_FLOW.find(n => n.id === sourceId);
+  if (!sourceNode) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  // Source point in canvas-content coordinates — the output port sits flush
+  // with the right edge of the card at vertical center.
+  const NW = 192, NH = 82;
+  connectDragState = {
+    sourceId,
+    sx: sourceNode.x + NW,
+    sy: sourceNode.y + NH/2,
+    hoverId: null,
+  };
+  document.body.classList.add('is-connecting');
+
+  // Append a temp path to the canvas SVG so we can update it cheaply.
+  const svg = document.querySelector('#bldrEditCanvas .canvas-svg');
+  if (svg) {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('id', 'bldrConnectTmp');
+    path.setAttribute('stroke', 'rgba(43,127,255,0.85)');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '5 4');
+    path.setAttribute('fill', 'none');
+    svg.appendChild(path);
+  }
+
+  document.addEventListener('mousemove', onPortConnectMove);
+  document.addEventListener('mouseup',   onPortConnectEnd);
+}
+
+function onPortConnectMove(ev) {
+  if (!connectDragState) return;
+  const canvas = document.getElementById('bldrEditCanvas');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const cx = ev.clientX - rect.left + canvas.scrollLeft;
+  const cy = ev.clientY - rect.top  + canvas.scrollTop;
+  // Update temp path
+  const path = document.getElementById('bldrConnectTmp');
+  if (path) {
+    const { sx, sy } = connectDragState;
+    const mx = (sx + cx) / 2;
+    path.setAttribute('d', `M${sx} ${sy} C${mx} ${sy} ${mx} ${cy} ${cx} ${cy}`);
+  }
+  // Highlight node under the cursor (excluding the source)
+  const under = ev.target.closest('.bn');
+  let hoverId = null;
+  if (under) {
+    const m = (under.getAttribute('onclick') || '').match(/selectEditNode\('([^']+)'\)/);
+    hoverId = m && m[1];
+    if (hoverId === connectDragState.sourceId) hoverId = null;  // no self-loops
+  }
+  if (hoverId !== connectDragState.hoverId) {
+    document.querySelectorAll('.bn.is-connect-target').forEach(el => el.classList.remove('is-connect-target'));
+    if (hoverId) {
+      const tgt = document.querySelector(`.bn[onclick*="selectEditNode('${hoverId}')"]`);
+      if (tgt) tgt.classList.add('is-connect-target');
+    }
+    connectDragState.hoverId = hoverId;
+  }
+}
+
+function onPortConnectEnd(ev) {
+  document.removeEventListener('mousemove', onPortConnectMove);
+  document.removeEventListener('mouseup',   onPortConnectEnd);
+  document.body.classList.remove('is-connecting');
+  document.querySelectorAll('.bn.is-connect-target').forEach(el => el.classList.remove('is-connect-target'));
+  const tmp = document.getElementById('bldrConnectTmp');
+  if (tmp) tmp.remove();
+  if (!connectDragState) return;
+
+  const targetId = connectDragState.hoverId;
+  const sourceId = connectDragState.sourceId;
+  connectDragState = null;
+  if (!targetId) return; // dropped on empty canvas — cancel silently
+
+  // Prevent duplicate edges
+  const dup = EDIT_EDGES.find(e => e.source === sourceId && e.target === targetId);
+  if (dup) {
+    toast('Those nodes are already connected', 'warn');
+    return;
+  }
+  EDIT_EDGES.push({
+    id: `e-${sourceId}-${targetId}`,
+    source: sourceId,
+    target: targetId,
+    label: '→',
+    output: '',
+    condition: { active: false, joinOp: 'AND', rules: [] },
+  });
+  flagSaving();
+  if (typeof renderEditCanvas === 'function' && bldrNet) renderEditCanvas(bldrNet);
+  const src = EDIT_FLOW.find(n => n.id === sourceId);
+  const tgt = EDIT_FLOW.find(n => n.id === targetId);
+  toast(`Connected ${src?.l || sourceId} → ${tgt?.l || targetId}`, 'ok');
 }
 
 // Update the SVG path d-attribute + label position for every edge that
