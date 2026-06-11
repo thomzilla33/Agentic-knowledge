@@ -10993,6 +10993,22 @@ function initNodeDragHandlers() {
     portEl.__connectWired = true;
     portEl.addEventListener('mousedown', onPortConnectStart);
   });
+  // A4.12 (fix): the tiny 9px port is fiddly with a real mouse — also let
+  // the "+" button act as a connect handle. Click on +  still opens the
+  // picker (current onclick), but mousedown+drag from + draws a connection.
+  canvas.querySelectorAll('.bn-add-port').forEach((addEl) => {
+    if (addEl.__connectWired) return;
+    addEl.__connectWired = true;
+    addEl.addEventListener('mousedown', onPortConnectStart);
+    // Suppress the click that would otherwise fire after a real drag —
+    // tracked via __suppressClick on the element by onPortConnectEnd.
+    addEl.addEventListener('click', (e) => {
+      if (addEl.__suppressClick) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);
+  });
   canvas.querySelectorAll('.bn').forEach((nodeEl) => {
     if (nodeEl.__dragWired) return;
     nodeEl.__dragWired = true;
@@ -11086,30 +11102,44 @@ let connectDragState = null;
 
 function onPortConnectStart(ev) {
   if (ev.button !== 0) return;
-  const portEl = ev.currentTarget;
-  const nodeEl = portEl.closest('.bn');
+  const handleEl = ev.currentTarget;
+  const nodeEl = handleEl.closest('.bn');
   if (!nodeEl) return;
   const m = (nodeEl.getAttribute('onclick') || '').match(/selectEditNode\('([^']+)'\)/);
   const sourceId = m && m[1];
   if (!sourceId) return;
   const sourceNode = EDIT_FLOW.find(n => n.id === sourceId);
   if (!sourceNode) return;
-  ev.preventDefault();
+
+  // For .bn-add-port we defer activation until the user actually drags >3px;
+  // a plain click should still open the picker. For .bn-port-out we engage
+  // immediately because the port has no click behavior of its own.
+  const isAddBtn = handleEl.classList.contains('bn-add-port');
   ev.stopPropagation();
-  // Source point in canvas-content coordinates — the output port sits flush
-  // with the right edge of the card at vertical center.
+  if (!isAddBtn) ev.preventDefault();
+
   const NW = 192, NH = 82;
   connectDragState = {
+    handleEl,
     sourceId,
     sx: sourceNode.x + NW,
     sy: sourceNode.y + NH/2,
     hoverId: null,
+    startX: ev.clientX,
+    startY: ev.clientY,
+    engaged: !isAddBtn,  // .bn-port-out engages instantly; + waits for movement
+    isAddBtn,
   };
-  document.body.classList.add('is-connecting');
+  if (connectDragState.engaged) engageConnectVisuals();
 
-  // Append a temp path to the canvas SVG so we can update it cheaply.
+  document.addEventListener('mousemove', onPortConnectMove);
+  document.addEventListener('mouseup',   onPortConnectEnd);
+}
+
+function engageConnectVisuals() {
+  document.body.classList.add('is-connecting');
   const svg = document.querySelector('#bldrEditCanvas .canvas-svg');
-  if (svg) {
+  if (svg && !document.getElementById('bldrConnectTmp')) {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('id', 'bldrConnectTmp');
     path.setAttribute('stroke', 'rgba(43,127,255,0.85)');
@@ -11118,19 +11148,24 @@ function onPortConnectStart(ev) {
     path.setAttribute('fill', 'none');
     svg.appendChild(path);
   }
-
-  document.addEventListener('mousemove', onPortConnectMove);
-  document.addEventListener('mouseup',   onPortConnectEnd);
 }
 
 function onPortConnectMove(ev) {
   if (!connectDragState) return;
+  // Activation threshold for .bn-add-port — protects the click-to-open-picker
+  // gesture from being hijacked by an accidental 1px wobble.
+  if (!connectDragState.engaged) {
+    const dx = ev.clientX - connectDragState.startX;
+    const dy = ev.clientY - connectDragState.startY;
+    if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+    connectDragState.engaged = true;
+    engageConnectVisuals();
+  }
   const canvas = document.getElementById('bldrEditCanvas');
   if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
   const cx = ev.clientX - rect.left + canvas.scrollLeft;
   const cy = ev.clientY - rect.top  + canvas.scrollTop;
-  // Update temp path
   const path = document.getElementById('bldrConnectTmp');
   if (path) {
     const { sx, sy } = connectDragState;
@@ -11143,7 +11178,7 @@ function onPortConnectMove(ev) {
   if (under) {
     const m = (under.getAttribute('onclick') || '').match(/selectEditNode\('([^']+)'\)/);
     hoverId = m && m[1];
-    if (hoverId === connectDragState.sourceId) hoverId = null;  // no self-loops
+    if (hoverId === connectDragState.sourceId) hoverId = null;
   }
   if (hoverId !== connectDragState.hoverId) {
     document.querySelectorAll('.bn.is-connect-target').forEach(el => el.classList.remove('is-connect-target'));
@@ -11158,15 +11193,30 @@ function onPortConnectMove(ev) {
 function onPortConnectEnd(ev) {
   document.removeEventListener('mousemove', onPortConnectMove);
   document.removeEventListener('mouseup',   onPortConnectEnd);
+  if (!connectDragState) return;
+  const wasEngaged = connectDragState.engaged;
+  const targetId   = connectDragState.hoverId;
+  const sourceId   = connectDragState.sourceId;
+  const handleEl   = connectDragState.handleEl;
+  const isAddBtn   = connectDragState.isAddBtn;
+  connectDragState = null;
+
+  // Always clean up visuals
   document.body.classList.remove('is-connecting');
   document.querySelectorAll('.bn.is-connect-target').forEach(el => el.classList.remove('is-connect-target'));
   const tmp = document.getElementById('bldrConnectTmp');
   if (tmp) tmp.remove();
-  if (!connectDragState) return;
 
-  const targetId = connectDragState.hoverId;
-  const sourceId = connectDragState.sourceId;
-  connectDragState = null;
+  // If the user never moved past the threshold on the + button, this was a
+  // plain click — let the picker open via the existing onclick handler.
+  if (!wasEngaged) return;
+
+  // We engaged drag → suppress the click that would otherwise fire on +.
+  if (isAddBtn && handleEl) {
+    handleEl.__suppressClick = true;
+    setTimeout(() => { handleEl.__suppressClick = false; }, 50);
+  }
+
   if (!targetId) return; // dropped on empty canvas — cancel silently
 
   // Prevent duplicate edges
