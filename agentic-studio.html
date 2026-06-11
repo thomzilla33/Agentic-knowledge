@@ -608,7 +608,22 @@ a{text-decoration:none;color:inherit}
 .bldr-canvas{flex:1;overflow:auto;position:relative;background:radial-gradient(circle at 50% 50%,rgba(43,127,255,0.04) 0%,transparent 70%)}
 .bldr-canvas-inner{position:relative;min-width:100%;min-height:280px}
 /* Node base styles */
-.bn{position:absolute;border-radius:var(--r12);border:1px solid rgba(255,255,255,0.10);background:#111827;cursor:pointer;transition:border-color .15s,box-shadow .15s;padding:14px 16px;min-width:170px}
+.bn{position:absolute;border-radius:var(--r12);border:1px solid rgba(255,255,255,0.10);background:#111827;cursor:grab;transition:border-color .15s,box-shadow .15s;padding:14px 16px;min-width:170px;user-select:none}
+.bn:active{cursor:grabbing}
+/* A4.7 — drag visual state */
+.bn.is-dragging{
+  cursor:grabbing;
+  transition:none;
+  box-shadow:0 0 0 1px rgba(43,127,255,0.55), 0 14px 36px rgba(0,0,0,0.45), 0 0 24px rgba(43,127,255,0.28);
+  z-index:50;
+  opacity:.96;
+}
+/* While any node is being dragged, suppress hover affordances + force the
+   grabbing cursor everywhere so the user knows they're in drag mode. */
+body.is-bn-dragging,
+body.is-bn-dragging *{cursor:grabbing!important}
+body.is-bn-dragging .bn:not(.is-dragging){pointer-events:none}
+body.is-bn-dragging .ed-lbl{pointer-events:none;opacity:.7}
 .bn:hover{border-color:rgba(255,255,255,0.22)}
 .bn.sel{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri-bg)}
 .bn-trigger{background:rgba(18,12,0,0.9);border-color:rgba(253,199,0,0.3)}
@@ -10062,12 +10077,26 @@ function describeEdgeCondition(edge) {
 function renderEditCanvas(net) {
   const canvas = document.getElementById('bldrEditCanvas');
   const flow = EDIT_FLOW;
-  const NW=192, NH=82, GX=60, SX=52, topY=100, canH=280;
-  const totalW = SX + flow.length*(NW+GX) + 60;
+  const NW=192, NH=82, GX=60, SX=52, topY=100;
+
+  // A4.7: Seed positions for nodes that don't yet have one — preserves the
+  // initial horizontal layout. User-dragged nodes keep their stored x/y so
+  // a re-render (e.g. after editing a field) doesn't snap them back.
+  flow.forEach((n, i) => {
+    if (typeof n.x !== 'number') n.x = SX + i*(NW+GX);
+    if (typeof n.y !== 'number') n.y = topY;
+  });
+
+  // Canvas extent grows with the dragged nodes — never shrinks below the
+  // baseline so the user always has room to drag right/down.
+  const maxX = flow.reduce((m, n) => Math.max(m, n.x + NW), 0);
+  const maxY = flow.reduce((m, n) => Math.max(m, n.y + NH), 0);
+  const totalW = Math.max(maxX + 80, 1200);
+  const canH   = Math.max(maxY + 120, 520);
 
   // Build a lookup of node id → {x, y} so we can resolve edges by id.
   const positions = {};
-  flow.forEach((n, i) => { positions[n.id] = { x: SX + i*(NW+GX), y: topY }; });
+  flow.forEach((n) => { positions[n.id] = { x: n.x, y: n.y }; });
 
   // SVG: draw all edges from EDIT_EDGES. Each edge label is clickable —
   // opens the edge config modal. Edges with no condition show the bare
@@ -10103,6 +10132,7 @@ function renderEditCanvas(net) {
          </span>`
       : '';
     labelOverlays += `<button class="ed-lbl ${isActive ? 'is-cond' : ''} ${edge.runtime === 'taken' ? 'is-taken' : ''}"
+        data-edge-lbl="${edge.id}"
         style="left:${lx}px;top:${ly}px"
         onclick="openEdgeConfigModal('${edge.id}')"
         title="Configure this connection">
@@ -10110,9 +10140,14 @@ function renderEditCanvas(net) {
       </button>`;
   });
   svg+='</svg>';
-  const nodes = flow.map((node,i)=>buildEditNode(node,SX+i*(NW+GX),topY,NW,NH)).join('');
+  // A4.7: each node renders at its own x/y. buildEditNode handles the styling
+  // and runtime-state chip; the drag wiring happens once after innerHTML is set.
+  const nodes = flow.map((node)=>buildEditNode(node, node.x, node.y, NW, NH)).join('');
   canvas.style.cssText=`position:relative;width:${totalW}px;height:${canH}px;`;
   canvas.innerHTML = svg + nodes + labelOverlays;
+
+  // A4.7: Wire drag handlers to each node card after the DOM is in place.
+  if (typeof initNodeDragHandlers === 'function') initNodeDragHandlers();
 }
 
 function buildEditNode(node,x,y,w,h) {
@@ -10149,7 +10184,7 @@ function buildEditNode(node,x,y,w,h) {
         rt === 'success' ? '✓' : rt === 'error' ? '!' : rt === 'warning' ? '⚠' : '·'
       }</span>`
     : '';
-  return `<div class="bn ${t.cls}${pendingCls}"${rtAttr} style="left:${x}px;top:${y}px;width:${w}px;z-index:2;cursor:pointer" onclick="selectEditNode('${node.id}')">
+  return `<div class="bn ${t.cls}${pendingCls}"${rtAttr} style="left:${x}px;top:${y}px;width:${w}px;z-index:2" onclick="selectEditNode('${node.id}')">
     ${rtChip}
     <div class="bn-hd">${iconBlock}${bdg}</div>
     <div class="bn-name">${_ie(node.l)}</div>
@@ -10370,6 +10405,139 @@ async function runFlowSimulation(target) {
     nodesRun: EDIT_FLOW.filter(n => n.runtimeState === 'success' || n.runtimeState === 'error').length,
   });
   runSimAbort = null;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// A4.7 — DRAG-TO-MOVE NODES ON THE CANVAS
+// ────────────────────────────────────────────────────────────────────────────
+// Attach mousedown handlers to every .bn after each render. The handler tracks
+// the pointer, updates the dragged node's left/top in real time (no full
+// re-render per frame), and live-updates the SVG edge paths + label overlays
+// that connect to the moving node. A move of >3px is treated as a drag —
+// suppressing the click that would otherwise call selectEditNode.
+//
+// Why DOM-direct instead of re-rendering on every move:
+//   • Re-rendering on every mousemove resets event listeners, jitters labels,
+//     and burns CPU on a single-file demo. The cheap path is to mutate the
+//     transform/left-top + setAttribute("d") on the inbound/outbound paths.
+//   • At drag-end we commit node.x/y back to EDIT_FLOW and call flagSaving so
+//     the position survives the next renderEditCanvas (e.g. after an inspector
+//     edit re-renders the canvas, the dragged position holds).
+// ════════════════════════════════════════════════════════════════════════════
+const NODE_DIM = { w: 192, h: 82 };
+
+function initNodeDragHandlers() {
+  const canvas = document.getElementById('bldrEditCanvas');
+  if (!canvas) return;
+  canvas.querySelectorAll('.bn').forEach((nodeEl) => {
+    if (nodeEl.__dragWired) return;
+    nodeEl.__dragWired = true;
+
+    nodeEl.addEventListener('mousedown', (ev) => {
+      // Skip drag if mousedown was on an interactive child — ports, configure
+      // CTA, or any future affordance we don't want to hijack.
+      if (ev.button !== 0) return;
+      if (ev.target.closest('.bn-port, .insp-configure-btn, .bn-rt-chip, button, a, input, select, textarea')) return;
+      ev.preventDefault();
+
+      // Resolve the node from the inline onclick (set by buildEditNode).
+      const m = (nodeEl.getAttribute('onclick') || '').match(/selectEditNode\('([^']+)'\)/);
+      const nodeId = m && m[1];
+      const node = nodeId && EDIT_FLOW.find(n => n.id === nodeId);
+      if (!node) return;
+
+      // Use canvas-relative coords via parseFloat on current style.left/top
+      // (set at render time). These are integers in pixel space.
+      const startMouseX = ev.clientX;
+      const startMouseY = ev.clientY;
+      const startNodeX  = parseFloat(nodeEl.style.left) || 0;
+      const startNodeY  = parseFloat(nodeEl.style.top)  || 0;
+
+      let moved = false;
+      const onMove = (mv) => {
+        const dx = mv.clientX - startMouseX;
+        const dy = mv.clientY - startMouseY;
+        if (!moved && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+          moved = true;
+          nodeEl.classList.add('is-dragging');
+          document.body.classList.add('is-bn-dragging');
+        }
+        if (!moved) return;
+        // Clamp to the canvas area — never let the node disappear off the
+        // top-left. The canvas itself grows on commit if user pushes right/down.
+        const nx = Math.max(0, startNodeX + dx);
+        const ny = Math.max(0, startNodeY + dy);
+        nodeEl.style.left = nx + 'px';
+        nodeEl.style.top  = ny + 'px';
+        // Live-update edges that touch this node
+        updateEdgesForNode(nodeId, nx, ny);
+      };
+
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        nodeEl.classList.remove('is-dragging');
+        document.body.classList.remove('is-bn-dragging');
+        if (moved) {
+          // Commit to the data model so future renders preserve position.
+          node.x = parseFloat(nodeEl.style.left) || 0;
+          node.y = parseFloat(nodeEl.style.top)  || 0;
+          // Suppress the click that follows mouseup so we don't open the
+          // inspector for a node the user was just dragging.
+          nodeEl.__suppressClick = true;
+          setTimeout(() => { nodeEl.__suppressClick = false; }, 50);
+          flagSaving();
+          // If the new position exceeded canvas extent, the next renderEditCanvas
+          // would expand it. Trigger one to keep extent honest.
+          if (bldrNet && (node.x + NODE_DIM.w > canvas.offsetWidth - 40 ||
+                          node.y + NODE_DIM.h > canvas.offsetHeight - 80)) {
+            renderEditCanvas(bldrNet);
+          }
+        }
+      };
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+
+    // Intercept the click that fires after a drag-mouseup so we don't open
+    // the inspector for a node the user was just repositioning.
+    nodeEl.addEventListener('click', (ev) => {
+      if (nodeEl.__suppressClick) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+      }
+    }, true);
+  });
+}
+
+// Update the SVG path d-attribute + label position for every edge that
+// touches the moved node. Reads the OTHER endpoint's position straight from
+// the live DOM so we stay in sync even while a drag is in flight.
+function updateEdgesForNode(nodeId, x, y) {
+  const NW = NODE_DIM.w, NH = NODE_DIM.h;
+  EDIT_EDGES.forEach(edge => {
+    if (edge.source !== nodeId && edge.target !== nodeId) return;
+    const otherId = edge.source === nodeId ? edge.target : edge.source;
+    const otherEl = document.querySelector(`.bn[onclick*="selectEditNode('${otherId}')"]`);
+    if (!otherEl) return;
+    const ox = parseFloat(otherEl.style.left) || 0;
+    const oy = parseFloat(otherEl.style.top)  || 0;
+    const sX = edge.source === nodeId ? x : ox;
+    const sY = edge.source === nodeId ? y : oy;
+    const tX = edge.target === nodeId ? x : ox;
+    const tY = edge.target === nodeId ? y : oy;
+    const x1 = sX + NW + 4, y1 = sY + NH/2;
+    const x2 = tX - 4,      y2 = tY + NH/2;
+    const mx = (x1 + x2) / 2;
+    const path = document.querySelector(`path[data-edge="${edge.id}"]`);
+    if (path) path.setAttribute('d', `M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`);
+    const lbl = document.querySelector(`.ed-lbl[data-edge-lbl="${edge.id}"]`);
+    if (lbl) {
+      lbl.style.left = ((x1 + x2) / 2) + 'px';
+      lbl.style.top  = (y1 - 12) + 'px';
+    }
+  });
 }
 
 function showRunBanner({ target, success, elapsed, nodesRun }) {
