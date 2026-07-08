@@ -92,6 +92,8 @@
       --shell-divider: rgba(255,255,255,0.08);
       --shell-focus-ring: rgba(43,127,255,0.30);
       --shell-accent-blue: #2B7FFF;
+  --btn-primary-bg:#2b7fff;
+  --btn-primary-hover-bg:#002f80;
     }
     html.theme-light {
       --shell-page-bg: #E4ECF7;
@@ -122,6 +124,8 @@
       --shell-divider: rgba(33,115,255,0.10);
       --shell-focus-ring: rgba(33,115,255,0.40);
       --shell-accent-blue: #2173FF;
+  --btn-primary-bg:#2173ff;
+  --btn-primary-hover-bg:#001a5c;
   /* ── DS Alignment: light-mode overrides for --color-* tokens ── */
   --color-app-bg:                        #E4ECF7;
   --color-surface-neutral-white:         #FFFFFF;
@@ -199,10 +203,10 @@
     .sidebar-wrap:not(.sb-expanded) .sb-item { justify-content:center;gap:0; }
     .sidebar-wrap.sb-expanded .sb-item { justify-content:flex-start;padding:0 12px;gap:10px; }
     .sb-item:hover { background:var(--shell-sidebar-item-icon-hover-bg);color:var(--shell-sidebar-item-hover-color); }
-    .sb-item.active { background:linear-gradient(135deg,rgba(21,93,252,0.55) 0%,rgba(0,194,194,0.35) 100%);color:#fff; }
-    .sb-item.active:hover { background:linear-gradient(135deg,rgba(21,93,252,0.65) 0%,rgba(0,194,194,0.45) 100%); }
+    .sb-item.active { background:rgba(43,127,255,0.10);color:#fff; }
+    .sb-item.active:hover { background:rgba(43,127,255,0.14); }
     .sidebar-wrap:not(.sb-expanded) .sb-item.active { background:transparent; }
-    .sidebar-wrap:not(.sb-expanded) .sb-item.active .sb-item-icon { background:linear-gradient(135deg,#155DFC 0%,#00C2C2 100%);border-radius:10px;width:36px;height:36px;box-shadow:0 0 12px rgba(21,93,252,0.45); }
+    .sidebar-wrap:not(.sb-expanded) .sb-item.active .sb-item-icon { background:radial-gradient(circle at 61% 68%,rgba(33,115,255,1) 29%,rgba(9,226,171,1) 61%);border-radius:10px;width:36px;height:36px;box-shadow:8px 8px 20px 0px rgba(82,163,255,0.38); }
 
     .sb-item-icon { width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:width .15s,height .15s,background .15s; }
     .sb-item-icon svg { width:18px;height:18px; }

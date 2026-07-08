@@ -20,6 +20,10 @@ html{-webkit-font-smoothing:antialiased}
   --t1:rgba(255,255,255,0.90); --t2:rgba(255,255,255,0.60);
   --t3:rgba(255,255,255,0.38); --t4:rgba(255,255,255,0.22);
   --grad:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
+  /* DS sidebar active state (Figma v6rmYKA2zmyXWOahlxLOeI · Sidebar page) */
+  --grad-sb-active:radial-gradient(circle at 61% 68%,rgba(33,115,255,1) 29%,rgba(9,226,171,1) 61%);
+  --shadow-sb-active:8px 8px 20px 0px rgba(82,163,255,0.38);
+  --shadow-sb-hover:0px 0px 20px 0px rgba(33,115,255,0.50);
   --r4:4px;--r6:6px;--r8:8px;--r10:10px;--r12:12px;--r20:20px;
 
   /* ── Shell tokens (dark-mode defaults) — aligned with AIMS-OS Design System ── */
@@ -53,6 +57,8 @@ html{-webkit-font-smoothing:antialiased}
   --shell-divider:rgba(255,255,255,0.08);           /* Border/Neutral/Subtle dark */
   --shell-focus-ring:rgba(43,127,255,0.30);         /* Border/Primary/Lighter dark */
   --shell-accent-blue:#2B7FFF;                      /* primary dark = Border/Primary/Default */
+  --btn-primary-bg:#2b7fff;
+  --btn-primary-hover-bg:#002f80;
 }
 html.theme-light{
   /* ── Shell tokens (light) — aligned with AIMS-OS Design System ── */
@@ -86,6 +92,8 @@ html.theme-light{
   --shell-divider:rgba(33,115,255,0.10);             /* brand-blue divider */
   --shell-focus-ring:rgba(33,115,255,0.40);          /* ring light */
   --shell-accent-blue:#2173FF;                       /* primary light */
+  --btn-primary-bg:#2173ff;
+  --btn-primary-hover-bg:#001a5c;
   /* ── DS Alignment: light-mode overrides for --color-* tokens ── */
   --color-app-bg:                        #E4ECF7;
   --color-surface-neutral-white:         #FFFFFF;
@@ -169,13 +177,13 @@ a{text-decoration:none;color:inherit}
 
 /* Hover — only icon container lights up */
 .sb-item:hover{background:transparent;color:var(--shell-sidebar-item-hover-color)}
-.sb-item:hover .sb-item-icon{background:var(--shell-sidebar-item-icon-hover-bg)}
+.sb-item:hover .sb-item-icon{background:var(--shell-sidebar-item-icon-hover-bg);box-shadow:var(--shadow-sb-hover)}
 
 /* Active — collapsed: gradient icon container */
 .sidebar:not(.sb-expanded) .sb-item.active{background:transparent}
 .sidebar:not(.sb-expanded) .sb-item.active .sb-item-icon{
-  background:var(--grad);color:#fff;
-  box-shadow:0 2px 10px rgba(21,93,252,0.4);
+  background:var(--grad-sb-active);color:#fff;
+  box-shadow:var(--shadow-sb-active);
 }
 
 /* Active — expanded: full-width blue pill + gradient icon */
@@ -183,9 +191,9 @@ a{text-decoration:none;color:inherit}
   background:rgba(43,127,255,0.10);color:var(--t1);
 }
 .sidebar.sb-expanded .sb-item.active .sb-item-icon{
-  background:var(--grad);color:#fff;
+  background:var(--grad-sb-active);color:#fff;box-shadow:var(--shadow-sb-active);
 }
-.sb-item.active:hover .sb-item-icon{background:var(--grad)}
+.sb-item.active:hover .sb-item-icon{background:var(--grad-sb-active);box-shadow:var(--shadow-sb-active),var(--shadow-sb-hover)}
 
 /* Labels */
 .sb-label{opacity:0;transition:opacity .12s;pointer-events:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
