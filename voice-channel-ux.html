@@ -1382,7 +1382,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
         <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5L9 3l6 5.5V15a1 1 0 01-1 1h-3v-5H7v5H4a1 1 0 01-1-1V8.5z"/></svg></span>
         <span class="sb-label">Home</span>
       </button>
-      <button class="sb-item active" id="ni-agents" onclick="showScreen('agents')" title="Agents" aria-label="Agents">
+      <button class="sb-item active" id="ni-agents" onclick="showScreen('agents')" title="Agents" aria-label="Agents" aria-current="page">
         <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5l1.7 4.8 4.8 1.7-4.8 1.7L9 15.5l-1.7-4.8-4.8-1.7 4.8-1.7z"/></svg></span>
         <span class="sb-label">Agents</span>
       </button>
@@ -1634,7 +1634,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
         <div class="agent-page">
           <div class="agent-header">
             <div class="agent-title-row">
-              <button style="background:none;border:none;cursor:pointer;padding:0;margin-right:4px;color:var(--color-text-caption)" onclick="showScreen('settings')">
+              <button style="background:none;border:none;cursor:pointer;padding:0;margin-right:4px;color:var(--color-text-caption)" onclick="showScreen('settings')" aria-label="Back to settings" title="Back to settings">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></svg>
               </button>
               <span class="agent-title">Sammy — Service Desk</span>
@@ -1731,7 +1731,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
                   <textarea class="test-textarea" id="test-msg" placeholder="Type your instructions here..." aria-label="Test message to agent" rows="2"></textarea>
                   <div class="flex items-center gap-2">
                     <button class="btn-icon-sm" title="Attach" aria-label="Attach file" onclick="toast('Attach file')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
-                    <button style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-text-title);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;margin-left:auto;transition:background .15s" onclick="sendTestMsg()">
+                    <button style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-text-title);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;margin-left:auto;transition:background .15s" onclick="sendTestMsg()" aria-label="Send test message" title="Send test message">
                       <svg width="14" height="14" stroke="var(--color-surface-neutral-black)" fill="none" stroke-width="2" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
                     </button>
                   </div>
@@ -1833,7 +1833,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
                   <textarea class="test-textarea" id="ch-test-msg" placeholder="Type your message…" aria-label="Test message to channel" rows="2"></textarea>
                   <div class="flex items-center gap-2">
                     <button class="btn-icon-sm" title="Attach" aria-label="Attach file" onclick="toast('Attach file')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
-                    <button style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-text-title);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;margin-left:auto;transition:background .15s" onclick="sendChTestMsg()">
+                    <button style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-text-title);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;margin-left:auto;transition:background .15s" onclick="sendChTestMsg()" aria-label="Send test message" title="Send test message">
                       <svg width="14" height="14" stroke="var(--color-surface-neutral-black)" fill="none" stroke-width="2" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
                     </button>
                   </div>
@@ -1880,7 +1880,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
                     <textarea class="test-textarea" id="kp-test-msg" placeholder="Ask the agent something…" aria-label="Test message to agent" rows="2"></textarea>
                     <div class="flex items-center gap-2">
                       <button class="btn-icon-sm" title="Attach" aria-label="Attach file" onclick="toast('Attach file')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
-                      <button style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-text-title);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;margin-left:auto;transition:background .15s" onclick="toast('Test message sent')">
+                      <button style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-text-title);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;margin-left:auto;transition:background .15s" onclick="toast('Test message sent')" aria-label="Send test message" title="Send test message">
                         <svg width="14" height="14" stroke="var(--color-surface-neutral-black)" fill="none" stroke-width="2" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
                       </button>
                     </div>
@@ -2554,7 +2554,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
 </div>
 <div class="modal-overlay" id="modal-addnum">
   <div class="modal-dialog" style="width:500px">
-    <button class="modal-dialog__close" onclick="closeNumModal()"><svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
+    <button class="modal-dialog__close" onclick="closeNumModal()" aria-label="Close dialog" title="Close dialog"><svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
     <div class="modal-dialog__body" style="text-align:left;align-items:stretch;padding:28px 28px 16px">
       <div style="font-size:17px;font-weight:700;color:var(--color-text-title);margin-bottom:4px">Add Phone Numbers</div>
       <div style="font-size:13px;color:var(--color-text-caption);margin-bottom:18px">Select one or more numbers from your account to assign to this voice configuration.</div>
@@ -2602,7 +2602,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
 </div>
 <div class="modal-overlay" id="modal-add-number-voice">
   <div class="modal-dialog" style="width:480px">
-    <button class="modal-dialog__close" onclick="document.getElementById('modal-add-number-voice').classList.remove('open')"><svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
+    <button class="modal-dialog__close" onclick="document.getElementById('modal-add-number-voice').classList.remove('open')" aria-label="Close dialog" title="Close dialog"><svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
     <div class="modal-dialog__body" style="text-align:left;align-items:stretch;padding:28px 28px 16px">
       <div style="font-size:17px;font-weight:700;color:var(--color-text-title);margin-bottom:4px">Add Phone Number</div>
       <div style="font-size:13px;color:var(--color-text-caption);margin-bottom:18px">Select a number from your account to add to this configuration.</div>
@@ -2639,7 +2639,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
 </div>
 <div class="modal-overlay" id="modal-buy">
   <div class="modal-dialog" id="buy-dialog" style="width:460px;transition:width .2s ease">
-    <button class="modal-dialog__close" onclick="closeModal()"><svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
+    <button class="modal-dialog__close" onclick="closeModal()" aria-label="Close dialog" title="Close dialog"><svg width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 16 16"><path d="M3 3l10 10M3 13L13 3"/></svg></button>
     <div id="buy-step-1">
       <div class="modal-dialog__body" style="text-align:left;align-items:stretch">
         <div>
@@ -3654,7 +3654,7 @@ function buildPlayer(){
   }).join('');
   return '<div class="player-card">' +
     '<div class="flex items-center gap-3 mb-3">' +
-    '<button class="play-btn" onclick="this.classList.toggle(\'playing\')"><svg width="14" height="14" fill="white" viewBox="0 0 16 16"><polygon points="4,2 13,8 4,14"/></svg></button>' +
+    '<button class="play-btn" onclick="this.classList.toggle(\'playing\')" aria-label="Play recording" title="Play recording"><svg width="14" height="14" fill="white" viewBox="0 0 16 16"><polygon points="4,2 13,8 4,14"/></svg></button>' +
     '<div class="waveform">'+bars+'</div></div>' +
     '<div class="flex items-center justify-between">' +
     '<span style="font-size:12px;color:var(--color-text-caption);font-variant-numeric:tabular-nums">1:28 / 4:12</span>' +
@@ -4436,16 +4436,16 @@ function renderKmlChips(kind){
   const st = KML_STATE[kind];
   let html = '';
   st.cats.forEach(c => {
-    html += '<span class="kml-chip">'+c+'<button class="kml-chip-x" onclick="kmlToggleCat(\''+kind+'\',\''+c.replace(/\'/g,"\\\\'")+'\')"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
+    html += '<span class="kml-chip">'+c+'<button class="kml-chip-x" onclick="kmlToggleCat(\''+kind+'\',\''+c.replace(/\'/g,"\\\\'")+'\')" aria-label="Remove filter" title="Remove filter"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
   });
   if(kind==='packs'){
     st.planes.forEach(pl => {
       const def = PACK_PLANES.find(p=>p.id===pl);
-      html += '<span class="kml-chip">'+def?.label+'<button class="kml-chip-x" onclick="kmlTogglePlane(\''+kind+'\',\''+pl+'\')"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
+      html += '<span class="kml-chip">'+def?.label+'<button class="kml-chip-x" onclick="kmlTogglePlane(\''+kind+'\',\''+pl+'\')" aria-label="Remove filter" title="Remove filter"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
     });
   }
-  if(st.show==='new'  ) html += '<span class="kml-chip">Not added<button class="kml-chip-x" onclick="kmlSetShow(\''+kind+'\',\'all\')"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
-  if(st.show==='added') html += '<span class="kml-chip">Added<button class="kml-chip-x" onclick="kmlSetShow(\''+kind+'\',\'all\')"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
+  if(st.show==='new'  ) html += '<span class="kml-chip">Not added<button class="kml-chip-x" onclick="kmlSetShow(\''+kind+'\',\'all\')" aria-label="Remove filter" title="Remove filter"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
+  if(st.show==='added') html += '<span class="kml-chip">Added<button class="kml-chip-x" onclick="kmlSetShow(\''+kind+'\',\'all\')" aria-label="Remove filter" title="Remove filter"><svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l5 5M2 7l5-5"/></svg></button></span>';
   root.innerHTML = html;
 }
 function _renderKmlPackCard(p){
@@ -5333,8 +5333,8 @@ function _renderAvatarMenu(){
   html += '</div>';
   // Personal preferences — moved from gear menu (these are "me as a user")
   html += '<div class="am-section">';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
   html += '</div>';
   // Appearance / Theme
   html += '<div class="am-section">';
@@ -5373,11 +5373,11 @@ function _renderAvatarMenu(){
     });
   }
   html += '</div>';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
   html += '</div>';
   // Sign out (danger)
   html += '<div class="am-section">';
-  html += '<button type="button" class="am-item is-danger" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
+  html += '<button type="button" class="am-item is-danger" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
   html += '</div>';
   menu.innerHTML = html;
   // Position the workspace dropdown if open — use fixed positioning so it escapes the avatar-menu's overflow

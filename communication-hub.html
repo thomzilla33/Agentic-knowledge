@@ -2276,7 +2276,7 @@
       <div class="card">
         <div class="card-header">
           <div class="row g-3"><div><div class="card-title">Q2 Promo — Premium Upgrade</div><p style="font-size:12px;color:var(--text-caption);margin-top:2px;">Email · 12,400 recipients · Scheduled Apr 25</p></div><span class="badge badge-alert">Scheduled</span></div>
-          <div class="row g-2"><button class="btn btn-secondary btn-sm" data-tooltip="Edit campaign settings">Edit</button><button class="btn btn-ghost btn-sm" data-tooltip="Preview this message">Preview</button></div>
+          <div class="row g-2"><button class="btn btn-secondary btn-sm" onclick="toast('Edit campaign — coming soon','info')" data-tooltip="Edit campaign settings" aria-label="Edit campaign" title="Edit campaign — coming soon">Edit</button><button class="btn btn-ghost btn-sm" onclick="toast('Preview campaign — coming soon','info')" data-tooltip="Preview this message" aria-label="Preview campaign" title="Preview campaign — coming soon">Preview</button></div>
         </div>
         <div class="row g-5">
           <div><p class="stat-value" style="font-size:20px;">12,400</p><p class="stat-label">Recipients</p></div>
@@ -2289,7 +2289,7 @@
       <div class="card">
         <div class="card-header">
           <div class="row g-3"><div><div class="card-title">Abandoned Cart Recovery</div><p style="font-size:12px;color:var(--text-caption);margin-top:2px;">SMS · Auto-trigger · 1,100 sent today</p></div><span class="badge badge-success"><span class="badge-dot"></span>Running</span></div>
-          <div class="row g-2"><button class="btn btn-secondary btn-sm" onclick="toggleCampaignPause(this)" data-tooltip="Pause this campaign">Pause</button><button class="btn btn-secondary btn-sm" data-tooltip="Edit campaign settings">Edit</button></div>
+          <div class="row g-2"><button class="btn btn-secondary btn-sm" onclick="toggleCampaignPause(this)" data-tooltip="Pause this campaign">Pause</button><button class="btn btn-secondary btn-sm" onclick="toast('Edit campaign — coming soon','info')" data-tooltip="Edit campaign settings" aria-label="Edit campaign" title="Edit campaign — coming soon">Edit</button></div>
         </div>
         <div class="row g-5">
           <div><p class="stat-value" style="font-size:20px;">1,100</p><p class="stat-label">Sent today</p></div>
@@ -3325,9 +3325,40 @@
   }
 
   /* ── MODALS ── */
-  function openModal(id) { document.getElementById(id).style.display='flex'; }
-  function closeModal(id) { document.getElementById(id).style.display='none'; }
+  // Legacy openModal — retrofitted with focus management + Esc handler
+  // so behavior matches the newer _openModal(key) API (audit fix)
+  let _legacyOpenModalId = null;
+  let _legacyPrevActive = null;
+  function openModal(id) {
+    const el = document.getElementById(id);
+    if(!el) return;
+    _legacyPrevActive = document.activeElement;
+    el.style.display = 'flex';
+    _legacyOpenModalId = id;
+    // Focus the first focusable descendant after render
+    setTimeout(() => {
+      const focusable = el.querySelector('input, textarea, select, button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      if(focusable) focusable.focus();
+    }, 30);
+  }
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.style.display = 'none';
+    if(_legacyOpenModalId === id){
+      _legacyOpenModalId = null;
+      try { _legacyPrevActive && _legacyPrevActive.focus(); } catch(e){}
+      _legacyPrevActive = null;
+    }
+  }
   function closeModalOverlay(e, overlay) { if (e.target === overlay) closeModal(overlay.id); }
+  // Global Escape handler for legacy modals
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && _legacyOpenModalId){
+      e.preventDefault();
+      closeModal(_legacyOpenModalId);
+    }
+  });
 
   /* ── CHANNEL OPTION SELECT (add channel modal) ── */
   function selectOption(el) {
@@ -4024,8 +4055,8 @@ function _avatarPickLanguage(code){
     html += '</div>';
     // Personal preferences — moved from gear menu (these are "me as a user")
     html += '<div class="am-section">';
-    html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
-    html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
+    html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
+    html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
     html += '</div>';
     html += '<div class="am-section">';
     const currentTheme = _getTheme();
@@ -4063,10 +4094,10 @@ function _avatarPickLanguage(code){
       });
     }
     html += '</div>';
-    html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
+    html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
     html += '</div>';
     html += '<div class="am-section">';
-    html += '<button type="button" class="am-item is-danger" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
+    html += '<button type="button" class="am-item is-danger" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
     html += '</div>';
     menu.innerHTML = html;
     // Position the workspace dropdown if open — use fixed positioning so it escapes the avatar-menu's overflow

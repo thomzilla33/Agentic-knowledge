@@ -3755,7 +3755,7 @@ html.theme-light .search-footer-link{color:#7C3AED}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="6" width="11" height="8" rx="1.5" stroke="var(--pur)" stroke-width="1.3"/><rect x="5.5" y="8.5" width="2" height="2" rx="1" fill="var(--pur)"/><rect x="8.5" y="8.5" width="2" height="2" rx="1" fill="var(--pur)"/><path d="M6 12h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/><path d="M8 6V3.5M6 3.5h4" stroke="var(--pur)" stroke-width="1.3" stroke-linecap="round"/></svg>
             </div>
             <div><div class="insp-node-nm" id="inspNodeNm">Customer Analyst</div><div class="insp-node-st">Agent · Active</div></div>
-            <button class="insp-link" onclick="toast('Opening agent config…','info')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 2H2v8h8V7M7 1h4v4M11 1L6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="insp-link" onclick="toast('Opening agent config…','info')" aria-label="Open agent config" title="Open agent config"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 2H2v8h8V7M7 1h4v4M11 1L6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
           <div class="insp-body" id="inspBody">
             <div class="insp-sec">
@@ -3780,7 +3780,7 @@ html.theme-light .search-footer-link{color:#7C3AED}
             <div class="insp-sec">
               <div class="insp-sec-lbl">
                 Model Settings
-                <button class="insp-collapse-btn" onclick="toast('Model settings','info')">
+                <button class="insp-collapse-btn" onclick="toast('Model settings','info')" aria-label="Collapse panel" title="Collapse panel">
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
               </div>
@@ -3812,7 +3812,7 @@ html.theme-light .search-footer-link{color:#7C3AED}
         <div class="wiz-chat" id="wizChat"></div>
         <div class="wiz-input" id="wizInputArea">
           <textarea class="wiz-ta" id="wizInput" rows="1" placeholder="Type your answer…" onkeydown="onWizKey(event)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
-          <button class="wiz-send" onclick="sendWizChat()">
+          <button class="wiz-send" onclick="sendWizChat()" aria-label="Send message" title="Send message">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 8L2 2l3 6-3 6 12-6z" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
           </button>
         </div>
@@ -4549,7 +4549,7 @@ function buildCard(n) {
       <span class="card-name">${n.name}</span>
       <span class="sc ${n.status}">${icons[n.status]}<span class="sc-dot" style="display:none"></span>${statusLabel[n.status]}</span>
       <span class="card-time">${n.ago}</span>
-      <button class="card-menu" onclick="event.stopPropagation();toast('Options for ${n.name}','info')">
+      <button class="card-menu" onclick="event.stopPropagation();toast('Options for ${n.name}','info')" aria-label="More actions" title="More actions">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="3" r="1" fill="currentColor"/><circle cx="7" cy="7" r="1" fill="currentColor"/><circle cx="7" cy="11" r="1" fill="currentColor"/></svg>
       </button>
     </div>
@@ -4718,7 +4718,7 @@ function buildTpKn(tp) {
     + '<div class="tp-name-kn">' + tp.name + '</div>'
     + '<div class="tp-docs-count">' + tp.docs.toLocaleString() + ' documents</div>'
     + '</div>'
-    + '<button class="tp-eye" onclick="' + eyeClick + '"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg></button>'
+    + '<button class="tp-eye" onclick="' + eyeClick + '" aria-label="Preview" title="Preview"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg></button>'
     + removeBtn
     + '</div>'
     + planeRows
@@ -6000,8 +6000,8 @@ function _renderAvatarMenu(){
   html += '</div>';
   // Personal preferences — moved from gear menu (these are "me as a user")
   html += '<div class="am-section">';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
   html += '</div>';
   html += '<div class="am-section">';
   const currentTheme = _getTheme();
@@ -6039,10 +6039,10 @@ function _renderAvatarMenu(){
     });
   }
   html += '</div>';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
   html += '</div>';
   html += '<div class="am-section">';
-  html += '<button type="button" class="am-item is-danger" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
+  html += '<button type="button" class="am-item is-danger" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
   html += '</div>';
   menu.innerHTML = html;
   // Position the workspace dropdown if open — use fixed positioning so it escapes the avatar-menu's overflow

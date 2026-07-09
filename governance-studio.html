@@ -1685,7 +1685,7 @@ function renderPlaybooks(){
   return `
   <div class="page-header">
     <span class="tb-title">Playbooks</span>
-    <button class="tb-btn tb-btn-primary" onclick="showToast('New Playbook — coming soon')">${IC('plus',14)} New Playbook</button>
+    <button class="tb-btn tb-btn-primary" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('New Playbook — coming soon')">${IC('plus',14)} New Playbook</button>
   </div>
   <div class="content">
     <div class="stat-row">
@@ -1720,7 +1720,7 @@ function renderPlaybooks(){
             <td class="text-sm text-ts">${p.lastRun}</td>
             <td>
               <div class="row-actions">
-                <button class="icon-btn" title="Edit" onclick="showToast('Edit Playbook — coming soon')">${IC('edit',13)}</button>
+                <button class="icon-btn" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Edit Playbook — coming soon')">${IC('edit',13)}</button>
                 <button class="icon-btn" title="Duplicate" onclick="showToast('Duplicated!')">${IC('copy',13)}</button>
                 <button class="icon-btn danger" title="Delete" onclick="showToast('Deleted!')">${IC('trash',13)}</button>
               </div>
@@ -1742,7 +1742,7 @@ function renderPlaybookDetail(){
     <span class="tb-title">${pb.name}</span>
     ${statusBadge(pb.status)}
     <div style="flex:1"></div>
-    <button class="tb-btn tb-btn-ghost" onclick="showToast('Edit Playbook — coming soon')">${IC('edit',14)} Edit</button>
+    <button class="tb-btn tb-btn-ghost" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Edit Playbook — coming soon')">${IC('edit',14)} Edit</button>
     <button class="tb-btn tb-btn-primary" onclick="showToast('Playbook triggered!')">${IC('play',14)} Run Now</button>
   </div>
   <div class="content">
@@ -1799,7 +1799,7 @@ function renderPbLogs(pb){
           <td class="text-sm text-ts">${r.started}</td>
           <td class="mono">${r.duration}</td>
           <td><span class="pill pill-gray text-xs">${r.trigger}</span></td>
-          <td><button class="icon-btn" title="View log" onclick="showToast('Log viewer — coming soon')">${IC('eye',13)}</button></td>
+          <td><button class="icon-btn" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Log viewer — coming soon')">${IC('eye',13)}</button></td>
         </tr>`).join('')}
       </tbody>
     </table>
@@ -1954,7 +1954,7 @@ function renderWorkers(){
   return `
   <div class="page-header">
     <span class="tb-title">Workers</span>
-    <button class="tb-btn tb-btn-ghost">${IC('info',14)} Docs</button>
+    <button class="tb-btn tb-btn-ghost" onclick="_ctxAction('help')" aria-label="Open documentation" title="Open documentation">${IC('info',14)} Docs</button>
     <button class="tb-btn tb-btn-primary" onclick="setState({modal:'newWorker',modalStep:1})">${IC('plus',14)} New Worker</button>
   </div>
   <div class="content">
@@ -2114,12 +2114,12 @@ function renderWkInstructions(w){
           </div>
           <button class="icon-btn" style="color:#ef4444" onclick="showToast('Tool removed!')">${IC('x',12)}</button>
         </div>`).join('')}
-        <button class="tb-btn tb-btn-ghost" style="font-size:12px;align-self:flex-start;margin-top:4px" onclick="showToast('Add tool — coming soon')">${IC('plus',12)} Add Tool</button>
+        <button class="tb-btn tb-btn-ghost" disabled aria-disabled="true" title="Coming soon" style="font-size:12px;align-self:flex-start;margin-top:4px;opacity:.5;cursor:not-allowed" onclick="showToast('Add tool — coming soon')">${IC('plus',12)} Add Tool</button>
       </div>
     </div>
     <div style="display:flex;gap:8px">
       <button class="tb-btn tb-btn-primary" onclick="showToast('Instructions saved!')">${IC('check',14)} Save Instructions</button>
-      <button class="tb-btn tb-btn-ghost" onclick="showToast('Test panel — coming soon')">${IC('play',14)} Test Worker</button>
+      <button class="tb-btn tb-btn-ghost" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Test panel — coming soon')">${IC('play',14)} Test Worker</button>
     </div>
   </div>`;
 }
@@ -2156,7 +2156,7 @@ function renderNetworkList(){
   return `
   <div class="page-header">
     <span class="tb-title">Agentic Networks</span>
-    <button class="tb-btn tb-btn-ghost">${IC('info',14)} Docs</button>
+    <button class="tb-btn tb-btn-ghost" onclick="_ctxAction('help')" aria-label="Open documentation" title="Open documentation">${IC('info',14)} Docs</button>
     <button class="tb-btn tb-btn-primary" onclick="setState({modal:'newNetwork'})">${IC('plus',14)} New Network</button>
   </div>
   <div class="content">
@@ -2312,7 +2312,7 @@ function renderNetInstances(net){
         <span>Last run: ${i.lastRun}</span>
       </div>
     </div>`).join('')}
-    <button class="tb-btn tb-btn-ghost" style="align-self:flex-start" onclick="showToast('Add instance — coming soon')">${IC('plus',14)} Add Instance</button>
+    <button class="tb-btn tb-btn-ghost" disabled aria-disabled="true" title="Coming soon" style="align-self:flex-start;opacity:.5;cursor:not-allowed" onclick="showToast('Add instance — coming soon')">${IC('plus',14)} Add Instance</button>
   </div>`;
 }
 
@@ -2474,7 +2474,7 @@ function extractFields(content, type) {
             <span class="var-map-arrow">→</span>
             <span class="var-map-target">${m.dst}</span>
           </div>`).join('')||`<div class="text-xs text-tm" style="text-align:center;padding:16px">No variable mappings for this node</div>`}
-        <button class="tb-btn tb-btn-ghost" style="font-size:12px;margin-top:4px" onclick="showToast('Add mapping — coming soon')">${IC('plus',12)} Add Mapping</button>
+        <button class="tb-btn tb-btn-ghost" disabled aria-disabled="true" title="Coming soon" style="font-size:12px;margin-top:4px;opacity:.5;cursor:not-allowed" onclick="showToast('Add mapping — coming soon')">${IC('plus',12)} Add Mapping</button>
       </div>
     `}
     </div>
@@ -2497,7 +2497,7 @@ function extractFields(content, type) {
       <span style="font-size:13px;font-weight:600;color:var(--tp)">${net.name}</span>
       ${statusBadge(net.status)}
       <div style="flex:1"></div>
-      <button class="tb-btn tb-btn-ghost" onclick="showToast('History — coming soon')">${IC('clock',14)} History</button>
+      <button class="tb-btn tb-btn-ghost" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('History — coming soon')">${IC('clock',14)} History</button>
       <button class="tb-btn tb-btn-ghost" onclick="showToast('Draft saved!')">${IC('check',14)} Save Draft</button>
       <button class="tb-btn tb-btn-primary" onclick="showToast('Network published!')">${IC('play',14)} Publish</button>
     </div>
@@ -2938,7 +2938,7 @@ function renderKnowledge(){
   return `
   <div class="page-header">
     <span class="tb-title">Knowledge</span>
-    <button class="tb-btn tb-btn-ghost">${IC('info',14)} Docs</button>
+    <button class="tb-btn tb-btn-ghost" onclick="_ctxAction('help')" aria-label="Open documentation" title="Open documentation">${IC('info',14)} Docs</button>
     <button class="tb-btn tb-btn-primary" onclick="setState({modal:'newTruthPack',modalStep:1})">${IC('plus',14)} New TruthPack</button>
   </div>
   <div class="content">
@@ -3023,7 +3023,7 @@ function renderTpDetail(){
           <div style="font-size:13px;font-weight:700;color:var(--t1)">${tp.facts.length} Facts / FAQs</div>
           <div style="font-size:11px;color:var(--tm);margin-top:2px">Verified facts that agents treat as ground truth (100% confidence)</div>
         </div>
-        <button class="tb-btn tb-btn-primary" onclick="showToast('Add Fact — coming soon')">${IC('plus',13)} Add Fact</button>
+        <button class="tb-btn tb-btn-primary" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Add Fact — coming soon')">${IC('plus',13)} Add Fact</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         ${tp.facts.map((f,i)=>`
@@ -3034,7 +3034,7 @@ function renderTpDetail(){
                 <div style="font-size:12px;color:var(--tm);line-height:1.5">A: ${f.a}</div>
               </div>
               <div style="display:flex;gap:4px;flex-shrink:0">
-                <button class="icon-btn" title="Edit" onclick="showToast('Edit Fact — coming soon')">${IC('edit2',12)}</button>
+                <button class="icon-btn" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Edit Fact — coming soon')">${IC('edit2',12)}</button>
                 <button class="icon-btn danger" title="Delete" onclick="showToast('Fact deleted!')">${IC('trash',12)}</button>
               </div>
             </div>
@@ -3050,7 +3050,7 @@ function renderTpDetail(){
           <div style="font-size:13px;font-weight:700;color:var(--t1)">${tp.claims.length} Sandbox Claims</div>
           <div style="font-size:11px;color:var(--tm);margin-top:2px">Tentative statements pending validation — treated at ~80% confidence by agents</div>
         </div>
-        <button class="tb-btn tb-btn-primary" onclick="showToast('Add Claim — coming soon')">${IC('plus',13)} Add Claim</button>
+        <button class="tb-btn tb-btn-primary" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Add Claim — coming soon')">${IC('plus',13)} Add Claim</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         ${tp.claims.map(c=>`
@@ -3065,7 +3065,7 @@ function renderTpDetail(){
               </div>
               <div style="display:flex;gap:4px;flex-shrink:0">
                 <button class="icon-btn" title="Promote to Fact" onclick="showToast('Claim promoted to fact!')" style="color:var(--ok)">${IC('check',12)}</button>
-                <button class="icon-btn" title="Edit" onclick="showToast('Edit Claim — coming soon')">${IC('edit2',12)}</button>
+                <button class="icon-btn" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Edit Claim — coming soon')">${IC('edit2',12)}</button>
                 <button class="icon-btn danger" title="Reject" onclick="showToast('Claim rejected!')">${IC('x',12)}</button>
               </div>
             </div>
@@ -3080,11 +3080,11 @@ function renderTpDetail(){
           <div style="font-size:13px;font-weight:700;color:var(--t1)">${tp.docs.length} Source Documents</div>
           <div style="font-size:11px;color:var(--tm);margin-top:2px">Reference documents — agents use these as supporting sources (~60% confidence)</div>
         </div>
-        <button class="tb-btn tb-btn-primary" onclick="showToast('Upload document — coming soon')">${IC('plus',13)} Add Document</button>
+        <button class="tb-btn tb-btn-primary" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="showToast('Upload document — coming soon')">${IC('plus',13)} Add Document</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${tp.docs.map(d=>`
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(43,127,255,0.05);border:1px solid rgba(43,127,255,0.15);border-radius:10px;cursor:pointer" onclick="showToast('Open document — coming soon')">
+          <div aria-disabled="true" title="Coming soon" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(43,127,255,0.05);border:1px solid rgba(43,127,255,0.15);border-radius:10px;cursor:not-allowed;opacity:.6" onclick="showToast('Open document — coming soon')">
             <div style="width:30px;height:30px;border-radius:7px;background:rgba(43,127,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 1h6.2L11 3.2V12H2.5V1z" stroke="var(--pri)" stroke-width="1.1" stroke-linejoin="round"/><path d="M8.5 1V3.5H11" stroke="var(--pri)" stroke-width="1.1"/></svg>
             </div>
@@ -3093,7 +3093,7 @@ function renderTpDetail(){
               <div style="font-size:11px;color:var(--tm);margin-top:1px">${d.size} · Updated ${d.updated}</div>
             </div>
             <div style="display:flex;gap:4px">
-              <button class="icon-btn" title="Download" onclick="event.stopPropagation();showToast('Download — coming soon')">${IC('download',12)}</button>
+              <button class="icon-btn" disabled aria-disabled="true" title="Coming soon" style="opacity:.5;cursor:not-allowed" onclick="event.stopPropagation();showToast('Download — coming soon')">${IC('download',12)}</button>
               <button class="icon-btn danger" title="Remove" onclick="event.stopPropagation();showToast('Document removed!')">${IC('trash',12)}</button>
             </div>
           </div>`).join('')}
@@ -3135,7 +3135,7 @@ function renderTpDetail(){
               <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px">Include items tagged with</div>
               <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
                 <span style="font-size:11px;padding:2px 9px;border-radius:20px;background:${tp.tagBg};color:${tp.tagColor};font-weight:700">${tp.tag}</span>
-                <button style="font-size:11px;padding:2px 9px;border-radius:20px;border:1px dashed var(--bds);background:transparent;color:var(--tm);cursor:pointer" onclick="showToast('Add rule — coming soon')">+ Add tag</button>
+                <button disabled aria-disabled="true" title="Coming soon" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1px dashed var(--bds);background:transparent;color:var(--tm);cursor:not-allowed;opacity:.5" onclick="showToast('Add rule — coming soon')">+ Add tag</button>
               </div>
             </div>
           </div>
@@ -3249,8 +3249,8 @@ function pgnBar(total,defaultRows=10){
     </div>
     <span class="pgn-range">1–${end} of ${total.toLocaleString()} items</span>
     <div class="pgn-nav">
-      <button class="pgn-btn pgn-prev" onclick="pgnGo(this,-1)" disabled><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button class="pgn-btn pgn-next" onclick="pgnGo(this,1)"${total<=defaultRows?' disabled':''}><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6l-3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="pgn-btn pgn-prev" onclick="pgnGo(this,-1)" disabled aria-label="Previous page" title="Previous page"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5L4.5 6l3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="pgn-btn pgn-next" onclick="pgnGo(this,1)"${total<=defaultRows?' disabled':''} aria-label="Next page" title="Next page"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6l-3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>`;
 }
@@ -3833,8 +3833,8 @@ function _renderAvatarMenu(){
   html += '</div>';
   // Personal preferences — moved from gear menu (these are "me as a user")
   html += '<div class="am-section">';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'general-settings\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke-linecap="round"/></svg>Profile &amp; preferences</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'notification-prefs\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3a6 6 0 016 6c0 4 2 6 2 6H4s2-2 2-6a6 6 0 016-6zM10 19a2 2 0 004 0" stroke-linecap="round"/></svg>Notification preferences</button>';
   html += '</div>';
   html += '<div class="am-section">';
   const currentTheme = _getTheme();
@@ -3872,10 +3872,10 @@ function _renderAvatarMenu(){
     });
   }
   html += '</div>';
-  html += '<button type="button" class="am-item" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
+  html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
   html += '</div>';
   html += '<div class="am-section">';
-  html += '<button type="button" class="am-item is-danger" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
+  html += '<button type="button" class="am-item is-danger" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
   html += '</div>';
   menu.innerHTML = html;
   // Position the workspace dropdown if open — use fixed positioning so it escapes the avatar-menu's overflow
