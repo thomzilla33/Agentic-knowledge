@@ -457,23 +457,15 @@ a{text-decoration:none;color:inherit}
 /* Divider */
 .sb-divider{height:1px;background:var(--shell-divider);margin:4px 0;flex-shrink:0}
 
-/* Bottom section */
-.sb-bottom{flex-shrink:0;border-top:1px solid var(--shell-divider);padding:4px 8px 8px}
-.sb-toggle{
-  display:flex;align-items:center;height:40px;border:none;border-radius:8px;
-  background:transparent;color:rgba(128,175,255,0.55);font-size:12px;font-weight:600;
-  cursor:pointer;width:100%;white-space:nowrap;overflow:hidden;transition:background .12s,color .12s;
-}
-.sidebar:not(.sb-expanded) .sb-toggle{justify-content:center;gap:0;padding:0}
-.sidebar.sb-expanded .sb-toggle{justify-content:flex-start;padding:0 8px;gap:8px}
-.sb-toggle:hover{background:var(--shell-menu-item-hover-bg);color:var(--accent-hover-blue)}
-.sb-toggle-icon{width:18px;height:18px;flex-shrink:0;transition:transform .22s cubic-bezier(.4,0,.2,1)}
-.sidebar.sb-expanded .sb-toggle-icon{transform:rotate(180deg)}
-.sb-toggle-label{opacity:0;transition:opacity .12s}
-.sidebar.sb-expanded .sb-toggle-label{opacity:1}
+/* Header (top toggle) */
+.sb-header{display:flex;align-items:center;justify-content:flex-end;padding:8px 8px 8px;flex-shrink:0}
+.sidebar:not(.sb-expanded) .sb-header{justify-content:center;padding:8px 0 6px}
+.sb-header-toggle{width:28px;height:28px;border-radius:8px;background:transparent;border:none;color:var(--shell-icon-default);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;flex-shrink:0}
+.sb-header-toggle:hover{background:var(--shell-menu-item-hover-bg);color:var(--shell-icon-hover)}
+.sb-header-toggle svg{width:16px;height:16px}
 
 /* Tooltip in compressed state */
-.sb-item[title],.sb-toggle[title]{position:relative}
+.sb-item[title]{position:relative}
 
 /* Legacy compat — keep nav-divider for any stray refs */
 .nav-divider{height:1px;background:var(--bd);margin:8px 0}
@@ -2645,7 +2637,12 @@ html.theme-light .search-footer-link{color:#7C3AED}
 <!-- ═══ SIDEBAR ═══ -->
 <nav class="sidebar" id="appSidebar" aria-label="Main navigation">
 
-  <!-- Brand -->
+  <div class="sb-header">
+    <button class="sb-header-toggle" id="sbToggleBtn" onclick="sbToggle()" title="Toggle sidebar" aria-label="Toggle sidebar" aria-expanded="true">
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3" width="13" height="12" rx="2"/><line x1="11" y1="3" x2="11" y2="15"/></svg>
+    </button>
+  </div>
+
   <!-- Nav items -->
   <div class="sb-nav">
 
@@ -2716,18 +2713,6 @@ html.theme-light .search-footer-link{color:#7C3AED}
     </button>
 
 
-  </div>
-
-  <!-- Collapse toggle -->
-  <div class="sb-bottom">
-    <button class="sb-toggle" id="sbToggleBtn" onclick="sbToggle()" title="Toggle sidebar" aria-label="Toggle sidebar" aria-expanded="false">
-      <!-- Dock-to-left / expand arrow icon -->
-      <svg class="sb-toggle-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M11 4L6 9l5 5"/>
-        <line x1="3" y1="3" x2="3" y2="15"/>
-      </svg>
-      <span class="sb-toggle-label">Collapse</span>
-    </button>
   </div>
 
 </nav>
@@ -9943,8 +9928,7 @@ function sbToggle() {
   const sb = document.getElementById('appSidebar');
   const btn = document.getElementById('sbToggleBtn');
   const expanded = sb.classList.toggle('sb-expanded');
-  btn.setAttribute('aria-expanded', expanded);
-  btn.querySelector('.sb-toggle-label').textContent = expanded ? 'Collapse' : 'Expand';
+  if (btn) btn.setAttribute('aria-expanded', expanded);
   try { localStorage.setItem('sb_expanded', expanded ? '1' : '0'); } catch(e) {}
 }
 function sbInit() {
@@ -9955,7 +9939,7 @@ function sbInit() {
       const btn = document.getElementById('sbToggleBtn');
       if (sb) {
         sb.classList.add('sb-expanded');
-        if (btn) { btn.setAttribute('aria-expanded','true'); btn.querySelector('.sb-toggle-label').textContent='Collapse'; }
+        if (btn) btn.setAttribute('aria-expanded','true');
       }
     }
   } catch(e) {}
