@@ -1345,7 +1345,7 @@ html.theme-light .search-footer-link{color:#7C3AED}
       <div class="notif-menu" id="notif-menu" role="dialog" aria-label="Notifications" aria-hidden="true"></div>
     </span>
     <div class="tb-gear-wrap">
-      <button class="icon-btn" id="gearLauncher" type="button" onclick="toggleGearMenu(event)" aria-label="Settings" aria-haspopup="menu" aria-expanded="false" data-tt="Settings" data-tt-desc="Personal settings and workspace admin">
+      <button class="icon-btn" id="gearLauncher" type="button" onclick="toggleGearMenu(event)" aria-label="Settings" aria-haspopup="menu" aria-expanded="false" data-tt="Settings" data-tt-desc="Personal · Studio · Workspace settings">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
       <div class="gear-menu" id="gearMenu" role="menu" aria-label="Settings"></div>
@@ -3970,7 +3970,7 @@ function _renderTbWsBadge(){
   const badgeEl = document.getElementById('tb-ws-badge');
   if(logoEl){ logoEl.textContent = _wsInitials(ws.name); logoEl.style.background = _wsHashColor(ws.id); }
   if(nameEl){ nameEl.textContent = ws.name; }
-  if(badgeEl){ badgeEl.setAttribute('data-tt-desc', 'Workspace · ' + ws.name + ' · click to switch'); badgeEl.setAttribute('aria-label', 'Current workspace: ' + ws.name + '. Click to switch workspace'); }
+  if(badgeEl){ badgeEl.setAttribute('data-tt-desc', 'Workspace · ' + ws.name + ' · click to open account menu'); badgeEl.setAttribute('aria-label', 'Account and workspace. Current workspace: ' + ws.name); }
 }
 // Legacy alias — the ws badge now toggles the avatar menu directly.
 function _openWorkspaceFromBadge(e){
