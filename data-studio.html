@@ -9,7 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#0a0d1a; --bg2:#0f172e; --bg3:#0d1323;
+  --bg:#0A0E1A; --bg2:#0D1120; --bg3:#131C2E;
+  --shell-app-bg:linear-gradient(144deg,#020618 0%,#0F172B 50%,#020618 100%);
   --t1:#F1F5F9; --t2:#94A3B8; --t3:#64748B;
   --line:rgba(255,255,255,0.08);
   --line-strong:rgba(255,255,255,0.14);
@@ -21,9 +22,25 @@
   --grad-app:linear-gradient(135deg,#10B981 0%,#06B6D4 100%);
 }
 
+/* ── LIGHT MODE — white topbar + dark rail + light content (AI Workers std) ── */
+html.theme-light{
+  --bg:#E4ECF7; --bg2:#FFFFFF; --bg3:#F1F5F9;
+  --t1:#0F172A; --t2:#475569; --t3:#64748B;
+  --line:rgba(15,23,42,0.10); --line-strong:rgba(15,23,42,0.16);
+  --hover:rgba(15,23,42,0.03); --hover-strong:rgba(15,23,42,0.06);
+  --shell-topbar-bg:rgba(255,255,255,0.85);
+}
+/* keep the left rail dark in light mode by re-scoping tokens onto the container */
+html.theme-light .ssb{
+  --bg:#0A0E1A; --bg2:#0D1120; --bg3:#131C2E;
+  --t1:#F1F5F9; --t2:#94A3B8; --t3:#64748B;
+  --line:rgba(255,255,255,0.08); --line-strong:rgba(255,255,255,0.14);
+  --hover:rgba(255,255,255,0.04); --hover-strong:rgba(255,255,255,0.08);
+}
+
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%; overflow:hidden}
-body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--t1); font-size:14px}
+body{font-family:'Inter',system-ui,sans-serif; background:var(--shell-app-bg); color:var(--t1); font-size:14px}
 
 /* ── TOPBAR ── */
 .topbar{
@@ -150,6 +167,263 @@ body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(-
 .breadcrumb:not(:has(a)){display:none}
 
 /* ── Hero (Connections list page) ── */
+
+/* ============================================================================
+   .hero — shared primitive for surface heroes across all studios.
+   Slots: hero-main (left) + hero-aside (right with KPIs + CTA).
+   Tone via data-tone="default|info|warn|ok". KPI kind via data-kind on each.
+============================================================================ */
+.hero{
+  display:grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap:24px;
+  align-items:start;
+  padding:24px 32px 22px;
+  border-bottom:1px solid var(--line);
+}
+.hero-main{min-width:0;}
+.hero-aside{
+  display:flex; flex-direction:column; gap:12px;
+  min-width:280px;
+  flex-shrink:0;
+}
+/* Buttons inside hero-aside size to content + right-align (no stretch to aside width) */
+.hero-aside > .btn{align-self:flex-end;}
+
+.hero-eyebrow{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  margin-bottom:8px;
+}
+.hero-mode-tag{
+  display:inline-flex; align-items:center; gap:5px;
+  height:22px; padding:0 9px;
+  font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  border-radius:11px;
+  background:rgba(16,185,129,0.12);
+  color:var(--emerald);
+  border:1px solid rgba(16,185,129,0.30);
+}
+.hero[data-tone="info"]  .hero-mode-tag{background:rgba(56,189,248,0.12);color:#7ed3f7;border-color:rgba(56,189,248,0.30);}
+.hero[data-tone="warn"]  .hero-mode-tag{background:rgba(245,158,11,0.12);color:#fbbf24;border-color:rgba(245,158,11,0.32);}
+.hero[data-tone="ok"]    .hero-mode-tag{background:rgba(16,185,129,0.12);color:var(--emerald);border-color:rgba(16,185,129,0.30);}
+
+.hero-meta{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11.5px; color:var(--t3); font-weight:500;
+}
+.hero-meta::before{
+  content:''; width:5px; height:5px; border-radius:50%;
+  background:#10b981; box-shadow:0 0 0 2px rgba(16,185,129,0.18);
+}
+
+.hero-title{
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight:800;
+  color:var(--t1);
+  letter-spacing:-.02em;
+  line-height:1.18;
+  margin:0 0 6px;
+}
+.hero-emphasis{font-weight:800;}
+.hero[data-tone="warn"] .hero-emphasis{color:#fbbf24;}
+.hero[data-tone="info"] .hero-emphasis{color:#7ed3f7;}
+.hero[data-tone="ok"]   .hero-emphasis{color:var(--emerald);}
+
+.hero-desc{
+  font-size:13.5px;
+  color:var(--t2);
+  line-height:1.55;
+  max-width:560px;
+  margin:0;
+}
+.hero-desc a{color:var(--cyan);}
+
+/* KPI cluster (status-tinted cards) */
+.hero-kpis{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap:10px;
+}
+.hero-kpi{
+  display:flex; flex-direction:column; gap:3px; align-items:flex-start;
+  padding:10px 14px;
+  border-radius:11px;
+  background:rgba(255,255,255,0.022);
+  border:1px solid rgba(255,255,255,0.06);
+  transition: border-color .15s, background .15s;
+}
+.hero-kpi[data-kind="ok"]      {background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.28);}
+.hero-kpi[data-kind="warn"]    {background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.34);}
+.hero-kpi[data-kind="info"]    {background:rgba(56,189,248,0.08); border-color:rgba(56,189,248,0.28);}
+.hero-kpi[data-kind="idle"]    {background:rgba(148,163,184,0.06); border-color:rgba(148,163,184,0.18);}
+.hero-kpi[data-kind="critical"]{background:rgba(239,68,68,0.08);  border-color:rgba(239,68,68,0.32);}
+
+.hero-kpi-n{font-size:22px; font-weight:800; line-height:1; letter-spacing:-.02em; color:var(--t1);}
+.hero-kpi[data-kind="ok"]       .hero-kpi-n{color:#34d39c;}
+.hero-kpi[data-kind="warn"]     .hero-kpi-n{color:#fbbf24;}
+.hero-kpi[data-kind="info"]     .hero-kpi-n{color:#7ed3f7;}
+.hero-kpi[data-kind="idle"]     .hero-kpi-n{color:var(--t3);}
+.hero-kpi[data-kind="critical"] .hero-kpi-n{color:#fca5a5;}
+
+.hero-kpi-l{font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--t3);}
+.hero-kpi[data-kind="ok"]       .hero-kpi-l{color:#34d39c;}
+.hero-kpi[data-kind="warn"]     .hero-kpi-l{color:#fbbf24;}
+.hero-kpi[data-kind="info"]     .hero-kpi-l{color:#7ed3f7;}
+.hero-kpi[data-kind="critical"] .hero-kpi-l{color:#fca5a5;}
+
+/* Primary CTA */
+.hero-cta{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 16px;
+  font-family:inherit; font-size:13px; font-weight:700;
+  border-radius:10px; cursor:pointer; white-space:nowrap;
+  text-decoration:none;
+  transition: all .15s ease;
+}
+.hero-cta[data-tone="warn"], .hero[data-tone="warn"] .hero-cta:not([data-tone]){
+  background:linear-gradient(135deg, rgba(245,158,11,0.22), rgba(245,158,11,0.10));
+  border:1px solid rgba(245,158,11,0.45);
+  color:#fbbf24;
+}
+.hero-cta[data-tone="warn"]:hover, .hero[data-tone="warn"] .hero-cta:not([data-tone]):hover{
+  background:linear-gradient(135deg, rgba(245,158,11,0.32), rgba(245,158,11,0.16));
+  border-color:rgba(245,158,11,0.65);
+  transform:translateY(-1px);
+}
+.hero-cta[data-tone="info"], .hero[data-tone="info"] .hero-cta:not([data-tone]){
+  background:linear-gradient(135deg, rgba(56,189,248,0.22), rgba(56,189,248,0.10));
+  border:1px solid rgba(56,189,248,0.42);
+  color:#7ed3f7;
+}
+.hero-cta[data-tone="info"]:hover, .hero[data-tone="info"] .hero-cta:not([data-tone]):hover{
+  background:linear-gradient(135deg, rgba(56,189,248,0.32), rgba(56,189,248,0.16));
+  border-color:rgba(56,189,248,0.65);
+  transform:translateY(-1px);
+}
+.hero-cta[data-tone="ok"]{
+  background:linear-gradient(135deg, rgba(16,185,129,0.22), rgba(16,185,129,0.10));
+  border:1px solid rgba(16,185,129,0.45);
+  color:var(--emerald);
+}
+
+/* Responsive: stack vertically below 900px so KPIs don't squeeze the title */
+@media (max-width: 900px){
+  .hero{grid-template-columns: 1fr;}
+  .hero-aside{min-width:0;}
+  .hero-kpis{grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));}
+}
+
+
+/* ============================================================================
+   .toolbar — shared primitive for search + filter rows across surfaces.
+   Slots: toolbar-search (left, flex:1) + toolbar-filters (right, pill row).
+============================================================================ */
+.toolbar{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 0 18px;
+  flex-wrap:wrap;
+}
+.toolbar-search{
+  flex:1 1 280px;
+  display:flex; align-items:center; gap:8px;
+  height:36px;
+  padding:0 12px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:9px;
+  transition: border-color .15s, background .15s;
+}
+.toolbar-search:focus-within{
+  border-color:rgba(56,189,248,0.40);
+  background:rgba(56,189,248,0.04);
+}
+.toolbar-search-ico{color:var(--t3); flex-shrink:0;}
+.toolbar-search input{
+  flex:1; min-width:0;
+  border:none; background:transparent;
+  color:var(--t1);
+  font-size:13px; font-family:inherit;
+  outline:none;
+}
+.toolbar-search input::placeholder{color:var(--t3);}
+.toolbar-search-clear{
+  width:20px; height:20px;
+  display:flex; align-items:center; justify-content:center;
+  background:transparent; border:none;
+  color:var(--t3);
+  cursor:pointer; border-radius:4px;
+  flex-shrink:0;
+}
+.toolbar-search-clear:hover{background:rgba(255,255,255,0.06); color:var(--t1);}
+
+.toolbar-filters{
+  display:flex; align-items:center; gap:6px;
+  flex-wrap:wrap;
+}
+.toolbar-filter{
+  display:inline-flex; align-items:center; gap:6px;
+  height:32px; padding:0 12px;
+  background:transparent;
+  border:1px solid var(--line);
+  border-radius:7px;
+  color:var(--t2);
+  font-size:12.5px; font-weight:600; font-family:inherit;
+  cursor:pointer;
+  white-space:nowrap;
+  transition: all .12s;
+}
+.toolbar-filter:hover{
+  border-color:var(--line-strong);
+  background:rgba(255,255,255,0.03);
+  color:var(--t1);
+}
+.toolbar-filter.is-active{
+  background:rgba(255,255,255,0.06);
+  border-color:rgba(255,255,255,0.18);
+  color:var(--t1);
+}
+.toolbar-filter[data-tone="ok"].is-active{
+  background:rgba(16,185,129,0.10);
+  border-color:rgba(16,185,129,0.40);
+  color:#34d39c;
+}
+.toolbar-filter[data-tone="warn"].is-active{
+  background:rgba(245,158,11,0.10);
+  border-color:rgba(245,158,11,0.40);
+  color:#fbbf24;
+}
+.toolbar-filter[data-tone="info"].is-active{
+  background:rgba(56,189,248,0.10);
+  border-color:rgba(56,189,248,0.40);
+  color:#7ed3f7;
+}
+.toolbar-filter-count{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:18px; height:18px; padding:0 5px;
+  background:rgba(255,255,255,0.06);
+  border-radius:9px;
+  font-size:10.5px; font-weight:700;
+  color:var(--t2);
+}
+.toolbar-filter.is-active .toolbar-filter-count{
+  background:rgba(255,255,255,0.14);
+  color:var(--t1);
+}
+.toolbar-filter[data-tone="ok"].is-active .toolbar-filter-count{background:rgba(16,185,129,0.20); color:#34d39c;}
+.toolbar-filter[data-tone="warn"].is-active .toolbar-filter-count{background:rgba(245,158,11,0.22); color:#fbbf24;}
+.toolbar-filter[data-tone="info"].is-active .toolbar-filter-count{background:rgba(56,189,248,0.22); color:#7ed3f7;}
+
+/* Empty state for filtered-down lists */
+.toolbar-empty{
+  padding:32px 24px;
+  text-align:center;
+  color:var(--t3);
+  font-size:13px;
+  border:1px dashed var(--line);
+  border-radius:10px;
+}
+.toolbar-empty strong{color:var(--t2); font-weight:600;}
+
 .ds-hero{
   display:flex; gap:32px; align-items:flex-start; justify-content:space-between;
   padding:28px 32px 24px;
@@ -1258,161 +1532,6 @@ body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(-
 
 
 
-/* ============ INTERACTIVE TOUR ============ */
-/* Backdrop is transparent — it only captures clicks for dismiss.
-   The visible dimming is done by the target's own box-shadow spotlight below. */
-.ds-tour-backdrop{
-  position:fixed;inset:0;z-index:400;
-  background:transparent;
-  display:none;
-}
-.ds-tour-backdrop.is-active{display:block}
-
-/* Spotlight effect: a huge outer box-shadow on the target creates a clear
-   cutout around it while dimming everything else. No blur — the target
-   stays crisp and the eye is forced to it. */
-.ds-tour-target-glow{
-  position:relative;z-index:401 !important;
-  pointer-events:none !important;
-  box-shadow:
-    0 0 0 3px rgba(43,127,255,0.75),     /* solid inner ring */
-    0 0 28px 6px rgba(43,127,255,0.45),  /* glow halo */
-    0 0 0 9999px rgba(4,8,18,0.68) !important;  /* dim everything outside the target */
-  border-radius:10px;
-  transition:box-shadow .35s cubic-bezier(.2,.8,.2,1);
-  animation:dsTourGlowPulse 1.6s ease-in-out infinite;
-}
-@keyframes dsTourGlowPulse{
-  0%,100%{ box-shadow:
-    0 0 0 3px rgba(43,127,255,0.75),
-    0 0 28px 6px rgba(43,127,255,0.45),
-    0 0 0 9999px rgba(4,8,18,0.68); }
-  50%{ box-shadow:
-    0 0 0 4px rgba(43,127,255,0.85),
-    0 0 36px 10px rgba(43,127,255,0.55),
-    0 0 0 9999px rgba(4,8,18,0.68); }
-}
-
-.ds-tour-pop{
-  position:fixed;z-index:402;
-  width:340px;max-width:calc(100vw - 32px);
-  background:#0c1428;
-  border:1px solid rgba(43,127,255,0.45);
-  border-radius:14px;
-  box-shadow:0 24px 60px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(43,127,255,0.15);
-  padding:18px 20px 14px;
-  animation:dsTourPop 280ms cubic-bezier(.2,.8,.2,1);
-}
-@keyframes dsTourPop{
-  from{opacity:0;transform:translateY(6px) scale(.97)}
-  to{opacity:1;transform:translateY(0) scale(1)}
-}
-.ds-tour-pop-h{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:8px;
-  cursor:grab;
-  user-select:none;
-  -webkit-user-select:none;
-}
-.ds-tour-pop-h:active{cursor:grabbing}
-.ds-tour-pop.is-dragging{
-  transition:none !important;
-  cursor:grabbing;
-}
-.ds-tour-pop.is-dragging .ds-tour-pop-h{cursor:grabbing}
-/* Visual hint that the header is a drag handle */
-.ds-tour-pop-h::after{
-  content:'';
-  position:absolute;
-  top:6px;left:50%;transform:translateX(-50%);
-  width:36px;height:3px;border-radius:2px;
-  background:rgba(255,255,255,0.10);
-  transition:background .12s;
-  pointer-events:none;
-}
-.ds-tour-pop-h:hover::after{background:rgba(43,127,255,0.45)}
-.ds-tour-pop-h{position:relative;padding-top:8px}
-.ds-tour-pop-step{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:2px 9px;border-radius:99px;
-  background:rgba(43,127,255,0.12);color:var(--blue);
-  border:1px solid rgba(43,127,255,0.32);
-  font-size:10.5px;font-weight:800;letter-spacing:.04em;
-}
-.ds-tour-pop-close{
-  background:transparent;border:none;cursor:pointer;
-  width:24px;height:24px;border-radius:6px;
-  color:var(--t3);display:flex;align-items:center;justify-content:center;
-  transition:background .12s, color .12s;
-}
-.ds-tour-pop-close:hover{background:var(--hover);color:var(--t1)}
-.ds-tour-pop-title{
-  font-size:15px;font-weight:800;color:var(--t1);letter-spacing:-.01em;
-  margin-bottom:6px;line-height:1.3;
-}
-.ds-tour-pop-body{
-  font-size:12.5px;color:var(--t2);line-height:1.55;
-  margin-bottom:14px;
-}
-.ds-tour-pop-body b{color:var(--t1);font-weight:600}
-.ds-tour-pop-body code{
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
-  background:rgba(43,127,255,0.10);padding:1px 5px;border-radius:4px;color:var(--cyan);
-}
-.ds-tour-pop-f{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;padding-top:10px;border-top:1px solid var(--line);
-}
-.ds-tour-pop-skip{
-  background:transparent;border:none;
-  color:var(--t3);font-family:inherit;font-size:11.5px;font-weight:500;cursor:pointer;
-  padding:4px 6px;border-radius:5px;
-  transition:color .12s;
-}
-.ds-tour-pop-skip:hover{color:var(--t2)}
-.ds-tour-pop-nav{display:flex;align-items:center;gap:8px}
-.ds-tour-pop-back{
-  background:transparent;border:1px solid var(--line-strong);
-  color:var(--t2);font-family:inherit;font-size:11.5px;font-weight:600;
-  padding:5px 11px;border-radius:7px;cursor:pointer;
-  transition:border-color .12s, color .12s;
-}
-.ds-tour-pop-back:hover{border-color:var(--blue);color:var(--blue)}
-.ds-tour-pop-next{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:6px 13px;
-  background:linear-gradient(135deg, #2B7FFF 0%, #1E63CC 100%);
-  color:#fff;border:none;border-radius:7px;
-  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
-  box-shadow:0 4px 12px -4px rgba(43,127,255,0.45);
-  transition:transform .12s, box-shadow .12s;
-}
-.ds-tour-pop-next:hover{transform:translateY(-1px);box-shadow:0 6px 16px -4px rgba(43,127,255,0.55)}
-
-.ds-tour-pop-arrow{
-  position:absolute;width:14px;height:14px;
-  background:#0c1428;
-  border-left:1px solid rgba(43,127,255,0.45);
-  border-top:1px solid rgba(43,127,255,0.45);
-}
-.ds-tour-pop-arrow.top   { top:-8px;    transform:rotate(45deg) }
-.ds-tour-pop-arrow.bottom{ bottom:-8px; transform:rotate(225deg) }
-.ds-tour-pop-arrow.left  { left:-8px;   transform:rotate(-45deg) }
-.ds-tour-pop-arrow.right { right:-8px;  transform:rotate(135deg) }
-
-/* Tour trigger button in the sidebar Demo controls */
-.ssb-demo-tour{
-  display:flex;align-items:center;gap:8px;width:100%;
-  margin-top:6px;padding:8px 10px;
-  background:rgba(43,127,255,0.07);
-  border:1px solid rgba(43,127,255,0.32);
-  border-radius:7px;
-  color:var(--blue);font-family:inherit;font-size:11.5px;font-weight:700;
-  cursor:pointer;
-  transition:background .12s, border-color .12s, transform .12s;
-}
-.ssb-demo-tour:hover{background:rgba(43,127,255,0.14);border-color:rgba(43,127,255,0.55);transform:translateY(-1px)}
-.ssb-demo-tour-ic{flex-shrink:0;color:currentColor}
 
 /* ============ WIZARD MICRO-ANIMATIONS ============ */
 @media (prefers-reduced-motion: no-preference) {
@@ -1864,6 +1983,29 @@ body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(-
 
 
 /* ============ TABLES SURFACE ============ */
+/* ============================================================================
+   .surface — canonical layout container for every studio page.
+   Provides horizontal padding + max-width so content never touches the
+   sidebar or viewport edges. Heroes inside extend to the edges via
+   negative margins for a full-bleed page-header look.
+============================================================================ */
+.surface{
+  padding: 24px 32px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.surface > .hero{
+  margin-left: -32px;
+  margin-right: -32px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+/* Onboarding keeps its own narrower container */
+.surface.tonb-wrap{
+  padding: 24px 20px 48px;
+  max-width: 1100px;
+}
+
 .tbl-wrap{padding:24px 28px;max-width:1280px;margin:0 auto}
 .tbl-h{
   display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
@@ -2105,7 +2247,70 @@ body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(-
 
 /* ============ TABLES — PHASE 1 (split layout + sync panel) ============ */
 
+/* ── Shared stats-strip pattern across DS surfaces ──────────────── */
+.ds-kpi-strip, .tpl-kpi-strip{
+  display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:10px;
+  margin-bottom:14px;
+}
+.ds-kpi, .tpl-kpi{
+  background:linear-gradient(180deg, rgba(255,255,255,0.034), rgba(255,255,255,0.014));
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;padding:12px 14px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.ds-kpi-v, .tpl-kpi-v{font-size:22px;font-weight:700;color:var(--t1);font-variant-numeric:tabular-nums;letter-spacing:-0.01em;}
+.ds-kpi-k, .tpl-kpi-k{font-size:10.5px;font-weight:600;letter-spacing:.08em;color:var(--t3);text-transform:uppercase;}
+.ds-kpi.is-ok{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.28);}
+.ds-kpi.is-ok .ds-kpi-v,.ds-kpi.is-ok .ds-kpi-k{color:#34d39c;}
+.ds-kpi.is-warn{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.34);}
+.ds-kpi.is-warn .ds-kpi-v,.ds-kpi.is-warn .ds-kpi-k{color:#fbbf24;}
+.tpl-kpi.is-applied{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.28);}
+.tpl-kpi.is-applied .tpl-kpi-v,.tpl-kpi.is-applied .tpl-kpi-k{color:#34d39c;}
+.tpl-kpi.is-custom{background:rgba(56,189,248,0.08);border-color:rgba(56,189,248,0.28);}
+.tpl-kpi.is-custom .tpl-kpi-v,.tpl-kpi.is-custom .tpl-kpi-k{color:#7ed3f7;}
+.tpl-kpi.is-unapplied{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.34);}
+.tpl-kpi.is-unapplied .tpl-kpi-v,.tpl-kpi.is-unapplied .tpl-kpi-k{color:#fbbf24;}
+
 /* Library polish */
+/* Stats strip — informational, read-only KPIs */
+.tbl-kpi-strip{
+  display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:10px;
+  margin-bottom:14px;
+}
+.tbl-kpi{
+  background:linear-gradient(180deg, rgba(255,255,255,0.034), rgba(255,255,255,0.014));
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;padding:12px 14px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.tbl-kpi-v{font-size:22px;font-weight:700;color:var(--t1);font-variant-numeric:tabular-nums;letter-spacing:-0.01em;}
+.tbl-kpi-k{font-size:10.5px;font-weight:600;letter-spacing:.08em;color:var(--t3);text-transform:uppercase;}
+.tbl-kpi.is-rows{background:rgba(56,189,248,0.08);border-color:rgba(56,189,248,0.28);}
+.tbl-kpi.is-rows .tbl-kpi-v,.tbl-kpi.is-rows .tbl-kpi-k{color:#7ed3f7;}
+.tbl-kpi.is-errors{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.32);}
+.tbl-kpi.is-errors .tbl-kpi-v,.tbl-kpi.is-errors .tbl-kpi-k{color:#fca5a5;}
+
+/* "+ New Table" compact CTA in toolbar */
+.tbl-new-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 12px;
+  background:linear-gradient(135deg, rgba(16,185,129,0.22), rgba(16,185,129,0.10));
+  border:1px solid rgba(16,185,129,0.45);
+  border-radius:8px;
+  color:var(--emerald);
+  font-family:inherit;font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;
+  margin-left:auto;
+  transition: all .15s ease;
+}
+.tbl-new-btn:hover{
+  background:linear-gradient(135deg, rgba(16,185,129,0.32), rgba(16,185,129,0.16));
+  border-color:rgba(16,185,129,0.65);
+  transform:translateY(-1px);
+}
+
+.tbl-filter-pills{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+
 .tbl-toolbar{
   display:flex;align-items:center;gap:10px;flex-wrap:wrap;
   margin-bottom:14px;padding:10px 14px;
@@ -2288,6 +2493,70 @@ body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(-
 .tbl-field-flag.f-t {background:rgba(255,255,255,0.06);color:var(--t2);border:1px solid var(--line-strong)}
 .tbl-field-flag.f-u {background:rgba(43,127,255,0.10);color:var(--blue);border:1px solid rgba(43,127,255,0.28)}
 
+
+/* ============ Hero CTA secondary — small status-tinted link button ============ */
+.hero-cta-secondary{
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:8px 12px;
+  font-family:inherit; font-size:12px; font-weight:600;
+  background:rgba(245,158,11,0.08);
+  border:1px solid rgba(245,158,11,0.30);
+  border-radius:8px;
+  color:var(--amber);
+  cursor:pointer; white-space:nowrap;
+  text-decoration:none;
+  transition: all .15s ease;
+}
+.hero-cta-secondary:hover{
+  background:rgba(245,158,11,0.16);
+  border-color:rgba(245,158,11,0.50);
+}
+.hero-cta-secondary-dot{
+  width:6px; height:6px; border-radius:50%;
+  background:var(--amber);
+  box-shadow:0 0 0 2px rgba(245,158,11,0.20);
+  animation: tblErrPulse 1.6s ease-in-out infinite;
+}
+
+/* ============ Spec v2 — STUB banner + canonical name editor ============ */
+.tbl-map-stub-banner{
+  display:flex; align-items:center; gap:12px;
+  margin:0 0 14px;
+  padding:10px 12px;
+  background:rgba(245,158,11,0.06);
+  border:1px solid rgba(245,158,11,0.36);
+  border-left:3px solid var(--amber);
+  border-radius:10px;
+}
+.tbl-map-stub-banner-ic{
+  width:26px; height:26px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; border-radius:6px;
+  background:rgba(245,158,11,0.14); color:var(--amber);
+}
+.tbl-map-stub-banner-l{flex:1; min-width:0;}
+.tbl-map-stub-banner-t{font-size:12.5px; font-weight:700; color:var(--amber); letter-spacing:-0.005em;}
+.tbl-map-stub-banner-d{font-size:11.5px; color:var(--t2); margin-top:2px; line-height:1.45;}
+
+.tbl-map-target-input{
+  width:100%;
+  background:transparent;
+  border:1px solid rgba(16,185,129,0.30);
+  border-radius:6px;
+  padding:5px 8px;
+  font-family:'SF Mono', ui-monospace, monospace;
+  font-size:13px; font-weight:600;
+  color:var(--emerald);
+  outline:none;
+  transition: border-color .12s, background .12s;
+}
+.tbl-map-target-input:focus{
+  border-color:var(--emerald);
+  background:rgba(16,185,129,0.06);
+}
+.tbl-map-target-hint{
+  font-size:10.5px; color:var(--t3); margin-top:4px;
+  font-family:'SF Mono', ui-monospace, monospace;
+}
 /* ============ PHASE A — Canonical Mapping ============ */
 .tbl-map{display:flex;flex-direction:column;gap:14px;padding:14px;}
 .tbl-map-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
@@ -3441,6 +3710,24 @@ body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(-
 .tpl-filter.is-active .tpl-filter-badge{background:rgba(56,189,248,0.26);color:var(--t1);}
 
 /* + New button (uses tbl-btn-new vibe but cyan for Templates) */
+.tpl-new-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 12px;
+  background:linear-gradient(135deg, rgba(56,189,248,0.22), rgba(56,189,248,0.10));
+  border:1px solid rgba(56,189,248,0.45);
+  border-radius:8px;
+  color:#7ed3f7;
+  font-family:inherit;font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;
+  margin-left:auto;
+  transition: all .15s ease;
+}
+.tpl-new-btn:hover{
+  background:linear-gradient(135deg, rgba(56,189,248,0.32), rgba(56,189,248,0.16));
+  border-color:rgba(56,189,248,0.65);
+  transform:translateY(-1px);
+}
+
 .tpl-btn-new{
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 14px;border-radius:9px;
@@ -4504,6 +4791,82 @@ html.theme-light .tonb-exit-leave:hover{
 .tonb-done-stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
 .tonb-done-stat-v{font-size:22px;font-weight:700;color:var(--t1);font-variant-numeric:tabular-nums;}
 .tonb-done-stat-k{font-size:10.5px;font-weight:600;letter-spacing:.08em;color:var(--t3);text-transform:uppercase;}
+
+/* ============ F6 — Done step v2 ============ */
+.tonb-summary{
+  border:1px solid var(--line);border-radius:10px;
+  background:rgba(255,255,255,0.02);
+  overflow:hidden;
+}
+.tonb-summary-h{
+  font-size:10px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;
+  color:var(--t3);
+  padding:10px 14px;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,0.02);
+}
+.tonb-summary-row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:10px 14px;
+  font-size:13px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.tonb-summary-row:last-child{border-bottom:none;}
+.tonb-summary-row-l{color:var(--t3);font-weight:500;}
+.tonb-summary-row-v{color:var(--t1);font-weight:600;text-align:right;display:inline-flex;align-items:center;gap:8px;}
+
+.tonb-summary-row.is-pending{
+  background:rgba(245,158,11,0.04);
+  cursor:pointer;
+}
+.tonb-summary-row.is-pending:hover{background:rgba(245,158,11,0.08);}
+.tonb-summary-row.is-pending .tonb-summary-row-v{color:var(--amber);}
+
+.tonb-summary-next{
+  display:inline-flex;align-items:center;
+  font-size:9px;font-weight:800;letter-spacing:.10em;
+  color:var(--amber);
+  background:rgba(245,158,11,0.14);
+  border:1px solid rgba(245,158,11,0.40);
+  padding:2px 6px;border-radius:5px;
+  margin-right:4px;
+}
+
+.tonb-summary-link{
+  color:var(--cyan);font-weight:600;font-size:11.5px;
+  cursor:pointer;text-decoration:none;
+}
+.tonb-summary-link:hover{text-decoration:underline;}
+
+.tonb-done-primary-cta{
+  display:flex;align-items:center;gap:14px;
+  width:100%;
+  padding:16px 18px;
+  background:linear-gradient(135deg, rgba(16,185,129,0.16), rgba(16,185,129,0.04));
+  border:1px solid rgba(16,185,129,0.45);
+  border-radius:12px;
+  cursor:pointer;
+  transition:.18s;
+  text-align:left;
+}
+.tonb-done-primary-cta:hover{
+  background:linear-gradient(135deg, rgba(16,185,129,0.24), rgba(16,185,129,0.10));
+  border-color:rgba(16,185,129,0.65);
+  transform:translateY(-2px);
+}
+.tonb-done-primary-cta-ic{
+  width:40px;height:40px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(16,185,129,0.22);color:var(--emerald);
+  border-radius:10px;
+}
+.tonb-done-primary-cta-l{flex:1;min-width:0;}
+.tonb-done-primary-cta-t{font-size:15px;font-weight:700;color:var(--emerald);letter-spacing:-.01em;}
+.tonb-done-primary-cta-d{font-size:12px;color:var(--t2);margin-top:3px;line-height:1.5;}
+.tonb-done-primary-cta-d code{font-family:ui-monospace,monospace;color:var(--t1);background:rgba(255,255,255,0.04);padding:1px 5px;border-radius:4px;}
+.tonb-done-primary-cta-arrow{font-size:20px;color:var(--emerald);flex-shrink:0;transition:.18s;}
+.tonb-done-primary-cta:hover .tonb-done-primary-cta-arrow{transform:translateX(2px);}
+
 .tonb-next-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
 .tonb-next-card{
   display:flex;flex-direction:column;gap:8px;
@@ -5248,6 +5611,62 @@ html.theme-light .tonb-exit-leave:hover{
 }
 
 /* KPI strip */
+
+/* ============ FM filter tabs — count + label, color-tinted, click-filters ============ */
+.fm-filtertabs{
+  display:flex; align-items:stretch; gap:4px;
+  border-bottom:1px solid var(--line);
+  margin: 0 0 16px;
+  overflow-x:auto;
+}
+.fm-tab{
+  display:flex; flex-direction:column; align-items:flex-start; gap:2px;
+  min-width:96px;
+  padding: 10px 16px 12px;
+  background:transparent; border:none;
+  border-bottom: 2px solid transparent;
+  color:var(--t2);
+  font-family:inherit;
+  cursor:pointer;
+  transition: all .15s ease;
+  text-align:left;
+  flex-shrink:0;
+}
+.fm-tab:hover{background:rgba(255,255,255,0.025); color:var(--t1);}
+.fm-tab-n{
+  font-size:20px; font-weight:700; line-height:1.1;
+  color:var(--t1);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-0.01em;
+}
+.fm-tab-l{
+  font-size:11px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--t3);
+}
+.fm-tab.is-active{background:rgba(255,255,255,0.02);}
+.fm-tab.is-active .fm-tab-n{font-weight:800;}
+.fm-tab.is-active .fm-tab-l{color:var(--t2);}
+
+/* Color tinting per kind — active state inherits the color */
+.fm-tab[data-kind="ok"].is-active   {border-bottom-color:var(--emerald);}
+.fm-tab[data-kind="ok"].is-active .fm-tab-n   {color:#34d39c;}
+.fm-tab[data-kind="ok"].is-active .fm-tab-l   {color:#34d39c;}
+
+.fm-tab[data-kind="warn"].is-active {border-bottom-color:var(--amber);}
+.fm-tab[data-kind="warn"].is-active .fm-tab-n {color:#fbbf24;}
+.fm-tab[data-kind="warn"].is-active .fm-tab-l {color:#fbbf24;}
+
+.fm-tab[data-kind="idle"].is-active {border-bottom-color:var(--t3);}
+.fm-tab[data-kind="idle"].is-active .fm-tab-n {color:var(--t2);}
+
+.fm-tab[data-kind="default"].is-active   {border-bottom-color:var(--cyan);}
+.fm-tab[data-kind="default"].is-active .fm-tab-n   {color:#7ed3f7;}
+.fm-tab[data-kind="default"].is-active .fm-tab-l   {color:#7ed3f7;}
+
+/* Counts of 0 fade — gentle "nothing here" signal without disabling click */
+.fm-tab .fm-tab-n:not(:empty)[data-zero]{opacity:.5;}
+
 .fm-kpi-strip{
   display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:10px;
   margin-bottom:4px;
@@ -5265,6 +5684,8 @@ html.theme-light .tonb-exit-leave:hover{
 .fm-kpi.is-auto .fm-kpi-v,.fm-kpi.is-auto .fm-kpi-k{color:#34d39c;}
 .fm-kpi.is-review{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.34);}
 .fm-kpi.is-review .fm-kpi-v,.fm-kpi.is-review .fm-kpi-k{color:#fbbf24;}
+.fm-kpi.is-clickable{cursor:pointer;transition:all .15s ease;}
+.fm-kpi.is-clickable:hover{background:rgba(245,158,11,0.16);border-color:rgba(245,158,11,0.55);transform:translateY(-1px);}
 .fm-kpi.is-resolved{background:rgba(56,189,248,0.08);border-color:rgba(56,189,248,0.28);}
 .fm-kpi.is-resolved .fm-kpi-v,.fm-kpi.is-resolved .fm-kpi-k{color:#7ed3f7;}
 .fm-kpi.is-skipped{background:rgba(148,163,184,0.06);border-color:rgba(148,163,184,0.18);}
@@ -5742,6 +6163,15 @@ html.theme-light .notif-bell-dot{border-color:#FFFFFF}
   <aside class="ssb">
     <div class="ssb-scroll">
       <div class="ssb-group">
+        <span class="ssb-grp-label">Model</span>
+        <a class="ssb-item" href="data-studio-models.html" style="text-decoration:none">
+          <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>
+          <span class="ssb-item-label">Models</span>
+          <span style="font-size:11px; color:var(--t3); margin-left:auto">↗</span>
+        </a>
+      </div>
+
+      <div class="ssb-group">
         <span class="ssb-grp-label">Configure</span>
         <button class="ssb-item" data-route="connections" onclick="navigate('connections')">
           <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg></span>
@@ -5804,10 +6234,6 @@ html.theme-light .notif-bell-dot{border-color:#FFFFFF}
           <option value="education">Education</option>
         </select>
       </div>
-      <button class="ssb-demo-tour" onclick="startDsTour()" title="Walk through the onboarding flow">
-        <svg class="ssb-demo-tour-ic" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M5.5 7l2.5 2.5L11 5.5"/></svg>
-        Take the guided tour
-      </button>
       <button class="ssb-demo-btn" onclick="resetOnboarding()" title="Show first time setup">
         <svg class="ssb-demo-btn-ic" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8a6 6 0 0 1 10.5-4M14 8a6 6 0 0 1-10.5 4"/><path d="M12 2v3h-3M4 14v-3h3"/></svg>
         Reset to first time setup
@@ -5863,26 +6289,6 @@ html.theme-light .notif-bell-dot{border-color:#FFFFFF}
   </div>
 </div>
 
-<!-- Interactive tour overlay -->
-<div class="ds-tour-backdrop" id="dsTourBackdrop" onclick="endDsTour()"></div>
-<div class="ds-tour-pop" id="dsTourPop" style="display:none;left:50%;top:50%;transform:translate(-50%,-50%)">
-  <div class="ds-tour-pop-arrow" id="dsTourArrow" style="display:none"></div>
-  <div class="ds-tour-pop-h" onmousedown="dsTourDragStart(event)" ontouchstart="dsTourDragStartTouch(event)">
-    <span class="ds-tour-pop-step" id="dsTourStep">Step 1 of 12</span>
-    <button class="ds-tour-pop-close" onclick="endDsTour()" aria-label="Close tour">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </button>
-  </div>
-  <div class="ds-tour-pop-title" id="dsTourTitle">Welcome to Data Studio</div>
-  <div class="ds-tour-pop-body" id="dsTourBody">A guided tour of the new onboarding flow.</div>
-  <div class="ds-tour-pop-f">
-    <button class="ds-tour-pop-skip" onclick="endDsTour()">Skip tour</button>
-    <div class="ds-tour-pop-nav">
-      <button class="ds-tour-pop-back" id="dsTourBack" onclick="prevDsTour()" style="display:none">&larr; Back</button>
-      <button class="ds-tour-pop-next" id="dsTourNext" onclick="nextDsTour()">Next &rarr;</button>
-    </div>
-  </div>
-</div>
 
 
 
@@ -6464,42 +6870,35 @@ function renderTables() {
         <span class="crumb-current">Tables</span>
       </div>
 
-      <header class="tbl-h">
-        <div class="tbl-h-l">
-          <div class="tbl-h-eyebrow-row" style="margin-bottom:8px">
-            <span class="tbl-h-time">${totalTables} table${totalTables===1?'':'s'} · ${formatRowCount(totalRows)} rows</span>
-          </div>
-          <h1 class="tbl-h-title">All your data tables</h1>
-          <p class="tbl-h-desc">One Table can be fed by multiple connections.</p>
+      <section class="hero">
+        <div class="hero-main">
+          <h1 class="hero-title">All your data tables</h1>
+          <p class="hero-desc">One Table can be fed by multiple connections.</p>
         </div>
-        <div class="tbl-counts">
-          <div class="tbl-count is-ok">
-            <span class="tbl-count-v">${totalTables}</span>
-            <span class="tbl-count-l">Tables</span>
-          </div>
-          <div class="tbl-count is-rows">
-            <span class="tbl-count-v">${formatRowCount(totalRows)}</span>
-            <span class="tbl-count-l">Total rows</span>
-          </div>
-          ${errorCount > 0 ? `<div class="tbl-count is-warn">
-            <span class="tbl-count-v">${errorCount}</span>
-            <span class="tbl-count-l">Errors</span>
-          </div>
-          <button class="tbl-hero-cta" onclick="tblLibSetFilter('errors')" aria-label="Filter to tables with errors">
-            Resolve ${errorCount} error${errorCount===1?'':'s'}
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10M9.5 4.5L13 8l-3.5 3.5"/></svg>
-          </button>` : ''}
-        </div>
-      </header>
+        <aside class="hero-aside">
+          <button class="btn btn-primary" onclick="if(typeof openWizard==='function'){openWizard()}else{location.hash='/connections'}" aria-label="Create a new table by connecting a source">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>
+            New Table
+          </button>
+        </aside>
+      </section>
+
+      <div class="tbl-kpi-strip">
+        <div class="tbl-kpi"><span class="tbl-kpi-v">${totalTables}</span><span class="tbl-kpi-k">Tables</span></div>
+        <div class="tbl-kpi is-rows"><span class="tbl-kpi-v">${formatRowCount(totalRows)}</span><span class="tbl-kpi-k">Total rows</span></div>
+        ${errorCount > 0 ? `<div class="tbl-kpi is-errors"><span class="tbl-kpi-v">${errorCount}</span><span class="tbl-kpi-k">Errors</span></div>` : ''}
+      </div>
 
       <div class="tbl-toolbar">
         <label class="tbl-search">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="M14 14l-3-3"/></svg>
           <input type="text" placeholder="Search tables or sources..." value="${escapeHtml(tblLibFilter.search)}" oninput="tblLibSearchInput(this.value)"/>
         </label>
-        <button class="tbl-filter ${tblLibFilter.filter === 'all' ? 'is-active' : ''}" onclick="tblLibSetFilter('all')">All <span class="tbl-filter-badge">${totalTables}</span></button>
-        ${errorCount > 0 ? `<button class="tbl-filter is-error ${tblLibFilter.filter === 'errors' ? 'is-active' : ''}" onclick="tblLibSetFilter('errors')">Errors <span class="tbl-filter-badge">${errorCount}</span></button>` : ''}
-        ${sourceList.map(s => `<button class="tbl-filter ${tblLibFilter.filter === s.slug ? 'is-active' : ''}" onclick="tblLibSetFilter('${s.slug}')">${escapeHtml(s.name)}</button>`).join('')}
+        <div class="tbl-filter-pills">
+          <button class="tbl-filter ${tblLibFilter.filter === 'all' ? 'is-active' : ''}" onclick="tblLibSetFilter('all')">All <span class="tbl-filter-badge">${totalTables}</span></button>
+          ${errorCount > 0 ? `<button class="tbl-filter is-error ${tblLibFilter.filter === 'errors' ? 'is-active' : ''}" onclick="tblLibSetFilter('errors')">Errors <span class="tbl-filter-badge">${errorCount}</span></button>` : ''}
+          ${sourceList.map(s => `<button class="tbl-filter ${tblLibFilter.filter === s.slug ? 'is-active' : ''}" onclick="tblLibSetFilter('${s.slug}')">${escapeHtml(s.name)}</button>`).join('')}
+        </div>
       </div>
 
       ${filtered.length === 0 ? `
@@ -7571,7 +7970,7 @@ function _doRestoreVersion(tableName, versionId) {
   list.unshift({
     id: 'v_backup_' + Date.now(),
     label: 'Auto-saved before restoring "' + target.label + '"',
-    createdAt: 'just now',
+    createdAt: Date.now(),
     author: 'You',
     snapshot: takeSnapshot(tableName)
   });
@@ -7580,7 +7979,7 @@ function _doRestoreVersion(tableName, versionId) {
   list.unshift({
     id: 'v_restore_' + Date.now(),
     label: 'Restored "' + target.label + '"',
-    createdAt: 'just now',
+    createdAt: Date.now(),
     author: 'You',
     snapshot: takeSnapshot(tableName)
   });
@@ -7872,6 +8271,21 @@ function tblMapRemove(idx) {
   persistFieldOverrides();
   renderTableDetail(ctx.tableName);
 }
+function tblMapSetCanonicalName(value) {
+  const ctx = _tblMappingCurrent(); if (!ctx) return;
+  // Sanitise to snake_case shape: lowercase, replace runs of non-alphanum
+  // with single underscores, trim leading/trailing underscores.
+  const sanitised = String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  ensureFieldOverride(ctx.tableName, tblSelectedFieldName());
+  const ov = getFieldOverride(ctx.tableName, tblSelectedFieldName());
+  ov.canonicalName = sanitised || null;
+  persistFieldOverrides();
+  // Don't re-render — preserve cursor position. Update the hint subtitle if needed.
+}
+
 function tblMapEditParam(idx, key, value) {
   const ctx = _tblMappingCurrent(); if (!ctx) return;
   const ov = getFieldOverride(ctx.tableName, tblSelectedFieldName());
@@ -8019,8 +8433,25 @@ function renderTblMappingTab(t, fields) {
     </div>
   ` : '';
 
+  // Canonical target name — defaults to the field's current displayName;
+  // user can edit to enforce snake_case. Saved to the same override store
+  // as transformations so it persists across sessions.
+  const ovForName = getFieldOverride(t.name, f.name);
+  const canonicalName = (ovForName && ovForName.canonicalName) || displayName;
+
   return `
     <div class="tbl-map">
+      ${hasStub ? `
+      <div class="tbl-map-stub-banner">
+        <span class="tbl-map-stub-banner-ic">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 11h.01"/></svg>
+        </span>
+        <div class="tbl-map-stub-banner-l">
+          <div class="tbl-map-stub-banner-t">This pipeline uses experimental operations</div>
+          <div class="tbl-map-stub-banner-d">Steps marked <span class="tbl-map-stub-chip" style="vertical-align:1px">STUB</span> are provisional. The data team will finalise them in a later release — behavior may change.</div>
+        </div>
+      </div>
+      ` : ''}
       <div class="tbl-map-head">
         <div class="tbl-map-head-l">
           <div class="tbl-map-head-eyebrow">Pipeline</div>
@@ -8050,8 +8481,9 @@ function renderTblMappingTab(t, fields) {
 
         <div class="tbl-map-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v10M3 8l4 4 4-4"/></svg></div>
         <div class="tbl-map-node tbl-map-target">
-          <div class="tbl-map-node-eyebrow">TARGET · canonical</div>
-          <div class="tbl-map-node-name">${escapeHtml(displayName)}</div>
+          <div class="tbl-map-node-eyebrow">TARGET &middot; canonical</div>
+          <input class="tbl-map-target-input" type="text" value="${escapeHtml(canonicalName)}" placeholder="snake_case_field_name" oninput="tblMapSetCanonicalName(this.value)" spellcheck="false" />
+          <div class="tbl-map-target-hint">snake_case · letters, numbers, underscores</div>
         </div>
       </div>
 
@@ -8587,7 +9019,7 @@ function createVersion(tableName, label) {
   tableVersions[tableName].unshift({
     id: 'v_' + Date.now() + '_' + Math.floor(Math.random()*999),
     label: label,
-    createdAt: 'just now',
+    createdAt: Date.now(),
     author: 'You',
     snapshot: takeSnapshot(tableName)
   });
@@ -8606,7 +9038,7 @@ function restoreVersion(tableName, versionId) {
   list.unshift({
     id: 'v_backup_' + Date.now(),
     label: 'Auto-saved before restoring "' + target.label + '"',
-    createdAt: 'just now',
+    createdAt: Date.now(),
     author: 'You',
     snapshot: takeSnapshot(tableName)
   });
@@ -8619,7 +9051,7 @@ function restoreVersion(tableName, versionId) {
   list.unshift({
     id: 'v_restore_' + Date.now(),
     label: 'Restored "' + target.label + '"',
-    createdAt: 'just now',
+    createdAt: Date.now(),
     author: 'You',
     snapshot: takeSnapshot(tableName)
   });
@@ -8662,7 +9094,7 @@ patchFieldOverride = function(tableName, fieldName, patch) {
       && versions[0].id === _lastVersionStamp.versionId) {
     // Merge into the existing top version
     versions[0].label = label;
-    versions[0].createdAt = 'just now';
+    versions[0].createdAt = Date.now();
     versions[0].snapshot = takeSnapshot(tableName);
     persistTableVersions();
     _lastVersionStamp.time = now;
@@ -9403,47 +9835,27 @@ function renderTemplatesLibrary() {
         <span class="crumb-current">Templates</span>
       </div>
 
-      <div class="tpl-page-h-row">
-        <div>
-          <div class="tpl-h-eyebrow-row" style="margin-bottom:8px">
-            ${(function(){
-              const latest = tplLibrary.reduce((a, t) => {
-                const v = (t.versions || [])[0];
-                if (!v) return a;
-                if (!a || (v.createdAt && v.createdAt > a)) return v.createdAt;
-                return a;
-              }, null);
-              return latest ? `<span class="tpl-h-time">Last edit ${escapeHtml(formatTplRelative(latest))}</span>` : '';
-            })()}
-          </div>
-          <h1 class="tpl-h-title">Validation &amp; transformation templates</h1>
-          <p class="tpl-h-sub">Reusable rule packs applied to Table fields — define once, every applied field inherits the rules.</p>
+      <section class="hero">
+        <div class="hero-main">
+          <h1 class="hero-title">Validation &amp; transformation templates</h1>
+          <p class="hero-desc">Reusable rule packs applied to Table fields. Define once, every applied field inherits the rules.</p>
         </div>
-        <div class="tpl-h-stats">
-          <div class="tpl-h-kpi is-primary">
-            <span class="tpl-h-kpi-n">${counts.all}</span>
-            <span class="tpl-h-kpi-l">Packs</span>
-          </div>
-          <div class="tpl-h-kpi is-applied">
-            <span class="tpl-h-kpi-n">${tplLibrary.reduce((sum, t) => sum + (t.appliedTo || []).length, 0)}</span>
-            <span class="tpl-h-kpi-l">Applied</span>
-          </div>
-          <div class="tpl-h-kpi is-custom">
-            <span class="tpl-h-kpi-n">${counts.cloned + counts.custom}</span>
-            <span class="tpl-h-kpi-l">Custom</span>
-          </div>
-          ${(function(){
-            const unapplied = tplLibrary.filter(t => (t.appliedTo || []).length === 0 && t.source !== 'system').length;
-            return unapplied > 0 ? `<div class="tpl-h-kpi is-unapplied">
-              <span class="tpl-h-kpi-n">${unapplied}</span>
-              <span class="tpl-h-kpi-l">Unapplied</span>
-            </div>` : '';
-          })()}
-          <button class="tpl-btn-new" onclick="openTemplateCreate()" style="align-self:stretch;">
+        <aside class="hero-aside">
+          <button class="btn btn-primary" onclick="openTemplateCreate()" aria-label="Create a new template">
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg>
             New template
           </button>
-        </div>
+        </aside>
+      </section>
+
+      <div class="tpl-kpi-strip">
+        <div class="tpl-kpi"><span class="tpl-kpi-v">${counts.all}</span><span class="tpl-kpi-k">Packs</span></div>
+        <div class="tpl-kpi is-applied"><span class="tpl-kpi-v">${tplLibrary.reduce((sum, t) => sum + (t.appliedTo || []).length, 0)}</span><span class="tpl-kpi-k">Applied</span></div>
+        <div class="tpl-kpi is-custom"><span class="tpl-kpi-v">${counts.cloned + counts.custom}</span><span class="tpl-kpi-k">Custom</span></div>
+        ${(function(){
+          const unapplied = tplLibrary.filter(t => (t.appliedTo || []).length === 0 && t.source !== 'system').length;
+          return unapplied > 0 ? `<div class="tpl-kpi is-unapplied"><span class="tpl-kpi-v">${unapplied}</span><span class="tpl-kpi-k">Unapplied</span></div>` : '';
+        })()}
       </div>
 
       <div class="tpl-lib-toolbar">
@@ -12305,9 +12717,11 @@ function _validateStep(stepId) {
   if (stepId === 'org') {
     const o = tonbState.org;
     if (!o.name || o.name.trim().length < 2) e.orgName = 'Required.';
-    if (!o.primaryCategory) e.orgCategory = 'Pick one.';
+    // Render binds to o.industry, not o.primaryCategory. Validator must match.
+    if (!o.industry) e.orgIndustry = 'Pick one.';
     if (!o.size) e.orgSize = 'Pick one.';
     if (!o.contactName || o.contactName.trim().length < 2) e.contactName = 'Required.';
+    if (!o.contactRole) e.contactRole = 'Pick one.';
     if (!o.contactEmail || !/^\S+@\S+$/.test(o.contactEmail.trim())) e.contactEmail = 'Need a valid email.';
   } else if (stepId === 'template') {
     if (!tonbState.template.source) e.template = 'Pick a composite template.';
@@ -12317,7 +12731,9 @@ function _validateStep(stepId) {
     const w = tonbState.siteProfile;
     if (!w.name || w.name.trim().length < 2) e.siteName = 'Required.';
     if (!w.primaryCategory) e.siteCategory = 'Pick one.';
-    if (!w.sourceSystemId) e.sourceSystemId = 'Required. This is the site’s ID in your source system.';
+    // sourceSystemId is no longer required here. The Connect Data wizard
+    // (step 6) auto-detects this from the source system's API after auth.
+    // Users who already know it can still fill it manually.
     if (!w.primaryContact || w.primaryContact.trim().length < 2) e.primaryContact = 'Required.';
     if (!w.contactEmail || !/^\S+@\S+$/.test(w.contactEmail.trim())) e.contactEmailSite = 'Need a valid email.';
   }
@@ -12335,7 +12751,11 @@ function updateTonbOrg(field, value) {
   _updatePrimaryBtnEnabled();
 }
 function selectTonbStarter(id) {
-  tonbState.starter = id;
+  // F1 v2 rename: state lives in tonbState.template.source (not tonbState.starter).
+  // The validator + _renderDoneStep read template.source. Keep the function name
+  // for backwards-compatibility with the existing click handlers.
+  if (!tonbState.template) tonbState.template = { source: null };
+  tonbState.template.source = id;
   tonbState.errors = {};
   persistTonbState();
   trackTonb('starter_selected', { starter: id });
@@ -12378,7 +12798,18 @@ function _onTonbTagKey(ev) {
 function updateTonbSiteProfile(field, value) {
   if (!tonbState.siteProfile) tonbState.siteProfile = {};
   tonbState.siteProfile[field] = value;
+  // Clear field-level errors as the user types/picks so the error UI doesn't lag.
+  if (tonbState.errors) {
+    const errKeys = { name:'siteName', primaryCategory:'siteCategory', sourceSystemId:'sourceSystemId',
+                      primaryContact:'primaryContact', contactEmail:'contactEmailSite' };
+    const k = errKeys[field];
+    if (k && tonbState.errors[k]) delete tonbState.errors[k];
+  }
   persistTonbState();
+  // Critical: re-evaluate the Continue button so it enables once required
+  // fields are filled. Without this, dropdowns + text inputs both leave the
+  // button stuck in its initial disabled state.
+  _updatePrimaryBtnEnabled();
 }
 /* Back-compat alias — old call sites still work. */
 function updateTonbWorkspace(field, value) {
@@ -12662,7 +13093,8 @@ function _renderOrgStep() {
 }
 
 function _renderTemplateStep() {
-  const cur = tonbState.starter;
+  // F1 v2: state shape is tonbState.template.source.
+  const cur = (tonbState.template && tonbState.template.source) || null;
   const tiles = TONB_STARTERS.map((s, i) => {
     const icon = s.icon === 'shield' ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 1.5L2.5 3.5v4c0 4 2.5 6.5 5.5 7.5 3-1 5.5-3.5 5.5-7.5v-4L8 1.5z" stroke-linejoin="round"/><path d="M5.5 8l2 2 3-3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
               : s.icon === 'gavel' ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 14h10M5 11l5-5M9 4l3 3-2 2-3-3 2-2zM4 9l3 3"/></svg>'
@@ -12827,10 +13259,9 @@ function _renderSiteProfileStep() {
       </div>` : ''}
 
       <div class="tonb-field is-wide">
-        <label class="tonb-field-label">Source system ID<span class="tonb-field-req">*</span></label>
+        <label class="tonb-field-label">Source system ID<span class="tonb-field-opt">(optional)</span></label>
         <input type="text" placeholder="${escapeHtml(sourcePlaceholder)}" value="${escapeHtml(w.sourceSystemId||'')}" oninput="updateTonbSiteProfile('sourceSystemId', this.value)" />
-        <div class="tonb-field-hint">The ${escapeHtml(ind.site.single)}'s identifier in ${escapeHtml(dmsName)}. ${escapeHtml(dmsHint)} <a href="#" onclick="if(typeof toast==='function')toast('Tutorial coming soon');return false;" style="color:#7ed3f7;text-decoration:none">Where do I find this?</a></div>
-        ${errs.sourceSystemId ? `<div class="tonb-field-err">${escapeHtml(errs.sourceSystemId)}</div>` : ''}
+        <div class="tonb-field-hint">If you already know the ${escapeHtml(ind.site.single)}'s ID in ${escapeHtml(dmsName)}, drop it here. Otherwise we'll detect it automatically when you connect the source in the next step.</div>
       </div>
 
       <div class="tonb-field">
@@ -13110,54 +13541,105 @@ toggleTonbApply = function(key, decision) {
 function _renderDoneStep() {
   const o = tonbState.org;
   const w = tonbState.siteProfile;
-  const accepted = Object.values(tonbState.apply).filter(v => v === 'accept').length;
-  const skipped = Object.values(tonbState.apply).filter(v => v === 'skip').length;
-  const starter = TONB_STARTERS.find(s => s.id === tonbState.starter);
-  const grouping = TONB_GROUPING.find(g => g.id === tonbState.grouping.mode);
+  const sitePlural = vocab('site.plural');
+  const siteSingle = vocab('site.single');
+  const isAddSite = tonbState.flow === 'add_site';
 
-  // Mark completed once we land on Done.
+  // Resolve template + peer rules labels from v2 state.
+  // Reuse the TONB_STARTERS catalog as the source of truth for labels.
+  const tplKey = tonbState.template && tonbState.template.source;
+  const tplLabel = (function(){
+    const s = (typeof TONB_STARTERS !== 'undefined') ? TONB_STARTERS.find(x => x.id === tplKey) : null;
+    return s ? s.name : 'Not picked';
+  })();
+  const peerPrimary = (tonbState.peerRules && tonbState.peerRules.primary) || null;
+  const peerSecondary = (tonbState.peerRules && tonbState.peerRules.secondary) || [];
+
+  // Source name from the wizard if launched, else mocked label.
+  const sourceLabel = (typeof obState !== 'undefined' && obState && obState.lastCompleted && obState.lastCompleted.name)
+    ? obState.lastCompleted.name
+    : (tonbState.connect.mocked ? 'Mock data (Salesforce + Stripe + GitHub)' : 'Not connected yet');
+  const sourceObject = (typeof obState !== 'undefined' && obState && obState.lastCompleted && obState.lastCompleted.object) || null;
+  const mappingPending = !!sourceObject; // any real source needs canonical mapping in Data Studio
+
+  // Mark completed once.
   if (!tonbState.completedAt) {
     tonbState.completedAt = Date.now();
     persistTonbState();
     trackTonb('completed', {
       flow: tonbState.flow,
       industry: o.industry, size: o.size,
-      starter: tonbState.starter, grouping: tonbState.grouping.mode,
-      acceptedCount: accepted, skippedCount: skipped,
+      template: tplKey, peerPrimary: peerPrimary,
     });
   }
+
+  // Helper: one summary row, with optional `pending` flag (NEXT badge + amber).
+  const row = (label, value, opts) => {
+    opts = opts || {};
+    const pending = !!opts.pending;
+    const onclick = opts.onclick ? ` onclick="${opts.onclick}"` : '';
+    const cls = pending ? 'tonb-summary-row is-pending' : 'tonb-summary-row';
+    return `<div class="${cls}"${onclick}>
+      <span class="tonb-summary-row-l">${escapeHtml(label)}</span>
+      <span class="tonb-summary-row-v">${pending ? '<span class="tonb-summary-next">NEXT</span>' : ''}${value}</span>
+    </div>`;
+  };
+
+  // Add-site flow has a simpler summary; first_run shows the full setup.
+  const summaryRows = isAddSite
+    ? [
+        row(`${cap(siteSingle)} name`, escapeHtml(w.name || '—')),
+        row('Region',         escapeHtml(w.region || '—')),
+        row('Source system ID', escapeHtml(w.sourceSystemId || '—')),
+        row('Data source',    escapeHtml(sourceLabel)),
+        mappingPending ? row('Account mapping', `Pending  <a class="tonb-summary-link" onclick="event.stopPropagation();tblRailTab='mapping';tblSelectedField=0;location.hash='/tables/${encodeURIComponent(sourceObject)}'">open →</a>`, { pending:true, onclick:`tblRailTab='mapping';tblSelectedField=0;location.hash='/tables/${encodeURIComponent(sourceObject)}'` }) : ''
+      ]
+    : [
+        row('Organization',     escapeHtml(o.name || '—')),
+        row('Industry',         escapeHtml(o.industry || '—')),
+        row('Template',         escapeHtml(tplLabel)),
+        row('Peer comparison',  peerPrimary ? `by <b>${escapeHtml(peerPrimary)}</b>${peerSecondary.length ? ` <span style="color:var(--t3)">+${peerSecondary.length} filters</span>` : ''}` : '—'),
+        row(`First ${siteSingle}`, escapeHtml(w.name || '—')),
+        row('Data source',      escapeHtml(sourceLabel)),
+        mappingPending ? row('Account mapping', `Pending  <a class="tonb-summary-link" onclick="event.stopPropagation();tblRailTab='mapping';tblSelectedField=0;location.hash='/tables/${encodeURIComponent(sourceObject)}'">open →</a>`, { pending:true, onclick:`tblRailTab='mapping';tblSelectedField=0;location.hash='/tables/${encodeURIComponent(sourceObject)}'` }) : ''
+      ];
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
   return `
     <div class="tonb-done-hero">
       <div class="tonb-done-emoji" aria-hidden="true"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke="rgba(16,185,129,0.45)" stroke-width="1.4"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#34d39c" stroke-width="2"/></svg></div>
-      <div class="tonb-done-title">${tonbState.flow === 'add_site' ? 'Workspace ready' : 'Tenant ready'}</div>
-      <div class="tonb-done-sub">${tonbState.flow === 'add_site'
-        ? '<b style="color:var(--t1)">' + escapeHtml(w.name || 'Your workspace') + '</b> is set up. Add another, or jump into Data Studio.'
-        : '<b style="color:var(--t1)">' + escapeHtml(o.name || 'Your organization') + '</b> is configured. ' + (starter ? 'Pre-applied: <b>' + escapeHtml(starter.name) + '</b>. ' : '') + 'You can jump into any Studio now.'}</div>
+      <div class="tonb-done-title">${isAddSite ? `${cap(siteSingle)} added` : 'You&rsquo;re all set'}</div>
+      <div class="tonb-done-sub">${isAddSite
+        ? `<b style="color:var(--t1)">${escapeHtml(w.name || `Your ${siteSingle}`)}</b> is set up. ${mappingPending ? `One thing left: map its source fields to your canonical schema.` : 'You can add another or jump into Data Studio.'}`
+        : `<b style="color:var(--t1)">${escapeHtml(o.name || 'Your organization')}</b> is configured. ${mappingPending ? `One thing left: map your source fields to the canonical schema.` : 'You can jump into any Studio now.'}`}</div>
     </div>
 
-    <div class="tonb-done-stats">
-      <div class="tonb-done-stat"><span class="tonb-done-stat-v">1</span><span class="tonb-done-stat-k">workspace</span></div>
-      <div class="tonb-done-stat"><span class="tonb-done-stat-v">${tonbState.connect.mocked || tonbState.connect.launched ? (tonbState.connect.mocked ? 3 : 1) : 0}</span><span class="tonb-done-stat-k">tables</span></div>
-      <div class="tonb-done-stat"><span class="tonb-done-stat-v" style="color:#34d39c">${accepted}</span><span class="tonb-done-stat-k">templates applied</span></div>
-      <div class="tonb-done-stat"><span class="tonb-done-stat-v">${grouping && grouping.id !== 'flat' ? (tonbState.grouping.tags || []).length : 0}</span><span class="tonb-done-stat-k">groups defined</span></div>
+    <div class="tonb-summary">
+      <div class="tonb-summary-h">Setup summary</div>
+      ${summaryRows.filter(Boolean).join('')}
     </div>
+
+    ${mappingPending ? `
+    <button class="tonb-done-primary-cta" onclick="tblRailTab='mapping';tblSelectedField=0;location.hash='/tables/${encodeURIComponent(sourceObject)}'">
+      <div class="tonb-done-primary-cta-ic">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4l5 0M3 8l3 0M3 12l5 0M13 4l-3 4 3 4"/></svg>
+      </div>
+      <div class="tonb-done-primary-cta-l">
+        <div class="tonb-done-primary-cta-t">Map your fields in Data Studio</div>
+        <div class="tonb-done-primary-cta-d">Open <code>${escapeHtml(sourceObject)}</code> and translate each ${escapeHtml(sourceLabel)} field into your canonical model. Then templates apply automatically.</div>
+      </div>
+      <div class="tonb-done-primary-cta-arrow">→</div>
+    </button>
+    ` : ''}
 
     <div class="tonb-next-grid">
-      <button class="tonb-next-card" onclick="tonbStart('add_site')">
-        <div class="tonb-next-card-h">
-          <span class="tonb-next-card-name">Add another workspace</span>
-          <span class="tonb-next-card-arrow">→</span>
-        </div>
-        <div class="tonb-next-card-desc">4-step flow per workspace. Reuses your tenant setup.</div>
-      </button>
-
       <button class="tonb-next-card" onclick="location.hash='/connections'">
         <div class="tonb-next-card-h">
           <span class="tonb-next-card-name">Open Data Studio</span>
           <span class="tonb-next-card-arrow">→</span>
         </div>
-        <div class="tonb-next-card-desc">See your Connections, Tables, and rule pack Templates.</div>
+        <div class="tonb-next-card-desc">Connections, Tables, Templates, Field mappings, Schema versions.</div>
       </button>
 
       <a class="tonb-next-card" href="settings.html" style="text-decoration:none;color:inherit">
@@ -13165,15 +13647,24 @@ function _renderDoneStep() {
           <span class="tonb-next-card-name">Open Admin Studio</span>
           <span class="tonb-next-card-arrow">→</span>
         </div>
-        <div class="tonb-next-card-desc">Distribution, Ownership, Publish workflow. Where governance lives.</div>
+        <div class="tonb-next-card-desc">Distribution, Ownership, Publish workflow.</div>
       </a>
+
+      ${isAddSite ? '' : `
+      <button class="tonb-next-card" onclick="tonbStart('add_site')">
+        <div class="tonb-next-card-h">
+          <span class="tonb-next-card-name">Add another ${escapeHtml(siteSingle)}</span>
+          <span class="tonb-next-card-arrow">→</span>
+        </div>
+        <div class="tonb-next-card-desc">3-step flow per ${escapeHtml(siteSingle)}. Reuses your tenant setup.</div>
+      </button>`}
 
       <button class="tonb-next-card" disabled title="Coming soon">
         <div class="tonb-next-card-h">
           <span class="tonb-next-card-name">Invite your team</span>
           <span class="tonb-next-card-arrow">→</span>
         </div>
-        <div class="tonb-next-card-desc">Send invites for the contacts and owners you named above.</div>
+        <div class="tonb-next-card-desc">Send invites for the contacts you named above.</div>
       </button>
     </div>
 
@@ -13372,19 +13863,12 @@ function renderFieldMappings() {
         <span class="crumb-current">Field mappings</span>
       </div>
 
-      <div class="fm-page-row">
-        <div>
-          <div class="fm-h-eyebrow-row" style="margin-bottom:8px">
-            <span class="fm-h-time">${counts.all} field${counts.all===1?'':'s'} · ${counts.review} need review</span>
-          </div>
-          <h1 class="fm-h-title">Cross-connection field mappings</h1>
-          <p class="fm-h-sub">Auto-mapped fields go through silently. Custom ones wait here for a decision.</p>
+      <section class="hero">
+        <div class="hero-main">
+          <h1 class="hero-title">Cross-connection field mappings</h1>
+          <p class="hero-desc">Auto-mapped fields go through silently. Custom ones wait here for a decision.</p>
         </div>
-        ${counts.review > 0 ? `<button class="fm-hero-cta" onclick="setFmStatus('review')" aria-label="Filter to fields needing review">
-          Resolve ${counts.review} field${counts.review===1?'':'s'}
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10M9.5 4.5L13 8l-3.5 3.5"/></svg>
-        </button>` : ''}
-      </div>
+      </section>
 
       <div class="fm-kpi-strip">
         <div class="fm-kpi"><span class="fm-kpi-v">${counts.all}</span><span class="fm-kpi-k">Total fields</span></div>
@@ -13695,13 +14179,12 @@ function renderSchemaVersions() {
         <span class="crumb-current">Schema versions</span>
       </div>
 
-      <div>
-        <div class="sv-h-eyebrow-row" style="margin-bottom:8px">
-          <span class="sv-h-time">${timeline.length} version${timeline.length===1?'':'s'} captured</span>
+      <section class="hero">
+        <div class="hero-main">
+          <h1 class="hero-title">Schema change history</h1>
+          <p class="hero-desc">Every edit captures a version.</p>
         </div>
-        <h1 class="sv-h-title">Schema change history</h1>
-        <p class="sv-h-sub">Every edit captures a version. Browse the timeline, then jump to any Table to inspect or restore.</p>
-      </div>
+      </section>
 
       <div class="sv-kpi-strip">
         <div class="sv-kpi"><span class="sv-kpi-v">${timeline.length}</span><span class="sv-kpi-k">Total versions</span></div>
@@ -13809,6 +14292,27 @@ function render() {
 
 /* ====================== CONNECTIONS LIST ====================== */
 
+
+/* ---- Connections toolbar state ---- */
+let dsToolbar = { search: '', filter: 'all' };
+function dsSetSearch(v) {
+  dsToolbar.search = (v || '').toLowerCase().trim();
+  renderConnections();
+  // Re-focus the input + restore cursor position after re-render.
+  setTimeout(() => {
+    const el = document.getElementById('dsSearchInput');
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }, 0);
+}
+function dsClearSearch() {
+  dsToolbar.search = '';
+  renderConnections();
+}
+function dsSetFilter(f) {
+  dsToolbar.filter = f;
+  renderConnections();
+}
+
 function renderConnections() {
   // Defensive: render() should have caught this, but keep the guard.
   if (typeof isOnboardingPending === 'function' && isOnboardingPending()) {
@@ -13833,47 +14337,59 @@ function renderConnections() {
   const availableCount = DS_CATALOG.length;
 
   $('content').innerHTML = `
+    <section class="surface">
     <div class="breadcrumb">
       <span class="crumb-current">Connections</span>
     </div>
 
-    <section class="ds-hero">
-      <div class="ds-hero-left">
-        <div class="ds-hero-eyebrow">
-          <span class="ds-mode-tag">Data Sync</span>
-          <span class="ds-hero-time">Updated just now</span>
-        </div>
-        <h1 class="ds-hero-title">${pending.length > 0 ? `<span style="color:#fbbf24">${pending.length}</span> connection${pending.length===1?'':'s'} need mapping` : 'Every connection is mapped and flowing'}</h1>
-        <p class="ds-hero-desc">Integrations authenticated in <a href="settings.html" style="color:var(--cyan)">Admin Studio</a> with Data Sync enabled. Map their events into your Tables here.</p>
-      </div>
-      <div class="ds-hero-right">
-        <div class="ds-kpi is-ok"><span class="ds-kpi-n">${mapped.length}</span><span class="ds-kpi-l">Mapped</span></div>
-        <div class="ds-kpi ${pending.length > 0 ? 'is-warn' : 'is-idle'}"><span class="ds-kpi-n">${pending.length}</span><span class="ds-kpi-l">Pending</span></div>
-        <div class="ds-kpi is-events"><span class="ds-kpi-n">${totalEvents.toLocaleString()}</span><span class="ds-kpi-l">Events/hr</span></div>
-        <div class="ds-kpi is-idle"><span class="ds-kpi-n">${availableCount}</span><span class="ds-kpi-l">Available</span></div>
-        ${pending.length > 0
-          ? `<button class="ds-hero-cta" onclick="document.querySelector('.ds-grid')?.scrollIntoView({behavior:'smooth',block:'start'})" aria-label="Jump to connections needing mapping">
-              Resolve ${pending.length} mapping${pending.length===1?'':'s'}
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10M9.5 4.5L13 8l-3.5 3.5"/></svg>
-             </button>`
-          : `<a class="ds-hero-cta is-primary" href="settings.html#/integrations" aria-label="Connect a new source in Admin Studio">
-              Connect new source
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10M9.5 4.5L13 8l-3.5 3.5"/></svg>
-             </a>`}
+    <section class="hero">
+      <div class="hero-main">
+        <h1 class="hero-title">Connections</h1>
+        <p class="hero-desc">Connections from <a href="settings.html">Admin Studio</a> with Data Sync enabled. Map their events into your Tables here.</p>
       </div>
     </section>
+
+    <div class="ds-kpi-strip">
+      <div class="ds-kpi"><span class="ds-kpi-v">${list.length}</span><span class="ds-kpi-k">Active</span></div>
+      <div class="ds-kpi is-ok"><span class="ds-kpi-v">${mapped.length}</span><span class="ds-kpi-k">Mapped</span></div>
+      ${pending.length > 0 ? `<div class="ds-kpi is-warn"><span class="ds-kpi-v">${pending.length}</span><span class="ds-kpi-k">Pending</span></div>` : ''}
+    </div>
 
     <div class="ds-section">
       <div class="ds-section-h">
         <div>
           <div class="ds-section-title">Active connections <span style="font-size:11px;font-weight:600;color:var(--t3);margin-left:6px">${list.length}</span></div>
-          <div class="ds-section-sub">Click any connection to review or edit its field mapping</div>
+          <div class="ds-section-sub">${availableCount} more available to connect in Admin Studio</div>
         </div>
         <a class="btn btn-ghost btn-sm" href="settings.html#/integrations">Connect new in Admin Studio ↗</a>
       </div>
 
-      <div class="ds-grid">
-        ${list.map(c => `
+      <div class="toolbar">
+        <label class="toolbar-search">
+          <svg class="toolbar-search-ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+          <input id="dsSearchInput" type="text" placeholder="Search by connection or vendor..." value="${escapeHtml(dsToolbar.search)}" oninput="dsSetSearch(this.value)" />
+          ${dsToolbar.search ? `<button class="toolbar-search-clear" onclick="dsClearSearch()" aria-label="Clear search"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg></button>` : ''}
+        </label>
+        <div class="toolbar-filters">
+          <button class="toolbar-filter ${dsToolbar.filter === 'all' ? 'is-active' : ''}" onclick="dsSetFilter('all')">All <span class="toolbar-filter-count">${list.length}</span></button>
+          <button class="toolbar-filter ${dsToolbar.filter === 'mapped' ? 'is-active' : ''}" data-tone="ok" onclick="dsSetFilter('mapped')">Mapped <span class="toolbar-filter-count">${mapped.length}</span></button>
+          ${pending.length > 0 ? `<button class="toolbar-filter ${dsToolbar.filter === 'pending' ? 'is-active' : ''}" data-tone="warn" onclick="dsSetFilter('pending')">Pending <span class="toolbar-filter-count">${pending.length}</span></button>` : ''}
+        </div>
+      </div>
+
+      ${(function(){
+        const q = dsToolbar.search;
+        const filtered = list.filter(c => {
+          if (dsToolbar.filter === 'mapped' && !c.mapped) return false;
+          if (dsToolbar.filter === 'pending' && c.mapped) return false;
+          if (!q) return true;
+          return (c.name || '').toLowerCase().includes(q) || (c.vendor || '').toLowerCase().includes(q);
+        });
+        if (filtered.length === 0) {
+          const what = q ? `<strong>${escapeHtml(q)}</strong>` : `the <strong>${escapeHtml(dsToolbar.filter)}</strong> filter`;
+          return `<div class="toolbar-empty">No connections match ${what}.${q ? ' <button class="btn btn-ghost btn-sm" onclick="dsClearSearch()" style="margin-left:6px">Clear search</button>' : ''}</div>`;
+        }
+        return `<div class="ds-grid">${filtered.map(c => `
           <div class="ds-card ${c.mapped ? '' : 'is-pending'}" onclick="navigate('connections/${c.slug}')">
             <span class="ds-card-status ${c.mapped ? 'is-mapped' : 'is-pending'}">
               ${c.mapped ? `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1px"><path d="M2 6l3 3 5-7"/></svg>` : `<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:1px"><circle cx="6" cy="6" r="4.5"/><path d="M6 4v2.5M6 8.2h.01"/></svg>`}${c.mapped ? 'Mapped' : 'Needs mapping'}
@@ -13898,8 +14414,8 @@ function renderConnections() {
               ${c.mapped ? 'Review mapping' : 'Finish mapping'} →
             </button>
           </div>
-        `).join('')}
-      </div>
+        `).join('')}</div>`;
+      })()}
     </div>
 
     <div class="ds-section-divider">
@@ -13957,6 +14473,7 @@ function renderConnections() {
         }).join('')}
       </div>
     </div>
+    </section>
   `;
 }
 
@@ -16054,6 +16571,7 @@ function renderOnboardingEmptyState() {
     : 'First time setup &middot; about 5 minutes';
   const lc = obState.lastCompleted;
   $('content').innerHTML = `
+    <section class="surface">
     <div class="breadcrumb"><span class="crumb-current">Connections</span></div>
 
     <section class="ob-empty">
@@ -16094,9 +16612,7 @@ function renderOnboardingEmptyState() {
 
         <div class="ob-empty-visual">
           <div class="ob-empty-visual-orb"></div>
-          <div class="ob-empty-visual-card c1"><span class="v-dot"></span> 4,210 events/hr</div>
-          <div class="ob-empty-visual-card c2"><span class="v-dot"></span> AI mapping &middot; 92%</div>
-          <div class="ob-empty-visual-card c3"><span class="v-dot"></span> 7 categories</div>
+          <div class="ob-empty-visual-card c3"><span class="v-dot"></span> ${(typeof OB_CATEGORIES !== 'undefined' ? OB_CATEGORIES.length : 7)} categories</div>
         </div>
       </div>
     </section>
@@ -16130,6 +16646,7 @@ function renderOnboardingEmptyState() {
         `).join('')}
       </div>
     </div>
+    </section>
   `;
 }
 
@@ -16265,9 +16782,24 @@ const DS_TOUR_STEPS = [
   },
   {
     title: 'Where your data lives — Tables',
-    body: '<b>What it does:</b> each connection produces Tables — structured rows your agents can query. <b>Input:</b> click a Table card to see its schema, sync state, and applied validations. <b>Output:</b> a per-Table inspector with tabs for Sync, Conn, Used by, Versions, and Custom fields.',
+    body: '<b>What it does:</b> each connection produces Tables — structured rows your agents can query. Library cards show health (red pulse + reason chip on errors) and a <b>Used by N</b> rollup of downstream template lines. <b>Input:</b> click a card to see its split layout. <b>Output:</b> a per-Table inspector with 7 tabs: Field, <b>Mapping</b>, Sync, Conn, Used by, Versions, and Custom fields.',
     setup: () => { location.hash = '/tables'; },
     target: '.tbl-grid',
+    scrollToTarget: true
+  },
+  {
+    title: 'Canonical Mapping — the v2 centerpiece',
+    body: '<b>What it does:</b> translates each raw source field into your canonical schema via a visual transformation pipeline. <b>Input:</b> pick a field on the left, then chain operations (trim, lowercase, dictionary lookup, etc.) from a 14-op catalog. <b>Output:</b> Source → Ops → Target visualised end-to-end with a live before/after preview. Experimental ops carry an amber <b>STUB</b> badge so you know what is stable vs. provisional.',
+    setup: () => {
+      const tables = (typeof getAllTables === 'function') ? getAllTables() : [];
+      const first = tables[0];
+      if (first) {
+        tblRailTab = 'mapping';
+        tblSelectedField = 0;
+        location.hash = '/tables/' + encodeURIComponent(first.name);
+      }
+    },
+    target: '.tbl-map',
     scrollToTarget: true
   },
   {
@@ -16293,279 +16825,17 @@ const DS_TOUR_STEPS = [
   },
   {
     title: 'Tenant onboarding — the welcome flow',
-    body: '<b>What it does:</b> the 8-step flow a fresh tenant sees on first run. <b>Phase 1</b> (Welcome \u2192 Organization \u2192 Starter setup \u2192 Workspace grouping) sets up the tenant identity. <b>Phase 2</b> (Workspace profile \u2192 Connect data \u2192 Apply templates) configures the first workspace. <b>Phase 3</b> wraps with a Done summary. <b>Try it:</b> clear <code>aims_ds_tenant_onboarding_v1</code> in localStorage and refresh.',
+    body: '<b>What it does:</b> the 7-step flow a fresh tenant sees on first run. <b>Phase 1 — Tenant</b> (Welcome \u2192 Organization \u2192 Composite template \u2192 Peer comparison rules). <b>Phase 2 — Site</b> (Site profile \u2192 Connect data). <b>Phase 3 — Done</b> (summary with primary CTA <b>Map your fields in Data Studio</b>). Industry vocabulary swaps every term (store / branch / restaurant / plant) based on the picked preset. <b>Try it:</b> clear <code>aims_ds_tenant_onboarding_v1</code> in localStorage and refresh.',
     setup: () => { location.hash = '/onboarding'; },
     target: '.tonb-h-eyebrow',
     scrollToTarget: true
   },
   {
     title: 'That is the flow — and the surfaces around it',
-    body: 'You just walked the data-connection wizard plus the four surfaces that surround it (Tables, Templates, Field mappings, Schema versions) and the tenant onboarding. Use <b>Reset to first time setup</b> in the sidebar to replay from the empty state, or <b>Show errors</b> to see the failure paths. Specs at <code>docs/OnboardingFlow.md</code> and <code>docs/DEMO.md</code>.',
+    body: 'You just walked the data-connection wizard plus the surfaces around it: <b>Tables</b> with the new <b>Canonical Mapping</b> pipeline (14 ops, 8 stable + 6 STUB), <b>Templates</b>, <b>Field mappings</b>, <b>Schema versions</b>, and the 7-step tenant onboarding with industry vocabulary. Health signals (pulsing dots, error banners, <b>Used by N</b>) make data infrastructure status evident at a glance. Use <b>Reset to first time setup</b> in the sidebar to replay from empty, or <b>Show errors</b> to see failure paths. Specs at <code>docs/OnboardingFlow.md</code> and <code>docs/DEMO.md</code>.',
   }
 ];
 
-let dsTourIdx = -1;
-
-function startDsTour() {
-  track('tour_started', { surface: 'data-studio' });
-  dsTourIdx = -1;
-  $('dsTourBackdrop').classList.add('is-active');
-  $('dsTourPop').style.display = 'block';
-  nextDsTour();
-}
-
-function endDsTour() {
-  track('tour_ended', { last_step: dsTourIdx + 1, completed: dsTourIdx >= DS_TOUR_STEPS.length - 1 });
-  dsTourIdx = -1;
-  $('dsTourBackdrop').classList.remove('is-active');
-  $('dsTourPop').style.display = 'none';
-  document.querySelectorAll('.ds-tour-target-glow').forEach(el => el.classList.remove('ds-tour-target-glow'));
-}
-
-function nextDsTour() {
-  if (dsTourIdx < DS_TOUR_STEPS.length - 1) {
-    dsTourIdx += 1;
-    paintDsTour();
-  } else {
-    endDsTour();
-  }
-}
-
-function prevDsTour() {
-  if (dsTourIdx > 0) {
-    dsTourIdx -= 1;
-    paintDsTour();
-  }
-}
-
-function paintDsTour() {
-  const step = DS_TOUR_STEPS[dsTourIdx];
-  if (!step) return endDsTour();
-
-  // Run any setup action for this step (may re-render the page)
-  if (typeof step.setup === 'function') {
-    try { step.setup(); } catch (e) { /* ignore */ }
-  }
-
-  // Update popover content
-  $('dsTourStep').textContent = 'Step ' + (dsTourIdx + 1) + ' of ' + DS_TOUR_STEPS.length;
-  $('dsTourTitle').textContent = step.title;
-  $('dsTourBody').innerHTML = step.body || '';
-  $('dsTourBack').style.display = dsTourIdx === 0 ? 'none' : 'inline-flex';
-  $('dsTourNext').textContent = (dsTourIdx === DS_TOUR_STEPS.length - 1) ? 'Done' : 'Next →';
-
-  // Clear previous glow + position popover
-  document.querySelectorAll('.ds-tour-target-glow').forEach(el => el.classList.remove('ds-tour-target-glow'));
-
-  // Defer positioning so DOM updates from setup() have a chance to paint
-  setTimeout(() => positionDsTour(step), 60);
-}
-
-function positionDsTour(step) {
-  const pop = $('dsTourPop');
-  const arrow = $('dsTourArrow');
-  pop.style.transition = 'top .25s, left .25s, transform .25s';
-
-  // If no target, center the popover
-  if (!step.target) {
-    pop.style.left = '50%';
-    pop.style.top = '50%';
-    pop.style.transform = 'translate(-50%, -50%)';
-    arrow.style.display = 'none';
-    return;
-  }
-
-  // Find the target element
-  let target = null;
-  if (step.targetFirst) {
-    // Comma-separated selectors, pick the first that matches
-    const selectors = step.target.split(',').map(s => s.trim());
-    for (const sel of selectors) {
-      target = document.querySelector(sel);
-      if (target) break;
-    }
-  } else {
-    target = document.querySelector(step.target);
-  }
-
-  if (!target) {
-    // Element not visible — center the popover
-    pop.style.left = '50%';
-    pop.style.top = '50%';
-    pop.style.transform = 'translate(-50%, -50%)';
-    arrow.style.display = 'none';
-    return;
-  }
-
-  // Scroll into view if requested
-  if (step.scrollToTarget) {
-    target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
-
-  // Apply glow class
-  target.classList.add('ds-tour-target-glow');
-  if (step.pulse) {
-    // Already has glow; could add a pulse animation but keeping it simple
-  }
-
-  // Position popover near the target
-  const rect = target.getBoundingClientRect();
-  const popW = pop.offsetWidth || 340;
-  const popH = pop.offsetHeight || 200;
-  const margin = 16;
-
-  // Prefer below target; fallback to above; fallback to right; fallback to centered
-  const spaceBelow = window.innerHeight - rect.bottom;
-  const spaceAbove = rect.top;
-  const spaceRight = window.innerWidth - rect.right;
-
-  let top, left, arrowSide = 'top';
-
-  if (spaceBelow >= popH + margin) {
-    top = rect.bottom + margin;
-    left = Math.max(margin, Math.min(window.innerWidth - popW - margin, rect.left + rect.width / 2 - popW / 2));
-    arrowSide = 'top';
-  } else if (spaceAbove >= popH + margin) {
-    top = rect.top - popH - margin;
-    left = Math.max(margin, Math.min(window.innerWidth - popW - margin, rect.left + rect.width / 2 - popW / 2));
-    arrowSide = 'bottom';
-  } else if (spaceRight >= popW + margin) {
-    top = Math.max(margin, Math.min(window.innerHeight - popH - margin, rect.top + rect.height / 2 - popH / 2));
-    left = rect.right + margin;
-    arrowSide = 'left';
-  } else {
-    top = (window.innerHeight - popH) / 2;
-    left = (window.innerWidth - popW) / 2;
-    arrowSide = 'none';
-  }
-
-  pop.style.left = left + 'px';
-  pop.style.top = top + 'px';
-  pop.style.transform = 'none';
-
-  // Position arrow
-  if (arrowSide === 'none') {
-    arrow.style.display = 'none';
-  } else {
-    arrow.style.display = 'block';
-    arrow.className = 'ds-tour-pop-arrow ' + arrowSide;
-    if (arrowSide === 'top' || arrowSide === 'bottom') {
-      const arrowLeft = Math.max(20, Math.min(popW - 28, rect.left + rect.width / 2 - left - 7));
-      arrow.style.left = arrowLeft + 'px';
-      arrow.style.right = 'auto';
-      arrow.style.top = arrowSide === 'top' ? '-8px' : 'auto';
-      arrow.style.bottom = arrowSide === 'bottom' ? '-8px' : 'auto';
-    } else if (arrowSide === 'left' || arrowSide === 'right') {
-      const arrowTop = Math.max(20, Math.min(popH - 28, rect.top + rect.height / 2 - top - 7));
-      arrow.style.top = arrowTop + 'px';
-      arrow.style.bottom = 'auto';
-      arrow.style.left = arrowSide === 'left' ? '-8px' : 'auto';
-      arrow.style.right = arrowSide === 'right' ? '-8px' : 'auto';
-    }
-  }
-}
-
-// Keep popover positioned on window resize
-window.addEventListener('resize', () => {
-  if (dsTourIdx >= 0) {
-    const step = DS_TOUR_STEPS[dsTourIdx];
-    if (step) positionDsTour(step);
-  }
-});
-
-/* ============ TOUR POPOVER DRAG ============ */
-let _dsTourDrag = null;
-
-function dsTourDragStart(e) {
-  // Don't start drag if the click landed on an interactive element (buttons, etc.)
-  if (e.target.closest('button, a, input, select, textarea')) return;
-  const pop = document.getElementById('dsTourPop');
-  if (!pop) return;
-  const rect = pop.getBoundingClientRect();
-  _dsTourDrag = { startX: e.clientX, startY: e.clientY, popX: rect.left, popY: rect.top };
-  // Pin the popover to its current pixel position so the drag math is consistent.
-  pop.style.left = rect.left + 'px';
-  pop.style.top = rect.top + 'px';
-  pop.style.transform = 'none';
-  pop.classList.add('is-dragging');
-  document.addEventListener('mousemove', dsTourDragMove);
-  document.addEventListener('mouseup', dsTourDragEnd);
-  e.preventDefault();
-}
-
-function dsTourDragMove(e) {
-  if (!_dsTourDrag) return;
-  const pop = document.getElementById('dsTourPop');
-  const dx = e.clientX - _dsTourDrag.startX;
-  const dy = e.clientY - _dsTourDrag.startY;
-  let nextLeft = _dsTourDrag.popX + dx;
-  let nextTop  = _dsTourDrag.popY + dy;
-  // Clamp inside the viewport with an 8px margin
-  const popW = pop.offsetWidth;
-  const popH = pop.offsetHeight;
-  nextLeft = Math.max(8, Math.min(window.innerWidth - popW - 8, nextLeft));
-  nextTop  = Math.max(8, Math.min(window.innerHeight - popH - 8, nextTop));
-  pop.style.left = nextLeft + 'px';
-  pop.style.top  = nextTop + 'px';
-  // Hide the arrow once moved — it no longer points to the target
-  const arrow = document.getElementById('dsTourArrow');
-  if (arrow) arrow.style.display = 'none';
-}
-
-function dsTourDragEnd() {
-  if (!_dsTourDrag) return;
-  _dsTourDrag = null;
-  const pop = document.getElementById('dsTourPop');
-  if (pop) pop.classList.remove('is-dragging');
-  document.removeEventListener('mousemove', dsTourDragMove);
-  document.removeEventListener('mouseup', dsTourDragEnd);
-}
-
-/* Touch variants */
-function dsTourDragStartTouch(e) {
-  if (e.target.closest('button, a, input, select, textarea')) return;
-  if (!e.touches || !e.touches[0]) return;
-  const t = e.touches[0];
-  const pop = document.getElementById('dsTourPop');
-  if (!pop) return;
-  const rect = pop.getBoundingClientRect();
-  _dsTourDrag = { startX: t.clientX, startY: t.clientY, popX: rect.left, popY: rect.top };
-  pop.style.left = rect.left + 'px';
-  pop.style.top = rect.top + 'px';
-  pop.style.transform = 'none';
-  pop.classList.add('is-dragging');
-  document.addEventListener('touchmove', dsTourDragMoveTouch, { passive: false });
-  document.addEventListener('touchend', dsTourDragEndTouch);
-  e.preventDefault();
-}
-
-function dsTourDragMoveTouch(e) {
-  if (!_dsTourDrag || !e.touches || !e.touches[0]) return;
-  const t = e.touches[0];
-  const pop = document.getElementById('dsTourPop');
-  const dx = t.clientX - _dsTourDrag.startX;
-  const dy = t.clientY - _dsTourDrag.startY;
-  let nextLeft = _dsTourDrag.popX + dx;
-  let nextTop  = _dsTourDrag.popY + dy;
-  const popW = pop.offsetWidth;
-  const popH = pop.offsetHeight;
-  nextLeft = Math.max(8, Math.min(window.innerWidth - popW - 8, nextLeft));
-  nextTop  = Math.max(8, Math.min(window.innerHeight - popH - 8, nextTop));
-  pop.style.left = nextLeft + 'px';
-  pop.style.top  = nextTop + 'px';
-  const arrow = document.getElementById('dsTourArrow');
-  if (arrow) arrow.style.display = 'none';
-  e.preventDefault();
-}
-
-function dsTourDragEndTouch() {
-  if (!_dsTourDrag) return;
-  _dsTourDrag = null;
-  const pop = document.getElementById('dsTourPop');
-  if (pop) pop.classList.remove('is-dragging');
-  document.removeEventListener('touchmove', dsTourDragMoveTouch);
-  document.removeEventListener('touchend', dsTourDragEndTouch);
-}
 
 
 /* ====================== BOOT ====================== */
@@ -16597,6 +16867,283 @@ function toggleTheme() {
     <!-- Body injected by openTplModal() -->
   </div>
 </div>
+
+<!-- ===== AIMS-OS Demo WalkMe (guided tour) ===== -->
+<style>
+/* Floating trigger (bottom-left; label swaps Demo <-> Continue) */
+.tour-trigger{
+  position:fixed; bottom:18px; left:18px; z-index:80;
+  display:inline-flex; align-items:center; gap:0; padding:0; height:38px; width:38px;
+  border-radius:9999px; background:linear-gradient(135deg,#06B6D4 0%,#A78BFA 100%);
+  color:#fff; border:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600;
+  white-space:nowrap; overflow:hidden;
+  box-shadow:0 8px 24px rgba(6,182,212,.36), 0 2px 8px rgba(0,0,0,.28);
+  transition:width .22s cubic-bezier(.18,.84,.34,1.1), gap .22s, padding .22s, transform .15s, box-shadow .15s;
+}
+.tour-trigger:hover, .tour-trigger:focus-visible{
+  width:112px; gap:6px; padding:0 16px 0 12px; transform:translateY(-2px);
+  box-shadow:0 14px 32px rgba(6,182,212,.50), 0 4px 12px rgba(0,0,0,.36); outline:none;
+}
+.tour-trigger svg{flex-shrink:0; margin-left:1px}
+.tour-trigger-pulse{position:absolute; inset:0; border-radius:inherit; border:2px solid rgba(6,182,212,.6); animation:tourPulse 2s ease-out infinite; pointer-events:none}
+.tour-trigger.seen .tour-trigger-pulse{display:none}
+.tour-trigger.tour-active{display:none}
+@keyframes tourPulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+@media (max-width:520px){.tour-trigger{bottom:14px; left:14px}}
+
+/* Interactive mask = 4 dim strips around the target (leaves a clickable hole) */
+.tour-mask{position:fixed; z-index:9000; background:rgba(4,8,18,.55); pointer-events:auto; display:none}
+.tour-mask.active{display:block}
+html.theme-light .tour-mask{background:rgba(15,23,42,.32)}
+
+/* Spotlight ring — sits over the hole, never blocks clicks */
+.tour-spotlight{
+  position:fixed; z-index:9001; pointer-events:none; border-radius:14px; border:2px solid var(--cyan,#06B6D4);
+  box-shadow:0 0 0 4px rgba(6,182,212,.18), 0 0 32px rgba(6,182,212,.55), 0 0 64px rgba(6,182,212,.25);
+  background:transparent; transition:all .28s cubic-bezier(.4,0,.2,1); opacity:0;
+}
+.tour-spotlight.active{opacity:1; animation:tourSpotlightPulse 2s ease-in-out infinite}
+@keyframes tourSpotlightPulse{
+  0%,100%{box-shadow:0 0 0 4px rgba(6,182,212,.18), 0 0 32px rgba(6,182,212,.55), 0 0 64px rgba(6,182,212,.25)}
+  50%{box-shadow:0 0 0 6px rgba(6,182,212,.28), 0 0 48px rgba(6,182,212,.70), 0 0 96px rgba(6,182,212,.35)}
+}
+html.theme-light .tour-spotlight{border-color:var(--accent,#2B7FFF); box-shadow:0 0 0 4px rgba(43,127,255,.18), 0 0 32px rgba(43,127,255,.50), 0 0 64px rgba(43,127,255,.20)}
+
+/* Popover */
+.tour-popover{
+  position:fixed; z-index:9002; width:360px; max-width:calc(100vw - 32px);
+  background:linear-gradient(180deg, rgba(20,28,48,.98) 0%, rgba(13,19,35,.98) 100%);
+  border:1px solid var(--line-strong,rgba(255,255,255,.14)); border-radius:var(--r12,12px); backdrop-filter:blur(24px) saturate(1.8);
+  box-shadow:0 16px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04); padding:18px 20px;
+  opacity:0; transform:scale(.96) translateY(4px); pointer-events:none;
+  transition:opacity .2s ease-out, transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.tour-popover.active{opacity:1; transform:scale(1) translateY(0); pointer-events:auto}
+html.theme-light .tour-popover{background:linear-gradient(180deg,#FFF 0%,#FAFBFC 100%); box-shadow:0 16px 48px rgba(15,23,42,.18), 0 0 0 1px rgba(15,23,42,.04)}
+/* Responsive: dock as a bottom sheet on narrow screens */
+.tour-popover.is-sheet{left:8px !important; right:8px; top:auto !important; bottom:8px; width:auto; max-width:none}
+.tour-popover-header{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+.tour-popover-step{font-size:10.5px; font-weight:700; letter-spacing:.10em; text-transform:uppercase; color:var(--cyan,#06B6D4); padding:2px 8px; border-radius:10px; background:rgba(6,182,212,.10); border:1px solid rgba(6,182,212,.25)}
+.tour-popover-restart{background:transparent; border:none; cursor:pointer; color:var(--t3,rgba(255,255,255,.38)); font-size:11px; padding:4px 6px; border-radius:5px; font-family:inherit}
+.tour-popover-restart:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
+.tour-popover-skip{margin-left:auto; background:transparent; border:none; cursor:pointer; color:var(--t3,rgba(255,255,255,.38)); font-size:11px; padding:4px 8px; border-radius:5px; font-family:inherit}
+.tour-popover-skip:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
+.tour-popover-title{font-size:16px; font-weight:700; color:var(--t1,rgba(255,255,255,.92)); line-height:1.3; margin-bottom:8px}
+.tour-popover-body{font-size:13px; line-height:1.6; color:var(--t2,rgba(255,255,255,.60)); margin-bottom:16px}
+.tour-popover-body strong,.tour-popover-body b{color:var(--t1,rgba(255,255,255,.92)); font-weight:600}
+.tour-popover-body code{font-family:'SF Mono',Menlo,monospace; font-size:12px; background:rgba(6,182,212,.10); color:var(--cyan,#06B6D4); padding:1.5px 5px; border-radius:4px}
+.tour-popover-footer{display:flex; align-items:center; gap:10px; padding-top:12px; border-top:1px solid var(--line,rgba(255,255,255,.10))}
+.tour-progress{display:inline-flex; gap:4px; flex:1}
+.tour-progress-dot{width:6px; height:6px; border-radius:50%; background:var(--hover-strong,rgba(255,255,255,.08)); transition:background .15s, transform .15s}
+.tour-progress-dot.current{background:var(--cyan,#06B6D4); transform:scale(1.4)}
+.tour-progress-dot.done{background:rgba(6,182,212,.45)}
+.tour-btn{padding:7px 14px; font-size:12.5px; font-weight:600; border-radius:var(--r6,6px); cursor:pointer; border:none; font-family:inherit; transition:.14s}
+.tour-btn-prev{background:transparent; color:var(--t2,rgba(255,255,255,.60)); border:1px solid var(--line,rgba(255,255,255,.10))}
+.tour-btn-prev:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
+.tour-btn-next{background:linear-gradient(135deg,#06B6D4 0%,#155DFC 100%); color:#fff; box-shadow:0 2px 8px rgba(6,182,212,.30)}
+.tour-btn-next:hover{transform:translateY(-1px)}
+
+/* Visually-hidden live region (screen-reader step announcements) */
+.tour-sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+
+/* Accessibility: honor reduced-motion */
+@media (prefers-reduced-motion: reduce){
+  .tour-spotlight, .tour-spotlight.active{animation:none; transition:none}
+  .tour-popover{transition:none; transform:none}
+  .tour-trigger-pulse{display:none}
+}
+</style>
+
+
+
+<button class="tour-trigger" id="tourTrigger" onclick="startTour()" aria-label="Start product demo">
+  <span class="tour-trigger-pulse"></span>
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2l11 6-11 6V2z" fill="currentColor"/></svg>
+  <span class="tour-trigger-label">Demo</span>
+</button>
+<div class="tour-mask" id="tourMaskT"></div>
+<div class="tour-mask" id="tourMaskR"></div>
+<div class="tour-mask" id="tourMaskB"></div>
+<div class="tour-mask" id="tourMaskL"></div>
+<div class="tour-spotlight" id="tourSpotlight"></div>
+<div class="tour-popover" id="tourPopover" role="dialog" aria-modal="true" aria-labelledby="tourTitle"></div>
+<div class="tour-sr-only" id="tourLive" aria-live="polite" aria-atomic="true"></div>
+
+
+
+<script>
+/* --- Author these for THIS surface. target = real selector; route = real hash. --- */
+const TOUR_STEPS = DS_TOUR_STEPS;
+
+const TOUR_LS_STEP = 'aims-tour-step';   // resume pointer
+const TOUR_LS_DONE = 'aims-tour-seen';   // completed once
+let tourState = { active:false, stepIndex:0 };
+let _tourLastFocus = null;
+
+function _tourSave(){ try{ localStorage.setItem(TOUR_LS_STEP, String(tourState.stepIndex)); }catch(e){} }
+function _tourClearProgress(){ try{ localStorage.removeItem(TOUR_LS_STEP); localStorage.setItem(TOUR_LS_DONE,'1'); }catch(e){} }
+
+function startTour(){                 // resume where left off, else step 1
+  let i = 0;
+  try{ const s = localStorage.getItem(TOUR_LS_STEP); if (s!=null && +s>0 && +s<TOUR_STEPS.length) i = +s; }catch(e){}
+  startTourAt(i);
+}
+function restartTour(){ startTourAt(0); }
+function startTourAt(i){
+  tourState = { active:true, stepIndex: Math.max(0, Math.min(i|0, TOUR_STEPS.length-1)) };
+  _tourLastFocus = document.activeElement;
+  const t = document.getElementById('tourTrigger'); if (t) t.classList.add('tour-active');
+  paintTourStep();
+}
+function endTour(finished){
+  tourState.active = false;
+  const t = document.getElementById('tourTrigger'); if (t){ t.classList.remove('tour-active'); t.classList.add('seen'); }
+  ['tourMaskT','tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.remove('active'); });
+  const sp=document.getElementById('tourSpotlight'); if(sp) sp.classList.remove('active');
+  const po=document.getElementById('tourPopover'); if(po) po.classList.remove('active');
+  finished ? _tourClearProgress() : _tourSave();
+  const sw=document.getElementById('studioSwitcher'); if(sw){ sw.classList.remove('open'); sw.setAttribute('aria-hidden','true'); }
+  _tourRefreshTriggerLabel();
+  if (_tourLastFocus && _tourLastFocus.focus){ try{ _tourLastFocus.focus(); }catch(e){} }
+}
+function tourNext(){ if (tourState.stepIndex>=TOUR_STEPS.length-1){ endTour(true); return; } tourState.stepIndex++; _tourSave(); paintTourStep(); }
+function tourPrev(){ if (tourState.stepIndex<=0) return; tourState.stepIndex--; _tourSave(); paintTourStep(); }
+
+function paintTourStep(){
+  if (!tourState.active) return;
+  const step = TOUR_STEPS[tourState.stepIndex];
+  const isFirst = tourState.stepIndex===0, isLast = tourState.stepIndex===TOUR_STEPS.length-1;
+
+  /* Optional per-step setup() — drive app state (open a wizard, seed data, navigate) before painting */
+  if (typeof step.setup === 'function') { try { step.setup(); } catch(e){} }
+
+  /* --- Orchestration hooks (all guarded — drop the ones this surface lacks) --- */
+  if (step.mode && typeof state==='object' && state.mode!==step.mode){
+    state.mode=step.mode; try{ localStorage.setItem('aims_mode',step.mode); }catch(e){}
+    document.documentElement.classList.toggle('mode-operate', step.mode==='operate');
+    if (typeof paintModeToggle==='function') paintModeToggle();
+  }
+  if (step.persona && typeof state==='object' && state.persona!==step.persona){
+    state.persona=step.persona; try{ localStorage.setItem('aims_persona',step.persona); }catch(e){}
+    if (typeof paintPersonaPill==='function') paintPersonaPill();
+  }
+  const sw=document.getElementById('studioSwitcher');
+  if (sw){ if (step.openSwitcher){ sw.classList.add('open'); sw.setAttribute('aria-hidden','false'); }
+           else if (sw.classList.contains('open')){ sw.classList.remove('open'); sw.setAttribute('aria-hidden','true'); } }
+  if (step.route && location.hash!==step.route){ location.hash=step.route; }
+  else if (step.route && step.mode && typeof route==='function'){ route(); }
+  if (step.detailTab && typeof setDetailTab==='function'){
+    setTimeout(()=>{ const slug=location.hash.split('/')[2]; if (slug) setDetailTab(slug, step.detailTab); }, 100);
+  }
+
+  setTimeout(()=>{
+    const popover=document.getElementById('tourPopover'), spotlight=document.getElementById('tourSpotlight');
+    popover.innerHTML = `
+      <div class="tour-popover-header">
+        <span class="tour-popover-step">Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}</span>
+        ${!isFirst ? `<button class="tour-popover-restart" onclick="restartTour()">Restart</button>` : ''}
+        <button class="tour-popover-skip" onclick="endTour(false)">Skip tour</button>
+      </div>
+      <div class="tour-popover-title" id="tourTitle">${step.title}</div>
+      <div class="tour-popover-body">${step.body}</div>
+      <div class="tour-popover-footer">
+        <div class="tour-progress">${TOUR_STEPS.map((_,i)=>`<div class="tour-progress-dot ${i===tourState.stepIndex?'current':i<tourState.stepIndex?'done':''}"></div>`).join('')}</div>
+        ${!isFirst ? `<button class="tour-btn tour-btn-prev" onclick="tourPrev()">← Back</button>` : ''}
+        <button class="tour-btn tour-btn-next" onclick="${isLast?'endTour(true)':'tourNext()'}">${isLast?'Finish':'Next →'}</button>
+      </div>`;
+
+    const targetEl = step.target ? document.querySelector(step.target) : null;
+    if (targetEl){
+      if (step.scrollToTarget){
+        const sc=document.querySelector('.content'); const r=targetEl.getBoundingClientRect();
+        if (sc){ sc.scrollBy({ top:r.top - sc.getBoundingClientRect().top - 80, behavior:'smooth' }); }
+        else { targetEl.scrollIntoView({ behavior:'smooth', block:'start' }); }
+      }
+      const place = ()=>{ _tourPlace(targetEl.getBoundingClientRect(), popover, spotlight); };
+      setTimeout(place, step.scrollToTarget ? 700 : 50);
+      if (step.scrollToTarget) setTimeout(place, 1100);
+    } else {
+      _tourMaskFull(); spotlight.classList.remove('active'); _tourCenter(popover);
+    }
+
+    // a11y: announce + move focus into popover
+    const live=document.getElementById('tourLive'); if (live) live.textContent=`Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}. ${step.title}`;
+    const nextBtn=popover.querySelector('.tour-btn-next'); if (nextBtn) setTimeout(()=>nextBtn.focus(), 60);
+  }, (step.route || step.setup) ? 250 : 50);
+}
+
+/* Position spotlight ring + 4-strip mask (click-through hole) + popover */
+function _tourPlace(rect, popover, spotlight){
+  const pad=6;
+  spotlight.style.left=(rect.left-pad)+'px'; spotlight.style.top=(rect.top-pad)+'px';
+  spotlight.style.width=(rect.width+pad*2)+'px'; spotlight.style.height=(rect.height+pad*2)+'px';
+  spotlight.classList.add('active');
+  _tourMask(rect, pad);
+  if (window.innerWidth < 560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  popover.classList.remove('is-sheet');
+  const pw=360, ph=popover.offsetHeight||280, m=16, W=window.innerWidth, H=window.innerHeight;
+  let top, left;
+  if (rect.bottom+ph+m < H){ top=rect.bottom+16; left=Math.min(Math.max(rect.left,16), W-pw-16); }
+  else if (rect.top-ph-m > 0){ top=rect.top-ph-16; left=Math.min(Math.max(rect.left,16), W-pw-16); }
+  else { top=(H-ph)/2; left=(W-pw)/2; }
+  popover.style.left=left+'px'; popover.style.top=top+'px'; popover.classList.add('active');
+}
+function _tourMask(rect, pad){
+  const W=window.innerWidth, H=window.innerHeight;
+  const top=Math.max(0,rect.top-pad), bot=Math.min(H,rect.bottom+pad), lft=Math.max(0,rect.left-pad), rgt=Math.min(W,rect.right+pad);
+  const set=(id,l,t,w,h)=>{ const e=document.getElementById(id); e.style.left=l+'px'; e.style.top=t+'px'; e.style.width=Math.max(0,w)+'px'; e.style.height=Math.max(0,h)+'px'; e.classList.add('active'); };
+  set('tourMaskT',0,0,W,top);
+  set('tourMaskB',0,bot,W,H-bot);
+  set('tourMaskL',0,top,lft,bot-top);
+  set('tourMaskR',rgt,top,W-rgt,bot-top);
+}
+function _tourMaskFull(){
+  const T=document.getElementById('tourMaskT'); T.style.left='0'; T.style.top='0'; T.style.width='100vw'; T.style.height='100vh'; T.classList.add('active');
+  ['tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); e.classList.remove('active'); });
+}
+function _tourCenter(popover){
+  if (window.innerWidth < 560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  popover.classList.remove('is-sheet');
+  popover.style.left=((window.innerWidth-360)/2)+'px'; popover.style.top=((window.innerHeight-(popover.offsetHeight||280))/2)+'px';
+  popover.classList.add('active');
+}
+
+/* Keyboard nav (arrows / esc) */
+document.addEventListener('keydown',(e)=>{
+  if (!tourState.active) return;
+  if (e.key==='Escape'){ endTour(false); }
+  else if (e.key==='ArrowRight'){ e.preventDefault(); tourNext(); }
+  else if (e.key==='ArrowLeft'){ e.preventDefault(); tourPrev(); }
+});
+/* Focus-trap: keep Tab inside the popover while the tour is active */
+document.addEventListener('keydown',(e)=>{
+  if (!tourState.active || e.key!=='Tab') return;
+  const po=document.getElementById('tourPopover');
+  const f=po.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+  if (!f.length) return;
+  const first=f[0], last=f[f.length-1];
+  if (e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
+
+/* Trigger label reflects resume state ("Continue" vs "Demo") */
+function _tourRefreshTriggerLabel(){
+  const t=document.getElementById('tourTrigger'); if (!t) return;
+  const label=t.querySelector('.tour-trigger-label');
+  let saved=null; try{ saved=localStorage.getItem(TOUR_LS_STEP); }catch(e){}
+  if (saved!=null && +saved>0 && +saved<TOUR_STEPS.length){ if (label) label.textContent='Continue'; t.classList.add('seen'); }
+  else { if (label) label.textContent='Demo'; try{ if (localStorage.getItem(TOUR_LS_DONE)) t.classList.add('seen'); }catch(e){} }
+}
+
+/* Init: deep-link ?tour=N (1-based) auto-starts at that step; else set label */
+(function tourInit(){
+  _tourRefreshTriggerLabel();
+  try{
+    const q=new URLSearchParams(window.location.search).get('tour');
+    if (q!=null){ const n=parseInt(q,10); if (!isNaN(n)){ startTourAt(Math.max(0,n-1)); } }
+  }catch(e){}
+})();
+</script>
 
 </body>
 </html>

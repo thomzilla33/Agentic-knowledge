@@ -10,8 +10,9 @@
 html{-webkit-font-smoothing:antialiased}
 :root{
   /* ── Surfaces ── */
-  --bg:#0a0d1a; --bg2:#0f172e; --sb:#000;
-  --bg-card:#0b1220; --bg-modal:#0c1428;
+  --bg:#0A0E1A; --bg2:#0D1120; --sb:#000;
+  --shell-app-bg:linear-gradient(144deg,#020618 0%,#0F172B 50%,#020618 100%);
+  --bg-card:#0D1120; --bg-modal:#131C2E;
   --cb:rgba(255,255,255,0.04); --cbh:rgba(255,255,255,0.07);
   --bd:rgba(255,255,255,0.08); --bds:rgba(255,255,255,0.16);
 
@@ -48,7 +49,7 @@ html{-webkit-font-smoothing:antialiased}
   --grad:linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-blue) 100%);
   --r4:4px;--r6:6px;--r8:8px;--r10:10px;--r12:12px;--r20:20px;
 }
-body{background:var(--bg);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
+body{background:var(--shell-app-bg);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
 button,input,select,textarea{font-family:'Inter',sans-serif}
 a{text-decoration:none;color:inherit}
 
@@ -60,7 +61,7 @@ a{text-decoration:none;color:inherit}
 .sidebar{
   width:52px;flex-shrink:0;
   margin-left:8px; /* 8px gap from left viewport edge */
-  background:#0d1323;
+  background:#131C2E;
   display:flex;flex-direction:column;
   border-radius:14px;
   border:1px solid rgba(255,255,255,0.08);
@@ -1592,7 +1593,7 @@ body.bldr-insp-resizing iframe{pointer-events:none}
 .insp-tog-lbl{font-size:13px;color:var(--t1)}
 .insp-sel-wrap{position:relative;margin-bottom:10px}
 .insp-sel{width:100%;height:32px;background:var(--cb);border:1px solid var(--bds);border-radius:var(--r6);padding:0 10px;color:var(--t1);font-size:12px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none}
-.insp-sel option{background:#0f172e}
+.insp-sel option{background:var(--bg2)}
 .insp-ta{width:100%;min-height:76px;background:var(--cb);border:1px solid var(--bd);border-radius:var(--r6);padding:9px;color:var(--t1);font-size:12px;outline:none;resize:none;font-family:inherit;transition:border-color .15s;line-height:1.5}
 .insp-ta:focus{border-color:var(--bds)}
 .insp-ta::placeholder{color:var(--t3);font-style:italic}
