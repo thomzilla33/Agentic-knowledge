@@ -471,8 +471,14 @@ html.persona-user [data-admin-only]{display:none !important}
   letter-spacing:.05em; line-height:1; text-transform:uppercase;
 }
 .ssb-item-badge{
-  font-size:8.5px; font-weight:700; padding:2px 6px; border-radius:8px;
-  flex-shrink:0; letter-spacing:.05em; line-height:1; text-transform:uppercase;
+  font-size:10px; font-weight:700; min-width:18px; height:18px;
+  padding:0 5px; border-radius:9px;
+  background:var(--pri); color:#fff;
+  flex-shrink:0; line-height:18px; text-align:center;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.ssb-item-badge--green{
+  background:var(--status-ok); color:#001a0e;
 }
 .ssb-badge-soon{
   background:var(--purple-10); color:var(--purple);
@@ -6729,9 +6735,15 @@ html.theme-light .theme-icon-moon{display:block}
     <!-- Sub-sidebar (premium) -->
     <aside class="ssb">
 
-      <!-- Header: Settings + Search -->
-      <div class="ssb-header">
-        <div class="ssb-header-title">Settings</div>
+      <!-- Header: Admin Console -->
+      <div class="ssb-header" style="display:flex;align-items:center;gap:10px;padding:16px 16px 12px">
+        <div style="width:28px;height:28px;border-radius:7px;background:var(--grad-identity);flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" fill="rgba(255,255,255,0.90)"/><rect x="8" y="2" width="4" height="4" rx="1" fill="rgba(255,255,255,0.60)"/><rect x="2" y="8" width="4" height="4" rx="1" fill="rgba(255,255,255,0.60)"/><rect x="8" y="8" width="4" height="4" rx="1" fill="rgba(255,255,255,0.90)"/></svg>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--t1);letter-spacing:-.01em;line-height:1.2">AIMS OS</div>
+          <div style="font-size:10px;font-weight:500;color:var(--t3);line-height:1.3">Admin Console</div>
+        </div>
       </div>
       <div class="ssb-search-wrap">
         <svg class="ssb-search-ico" width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
@@ -6742,133 +6754,83 @@ html.theme-light .theme-icon-moon{display:block}
       <!-- Scrollable nav -->
       <div class="ssb-scroll">
 
-        <!-- Integrations — the marketplace + activation surface of Admin Studio -->
-        <div class="ssb-group">
-          <div class="ssb-grp-h"><span class="ssb-grp-label">Integrations</span></div>
-
-          <button class="ssb-item" data-route="integrations">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg></span>
-            <span class="ssb-item-label">Integrations</span>
-            <span class="ssb-item-alert" title="1 integration failing"></span>
-          </button>
-
-          <button class="ssb-item" data-admin-only data-route="requests" title="Integration requests">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 5l6 4 6-4"/></svg></span>
-            <span class="ssb-item-label">Requests</span>
-            <span class="ssb-item-alert" id="reqAlertDot" title="Pending requests"></span>
-          </button>
-
-          <button class="ssb-item" data-admin-only data-route="distribution" title="Control where integrations are exposed">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>
-            <span class="ssb-item-label">Distribution</span>
-          </button>
-
-          <button class="ssb-item" data-admin-only data-route="users" title="Who has access to which integration instance">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="6" r="2.4"/><circle cx="11" cy="6.8" r="1.8"/><path d="M1.5 13.5c0-2.2 1.8-4 4-4s4 1.8 4 4M9.5 13.5c0-1.5 1.1-2.8 2.5-2.8s2.5 1.3 2.5 2.8"/></svg></span>
-            <span class="ssb-item-label">Users</span>
-          </button>
-
-          <button class="ssb-item" data-admin-only data-route="widgets" title="Workspace widget templates">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="4" rx="1"/><rect x="9" y="2" width="5" height="6" rx="1"/><rect x="2" y="8" width="5" height="6" rx="1"/><rect x="8" y="10" width="6" height="4" rx="1"/></svg></span>
-            <span class="ssb-item-label">Widgets</span>
-          </button>
-        </div>
-
-        <div class="ssb-group">
-          <div class="ssb-grp-h"><span class="ssb-grp-label">Cross-functional</span></div>
-          <a class="ssb-item" href="data-studio.html" style="text-decoration:none">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10"/></svg></span>
-            <span class="ssb-item-label">Data Studio</span>
-            <span style="font-size:11px; color:var(--t3); margin-left:auto">↗</span>
-          </a>
-          <a class="ssb-item" href="agent-tools.html" style="text-decoration:none">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="4.5" width="4" height="3" rx=".8"/><rect x="6.5" y="1.5" width="4" height="3" rx=".8"/><rect x="6.5" y="7.5" width="4" height="3" rx=".8"/></svg></span>
-            <span class="ssb-item-label">Agent Studio · Tools</span>
-            <span style="font-size:11px; color:var(--t3); margin-left:auto">↗</span>
-          </a>
-        </div>
-
-        <div class="ssb-group">
-          <div class="ssb-grp-h"><span class="ssb-grp-label">Workspace</span></div>
-
-          <button class="ssb-item disabled" data-route="general" title="General — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/></svg></span>
-            <span class="ssb-item-label">General</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
-          </button>
-
-          <button class="ssb-item disabled" data-route="members" title="Members & Teams — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="5" r="2.2"/><circle cx="11" cy="6" r="1.8"/><path d="M2 14c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5M10 14c0-1.6 1.2-2.8 2.6-2.8s2.4 1.2 2.4 2.8"/></svg></span>
-            <span class="ssb-item-label">Members & Teams</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
-          </button>
-
-          <button class="ssb-item disabled" data-route="roles" title="Roles & Permissions — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M8 1.5L2 4v4C2 11.5 4.5 14 8 14.5c3.5-.5 6-3 6-6.5V4L8 1.5z"/><path d="M5.5 8l2 2 3.5-4" stroke-linecap="round"/></svg></span>
-            <span class="ssb-item-label">Roles & Permissions</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
-          </button>
-
-          <button class="ssb-item disabled" data-route="models" title="Models & Providers — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="3" y="3" width="10" height="10" rx="1.5"/><rect x="5.5" y="5.5" width="5" height="5" rx=".8"/><path d="M5.5 1.5v1.5M8 1.5v1.5M10.5 1.5v1.5M5.5 13v1.5M8 13v1.5M10.5 13v1.5M1.5 5.5h1.5M1.5 8h1.5M1.5 10.5h1.5M13 5.5h1.5M13 8h1.5M13 10.5h1.5" stroke-linecap="round"/></svg></span>
-            <span class="ssb-item-label">Models & Providers</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
-          </button>
-
-          <button class="ssb-item disabled" data-route="security" title="Security & SSO — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/><circle cx="8" cy="10.5" r="1"/></svg></span>
-            <span class="ssb-item-label">Security & SSO</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
-          </button>
-
-          <button class="ssb-item" data-route="audit" data-admin-only>
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="2" width="10" height="12" rx="1.2"/><path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3"/></svg></span>
-            <span class="ssb-item-label">Audit log</span>
-          </button>
-
-          <button class="ssb-item disabled" data-route="billing" title="Billing & Usage — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="4" width="13" height="9" rx="1.2"/><path d="M1.5 7h13M4 10h2.5"/></svg></span>
-            <span class="ssb-item-label">Billing & Usage</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
-          </button>
-        </div>
-
+        <!-- PERSONAL -->
         <div class="ssb-group">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Personal</span></div>
 
-          <button class="ssb-item disabled" data-route="profile" title="Profile — Coming soon">
+          <button class="ssb-item disabled" data-route="my-settings" title="My Settings — Coming soon">
             <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="6" r="2.6"/><path d="M3 14c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></svg></span>
-            <span class="ssb-item-label">Profile</span>
+            <span class="ssb-item-label">My Settings</span>
             <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- TENANT -->
+        <div class="ssb-group">
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Tenant</span></div>
+
+          <button class="ssb-item disabled" data-route="people" title="People & Access — Coming soon">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="5" r="2.2"/><circle cx="11" cy="6" r="1.8"/><path d="M2 14c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5M10 14c0-1.6 1.2-2.8 2.6-2.8s2.4 1.2 2.4 2.8"/></svg></span>
+            <span class="ssb-item-label">People & Access</span>
+            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+          </button>
+
+          <button class="ssb-item disabled" data-route="organization" title="Organization — Coming soon">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="1.5" width="4" height="3" rx=".7"/><rect x="2" y="11.5" width="4" height="3" rx=".7"/><rect x="10" y="11.5" width="4" height="3" rx=".7"/><path d="M8 4.5v3M8 7.5H4.5a1 1 0 00-1 1v3M8 7.5h3.5a1 1 0 011 1v3"/></svg></span>
+            <span class="ssb-item-label">Organization</span>
+            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+          </button>
+
+          <button class="ssb-item disabled" data-route="identity" title="Identity & Security — Coming soon">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5L2 4v4C2 11.5 4.5 14 8 14.5c3.5-.5 6-3 6-6.5V4L8 1.5z"/><path d="M5.5 8l2 2 3.5-4"/></svg></span>
+            <span class="ssb-item-label">Identity & Security</span>
+            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+          </button>
+
+          <button class="ssb-item disabled" data-route="studios" title="Studios & Entitlements — Coming soon">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="4" rx="1"/><rect x="9" y="2" width="5" height="6" rx="1"/><rect x="2" y="8" width="5" height="6" rx="1"/><rect x="8" y="10" width="6" height="4" rx="1"/></svg></span>
+            <span class="ssb-item-label">Studios & Entitlements</span>
+            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+          </button>
+
+          <button class="ssb-item disabled" data-route="billing" title="Billing & Subscription — Coming soon">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="4" width="13" height="9" rx="1.2"/><path d="M1.5 7h13M4 10h2.5"/></svg></span>
+            <span class="ssb-item-label">Billing & Subscription</span>
+            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- PLATFORM -->
+        <div class="ssb-group">
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
+
+          <button class="ssb-item disabled" data-route="governance-defaults" title="Governance Defaults — Coming soon">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5L2 4v4C2 11.5 4.5 14 8 14.5c3.5-.5 6-3 6-6.5V4L8 1.5z"/><circle cx="8" cy="8" r="1.8"/></svg></span>
+            <span class="ssb-item-label">Governance Defaults</span>
+            <span class="ssb-item-badge ssb-item-badge--green">2</span>
+          </button>
+
+          <button class="ssb-item disabled" data-route="data-privacy" title="Data & Privacy — Coming soon">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7" rx="1"/><path d="M5 7V5a3 3 0 016 0v2"/></svg></span>
+            <span class="ssb-item-label">Data & Privacy</span>
+            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+          </button>
+
+          <button class="ssb-item" data-route="integrations">
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg></span>
+            <span class="ssb-item-label">Integrations & Credentials</span>
+            <span class="ssb-item-alert" title="1 integration failing"></span>
           </button>
 
           <button class="ssb-item disabled" data-route="notifications" title="Notifications — Coming soon">
             <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0"/></svg></span>
             <span class="ssb-item-label">Notifications</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+            <span class="ssb-item-badge">4</span>
           </button>
 
-          <button class="ssb-item" data-route="personal">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 1.5v3M11 1.5v3M3 5h10v2a4 4 0 01-4 4H7a4 4 0 01-4-4V5zM8 11v3.5"/></svg></span>
-            <span class="ssb-item-label">My Integrations</span>
-          </button>
-
-          <button class="ssb-item disabled" data-route="tokens" title="API tokens — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="11" r="2.5"/><path d="M7 9l5-5M10 6l2 2M14 4l-2-2"/></svg></span>
-            <span class="ssb-item-label">API tokens</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
-          </button>
-
-          <button class="ssb-item disabled" data-route="lang" title="Language & Region — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2 2 3 4 3 6s-1 4-3 6c-2-2-3-4-3-6s1-4 3-6z"/></svg></span>
-            <span class="ssb-item-label">Language & Region</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
-          </button>
-
-          <button class="ssb-item disabled" data-route="sessions" title="Sessions & Devices — Coming soon">
-            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 14h4M8 11v3"/></svg></span>
-            <span class="ssb-item-label">Sessions & Devices</span>
-            <svg class="ssb-item-lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke-linecap="round"/></svg>
+          <button class="ssb-item" data-route="audit" data-admin-only>
+            <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="2" width="10" height="12" rx="1.2"/><path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3"/></svg></span>
+            <span class="ssb-item-label">Audit & Compliance</span>
           </button>
         </div>
 
