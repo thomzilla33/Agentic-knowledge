@@ -401,7 +401,7 @@
     --color-border-neutral-default:       rgba(255,255,255,0.10);  /* Border/Neutral/Default dark    */
     --color-border-primary-lighter:       #80afff;                 /* Border/Primary/Lighter (static)*/
     --color-text-label:                   rgba(255,255,255,0.80);  /* Text/Label dark                */
-    --color-text-disabled:                rgba(255,255,255,0.45);  /* Text/Disabled dark             */
+    --color-text-disabled:                rgba(255,255,255,0.30);  /* Text/Disabled dark             */
     --color-text-negative:                #ffffff;                 /* Text/Negative (static)         */
     --color-surface-success-more-subtle:  rgba(110,231,183,0.10);  /* Surface/Success/More Subtle dk */
     --color-border-success-lighter:       #009978;                 /* Border/Success/Lighter (static)*/
@@ -1110,13 +1110,13 @@ html.theme-light .tb-search kbd{background:rgba(15,23,42,0.05)}
   border-radius:4px; color:inherit; font-size:13px; line-height:1; cursor:pointer}
 .dsf-chip-x:hover{background:rgba(43,127,255,0.30); color:#fff}
 .dsf-menu{display:none; position:absolute; top:calc(100% + 6px); left:0; z-index:80; min-width:200px; padding:6px;
-  background:var(--bg2); border:1px solid var(--line-strong); border-radius:10px; box-shadow:0 16px 40px rgba(0,0,0,0.45)}
+  background:var(--bg2); border:1px solid var(--line); border-radius:10px; box-shadow:0 16px 40px rgba(0,0,0,0.45)}  /* DS Menu: subtle hairline, elevation via shadow */
 html.theme-light .dsf-menu{background:#fff; box-shadow:0 16px 40px rgba(15,23,42,0.16)}
 .dsf-drop.is-open .dsf-menu{display:block}
 .dsf-menu-item{display:flex; align-items:center; gap:8px; width:100%; padding:7px 8px; border:none; background:transparent; border-radius:7px;
   color:var(--t1); font-family:inherit; font-size:13px; font-weight:500; cursor:pointer; text-align:left}
 .dsf-menu-item:hover{background:var(--hover-strong)}
-.dsf-menu-item.is-sel{color:var(--accent)}
+.dsf-menu-item.is-sel{color:var(--t1); font-weight:600}  /* DS: selected = normal text + check, not primary-colored */
 .dsf-menu-check{width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; color:var(--accent); flex-shrink:0}
 .dsf-menu-lbl{flex:1; white-space:nowrap}
 .dsf-menu-count{font-size:11px; font-weight:700; color:var(--t3); background:rgba(255,255,255,0.06); padding:1px 6px; border-radius:6px}
@@ -1171,6 +1171,10 @@ html.theme-light .elist{background:#fff}
 .so-internal{font-size:12px; color:var(--t3); font-family:'SF Mono',Menlo,monospace; margin-top:2px}
 .so-close{margin-left:auto; width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--t2); cursor:pointer; flex-shrink:0}
 .so-close:hover{color:var(--t1); border-color:var(--line-strong)}
+/* Slide Out header subtitle + right-aligned footer (DS Slide Out) */
+.so-subtitle{font-size:12.5px; color:var(--t2); margin-top:5px}
+.mp-foot{justify-content:flex-end}
+.so-foot.mp-foot .btn{flex:0 0 auto}
 .so-body{flex:1; overflow:auto; padding:18px 22px}
 .so-desc{font-size:13px; color:var(--t2); line-height:1.6; margin-bottom:18px}
 .so-sec{margin-bottom:20px}
@@ -1368,16 +1372,21 @@ html.theme-light .toast{background:#fff}
 /* ── Version / scope callouts + floating toggle ── */
 .vcallout{display:flex; align-items:center; gap:10px; border:1px dashed var(--line-strong); border-radius:10px; padding:11px 14px; margin-top:12px; font-size:12.5px; color:var(--t2); background:rgba(255,255,255,0.015)}
 .vcallout-tag{flex-shrink:0; font-size:10.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--tag-purple-fg,#c084fc); background:var(--tag-purple-bg,rgba(168,85,247,0.14)); border:1px solid var(--tag-purple-bd,rgba(168,85,247,0.3)); padding:2px 7px; border-radius:6px}
-.vtoggle{position:fixed; bottom:16px; right:16px; z-index:80; display:flex; align-items:center; gap:8px; background:var(--surface-raised,var(--bg2)); border:1px solid var(--line); border-radius:10px; padding:6px 8px 6px 12px; box-shadow:0 8px 24px rgba(0,0,0,0.28); font-size:12px}
-.vtoggle-lbl{font-weight:600; color:var(--t2)}
-.vtoggle-seg{display:flex; gap:3px}
-.vtoggle-seg button{padding:4px 10px; border-radius:6px; border:1px solid transparent; background:transparent; color:var(--t2); font-size:11.5px; font-weight:600; cursor:pointer; white-space:nowrap}
-.vtoggle-seg button.on{background:var(--primary); color:#fff; border-color:var(--primary)}
+.vtoggle{position:fixed; bottom:16px; right:16px; z-index:80; display:flex; align-items:center; gap:10px; background:var(--surface-raised,var(--bg2)); background-image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05)); border:1.5px solid var(--line-strong); border-radius:12px; padding:7px 9px 7px 11px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.07), 0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.28); font-size:12.5px; cursor:grab; touch-action:none; user-select:none}
+.vtoggle.dragging{cursor:grabbing; border-color:var(--primary); box-shadow:0 16px 42px rgba(0,0,0,0.6), 0 0 0 1px var(--primary)}
+.vtoggle-grip{display:flex; align-items:center; color:var(--t2)}
+.vtoggle-lbl{font-weight:700; color:var(--t1); letter-spacing:.02em}
+.vtoggle-seg{display:flex; gap:2px; background:var(--hover); border:1px solid var(--line); border-radius:9px; padding:2px}
+.vtoggle-seg button{padding:5px 11px; border-radius:7px; border:1px solid transparent; background:transparent; color:var(--t2); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:color .12s, background .12s}
+.vtoggle-seg button:hover:not(.on){color:var(--t1); background:var(--hover)}
+.vtoggle-seg button.on{background:var(--primary); color:#fff; border-color:var(--primary); box-shadow:0 1px 5px rgba(43,127,255,0.55)}
 
 /* ── Persistent page header (Models module) ── */
-.page-h1{font-size:30px; font-weight:800; letter-spacing:-.02em; color:var(--t1); margin:2px 0 16px}
-.mtabs.mtabs-lg{gap:6px; margin-bottom:22px}
-.mtabs.mtabs-lg .mtab{padding:9px 4px; margin-right:20px; font-size:14px; font-weight:600}
+.page-head{display:flex; align-items:center; justify-content:space-between; gap:16px; margin:2px 0 16px}
+.page-h1{font-size:24px; font-weight:600; letter-spacing:-.01em; color:var(--t1); margin:0}  /* DS Text/Title L */
+@media (max-width:640px){ .page-h1{font-size:18px} }  /* DS Text/Title M / compress */
+.mtabs.mtabs-lg{gap:4px; margin-bottom:22px; border-bottom:0}  /* DS tabs: no full-width divider, only the active underline */
+.mtabs.mtabs-lg .mtab{padding:9px 12px; margin-right:0; font-size:14px; font-weight:600; border-radius:8px 8px 0 0}  /* hover fill gets horizontal padding */
 
 /* ── Toolbar row: filters left, view-toggle + primary right ── */
 .tbar{display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap}
@@ -1386,8 +1395,8 @@ html.theme-light .toast{background:#fff}
 .vw-seg{display:inline-flex; gap:2px; padding:3px; border-radius:9px; border:1px solid var(--field-border); background:var(--field-bg)}
 .vw-seg button{width:30px; height:28px; display:flex; align-items:center; justify-content:center; border:none; background:transparent; color:var(--t3); border-radius:6px; cursor:pointer}
 .vw-seg button:hover{color:var(--t1)}
-.vw-seg button.on{background:var(--surface-raised,var(--bg2)); color:var(--primary); box-shadow:0 1px 2px rgba(0,0,0,0.18)}
-html.theme-light .vw-seg button.on{background:#fff}
+.vw-seg button.on{background:var(--primary); color:#fff}  /* DS: selected view = primary button default */
+html.theme-light .vw-seg button.on{color:#fff}  /* keep white icon in light theme; bg stays --primary */
 
 /* ── Avatars ── */
 .av{display:inline-flex; align-items:center; justify-content:center; border-radius:50%; color:#fff; font-weight:700; flex-shrink:0; border:1.5px solid var(--bg2)}
@@ -1400,11 +1409,23 @@ html.theme-light .vw-seg button.on{background:#fff}
 
 /* ── Model card grid ── */
 .mcard-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px}
-.mcard{display:flex; flex-direction:column; gap:12px; padding:18px; border:1px solid var(--card-border,var(--line)); border-radius:14px; background:var(--card-bg,var(--bg2)); cursor:pointer; transition:border-color .12s, box-shadow .12s, transform .12s}
+.mcard{display:flex; flex-direction:column; gap:12px; padding:18px; border:1px solid var(--card-border,var(--line)); border-radius:14px; background:var(--card-bg,var(--bg2)); cursor:pointer; transition:border-color .12s, box-shadow .12s, transform .12s, background .12s}
+html:not(.theme-light) .mcard{background:var(--surface-raised)}  /* DS card container: distinct surface, not blended with the page bg */
+/* DS Card-grid layout: title + State tag · subtitle · desc · colored-icon metadata row */
+.mcard-top{display:flex; align-items:flex-start; justify-content:space-between; gap:12px}
+.mcard-subtitle{font-size:13px; color:var(--t2); margin-top:-6px}
+.mcard-state{flex-shrink:0; display:inline-flex; align-items:center; font-size:11px; font-weight:600; padding:2px 10px; border-radius:999px; border:1px solid var(--line-strong); background:transparent; color:var(--t2); white-space:nowrap}
+.mcard-state.published{color:var(--tag-success-fg); border-color:var(--tag-success-fg)}
+.mcard-state.pending{color:var(--tag-alert-fg); border-color:var(--tag-alert-fg)}
+.mcard-state.deprecated{color:var(--tag-error-fg); border-color:var(--tag-error-fg)}
+.mcard-meta2{display:flex; align-items:center; flex-wrap:wrap; gap:7px 16px; margin-top:2px}
+.cmeta{display:inline-flex; align-items:center; gap:5px; font-size:12.5px; color:var(--t2)}
+.cmi{flex-shrink:0}
+.cmi-blue{color:var(--primary)} .cmi-cyan{color:var(--cyan)} .cmi-green{color:var(--tag-success-fg)} .cmi-orange{color:var(--tag-alert-fg)} .cmi-purple{color:#a78bfa}
 /* Light mode: soft resting shadow so white cards float on the blue-gray canvas */
 html.theme-light .mcard, html.theme-light .lrow, html.theme-light .md-ecard, html.theme-light .md-trow, html.theme-light .md-ccard, html.theme-light .md-tile, html.theme-light .md-sec, html.theme-light .mtbl-wrap{box-shadow:0 1px 2px rgba(15,23,42,0.04), 0 2px 6px rgba(15,23,42,0.05)}
 html.theme-light .mcard:hover, html.theme-light .lrow:hover, html.theme-light .md-ecard:hover, html.theme-light .md-trow:hover, html.theme-light .md-ccard:hover{box-shadow:0 4px 14px rgba(15,23,42,0.10)}
-.mcard:hover{border-color:var(--field-border-hover,var(--line-strong)); box-shadow:0 8px 24px rgba(0,0,0,0.16); transform:translateY(-1px)}
+.mcard:hover{border-color:var(--field-border-hover,var(--line-strong)); box-shadow:inset 0 0 0 2000px rgba(255,255,255,0.025), 0 8px 24px rgba(0,0,0,0.16); transform:translateY(-1px)}  /* more evident hover: subtle surface lift */
 .mcard-head{display:flex; align-items:flex-start; gap:8px}
 .mcard-title{font-size:16px; font-weight:700; color:var(--t1); letter-spacing:-.01em}
 .mcard-head .av-stack{margin-left:auto}
@@ -1422,13 +1443,23 @@ html.theme-light .mcard:hover, html.theme-light .lrow:hover, html.theme-light .m
 .obadge.implemented{color:var(--tag-informative-fg,#7db1ff); background:var(--tag-informative-bg,rgba(43,127,255,0.14)); border-color:var(--tag-informative-bd,rgba(43,127,255,0.3))}
 .obadge.cloned{color:var(--tag-purple-fg,#c084fc); background:var(--tag-purple-bg,rgba(168,85,247,0.14)); border-color:var(--tag-purple-bd,rgba(168,85,247,0.3))}
 .ver-chip{display:inline-flex; align-items:center; gap:4px; height:20px; padding:0 7px; border-radius:6px; font-size:11px; font-weight:700; color:var(--tag-informative-fg,#7db1ff); background:var(--tag-informative-bg,rgba(43,127,255,0.1)); border:1px solid var(--tag-informative-bd,rgba(43,127,255,0.22))}
-.st-pill{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600}
-.st-pill .st-dot{width:7px; height:7px; border-radius:50%}
-.st-pill.published{color:var(--tag-success-fg,#34d399)} .st-pill.published .st-dot{background:var(--tag-success-fg,#34d399)}
-.st-pill.draft{color:var(--t3)} .st-pill.draft .st-dot{background:var(--t3)}
-.st-pill.pending{color:var(--tag-alert-fg,#fbbf24)} .st-pill.pending .st-dot{background:var(--tag-alert-fg,#fbbf24)}
-.st-pill.deprecated{color:var(--tag-alert-fg,#fbbf24)} .st-pill.deprecated .st-dot{background:var(--tag-alert-fg,#fbbf24)}
-.st-pill.archived{color:var(--t3); opacity:.8} .st-pill.archived .st-dot{background:var(--t3)}
+/* DS Badge = colored dot (state by color) + neutral label; not colored text */
+.st-pill{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500; color:var(--t2)}
+.st-pill .st-dot{width:7px; height:7px; border-radius:50%; background:var(--t3)}
+.st-pill.published .st-dot{background:var(--tag-success-fg,#34d399)}
+.st-pill.draft .st-dot{background:var(--t3)}
+.st-pill.pending .st-dot{background:var(--tag-alert-fg,#fbbf24)}
+.st-pill.deprecated .st-dot{background:var(--tag-error-fg,#f87171)}
+.st-pill.archived{opacity:.8} .st-pill.archived .st-dot{background:var(--t3)}
+/* Semantic status tag (Entity-list rows) */
+.st-tag{display:inline-flex; align-items:center; font-size:11px; font-weight:600; padding:2px 9px; border-radius:999px; line-height:1.55}
+.st-tag-success{color:var(--tag-success-fg); background:var(--tag-success-bg)}
+.st-tag-alert{color:var(--tag-alert-fg); background:var(--tag-alert-bg,rgba(252,211,77,0.14))}
+.st-tag-error{color:var(--tag-error-fg); background:var(--tag-error-bg)}
+.st-tag-neutral{color:var(--t2); background:var(--hover)}
+/* Entity-list primary metadata (icon + text beside the title, not a tag) */
+.lrow-pmeta{display:inline-flex; align-items:center; gap:4px; font-size:12px; color:var(--t2)}
+.lrow-pmeta svg{color:var(--t3); flex-shrink:0}
 
 /* ── Rich list rows (Entities / Tables / Reference) ── */
 .lrows{display:flex; flex-direction:column; gap:12px}
@@ -1450,6 +1481,7 @@ html.theme-light .mcard:hover, html.theme-light .lrow:hover, html.theme-light .m
 .lrow-metric{display:inline-flex; align-items:center; gap:6px}
 .lrow-metric svg{color:var(--t3)}
 .lrow-foot-r{margin-left:auto; display:flex; align-items:center; gap:10px}
+.lrow-collab{display:inline-flex; align-items:center}
 .chip{display:inline-flex; align-items:center; gap:5px; height:23px; padding:0 9px; border-radius:7px; font-size:12px; font-weight:500; border:1px solid var(--line); background:var(--muted); color:var(--t2); white-space:nowrap}
 .chip svg{color:var(--t3); flex-shrink:0}
 .chip-model{font-weight:600; color:var(--t1)}
@@ -1737,18 +1769,7 @@ html:not(.theme-light) .diag-legend{background:var(--surface-raised,#131C2E)}
 /* PII badge */
 .pii-badge{display:inline-flex; align-items:center; gap:3px; font-size:10px; font-weight:700; letter-spacing:.02em; color:var(--tag-alert-fg,#d08700); background:var(--tag-alert-bg,rgba(208,135,0,0.12)); border-radius:6px; padding:2px 6px}
 
-/* entity / table cards */
-.md-ecard{display:flex; flex-direction:column; gap:10px; border:1px solid var(--card-border,var(--line)); border-radius:12px; background:var(--card-bg,var(--bg2)); padding:16px; cursor:pointer; transition:border-color .12s, box-shadow .12s}
-.md-ecard:hover{border-color:var(--field-border-hover,var(--line-strong)); box-shadow:0 4px 14px rgba(0,0,0,0.08)}
-.md-ecard-h{display:flex; align-items:center; gap:8px}
-.md-ecard-ic{display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:var(--muted,var(--hover)); color:var(--t2); flex-shrink:0}
-.md-ecard-name{font-size:15px; font-weight:700; color:var(--t1); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.md-ecard-desc{font-size:12.5px; line-height:1.5; color:var(--t2); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:37px}
-.md-ecard-meta{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
-.md-ecard-meta .metaico{display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--t2)}
-.md-ecard-foot{display:flex; align-items:center; justify-content:space-between; padding-top:11px; border-top:1px solid var(--line)}
-.md-ecard-foot .mcard-owner{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--t2)}
-.md-ecard-foot .mcard-date{font-size:12px; color:var(--t3)}
+/* entity / table / component grids in the model detail reuse the shared .mcard (DS Card-grid) */
 
 /* code chips */
 .md-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:var(--t3); background:var(--muted,var(--hover)); padding:1px 7px; border-radius:6px}
@@ -1788,14 +1809,6 @@ html:not(.theme-light) .diag-legend{background:var(--surface-raised,#131C2E)}
 .md-comp-head h3{font-size:16px; font-weight:700; color:var(--t1); margin:0 0 4px}
 .md-comp-head p{font-size:13px; color:var(--t2); margin:0 0 16px}
 .md-comp-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
-.md-ccard{display:flex; flex-direction:column; gap:12px; border:1px solid var(--card-border,var(--line)); border-radius:12px; background:var(--card-bg,var(--bg2)); padding:15px; cursor:pointer; transition:border-color .12s, box-shadow .12s}
-.md-ccard:hover{border-color:var(--field-border-hover,var(--line-strong)); box-shadow:0 4px 14px rgba(0,0,0,0.08)}
-.md-ccard-h{display:flex; align-items:center; gap:9px}
-.md-ccard-ic{display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:var(--tag-informative-bg,rgba(37,99,235,0.1)); color:var(--primary); flex-shrink:0}
-.md-ccard-name{font-size:14px; font-weight:700; color:var(--t1); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.md-ccard-sub{font-size:12px; color:var(--t3)}
-.md-ccard-foot{display:flex; align-items:center; justify-content:space-between; gap:8px}
-.md-ccard-ent{display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--t2)}
 .mtbl-inline{display:inline-flex; align-items:center; gap:6px}
 
 @media (max-width:900px){
@@ -2123,22 +2136,26 @@ html:not(.theme-light) .ref-vals{background:var(--surface-raised,#131C2E)}
 .priv-sec-actions{margin-left:auto; display:flex; align-items:center; gap:10px}
 .dsec-count{font-size:11px; font-weight:700; color:var(--t3); background:var(--hover); padding:1px 8px; border-radius:6px}
 .priv-sec-sub{font-size:12.5px; color:var(--t3); margin:0 0 14px; max-width:660px; line-height:1.5}
-.priv-card-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px}
-.priv-card{border:1px solid var(--card-border); background:var(--card-bg); border-radius:var(--r12); padding:14px 16px; display:flex; flex-direction:column; gap:10px}
-.priv-card-h{display:flex; align-items:flex-start; gap:10px}
-.priv-card-ic{width:30px; height:30px; border-radius:var(--r8); display:flex; align-items:center; justify-content:center; background:var(--hover); color:var(--t2); flex-shrink:0}
+/* Privileges — compact permission rows (standard CRUD + custom) */
+.priv-list{border:1px solid var(--card-border); background:var(--card-bg); border-radius:var(--r12); overflow:hidden}
+.priv-row{display:flex; align-items:center; gap:16px; padding:12px 14px 12px 16px; border-top:1px solid var(--line); transition:background .12s}
+.priv-row:first-child{border-top:0}
+.priv-row:hover{background:var(--hover)}
+.priv-row-l{display:flex; align-items:center; gap:12px; flex:1; min-width:0}
+.priv-card-ic{width:32px; height:32px; border-radius:var(--r8); display:flex; align-items:center; justify-content:center; background:var(--hover); color:var(--t2); flex-shrink:0}
 .priv-card-ic-key{background:var(--tag-informative-bg); color:var(--tag-informative-fg)}
-.priv-card-tt{flex:1; min-width:0}
-.priv-card-name{font-size:14px; font-weight:600; color:var(--t1)}
-.priv-sym{font-family:var(--font-mono,ui-monospace,Menlo,monospace); font-size:11.5px; color:var(--t3); margin-top:1px}
-.priv-badge{font-size:10.5px; font-weight:600; color:var(--t3); background:var(--hover); border:1px solid var(--line); border-radius:999px; padding:2px 8px; flex-shrink:0}
-.priv-badge-custom{color:var(--tag-informative-fg); background:var(--tag-informative-bg); border-color:transparent}
-.priv-badge-scope{color:var(--primary); background:transparent; border-color:var(--line)}
-.priv-card-desc{font-size:12.5px; color:var(--t2); line-height:1.5; flex:1}
-.priv-card-foot{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding-top:11px; border-top:1px solid var(--line); margin-top:auto}
-.priv-roles{display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1}
+.priv-row-tx{min-width:0}
+.priv-row-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.priv-row-name{font-size:13.5px; font-weight:600; color:var(--t1)}
+.priv-sym{font-family:var(--font-mono,ui-monospace,Menlo,monospace); font-size:11px; color:var(--t3)}
+.priv-row-desc{font-size:12px; color:var(--t2); line-height:1.45; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.priv-row-r{display:flex; align-items:center; gap:10px; flex-shrink:0}
+.priv-roles{display:flex; align-items:center; gap:6px}
 .priv-role{font-size:11px; font-weight:600; color:var(--t2); background:var(--hover); border-radius:999px; padding:3px 9px}
-.priv-role-none{color:var(--t3); background:transparent; border:1px dashed var(--line); font-weight:500}
+.priv-role-none{color:var(--t3); background:transparent; border:1px dashed var(--line); font-weight:500; padding:3px 9px; border-radius:999px}
+.priv-more{font-size:11px; font-weight:600; color:var(--t3)}
+.priv-badge{font-size:10.5px; font-weight:600; color:var(--t3); background:var(--hover); border:1px solid var(--line); border-radius:999px; padding:2px 8px; flex-shrink:0}
+.priv-badge-scope{color:var(--primary); background:transparent; border-color:var(--line)}
 .priv-manage{height:30px; font-size:12px; flex-shrink:0}
 /* Manage-roles + create-custom-privilege modals */
 .modal.modal-lg{width:560px; max-width:calc(100vw - 32px)}
@@ -2499,7 +2516,8 @@ html:not(.theme-light) .mdw-seg.on{background:var(--surface-raised,#131C2E)}
 .mdw-rel-k{font-size:10px; font-weight:700; letter-spacing:.05em; color:var(--t3)}
 .mdw-rel-sep{color:var(--field-placeholder)}
 .mdw-rel-inc-h{display:flex; align-items:center; gap:8px; margin:20px 0 10px; font-size:13px; font-weight:700; color:var(--t1)}
-/* Workspace privileges */
+/* Workspace privileges — entity Privileges subtab now reuses the shared .priv-list/.priv-row rows;
+   the .mdw-priv-* rows below are still used by the table-columns list, permission browser & lineage. */
 .mdw-priv-sub{font-size:12.5px; color:var(--t3); margin:-4px 0 12px}
 .mdw-priv-list{display:flex; flex-direction:column; border:1px solid var(--card-border,var(--line)); border-radius:11px; overflow:hidden; margin-bottom:8px}
 .mdw-priv-row{display:flex; align-items:center; gap:12px; padding:13px 15px; border-bottom:1px solid var(--card-border,var(--line))}
@@ -2509,18 +2527,7 @@ html:not(.theme-light) .mdw-seg.on{background:var(--surface-raised,#131C2E)}
 .mdw-priv-n{font-size:13.5px; font-weight:700; color:var(--t1); display:flex; align-items:center; gap:8px}
 .mdw-priv-sym{font-family:'SF Mono',Menlo,monospace; font-size:11px; font-weight:500; color:var(--t3); background:transparent}
 .mdw-priv-d{font-size:12.5px; color:var(--t2); margin-top:3px}
-.mdw-priv-std{font-size:11.5px; font-weight:600; color:var(--t3); background:var(--muted); border:1px solid var(--card-border,var(--line)); border-radius:6px; padding:3px 10px; flex-shrink:0}
 .mdw-cpriv-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin:22px 0 10px}
-.mdw-cpriv-list{display:flex; flex-direction:column; gap:10px}
-.mdw-cpriv{border:1px solid var(--card-border,var(--line)); border-radius:11px; background:var(--card-bg,var(--bg2)); padding:14px 15px}
-.mdw-cpriv-top{display:flex; align-items:center; gap:9px}
-.mdw-cpriv-ic{width:30px; height:30px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:8px; background:rgba(43,127,255,0.1); color:var(--primary)}
-.mdw-cpriv-n{font-size:14px; font-weight:700; color:var(--t1)}
-.mdw-cpriv-scope{font-size:11.5px; font-weight:600; color:var(--primary); background:rgba(43,127,255,0.1); border-radius:6px; padding:3px 9px}
-.mdw-cpriv-d{font-size:12.5px; color:var(--t2); margin:10px 0}
-.mdw-cpriv-foot{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--t3); border-top:1px solid var(--card-border,var(--line)); padding-top:10px}
-.mdw-cpriv-c{display:inline-flex; align-items:center; gap:5px}
-.mdw-cpriv-desc2{color:var(--primary); cursor:pointer}
 .mdw-priv-note{display:flex; align-items:center; gap:9px; margin-top:16px; padding:12px 15px; border-radius:10px; background:rgba(43,127,255,0.06); border:1px solid rgba(43,127,255,0.16); font-size:12.5px; color:var(--t2)}
 .mdw-priv-note a{color:var(--primary); cursor:pointer; font-weight:600}
 .mdw-priv-note svg{color:var(--primary); flex-shrink:0}
@@ -2721,14 +2728,79 @@ html:not(.theme-light) .mdw-seg.on{background:var(--surface-raised,#131C2E)}
 <div class="modal-scrim" id="modalScrim" onclick="if(event.target===this)closeModal()"></div>
 
 <!-- Scope toggle (feature versioning) -->
-<div class="vtoggle" role="group" aria-label="Scope">
+<div class="vtoggle" role="group" aria-label="Scope" title="Drag to reposition">
+  <span class="vtoggle-grip" aria-hidden="true"><svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="3" cy="3" r="1.2"/><circle cx="7" cy="3" r="1.2"/><circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="3" cy="11" r="1.2"/><circle cx="7" cy="11" r="1.2"/></svg></span>
   <span class="vtoggle-lbl">Scope</span>
   <div class="vtoggle-seg">
     <button id="scope-v1" class="on" onclick="setScope('v1')">V1</button>
     <button id="scope-v1.5" onclick="setScope('v1.5')">V1.5</button>
     <button id="scope-v2" onclick="setScope('v2')">Full vision</button>
   </div>
+  <button class="vtoggle-cl" onclick="showScopeChangelog()" title="Scope changelog — what each tier ships" aria-label="Scope changelog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5h7M5.5 8h7M5.5 12.5h4"/><circle cx="2.7" cy="3.5" r="1"/><circle cx="2.7" cy="8" r="1"/><circle cx="2.7" cy="12.5" r="1"/></svg></button>
 </div>
+<style>
+.vtoggle-cl{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--t2);cursor:pointer;flex-shrink:0}
+.vtoggle-cl:hover{color:var(--t1);border-color:var(--primary)}
+.sclog-scrim{position:fixed;inset:0;background:rgba(2,6,24,.55);z-index:1200;opacity:0;transition:opacity .15s}
+.sclog-scrim.open{opacity:1}
+.sclog{position:fixed;top:0;right:0;height:100%;width:min(430px,94vw);background:var(--surface-raised,var(--bg2));border-left:1px solid var(--line-strong,var(--line));z-index:1201;transform:translateX(100%);transition:transform .2s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(0,0,0,.4)}
+.sclog.open{transform:none}
+.sclog-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px;border-bottom:1px solid var(--line)}
+.sclog-h .eyb{font:700 10px/1 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--primary)}
+.sclog-h h4{margin:8px 0 0;font-size:15px;font-weight:800;color:var(--t1)}
+.sclog-h .sub{font-size:12px;color:var(--t3);margin-top:4px}
+.sclog-x{background:none;border:0;color:var(--t2);font-size:18px;cursor:pointer;line-height:1}
+.sclog-b{padding:16px 20px;overflow-y:auto;flex:1}
+.sclog-t{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.sclog-t.on{border-color:var(--primary);background:rgba(43,127,255,.06)}
+.sclog-th{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.sclog-nm{font:700 13.5px Inter,sans-serif;color:var(--t1)}
+.sclog-nm small{display:block;font-weight:500;font-size:11px;color:var(--t3);margin-top:1px}
+.sclog-cur{font:700 9.5px/1 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--primary);border:1px solid var(--primary);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.sclog-sw{font:600 11px Inter,sans-serif;color:var(--t3);white-space:nowrap}
+.sclog-th:hover .sclog-sw{color:var(--primary)}
+.sclog-sec{margin-top:10px}
+.sclog-sl{font:700 9.5px/1 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.sclog-sl.nw{color:var(--tag-success-fg,#12a150)}
+.sclog-sl.up{color:var(--primary)}
+.sclog-sl.rm{color:var(--t3)}
+.sclog-ul{margin:0;padding-left:16px}
+.sclog-ul li{font:400 12px/1.5 Inter,sans-serif;color:var(--t2);margin-bottom:2px}
+</style>
+<script>
+window.SCOPE_CHANGELOG=[
+ {tier:'v1',name:'V1 · Foundation',sub:'Browse &amp; understand the model',
+  nw:['Models · Entities · Tables · Reference Data lists (list / grid / table · filters · pagination)','Entity detail — Overview · Tables · Relationships','Table detail — Overview · Columns · Data · Relationships','Reference detail — Overview · Data · Referenced-by · Columns','Model detail — browse entities / tables / components','Slide-out previews'],
+  up:[],rm:['Authoring, governance &amp; the API builder — deferred to V1.5 / Full vision']},
+ {tier:'v1.5',name:'V1.5 · Expansion',sub:'Author &amp; govern',
+  nw:['Create / publish — New model · entity · table · reference','Privileges — standard + custom · Manage roles','History — version history + rollback','Table Indexes · Reference Settings','Edit / deprecate actions'],
+  up:['Detail views gain their authoring tabs (Privileges · History · Indexes · Settings)'],
+  rm:['API contracts builder &amp; AI modeling — Full vision']},
+ {tier:'v2',name:'Full vision',sub:'The complete experience',
+  nw:['API contracts — two-pane builder','ORI / AI-suggested modeling','Cross-model relationships','Saved filters · bulk actions','Handoff to Admin Studio'],
+  up:['Every tab + action unlocked'],rm:['None — this is the complete version']}
+];
+window.showScopeChangelog=function(){
+  var cur=(typeof SCOPE!=='undefined')?SCOPE:'v1';
+  var prev=document.activeElement;
+  closeScopeChangelog();
+  function sec(l,a,c){ if(!a||!a.length) return ''; return '<div class="sclog-sec"><div class="sclog-sl '+c+'">'+l+'</div><ul class="sclog-ul">'+a.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>'; }
+  var body=SCOPE_CHANGELOG.map(function(t){ var on=t.tier===cur;
+    return '<div class="sclog-t'+(on?' on':'')+'"><button class="sclog-th" onclick="setScope(\''+t.tier+'\');showScopeChangelog()"><span class="sclog-nm">'+t.name+'<small>'+t.sub+'</small></span>'+(on?'<span class="sclog-cur">Current</span>':'<span class="sclog-sw">Switch →</span>')+'</button>'+sec('New',t.nw,'nw')+sec('Updated',t.up,'up')+sec('Removed / deferred',t.rm,'rm')+'</div>'; }).join('');
+  var scrim=document.createElement('div'); scrim.className='sclog-scrim'; scrim.id='sclogScrim'; scrim.onclick=closeScopeChangelog;
+  var d=document.createElement('aside'); d.className='sclog'; d.id='sclogDrawer'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true'); d.setAttribute('aria-label','Scope changelog');
+  d.innerHTML='<div class="sclog-h"><div><span class="eyb">Feature versioning</span><h4>Scope changelog</h4><div class="sub">What each scope ships — click a tier to preview it live</div></div><button class="sclog-x" onclick="closeScopeChangelog()" aria-label="Close">✕</button></div><div class="sclog-b">'+body+'</div>';
+  document.body.appendChild(scrim); document.body.appendChild(d);
+  requestAnimationFrame(function(){ scrim.classList.add('open'); d.classList.add('open'); });
+  d._k=function(e){ if(e.key==='Escape') closeScopeChangelog(); }; document.addEventListener('keydown', d._k);
+  d._prev=prev;
+};
+window.closeScopeChangelog=function(){ var d=document.getElementById('sclogDrawer'), s=document.getElementById('sclogScrim');
+  if(d&&d._k) document.removeEventListener('keydown', d._k);
+  if(d){ d.classList.remove('open'); var p=d._prev; setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); if(p&&p.focus){try{p.focus();}catch(e){}} },200); }
+  if(s){ s.classList.remove('open'); setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); },200); }
+};
+</script>
 
 
 <script>
@@ -2900,7 +2972,6 @@ function renderEntities(){
       ${filtering ? `<button class="dsf-clear" onclick="clearFilters()">Clear</button>` : ''}
       <span class="tbar-spring"></span>
       ${viewToggle(listState,'eView')}
-      <button class="btn btn-primary" onclick="navigate('entities/new')"><svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> New entity</button>
     </div>
     ${listState.view==='table' ? dtblView('entities',filtered,_entCols(),'entities') : filtered.length===0 ? `<div class="empty"><div class="empty-t">No entities match</div>Try a different search or clear the filters.</div>` : listState.view==='grid' ? `<div class="mcard-grid">${filtered.map(entityCard).join('')}</div>` : `<div class="lrows">${filtered.map(entityRow).join('')}</div>`}
     ${vcallout('v2','Models &amp; Marketplace — group entities and tables into publishable models, browse pre-built marketplace models, and generate entities with AI.')}
@@ -2912,9 +2983,9 @@ function entityRow(e){
     <div class="lrow-top">
       <span class="lrow-ic">${_IC_ENTITY}</span>
       <span class="lrow-title">${escapeHtml(e.name)}</span>
-      ${_modelChip(e.model)}
-      <span class="chip">${escapeHtml(e.domain)}</span>
-      <span class="lrow-right">${_stPill(e.status)}<span class="lrow-time">${escapeHtml(e.updated)}</span><button class="lrow-menu" onclick="event.stopPropagation();openRowMenu('entities','${e.id}',this)" aria-label="Actions"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></span>
+      ${_lpm(_MDIC.tbl,(_model(e.model)||{}).name||e.model)}
+      ${_lpm(_PM_TAG,e.domain)}
+      <span class="lrow-right">${_stTag(e.status)}<span class="lrow-time">${escapeHtml(e.updated)}</span><button class="lrow-menu" onclick="event.stopPropagation();openRowMenu('entities','${e.id}',this)" aria-label="Actions"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></span>
     </div>
     <div class="lrow-desc">${escapeHtml(e.desc)}</div>
     <div class="lrow-foot">
@@ -2922,7 +2993,7 @@ function entityRow(e){
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M6 6.5v6.5"/></svg>${e.tables.length} tables</span>
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h3v3M13 3l-5 5M3 7v6h6v-3"/></svg>${e.external} external</span>
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><ellipse cx="8" cy="4" rx="5" ry="2"/><path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/></svg>${escapeHtml(e.records)} records</span>
-      <span class="lrow-foot-r">${e.collab&&e.collab.length?avStack(e.collab,3):''}${e.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</span>
+      ${e.collab&&e.collab.length?`<span class="lrow-sep">·</span><span class="lrow-collab">${avStack(e.collab,3)}</span>`:''}<span class="lrow-foot-r">${e.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</span>
     </div>
   </div>`;
 }
@@ -3005,7 +3076,7 @@ function renderEntityDetail(id){
           : `<button class="btn" onclick="toast('No pending changes')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>Published</button>`}<button class="btn" style="width:40px;padding:0" aria-label="More actions" onclick="_detailKebab(this,'entities','${id}')"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button>
       </div>
     </div>
-    <div class="mtabs">${tabs.map(([tid,label])=>`<button class="mtab ${tab===tid?'active':''}" onclick="setDetailTab('${tid}')">${label}${cnt[tid]!=null?` <span style="font-size:11px;font-weight:700;color:var(--t3);background:var(--hover);padding:1px 6px;border-radius:6px;margin-left:2px">${cnt[tid]}</span>`:''}</button>`).join('')}</div>
+    <div class="mtabs">${tabs.map(([tid,label])=>`<button class="mtab ${tab===tid?'active':''}" ${TAB_VER[tid]?`data-version="${TAB_VER[tid]}"`:''} onclick="setDetailTab('${tid}')">${label}${cnt[tid]!=null?` <span style="font-size:11px;font-weight:700;color:var(--t3);background:var(--hover);padding:1px 6px;border-radius:6px;margin-left:2px">${cnt[tid]}</span>`:''}</button>`).join('')}</div>
     <div id="dpanel">${renderDetailTab(e,tab,endpoints)}</div>`;
   if(tab==='overview' || (tab==='relationships'&&_relViewMode==='diagram')) setTimeout(_diagInit,0);
 }
@@ -3133,11 +3204,10 @@ function _etTblRow(e,t,idx){
   </div>`;
 }
 function _etTblCard(e,t){
-  return `<div class="md-ecard" onclick="etView('list');etExpand('${t.id}')">
-    <div class="md-ecard-h"><span class="md-ecard-ic">${_MDIC.tbl}</span><span class="md-ecard-name">${escapeHtml(t.alias)}</span><span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span></div>
-    <div class="md-ecard-desc">${escapeHtml(t.desc)}</div>
-    <div class="md-ecard-meta">${_stPill(t.status)}<span class="metaico">${_MDIC.col}${t.cols} cols</span><span class="metaico">${_MDIC.rel}${t.rel} rel</span></div>
-    <div class="md-ecard-foot"><span class="mcard-owner">${av(P(t.owner),'sm')}${escapeHtml(t.entity)}</span><span class="mcard-date">${escapeHtml(t.updated)}</span></div></div>`;
+  return `<div class="mcard" onclick="etView('list');etExpand('${t.id}')">
+    <div class="mcard-top"><div style="display:flex;align-items:center;gap:8px;min-width:0"><div class="mcard-title">${escapeHtml(t.alias)}</div><span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span></div>${_stateTag(t.status)}</div>
+    <div class="mcard-desc">${escapeHtml(t.desc)}</div>
+    <div class="mcard-meta2"><span class="cmeta">${_CIC.user}${escapeHtml(P(t.owner).n)}</span><span class="cmeta">${_CIC.col}${t.cols} cols</span><span class="cmeta">${_CIC.link}${t.rel} rel</span><span class="cmeta">${_CIC.clock}${escapeHtml(t.updated)}</span></div></div>`;
 }
 function _tableExists(id){ return !!(typeof _table==='function'?_table(id):TABLES.find(t=>t.id===id)); }
 /* ── Relationships tab: Diagram / Cards / Table (port of TfdRelationshipsTab) ── */
@@ -3318,7 +3388,6 @@ const _STD_PRIV_DEFS=[
 let _cpSearch='', _cpDraft=null, _mrDraft=null;
 function cpSearch(v){ _cpSearch=v; renderEntityDetail(detailState.id); _mdRefocus('cpSearch',v); }
 function _normCpriv(pv){ return { n:pv.n, sym:pv.sym||(_slug(pv.n).replace(/-/g,'_')), scope:pv.scope||'This entity only', desc:pv.desc||'', roles:pv.roles||[], perms:pv.perms||((pv.p||[]).map(x=>x[0])), isNew:!!pv.isNew }; }
-function _roleChips(roles){ return roles.length? roles.map(r=>`<span class="priv-role">${escapeHtml(r)}</span>`).join('') : `<span class="priv-role priv-role-none">No roles assigned</span>`; }
 function privTab(e){
   e.privRoles=e.privRoles||{};
   const cprivs=(e.cprivs||[]).map(_normCpriv);
@@ -3326,37 +3395,41 @@ function privTab(e){
   const cfiltered=cprivs.filter(pv=>!q||pv.n.toLowerCase().includes(q)||pv.sym.toLowerCase().includes(q));
   return `
     <div class="dsec">
-      <div class="priv-sec-h"><div class="dsec-t">Standard privileges</div></div>
+      <div class="priv-sec-h"><div class="dsec-t">Standard privileges <span class="dsec-count">${_STD_PRIV_DEFS.length}</span></div></div>
       <div class="priv-sec-sub">Predefined system privileges every entity has. Assign which roles hold them; the privileges themselves can’t be edited.</div>
-      <div class="priv-card-grid">${_STD_PRIV_DEFS.map(p=>_entStdPrivCard(e,p)).join('')}</div>
+      <div class="priv-list">${_STD_PRIV_DEFS.map(p=>_entStdPrivRow(e,p)).join('')}</div>
     </div>
     <div class="dsec">
       <div class="priv-sec-h"><div class="dsec-t">Custom privileges <span class="dsec-count">${cprivs.length}</span></div>
         <div class="priv-sec-actions"><label class="dsf-search" style="max-width:220px;height:34px">${_MDIC.search}<input id="cpSearch" type="text" placeholder="Search privileges…" value="${escapeHtml(_cpSearch)}" oninput="cpSearch(this.value)" autocomplete="off"></label>
           <button class="btn btn-primary" onclick="openCreateCustomPriv('${e.id}')">${_MDIC.plus} New custom privilege</button></div></div>
       <div class="priv-sec-sub">Domain-specific privileges you define for ${escapeHtml(e.name)}, composed from the tenant permission catalog. Cross-entity permissions are allowed.</div>
-      ${cfiltered.length?`<div class="priv-card-grid">${cfiltered.map(pv=>_entCustPrivCard(e,pv,cprivs.indexOf(pv))).join('')}</div>`
+      ${cfiltered.length?`<div class="priv-list">${cfiltered.map(pv=>_entCustPrivRow(e,pv,cprivs.indexOf(pv))).join('')}</div>`
         :`<div class="empty" style="padding:30px"><div class="empty-t">${cprivs.length?'No privileges match':'No custom privileges yet'}</div>${cprivs.length?'Try a different search.':'Create one to grant domain-specific access.'}</div>`}
     </div>`;
 }
-function _entStdPrivCard(e,p){
+function _roleRow(roles){
+  if(!roles||!roles.length) return `<span class="priv-role priv-role-none">No roles assigned</span>`;
+  const shown=roles.slice(0,2), extra=roles.length-shown.length;
+  return shown.map(r=>`<span class="priv-role">${escapeHtml(r)}</span>`).join('')+(extra>0?`<span class="priv-more">+${extra}</span>`:'');
+}
+function _entStdPrivRow(e,p){
   const roles=(e.privRoles[p.k]||[]);
-  return `<div class="priv-card"><div class="priv-card-h"><span class="priv-card-ic">${p.ic}</span>
-      <div class="priv-card-tt"><div class="priv-card-name">${p.n}</div><div class="priv-sym">${p.k}</div></div>
-      <span class="priv-badge">Standard</span></div>
-    <div class="priv-card-desc">${p.desc}</div>
-    <div class="priv-card-foot"><div class="priv-roles">${_roleChips(roles)}</div>
+  return `<div class="priv-row">
+    <div class="priv-row-l"><span class="priv-card-ic">${p.ic}</span>
+      <div class="priv-row-tx"><div class="priv-row-top"><span class="priv-row-name">${p.n}</span><span class="priv-sym">${p.k}</span></div>
+        <div class="priv-row-desc">${p.desc}</div></div></div>
+    <div class="priv-row-r"><div class="priv-roles">${_roleRow(roles)}</div>
       <button class="btn priv-manage" onclick="openManageRoles('${e.id}','${p.k}')">${_MDIC.gear} Manage roles</button></div></div>`;
 }
-function _entCustPrivCard(e,pv,idx){
-  return `<div class="priv-card"><div class="priv-card-h"><span class="priv-card-ic priv-card-ic-key">${_KEY_IC}</span>
-      <div class="priv-card-tt"><div class="priv-card-name">${escapeHtml(pv.n)}</div><div class="priv-sym">${escapeHtml(pv.sym)}</div></div>
-      <span class="priv-badge priv-badge-custom">Custom</span><span class="priv-badge priv-badge-scope">${escapeHtml(pv.scope)}</span>
-      ${pv.isNew?'<span class="erel-new">NEW</span>':''}
-      <button class="lrow-menu" onclick="_cpMenu('${e.id}',${idx},this)" aria-label="Privilege actions">${_MDIC.dots}</button></div>
-    <div class="priv-card-desc">${escapeHtml(pv.desc)}</div>
-    <div class="priv-card-foot"><div class="priv-roles">${_roleChips(pv.roles)}</div>
-      <button class="btn priv-manage" onclick="openManageRoles('${e.id}','custom:${idx}')">${_MDIC.gear} Manage roles</button></div></div>`;
+function _entCustPrivRow(e,pv,idx){
+  return `<div class="priv-row">
+    <div class="priv-row-l"><span class="priv-card-ic priv-card-ic-key">${_KEY_IC}</span>
+      <div class="priv-row-tx"><div class="priv-row-top"><span class="priv-row-name">${escapeHtml(pv.n)}</span><span class="priv-sym">${escapeHtml(pv.sym)}</span><span class="priv-badge priv-badge-scope">${escapeHtml(pv.scope)}</span>${pv.isNew?'<span class="erel-new">NEW</span>':''}</div>
+        <div class="priv-row-desc">${escapeHtml(pv.desc)}</div></div></div>
+    <div class="priv-row-r"><div class="priv-roles">${_roleRow(pv.roles)}</div>
+      <button class="btn priv-manage" onclick="openManageRoles('${e.id}','custom:${idx}')">${_MDIC.gear} Manage roles</button>
+      <button class="lrow-menu" onclick="_cpMenu('${e.id}',${idx},this)" aria-label="Privilege actions">${_MDIC.dots}</button></div></div>`;
 }
 function _cpMenu(id,idx,btn){ _mdKebab(btn,[
     {ic:_MDIC.gear,label:'Manage roles',act:`openManageRoles('${id}','custom:${idx}')`},
@@ -3862,7 +3935,6 @@ function renderTablesList(){
       ${filtering?`<button class="dsf-clear" onclick="tlClear()">Clear</button>`:''}
       <span class="tbar-spring"></span>
       ${viewToggle(tablesListState,'tlView')}
-      <button class="btn btn-primary" onclick="navigate('tables/new')"><svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> New table</button>
     </div>
     ${tablesListState.view==='table' ? dtblView('tables',filtered,_tblCols(),'tables') : filtered.length===0?`<div class="empty"><div class="empty-t">No tables match</div>Try a different search or clear the filters.</div>` : tablesListState.view==='grid' ? `<div class="mcard-grid">${filtered.map(tableCard).join('')}</div>` : `<div class="lrows">${filtered.map(tableRow).join('')}</div>`}`;
 }
@@ -3872,10 +3944,10 @@ function tableRow(t){
     <div class="lrow-top">
       <span class="lrow-ic ic-tbl">${_IC_TABLE}</span>
       <span class="lrow-title">${escapeHtml(t.alias)}</span>
-      ${_modelChip(t.model)}
-      ${_entityChip(t.entityId,t.entity)}
+      ${_lpm(_MDIC.tbl,(_model(t.model)||{}).name||t.model)}
+      ${_lpm(_MDIC.ent,t.entity)}
       <span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span>
-      <span class="lrow-right">${_stPill(t.status)}<span class="lrow-time">${escapeHtml(t.updated)}</span><button class="lrow-menu" onclick="event.stopPropagation();openRowMenu('tables','${t.id}',this)" aria-label="Actions"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></span>
+      <span class="lrow-right">${_stTag(t.status)}<span class="lrow-time">${escapeHtml(t.updated)}</span><button class="lrow-menu" onclick="event.stopPropagation();openRowMenu('tables','${t.id}',this)" aria-label="Actions"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></span>
     </div>
     <div class="lrow-desc">${escapeHtml(t.desc)}</div>
     <div class="lrow-foot">
@@ -3883,7 +3955,7 @@ function tableRow(t){
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M2.5 6.5h11"/></svg>${t.cols.length} columns</span>
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><ellipse cx="8" cy="4" rx="5" ry="2"/><path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/></svg>${escapeHtml(t.rows)} rows</span>
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M6 10a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M10 6a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4"/></svg>${relN} relations</span>
-      <span class="lrow-foot-r">${t.collab&&t.collab.length?avStack(t.collab,3):''}${t.tags.map(x=>`<span class="tag">${escapeHtml(x)}</span>`).join('')}</span>
+      ${t.collab&&t.collab.length?`<span class="lrow-sep">·</span><span class="lrow-collab">${avStack(t.collab,3)}</span>`:''}<span class="lrow-foot-r">${t.tags.map(x=>`<span class="tag">${escapeHtml(x)}</span>`).join('')}</span>
     </div>
   </div>`;
 }
@@ -3906,7 +3978,7 @@ function renderTableDetail(id){
       <div class="dh-desc" style="margin-top:8px">${escapeHtml(t.desc)}</div>
       <div class="lrow-foot" style="margin-left:0;margin-top:12px"><span class="lrow-owner">${av(P(t.owner),'sm')}${escapeHtml(P(t.owner).n)}</span><span class="lrow-sep">·</span><span>entity <a onclick="navigate('entities/${t.entityId}')" style="color:var(--primary);cursor:pointer">${escapeHtml(t.entity)}</a></span><span class="lrow-sep">·</span><span class="lrow-metric">${t.cols.length} columns</span><span class="lrow-sep">·</span><span class="lrow-metric">${escapeHtml(t.rows)} rows</span><span class="lrow-sep">·</span><span>Updated ${escapeHtml(t.updated)}</span></div>
     </div><div class="dh-actions">${pending?`<span class="publish-hint"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"/></svg>Unpublished changes</span><button class="btn btn-primary" onclick="openPublishTable('${id}')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10"/></svg>Publish</button>`:`<button class="btn" onclick="toast('No pending changes')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>Published</button>`}<button class="btn" style="width:40px;padding:0" aria-label="More actions" onclick="_detailKebab(this,'tables','${id}')"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></div></div>
-    <div class="mtabs">${tabs.map(([tid,label])=>`<button class="mtab ${tab===tid?'active':''}" onclick="setTableTab('${tid}')">${label}${cnt[tid]!=null?` <span style="font-size:11px;font-weight:700;color:var(--field-placeholder);background:var(--muted);padding:1px 6px;border-radius:6px;margin-left:2px">${cnt[tid]}</span>`:''}</button>`).join('')}</div>
+    <div class="mtabs">${tabs.map(([tid,label])=>`<button class="mtab ${tab===tid?'active':''}" ${TAB_VER[tid]?`data-version="${TAB_VER[tid]}"`:''} onclick="setTableTab('${tid}')">${label}${cnt[tid]!=null?` <span style="font-size:11px;font-weight:700;color:var(--field-placeholder);background:var(--muted);padding:1px 6px;border-radius:6px;margin-left:2px">${cnt[tid]}</span>`:''}</button>`).join('')}</div>
     <div id="tpanel">${tab==='overview'?tableOverviewTab(t):tab==='columns'?columnsTab(t):tab==='relationships'?relationshipsTab(t):tab==='data'?dataTab(t):tab==='indexes'?tableIndexesTab(t):_historyTab('table',t)}</div>`;
   if(tab==='relationships'&&_relViewMode==='diagram') setTimeout(_diagInit,0);
 }
@@ -4560,7 +4632,6 @@ function renderReferenceList(){
       ${filtering?`<button class="dsf-clear" onclick="rlClear()">Clear</button>`:''}
       <span class="tbar-spring"></span>
       ${viewToggle(refListState,'rlView')}
-      <button class="btn btn-primary" onclick="navigate('reference/new')"><svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> New reference list</button>
     </div>
     ${refListState.view==='table' ? dtblView('reference',filtered,_refCols(),'reference') : filtered.length===0?`<div class="empty"><div class="empty-t">No reference data matches</div>Try a different search or clear the filters.</div>` : refListState.view==='grid' ? `<div class="mcard-grid">${filtered.map(refCard).join('')}</div>` : `<div class="lrows">${filtered.map(refRow).join('')}</div>`}`;
 }
@@ -4569,9 +4640,9 @@ function refRow(r){
     <div class="lrow-top">
       ${_catIcon(r.category)}
       <span class="lrow-title">${escapeHtml(r.name)}</span>
-      ${_catBadge(r.category)}
-      ${_originBadge(r.origin)}
-      <span class="lrow-right">${_stPill(r.status)}<span class="lrow-time">${escapeHtml(r.updated)}</span><button class="lrow-menu" onclick="event.stopPropagation();openRowMenu('reference','${r.id}',this)" aria-label="Actions"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></span>
+      ${_lpm(_PM_TAG,r.category)}
+      ${_lpm(_PM_SRC,r.origin)}
+      <span class="lrow-right">${_stTag(r.status)}<span class="lrow-time">${escapeHtml(r.updated)}</span><button class="lrow-menu" onclick="event.stopPropagation();openRowMenu('reference','${r.id}',this)" aria-label="Actions"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></span>
     </div>
     <div class="lrow-desc">${escapeHtml(r.desc)}</div>
     <div class="lrow-foot">
@@ -4579,7 +4650,7 @@ function refRow(r){
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 4h10M3 8h10M3 12h6"/></svg>${r.values.length} items</span>
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M2.5 6.5h11"/></svg>${r.fields} fields</span>
       <span class="lrow-sep">·</span><span class="lrow-metric"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M6 10a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M10 6a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4"/></svg>${r.referencedBy} referenced by</span>
-      <span class="lrow-foot-r">${r.collab&&r.collab.length?avStack(r.collab,3):''}${r.tags.map(x=>`<span class="tag">${escapeHtml(x)}</span>`).join('')}</span>
+      ${r.collab&&r.collab.length?`<span class="lrow-sep">·</span><span class="lrow-collab">${avStack(r.collab,3)}</span>`:''}<span class="lrow-foot-r">${r.tags.map(x=>`<span class="tag">${escapeHtml(x)}</span>`).join('')}</span>
     </div>
   </div>`;
 }
@@ -4602,7 +4673,7 @@ function renderReferenceDetail(id){
       <div class="rfd-internal"><code>${escapeHtml(_refInternal(r))}</code><span class="rfd-lock" title="Internal name — cannot be changed after creation"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="10" height="6" rx="1.3"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg></span></div>
       <div class="dh-title-row" style="margin-top:10px">${_stPill(r.status)}${_originBadge(r.origin)}${_catBadge(r.category)}<span class="rfd-sens"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M8 1.5l5.5 2v4c0 3.2-2.3 5.6-5.5 6.5-3.2-.9-5.5-3.3-5.5-6.5v-4L8 1.5Z"/></svg>${escapeHtml(r.sensitivity||'Internal')}</span></div>
     </div><div class="dh-actions">${pending?`<button class="btn btn-primary" onclick="publishReference('${id}')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10"/></svg>Publish</button>`:`<button class="btn" onclick="toast('No pending changes')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>Published</button>`}<button class="btn" style="width:40px;padding:0" aria-label="More actions" onclick="_refKebab(this,'${id}')"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></div></div>
-    <div class="mtabs">${tabs.map(([tid,label])=>`<button class="mtab ${tab===tid?'active':''}" onclick="setRefTab('${tid}')">${label}${cnt[tid]!=null?` <span style="font-size:11px;font-weight:700;color:var(--field-placeholder);background:var(--muted);padding:1px 6px;border-radius:6px;margin-left:2px">${cnt[tid]}</span>`:''}</button>`).join('')}</div>
+    <div class="mtabs">${tabs.map(([tid,label])=>`<button class="mtab ${tab===tid?'active':''}" ${TAB_VER[tid]?`data-version="${TAB_VER[tid]}"`:''} onclick="setRefTab('${tid}')">${label}${cnt[tid]!=null?` <span style="font-size:11px;font-weight:700;color:var(--field-placeholder);background:var(--muted);padding:1px 6px;border-radius:6px;margin-left:2px">${cnt[tid]}</span>`:''}</button>`).join('')}</div>
     <div id="rpanel">${tab==='overview'?refOverviewTab(r):tab==='data'?refDataTab(r):tab==='refby'?refReferencedByTab(r):tab==='columns'?refColumnsTab(r):tab==='relationships'?refRelTab(r):tab==='settings'?refSettingsTab(r):_historyTab('reference',r)}</div>`;
   if(tab==='relationships'&&_relViewMode==='diagram') setTimeout(_diagInit,0);
 }
@@ -5092,6 +5163,8 @@ function saveNewTable(){
    ────────────────────────────────────────────────────────────── */
 const SCOPE_TIERS = ['v1','v1.5','v2'];
 let SCOPE = 'v1';
+/* Which detail tabs belong to which scope (untagged = V1 · browse). Authoring/govern → V1.5, API builder → Full vision. */
+const TAB_VER = { privileges:'v1.5', history:'v1.5', settings:'v1.5', indexes:'v1.5', api:'v2' };
 function vcallout(tier,text){ return `<div class="vcallout" data-version="${tier}"><span class="vcallout-tag">${tier==='v2'?'Full vision':tier==='v1.5'?'V1.5':'V1'}</span><span>${text}</span></div>`; }
 function applyScope(){
   const si=SCOPE_TIERS.indexOf(SCOPE);
@@ -5100,6 +5173,43 @@ function applyScope(){
   const foot=document.querySelector('.sb-foot'); if(foot) foot.textContent = (SCOPE==='v1'?'V1 · Foundation':SCOPE==='v1.5'?'V1.5 · Expansion':'Full vision')+' scope';
 }
 function setScope(t){ SCOPE=t; applyScope(); }
+/* Draggable Scope toggle — so it never blocks proto functionality underneath it */
+(function makeScopeDraggable(){
+  const el=document.querySelector('.vtoggle'); if(!el) return;
+  const KEY='aims-vtoggle-pos', M=8;
+  const clamp=(x,y)=>{ const r=el.getBoundingClientRect(); return {
+    x:Math.max(M,Math.min(x, innerWidth  - r.width  - M)),
+    y:Math.max(M,Math.min(y, innerHeight - r.height - M)) }; };
+  const place=(x,y)=>{ const p=clamp(x,y); el.style.left=p.x+'px'; el.style.top=p.y+'px'; el.style.right='auto'; el.style.bottom='auto'; };
+  try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&typeof s.x==='number') place(s.x,s.y); }catch(e){}
+  let st=null;                                   // {px,py,ox,oy,moved}
+  el.addEventListener('pointerdown',e=>{
+    if(e.target.closest('button')) return;       // let V1/V1.5/Full-vision clicks through
+    const r=el.getBoundingClientRect();
+    st={px:e.clientX, py:e.clientY, ox:r.left, oy:r.top, moved:false};
+    try{ el.setPointerCapture(e.pointerId); }catch(_){} e.preventDefault();
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!st) return;
+    const dx=e.clientX-st.px, dy=e.clientY-st.py;
+    if(!st.moved && Math.hypot(dx,dy)<3) return;  // ignore micro-jitter → still a click
+    st.moved=true; el.classList.add('dragging');
+    place(st.ox+dx, st.oy+dy);
+  });
+  const end=()=>{
+    if(!st) return;
+    if(st.moved){
+      const r=el.getBoundingClientRect();
+      try{ localStorage.setItem(KEY, JSON.stringify({x:r.left,y:r.top})); }catch(_){}
+      const swallow=ev=>ev.stopPropagation();     // eat the synthetic click after a drag
+      el.addEventListener('click',swallow,true);
+      setTimeout(()=>el.removeEventListener('click',swallow,true),60);
+    }
+    el.classList.remove('dragging'); st=null;
+  };
+  el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+  addEventListener('resize',()=>{ if(el.style.left){ const r=el.getBoundingClientRect(); place(r.left,r.top); } });
+})();
 
 /* ──────────────────────────────────────────────────────────────
    MODELS (hero tab) — SaaS demo data, card grid
@@ -5118,6 +5228,12 @@ function P(k){ return PEOPLE[k]||{i:'?',n:'Unknown',c:'slate'}; }
 function av(p,size){ const c=AV_COLORS[p.c]||AV_COLORS.slate; return `<span class="av av-${size||'sm'}" style="background:${c}" title="${escapeHtml(p.n||p.i)}">${escapeHtml(p.i)}</span>`; }
 function avStack(keys,max){ max=max||3; const list=keys.map(P); const shown=list.slice(0,max); const extra=list.length-shown.length; return `<span class="av-stack">${shown.map(p=>av(p,'sm')).join('')}${extra>0?`<span class="av-more">+${extra}</span>`:''}</span>`; }
 function _stPill(s){ const map={Published:'published',Draft:'draft','Pending changes':'pending',Deprecated:'deprecated',Archived:'archived'}; return `<span class="st-pill ${map[s]||'draft'}"><span class="st-dot"></span>${escapeHtml(s)}</span>`; }
+/* Entity-list uses a SEMANTIC TAG for status (colored pill), vs the card Badge (dot). */
+function _stTag(s){ const map={Published:'success',Draft:'neutral','Pending changes':'alert',Deprecated:'error',Archived:'neutral'}; return `<span class="st-tag st-tag-${map[s]||'neutral'}">${escapeHtml(s)}</span>`; }
+/* Entity-list: the slot beside the title is PRIMARY METADATA (icon + text), not neutral tags */
+const _PM_TAG='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.5 8V3.5a1 1 0 0 1 1-1H8l5.5 5.5a1 1 0 0 1 0 1.4l-3.6 3.6a1 1 0 0 1-1.4 0L2.8 8.7A1 1 0 0 1 2.5 8Z"/><circle cx="5.4" cy="5.4" r="1"/></svg>';
+const _PM_SRC='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="4" cy="4" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="12" cy="8" r="1.6"/><path d="M4 5.6v4.8M5.6 4H8a2.4 2.4 0 0 1 2.4 2.4v0"/></svg>';
+function _lpm(ic,text){ return `<span class="lrow-pmeta">${ic}${escapeHtml(text)}</span>`; }
 function _origin(o){ return `<span class="obadge ${o.toLowerCase()}">${escapeHtml(o)}</span>`; }
 
 const MODELS=[
@@ -5160,7 +5276,9 @@ function _crumbs(items){
 }
 function pageShell(active){
   const tab=(id,label)=>`<button class="mtab ${active===id?'active':''}" onclick="navigate('${id}')">${label}</button>`;
-  return `<h1 class="page-h1">Models</h1>
+  const ACT={models:['New model','models/new'],entities:['New entity','entities/new'],tables:['New table','tables/new'],reference:['New reference list','reference/new']};
+  const a=ACT[active]||ACT.models;
+  return `<div class="page-head"><h1 class="page-h1">Models</h1><button class="btn btn-primary" data-version="v1.5" onclick="navigate('${a[1]}')">${_MDIC.plus} ${a[0]}</button></div>
     <div class="mtabs mtabs-lg">${tab('models','Models')}${tab('entities','Entities')}${tab('tables','Tables')}${tab('reference','Reference Data')}</div>`;
 }
 
@@ -5225,16 +5343,39 @@ function renderModels(){
       ${filtering?`<button class="dsf-clear" onclick="mClear()">Clear filters</button>`:''}
       <span class="tbar-spring"></span>
       ${viewToggle(modelsState,'mView')}
-      <button class="btn btn-primary" onclick="navigate('models/new')"><svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> New model</button>
     </div>
     ${body}`;
 }
+/* Colored metadata icons for the DS card-grid layout */
+const _CIC={
+  user:'<svg class="cmi cmi-blue" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.3" r="2.5"/><path d="M3.5 13a4.5 4.5 0 0 1 9 0" stroke-linecap="round"/></svg>',
+  grid:'<svg class="cmi cmi-cyan" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>',
+  clock:'<svg class="cmi cmi-green" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4.6V8l2.4 1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  people:'<svg class="cmi cmi-orange" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5.5" r="2.1"/><path d="M2.4 12.5a3.6 3.6 0 0 1 7.2 0" stroke-linecap="round"/><path d="M10.6 4.2a2 2 0 0 1 0 3.6M11.4 12.5a3.4 3.4 0 0 0-1.6-2.7" stroke-linecap="round"/></svg>',
+  ver:'<svg class="cmi cmi-purple" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3.5h6l4 4v5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z"/><path d="M9 3.5V7h4" stroke-linejoin="round"/></svg>',
+  tbl:'<svg class="cmi cmi-cyan" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M6 6.5v6.5"/></svg>',
+  col:'<svg class="cmi cmi-cyan" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M2.5 6.5h11"/></svg>',
+  db:'<svg class="cmi cmi-purple" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="8" cy="4" rx="5" ry="2"/><path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/></svg>',
+  items:'<svg class="cmi cmi-cyan" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 4h10M3 8h10M3 12h6"/></svg>',
+  link:'<svg class="cmi cmi-purple" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 10a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M10 6a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4"/></svg>',
+};
+/* Shared DS status state-tag (outline pill) — used by cards + preview slideouts */
+function _stateTag(s){ const c={Published:'published',Draft:'draft','Pending changes':'pending',Deprecated:'deprecated',Archived:'draft'}[s]||'draft'; return `<span class="mcard-state ${c}">${escapeHtml(s)}</span>`; }
 function modelCard(m){
+  const own=P(m.owner);
+  const st={Published:'published',Draft:'draft','Pending changes':'pending',Deprecated:'deprecated',Archived:'draft'}[m.status]||'draft';
+  const meta=[
+    `<span class="cmeta">${_CIC.user}${escapeHtml(own.n)}</span>`,
+    `<span class="cmeta">${_CIC.grid}${m.entities} entities</span>`,
+    `<span class="cmeta">${_CIC.clock}${escapeHtml(m.updated)}</span>`,
+    (m.collab&&m.collab.length)?`<span class="cmeta">${_CIC.people}+${m.collab.length}</span>`:'',
+    m.version?`<span class="cmeta">${_CIC.ver}${escapeHtml(m.version)}</span>`:'',
+  ].filter(Boolean).join('');
   return `<div class="mcard" onclick="openModelPreview('${m.id}')">
-    <div class="mcard-head"><div class="mcard-title">${escapeHtml(m.name)}</div>${_origin(m.origin)}${m.collab&&m.collab.length?avStack([m.owner].concat(m.collab),3):''}</div>
+    <div class="mcard-top"><div class="mcard-title">${escapeHtml(m.name)}</div><span class="mcard-state ${st}">${escapeHtml(m.status)}</span></div>
+    <div class="mcard-subtitle">${escapeHtml(m.origin)}${m.category?' · '+escapeHtml(m.category):''}</div>
     <div class="mcard-desc">${escapeHtml(m.desc)}</div>
-    <div class="mcard-meta">${_stPill(m.status)}<span class="metaico"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>${m.entities} entities</span>${m.version?`<span class="ver-chip"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5" stroke-linecap="round"/></svg>${m.version}</span>`:''}</div>
-    <div class="mcard-foot"><span class="mcard-owner">${av(P(m.owner),'sm')}${escapeHtml(P(m.owner).n)}</span><span class="mcard-date">${escapeHtml(m.updated)}</span></div>
+    <div class="mcard-meta2">${meta}</div>
   </div>`;
 }
 function modelRow(m){
@@ -5357,37 +5498,54 @@ function _refCols(){ return [
   {key:'owner',label:'Owner',cell:r=>_ownerCell(r.owner),sort:r=>P(r.owner).n.toLowerCase()},
   {key:'updated',label:'Last modified',cell:r=>`<span class="mtbl-date">${escapeHtml(r.updated)}</span>`,sort:r=>_agoOrder(r.updated)},
 ]; }
-/* ── Grid (card) views for Entities / Tables / Reference ── */
-const _MI_TBL='<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M6 6.5v6.5"/></svg>';
-const _MI_COL='<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M2.5 6.5h11"/></svg>';
-const _MI_DB='<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><ellipse cx="8" cy="4" rx="5" ry="2"/><path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/></svg>';
-const _MI_ITEMS='<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 4h10M3 8h10M3 12h6"/></svg>';
-const _MI_LINK='<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M6 10a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M10 6a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4"/></svg>';
+/* ── Grid (card) views for Entities / Tables / Reference (DS Card-grid layout) ── */
 function entityCard(e){
-  return `<div class="mcard" onclick="navigate('entities/${e.id}')">
-    <div class="mcard-head"><div class="mcard-title">${escapeHtml(e.name)}</div>${e.collab&&e.collab.length?avStack([e.owner].concat(e.collab),3):''}</div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">${_modelChip(e.model)}<span class="chip">${escapeHtml(e.domain)}</span></div>
+  const own=P(e.owner), mdl=_model(e.model);
+  const meta=[
+    `<span class="cmeta">${_CIC.user}${escapeHtml(own.n)}</span>`,
+    `<span class="cmeta">${_CIC.tbl}${e.tables.length} tables</span>`,
+    `<span class="cmeta">${_CIC.db}${escapeHtml(e.records)}</span>`,
+    `<span class="cmeta">${_CIC.clock}${escapeHtml(e.updated)}</span>`,
+    (e.collab&&e.collab.length)?`<span class="cmeta">${_CIC.people}+${e.collab.length}</span>`:'',
+  ].filter(Boolean).join('');
+  return `<div class="mcard" onclick="openEntityPreview('${e.id}')">
+    <div class="mcard-top"><div class="mcard-title">${escapeHtml(e.name)}</div>${_stateTag(e.status)}</div>
+    <div class="mcard-subtitle">${escapeHtml((mdl||{name:e.model}).name)} · ${escapeHtml(e.domain)}</div>
     <div class="mcard-desc">${escapeHtml(e.desc)}</div>
-    <div class="mcard-meta">${_stPill(e.status)}<span class="metaico">${_MI_TBL}${e.tables.length} tables</span><span class="metaico">${_MI_DB}${escapeHtml(e.records)}</span></div>
-    <div class="mcard-foot"><span class="mcard-owner">${av(P(e.owner),'sm')}${escapeHtml(P(e.owner).n)}</span><span class="mcard-date">${escapeHtml(e.updated)}</span></div>
+    <div class="mcard-meta2">${meta}</div>
   </div>`;
 }
 function tableCard(t){
-  return `<div class="mcard" onclick="navigate('tables/${t.id}')">
-    <div class="mcard-head"><div class="mcard-title">${escapeHtml(t.alias)}</div><span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span>${t.collab&&t.collab.length?avStack([t.owner].concat(t.collab),3):''}</div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">${_modelChip(t.model)}${_entityChip(t.entityId,t.entity)}</div>
+  const own=P(t.owner), mdl=_model(t.model);
+  const role=`<span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span>`;
+  const meta=[
+    `<span class="cmeta">${_CIC.user}${escapeHtml(own.n)}</span>`,
+    `<span class="cmeta">${_CIC.col}${t.cols.length} cols</span>`,
+    `<span class="cmeta">${_CIC.db}${escapeHtml(t.rows)}</span>`,
+    `<span class="cmeta">${_CIC.clock}${escapeHtml(t.updated)}</span>`,
+    (t.collab&&t.collab.length)?`<span class="cmeta">${_CIC.people}+${t.collab.length}</span>`:'',
+  ].filter(Boolean).join('');
+  return `<div class="mcard" onclick="openTablePreview('${t.id}')">
+    <div class="mcard-top"><div style="display:flex;align-items:center;gap:8px;min-width:0">${`<div class="mcard-title">${escapeHtml(t.alias)}</div>`}${role}</div>${_stateTag(t.status)}</div>
+    <div class="mcard-subtitle">${escapeHtml((mdl||{name:t.model}).name)} · ${escapeHtml(t.entity)}</div>
     <div class="mcard-desc">${escapeHtml(t.desc)}</div>
-    <div class="mcard-meta">${_stPill(t.status)}<span class="metaico">${_MI_COL}${t.cols.length} cols</span><span class="metaico">${_MI_DB}${escapeHtml(t.rows)}</span></div>
-    <div class="mcard-foot"><span class="mcard-owner">${av(P(t.owner),'sm')}${escapeHtml(P(t.owner).n)}</span><span class="mcard-date">${escapeHtml(t.updated)}</span></div>
+    <div class="mcard-meta2">${meta}</div>
   </div>`;
 }
 function refCard(r){
-  return `<div class="mcard" onclick="navigate('reference/${r.id}')">
-    <div class="mcard-head"><div class="mcard-title">${escapeHtml(r.name)}</div>${r.collab&&r.collab.length?avStack([r.owner].concat(r.collab),3):''}</div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">${_catBadge(r.category)}${_originBadge(r.origin)}</div>
+  const own=P(r.owner);
+  const meta=[
+    `<span class="cmeta">${_CIC.user}${escapeHtml(own.n)}</span>`,
+    `<span class="cmeta">${_CIC.items}${r.values.length} items</span>`,
+    `<span class="cmeta">${_CIC.link}${r.referencedBy} refs</span>`,
+    `<span class="cmeta">${_CIC.clock}${escapeHtml(r.updated)}</span>`,
+    (r.collab&&r.collab.length)?`<span class="cmeta">${_CIC.people}+${r.collab.length}</span>`:'',
+  ].filter(Boolean).join('');
+  return `<div class="mcard" onclick="openRefPreview('${r.id}')">
+    <div class="mcard-top"><div class="mcard-title">${escapeHtml(r.name)}</div>${_stateTag(r.status)}</div>
+    <div class="mcard-subtitle">${escapeHtml(r.category)} · ${escapeHtml(r.origin)}</div>
     <div class="mcard-desc">${escapeHtml(r.desc)}</div>
-    <div class="mcard-meta">${_stPill(r.status)}<span class="metaico">${_MI_ITEMS}${r.values.length} items</span><span class="metaico">${_MI_LINK}${r.referencedBy} refs</span></div>
-    <div class="mcard-foot"><span class="mcard-owner">${av(P(r.owner),'sm')}${escapeHtml(P(r.owner).n)}</span><span class="mcard-date">${escapeHtml(r.updated)}</span></div>
+    <div class="mcard-meta2">${meta}</div>
   </div>`;
 }
 let _diagState={scale:1,tx:0,ty:0,drag:null};
@@ -5427,21 +5585,22 @@ function openModelPreview(id){
   const added = 2 + (e % 5);
   $('slideout').innerHTML=`
     <div class="so-head mp-head">
-      <div style="display:flex;align-items:flex-start;gap:12px;min-width:0">
+      <div class="mp-head-l">
         <span class="lrow-ic" style="width:34px;height:34px;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>
-        <div style="min-width:0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="so-title">${escapeHtml(m.name)}</span>${_stPill(m.status)}</div>
-          <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">${_origin(m.origin)}${m.version?`<span class="ver-chip">${m.version}</span>`:''}</div></div>
+        <div style="min-width:0"><div class="mp-title-row"><span class="so-title">${escapeHtml(m.name)}</span><span class="mcard-state ${({Published:'published',Draft:'draft','Pending changes':'pending',Deprecated:'deprecated',Archived:'draft'}[m.status])||'draft'}">${escapeHtml(m.status)}</span></div>
+          <div class="so-subtitle">${escapeHtml(m.origin)}${m.version?' · '+escapeHtml(m.version):''}${m.category?' · '+escapeHtml(m.category):''}</div></div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><button class="btn btn-primary" onclick="closeSlideout();navigate('models/${m.id}')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7M13 3L7 9"/><path d="M10 13H3V6"/></svg> Open</button><button class="so-close" onclick="closeSlideout()" aria-label="Close">✕</button></div>
+      <div class="mp-head-r"><button class="so-close" onclick="closeSlideout();navigate('models/${m.id}')" title="Open model" aria-label="Open model">${_MDIC.edit}</button><button class="so-close" onclick="closeSlideout()" aria-label="Close">✕</button></div>
     </div>
     <div class="so-body">
       ${_pvInsights([drift, added+' columns added across the model in the last week.'])}
-      <div class="so-desc" style="margin-bottom:4px">${escapeHtml(m.desc)}</div>
-      ${_erDiagram(er.nodes, er.edges, er.note)}
-      <div class="mp-stats">${stats.map(([l,v])=>`<div class="mp-stat"><div class="mp-stat-v">${v}</div><div class="mp-stat-l">${l}</div></div>`).join('')}</div>
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">${avStack([m.owner].concat(m.collab||[]),6)}<span style="font-size:12.5px;color:var(--t2)">${escapeHtml(P(m.owner).n)} (owner)${m.collab&&m.collab.length?` · +${m.collab.length} collaborator${m.collab.length===1?'':'s'}`:''}</span></div>
-      ${m.tags&&m.tags.length?`<div style="display:flex;flex-wrap:wrap;gap:6px">${m.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>`:''}
-    </div>`;
+      <div class="so-desc">${escapeHtml(m.desc)}</div>
+      <div class="so-sec"><div class="so-sec-h">Metrics</div><div class="mp-stats">${stats.map(([l,v])=>`<div class="mp-stat"><div class="mp-stat-v">${v}</div><div class="mp-stat-l">${l}</div></div>`).join('')}</div></div>
+      <div class="so-sec"><div class="so-sec-h">Structure</div>${_erDiagram(er.nodes, er.edges, er.note)}</div>
+      <div class="so-sec"><div class="so-sec-h">Team</div><div style="display:flex;align-items:center;gap:9px">${avStack([m.owner].concat(m.collab||[]),6)}<span style="font-size:12.5px;color:var(--t2)">${escapeHtml(P(m.owner).n)} (owner)${m.collab&&m.collab.length?` · +${m.collab.length} collaborator${m.collab.length===1?'':'s'}`:''}</span></div></div>
+      ${m.tags&&m.tags.length?`<div class="so-sec"><div class="so-sec-h">Tags</div><div style="display:flex;flex-wrap:wrap;gap:6px">${m.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div></div>`:''}
+    </div>
+    <div class="so-foot mp-foot"><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="closeSlideout();navigate('models/${m.id}')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7M13 3L7 9"/><path d="M10 13H3V6"/></svg> Open model</button></div>`;
   $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
   _diagInit();
 }
@@ -5494,11 +5653,19 @@ function _erDiagram(nodes, edges, note){
   </div>`;
 }
 function _pvStats(stats){ return `<div class="mp-stats">${stats.map(([l,v])=>`<div class="mp-stat"><div class="mp-stat-v">${v}</div><div class="mp-stat-l">${l}</div></div>`).join('')}</div>`; }
-const _pvOpenBtn=(route)=>`<button class="btn btn-primary" onclick="closeSlideout();navigate('${route}')">${_OPEN_IC} Open</button>`;
-function _pvHead(icon,name,status,badges,headBtn){ return `<div class="so-head mp-head">
+/* DS Slide Out header — icon + title + status state-tag + subtitle line; header shows only open/close icons */
+function _pvHead2(icon,name,status,subtitle,route){ return `<div class="so-head mp-head">
     <div class="mp-head-l"><span class="lrow-ic" style="width:34px;height:34px;flex-shrink:0">${icon}</span>
-      <div style="min-width:0"><div class="mp-title-row"><span class="so-title">${escapeHtml(name)}</span>${status}</div><div class="mp-badges">${badges}</div></div></div>
-    <div class="mp-head-r">${headBtn||''}<button class="so-close" onclick="closeSlideout()" aria-label="Close">✕</button></div>
+      <div style="min-width:0"><div class="mp-title-row"><span class="so-title">${escapeHtml(name)}</span>${_stateTag(status)}</div><div class="so-subtitle">${subtitle}</div></div></div>
+    <div class="mp-head-r"><button class="so-close" onclick="closeSlideout();navigate('${route}')" title="Open" aria-label="Open">${_MDIC.edit}</button><button class="so-close" onclick="closeSlideout()" aria-label="Close">✕</button></div>
+  </div>`; }
+/* DS Slide Out footer — primary action moves out of the header into a right-aligned footer */
+function _pvFoot2(route,label){ return `<div class="so-foot mp-foot"><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="closeSlideout();navigate('${route}')">${_OPEN_IC} ${escapeHtml(label)}</button></div>`; }
+/* DS Slide Out header for edit-context previews — status state-tag + subtitle; close only (footer carries edit/remove) */
+function _pvHead3(icon,name,status,subtitle){ return `<div class="so-head mp-head">
+    <div class="mp-head-l"><span class="lrow-ic" style="width:34px;height:34px;flex-shrink:0">${icon}</span>
+      <div style="min-width:0"><div class="mp-title-row"><span class="so-title">${escapeHtml(name)}</span>${status?_stateTag(status):''}</div>${subtitle?`<div class="so-subtitle">${subtitle}</div>`:''}</div></div>
+    <div class="mp-head-r"><button class="so-close" onclick="closeSlideout()" aria-label="Close">✕</button></div>
   </div>`; }
 function openEntityPreview(id){
   const e=ENTITIES.find(x=>x.id===id); if(!e) return;
@@ -5507,9 +5674,16 @@ function openEntityPreview(id){
   const drift=e.status==='Published'?'No drift detected against the catalog baseline.':e.status==='Draft'?'Draft — not yet published to the catalog.':e.status==='Pending changes'?'Pending changes awaiting publish — review before applying.':'Deprecated — superseded by another entity.';
   const insights=[`${tbls.length} table${tbls.length===1?'':'s'} and ${rels.length} external relation${rels.length===1?'':'s'}, last touched ${escapeHtml(e.updated)}.`, drift, `${added} column${added===1?'':'s'} added in the last week.`];
   const stats=[['Records',escapeHtml(e.records||'—')],['Tables',tbls.length],['Relations',rels.length],['Columns',cols]];
-  const er=_erEntityNodes(e);
-  $('slideout').innerHTML=`${_pvHead(_IC_ENTITY,e.name,_stPill(e.status),`<span class="chip">${escapeHtml(e.domain)}</span>${_modelChip(e.model)}`,_pvOpenBtn('entities/'+e.id))}
-    <div class="so-body">${_pvInsights(insights)}<div class="so-desc" style="margin-bottom:8px">${escapeHtml(e.desc)}</div>${_erDiagram(er.nodes,er.edges,er.note)}${_pvStats(stats)}</div>`;
+  const er=_erEntityNodes(e); const mdl=_model(e.model);
+  const subtitle=`${escapeHtml((mdl||{name:e.model}).name)} · ${escapeHtml(e.domain)}`;
+  $('slideout').innerHTML=`${_pvHead2(_IC_ENTITY,e.name,e.status,subtitle,'entities/'+e.id)}
+    <div class="so-body">
+      ${_pvInsights(insights)}
+      <div class="so-desc">${escapeHtml(e.desc)}</div>
+      <div class="so-sec"><div class="so-sec-h">Metrics</div>${_pvStats(stats)}</div>
+      <div class="so-sec"><div class="so-sec-h">Structure</div>${_erDiagram(er.nodes,er.edges,er.note)}</div>
+    </div>
+    ${_pvFoot2('entities/'+e.id,'Open entity')}`;
   _soOpen(); setTimeout(_diagInit,0);
 }
 function openTablePreview(id){
@@ -5519,10 +5693,16 @@ function openTablePreview(id){
   const rels=out.concat(inc); const idx=_tblIndexes(t); const pk=(t.cols||[]).find(c=>c.pk);
   const insights=[`${t.cols.length} column${t.cols.length===1?'':'s'} across ${rels.length} relation${rels.length===1?'':'s'}.`, pk?`Primary key on ${escapeHtml(pk.d||pk.n)} · ${idx.length} index${idx.length===1?'':'es'}.`:`${idx.length} index${idx.length===1?'':'es'} defined.`, `Sample of ${escapeHtml(t.rows||'0')} rows available in the Data tab.`];
   const stats=[['Rows',escapeHtml(t.rows||'0')],['Columns',t.cols.length],['Relations',rels.length],['Indexes',idx.length]];
-  const badges=`<span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span>${_entityChip(t.entityId,t.entity)}${_modelChip(t.model)}`;
-  const er=_erTableNodes(t);
-  $('slideout').innerHTML=`${_pvHead(_IC_TABLE,t.alias,_stPill(t.status),badges,_pvOpenBtn('tables/'+t.id))}
-    <div class="so-body">${_pvInsights(insights)}<div class="so-desc" style="margin-bottom:8px">${escapeHtml(t.desc)}</div>${_erDiagram(er.nodes,er.edges,er.note)}${_pvStats(stats)}</div>`;
+  const er=_erTableNodes(t); const mdl=_model(t.model);
+  const subtitle=`${escapeHtml(t.role)} · ${escapeHtml((mdl||{name:t.model}).name)} · ${escapeHtml(t.entity)}`;
+  $('slideout').innerHTML=`${_pvHead2(_IC_TABLE,t.alias,t.status,subtitle,'tables/'+t.id)}
+    <div class="so-body">
+      ${_pvInsights(insights)}
+      <div class="so-desc">${escapeHtml(t.desc)}</div>
+      <div class="so-sec"><div class="so-sec-h">Metrics</div>${_pvStats(stats)}</div>
+      <div class="so-sec"><div class="so-sec-h">Structure</div>${_erDiagram(er.nodes,er.edges,er.note)}</div>
+    </div>
+    ${_pvFoot2('tables/'+t.id,'Open table')}`;
   _soOpen(); setTimeout(_diagInit,0);
 }
 const _REF_SCHEMA=[{n:'label',t:'string',req:1},{n:'code',t:'string',key:1,req:1},{n:'description',t:'string',req:0},{n:'status',t:'enum',req:1}];
@@ -5541,9 +5721,18 @@ function openRefPreview(id){
   const r=_ref(id); if(!r) return;
   const vals=r.values||[]; const active=vals.filter(v=>v.active).length;
   const stats=[['Items',vals.length],['Referenced by',r.referencedBy||0],['Active',active],['Fields',r.fields||_REF_SCHEMA.length]];
-  const badges=`<span class="chip" style="font-family:'SF Mono',Menlo,monospace">${escapeHtml(_refInternal(r))}</span><span class="pv-hsep">·</span>${_originBadge(r.origin)}`;
-  $('slideout').innerHTML=`${_pvHead(_catIcon(r.category),r.name,_stPill(r.status),badges,_pvOpenBtn('reference/'+r.id))}
-    <div class="so-body"><div class="so-desc" style="margin-bottom:2px">${escapeHtml(r.desc)}</div>${_refSchemaSection()}${_refItemsSection(r)}${_pvStats(stats)}</div>`;
+  const drift=r.status==='Published'?'No drift detected against the catalog baseline.':r.status==='Draft'?'Draft — not yet published to the catalog.':r.status==='Pending changes'?'Pending changes awaiting publish — review before applying.':'Deprecated — superseded by another reference set.';
+  const insights=[`${vals.length} item${vals.length===1?'':'s'} · ${active} active · referenced by ${r.referencedBy||0} table${(r.referencedBy||0)===1?'':'s'}.`, drift];
+  const subtitle=`${escapeHtml(r.category)} · ${escapeHtml(r.origin)}`;
+  $('slideout').innerHTML=`${_pvHead2(_catMeta(r.category).ic,r.name,r.status,subtitle,'reference/'+r.id)}
+    <div class="so-body">
+      ${_pvInsights(insights)}
+      <div class="so-desc">${escapeHtml(r.desc)}</div>
+      <div class="so-sec">${_refSchemaSection()}</div>
+      <div class="so-sec">${_refItemsSection(r)}</div>
+      <div class="so-sec"><div class="so-sec-h">Metrics</div>${_pvStats(stats)}</div>
+    </div>
+    ${_pvFoot2('reference/'+r.id,'Open reference')}`;
   _soOpen();
 }
 
@@ -5981,11 +6170,12 @@ function mdBackToEntities(mid){ modelDetailState.ent.selEntId=null; renderModelD
 function mdEntWsTab(mid,t){ modelDetailState.ent.subtab=t; renderModelDetail(mid); if(t==='diagram') setTimeout(_diagInit,0); }
 function mdDiagMode(mid,v){ modelDetailState.ent.diagMode=v; renderModelDetail(mid); setTimeout(_diagInit,0); }
 function _mdEntCard(m,e){
-  return `<div class="md-ecard" onclick="${_mdEntClick(e)}">
-    <div class="md-ecard-h"><span class="md-ecard-ic">${_MDIC.ent}</span><span class="md-ecard-name">${escapeHtml(e.name)}</span>${e.pii?_piiBadge():''}<button class="md-cardkb" onclick="event.stopPropagation();mdEntMenu('${m.id}','${e.id}',this)" aria-label="Entity actions">${_MDIC.dots}</button></div>
-    <div class="md-ecard-desc">${escapeHtml(e.desc)}</div>
-    <div class="md-ecard-meta">${_stPill(e.status)}<span class="metaico">${_MDIC.tbl}${e.tables} tables</span><span class="metaico">${_MDIC.col}${e.cols} cols</span></div>
-    <div class="md-ecard-foot"><span class="mcard-owner">${av(P(e.owner),'sm')}${escapeHtml(P(e.owner).n)}</span><span class="mcard-date">${escapeHtml(e.updated)}</span></div></div>`;
+  const dom=e.domain||(_entById(e.id)||{}).domain||'Entity';
+  return `<div class="mcard" onclick="${_mdEntClick(e)}">
+    <div class="mcard-top"><div style="display:flex;align-items:center;gap:8px;min-width:0"><div class="mcard-title">${escapeHtml(e.name)}</div>${e.pii?_piiBadge():''}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0">${_stateTag(e.status)}<button class="md-cardkb" onclick="event.stopPropagation();mdEntMenu('${m.id}','${e.id}',this)" aria-label="Entity actions">${_MDIC.dots}</button></div></div>
+    <div class="mcard-subtitle">${escapeHtml(dom)}</div>
+    <div class="mcard-desc">${escapeHtml(e.desc)}</div>
+    <div class="mcard-meta2"><span class="cmeta">${_CIC.user}${escapeHtml(P(e.owner).n)}</span><span class="cmeta">${_CIC.tbl}${e.tables} tables</span><span class="cmeta">${_CIC.col}${e.cols} cols</span><span class="cmeta">${_CIC.clock}${escapeHtml(e.updated)}</span></div></div>`;
 }
 function _mdEntListRow(m,e){
   return `<div class="lrow" onclick="${_mdEntClick(e)}"><div class="lrow-top"><span class="lrow-ic">${_MDIC.ent}</span><span class="lrow-title">${escapeHtml(e.name)}</span>${e.pii?_piiBadge():''}<span class="lrow-right">${_stPill(e.status)}<span class="lrow-time">${escapeHtml(e.updated)}</span><button class="lrow-menu" onclick="event.stopPropagation();mdEntMenu('${modelDetailState.id}','${e.id}',this)" aria-label="Entity actions">${_MDIC.dots}</button></span></div>
@@ -6009,7 +6199,7 @@ function _mdEntWorkspace(m,md,e){
     <section class="mdw-main">
       <div class="mdw-head"><div class="mdw-head-l"><span class="mdw-title">${escapeHtml(e.name)}</span>${_stPill(e.status)}</div>
         <button class="btn btn-primary" onclick="openMdEntityFull('${m.id}','${e.id}')">${_MDIC.open} Open</button></div>
-      <div class="mdw-tabs">${tabs.map(([tid,l])=>`<button class="mdw-tab ${sub===tid?'on':''}" onclick="mdEntWsTab('${m.id}','${tid}')">${l}</button>`).join('')}</div>
+      <div class="mdw-tabs">${tabs.map(([tid,l])=>`<button class="mdw-tab ${sub===tid?'on':''}" ${TAB_VER[tid]?`data-version="${TAB_VER[tid]}"`:''} onclick="mdEntWsTab('${m.id}','${tid}')">${l}</button>`).join('')}</div>
       <div class="mdw-body">${body}</div>
     </section>
   </div>`;
@@ -6123,7 +6313,6 @@ function _mdwRelMenu(mid,eid,idx,btn){ _mdKebab(btn,[
 function _mdwRemoveRel(mid,eid,idx){ const c=_mdCtx(mid); if(!c) return; const e=c.md.ents.find(x=>x.id===eid); const rels=_mdwEnsureRels(c.m,c.md,e); rels.splice(idx,1); _mdEdited(c.m); toast('Relationship removed','ok'); renderModelDetail(mid); }
 
 /* ── Workspace: Privileges (standard + custom + permission browser) ── */
-const _STD_PRIVS=[['Read','read','Allows reading records of this entity through APIs and views.'],['Create','create','Allows creating new records of this entity.'],['Update','update','Allows updating existing records of this entity.'],['Delete','delete','Allows soft-deleting records of this entity.'],['List','list','Allows listing records of this entity through paginated queries.']];
 function _mdwEnsureCprivs(m,e){
   if(e._wcprivs) return e._wcprivs; const es=_rsnip(e.name);
   e._wcprivs=[
@@ -6133,14 +6322,26 @@ function _mdwEnsureCprivs(m,e){
 }
 function _mdwPrivileges(m,md,e){
   const cprivs=_mdwEnsureCprivs(m,e);
-  const std=_STD_PRIVS.map(([n,sym,d])=>`<div class="mdw-priv-row"><span class="mdw-priv-lock">${_MDIC.lock}</span><div class="mdw-priv-b"><div class="mdw-priv-n">${n} <code class="mdw-priv-sym">${sym}</code></div><div class="mdw-priv-d">${escapeHtml(d)}</div></div><span class="mdw-priv-std">Standard</span></div>`).join('');
-  const cust=cprivs.map((pv,i)=>`<div class="mdw-cpriv"><div class="mdw-cpriv-top"><span class="mdw-cpriv-ic">${_MDIC.key||_HIC.link}</span><span class="mdw-cpriv-n">${escapeHtml(pv.n)}</span><code class="mdw-priv-sym">${escapeHtml(pv.sym)}</code><span style="flex:1"></span><span class="mdw-cpriv-scope">This entity only</span><button class="lrow-menu" onclick="_mdwPrivMenu('${m.id}','${e.id}',${i},this)" aria-label="Privilege actions">${_MDIC.dots}</button></div>
-      <div class="mdw-cpriv-d">${escapeHtml(pv.desc)}</div>
-      <div class="mdw-cpriv-foot"><span class="mdw-cpriv-c">${_MDIC.lock}${pv.perms.length} permission${pv.perms.length===1?'':'s'}</span>${pv.desc2?`<span class="mdw-rel-sep">·</span><a class="mdw-cpriv-desc2">+ ${pv.desc2} descendant permissions included</a>`:''}</div></div>`).join('');
-  return `<div class="mdw-sec-t" style="margin-top:4px">Standard privileges</div><div class="mdw-priv-sub">These privileges are automatically defined for every entity and cannot be edited.</div>
-    <div class="mdw-priv-list">${std}</div>
-    <div class="mdw-cpriv-head"><div><span class="mdw-sec-t" style="margin:0">Custom privileges</span> <span class="mdw-rel-h-c">${cprivs.length}</span><div class="mdw-priv-sub" style="margin-top:2px">Domain-specific privileges you define for ${escapeHtml(e.name)}, composed from the tenant permission catalog.</div></div><button class="btn btn-primary" style="height:34px" onclick="openMdwPrivForm('${m.id}','${e.id}',null)">${_MDIC.plus} New custom privilege</button></div>
-    <div class="mdw-cpriv-list">${cust||'<div class="placeholder" style="padding:24px">No custom privileges yet.</div>'}</div>
+  const std=_STD_PRIV_DEFS.map(p=>`<div class="priv-row">
+    <div class="priv-row-l"><span class="priv-card-ic">${p.ic}</span>
+      <div class="priv-row-tx"><div class="priv-row-top"><span class="priv-row-name">${p.n}</span><span class="priv-sym">${p.k}</span></div>
+        <div class="priv-row-desc">${p.desc}</div></div></div>
+    <div class="priv-row-r"><span class="priv-badge" style="display:inline-flex;align-items:center;gap:4px">${_MDIC.lock} System</span></div></div>`).join('');
+  const cust=cprivs.map((pv,i)=>`<div class="priv-row">
+    <div class="priv-row-l"><span class="priv-card-ic priv-card-ic-key">${_KEY_IC}</span>
+      <div class="priv-row-tx"><div class="priv-row-top"><span class="priv-row-name">${escapeHtml(pv.n)}</span><span class="priv-sym">${escapeHtml(pv.sym)}</span><span class="priv-badge priv-badge-scope">This entity only</span></div>
+        <div class="priv-row-desc">${escapeHtml(pv.desc)}</div></div></div>
+    <div class="priv-row-r"><span class="priv-more">${pv.perms.length} permission${pv.perms.length===1?'':'s'}${pv.desc2?' · +'+pv.desc2+' inherited':''}</span>
+      <button class="lrow-menu" onclick="_mdwPrivMenu('${m.id}','${e.id}',${i},this)" aria-label="Privilege actions">${_MDIC.dots}</button></div></div>`).join('');
+  return `<div class="priv-sec-h"><div class="dsec-t">Standard privileges <span class="dsec-count">${_STD_PRIV_DEFS.length}</span></div></div>
+    <div class="priv-sec-sub">Predefined system privileges every entity has — automatically defined and can’t be edited.</div>
+    <div class="priv-list">${std}</div>
+    <div class="dsec" style="margin-top:22px">
+      <div class="priv-sec-h"><div class="dsec-t">Custom privileges <span class="dsec-count">${cprivs.length}</span></div>
+        <div class="priv-sec-actions"><button class="btn btn-primary" onclick="openMdwPrivForm('${m.id}','${e.id}',null)">${_MDIC.plus} New custom privilege</button></div></div>
+      <div class="priv-sec-sub">Domain-specific privileges you define for ${escapeHtml(e.name)}, composed from the tenant permission catalog.</div>
+      <div class="priv-list">${cust||`<div class="empty" style="padding:24px"><div class="empty-t">No custom privileges yet</div>Create one to compose domain-specific access.</div>`}</div>
+    </div>
     <div class="mdw-priv-note">${_HIC.shield} Privileges defined here are assigned to roles and users in <b>Admin Studio</b>. <a onclick="toast('Admin Studio · Roles — prototype')">Go to Admin Studio › Roles →</a></div>`;
 }
 function _mdwPrivMenu(mid,eid,idx,btn){ _mdKebab(btn,[
@@ -6248,11 +6449,11 @@ function _mdTblRow(m,t){
     <div class="md-trow-foot"><span class="lrow-metric">${_MDIC.col}${t.cols} columns</span><span class="lrow-sep">·</span><span class="lrow-metric">${_MDIC.rel}${t.rel} relations</span><span class="lrow-sep">·</span><span>${escapeHtml(P(t.owner).n)}</span></div></div>`;
 }
 function _mdTblCard(m,t){
-  return `<div class="md-ecard" onclick="mdSelectTbl('${m.id}','${t.id}')">
-    <div class="md-ecard-h"><span class="md-ecard-ic">${_MDIC.tbl}</span><span class="md-ecard-name">${escapeHtml(t.name)}</span><span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span><button class="md-cardkb" onclick="event.stopPropagation();_mdTblMenu('${m.id}','${t.id}',this)" aria-label="Table actions">${_MDIC.dots}</button></div>
-    <div class="md-ecard-desc">${escapeHtml(t.desc)}</div>
-    <div class="md-ecard-meta">${_stPill(t.status)}<span class="metaico">${_MDIC.col}${t.cols} cols</span><span class="metaico">${_MDIC.rel}${t.rel} rel</span></div>
-    <div class="md-ecard-foot"><span class="mcard-owner">${av(P(t.owner),'sm')}${escapeHtml(t.entity)}</span><span class="mcard-date">${escapeHtml(t.updated)}</span></div></div>`;
+  return `<div class="mcard" onclick="mdSelectTbl('${m.id}','${t.id}')">
+    <div class="mcard-top"><div style="display:flex;align-items:center;gap:8px;min-width:0"><div class="mcard-title">${escapeHtml(t.name)}</div><span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0">${_stateTag(t.status)}<button class="md-cardkb" onclick="event.stopPropagation();_mdTblMenu('${m.id}','${t.id}',this)" aria-label="Table actions">${_MDIC.dots}</button></div></div>
+    <div class="mcard-subtitle">${escapeHtml(t.entity)}</div>
+    <div class="mcard-desc">${escapeHtml(t.desc)}</div>
+    <div class="mcard-meta2"><span class="cmeta">${_CIC.user}${escapeHtml(P(t.owner).n)}</span><span class="cmeta">${_CIC.col}${t.cols} cols</span><span class="cmeta">${_CIC.link}${t.rel} rel</span><span class="cmeta">${_CIC.clock}${escapeHtml(t.updated)}</span></div></div>`;
 }
 
 /* ── Table WORKSPACE (master-detail inside a model) ── */
@@ -6478,10 +6679,10 @@ function _mdComponentsTab(m,md){
 const _COMP_SING={widgets:'widget',queries:'query',metrics:'metric',datasets:'dataset'};
 function _mdCompSub(sub,x){ return sub==='widgets'?`${x.type} · ${x.studio}` : sub==='queries'?`Query · ${x.rows} rows` : sub==='metrics'?`Metric · ${x.val}` : `Dataset · ${x.rows} rows`; }
 function _mdCompCard(mid,sub,x,idx){
-  return `<div class="md-ccard" onclick="mdSelectComp('${mid}','${sub}',${idx})">
-    <div class="md-ccard-h"><span class="md-ccard-ic">${_COMP_IC[sub]}</span><span class="md-ccard-name">${escapeHtml(x.name)}</span><button class="md-cardkb" onclick="event.stopPropagation();_mdCompMenu('${mid}','${sub}',${idx},this)" aria-label="Component actions">${_MDIC.dots}</button></div>
-    <div class="md-ccard-sub">${escapeHtml(_mdCompSub(sub,x))}</div>
-    <div class="md-ccard-foot"><span class="md-ccard-ent">${_MDIC.ent}${escapeHtml(x.entity)}</span>${av(P(x.owner),'sm')}</div></div>`;
+  return `<div class="mcard" onclick="mdSelectComp('${mid}','${sub}',${idx})">
+    <div class="mcard-top"><div class="mcard-title">${escapeHtml(x.name)}</div><button class="md-cardkb" onclick="event.stopPropagation();_mdCompMenu('${mid}','${sub}',${idx},this)" aria-label="Component actions">${_MDIC.dots}</button></div>
+    <div class="mcard-subtitle">${escapeHtml(_mdCompSub(sub,x))}</div>
+    <div class="mcard-meta2"><span class="cmeta">${_CIC.grid}${escapeHtml(x.entity)}</span><span class="cmeta">${_CIC.user}${escapeHtml(P(x.owner).n)}</span></div></div>`;
 }
 
 /* ── Component WORKSPACE (master-detail inside a model) ── */
@@ -6743,9 +6944,14 @@ function openMdEntityPreview(id,entId){
   const drift=e.status==='Published'?'No drift detected against the catalog baseline.':e.status==='Draft'?'Draft — not yet published to the catalog.':e.status==='Pending changes'?'Pending changes awaiting publish.':'Deprecated — superseded.';
   const insights=[`${e.tables} table${e.tables===1?'':'s'} in ${escapeHtml(m.name)}, last touched ${escapeHtml(e.updated)}.`, drift, `${e.cols} column${e.cols===1?'':'s'} total${e.pii?' · contains PII':''}.`];
   const stats=[['Tables',e.tables],['Columns',e.cols],['PII',e.pii?'Yes':'No'],['Updated',escapeHtml(e.updated)]];
-  const badges=`${_modelChip(m.id)}${e.pii?_piiBadge():''}`;
-  $('slideout').innerHTML=`${_pvHead(_IC_ENTITY,e.name,_stPill(e.status),badges,'')}
-    <div class="so-body">${_pvInsights(insights)}<div class="so-desc" style="margin-bottom:8px">${escapeHtml(e.desc)}</div>${_erDiagram(er.nodes,er.edges,er.note)}${_pvStats(stats)}</div>
+  const subtitle=`${escapeHtml(m.name)}${e.domain?' · '+escapeHtml(e.domain):''}${e.pii?' · PII':''}`;
+  $('slideout').innerHTML=`${_pvHead3(_IC_ENTITY,e.name,e.status,subtitle)}
+    <div class="so-body">
+      ${_pvInsights(insights)}
+      <div class="so-desc">${escapeHtml(e.desc)}</div>
+      <div class="so-sec"><div class="so-sec-h">Metrics</div>${_pvStats(stats)}</div>
+      <div class="so-sec"><div class="so-sec-h">Structure</div>${_erDiagram(er.nodes,er.edges,er.note)}</div>
+    </div>
     <div class="so-foot"><button class="btn btn-danger" style="margin-right:auto" onclick="confirmMdRemoveEnt('${id}','${entId}')">${_RM_IC.del} Remove</button><button class="btn btn-primary" onclick="openMdEditEntity('${id}','${entId}')">${_MDIC.edit} Edit entity</button></div>`;
   _soOpen(); setTimeout(_diagInit,0);
 }
@@ -6805,9 +7011,14 @@ function openMdTablePreview(id,tblId){
   const drift=t.status==='Published'?'No drift detected against the catalog baseline.':t.status==='Draft'?'Draft — not yet published to the catalog.':'Pending changes awaiting publish.';
   const insights=[`${t.cols} column${t.cols===1?'':'s'} · ${t.rel} relation${t.rel===1?'':'s'}.`, drift, `Backs the ${escapeHtml(t.entity)} entity in ${escapeHtml(m.name)}.`];
   const stats=[['Columns',t.cols],['Relations',t.rel],['Role',t.role],['Updated',escapeHtml(t.updated)]];
-  const badges=`<span class="mono" style="font-size:12px;color:var(--t3)">${escapeHtml(t.code)}</span><span class="pv-hsep">·</span><span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role)}</span>${_entityChip(t.entityId,t.entity)}${t.pii?_piiBadge():''}`;
-  $('slideout').innerHTML=`${_pvHead(_IC_TABLE,t.name,_stPill(t.status),badges,'')}
-    <div class="so-body">${_pvInsights(insights)}<div class="so-desc" style="margin-bottom:8px">${escapeHtml(t.desc)}</div>${_erDiagram(er.nodes,er.edges,er.note)}${_pvStats(stats)}</div>
+  const subtitle=`${escapeHtml(t.role)} · ${escapeHtml(t.entity)} · <span style="font-family:var(--font-mono,ui-monospace,Menlo,monospace)">${escapeHtml(t.code)}</span>${t.pii?' · PII':''}`;
+  $('slideout').innerHTML=`${_pvHead3(_IC_TABLE,t.name,t.status,subtitle)}
+    <div class="so-body">
+      ${_pvInsights(insights)}
+      <div class="so-desc">${escapeHtml(t.desc)}</div>
+      <div class="so-sec"><div class="so-sec-h">Metrics</div>${_pvStats(stats)}</div>
+      <div class="so-sec"><div class="so-sec-h">Structure</div>${_erDiagram(er.nodes,er.edges,er.note)}</div>
+    </div>
     <div class="so-foot"><button class="btn btn-danger" style="margin-right:auto" onclick="confirmMdRemoveTbl('${id}','${tblId}')">${_RM_IC.del} Remove</button><button class="btn btn-primary" onclick="openMdEditTable('${id}','${tblId}')">${_MDIC.edit} Edit table</button></div>`;
   _soOpen(); setTimeout(_diagInit,0);
 }
@@ -6868,8 +7079,8 @@ function openMdCompPreview(id,sub,idx){
   const extra = sub==='widgets' ? F('Type',escapeHtml(x.type))+F('Studio',escapeHtml(x.studio))
     : sub==='metrics' ? F('Value',escapeHtml(x.val)) : F('Rows',escapeHtml(x.rows));
   const insights=[`${kind} consuming the ${escapeHtml(x.entity)} entity of ${escapeHtml(m.name)}.`, `${escapeHtml(detail)}.`, `Owned by ${escapeHtml(P(x.owner).n)}.`];
-  const badges=`<span class="chip">${_COMP_IC[sub]}${kind}</span><span class="md-ccard-ent" style="font-size:12px;color:var(--t3)">${_MDIC.ent}${escapeHtml(x.entity)}</span>`;
-  $('slideout').innerHTML=`${_pvHead(_COMP_IC[sub],x.name,'',badges,'')}
+  const subtitle=`${escapeHtml(kind)} · ${escapeHtml(x.entity)}`;
+  $('slideout').innerHTML=`${_pvHead3(_COMP_IC[sub],x.name,'',subtitle)}
     <div class="so-body">${_pvInsights(insights)}
       <div class="so-sec"><div class="so-sec-h">Details</div><div class="so-fields">
         ${F('Kind',escapeHtml(kind))}${F('Source entity',_entityChip('',x.entity))}${extra}${F('Owner',`<span class="mtbl-inline">${av(P(x.owner),'sm')}${escapeHtml(P(x.owner).n)}</span>`)}
