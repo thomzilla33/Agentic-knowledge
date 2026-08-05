@@ -6,9 +6,20 @@
   <title>AIMS-OS — Prototype Hub</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Inter',system-ui,sans-serif;background:#070e1c;color:#e2e8f0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+    /* App/Background — from DS Figma (node 12655:211436). Theme-aware:
+   dark = diagonal navy gradient · light = subtle blue-white radial glow. */
+:root{
+  --ds-app-bg-dark: linear-gradient(155.58deg, #020618 14.2%, #0f172b 50%, #020618 85.8%);
+  --ds-app-bg-light: radial-gradient(130% 130% at 18% 96%, #f6f9ff 0%, #ffffff 78%);
+  --app-bg: var(--ds-app-bg-dark);
+  --app-fg: #e2e8f0;
+}
+@media (prefers-color-scheme: light){ :root{ --app-bg: var(--ds-app-bg-light); --app-fg: #0f172a; } }
+html.theme-dark{ --app-bg: var(--ds-app-bg-dark); --app-fg: #e2e8f0; }
+html.theme-light{ --app-bg: var(--ds-app-bg-light); --app-fg: #0f172a; }
+body{font-family:'Inter',system-ui,sans-serif;background:var(--app-bg);background-attachment:fixed;color:var(--app-fg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
     .logo{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2B7FFF;margin-bottom:12px}
-    h1{font-size:28px;font-weight:700;color:#f1f5f9;margin-bottom:8px;text-align:center}
+    h1{font-size:28px;font-weight:700;color:var(--app-fg);margin-bottom:8px;text-align:center}
     .sub{font-size:14px;color:#64748b;margin-bottom:48px;text-align:center;max-width:520px;line-height:1.55}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,360px));gap:16px;width:100%;max-width:760px;justify-content:center}
     .card{background:#0c1428;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s;display:flex;flex-direction:column;gap:10px}
@@ -19,7 +30,9 @@
     .card-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;width:fit-content}
     .tag-cyan{background:rgba(6,182,212,.1);color:#06B6D4;border:1px solid rgba(6,182,212,.22)}
     .tag-emerald{background:rgba(16,185,129,.10);color:#10B981;border:1px solid rgba(16,185,129,.22)}
-    .tag-purple{background:rgba(167,139,250,.10);color:#A78BFA;border:1px solid rgba(167,139,250,.22)}
+    .tag-blue{background:rgba(59,130,246,.10);color:#3B82F6;border:1px solid rgba(59,130,246,.22)}
+.tag-purple{background:rgba(167,139,250,.10);color:#A78BFA;border:1px solid rgba(167,139,250,.22)}
+.tag-green{background:rgba(34,197,94,.10);color:#22C55E;border:1px solid rgba(34,197,94,.22)}
     .coming{margin-top:32px;font-size:11px;color:#475569;letter-spacing:.05em;text-transform:uppercase}
     .ft{margin-top:48px;font-size:11px;color:#334155;text-align:center;line-height:1.6}
     .ft a{color:#64748b;text-decoration:none}
@@ -60,6 +73,33 @@
       <span class="card-tag tag-emerald">Data · Cross-functional</span>
     </a>
 
+    <a class="card" href="data-studio-models.html">
+      <div class="card-ico" style="background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.22)">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="5" height="5" rx="1" stroke="#3B82F6" stroke-width="1.2"/>
+          <rect x="9" y="2" width="5" height="5" rx="1" stroke="#3B82F6" stroke-width="1.2"/>
+          <rect x="2" y="9" width="5" height="5" rx="1" stroke="#3B82F6" stroke-width="1.2"/>
+          <rect x="9" y="9" width="5" height="5" rx="1" stroke="#3B82F6" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <div class="card-title">Data Studio · Models</div>
+      <div class="card-desc">Model the data layer. Entities, tables, relationships, reference data and per-entity API contracts — the semantic schema agents and products build on. The modeling surface for Data Studio.</div>
+      <span class="card-tag tag-blue">Data · Modeling</span>
+    </a>
+
+    <a class="card" href="helix-data-studio.html">
+      <div class="card-ico" style="background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.22)">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#22C55E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 2c0 3 6 3 6 6s-6 3-6 6"/>
+          <path d="M11 2c0 3-6 3-6 6s6 3 6 6"/>
+          <path d="M6 4.2h4M5.2 8h5.6M6 11.8h4"/>
+        </svg>
+      </div>
+      <div class="card-title">Helix Data Studio</div>
+      <div class="card-desc">Governed data ingestion — connect certified sources, map to the canonical schema, resolve drift and activate. V1 sprint scope with a live version switcher (V1 → V3), decision pins and the cross-tenant clone/diff flow.</div>
+      <span class="card-tag tag-green">Ingestion · V1</span>
+    </a>
+
     <a class="card" href="agent-tools.html">
       <div class="card-ico" style="background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.22)">
         <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
@@ -81,5 +121,285 @@
     AIMS-OS · Internal prototype — not for public distribution<br>
     <a href="docs/spec.md">View the design spec →</a>
   </p>
+<!-- ===== AIMS-OS Demo WalkMe (guided tour) ===== -->
+<style>
+/* Floating trigger (bottom-left; label swaps Demo <-> Continue) */
+.tour-trigger{
+  position:fixed; bottom:18px; left:18px; z-index:80;
+  display:inline-flex; align-items:center; gap:0; padding:0; height:38px; width:38px;
+  border-radius:9999px; background:linear-gradient(135deg,#06B6D4 0%,#A78BFA 100%);
+  color:#fff; border:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600;
+  white-space:nowrap; overflow:hidden;
+  box-shadow:0 8px 24px rgba(6,182,212,.36), 0 2px 8px rgba(0,0,0,.28);
+  transition:width .22s cubic-bezier(.18,.84,.34,1.1), gap .22s, padding .22s, transform .15s, box-shadow .15s;
+}
+.tour-trigger:hover, .tour-trigger:focus-visible{
+  width:112px; gap:6px; padding:0 16px 0 12px; transform:translateY(-2px);
+  box-shadow:0 14px 32px rgba(6,182,212,.50), 0 4px 12px rgba(0,0,0,.36); outline:none;
+}
+.tour-trigger svg{flex-shrink:0; margin-left:1px}
+.tour-trigger-pulse{position:absolute; inset:0; border-radius:inherit; border:2px solid rgba(6,182,212,.6); animation:tourPulse 2s ease-out infinite; pointer-events:none}
+.tour-trigger.seen .tour-trigger-pulse{display:none}
+.tour-trigger.tour-active{display:none}
+@keyframes tourPulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+@media (max-width:520px){.tour-trigger{bottom:14px; left:14px}}
+
+/* Interactive mask = 4 dim strips around the target (leaves a clickable hole) */
+.tour-mask{position:fixed; z-index:150; background:rgba(4,8,18,.55); pointer-events:auto; display:none}
+.tour-mask.active{display:block}
+html.theme-light .tour-mask{background:rgba(15,23,42,.32)}
+
+/* Spotlight ring — sits over the hole, never blocks clicks */
+.tour-spotlight{
+  position:fixed; z-index:155; pointer-events:none; border-radius:14px; border:2px solid var(--cyan,#06B6D4);
+  box-shadow:0 0 0 4px rgba(6,182,212,.18), 0 0 32px rgba(6,182,212,.55), 0 0 64px rgba(6,182,212,.25);
+  background:transparent; transition:all .28s cubic-bezier(.4,0,.2,1); opacity:0;
+}
+.tour-spotlight.active{opacity:1; animation:tourSpotlightPulse 2s ease-in-out infinite}
+@keyframes tourSpotlightPulse{
+  0%,100%{box-shadow:0 0 0 4px rgba(6,182,212,.18), 0 0 32px rgba(6,182,212,.55), 0 0 64px rgba(6,182,212,.25)}
+  50%{box-shadow:0 0 0 6px rgba(6,182,212,.28), 0 0 48px rgba(6,182,212,.70), 0 0 96px rgba(6,182,212,.35)}
+}
+html.theme-light .tour-spotlight{border-color:var(--accent,#2B7FFF); box-shadow:0 0 0 4px rgba(43,127,255,.18), 0 0 32px rgba(43,127,255,.50), 0 0 64px rgba(43,127,255,.20)}
+
+/* Popover */
+.tour-popover{
+  position:fixed; z-index:160; width:360px; max-width:calc(100vw - 32px);
+  background:linear-gradient(180deg, rgba(20,28,48,.98) 0%, rgba(13,19,35,.98) 100%);
+  border:1px solid var(--line-strong,rgba(255,255,255,.14)); border-radius:var(--r12,12px); backdrop-filter:blur(24px) saturate(1.8);
+  box-shadow:0 16px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04); padding:18px 20px;
+  opacity:0; transform:scale(.96) translateY(4px); pointer-events:none;
+  transition:opacity .2s ease-out, transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.tour-popover.active{opacity:1; transform:scale(1) translateY(0); pointer-events:auto}
+html.theme-light .tour-popover{background:linear-gradient(180deg,#FFF 0%,#FAFBFC 100%); box-shadow:0 16px 48px rgba(15,23,42,.18), 0 0 0 1px rgba(15,23,42,.04)}
+/* Responsive: dock as a bottom sheet on narrow screens */
+.tour-popover.is-sheet{left:8px !important; right:8px; top:auto !important; bottom:8px; width:auto; max-width:none}
+.tour-popover-header{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+.tour-popover-step{font-size:10.5px; font-weight:700; letter-spacing:.10em; text-transform:uppercase; color:var(--cyan,#06B6D4); padding:2px 8px; border-radius:10px; background:rgba(6,182,212,.10); border:1px solid rgba(6,182,212,.25)}
+.tour-popover-restart{background:transparent; border:none; cursor:pointer; color:var(--t3,rgba(255,255,255,.38)); font-size:11px; padding:4px 6px; border-radius:5px; font-family:inherit}
+.tour-popover-restart:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
+.tour-popover-skip{margin-left:auto; background:transparent; border:none; cursor:pointer; color:var(--t3,rgba(255,255,255,.38)); font-size:11px; padding:4px 8px; border-radius:5px; font-family:inherit}
+.tour-popover-skip:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
+.tour-popover-title{font-size:16px; font-weight:700; color:var(--t1,rgba(255,255,255,.92)); line-height:1.3; margin-bottom:8px}
+.tour-popover-body{font-size:13px; line-height:1.6; color:var(--t2,rgba(255,255,255,.60)); margin-bottom:16px}
+.tour-popover-body strong,.tour-popover-body b{color:var(--t1,rgba(255,255,255,.92)); font-weight:600}
+.tour-popover-body code{font-family:'SF Mono',Menlo,monospace; font-size:12px; background:rgba(6,182,212,.10); color:var(--cyan,#06B6D4); padding:1.5px 5px; border-radius:4px}
+.tour-popover-footer{display:flex; align-items:center; gap:10px; padding-top:12px; border-top:1px solid var(--line,rgba(255,255,255,.10))}
+.tour-progress{display:inline-flex; gap:4px; flex:1}
+.tour-progress-dot{width:6px; height:6px; border-radius:50%; background:var(--hover-strong,rgba(255,255,255,.08)); transition:background .15s, transform .15s}
+.tour-progress-dot.current{background:var(--cyan,#06B6D4); transform:scale(1.4)}
+.tour-progress-dot.done{background:rgba(6,182,212,.45)}
+.tour-btn{padding:7px 14px; font-size:12.5px; font-weight:600; border-radius:var(--r6,6px); cursor:pointer; border:none; font-family:inherit; transition:.14s}
+.tour-btn-prev{background:transparent; color:var(--t2,rgba(255,255,255,.60)); border:1px solid var(--line,rgba(255,255,255,.10))}
+.tour-btn-prev:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
+.tour-btn-next{background:linear-gradient(135deg,#06B6D4 0%,#155DFC 100%); color:#fff; box-shadow:0 2px 8px rgba(6,182,212,.30)}
+.tour-btn-next:hover{transform:translateY(-1px)}
+
+/* Visually-hidden live region (screen-reader step announcements) */
+.tour-sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+
+/* Accessibility: honor reduced-motion */
+@media (prefers-reduced-motion: reduce){
+  .tour-spotlight, .tour-spotlight.active{animation:none; transition:none}
+  .tour-popover{transition:none; transform:none}
+  .tour-trigger-pulse{display:none}
+}
+</style>
+
+
+
+<button class="tour-trigger" id="tourTrigger" onclick="startTour()" aria-label="Start product demo">
+  <span class="tour-trigger-pulse"></span>
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2l11 6-11 6V2z" fill="currentColor"/></svg>
+  <span class="tour-trigger-label">Demo</span>
+</button>
+<div class="tour-mask" id="tourMaskT"></div>
+<div class="tour-mask" id="tourMaskR"></div>
+<div class="tour-mask" id="tourMaskB"></div>
+<div class="tour-mask" id="tourMaskL"></div>
+<div class="tour-spotlight" id="tourSpotlight"></div>
+<div class="tour-popover" id="tourPopover" role="dialog" aria-modal="true" aria-labelledby="tourTitle"></div>
+<div class="tour-sr-only" id="tourLive" aria-live="polite" aria-atomic="true"></div>
+
+
+
+<script>
+/* --- Author these for THIS surface. target = real selector; route = real hash. --- */
+const TOUR_STEPS = [
+  { title:'AIMS-OS Prototype Hub', body:'Three cross-functional surfaces from the engineering model. About 30 seconds — use <strong>&larr; &rarr;</strong> or the buttons.' },
+  { title:'Admin Studio · Integrations', body:'Global activation and authentication — the control plane for credentials, access and audit.', target:'.grid > a:nth-child(1)', scrollToTarget:true },
+  { title:'Data Studio', body:'Where data actually flows — field mapping, tables, schema versions. Cross-functional with Admin Studio.', target:'.grid > a:nth-child(2)', scrollToTarget:true },
+  { title:'Agent Studio · Tools', body:'What agents can actually do — tools and wrappers per integration.', target:'.grid > a:nth-child(3)', scrollToTarget:true },
+  { title:'Pick a surface', body:'Open any card to explore its prototype. Press <strong>Esc</strong> to exit the tour.' }
+];
+
+const TOUR_LS_STEP = 'aims-tour-step';   // resume pointer
+const TOUR_LS_DONE = 'aims-tour-seen';   // completed once
+let tourState = { active:false, stepIndex:0 };
+let _tourLastFocus = null;
+
+function _tourSave(){ try{ localStorage.setItem(TOUR_LS_STEP, String(tourState.stepIndex)); }catch(e){} }
+function _tourClearProgress(){ try{ localStorage.removeItem(TOUR_LS_STEP); localStorage.setItem(TOUR_LS_DONE,'1'); }catch(e){} }
+
+function startTour(){                 // resume where left off, else step 1
+  let i = 0;
+  try{ const s = localStorage.getItem(TOUR_LS_STEP); if (s!=null && +s>0 && +s<TOUR_STEPS.length) i = +s; }catch(e){}
+  startTourAt(i);
+}
+function restartTour(){ startTourAt(0); }
+function startTourAt(i){
+  tourState = { active:true, stepIndex: Math.max(0, Math.min(i|0, TOUR_STEPS.length-1)) };
+  _tourLastFocus = document.activeElement;
+  const t = document.getElementById('tourTrigger'); if (t) t.classList.add('tour-active');
+  paintTourStep();
+}
+function endTour(finished){
+  tourState.active = false;
+  const t = document.getElementById('tourTrigger'); if (t){ t.classList.remove('tour-active'); t.classList.add('seen'); }
+  ['tourMaskT','tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.remove('active'); });
+  const sp=document.getElementById('tourSpotlight'); if(sp) sp.classList.remove('active');
+  const po=document.getElementById('tourPopover'); if(po) po.classList.remove('active');
+  finished ? _tourClearProgress() : _tourSave();
+  const sw=document.getElementById('studioSwitcher'); if(sw){ sw.classList.remove('open'); sw.setAttribute('aria-hidden','true'); }
+  _tourRefreshTriggerLabel();
+  if (_tourLastFocus && _tourLastFocus.focus){ try{ _tourLastFocus.focus(); }catch(e){} }
+}
+function tourNext(){ if (tourState.stepIndex>=TOUR_STEPS.length-1){ endTour(true); return; } tourState.stepIndex++; _tourSave(); paintTourStep(); }
+function tourPrev(){ if (tourState.stepIndex<=0) return; tourState.stepIndex--; _tourSave(); paintTourStep(); }
+
+function paintTourStep(){
+  if (!tourState.active) return;
+  const step = TOUR_STEPS[tourState.stepIndex];
+  const isFirst = tourState.stepIndex===0, isLast = tourState.stepIndex===TOUR_STEPS.length-1;
+
+  /* --- Orchestration hooks (all guarded — drop the ones this surface lacks) --- */
+  if (step.mode && typeof state==='object' && state.mode!==step.mode){
+    state.mode=step.mode; try{ localStorage.setItem('aims_mode',step.mode); }catch(e){}
+    document.documentElement.classList.toggle('mode-operate', step.mode==='operate');
+    if (typeof paintModeToggle==='function') paintModeToggle();
+  }
+  if (step.persona && typeof state==='object' && state.persona!==step.persona){
+    state.persona=step.persona; try{ localStorage.setItem('aims_persona',step.persona); }catch(e){}
+    if (typeof paintPersonaPill==='function') paintPersonaPill();
+  }
+  const sw=document.getElementById('studioSwitcher');
+  if (sw){ if (step.openSwitcher){ sw.classList.add('open'); sw.setAttribute('aria-hidden','false'); }
+           else if (sw.classList.contains('open')){ sw.classList.remove('open'); sw.setAttribute('aria-hidden','true'); } }
+  if (step.route && location.hash!==step.route){ location.hash=step.route; }
+  else if (step.route && step.mode && typeof route==='function'){ route(); }
+  if (step.detailTab && typeof setDetailTab==='function'){
+    setTimeout(()=>{ const slug=location.hash.split('/')[2]; if (slug) setDetailTab(slug, step.detailTab); }, 100);
+  }
+
+  setTimeout(()=>{
+    const popover=document.getElementById('tourPopover'), spotlight=document.getElementById('tourSpotlight');
+    popover.innerHTML = `
+      <div class="tour-popover-header">
+        <span class="tour-popover-step">Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}</span>
+        ${!isFirst ? `<button class="tour-popover-restart" onclick="restartTour()">Restart</button>` : ''}
+        <button class="tour-popover-skip" onclick="endTour(false)">Skip tour</button>
+      </div>
+      <div class="tour-popover-title" id="tourTitle">${step.title}</div>
+      <div class="tour-popover-body">${step.body}</div>
+      <div class="tour-popover-footer">
+        <div class="tour-progress">${TOUR_STEPS.map((_,i)=>`<div class="tour-progress-dot ${i===tourState.stepIndex?'current':i<tourState.stepIndex?'done':''}"></div>`).join('')}</div>
+        ${!isFirst ? `<button class="tour-btn tour-btn-prev" onclick="tourPrev()">← Back</button>` : ''}
+        <button class="tour-btn tour-btn-next" onclick="${isLast?'endTour(true)':'tourNext()'}">${isLast?'Finish':'Next →'}</button>
+      </div>`;
+
+    const targetEl = step.target ? document.querySelector(step.target) : null;
+    if (targetEl){
+      if (step.scrollToTarget){
+        const sc=document.querySelector('.content'); const r=targetEl.getBoundingClientRect();
+        if (sc){ sc.scrollBy({ top:r.top - sc.getBoundingClientRect().top - 80, behavior:'smooth' }); }
+        else { targetEl.scrollIntoView({ behavior:'smooth', block:'start' }); }
+      }
+      const place = ()=>{ _tourPlace(targetEl.getBoundingClientRect(), popover, spotlight); };
+      setTimeout(place, step.scrollToTarget ? 700 : 50);
+      if (step.scrollToTarget) setTimeout(place, 1100);
+    } else {
+      _tourMaskFull(); spotlight.classList.remove('active'); _tourCenter(popover);
+    }
+
+    // a11y: announce + move focus into popover
+    const live=document.getElementById('tourLive'); if (live) live.textContent=`Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}. ${step.title}`;
+    const nextBtn=popover.querySelector('.tour-btn-next'); if (nextBtn) setTimeout(()=>nextBtn.focus(), 60);
+  }, step.route ? 250 : 50);
+}
+
+/* Position spotlight ring + 4-strip mask (click-through hole) + popover */
+function _tourPlace(rect, popover, spotlight){
+  const pad=6;
+  spotlight.style.left=(rect.left-pad)+'px'; spotlight.style.top=(rect.top-pad)+'px';
+  spotlight.style.width=(rect.width+pad*2)+'px'; spotlight.style.height=(rect.height+pad*2)+'px';
+  spotlight.classList.add('active');
+  _tourMask(rect, pad);
+  if (window.innerWidth < 560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  popover.classList.remove('is-sheet');
+  const pw=360, ph=popover.offsetHeight||280, m=16, W=window.innerWidth, H=window.innerHeight;
+  let top, left;
+  if (rect.bottom+ph+m < H){ top=rect.bottom+16; left=Math.min(Math.max(rect.left,16), W-pw-16); }
+  else if (rect.top-ph-m > 0){ top=rect.top-ph-16; left=Math.min(Math.max(rect.left,16), W-pw-16); }
+  else { top=(H-ph)/2; left=(W-pw)/2; }
+  popover.style.left=left+'px'; popover.style.top=top+'px'; popover.classList.add('active');
+}
+function _tourMask(rect, pad){
+  const W=window.innerWidth, H=window.innerHeight;
+  const top=Math.max(0,rect.top-pad), bot=Math.min(H,rect.bottom+pad), lft=Math.max(0,rect.left-pad), rgt=Math.min(W,rect.right+pad);
+  const set=(id,l,t,w,h)=>{ const e=document.getElementById(id); e.style.left=l+'px'; e.style.top=t+'px'; e.style.width=Math.max(0,w)+'px'; e.style.height=Math.max(0,h)+'px'; e.classList.add('active'); };
+  set('tourMaskT',0,0,W,top);
+  set('tourMaskB',0,bot,W,H-bot);
+  set('tourMaskL',0,top,lft,bot-top);
+  set('tourMaskR',rgt,top,W-rgt,bot-top);
+}
+function _tourMaskFull(){
+  const T=document.getElementById('tourMaskT'); T.style.left='0'; T.style.top='0'; T.style.width='100vw'; T.style.height='100vh'; T.classList.add('active');
+  ['tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); e.classList.remove('active'); });
+}
+function _tourCenter(popover){
+  if (window.innerWidth < 560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  popover.classList.remove('is-sheet');
+  popover.style.left=((window.innerWidth-360)/2)+'px'; popover.style.top=((window.innerHeight-(popover.offsetHeight||280))/2)+'px';
+  popover.classList.add('active');
+}
+
+/* Keyboard nav (arrows / esc) */
+document.addEventListener('keydown',(e)=>{
+  if (!tourState.active) return;
+  if (e.key==='Escape'){ endTour(false); }
+  else if (e.key==='ArrowRight'){ e.preventDefault(); tourNext(); }
+  else if (e.key==='ArrowLeft'){ e.preventDefault(); tourPrev(); }
+});
+/* Focus-trap: keep Tab inside the popover while the tour is active */
+document.addEventListener('keydown',(e)=>{
+  if (!tourState.active || e.key!=='Tab') return;
+  const po=document.getElementById('tourPopover');
+  const f=po.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+  if (!f.length) return;
+  const first=f[0], last=f[f.length-1];
+  if (e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
+
+/* Trigger label reflects resume state ("Continue" vs "Demo") */
+function _tourRefreshTriggerLabel(){
+  const t=document.getElementById('tourTrigger'); if (!t) return;
+  const label=t.querySelector('.tour-trigger-label');
+  let saved=null; try{ saved=localStorage.getItem(TOUR_LS_STEP); }catch(e){}
+  if (saved!=null && +saved>0 && +saved<TOUR_STEPS.length){ if (label) label.textContent='Continue'; t.classList.add('seen'); }
+  else { if (label) label.textContent='Demo'; try{ if (localStorage.getItem(TOUR_LS_DONE)) t.classList.add('seen'); }catch(e){} }
+}
+
+/* Init: deep-link ?tour=N (1-based) auto-starts at that step; else set label */
+(function tourInit(){
+  _tourRefreshTriggerLabel();
+  try{
+    const q=new URLSearchParams(window.location.search).get('tour');
+    if (q!=null){ const n=parseInt(q,10); if (!isNaN(n)){ startTourAt(Math.max(0,n-1)); } }
+  }catch(e){}
+})();
+</script>
+
 </body>
 </html>
