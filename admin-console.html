@@ -871,6 +871,19 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
 }
 .ac-dock-input-row .ac-copilot-input:focus{border-color:transparent; box-shadow:none}
 html.theme-light .ac-dock-input-row{background:#fff}
+.ac-dock-meta{
+  display:none; justify-content:flex-end; align-items:center;
+  padding:0 2px;
+}
+.ac-dock-meta.visible{display:flex}
+.ac-dock-reset{
+  display:flex; align-items:center; gap:5px;
+  background:none; border:none; cursor:pointer; font-family:inherit;
+  font-size:11px; color:var(--t3); padding:3px 6px; border-radius:6px;
+  transition:color .15s, background .15s;
+}
+.ac-dock-reset:hover{color:var(--t2); background:var(--pri-06)}
+.ac-dock-reset svg{opacity:.6}
 .ac-msg{display:flex; gap:8px; align-items:flex-start; animation:ac-msg-in .25s ease both}
 @keyframes ac-msg-in{from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none}}
 .ac-msg--ai .ac-msg-bubble{
@@ -10471,12 +10484,14 @@ function acActivateChat() {
   const hero = document.getElementById('acHero');
   const chatZone = document.getElementById('acMessages');
   const chips = document.getElementById('acChips');
+  const meta = document.getElementById('acDockMeta');
   if (hero && hero.style.display !== 'none') {
     hero.style.animation = 'ac-hero-out .22s ease both';
     hero.addEventListener('animationend', function() { hero.style.display = 'none'; }, { once: true });
   }
   if (chatZone) chatZone.classList.add('active');
   if (chips) chips.style.display = 'none';
+  if (meta) meta.classList.add('visible');
 }
 
 function acSendChip(btn, text) {
@@ -10539,6 +10554,15 @@ function renderAdminHome() {
 
       <!-- Input dock: always at bottom -->
       <div class="ac-dock">
+        <div class="ac-dock-meta" id="acDockMeta">
+          <button class="ac-dock-reset" onclick="renderAdminHome()" aria-label="New conversation">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6a4 4 0 1 1 .5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M2 8.5V6H4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            New conversation
+          </button>
+        </div>
         <div class="ac-dock-starters" id="acChips">
           <button class="ac-chip" onclick="acSendChip(this,'Invite a new user')">+ Invite user</button>
           <button class="ac-chip" onclick="acSendChip(this,'Show workspace status')">Workspace status</button>
