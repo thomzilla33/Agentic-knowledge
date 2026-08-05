@@ -807,85 +807,70 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
 }
 @keyframes ac-halo{from{opacity:.5} to{opacity:1}}
 
-/* ── Spinning-border ring ── */
-.ac-copilot-ring{
-  position:relative; border-radius:20px; padding:1.5px;
-  overflow:hidden; z-index:1; flex:1; display:flex; flex-direction:column;
-  max-width:760px; width:100%; margin:0 auto;
-  background:var(--pri-15);
+/* ── Hero state (shown before first message) ── */
+.ac-hero{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:0; padding:0 40px 48px; text-align:center;
+  animation:ac-hero-in .45s cubic-bezier(.2,.8,.4,1) both;
+  position:relative; z-index:1;
 }
-.ac-copilot-ring::before{
-  content:'';
-  position:absolute; width:200%; height:200%; top:-50%; left:-50%;
-  background:conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(9,226,171,.9) 60deg,
-    var(--pri) 120deg,
-    transparent 180deg,
-    transparent 270deg,
-    var(--pri-60) 300deg,
-    transparent 360deg
-  );
-  animation:ac-ring-spin 5s linear infinite;
-  pointer-events:none; z-index:0;
-}
-@keyframes ac-ring-spin{from{transform:rotate(0deg)} to{transform:rotate(360deg)}}
-
-/* ── Copilot card ── */
-.ac-copilot-card{
-  position:relative; border-radius:19px; overflow:hidden; z-index:1;
-  background:
-    radial-gradient(var(--pri-08) 1px, transparent 1px),
-    linear-gradient(170deg, var(--pri-05) 0%, transparent 35%),
-    var(--bg2);
-  background-size:22px 22px, 100% 100%, 100% 100%;
-  display:flex; flex-direction:column; flex:1; min-height:0;
-}
-html.theme-light .ac-copilot-card{
-  background:
-    radial-gradient(var(--pri-04) 1px, transparent 1px),
-    linear-gradient(170deg, var(--pri-03) 0%, transparent 35%),
-    #ffffff;
-  background-size:22px 22px, 100% 100%, 100% 100%;
-}
-
-/* ── Copilot header ── */
-.ac-copilot-header{
-  display:flex; align-items:center; gap:12px;
-  padding:18px 24px 16px;
-  border-bottom:1px solid var(--line);
-  background:linear-gradient(90deg, var(--pri-07) 0%, transparent 60%);
-  flex-shrink:0;
-}
-.ac-copilot-avatar{
-  width:38px; height:38px; border-radius:11px; flex-shrink:0;
+@keyframes ac-hero-in{from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none}}
+@keyframes ac-hero-out{from{opacity:1;transform:none} to{opacity:0;transform:translateY(-10px)}}
+.ac-hero-icon{
+  width:64px; height:64px; border-radius:20px; margin-bottom:24px;
   background:linear-gradient(135deg, var(--pri) 0%, var(--teal) 100%);
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 0 14px var(--pri-45), 0 0 28px var(--teal-15);
+  box-shadow:0 0 48px var(--pri-30), 0 0 96px var(--teal-15);
 }
-.ac-copilot-avatar svg{display:block}
-.ac-copilot-name{font-size:14px; font-weight:700; color:var(--t1); letter-spacing:-.01em}
-.ac-copilot-sub{font-size:11px; color:var(--t3); margin-top:1px}
-.ac-copilot-online{
-  margin-left:auto; display:flex; align-items:center; gap:5px;
-  font-size:11px; color:var(--status-ok-dot); font-weight:500;
+.ac-hero-icon svg{display:block}
+.ac-hero-greeting{
+  font-size:28px; font-weight:700; color:var(--t1);
+  letter-spacing:-.025em; margin-bottom:10px; line-height:1.2;
 }
-.ac-copilot-online-dot{
-  width:6px; height:6px; border-radius:50%; background:var(--status-ok-dot);
-  animation:ac-dot-pulse 2s ease-in-out infinite;
-}
-@keyframes ac-dot-pulse{
-  0%,100%{box-shadow:0 0 0 0 var(--em-50)}
-  60%{box-shadow:0 0 0 5px rgba(16,185,129,0)}
+.ac-hero-sub{
+  font-size:14px; color:var(--t2); max-width:420px; line-height:1.65;
 }
 
-/* ── Messages — scrollable, fills space ── */
-.ac-copilot-messages{
-  flex:1; padding:20px 24px; display:flex; flex-direction:column; gap:14px;
+/* ── Chat zone — message scroll area (inactive until first message) ── */
+.ac-chat-zone{
+  display:none; flex:1; padding:24px 0 0;
+  flex-direction:column; gap:14px;
   overflow-y:auto; min-height:0;
   scrollbar-width:thin; scrollbar-color:var(--line) transparent;
 }
+.ac-chat-zone.active{display:flex}
+.ac-chat-inner{
+  display:flex; flex-direction:column; gap:14px;
+  max-width:760px; width:100%; margin:0 auto; padding:0 40px;
+}
+
+/* ── Input dock — always at bottom ── */
+.ac-dock{
+  flex-shrink:0; padding:16px 40px 32px;
+  display:flex; flex-direction:column; gap:10px;
+  max-width:760px; width:100%; margin:0 auto;
+  position:relative; z-index:1;
+}
+.ac-dock-starters{
+  display:flex; gap:8px; flex-wrap:wrap;
+  justify-content:center;
+}
+.ac-dock-input-row{
+  display:flex; align-items:center; gap:8px;
+  background:var(--bg2); border:1px solid var(--line);
+  border-radius:14px; padding:8px 8px 8px 16px;
+  transition:border-color .18s, box-shadow .18s;
+}
+.ac-dock-input-row:focus-within{
+  border-color:var(--pri-60);
+  box-shadow:0 0 0 3px var(--pri-12), 0 0 20px var(--pri-08);
+}
+.ac-dock-input-row .ac-copilot-input{
+  border:none; background:transparent; padding:6px 0; border-radius:0;
+}
+.ac-dock-input-row .ac-copilot-input:focus{border-color:transparent; box-shadow:none}
+html.theme-light .ac-dock-input-row{background:#fff}
 .ac-msg{display:flex; gap:8px; align-items:flex-start; animation:ac-msg-in .25s ease both}
 @keyframes ac-msg-in{from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none}}
 .ac-msg--ai .ac-msg-bubble{
@@ -941,10 +926,6 @@ html.theme-light .ac-msg-stat{background:rgba(0,0,0,.03)}
 .ac-msg-chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
 
 /* ── Quick-action chips ── */
-.ac-copilot-chips{
-  display:flex; gap:8px; flex-wrap:wrap;
-  padding:0 24px 14px; flex-shrink:0;
-}
 .ac-chip{
   font-size:12px; font-weight:500; padding:5px 12px; border-radius:20px;
   background:var(--pri-08); border:1px solid var(--pri-25);
@@ -958,12 +939,7 @@ html.theme-light .ac-msg-stat{background:rgba(0,0,0,.03)}
 }
 .ac-chip--sm{font-size:11px; padding:4px 10px}
 
-/* ── Input area ── */
-.ac-copilot-input-row{
-  display:flex; align-items:center; gap:8px;
-  padding:12px 20px 18px; border-top:1px solid var(--line);
-  flex-shrink:0;
-}
+/* ── Input ── */
 .ac-copilot-input{
   flex:1; background:rgba(255,255,255,.05); border:1px solid var(--line);
   border-radius:10px; padding:9px 14px; font-size:13px;
@@ -10461,10 +10437,10 @@ function acAddTyping() {
   if (!msgs) return null;
   const id = 'ac-typing-' + Date.now();
   msgs.insertAdjacentHTML('beforeend',
-    `<div class="ac-typing-wrap" id="${id}">
+    `<div class="ac-chat-inner"><div class="ac-typing-wrap" id="${id}">
       <div class="ac-msg-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><path d="M7 4.5v3l1.5 1.5" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div class="ac-typing-bubble"><div class="ac-typing-dot"></div><div class="ac-typing-dot"></div><div class="ac-typing-dot"></div></div>
-    </div>`
+    </div></div>`
   );
   msgs.scrollTop = msgs.scrollHeight;
   return id;
@@ -10473,27 +10449,41 @@ function acAddTyping() {
 function acRemoveTyping(id) {
   if (!id) return;
   const el = document.getElementById(id);
-  if (el) el.remove();
+  if (el) {
+    const wrapper = el.closest('.ac-chat-inner') || el;
+    wrapper.remove();
+  }
 }
 
 function acAddAIMessage(html) {
   const msgs = document.getElementById('acMessages');
   if (!msgs) return;
   msgs.insertAdjacentHTML('beforeend',
-    `<div class="ac-msg ac-msg--ai">
+    `<div class="ac-chat-inner"><div class="ac-msg ac-msg--ai">
       <div class="ac-msg-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><path d="M5 7l1.5 1.5L9.5 5" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="ac-msg-bubble">${html}</div>
-    </div>`
+    </div></div>`
   );
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-function acSendChip(btn, text) {
+function acActivateChat() {
+  const hero = document.getElementById('acHero');
+  const chatZone = document.getElementById('acMessages');
   const chips = document.getElementById('acChips');
+  if (hero && hero.style.display !== 'none') {
+    hero.style.animation = 'ac-hero-out .22s ease both';
+    hero.addEventListener('animationend', function() { hero.style.display = 'none'; }, { once: true });
+  }
+  if (chatZone) chatZone.classList.add('active');
   if (chips) chips.style.display = 'none';
+}
+
+function acSendChip(btn, text) {
+  acActivateChat();
   const msgs = document.getElementById('acMessages');
   if (msgs) {
-    msgs.insertAdjacentHTML('beforeend', `<div class="ac-msg ac-msg--user"><div class="ac-msg-bubble">${text}</div></div>`);
+    msgs.insertAdjacentHTML('beforeend', `<div class="ac-chat-inner"><div class="ac-msg ac-msg--user"><div class="ac-msg-bubble">${text}</div></div></div>`);
     msgs.scrollTop = msgs.scrollHeight;
   }
   const typingId = acAddTyping();
@@ -10509,11 +10499,10 @@ function acSend() {
   const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
-  const chips = document.getElementById('acChips');
-  if (chips) chips.style.display = 'none';
+  acActivateChat();
   const msgs = document.getElementById('acMessages');
   if (msgs) {
-    msgs.insertAdjacentHTML('beforeend', `<div class="ac-msg ac-msg--user"><div class="ac-msg-bubble">${msg}</div></div>`);
+    msgs.insertAdjacentHTML('beforeend', `<div class="ac-chat-inner"><div class="ac-msg ac-msg--user"><div class="ac-msg-bubble">${msg}</div></div></div>`);
     msgs.scrollTop = msgs.scrollHeight;
   }
   const typingId = acAddTyping();
@@ -10529,58 +10518,48 @@ function renderAdminHome() {
 
   el.innerHTML = `<div class="ac-home-wrap">
     <div class="ac-copilot-outer">
-      <div class="ac-copilot-ring">
-        <div class="ac-copilot-card">
-          <div class="ac-copilot-header">
-            <div class="ac-copilot-avatar">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="9" r="6" stroke="rgba(255,255,255,.9)" stroke-width="1.5"/>
-                <path d="M6.5 9.5 C6.5 7.5 11.5 7.5 11.5 9.5 C11.5 11.5 9 12.5 9 12.5 C9 12.5 6.5 11.5 6.5 9.5Z" fill="rgba(255,255,255,.9)"/>
-                <circle cx="9" cy="6" r="1" fill="rgba(255,255,255,.9)"/>
-              </svg>
-            </div>
-            <div>
-              <div class="ac-copilot-name">Admin Copilot</div>
-              <div class="ac-copilot-sub">AIMS OS · Contoso Ltd</div>
-            </div>
-            <div class="ac-copilot-online">
-              <span class="ac-copilot-online-dot"></span>Online
-            </div>
-          </div>
 
-          <div class="ac-copilot-messages" id="acMessages">
-            <div class="ac-msg ac-msg--ai">
-              <div class="ac-msg-icon">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><path d="M5 7l1.5 1.5L9.5 5" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-              <div class="ac-msg-bubble">
-                Good morning, TG. One thing needs your attention: <a class="ac-msg-link" href="#/integrations">Salesforce CRM</a> lost its authentication 2 days ago and is affecting 3 active workflows. What would you like to do?
-              </div>
-            </div>
-          </div>
-
-          <div class="ac-copilot-chips" id="acChips">
-            <button class="ac-chip" onclick="acSendChip(this,'Invite a new user')">+ Invite user</button>
-            <button class="ac-chip" onclick="acSendChip(this,'Show workspace status')">Workspace status</button>
-            <button class="ac-chip" onclick="acSendChip(this,'What integrations are failing?')">Review integrations</button>
-            <button class="ac-chip" onclick="acSendChip(this,'Show recent audit activity')">Audit log</button>
-          </div>
-
-          <div class="ac-copilot-input-row">
-            <input
-              class="ac-copilot-input" id="acInput"
-              placeholder="Ask anything about your workspace…"
-              onkeydown="if(event.key==='Enter')acSend()"
-              autocomplete="off"
-            />
-            <button class="ac-copilot-send" onclick="acSend()" aria-label="Send">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 13V3M3 8l5-5 5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
+      <!-- Hero: shown before first message -->
+      <div class="ac-hero" id="acHero">
+        <div class="ac-hero-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="9" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
+            <path d="M10 14.5C10 11.5 18 11.5 18 14.5C18 17.5 14 18.8 14 18.8C14 18.8 10 17.5 10 14.5Z" fill="rgba(255,255,255,.85)"/>
+            <circle cx="14" cy="9.5" r="1.4" fill="rgba(255,255,255,.85)"/>
+          </svg>
+        </div>
+        <div class="ac-hero-greeting">Good morning, TG.</div>
+        <div class="ac-hero-sub">
+          One thing needs your attention: <a class="ac-msg-link" href="#/integrations">Salesforce CRM</a> lost authentication 2 days ago and is affecting 3 active workflows.
         </div>
       </div>
+
+      <!-- Chat zone: appears after first message -->
+      <div class="ac-chat-zone" id="acMessages"></div>
+
+      <!-- Input dock: always at bottom -->
+      <div class="ac-dock">
+        <div class="ac-dock-starters" id="acChips">
+          <button class="ac-chip" onclick="acSendChip(this,'Invite a new user')">+ Invite user</button>
+          <button class="ac-chip" onclick="acSendChip(this,'Show workspace status')">Workspace status</button>
+          <button class="ac-chip" onclick="acSendChip(this,'What integrations are failing?')">Review integrations</button>
+          <button class="ac-chip" onclick="acSendChip(this,'Show recent audit activity')">Audit log</button>
+        </div>
+        <div class="ac-dock-input-row">
+          <input
+            class="ac-copilot-input" id="acInput"
+            placeholder="Ask anything about your workspace…"
+            onkeydown="if(event.key==='Enter')acSend()"
+            autocomplete="off"
+          />
+          <button class="ac-copilot-send" onclick="acSend()" aria-label="Send">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 13V3M3 8l5-5 5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>`;
 }
