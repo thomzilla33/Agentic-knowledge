@@ -1351,6 +1351,7 @@ html.theme-light .search-footer-link{color:#7C3AED}
 .pri-ds--medium{background:var(--priority-medium)}
 .pri-ds--low{background:var(--priority-low)}
 </style>
+<link rel="stylesheet" href="shared/notif-panel.css">
 </head>
 <body>
 <header class="topbar">
@@ -5942,5 +5943,16 @@ function _tourRefreshTriggerLabel(){
 })();
 </script>
 
+<script>
+window.NOTIF_DATA = [
+  { id:'gs1', source:'agent',    eventType:'security',   severity:'critical', title:'Policy violation detected — PII exposure',    desc:'Agent "Lead Enrichment" accessed `email` field outside approved scope. Audit log created.',     time:'6m ago',    day:'today',     unread:true  },
+  { id:'gs2', source:'workflow', eventType:'approval',   severity:'warning',  title:'Policy exception requires approval',          desc:'Workflow "Contract Auto-Sign" requests elevated data access. Review scope before approving.',    time:'34m ago',   day:'today',     unread:true  },
+  { id:'gs3', source:'system',   eventType:'reminder',   severity:'warning',  title:'3 policies expiring this week',               desc:'"Data Retention v2", "PII Masking v1", "EU GDPR Scope" — all expire Aug 8. Renew or archive.',  time:'2h ago',    day:'today',     unread:true  },
+  { id:'gs4', source:'human',    eventType:'assignment', severity:'info',     title:'Compliance review assigned to you',           desc:'Q3 AI governance audit assigned by Lisa D. Deadline: Aug 15. 14 policies to review.',           time:'4h ago',    day:'today',     unread:false },
+  { id:'gs5', source:'agent',    eventType:'completion', severity:'success',  title:'Audit trail export complete',                 desc:'Full audit log for July exported (2,841 events). Download link sent to compliance@aimsos.ai.',  time:'Yesterday', day:'yesterday', unread:false },
+  { id:'gs6', source:'system',   eventType:'update',     severity:'info',     title:'Governance Studio updated to v2.14.0',        desc:'New: real-time policy violation alerts, improved RBAC diff view, SOC 2 evidence export.',        time:'3d ago',    day:'earlier',   unread:false },
+];
+</script>
+<script src="shared/notif-panel.js"></script>
 </body>
 </html>

@@ -1407,6 +1407,7 @@ html.theme-light .gear-search-kbd{background:rgba(15,23,42,0.04);border-color:rg
     button:focus-visible, a:focus-visible, [role="button"]:focus-visible, [role="tab"]:focus-visible, [tabindex="0"]:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--color-border-primary-default); outline-offset: 2px; border-radius: 4px; }
     button:focus:not(:focus-visible), a:focus:not(:focus-visible), [role="button"]:focus:not(:focus-visible), [role="tab"]:focus:not(:focus-visible) { outline: none; }
   </style>
+<link rel="stylesheet" href="shared/notif-panel.css">
 </head>
 <body>
 <div class="app-shell" id="app">
@@ -7628,6 +7629,18 @@ function _tourRefreshTriggerLabel(){
   }catch(e){}
 })();
 </script>
+
+<script>
+window.NOTIF_DATA = [
+  { id:'vc1', source:'human',    eventType:'escalation', severity:'critical', title:'Call escalated — Tier 2 required',         desc:'Agent Aria escalated call #4821 (Contoso Ltd.). Customer requesting billing supervisor. Waiting.', time:'1m ago',    day:'today',     unread:true  },
+  { id:'vc2', source:'agent',    eventType:'completion', severity:'success',  title:'Voice session complete — resolved',         desc:'Call #4820 closed after 4m 12s. Resolution: password reset. CSAT survey sent.',                  time:'12m ago',   day:'today',     unread:true  },
+  { id:'vc3', source:'workflow', eventType:'approval',   severity:'warning',  title:'Human handoff queue growing',              desc:'7 calls waiting for live agent. Avg wait time: 4m 30s. Above SLA threshold of 3m.',              time:'18m ago',   day:'today',     unread:true  },
+  { id:'vc4', source:'system',   eventType:'reminder',   severity:'info',     title:'Script update ready for review',           desc:'"Refund Policy v3" script updated by Product team. Review before deploying to voice agents.',      time:'2h ago',    day:'today',     unread:false },
+  { id:'vc5', source:'agent',    eventType:'failure',    severity:'warning',  title:'STT transcription confidence low',         desc:'Call #4818: avg confidence 61% (threshold 80%). Review transcript before closing.',               time:'Yesterday', day:'yesterday', unread:true  },
+  { id:'vc6', source:'system',   eventType:'update',     severity:'info',     title:'Voice engine updated — latency improved',  desc:'P95 response time reduced from 1.2s to 0.8s. Updated Whisper model deployed to all regions.',     time:'3d ago',    day:'earlier',   unread:false },
+];
+</script>
+<script src="shared/notif-panel.js"></script>
 
 </body>
 </html>

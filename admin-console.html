@@ -7295,7 +7295,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
       </button>
       <div class="studio-switcher" id="studioSwitcher" role="menu" aria-hidden="true">
         <div class="studio-switcher-h">Switch surface</div>
-      <a href="settings.html" class="studio-switcher-item active" data-surface="admin">
+      <a href="admin-console.html" class="studio-switcher-item active" data-surface="admin">
         <div class="studio-switcher-ico" style="background:var(--cyan-10);color:#06B6D4;border:1px solid var(--cyan-22)">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg>
         </div>
@@ -7456,7 +7456,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
           <span class="sb-label">Agent Tools</span>
         </button>
         <div class="sb-divider"></div>
-        <button class="sb-item active" title="Settings" aria-label="Settings" onclick="window.location.href='settings.html'" aria-current="page">
+        <button class="sb-item active" title="Settings" aria-label="Settings" onclick="window.location.href='admin-console.html'" aria-current="page">
           <span class="sb-item-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="2.2"/><path d="M9 2v1.5M9 14.5V16M2 9h1.5M14.5 9H16M3.9 3.9l1.1 1.1M13 13l1.1 1.1M3.9 14.1l1.1-1.1M13 5l1.1-1.1"/></svg></span>
           <span class="sb-label">Settings</span>
         </button>
@@ -15864,7 +15864,7 @@ function exitSettings() {
   const origin = sessionStorage.getItem('aims-settings-origin');
   const studioName = origin || document.querySelector('.tb-context-name')?.textContent?.trim() || 'Agentic Studio';
   const url = STUDIO_URLS[studioName] || 'agentic-studio.html';
-  if (document.referrer && !document.referrer.includes('settings.html')) {
+  if (document.referrer && !document.referrer.includes('admin-console.html')) {
     history.back();
   } else {
     window.location.href = url;

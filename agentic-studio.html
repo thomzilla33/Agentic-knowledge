@@ -2662,6 +2662,7 @@ html.theme-light .search-footer-link{color:#7C3AED}
 .pri-ds--medium{background:var(--priority-medium)}
 .pri-ds--low{background:var(--priority-low)}
 </style>
+<link rel="stylesheet" href="shared/notif-panel.css">
 </head>
 <body>
 <div class="app">
@@ -11388,5 +11389,16 @@ document.addEventListener('keydown', function(e){ if((e.metaKey || e.ctrlKey) &&
     </div>
   </div>
 </div>
+<script>
+window.NOTIF_DATA = [
+  { id:'as1', source:'agent',    eventType:'failure',    severity:'critical', title:'Lead Qualifier halted — unhandled exception', desc:'RuntimeError on node "Enrich from Clearbit". 23 records pending. Check agent logs.',           time:'4m ago',    day:'today',     unread:true  },
+  { id:'as2', source:'workflow', eventType:'approval',   severity:'warning',  title:'Human approval required — Contract Renewal',  desc:'Workflow paused at "CFO Sign-off" step for Contoso Ltd. Lisa D. has been notified.',           time:'49m ago',   day:'today',     unread:true  },
+  { id:'as3', source:'agent',    eventType:'completion', severity:'success',  title:'Onboarding Sequence complete',                desc:'All 8 nodes finished for Northwind Corp. 0 manual interventions. 3 CRM tasks created.',        time:'2h ago',    day:'today',     unread:false },
+  { id:'as4', source:'workflow', eventType:'escalation', severity:'warning',  title:'SLA breach imminent — Invoice Processor',     desc:'Current run at 4h 48m against 5h SLA. Auto-escalation triggers in 12 min if not resolved.',   time:'3h ago',    day:'today',     unread:true  },
+  { id:'as5', source:'agent',    eventType:'completion', severity:'success',  title:'Email Triage processed 142 emails',           desc:'132 auto-resolved. 10 escalated to human queue. Avg confidence score: 91%.',                   time:'Yesterday', day:'yesterday', unread:false },
+  { id:'as6', source:'system',   eventType:'update',     severity:'info',     title:'Agentic Studio updated to v2.14.0',           desc:'New: parallel node execution, retry budget per workflow, improved Human-in-the-Loop UI.',      time:'3d ago',    day:'earlier',   unread:false },
+];
+</script>
+<script src="shared/notif-panel.js"></script>
 </body>
 </html>

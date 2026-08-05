@@ -1836,6 +1836,7 @@ html.theme-light .sb-sub-item[data-soon]::after {
 .pri-ds--medium{background:var(--priority-medium)}
 .pri-ds--low{background:var(--priority-low)}
 </style>
+<link rel="stylesheet" href="shared/notif-panel.css">
 </head>
 <body>
 <div class="layout">
@@ -6178,5 +6179,16 @@ function _tourRefreshTriggerLabel(){
 })();
 </script>
 
+<script>
+window.NOTIF_DATA = [
+  { id:'ch1', source:'human',    eventType:'assignment', severity:'info',     title:'Sarah K. mentioned you in Pipeline Review',   desc:'"@thomas can you check the Contoso deal stage? Something looks off in the CRM data."',         time:'3m ago',    day:'today',     unread:true  },
+  { id:'ch2', source:'agent',    eventType:'completion', severity:'success',  title:'Weekly digest ready',                         desc:'AI summary of 847 messages across 12 channels. 3 action items flagged for your review.',        time:'1h ago',    day:'today',     unread:true  },
+  { id:'ch3', source:'workflow', eventType:'approval',   severity:'warning',  title:'Draft message pending your approval',         desc:'Outbound email to Northwind Corp. prepared by Outreach Agent. Review before sending.',          time:'2h ago',    day:'today',     unread:true  },
+  { id:'ch4', source:'human',    eventType:'assignment', severity:'info',     title:'Task assigned — Q3 pipeline commentary',      desc:'Carlos M. assigned you to add commentary to the Q3 Pipeline Report by EOD Friday.',            time:'3h ago',    day:'today',     unread:false },
+  { id:'ch5', source:'agent',    eventType:'completion', severity:'success',  title:'Email campaign sent — 1,240 recipients',      desc:'Q3 product update campaign delivered. Open rate tracking starts in 24h.',                       time:'Yesterday', day:'yesterday', unread:false },
+  { id:'ch6', source:'system',   eventType:'update',     severity:'info',     title:'Communication Hub updated to v2.14.0',        desc:'New: AI-suggested replies, channel summarisation, improved search with semantic matching.',      time:'3d ago',    day:'earlier',   unread:false },
+];
+</script>
+<script src="shared/notif-panel.js"></script>
 </body>
 </html>
