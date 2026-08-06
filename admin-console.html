@@ -15886,7 +15886,7 @@ function renderStudiosEntitlements() {
         </div>
         ${s.active
           ? `<button class="se-btn manage" onclick="navigate('#/studios/${s.id}')">Manage</button>`
-          : `<button class="se-btn contact" onclick="seOpenContact('${s.id}')">Contact sales</button>`
+          : `<button class="se-btn contact" onclick="navigate('#/studios/${s.id}')">View details</button>`
         }
       </div>
     </div>`).join('')}
@@ -16467,10 +16467,135 @@ function renderStudioManageHelix() {
 </div>`;
 }
 
+function renderStudioManageWs() {
+  const s = SE_STUDIOS.find(x => x.id === 'ws');
+
+  const FEATURES = [
+    {
+      ico: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>`,
+      name: 'Drag-and-drop canvas',
+      desc: 'Teams build their own layouts from a shared widget library — no IT involvement required.'
+    },
+    {
+      ico: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="14" cy="5" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M16 10.5c1.2.8 2 2.1 2 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+      name: 'Team-scoped views',
+      desc: 'Each team, department, or role gets its own surface — separate layouts, separate data.'
+    },
+    {
+      ico: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5c2-2 10-2 12 0s-10 6-12 8 10 2 12 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="9" r="2" fill="currentColor" opacity=".3"/></svg>`,
+      name: 'Helix-embedded reports',
+      desc: 'Pull live entity data and pipeline outputs from Helix Data Studio directly into any surface.'
+    },
+    {
+      ico: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="8" width="14" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      name: 'Role-gated access',
+      desc: 'Admins control who can view, edit, or publish each surface — at the role or user level.'
+    },
+  ];
+
+  const featureCards = FEATURES.map(f => `
+    <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:18px 20px">
+      <div style="width:36px;height:36px;border-radius:10px;background:var(--bg3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--t2);margin-bottom:12px">${f.ico}</div>
+      <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px">${f.name}</div>
+      <div style="font-size:12px;color:var(--t3);line-height:1.55">${f.desc}</div>
+    </div>
+  `).join('');
+
+  const LOCK = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="opacity:.35"><rect x="2" y="6" width="9" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4 6V4.5a2.5 2.5 0 0 1 5 0V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+
+  const PREVIEW_ROWS = [
+    { label:'Surface provisioning', sub:'Control which teams can create and publish surfaces' },
+    { label:'Widget library',       sub:'Choose which widgets are available in the builder' },
+    { label:'Helix report access',  sub:'Define which Helix reports can be embedded per team' },
+    { label:'Role permissions',     sub:'Set view, edit, and publish rights per surface' },
+    { label:'Usage limits',         sub:'Max surfaces per team and max widgets per surface' },
+  ];
+
+  const previewRows = PREVIEW_ROWS.map(r => `
+    <div class="sm-setting-row" style="opacity:.45">
+      <div>
+        <div class="sm-setting-label">${r.label}</div>
+        <div class="sm-setting-sub">${r.sub}</div>
+      </div>
+      <div class="sm-setting-value" style="gap:6px">${LOCK} Locked</div>
+    </div>
+  `).join('');
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="sm-breadcrumb">
+    <button class="sm-breadcrumb-back" onclick="navigate('#/studios')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Studios & Entitlements
+    </button>
+    <span class="sm-breadcrumb-sep">/</span>
+    <span class="sm-breadcrumb-cur">${s.name}</span>
+  </div>
+
+  <div class="sm-page-header">
+    <div class="sm-page-title-row">
+      <div class="se-ico ${s.ico}">${s.icoSvg}</div>
+      <div class="sm-page-title">${s.name}</div>
+      <span style="display:inline-flex;align-items:center;background:var(--bg3);color:var(--t3);border:1px solid var(--line);border-radius:20px;padding:2px 10px;font-size:11.5px;font-weight:600;margin-left:4px">Not in your plan</span>
+    </div>
+    <div class="sm-page-desc">Customizable dashboards and collaborative surfaces for every team — drag-and-drop widgets, embedded Helix reports, and role-gated access per surface.</div>
+  </div>
+
+  <!-- What you get -->
+  <div class="sm-section">
+    <div class="sm-section-title">What's included</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${featureCards}</div>
+  </div>
+
+  <!-- Pricing -->
+  <div class="sm-section">
+    <div class="sm-section-title">Pricing</div>
+    <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span style="font-size:32px;font-weight:700;color:var(--t1)">$18</span>
+          <span style="font-size:13px;color:var(--t3)">&nbsp;/ user / month</span>
+        </div>
+        <div style="font-size:12px;color:var(--t3);margin-top:4px">Billed annually · Add-on to any Enterprise plan</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--t2)">
+        <div>&#10003;&nbsp; Unlimited surfaces</div>
+        <div>&#10003;&nbsp; Full widget library access</div>
+        <div>&#10003;&nbsp; Helix report embedding</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add to plan -->
+  <div class="sm-section">
+    <div class="sm-section-title">Add to your plan</div>
+    <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:6px">Work Surfaces is not included in your current Enterprise plan</div>
+        <div style="font-size:13px;color:var(--t3)">Contact your account team to get a quote and activate Work Surfaces for your workspace.</div>
+      </div>
+      <button onclick="seOpenContact('ws')" style="flex-shrink:0;height:36px;padding:0 18px;border-radius:var(--r8);background:var(--pri);border:none;font-size:13px;font-weight:600;color:#fff;cursor:pointer">Contact sales</button>
+    </div>
+  </div>
+
+  <!-- Admin controls preview -->
+  <div class="sm-section">
+    <div class="sm-section-title" style="display:flex;align-items:center;gap:8px">
+      Admin controls
+      <span style="font-size:11px;font-weight:500;color:var(--t3)">Available once activated</span>
+    </div>
+    <div class="ms-card">${previewRows}</div>
+  </div>
+
+</div>`;
+}
+
 function renderStudioManage(studioId) {
   if (studioId === 'gov') return renderStudioManageGov();
   if (studioId === 'ag') return renderStudioManageAg();
   if (studioId === 'helix') return renderStudioManageHelix();
+  if (studioId === 'ws') return renderStudioManageWs();
   const s = SE_STUDIOS.find(x => x.id === studioId);
   if (!s) { navigate('#/studios'); return; }
 
