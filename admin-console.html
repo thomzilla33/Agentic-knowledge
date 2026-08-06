@@ -7386,6 +7386,33 @@ html.theme-light .bill-pm-card{background:var(--canvas);}
 html.theme-light .bill-invoice-table td{border-bottom-color:var(--line);}
 html.theme-light .bill-stat{background:var(--canvas);}
 
+/* ── Notifications ───────────────────────────────────────── */
+.notif-channel-grid{display:flex;flex-direction:column;gap:10px;}
+.notif-channel-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:16px 20px;display:flex;align-items:center;gap:14px;}
+.notif-channel-ico{width:36px;height:36px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;}
+.notif-channel-ico.email{background:rgba(43,127,255,.12);color:var(--pri);}
+.notif-channel-ico.slack{background:rgba(74,21,75,.18);color:#e01e5a;}
+.notif-channel-ico.webhook{background:var(--bg3);color:var(--t3);}
+.notif-channel-body{flex:1;min-width:0;}
+.notif-channel-name{font-size:13px;font-weight:600;color:var(--t1);}
+.notif-channel-detail{font-size:12px;color:var(--t3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.notif-channel-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.notif-rule-category{margin-bottom:0;}
+.notif-rule-category-h{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);}
+.notif-rule-category-h:last-child{border-bottom:none;}
+.notif-rule-info{flex:1;}
+.notif-rule-label{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:2px;}
+.notif-rule-sub{font-size:12px;color:var(--t3);}
+.notif-rule-controls{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.notif-rule-channels{display:flex;gap:5px;}
+.notif-rule-ch-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r6);font-size:11px;font-weight:500;background:var(--bg3);color:var(--t2);border:1px solid var(--line);}
+.notif-rule-ch-chip.active{background:var(--pri-10,rgba(43,127,255,.1));color:var(--pri);border-color:var(--pri-30,rgba(43,127,255,.3));}
+.notif-sev-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:5px;}
+.notif-sev-dot.critical{background:#f87171;}
+.notif-sev-dot.warning{background:#fbbf24;}
+.notif-sev-dot.info{background:var(--t3);}
+html.theme-light .notif-channel-card{background:var(--canvas);}
+
 /* ── Studios & Entitlements ──────────────────────────────── */
 .se-wrap{max-width:860px;padding:32px 24px 64px;}
 .se-header{margin-bottom:28px;}
@@ -7751,7 +7778,7 @@ html.theme-light .se-confirm-summary{background:var(--bg2);}
             <span class="ssb-item-alert" title="1 integration failing"></span>
           </button>
 
-          <button class="ssb-item disabled" data-route="notifications">
+          <button class="ssb-item" data-route="notifications" onclick="navigate('#/notifications')">
             <span class="ssb-item-label">Notifications</span>
             <span class="ssb-item-badge">4</span>
           </button>
@@ -10899,7 +10926,7 @@ const AC_SECTIONS = [
     { id:'governance-defaults', name:'Governance Defaults',        desc:'Default policies applied across all studios',       state:'active', route:'governance-defaults' },
     { id:'data-privacy',        name:'Data & Privacy',             desc:'Data retention, export, and compliance settings',   state:'active', route:'data-privacy' },
     { id:'integrations',        name:'Integrations & Credentials', desc:'Authenticate and govern third-party connections',   state:'active', alert:1, route:'integrations' },
-    { id:'notifications',       name:'Notifications',              desc:'Alert channels, rules, and delivery preferences',   state:'soon' },
+    { id:'notifications',       name:'Notifications',              desc:'Alert channels, rules, and delivery preferences',   state:'active', route:'notifications' },
     { id:'audit',               name:'Audit & Compliance',         desc:'Activity logs and compliance reporting',            state:'active', route:'audit' },
   ]},
 ];
@@ -11112,7 +11139,8 @@ function route() {
     'organization':'organization',
     'identity':'identity',
     'governance-defaults':'governance-defaults',
-    'data-privacy':'data-privacy'
+    'data-privacy':'data-privacy',
+    'notifications':'notifications'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -11175,6 +11203,8 @@ function route() {
     renderGovernanceDefaults();
   } else if (parts[0]==='data-privacy') {
     renderDataPrivacy();
+  } else if (parts[0]==='notifications') {
+    renderNotifications();
   } else {
     renderHome();
   }
@@ -16739,6 +16769,177 @@ function renderDataPrivacy() {
         <div class="sm-setting-value">
           <button class="bill-pm-btn" onclick="toast('Contact support to submit a data erasure request','info')">Submit request</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderNotifications() {
+  const RULES = [
+    {
+      key:'security',
+      label:'Security events',
+      sub:'SSO certificate expiry, failed logins, MFA violations, inactive API keys',
+      sev:'critical',
+      toggle:true,
+      channels:['email','slack'],
+    },
+    {
+      key:'integration-health',
+      label:'Integration health',
+      sub:'Disconnected integrations, token expiry, webhook failures, health degraded',
+      sev:'warning',
+      toggle:true,
+      channels:['email','slack'],
+    },
+    {
+      key:'platform-updates',
+      label:'Platform updates',
+      sub:'New roles available, version releases, scheduled maintenance windows',
+      sev:'info',
+      toggle:true,
+      channels:['email'],
+    },
+    {
+      key:'access-events',
+      label:'User & access events',
+      sub:'Workspace ownership transfers, permission changes, new member joined',
+      sev:'info',
+      toggle:true,
+      channels:['email'],
+    },
+    {
+      key:'agent-alerts',
+      label:'Agent run alerts',
+      sub:'Agent run failures, Human-in-the-Loop requests awaiting review',
+      sev:'warning',
+      toggle:false,
+      channels:[],
+    },
+    {
+      key:'policy-events',
+      label:'Policy & approval events',
+      sub:'Approval requests assigned to you, policy violations detected',
+      sev:'warning',
+      toggle:true,
+      channels:['email','slack'],
+    },
+  ];
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="bill-page-title">Notifications</div>
+  <div class="bill-page-desc">Configure where workspace alerts are delivered and which events trigger them. Personal notification preferences are set in My Settings.</div>
+
+  <!-- Channels -->
+  <div class="bill-section">
+    <div class="bill-section-title">Notification Channels</div>
+    <div class="notif-channel-grid">
+
+      <div class="notif-channel-card">
+        <div class="notif-channel-ico email">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 6l7 5 7-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="notif-channel-body">
+          <div class="notif-channel-name">Email</div>
+          <div class="notif-channel-detail">thomas.gonzalez@aimsos.ai · All admins on critical alerts</div>
+        </div>
+        <div class="notif-channel-right">
+          <span class="bill-invoice-status paid">Active</span>
+          <button class="bill-pm-btn" onclick="toast('Email notification settings updated','success')">Configure</button>
+        </div>
+      </div>
+
+      <div class="notif-channel-card">
+        <div class="notif-channel-ico slack">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="5.5" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10.5" y="2" width="5.5" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="10.5" width="5.5" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10.5" y="10.5" width="5.5" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div class="notif-channel-body">
+          <div class="notif-channel-name">Slack</div>
+          <div class="notif-channel-detail">#aims-alerts · contoso.slack.com</div>
+        </div>
+        <div class="notif-channel-right">
+          <span class="bill-invoice-status paid">Connected</span>
+          <button class="bill-pm-btn" onclick="navigate('#/integrations/slack')">Configure</button>
+        </div>
+      </div>
+
+      <div class="notif-channel-card">
+        <div class="notif-channel-ico webhook">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9a6 6 0 0 1 6-6m0 0a6 6 0 0 1 6 6m-6-6v2m6 4a6 6 0 0 1-6 6m0 0a6 6 0 0 1-6-6m6 6v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="notif-channel-body">
+          <div class="notif-channel-name">Webhook</div>
+          <div class="notif-channel-detail">No endpoint configured</div>
+        </div>
+        <div class="notif-channel-right">
+          <span style="font-size:12px;color:var(--t3)">Not set up</span>
+          <button class="bill-pm-btn" onclick="toast('Webhook configuration — coming soon','info')">Set up</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Alert Rules -->
+  <div class="bill-section">
+    <div class="bill-section-title">Alert Rules</div>
+    <div class="ms-card" style="padding:0 24px;">
+      ${RULES.map(r => `
+      <div class="notif-rule-category-h">
+        <div class="notif-rule-info">
+          <div class="notif-rule-label">
+            <span class="notif-sev-dot ${r.sev}"></span>${r.label}
+          </div>
+          <div class="notif-rule-sub">${r.sub}</div>
+        </div>
+        <div class="notif-rule-controls">
+          <div class="notif-rule-channels">
+            <span class="notif-rule-ch-chip ${r.channels.includes('email') ? 'active' : ''}">Email</span>
+            <span class="notif-rule-ch-chip ${r.channels.includes('slack') ? 'active' : ''}">Slack</span>
+          </div>
+          <span class="sm-toggle">
+            <span class="sm-toggle-pill ${r.toggle ? '' : 'off'}"></span>
+          </span>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- Delivery Preferences -->
+  <div class="bill-section">
+    <div class="bill-section-title">Delivery Preferences</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Critical alert delivery</div>
+          <div class="sm-setting-sub">How quickly critical-severity alerts are sent after the event occurs</div>
+        </div>
+        <div class="sm-setting-value">Immediately <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Non-critical alert digest</div>
+          <div class="sm-setting-sub">Warning and info alerts are batched and sent as a digest</div>
+        </div>
+        <div class="sm-setting-value">Daily at 9:00 AM <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Quiet hours</div>
+          <div class="sm-setting-sub">Suppress non-critical notifications outside business hours (critical alerts always go through)</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>9 AM – 6 PM ET</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Notify on resolved alerts</div>
+          <div class="sm-setting-sub">Send a follow-up notification when a flagged issue is resolved</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
       </div>
     </div>
   </div>
