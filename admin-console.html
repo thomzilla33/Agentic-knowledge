@@ -7340,6 +7340,52 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 html.theme-light .sm-plan-cell{background:var(--canvas);}
 html.theme-light .sm-danger-card{background:rgba(220,38,38,.04);}
 
+/* ── Billing & Subscription ──────────────────────────────── */
+.bill-wrap{max-width:720px;padding:32px 24px 64px;}
+.bill-page-title{font-size:20px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+.bill-page-desc{font-size:13px;color:var(--t3);line-height:1.55;margin-bottom:32px;}
+.bill-section{margin-bottom:32px;}
+.bill-section-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;}
+.bill-plan-hero{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.bill-plan-badge{display:inline-flex;align-items:center;gap:6px;background:var(--pri-10,rgba(43,127,255,.1));border:1px solid var(--pri-30,rgba(43,127,255,.3));color:var(--pri);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;margin-bottom:8px;}
+.bill-plan-name{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:2px;}
+.bill-plan-meta{font-size:12.5px;color:var(--t3);}
+.bill-plan-amount{text-align:right;flex-shrink:0;}
+.bill-plan-price{font-size:24px;font-weight:700;color:var(--t1);line-height:1;}
+.bill-plan-price-sub{font-size:12px;color:var(--t3);margin-top:3px;}
+.bill-stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:var(--r12);overflow:hidden;}
+.bill-stat{padding:16px 18px;border-right:1px solid var(--line);}
+.bill-stat:last-child{border-right:none;}
+.bill-stat-label{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.bill-stat-value{font-size:15px;font-weight:600;color:var(--t1);}
+.bill-stat-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.bill-invoice-table{width:100%;border-collapse:collapse;}
+.bill-invoice-table th{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:0 0 10px;text-align:left;border-bottom:1px solid var(--line);}
+.bill-invoice-table th:last-child{text-align:right;}
+.bill-invoice-table td{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:var(--t2);vertical-align:middle;}
+.bill-invoice-table td:last-child{text-align:right;}
+.bill-invoice-table tr:last-child td{border-bottom:none;}
+.bill-invoice-amount{font-weight:600;color:var(--t1);}
+.bill-invoice-status{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:20px;}
+.bill-invoice-status.paid{background:var(--green-10);color:var(--green);}
+.bill-invoice-status.upcoming{background:var(--pri-10,rgba(43,127,255,.1));color:var(--pri);}
+.bill-invoice-dl{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--t3);cursor:pointer;padding:4px 8px;border-radius:var(--r6);border:1px solid var(--line);background:none;transition:background .12s;}
+.bill-invoice-dl:hover{background:var(--bg3);color:var(--t1);}
+.bill-pm-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:20px 22px;display:flex;align-items:center;gap:16px;}
+.bill-pm-icon{width:44px;height:30px;border-radius:6px;background:var(--bg3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bill-pm-details{flex:1;}
+.bill-pm-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:2px;}
+.bill-pm-sub{font-size:12px;color:var(--t3);}
+.bill-pm-actions{display:flex;gap:8px;flex-shrink:0;}
+.bill-pm-btn{padding:6px 14px;border-radius:var(--r6);font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid var(--line);background:var(--bg3);color:var(--t2);transition:background .12s,color .12s;}
+.bill-pm-btn:hover{background:var(--hover);color:var(--t1);}
+.bill-contact-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);}
+.bill-contact-row:last-child{border-bottom:none;}
+html.theme-light .bill-plan-hero{background:var(--canvas);}
+html.theme-light .bill-pm-card{background:var(--canvas);}
+html.theme-light .bill-invoice-table td{border-bottom-color:var(--line);}
+html.theme-light .bill-stat{background:var(--canvas);}
+
 /* ── Studios & Entitlements ──────────────────────────────── */
 .se-wrap{max-width:860px;padding:32px 24px 64px;}
 .se-header{margin-bottom:28px;}
@@ -7682,7 +7728,7 @@ html.theme-light .se-confirm-summary{background:var(--bg2);}
             <span class="ssb-item-label">Studios & Entitlements</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="billing">
+          <button class="ssb-item" data-route="billing" onclick="navigate('#/billing')">
             <span class="ssb-item-label">Billing & Subscription</span>
           </button>
         </div>
@@ -10847,7 +10893,7 @@ const AC_SECTIONS = [
     { id:'organization', name:'Organization',             desc:'Configure your organization structure and details',     state:'soon' },
     { id:'identity',     name:'Identity & Security',      desc:'SSO, MFA, and authentication policies',                state:'soon' },
     { id:'studios',      name:'Studios & Entitlements',   desc:'Manage licensed products and studio access',           state:'active', route:'studios' },
-    { id:'billing',      name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'soon' },
+    { id:'billing',      name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'active', route:'billing' },
   ]},
   { group:'Platform', items:[
     { id:'governance-defaults', name:'Governance Defaults',        desc:'Default policies applied across all studios',       state:'soon' },
@@ -11061,7 +11107,8 @@ function route() {
     'personal':'personal',
     'my-settings':'my-settings',
     'studios':'studios',
-    'people':'people'
+    'people':'people',
+    'billing':'billing'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -11114,6 +11161,8 @@ function route() {
     }
   } else if (parts[0]==='people') {
     renderPeopleAccess();
+  } else if (parts[0]==='billing') {
+    renderBilling();
   } else {
     renderHome();
   }
@@ -15935,6 +15984,170 @@ function renderStudioManage(studioId) {
         <div class="sm-danger-desc">Immediately invalidates all running agent sessions and active user tokens in this studio.</div>
       </div>
       <button class="sm-danger-btn" onclick="toast('All sessions revoked — users will need to re-authenticate.','warning')">Revoke sessions</button>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderBilling() {
+  const INVOICES = [
+    { id:'INV-2027-001', date:'Jan 14, 2027', desc:'AIMS OS Enterprise — Annual renewal', amount:'$52,800.00', status:'upcoming' },
+    { id:'INV-2026-001', date:'Jan 14, 2026', desc:'AIMS OS Enterprise — Annual renewal', amount:'$50,400.00', status:'paid' },
+    { id:'INV-2025-001', date:'Jan 14, 2025', desc:'AIMS OS Enterprise — Annual renewal', amount:'$45,000.00', status:'paid' },
+    { id:'INV-2024-001', date:'Jan 14, 2024', desc:'AIMS OS Enterprise — Annual renewal', amount:'$38,400.00', status:'paid' },
+  ];
+
+  $('content').innerHTML = `
+<div class="bill-wrap">
+
+  <div class="bill-page-title">Billing & Subscription</div>
+  <div class="bill-page-desc">Manage your AIMS OS plan, invoices, and payment details.</div>
+
+  <!-- Current Plan -->
+  <div class="bill-section">
+    <div class="bill-section-title">Current Plan</div>
+    <div class="bill-plan-hero">
+      <div>
+        <div class="bill-plan-badge">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="currentColor" opacity=".25"/><circle cx="5" cy="5" r="2" fill="currentColor"/></svg>
+          Enterprise
+        </div>
+        <div class="bill-plan-name">AIMS OS Enterprise</div>
+        <div class="bill-plan-meta">3 active studios · Annual contract · Renews Jan 14, 2027</div>
+      </div>
+      <div class="bill-plan-amount">
+        <div class="bill-plan-price">$52,800</div>
+        <div class="bill-plan-price-sub">per year · billed annually</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Usage Summary -->
+  <div class="bill-section">
+    <div class="bill-section-title">Usage Summary</div>
+    <div class="bill-stats">
+      <div class="bill-stat">
+        <div class="bill-stat-label">Active studios</div>
+        <div class="bill-stat-value">3 / 3</div>
+        <div class="bill-stat-sub">Gov · Agentic · Helix</div>
+      </div>
+      <div class="bill-stat">
+        <div class="bill-stat-label">Workspace seats</div>
+        <div class="bill-stat-value">10 active</div>
+        <div class="bill-stat-sub">Unlimited license</div>
+      </div>
+      <div class="bill-stat">
+        <div class="bill-stat-label">Contract term</div>
+        <div class="bill-stat-value">Annual</div>
+        <div class="bill-stat-sub">163 days remaining</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoices -->
+  <div class="bill-section">
+    <div class="bill-section-title">Invoices</div>
+    <div class="ms-card" style="padding:0 24px;">
+      <table class="bill-invoice-table">
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${INVOICES.map(inv => `
+          <tr>
+            <td style="color:var(--t1);font-weight:500">${inv.id}</td>
+            <td>${inv.date}</td>
+            <td class="bill-invoice-amount">${inv.amount}</td>
+            <td>
+              <span class="bill-invoice-status ${inv.status}">
+                ${inv.status === 'upcoming' ? 'Upcoming' : 'Paid'}
+              </span>
+            </td>
+            <td>
+              ${inv.status === 'paid'
+                ? `<button class="bill-invoice-dl" onclick="toast('Downloading ${inv.id}.pdf…','info')">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v6M3 6l3 3 3-3M2 10h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    PDF
+                  </button>`
+                : `<span style="font-size:12px;color:var(--t3)">Due on renewal</span>`
+              }
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Payment Method -->
+  <div class="bill-section">
+    <div class="bill-section-title">Payment Method</div>
+    <div class="bill-pm-card">
+      <div class="bill-pm-icon">
+        <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><rect width="28" height="18" rx="3" fill="var(--bg3)"/><rect x="0" y="5" width="28" height="4" fill="var(--line)"/><rect x="3" y="12" width="6" height="2" rx="1" fill="var(--t3)"/></svg>
+      </div>
+      <div class="bill-pm-details">
+        <div class="bill-pm-name">Visa ending in 4242</div>
+        <div class="bill-pm-sub">Expires 08/2027 · Billing contact: thomas.gonzalez@aimsos.ai</div>
+      </div>
+      <div class="bill-pm-actions">
+        <button class="bill-pm-btn" onclick="toast('Payment method update — contact your account team','info')">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Billing Contact -->
+  <div class="bill-section">
+    <div class="bill-section-title">Billing Contact</div>
+    <div class="ms-card">
+      <div class="bill-contact-row">
+        <div>
+          <div class="sm-setting-label">Invoice recipient</div>
+          <div class="sm-setting-sub">Invoices and payment confirmations are sent to this address</div>
+        </div>
+        <div class="sm-setting-value">
+          thomas.gonzalez@aimsos.ai
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="bill-contact-row">
+        <div>
+          <div class="sm-setting-label">CC recipients</div>
+          <div class="sm-setting-sub">Additional addresses that receive a copy of each invoice</div>
+        </div>
+        <div class="sm-setting-value" style="color:var(--t3)">
+          None configured
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="bill-contact-row">
+        <div>
+          <div class="sm-setting-label">Purchase order number</div>
+          <div class="sm-setting-sub">Printed on invoices when required by your procurement team</div>
+        </div>
+        <div class="sm-setting-value" style="color:var(--t3)">
+          Not set
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="bill-section">
+    <div class="bill-section-title">Actions</div>
+    <div class="sm-danger-card">
+      <div>
+        <div class="sm-danger-label">Cancel subscription</div>
+        <div class="sm-danger-desc">Access continues until Jan 14, 2027. Contact your account team to process the cancellation.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('Contact your account team at accounts@aimsos.ai to cancel','info')">Cancel plan</button>
     </div>
   </div>
 
