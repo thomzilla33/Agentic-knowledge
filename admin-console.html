@@ -3684,6 +3684,53 @@ html.theme-light .users-via-chip{background:var(--hover); border-color:var(--lin
 }
 html.theme-light .users-empty{border-color:var(--line)}
 
+/* ── People & Access — studio badges & status ──────────────── */
+/* ── People & Access — chips ───────────────────────────────── */
+.pa-studio-chips{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.pa-studio-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;letter-spacing:.01em;}
+.pa-studio-chip.gov{background:var(--green-10);color:var(--green);border:1px solid var(--green-30);}
+.pa-studio-chip.ag{background:var(--purple-10);color:var(--purple);border:1px solid var(--purple-22);}
+.pa-studio-chip.helix{background:var(--int-cyan-10);color:var(--int-cyan);border:1px solid var(--int-cyan-24);}
+.pa-studio-chip.none{color:var(--t3);font-weight:400;font-size:12px;}
+.pa-ws-role{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;background:var(--bg3);color:var(--t2);border:1px solid var(--line);}
+.pa-ws-role.super-admin{background:var(--pri-10,rgba(43,127,255,.1));color:var(--pri);border-color:var(--pri-30,rgba(43,127,255,.3));}
+.pa-ws-role.admin{background:var(--purple-10);color:var(--purple);border-color:var(--purple-22);}
+.pa-status{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;}
+.pa-status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.pa-status.active .pa-status-dot{background:var(--green);}
+.pa-status.active{color:var(--t2);}
+.pa-status.pending .pa-status-dot{background:var(--status-warn);}
+.pa-status.pending{color:var(--status-warn);}
+
+/* ── People Drawer ─────────────────────────────────────────── */
+.pa-drawer-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px;}
+.pa-drawer-stat{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--t3);}
+.pa-drawer-stat strong{color:var(--t2);}
+.pa-drawer-studio-rows{display:flex;flex-direction:column;gap:0;}
+.pa-drawer-studio-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.pa-drawer-studio-row:last-child{border-bottom:none;}
+html.theme-light .pa-drawer-studio-row{border-bottom-color:var(--line);}
+.pa-drawer-studio-role{font-size:12.5px;color:var(--t2);}
+.pa-drawer-actions{display:flex;flex-direction:column;gap:8px;}
+.pa-drawer-action-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:9px 14px;border-radius:var(--r6);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s, opacity .12s;border:1px solid var(--line);background:var(--bg3);color:var(--t1);}
+.pa-drawer-action-btn:hover{background:var(--hover);}
+.pa-drawer-action-btn.danger{color:var(--status-err,#f87171);border-color:var(--status-err-border,rgba(248,113,113,.3));background:var(--status-err-bg,rgba(248,113,113,.06));}
+.pa-drawer-action-btn.danger:hover{opacity:.8;}
+html.theme-light .pa-drawer-action-btn{background:#fff;border-color:var(--line);}
+html.theme-light .pa-drawer-action-btn:hover{background:var(--hover);}
+.pa-invite-row td{color:var(--t3);}
+.pa-invite-row:hover{background:var(--hover)!important;}
+/* Studio-specific active states extending .users-filter */
+.users-filter.studio-gov.is-on{background:var(--green-10);border-color:var(--green-30);color:var(--green);}
+.users-filter.studio-gov.is-on .users-filter-badge{background:rgba(5,223,114,0.16);color:var(--green);}
+.users-filter.studio-ag.is-on{background:var(--purple-10);border-color:var(--purple-30);color:var(--purple);}
+.users-filter.studio-ag.is-on .users-filter-badge{background:rgba(167,139,250,0.16);color:var(--purple);}
+.users-filter.studio-helix.is-on{background:var(--int-cyan-08);border-color:var(--int-cyan-40);color:var(--int-cyan);}
+.users-filter.studio-helix.is-on .users-filter-badge{background:var(--int-cyan-18);color:var(--int-cyan);}
+html.theme-light .users-filter.studio-gov.is-on{background:var(--green-10);border-color:var(--green-30);}
+html.theme-light .users-filter.studio-ag.is-on{background:var(--purple-10);border-color:var(--purple-30);}
+html.theme-light .users-filter.studio-helix.is-on{background:var(--int-cyan-06);border-color:var(--int-cyan-42);}
+
 /* User drawer access list */
 .user-drawer-access{display:flex; flex-direction:column; gap:12px}
 .user-drawer-int{
@@ -7256,6 +7303,99 @@ html.theme-light .ms-input:disabled,html.theme-light .ms-input[readonly]{backgro
 html.theme-light .ms-select{background:var(--canvas);color:var(--t1);}
 html.theme-light .ms-theme-card{background:var(--bg2);}
 
+/* ── Studios & Entitlements ──────────────────────────────── */
+.se-wrap{max-width:860px;padding:32px 24px 64px;}
+.se-header{margin-bottom:28px;}
+.se-title{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+.se-subtitle{font-size:13px;color:var(--t3);line-height:1.5;}
+.se-summary{display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap;}
+.se-summary-stat{background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);padding:12px 16px;min-width:120px;}
+.se-summary-val{font-size:20px;font-weight:700;color:var(--t1);line-height:1;}
+.se-summary-label{font-size:11px;color:var(--t3);margin-top:3px;text-transform:uppercase;letter-spacing:.04em;font-weight:500;}
+.se-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px;}
+.se-card{background:var(--bg3);border:1px solid var(--line);border-radius:var(--r12);padding:20px;display:flex;flex-direction:column;gap:16px;transition:border-color .15s;}
+.se-card.active-card{border-color:var(--line-strong);}
+.se-card.inactive-card{opacity:.72;}
+.se-card-head{display:flex;align-items:flex-start;gap:12px;}
+.se-ico{width:36px;height:36px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.se-ico.gov{background:var(--green-10);color:var(--green);}
+.se-ico.ag{background:var(--purple-10);color:var(--purple);}
+.se-ico.helix{background:var(--cyan-10,rgba(0,200,220,.12));color:var(--cyan,#00c8dc);}
+.se-ico.ws{background:var(--pri-10);color:var(--pri);}
+.se-card-meta{flex:1;min-width:0;}
+.se-card-name{font-size:14px;font-weight:700;color:var(--t1);line-height:1.3;}
+.se-card-desc{font-size:12px;color:var(--t3);margin-top:3px;line-height:1.5;}
+.se-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;flex-shrink:0;}
+.se-badge.on{background:var(--green-10);color:var(--green);}
+.se-badge.off{background:var(--bg2);color:var(--t3);}
+.se-badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.se-stats{display:flex;gap:20px;}
+.se-stat{display:flex;flex-direction:column;gap:2px;}
+.se-stat-val{font-size:15px;font-weight:700;color:var(--t1);}
+.se-stat-label{font-size:11px;color:var(--t3);}
+.se-card-foot{display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid var(--line);}
+.se-plan{font-size:11px;color:var(--t3);flex:1;}
+.se-plan strong{color:var(--t2);font-weight:600;}
+.se-btn{padding:7px 14px;border-radius:var(--r6);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;}
+.se-btn:hover{opacity:.85;}
+.se-btn.manage{background:var(--pri);color:#fff;}
+.se-btn.contact{background:var(--bg2);color:var(--t2);border:1px solid var(--line);}
+html.theme-light .se-card{background:var(--canvas);}
+html.theme-light .se-summary-stat{background:var(--bg2);}
+
+/* ── Studios & Entitlements — simplified cards ───────────── */
+.se-card-foot{display:flex;align-items:center;gap:8px;padding-top:14px;border-top:1px solid var(--line);}
+/* override previous stats rule — cards are now flex-col with just head + foot */
+.se-card{gap:14px;}
+
+/* ── Contact Sales Modal ──────────────────────────────────── */
+.se-modal-overlay{position:fixed;inset:0;z-index:280;background:var(--overlay-scrim-66);backdrop-filter:blur(6px) saturate(140%);-webkit-backdrop-filter:blur(6px) saturate(140%);display:none;align-items:center;justify-content:center;padding:24px;}
+.se-modal-overlay.is-open{display:flex;}
+html.theme-light .se-modal-overlay{background:var(--overlay-scrim-lt-42);}
+.se-modal{width:100%;max-width:480px;background:var(--modal-panel-grad);border:1px solid rgba(255,255,255,.10);border-radius:16px;box-shadow:0 36px 80px -24px rgba(0,0,0,.7);display:flex;flex-direction:column;overflow:hidden;animation:obSlide .22s cubic-bezier(.2,.8,.2,1);}
+html.theme-light .se-modal{background:#fff;border:1px solid var(--line);box-shadow:0 28px 64px -16px var(--overlay-shadow);}
+.se-modal-h{padding:16px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;}
+html.theme-light .se-modal-h{border-bottom-color:var(--line);}
+.se-modal-title{font-size:15px;font-weight:700;color:var(--t1);}
+.se-modal-close{background:none;border:none;color:var(--t3);cursor:pointer;padding:4px;border-radius:var(--r4);display:flex;align-items:center;justify-content:center;}
+.se-modal-close:hover{color:var(--t1);background:var(--hover);}
+.se-modal-body{padding:20px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;max-height:70vh;}
+.se-modal-studio-head{display:flex;align-items:flex-start;gap:12px;}
+.se-ico--lg{width:44px;height:44px;border-radius:var(--r8);flex-shrink:0;}
+.se-modal-studio-name{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.se-modal-studio-desc{font-size:12px;color:var(--t3);line-height:1.5;}
+.se-modal-features{display:flex;flex-direction:column;gap:7px;padding:14px 16px;background:var(--bg3);border-radius:var(--r8);border:1px solid var(--line);}
+html.theme-light .se-modal-features{background:var(--bg2);}
+.se-modal-feature{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--t2);}
+.se-modal-field-label{font-size:12px;font-weight:600;color:var(--t2);}
+.se-modal-seat-opts{display:flex;gap:8px;flex-wrap:wrap;}
+.se-seat-opt{padding:8px 16px;border-radius:var(--r6);font-size:13px;font-weight:500;color:var(--t2);background:var(--bg3);border:1px solid var(--line);cursor:pointer;transition:border-color .15s,color .15s,background .15s;}
+.se-seat-opt:hover{border-color:var(--pri-30);color:var(--t1);}
+.se-seat-opt.selected{border-color:var(--pri);color:var(--pri);background:var(--pri-10);}
+html.theme-light .se-seat-opt{background:var(--bg2);}
+.se-modal-foot{display:flex;justify-content:flex-end;gap:8px;padding-top:4px;}
+.se-modal-btn-cancel{background:none;border:1px solid var(--line);border-radius:var(--r6);padding:8px 16px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;}
+.se-modal-btn-cancel:hover{background:var(--hover);}
+.se-modal-btn-primary{background:var(--pri);border:none;border-radius:var(--r6);padding:8px 18px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s;}
+.se-modal-btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+.se-modal-btn-primary:not(:disabled):hover{opacity:.88;}
+.se-modal-confirm{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:12px 0 8px;}
+.se-confirm-icon{margin-bottom:4px;}
+.se-confirm-title{font-size:16px;font-weight:700;color:var(--t1);}
+.se-confirm-body{font-size:13px;color:var(--t3);line-height:1.6;max-width:320px;}
+.se-confirm-ref{font-size:12px;color:var(--t3);}
+.se-pricing-box{background:var(--pri-10);border:1px solid var(--pri-30);border-radius:var(--r8);padding:14px 16px;display:flex;flex-direction:column;gap:4px;}
+.se-pricing-amount{font-size:22px;font-weight:800;color:var(--t1);line-height:1;}
+.se-pricing-unit{font-size:13px;font-weight:400;color:var(--t3);}
+.se-pricing-note{font-size:11.5px;color:var(--t3);}
+.se-estimate{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--t3);line-height:1.5;padding:2px 0;}
+.se-estimate strong{color:var(--t2);}
+.se-confirm-summary{width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);padding:4px 0;display:flex;flex-direction:column;}
+html.theme-light .se-confirm-summary{background:var(--bg2);}
+.se-confirm-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;font-size:13px;color:var(--t3);}
+.se-confirm-row:not(:last-child){border-bottom:1px solid var(--line);}
+.se-confirm-row strong{color:var(--t1);font-weight:600;}
+
 </style>
 <link rel="stylesheet" href="shared/notif-panel.css">
 </head>
@@ -7489,7 +7629,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
         <div class="ssb-group">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Tenant</span></div>
 
-          <button class="ssb-item disabled" data-route="people">
+          <button class="ssb-item" data-route="people" onclick="navigate('#/people')">
             <span class="ssb-item-label">People & Access</span>
           </button>
 
@@ -7501,7 +7641,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
             <span class="ssb-item-label">Identity & Security</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="studios">
+          <button class="ssb-item" data-route="studios" onclick="navigate('#/studios')">
             <span class="ssb-item-label">Studios & Entitlements</span>
           </button>
 
@@ -8268,6 +8408,44 @@ const MOCK_PEOPLE = [
   { id:'ap',  name:'Alex Park',        initials:'AP', role:'Finance Manager',      color:'#fbbf24' },
   { id:'jh',  name:'Jordan Huerta',    initials:'JH', role:'Eng Manager',          color:'var(--int-cyan)' }
 ];
+
+/* ── People & Access — studio memberships ─────────────────── */
+const WORKSPACE_ROLES = {
+  tg:'Super Admin', mg:'Admin', es:'Admin', sb:'Member',
+  dp:'Member', np:'Member', mc:'Admin', sc:'Member', ap:'Member', jh:'Member'
+};
+
+/* Studio roles per studio (simple list for People & Access badges) */
+const PA_STUDIO_ROLES = {
+  gov:    ['Policy Manager','Approver','Viewer'],
+  ag:     ['Builder','Operator','Viewer'],
+  helix:  ['Modeler','Analyst','Viewer'],
+};
+
+/* Who has access to which studio and with what role */
+const STUDIO_MEMBERSHIPS = {
+  tg: { gov:'Policy Manager', ag:'Builder',  helix:'Modeler'  },
+  mg: { gov:'Approver',       helix:'Modeler' },
+  es: { ag:'Builder',         helix:'Analyst' },
+  sb: { ag:'Viewer' },
+  dp: { gov:'Approver',       ag:'Operator',  helix:'Analyst'  },
+  np: { helix:'Analyst' },
+  mc: { ag:'Builder',         helix:'Viewer'  },
+  sc: { gov:'Viewer' },
+  ap: {},
+  jh: { ag:'Operator' },
+};
+
+/* Pending invites */
+const PENDING_INVITES = [
+  { email:'r.okonkwo@contoso.com',   invitedBy:'tg', invitedAt:'2026-08-04', studios:['ag'] },
+  { email:'l.hartmann@contoso.com',  invitedBy:'mg', invitedAt:'2026-08-05', studios:['helix','gov'] },
+];
+
+const LAST_ACTIVE = {
+  tg:'2h ago', mg:'Today', es:'1d ago', sb:'3d ago',
+  dp:'Today', np:'1w ago', mc:'Today', sc:'4h ago', ap:'2w ago', jh:'5h ago'
+};
 
 /* Seed default "Who can use it" for an instance the first time it's read.
    Always includes the connector; adds 1-2 contextual groups by category. */
@@ -9920,6 +10098,251 @@ function _paintUsersTable() {
     `;
 }
 
+/* ====================== PEOPLE & ACCESS ====================== */
+
+const _paState = { search:'', studio:'all' };
+
+const PA_STUDIO_META = {
+  gov:   { label:'Governance', cls:'gov' },
+  ag:    { label:'Agentic',    cls:'ag'  },
+  helix: { label:'Helix',      cls:'helix' },
+};
+
+function _paFiltered() {
+  const q = (_paState.search||'').toLowerCase();
+  const st = _paState.studio;
+  return MOCK_PEOPLE.filter(p => {
+    if (q && !p.name.toLowerCase().includes(q) && !p.role.toLowerCase().includes(q)) return false;
+    if (st !== 'all') return !!(STUDIO_MEMBERSHIPS[p.id]||{})[st];
+    return true;
+  });
+}
+
+function setPaSearch(v) { _paState.search = v; _repaintPa(); setTimeout(()=>{ const el=document.getElementById('paSearch'); if(el){el.focus();el.setSelectionRange(v.length,v.length);}},0); }
+function setPaStudio(v) { _paState.studio = v; _repaintPa(); }
+
+function _studioChipsHTML(personId) {
+  const m = STUDIO_MEMBERSHIPS[personId]||{};
+  const studios = Object.keys(m);
+  if (!studios.length) return `<span class="pa-studio-chip none">No studio access</span>`;
+  return studios.map(sid => {
+    const meta = PA_STUDIO_META[sid];
+    return `<span class="pa-studio-chip ${meta.cls}" title="${m[sid]}">${meta.label}</span>`;
+  }).join('');
+}
+
+function _wsRoleChipHTML(personId) {
+  const r = WORKSPACE_ROLES[personId]||'Member';
+  const cls = r==='Super Admin'?'super-admin':r==='Admin'?'admin':'';
+  return `<span class="pa-ws-role ${cls}">${r}</span>`;
+}
+
+function _repaintPa() {
+  const wrap = document.getElementById('paTableWrap'); if(!wrap) return;
+  const rows = _paFiltered();
+  const pendingRows = _paState.studio==='all' && !_paState.search ? PENDING_INVITES : [];
+
+  wrap.innerHTML = `
+  <table class="users-table">
+    <thead><tr>
+      <th>User</th>
+      <th>Workspace role</th>
+      <th>Studio access</th>
+      <th>Last active</th>
+      <th style="width:32px"></th>
+    </tr></thead>
+    <tbody>
+      ${rows.map(p => `
+      <tr class="users-row" onclick="openPeopleDrawer('${p.id}')">
+        <td>
+          <div class="users-cell-name">
+            <span class="who-avatar" style="background:${p.color}">${escapeHtml(p.initials)}</span>
+            <span>
+              <div class="users-cell-name-t">${escapeHtml(p.name)}</div>
+              <div class="users-cell-name-s">${escapeHtml(p.role)}</div>
+            </span>
+          </div>
+        </td>
+        <td>${_wsRoleChipHTML(p.id)}</td>
+        <td><div class="pa-studio-chips">${_studioChipsHTML(p.id)}</div></td>
+        <td><span class="users-cell-role">${LAST_ACTIVE[p.id]||'—'}</span></td>
+        <td style="text-align:right"><span class="users-row-chevron">→</span></td>
+      </tr>`).join('')}
+      ${pendingRows.map(inv => `
+      <tr class="users-row pa-invite-row" onclick="toast('Pending invite — resend or revoke coming soon','info')">
+        <td>
+          <div class="users-cell-name">
+            <span class="who-avatar" style="background:var(--bg3);color:var(--t3);border:1px dashed var(--line)">?</span>
+            <span>
+              <div class="users-cell-name-t" style="color:var(--t3)">${escapeHtml(inv.email)}</div>
+              <div class="users-cell-name-s">Invited by ${escapeHtml((MOCK_PEOPLE.find(p=>p.id===inv.invitedBy)||{}).name||inv.invitedBy)} · ${escapeHtml(inv.invitedAt)}</div>
+            </span>
+          </div>
+        </td>
+        <td>—</td>
+        <td><div class="pa-studio-chips">${inv.studios.map(sid=>{ const m=PA_STUDIO_META[sid]; return `<span class="pa-studio-chip ${m.cls}">${m.label}</span>`; }).join('')}</div></td>
+        <td><span class="pa-status pending"><span class="pa-status-dot"></span>Pending</span></td>
+        <td style="text-align:right"><span class="users-row-chevron" style="opacity:.4">→</span></td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+
+  /* Sync filter button active states */
+  ['all', ...Object.keys(PA_STUDIO_META)].forEach(sid => {
+    const el = document.getElementById('paTab_'+sid); if(!el) return;
+    el.classList.toggle('is-on', _paState.studio === sid);
+  });
+}
+
+function renderPeopleAccess() {
+  const total = MOCK_PEOPLE.length + PENDING_INVITES.length;
+  const active = MOCK_PEOPLE.length;
+
+  $('content').innerHTML = `
+<div class="users-wrap">
+
+  <div class="users-h">
+    <div class="users-h-l">
+      <div class="users-h-title">People & Access</div>
+      <div class="users-h-desc">All workspace members and their studio access across Governance, Agentic Studio, and Helix Data Studio.</div>
+    </div>
+  </div>
+
+  <div class="users-toolbar" style="justify-content:space-between">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <label class="users-search">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12" stroke-linecap="round"/></svg>
+        <input id="paSearch" type="text" placeholder="Search by name or role…" value="${escapeHtml(_paState.search)}" oninput="setPaSearch(this.value)"/>
+      </label>
+      <div class="users-filters">
+        <button id="paTab_all" class="users-filter ${_paState.studio==='all'?'is-on':''}" onclick="setPaStudio('all')">All <span class="users-filter-badge">${total}</span></button>
+        ${Object.entries(PA_STUDIO_META).map(([sid,m]) => {
+          const n = MOCK_PEOPLE.filter(p=>!!(STUDIO_MEMBERSHIPS[p.id]||{})[sid]).length;
+          return `<button id="paTab_${sid}" class="users-filter studio-${m.cls} ${_paState.studio===sid?'is-on':''}" onclick="setPaStudio('${sid}')">
+            ${m.label} <span class="users-filter-badge">${n}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="toast('Invite flow — coming in Phase 3','info')">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Invite user
+    </button>
+  </div>
+
+  <div id="paTableWrap"></div>
+
+</div>`;
+  _repaintPa();
+}
+
+/* ====================== PEOPLE DRAWER ======================== */
+
+let _paDrawerState = { open:false, personId:null };
+
+function ensurePaDrawer() {
+  if (document.getElementById('paDrawerOverlay')) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="cap-drawer-overlay" id="paDrawerOverlay" onclick="closePeopleDrawer()"></div>
+    <aside class="cap-drawer" id="paDrawer" role="dialog" aria-labelledby="paDrawerTitle" aria-modal="true">
+      <div class="cap-drawer-body" id="paDrawerBody"></div>
+    </aside>`;
+  while (wrap.firstChild) document.body.appendChild(wrap.firstChild);
+}
+
+function openPeopleDrawer(personId) {
+  ensurePaDrawer();
+  _paDrawerState = { open:true, personId };
+  _paintPeopleDrawer();
+  requestAnimationFrame(() => {
+    document.getElementById('paDrawerOverlay')?.classList.add('is-open');
+    document.getElementById('paDrawer')?.classList.add('is-open');
+  });
+}
+
+function closePeopleDrawer() {
+  _paDrawerState.open = false;
+  document.getElementById('paDrawerOverlay')?.classList.remove('is-open');
+  document.getElementById('paDrawer')?.classList.remove('is-open');
+}
+
+function _paintPeopleDrawer() {
+  const body = document.getElementById('paDrawerBody'); if (!body) return;
+  const p = MOCK_PEOPLE.find(x => x.id === _paDrawerState.personId); if (!p) return;
+  const memberships = STUDIO_MEMBERSHIPS[p.id] || {};
+  const studioKeys = Object.keys(memberships);
+  const wsRole = WORKSPACE_ROLES[p.id] || 'Member';
+  const lastActive = LAST_ACTIVE[p.id] || '—';
+
+  const studioRowsHTML = studioKeys.length === 0
+    ? `<p class="cap-drawer-p" style="color:var(--t3);font-size:12.5px">No studio access assigned.</p>`
+    : `<div class="pa-drawer-studio-rows">
+        ${studioKeys.map(sid => {
+          const meta = PA_STUDIO_META[sid];
+          const role = memberships[sid];
+          return `<div class="pa-drawer-studio-row">
+            <span class="pa-studio-chip ${meta.cls}">${meta.label}</span>
+            <span class="pa-drawer-studio-role">${escapeHtml(role)}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+
+  const memberOf = (WORKSPACE_GROUPS || []).filter(g => (g.memberIds||[]).includes(p.id));
+
+  body.innerHTML = `
+    <header class="cap-drawer-h">
+      <div class="cap-drawer-h-row">
+        <span class="who-avatar" style="background:${p.color};width:36px;height:36px;font-size:12px;flex-shrink:0">${escapeHtml(p.initials)}</span>
+        <span class="cap-drawer-h-tag">Member</span>
+        <button class="cap-drawer-close" type="button" onclick="closePeopleDrawer()" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <h2 class="cap-drawer-title" id="paDrawerTitle">${escapeHtml(p.name)}</h2>
+      <div class="cap-drawer-h-sub">${escapeHtml(p.role)}</div>
+    </header>
+
+    <section class="cap-drawer-section">
+      <h3 class="cap-drawer-section-h">Workspace</h3>
+      <div class="pa-drawer-meta">
+        ${_wsRoleChipHTML(p.id)}
+        <span class="pa-status active"><span class="pa-status-dot"></span>Active</span>
+        <span class="pa-drawer-stat">Last active <strong>${escapeHtml(lastActive)}</strong></span>
+      </div>
+    </section>
+
+    <section class="cap-drawer-section">
+      <h3 class="cap-drawer-section-h">Studio access · ${studioKeys.length}</h3>
+      ${studioRowsHTML}
+    </section>
+
+    ${memberOf.length > 0 ? `
+    <section class="cap-drawer-section">
+      <h3 class="cap-drawer-section-h">Groups</h3>
+      <div class="cap-drawer-scopes">
+        ${memberOf.map(g => `<code class="cap-drawer-scope">${escapeHtml(g.label)}</code>`).join('')}
+      </div>
+    </section>` : ''}
+
+    <section class="cap-drawer-section">
+      <h3 class="cap-drawer-section-h">Actions</h3>
+      <div class="pa-drawer-actions">
+        <button class="pa-drawer-action-btn" onclick="toast('Edit access — coming in Phase 3','info'); closePeopleDrawer()">
+          Edit studio access
+        </button>
+        <button class="pa-drawer-action-btn danger" onclick="toast('Remove from workspace — coming in Phase 3','info'); closePeopleDrawer()">
+          Remove from workspace
+        </button>
+      </div>
+    </section>
+  `;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && _paDrawerState.open) closePeopleDrawer();
+});
+
 function renderUsersHome(userId) {
   // If a userId is in the route, open the drawer after rendering the table
   const totalAccess = MOCK_PEOPLE.reduce((s, p) => s + _accessForUser(p.id).length, 0);
@@ -10386,7 +10809,7 @@ const AC_SECTIONS = [
     { id:'people',       name:'People & Access',          desc:'Manage users, roles, and workspace invitations',        state:'soon' },
     { id:'organization', name:'Organization',             desc:'Configure your organization structure and details',     state:'soon' },
     { id:'identity',     name:'Identity & Security',      desc:'SSO, MFA, and authentication policies',                state:'soon' },
-    { id:'studios',      name:'Studios & Entitlements',   desc:'Manage licensed products and studio access',           state:'soon' },
+    { id:'studios',      name:'Studios & Entitlements',   desc:'Manage licensed products and studio access',           state:'active', route:'studios' },
     { id:'billing',      name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'soon' },
   ]},
   { group:'Platform', items:[
@@ -10599,7 +11022,9 @@ function route() {
     'distribution':'distribution',
     'widgets':'widgets',
     'personal':'personal',
-    'my-settings':'my-settings'
+    'my-settings':'my-settings',
+    'studios':'studios',
+    'people':'people'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -10644,6 +11069,10 @@ function route() {
     renderPersonal();
   } else if (parts[0]==='my-settings') {
     renderMySettings();
+  } else if (parts[0]==='studios') {
+    renderStudiosEntitlements();
+  } else if (parts[0]==='people') {
+    renderPeopleAccess();
   } else {
     renderHome();
   }
@@ -15218,6 +15647,185 @@ function renderMySettings() {
 
 </div>
   `;
+}
+
+/* ====================== STUDIOS & ENTITLEMENTS ====================== */
+
+const SE_STUDIOS = [
+  {
+    id: 'gov',
+    name: 'Governance Studio',
+    desc: 'Policy management, approval workflows, and compliance controls across your workspace.',
+    ico: 'gov',
+    active: true,
+    plan: 'Enterprise',
+    renewDate: 'Jan 14, 2027',
+    features: ['Policy templates & enforcement', 'Approval workflow builder', 'Compliance reporting', 'Risk scoring'],
+    icoSvg: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L15 5v4c0 3.3-2.5 6.4-6 7.2C4.5 15.4 2 12.3 2 9V5l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`
+  },
+  {
+    id: 'ag',
+    name: 'Agentic Studio',
+    desc: 'Build, deploy, and monitor AI agents and automated workflows at scale.',
+    ico: 'ag',
+    active: true,
+    plan: 'Enterprise',
+    renewDate: 'Jan 14, 2027',
+    features: ['Agent builder & orchestration', 'Multi-agent networks', 'Human-in-the-loop controls', 'Run monitoring & logs'],
+    icoSvg: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.1 4.1l1.4 1.4M12.5 12.5l1.4 1.4M12.5 5.5l-1.4 1.4M5.5 12.5l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`
+  },
+  {
+    id: 'helix',
+    name: 'Helix Data Studio',
+    desc: 'Governed data ingestion, modeling, and lineage tracking for your AI pipelines.',
+    ico: 'helix',
+    active: true,
+    plan: 'Enterprise',
+    renewDate: 'Jan 14, 2027',
+    features: ['Governed data ingestion', 'Entity & model builder', 'Data lineage tracking', 'Schema versioning'],
+    icoSvg: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5c2-2 10-2 12 0s-10 6-12 8 10 2 12 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`
+  },
+  {
+    id: 'ws',
+    name: 'Work Surfaces',
+    desc: 'Customizable dashboards and collaborative workspaces for every team in your organization.',
+    ico: 'ws',
+    active: false,
+    plan: null,
+    renewDate: null,
+    price: 18,
+    priceNote: 'per user / month · billed annually',
+    features: ['Drag-and-drop widget canvas', 'Team-scoped views', 'Embeddable reports from Helix', 'Role-gated access per surface'],
+    icoSvg: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>`
+  },
+];
+
+function renderStudiosEntitlements() {
+  $('content').innerHTML = `
+<div class="se-wrap">
+
+  <div class="se-header">
+    <div class="se-title">Studios & Entitlements</div>
+    <div class="se-subtitle">View your licensed AIMS OS studios. Contact your account team to add a new studio to your plan.</div>
+  </div>
+
+  <div class="se-grid">
+    ${SE_STUDIOS.map(s => `
+    <div class="se-card ${s.active ? 'active-card' : 'inactive-card'}">
+      <div class="se-card-head">
+        <div class="se-ico ${s.ico}">${s.icoSvg}</div>
+        <div class="se-card-meta">
+          <div class="se-card-name">${s.name}</div>
+          <div class="se-card-desc">${s.desc}</div>
+        </div>
+        <div class="se-badge ${s.active ? 'on' : 'off'}">
+          <span class="se-badge-dot"></span>
+          ${s.active ? 'Active' : 'Not purchased'}
+        </div>
+      </div>
+      <div class="se-card-foot">
+        <div class="se-plan">
+          ${s.active ? `Plan: <strong>${s.plan}</strong> · Renews ${s.renewDate}` : `Not included in your current plan`}
+        </div>
+        ${s.active
+          ? `<button class="se-btn manage" onclick="toast('Studio management coming soon','info')">Manage</button>`
+          : `<button class="se-btn contact" onclick="seOpenContact('${s.id}')">Contact sales</button>`
+        }
+      </div>
+    </div>`).join('')}
+  </div>
+
+</div>
+
+<!-- Contact Sales Modal -->
+<div class="se-modal-overlay" id="seModalOverlay" onclick="if(event.target===this)seCloseContact()">
+  <div class="se-modal" id="seModal">
+    <div class="se-modal-h">
+      <div class="se-modal-title" id="seModalTitle">Contact sales</div>
+      <button class="se-modal-close" onclick="seCloseContact()" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="se-modal-body" id="seModalBody"></div>
+  </div>
+</div>`;
+}
+
+function seOpenContact(studioId) {
+  const s = SE_STUDIOS.find(s => s.id === studioId);
+  if (!s) return;
+  document.getElementById('seModalTitle').textContent = s.name;
+  document.getElementById('seModalBody').innerHTML = seStep1HTML(s);
+  document.getElementById('seModalOverlay').classList.add('is-open');
+}
+
+function seCloseContact() {
+  document.getElementById('seModalOverlay').classList.remove('is-open');
+}
+
+function seStep1HTML(s) {
+  return `
+    <div class="se-modal-studio-head">
+      <div class="se-ico ${s.ico} se-ico--lg">${s.icoSvg.replace('width="18" height="18"','width="22" height="22"')}</div>
+      <div>
+        <div class="se-modal-studio-name">${s.name}</div>
+        <div class="se-modal-studio-desc">${s.desc}</div>
+      </div>
+    </div>
+    <div class="se-modal-features">
+      ${s.features.map(f => `<div class="se-modal-feature"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="var(--green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${f}</div>`).join('')}
+    </div>
+    <div class="se-pricing-box">
+      <div class="se-pricing-amount">$${s.price} <span class="se-pricing-unit">${s.priceNote}</span></div>
+      <div class="se-pricing-note">Final pricing confirmed by your account team based on volume.</div>
+    </div>
+    <div class="se-modal-field-label">How many users would need access?</div>
+    <div class="se-modal-seat-opts" id="seSeatOpts">
+      <button class="se-seat-opt" onclick="seSelectSeats(this,'1–25',${s.price * 25})">1–25</button>
+      <button class="se-seat-opt" onclick="seSelectSeats(this,'26–50',${s.price * 50})">26–50</button>
+      <button class="se-seat-opt" onclick="seSelectSeats(this,'51–100',${s.price * 100})">51–100</button>
+      <button class="se-seat-opt" onclick="seSelectSeats(this,'100+',null)">100+</button>
+    </div>
+    <div class="se-estimate" id="seEstimate" style="display:none"></div>
+    <div class="se-modal-foot">
+      <button class="se-modal-btn-cancel" onclick="seCloseContact()">Cancel</button>
+      <button class="se-modal-btn-primary" id="seRequestBtn" onclick="seSubmitRequest('${s.id}')" disabled>Request access</button>
+    </div>`;
+}
+
+function seSelectSeats(btn, range, maxCost) {
+  document.querySelectorAll('.se-seat-opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const body = btn.closest('.se-modal-body');
+  body.querySelector('#seRequestBtn').disabled = false;
+  const est = body.querySelector('#seEstimate');
+  est.style.display = 'flex';
+  est.innerHTML = maxCost
+    ? `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="var(--t3)" stroke-width="1.2"/><path d="M6.5 4v3.5M6.5 9v.5" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round"/></svg>Estimated up to <strong>$${maxCost.toLocaleString()} / month</strong> for ${range} users · final price confirmed by your account team`
+    : `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="var(--t3)" stroke-width="1.2"/><path d="M6.5 4v3.5M6.5 9v.5" stroke="var(--t3)" stroke-width="1.2" stroke-linecap="round"/></svg>Volume pricing applies for 100+ users · your account team will prepare a custom quote`;
+  btn.dataset.range = range;
+}
+
+function seSubmitRequest(studioId) {
+  const s = SE_STUDIOS.find(s => s.id === studioId);
+  const selectedBtn = document.querySelector('.se-seat-opt.selected');
+  const range = selectedBtn ? selectedBtn.dataset.range : '—';
+  const ref = 'REQ-2026-' + Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('seModalBody').innerHTML = `
+    <div class="se-modal-confirm">
+      <div class="se-confirm-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="var(--green-10)"/><path d="M9 16l5 5 9-9" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="se-confirm-title">Access request submitted</div>
+      <div class="se-confirm-summary">
+        <div class="se-confirm-row"><span>Studio</span><strong>${s.name}</strong></div>
+        <div class="se-confirm-row"><span>Team size</span><strong>${range} users</strong></div>
+        <div class="se-confirm-row"><span>Starting from</span><strong>$${s.price} / user / month</strong></div>
+      </div>
+      <div class="se-confirm-body">Your account team will reach out within 1 business day to finalize pricing and activate access.</div>
+      <div class="se-confirm-ref">Reference: <strong>${ref}</strong></div>
+      <button class="se-modal-btn-primary" style="align-self:stretch" onclick="seCloseContact()">Done</button>
+    </div>`;
 }
 
 /* ====================== PERSONAL ====================== */
