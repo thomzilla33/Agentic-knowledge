@@ -7716,11 +7716,11 @@ html.theme-light .se-confirm-summary{background:var(--bg2);}
             <span class="ssb-item-label">People & Access</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="organization">
+          <button class="ssb-item" data-route="organization" onclick="navigate('#/organization')">
             <span class="ssb-item-label">Organization</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="identity">
+          <button class="ssb-item" data-route="identity" onclick="navigate('#/identity')">
             <span class="ssb-item-label">Identity & Security</span>
           </button>
 
@@ -10890,8 +10890,8 @@ const AC_SECTIONS = [
   ]},
   { group:'Tenant', items:[
     { id:'people',       name:'People & Access',          desc:'Manage users, roles, and workspace invitations',        state:'soon' },
-    { id:'organization', name:'Organization',             desc:'Configure your organization structure and details',     state:'soon' },
-    { id:'identity',     name:'Identity & Security',      desc:'SSO, MFA, and authentication policies',                state:'soon' },
+    { id:'organization', name:'Organization',             desc:'Configure your organization structure and details',     state:'active', route:'organization' },
+    { id:'identity',     name:'Identity & Security',      desc:'SSO, MFA, and authentication policies',                state:'active', route:'identity' },
     { id:'studios',      name:'Studios & Entitlements',   desc:'Manage licensed products and studio access',           state:'active', route:'studios' },
     { id:'billing',      name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'active', route:'billing' },
   ]},
@@ -11108,7 +11108,9 @@ function route() {
     'my-settings':'my-settings',
     'studios':'studios',
     'people':'people',
-    'billing':'billing'
+    'billing':'billing',
+    'organization':'organization',
+    'identity':'identity'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -11163,6 +11165,10 @@ function route() {
     renderPeopleAccess();
   } else if (parts[0]==='billing') {
     renderBilling();
+  } else if (parts[0]==='organization') {
+    renderOrganization();
+  } else if (parts[0]==='identity') {
+    renderIdentity();
   } else {
     renderHome();
   }
@@ -16148,6 +16154,318 @@ function renderBilling() {
         <div class="sm-danger-desc">Access continues until Jan 14, 2027. Contact your account team to process the cancellation.</div>
       </div>
       <button class="sm-danger-btn" onclick="toast('Contact your account team at accounts@aimsos.ai to cancel','info')">Cancel plan</button>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderOrganization() {
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="bill-page-title">Organization</div>
+  <div class="bill-page-desc">Manage your workspace identity, company details, and structural settings.</div>
+
+  <!-- Workspace Identity -->
+  <div class="bill-section">
+    <div class="bill-section-title">Workspace Identity</div>
+    <div class="ms-card">
+      <div class="ms-avatar-row" style="margin-bottom:0;padding-bottom:20px;">
+        <div class="ms-avatar" style="background:var(--pri);border-radius:var(--r12);font-size:18px;">CO</div>
+        <div class="ms-avatar-meta">
+          <div class="ms-avatar-name">Contoso Ltd</div>
+          <div class="ms-avatar-role">Workspace slug: <span style="font-family:monospace;color:var(--t2)">contoso</span></div>
+        </div>
+        <button class="bill-pm-btn" onclick="toast('Logo upload — coming soon','info')">Change logo</button>
+      </div>
+      <div style="padding-top:20px;border-top:1px solid var(--line);">
+        <div class="ms-form-grid">
+          <div class="ms-field">
+            <div class="ms-label">Organization name</div>
+            <input class="ms-input" value="Contoso Ltd" oninput="void(0)"/>
+          </div>
+          <div class="ms-field">
+            <div class="ms-label">Workspace URL slug</div>
+            <input class="ms-input" value="contoso" oninput="void(0)"/>
+          </div>
+          <div class="ms-field full">
+            <div class="ms-label">Description</div>
+            <input class="ms-input" value="Enterprise AI operations platform for Contoso Ltd." oninput="void(0)"/>
+          </div>
+        </div>
+        <div class="ms-save-row">
+          <button class="ms-btn-save" onclick="toast('Organization details saved','success')">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Company Details -->
+  <div class="bill-section">
+    <div class="bill-section-title">Company Details</div>
+    <div class="ms-card">
+      <div class="ms-form-grid">
+        <div class="ms-field">
+          <div class="ms-label">Primary domain</div>
+          <input class="ms-input" value="contoso.com" oninput="void(0)"/>
+        </div>
+        <div class="ms-field">
+          <div class="ms-label">Industry</div>
+          <select class="ms-select">
+            <option>Technology</option>
+            <option>Financial Services</option>
+            <option selected>Enterprise Software</option>
+            <option>Healthcare</option>
+            <option>Manufacturing</option>
+          </select>
+        </div>
+        <div class="ms-field">
+          <div class="ms-label">Company size</div>
+          <select class="ms-select">
+            <option>1–50</option>
+            <option>51–200</option>
+            <option>201–500</option>
+            <option selected>501–2,000</option>
+            <option>2,001–10,000</option>
+            <option>10,000+</option>
+          </select>
+        </div>
+        <div class="ms-field">
+          <div class="ms-label">Headquarters timezone</div>
+          <select class="ms-select">
+            <option>UTC−8 (Pacific)</option>
+            <option selected>UTC−5 (Eastern)</option>
+            <option>UTC+0 (London)</option>
+            <option>UTC+1 (Central Europe)</option>
+            <option>UTC+9 (Tokyo)</option>
+          </select>
+        </div>
+      </div>
+      <div class="ms-save-row">
+        <button class="ms-btn-save" onclick="toast('Company details saved','success')">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Default Language & Region -->
+  <div class="bill-section">
+    <div class="bill-section-title">Language & Region</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Default language</div>
+          <div class="sm-setting-sub">Applied to new users unless they set a personal preference</div>
+        </div>
+        <div class="sm-setting-value">English (US) <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Date format</div>
+          <div class="sm-setting-sub">Used across all studio-generated reports and exports</div>
+        </div>
+        <div class="sm-setting-value">MM/DD/YYYY <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Currency display</div>
+          <div class="sm-setting-sub">Default currency symbol for cost and billing surfaces</div>
+        </div>
+        <div class="sm-setting-value">USD ($) <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="bill-section">
+    <div class="bill-section-title">Danger Zone</div>
+    <div class="sm-danger-card" style="margin-bottom:12px;">
+      <div>
+        <div class="sm-danger-label">Transfer workspace ownership</div>
+        <div class="sm-danger-desc">Assigns the Super Admin role to another member and removes it from your account.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('Contact support to transfer ownership','info')">Transfer</button>
+    </div>
+    <div class="sm-danger-card">
+      <div>
+        <div class="sm-danger-label">Delete workspace</div>
+        <div class="sm-danger-desc">Permanently deletes all data, users, and configurations. This action cannot be undone.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('Contact support to initiate workspace deletion','info')">Delete workspace</button>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderIdentity() {
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="bill-page-title">Identity & Security</div>
+  <div class="bill-page-desc">Configure SSO, authentication policies, and session security for your workspace.</div>
+
+  <!-- SSO -->
+  <div class="bill-section">
+    <div class="bill-section-title">Single Sign-On (SSO)</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">SSO provider</div>
+          <div class="sm-setting-sub">Identity provider connected to this workspace</div>
+        </div>
+        <div class="sm-setting-value">
+          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--green-10);color:var(--green);border:1px solid var(--green-30);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+            Active
+          </span>
+          Microsoft Entra ID
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Claimed domains</div>
+          <div class="sm-setting-sub">Email domains routed through SSO automatically</div>
+        </div>
+        <div class="sm-setting-value">contoso.com <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">SSO enforcement</div>
+          <div class="sm-setting-sub">Require all members with a claimed domain to sign in via SSO</div>
+        </div>
+        <div class="sm-setting-value">
+          <span class="sm-toggle"><span class="sm-toggle-pill"></span>Enforced</span>
+        </div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Just-in-time provisioning</div>
+          <div class="sm-setting-sub">Automatically create workspace accounts on first SSO login</div>
+        </div>
+        <div class="sm-setting-value">
+          <span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MFA -->
+  <div class="bill-section">
+    <div class="bill-section-title">Multi-Factor Authentication</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">MFA requirement</div>
+          <div class="sm-setting-sub">Applies to members not covered by SSO enforcement</div>
+        </div>
+        <div class="sm-setting-value">
+          <span class="sm-toggle"><span class="sm-toggle-pill"></span>Required</span>
+        </div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Allowed MFA methods</div>
+          <div class="sm-setting-sub">Methods members may use to satisfy the MFA requirement</div>
+        </div>
+        <div class="sm-setting-value">Authenticator app, SMS <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Grace period for new members</div>
+          <div class="sm-setting-sub">Time a new member has to enroll in MFA before being locked out</div>
+        </div>
+        <div class="sm-setting-value">7 days <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sessions -->
+  <div class="bill-section">
+    <div class="bill-section-title">Session Policy</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Session timeout (idle)</div>
+          <div class="sm-setting-sub">Inactive sessions are invalidated after this period</div>
+        </div>
+        <div class="sm-setting-value">4 hours <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Absolute session lifetime</div>
+          <div class="sm-setting-sub">Maximum session duration regardless of activity</div>
+        </div>
+        <div class="sm-setting-value">7 days <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Concurrent session limit</div>
+          <div class="sm-setting-sub">Maximum number of active sessions per user account</div>
+        </div>
+        <div class="sm-setting-value">5 sessions <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IP Allowlist -->
+  <div class="bill-section">
+    <div class="bill-section-title">IP Allowlist</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">IP restriction</div>
+          <div class="sm-setting-sub">Restrict workspace access to approved IP ranges only</div>
+        </div>
+        <div class="sm-setting-value">
+          <span class="sm-toggle"><span class="sm-toggle-pill off"></span>Disabled</span>
+        </div>
+      </div>
+      <div class="sm-setting-row" style="opacity:.45;pointer-events:none;">
+        <div>
+          <div class="sm-setting-label">Allowed IP ranges</div>
+          <div class="sm-setting-sub">CIDR notation — enable IP restriction to configure</div>
+        </div>
+        <div class="sm-setting-value" style="color:var(--t3)">Not configured <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit link -->
+  <div class="bill-section">
+    <div class="bill-section-title">Security Monitoring</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Failed login alerts</div>
+          <div class="sm-setting-sub">Notify Super Admins when a member has 5+ failed login attempts</div>
+        </div>
+        <div class="sm-setting-value">
+          <span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span>
+        </div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Audit log</div>
+          <div class="sm-setting-sub">Full authentication and access event log</div>
+        </div>
+        <div class="sm-setting-value">
+          <button class="bill-pm-btn" onclick="navigate('#/audit')">View audit log →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danger -->
+  <div class="bill-section">
+    <div class="bill-section-title">Actions</div>
+    <div class="sm-danger-card">
+      <div>
+        <div class="sm-danger-label">Revoke all active sessions</div>
+        <div class="sm-danger-desc">Signs every member out of AIMS OS immediately. Users will need to re-authenticate.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('All workspace sessions revoked','warning')">Revoke all sessions</button>
     </div>
   </div>
 
