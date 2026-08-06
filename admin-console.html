@@ -16095,8 +16095,382 @@ function renderStudioManageGov() {
 </div>`;
 }
 
+function renderStudioManageAg() {
+  const s = SE_STUDIOS.find(x => x.id === 'ag');
+  const CHV = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="sm-breadcrumb">
+    <button class="sm-breadcrumb-back" onclick="navigate('#/studios')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Studios & Entitlements
+    </button>
+    <span class="sm-breadcrumb-sep">/</span>
+    <span class="sm-breadcrumb-cur">${s.name}</span>
+  </div>
+
+  <div class="sm-page-header">
+    <div class="sm-page-title-row">
+      <div class="se-ico ${s.ico}">${s.icoSvg}</div>
+      <div class="sm-page-title">${s.name}</div>
+    </div>
+    <div class="sm-page-desc">Build, deploy, and monitor AI workers and multi-agent networks at scale — with Human-in-the-Loop controls and full run observability.</div>
+  </div>
+
+  <!-- Plan & Entitlements -->
+  <div class="sm-section">
+    <div class="sm-section-title">Plan & Entitlements</div>
+    <div class="sm-plan-grid">
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Current plan</div>
+        <div class="sm-plan-cell-value">${s.plan}</div>
+        <div class="sm-plan-cell-sub">Workspace-wide</div>
+      </div>
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Renewal date</div>
+        <div class="sm-plan-cell-value">${s.renewDate}</div>
+        <div class="sm-plan-cell-sub">Annual contract</div>
+      </div>
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Licensed seats</div>
+        <div class="sm-plan-cell-value">Unlimited</div>
+        <div class="sm-plan-cell-sub">Enterprise tier</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Studio health -->
+  <div class="sm-section">
+    <div class="sm-section-title">Studio health</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:var(--r12);overflow:hidden">
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Active workers</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">23</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">18 deployed · 5 draft</div>
+      </div>
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Active networks</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">5</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">3 multi-agent</div>
+      </div>
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Runs today</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">847</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">99.1% success rate</div>
+      </div>
+      <div style="padding:16px 18px">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">HITL pending review</div>
+        <div style="font-size:22px;font-weight:700;color:#fbbf24;line-height:1">2</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">Oldest: 4h ago</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Execution limits -->
+  <div class="sm-section">
+    <div class="sm-section-title">Execution limits</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Max concurrent runs</div>
+          <div class="sm-setting-sub">Total agent runs allowed simultaneously across all workers and networks</div>
+        </div>
+        <div class="sm-setting-value">50 runs ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Daily execution quota</div>
+          <div class="sm-setting-sub">Total agent-minutes allowed per calendar day before runs are queued</div>
+        </div>
+        <div class="sm-setting-value">10,000 min / day ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Max execution timeout per run</div>
+          <div class="sm-setting-sub">Hard ceiling before a run is force-stopped and logged as timed out</div>
+        </div>
+        <div class="sm-setting-value">30 min ${CHV}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HITL defaults -->
+  <div class="sm-section">
+    <div class="sm-section-title">Human-in-the-Loop defaults</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Default HITL mode</div>
+          <div class="sm-setting-sub">Applied to new workers unless the builder overrides it in the worker definition</div>
+        </div>
+        <div class="sm-setting-value">Review on error ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">HITL response timeout</div>
+          <div class="sm-setting-sub">Time before an unreviewed HITL step is auto-escalated to a workspace admin</div>
+        </div>
+        <div class="sm-setting-value">24 hours ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Require HITL for external API calls</div>
+          <div class="sm-setting-sub">Force a human review step before any outbound API call made by an agent</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill off"></span>Disabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature enablement -->
+  <div class="sm-section">
+    <div class="sm-section-title">Feature enablement</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Multi-agent networks</div>
+          <div class="sm-setting-sub">Allow builders to connect workers into orchestrated networks with shared context</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Human-in-the-Loop</div>
+          <div class="sm-setting-sub">Allow workers to pause and route steps to a human reviewer</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">External API calls from agents</div>
+          <div class="sm-setting-sub">Allow workers to make outbound calls to third-party APIs and integrations</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Run monitoring & logs</div>
+          <div class="sm-setting-sub">Capture full execution traces and step-level logs for every agent run</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="sm-section">
+    <div class="sm-section-title">Actions</div>
+    <div class="sm-danger-card" style="margin-bottom:10px">
+      <div>
+        <div class="sm-danger-label">Revoke all active sessions</div>
+        <div class="sm-danger-desc">Immediately invalidates all running sessions and active user tokens in Agentic Studio. Users will need to re-authenticate.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('All sessions revoked — users will need to re-authenticate.','warning')">Revoke sessions</button>
+    </div>
+    <div class="sm-danger-card">
+      <div>
+        <div class="sm-danger-label">Pause all active runs</div>
+        <div class="sm-danger-desc">Immediately halts all in-progress agent runs across all workers and networks. Runs in a HITL step are unaffected until reviewed.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('All active runs paused. Resume from the Agentic Studio run monitor.','warning')">Pause all runs</button>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderStudioManageHelix() {
+  const s = SE_STUDIOS.find(x => x.id === 'helix');
+  const CHV = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="sm-breadcrumb">
+    <button class="sm-breadcrumb-back" onclick="navigate('#/studios')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Studios & Entitlements
+    </button>
+    <span class="sm-breadcrumb-sep">/</span>
+    <span class="sm-breadcrumb-cur">${s.name}</span>
+  </div>
+
+  <div class="sm-page-header">
+    <div class="sm-page-title-row">
+      <div class="se-ico ${s.ico}">${s.icoSvg}</div>
+      <div class="sm-page-title">${s.name}</div>
+    </div>
+    <div class="sm-page-desc">Governed data ingestion, entity modeling, and lineage tracking for AI pipelines — with schema versioning, approval gates, and full provenance.</div>
+  </div>
+
+  <!-- Plan & Entitlements -->
+  <div class="sm-section">
+    <div class="sm-section-title">Plan & Entitlements</div>
+    <div class="sm-plan-grid">
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Current plan</div>
+        <div class="sm-plan-cell-value">${s.plan}</div>
+        <div class="sm-plan-cell-sub">Workspace-wide</div>
+      </div>
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Renewal date</div>
+        <div class="sm-plan-cell-value">${s.renewDate}</div>
+        <div class="sm-plan-cell-sub">Annual contract</div>
+      </div>
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Licensed seats</div>
+        <div class="sm-plan-cell-value">Unlimited</div>
+        <div class="sm-plan-cell-sub">Enterprise tier</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Studio health -->
+  <div class="sm-section">
+    <div class="sm-section-title">Studio health</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:var(--r12);overflow:hidden">
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Connected sources</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">8</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">7 active · 1 paused</div>
+      </div>
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Entity models</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">34</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">29 published</div>
+      </div>
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Pipeline runs (30d)</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">1,247</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">98.4% success rate</div>
+      </div>
+      <div style="padding:16px 18px">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Ingestion warnings</div>
+        <div style="font-size:22px;font-weight:700;color:#fbbf24;line-height:1">3</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">Schema drift detected</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data retention -->
+  <div class="sm-section">
+    <div class="sm-section-title">Data retention</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Model version history</div>
+          <div class="sm-setting-sub">Number of past versions kept per entity model before older ones are archived</div>
+        </div>
+        <div class="sm-setting-value">25 versions ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Ingestion log retention</div>
+          <div class="sm-setting-sub">How long raw ingestion event logs are stored before being purged</div>
+        </div>
+        <div class="sm-setting-value">1 year ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Deleted entity grace period</div>
+          <div class="sm-setting-sub">Time before a soft-deleted entity and its data are permanently removed</div>
+        </div>
+        <div class="sm-setting-value">30 days ${CHV}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compute & pipelines -->
+  <div class="sm-section">
+    <div class="sm-section-title">Compute & pipelines</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Monthly compute quota</div>
+          <div class="sm-setting-sub">Compute-hours allocated to pipeline runs per calendar month</div>
+        </div>
+        <div class="sm-setting-value">500 hours ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Max concurrent pipeline runs</div>
+          <div class="sm-setting-sub">Pipelines allowed to run in parallel at any given time</div>
+        </div>
+        <div class="sm-setting-value">10 pipelines ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Auto-snapshot on schema change</div>
+          <div class="sm-setting-sub">Snapshot the previous version before any schema migration is applied</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature enablement -->
+  <div class="sm-section">
+    <div class="sm-section-title">Feature enablement</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Data lineage tracking</div>
+          <div class="sm-setting-sub">Capture full column-level lineage across all ingestion and transformation steps</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Schema versioning</div>
+          <div class="sm-setting-sub">Track all schema changes as immutable versions with diff and rollback support</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Governed ingestion approvals</div>
+          <div class="sm-setting-sub">Require admin approval before a new data source can begin ingesting into Helix</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Entity relationship mapping</div>
+          <div class="sm-setting-sub">Allow modelers to define and visualize relationships between entity types</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="sm-section">
+    <div class="sm-section-title">Actions</div>
+    <div class="sm-danger-card" style="margin-bottom:10px">
+      <div>
+        <div class="sm-danger-label">Revoke all active sessions</div>
+        <div class="sm-danger-desc">Immediately invalidates all running sessions and active user tokens in Helix Data Studio. Users will need to re-authenticate.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('All sessions revoked — users will need to re-authenticate.','warning')">Revoke sessions</button>
+    </div>
+    <div class="sm-danger-card">
+      <div>
+        <div class="sm-danger-label">Lock all pipelines</div>
+        <div class="sm-danger-desc">Prevents new pipeline runs from starting across all data sources. Active runs will complete. Use during schema migrations or maintenance windows.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('All pipelines locked. No new runs will start until unlocked.','warning')">Lock pipelines</button>
+    </div>
+  </div>
+
+</div>`;
+}
+
 function renderStudioManage(studioId) {
   if (studioId === 'gov') return renderStudioManageGov();
+  if (studioId === 'ag') return renderStudioManageAg();
+  if (studioId === 'helix') return renderStudioManageHelix();
   const s = SE_STUDIOS.find(x => x.id === studioId);
   if (!s) { navigate('#/studios'); return; }
 
