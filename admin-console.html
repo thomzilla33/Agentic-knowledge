@@ -7737,12 +7737,12 @@ html.theme-light .se-confirm-summary{background:var(--bg2);}
         <div class="ssb-group">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
 
-          <button class="ssb-item disabled" data-route="governance-defaults">
+          <button class="ssb-item" data-route="governance-defaults" onclick="navigate('#/governance-defaults')">
             <span class="ssb-item-label">Governance Defaults</span>
             <span class="ssb-item-badge ssb-item-badge--green">2</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="data-privacy">
+          <button class="ssb-item" data-route="data-privacy" onclick="navigate('#/data-privacy')">
             <span class="ssb-item-label">Data & Privacy</span>
           </button>
 
@@ -10896,8 +10896,8 @@ const AC_SECTIONS = [
     { id:'billing',      name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'active', route:'billing' },
   ]},
   { group:'Platform', items:[
-    { id:'governance-defaults', name:'Governance Defaults',        desc:'Default policies applied across all studios',       state:'soon' },
-    { id:'data-privacy',        name:'Data & Privacy',             desc:'Data retention, export, and compliance settings',   state:'soon' },
+    { id:'governance-defaults', name:'Governance Defaults',        desc:'Default policies applied across all studios',       state:'active', route:'governance-defaults' },
+    { id:'data-privacy',        name:'Data & Privacy',             desc:'Data retention, export, and compliance settings',   state:'active', route:'data-privacy' },
     { id:'integrations',        name:'Integrations & Credentials', desc:'Authenticate and govern third-party connections',   state:'active', alert:1, route:'integrations' },
     { id:'notifications',       name:'Notifications',              desc:'Alert channels, rules, and delivery preferences',   state:'soon' },
     { id:'audit',               name:'Audit & Compliance',         desc:'Activity logs and compliance reporting',            state:'active', route:'audit' },
@@ -11110,7 +11110,9 @@ function route() {
     'people':'people',
     'billing':'billing',
     'organization':'organization',
-    'identity':'identity'
+    'identity':'identity',
+    'governance-defaults':'governance-defaults',
+    'data-privacy':'data-privacy'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -11169,6 +11171,10 @@ function route() {
     renderOrganization();
   } else if (parts[0]==='identity') {
     renderIdentity();
+  } else if (parts[0]==='governance-defaults') {
+    renderGovernanceDefaults();
+  } else if (parts[0]==='data-privacy') {
+    renderDataPrivacy();
   } else {
     renderHome();
   }
@@ -16466,6 +16472,274 @@ function renderIdentity() {
         <div class="sm-danger-desc">Signs every member out of AIMS OS immediately. Users will need to re-authenticate.</div>
       </div>
       <button class="sm-danger-btn" onclick="toast('All workspace sessions revoked','warning')">Revoke all sessions</button>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderGovernanceDefaults() {
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="bill-page-title">Governance Defaults</div>
+  <div class="bill-page-desc">Workspace-wide defaults that apply across all studios unless a studio overrides them. Changes here take effect on new policies and workflows — existing ones are unaffected.</div>
+
+  <!-- Policy Enforcement -->
+  <div class="bill-section">
+    <div class="bill-section-title">Policy Enforcement</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Default enforcement mode</div>
+          <div class="sm-setting-sub">Applied to new policies created in any studio unless the studio sets its own mode</div>
+        </div>
+        <div class="sm-setting-value">Strict <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Auto-apply policies to new studios</div>
+          <div class="sm-setting-sub">When a new studio is activated, workspace defaults are applied immediately</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Policy override by studio admins</div>
+          <div class="sm-setting-sub">Allow Studio Admins to override workspace defaults within their studio</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Allowed</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approval Workflow Defaults -->
+  <div class="bill-section">
+    <div class="bill-section-title">Approval Workflow Defaults</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Operations requiring approval</div>
+          <div class="sm-setting-sub">Action categories that must go through an approval workflow by default</div>
+        </div>
+        <div class="sm-setting-value">Agent deploy, Data connection <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Default approver role</div>
+          <div class="sm-setting-sub">Role required to approve operations when no specific approver is assigned</div>
+        </div>
+        <div class="sm-setting-value">Admin <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Default approval quorum</div>
+          <div class="sm-setting-sub">Minimum number of approvers needed to advance an item</div>
+        </div>
+        <div class="sm-setting-value">1 of 1 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Escalation timeout</div>
+          <div class="sm-setting-sub">Time before an unanswered approval request escalates to the next level</div>
+        </div>
+        <div class="sm-setting-value">48 hours <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk Scoring -->
+  <div class="bill-section">
+    <div class="bill-section-title">Risk Scoring</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Risk score — alert threshold</div>
+          <div class="sm-setting-sub">Scores at or above this value trigger a notification to workspace admins</div>
+        </div>
+        <div class="sm-setting-value" style="display:flex;align-items:center;gap:8px;">
+          <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:20px;padding:2px 9px;font-size:12px;font-weight:600;">Medium · 50</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Risk score — block threshold</div>
+          <div class="sm-setting-sub">Scores at or above this value automatically block the operation</div>
+        </div>
+        <div class="sm-setting-value" style="display:flex;align-items:center;gap:8px;">
+          <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.3);border-radius:20px;padding:2px 9px;font-size:12px;font-weight:600;">High · 80</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Notify on score change</div>
+          <div class="sm-setting-sub">Alert Policy Managers when a resource crosses a risk threshold</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compliance Reporting -->
+  <div class="bill-section">
+    <div class="bill-section-title">Compliance Reporting</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Active compliance frameworks</div>
+          <div class="sm-setting-sub">Reports and controls mapped to these frameworks are generated automatically</div>
+        </div>
+        <div class="sm-setting-value">SOC 2 Type II, ISO 27001 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Reporting frequency</div>
+          <div class="sm-setting-sub">How often compliance summary reports are generated and sent to Policy Managers</div>
+        </div>
+        <div class="sm-setting-value">Monthly <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Include audit log in reports</div>
+          <div class="sm-setting-sub">Attach the full audit log export to each compliance report</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderDataPrivacy() {
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="bill-page-title">Data & Privacy</div>
+  <div class="bill-page-desc">Control how AIMS OS stores, retains, and handles workspace data. These settings apply to platform-generated data — audit logs, run logs, and user activity records.</div>
+
+  <!-- Data Retention -->
+  <div class="bill-section">
+    <div class="bill-section-title">Data Retention</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Workspace audit log retention</div>
+          <div class="sm-setting-sub">How long admin and security event logs are kept before being purged</div>
+        </div>
+        <div class="sm-setting-value">2 years <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Agent run log retention</div>
+          <div class="sm-setting-sub">How long agent execution logs are retained in Agentic Studio</div>
+        </div>
+        <div class="sm-setting-value">90 days <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">User activity log retention</div>
+          <div class="sm-setting-sub">Login history, page activity, and session records</div>
+        </div>
+        <div class="sm-setting-value">1 year <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Deleted member data</div>
+          <div class="sm-setting-sub">How long a removed member's records are kept before permanent deletion</div>
+        </div>
+        <div class="sm-setting-value">30 days <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Residency -->
+  <div class="bill-section">
+    <div class="bill-section-title">Data Residency</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Primary data region</div>
+          <div class="sm-setting-sub">Where workspace data is stored and processed at rest</div>
+        </div>
+        <div class="sm-setting-value">United States (us-east-1) <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Cross-region data transfer</div>
+          <div class="sm-setting-sub">Allow data to be processed in other regions for redundancy or performance</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill off"></span>Disabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Controls -->
+  <div class="bill-section">
+    <div class="bill-section-title">Privacy Controls</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">PII detection in agent outputs</div>
+          <div class="sm-setting-sub">Flag agent responses that appear to contain personally identifiable information</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Mask PII in run logs</div>
+          <div class="sm-setting-sub">Replace detected PII patterns with redacted placeholders before storing logs</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Data use for platform improvement</div>
+          <div class="sm-setting-sub">Allow anonymized usage data to be used by AIMS OS to improve the platform</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill off"></span>Disabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Export -->
+  <div class="bill-section">
+    <div class="bill-section-title">Data Export</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Export format</div>
+          <div class="sm-setting-sub">Default format for on-demand workspace data exports</div>
+        </div>
+        <div class="sm-setting-value">JSON + CSV <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Request workspace data export</div>
+          <div class="sm-setting-sub">Generate a full export of all workspace data. Delivery takes up to 24 hours.</div>
+        </div>
+        <div class="sm-setting-value">
+          <button class="bill-pm-btn" onclick="toast('Export requested — you will receive an email when it is ready','info')">Request export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member data erasure -->
+  <div class="bill-section">
+    <div class="bill-section-title">Member Data Erasure</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Process erasure request</div>
+          <div class="sm-setting-sub">Permanently delete all personal data associated with a specific member account</div>
+        </div>
+        <div class="sm-setting-value">
+          <button class="bill-pm-btn" onclick="toast('Contact support to submit a data erasure request','info')">Submit request</button>
+        </div>
+      </div>
     </div>
   </div>
 
