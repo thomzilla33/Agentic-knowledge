@@ -7760,14 +7760,30 @@ html.theme-light .se-confirm-summary{background:var(--bg2);}
           </button>
         </div>
 
-        <!-- PLATFORM -->
+        <!-- GOVERNANCE -->
         <div class="ssb-group">
-          <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Governance</span></div>
 
           <button class="ssb-item" data-route="governance-defaults" onclick="navigate('#/governance-defaults')">
             <span class="ssb-item-label">Governance Defaults</span>
-            <span class="ssb-item-badge ssb-item-badge--green">2</span>
           </button>
+
+          <button class="ssb-item" data-route="domains" onclick="navigate('#/domains')">
+            <span class="ssb-item-label">Domains</span>
+          </button>
+
+          <button class="ssb-item" data-route="action-gating" onclick="navigate('#/action-gating')">
+            <span class="ssb-item-label">Action Gating</span>
+          </button>
+
+          <button class="ssb-item" data-route="resolution-requests" onclick="navigate('#/resolution-requests')">
+            <span class="ssb-item-label">Resolution Requests</span>
+          </button>
+        </div>
+
+        <!-- PLATFORM -->
+        <div class="ssb-group">
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
 
           <button class="ssb-item" data-route="data-privacy" onclick="navigate('#/data-privacy')">
             <span class="ssb-item-label">Data & Privacy</span>
@@ -11139,6 +11155,9 @@ function route() {
     'organization':'organization',
     'identity':'identity',
     'governance-defaults':'governance-defaults',
+    'domains':'domains',
+    'action-gating':'action-gating',
+    'resolution-requests':'resolution-requests',
     'data-privacy':'data-privacy',
     'notifications':'notifications'
   };
@@ -11201,6 +11220,12 @@ function route() {
     renderIdentity();
   } else if (parts[0]==='governance-defaults') {
     renderGovernanceDefaults();
+  } else if (parts[0]==='domains') {
+    renderDomains();
+  } else if (parts[0]==='action-gating') {
+    renderActionGating();
+  } else if (parts[0]==='resolution-requests') {
+    renderResolutionRequests();
   } else if (parts[0]==='data-privacy') {
     renderDataPrivacy();
   } else if (parts[0]==='notifications') {
@@ -16509,131 +16534,312 @@ function renderIdentity() {
 }
 
 function renderGovernanceDefaults() {
+  const CHV = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   $('content').innerHTML = `
 <div class="sm-wrap">
 
   <div class="bill-page-title">Governance Defaults</div>
-  <div class="bill-page-desc">Workspace-wide defaults that apply across all studios unless a studio overrides them. Changes here take effect on new policies and workflows — existing ones are unaffected.</div>
+  <div class="bill-page-desc">Workspace-wide configuration for the Sandbox and Truth planes, and promotion workflow defaults. These apply to all domain sections unless a steward overrides them at the domain level.</div>
 
-  <!-- Policy Enforcement -->
+  <!-- Sandbox Plane -->
   <div class="bill-section">
-    <div class="bill-section-title">Policy Enforcement</div>
+    <div class="bill-section-title" style="display:flex;align-items:center;gap:8px">
+      Sandbox Plane
+      <span style="display:inline-flex;align-items:center;background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.2);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:600">DRAFT</span>
+    </div>
     <div class="ms-card">
       <div class="sm-setting-row">
         <div>
-          <div class="sm-setting-label">Default enforcement mode</div>
-          <div class="sm-setting-sub">Applied to new policies created in any studio unless the studio sets its own mode</div>
+          <div class="sm-setting-label">Allowed source types</div>
+          <div class="sm-setting-sub">Connector categories that stewards may use when ingesting content into Sandbox</div>
         </div>
-        <div class="sm-setting-value">Strict <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="sm-setting-value">Internal DB, CRM, HR systems ${CHV}</div>
       </div>
       <div class="sm-setting-row">
         <div>
-          <div class="sm-setting-label">Auto-apply policies to new studios</div>
-          <div class="sm-setting-sub">When a new studio is activated, workspace defaults are applied immediately</div>
+          <div class="sm-setting-label">Draft auto-expiry</div>
+          <div class="sm-setting-sub">Drafts not promoted or updated within this window are flagged as stale</div>
+        </div>
+        <div class="sm-setting-value">90 days ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Default scope template</div>
+          <div class="sm-setting-sub">Starting scope when a steward creates a new domain section</div>
+        </div>
+        <div class="sm-setting-value">Department ${CHV}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Truth Plane -->
+  <div class="bill-section">
+    <div class="bill-section-title" style="display:flex;align-items:center;gap:8px">
+      Truth Plane
+      <span style="display:inline-flex;align-items:center;background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:600">PUBLISHED</span>
+    </div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Evidence required for promotion</div>
+          <div class="sm-setting-sub">Promotion Packets must include at least one evidence attachment before the approval chain can start</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Required</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Conflict-blocking</div>
+          <div class="sm-setting-sub">Block a promotion if open conflicts exist for the same scope or time window in Truth</div>
         </div>
         <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
       </div>
       <div class="sm-setting-row">
         <div>
-          <div class="sm-setting-label">Policy override by studio admins</div>
-          <div class="sm-setting-sub">Allow Studio Admins to override workspace defaults within their studio</div>
+          <div class="sm-setting-label">Auto-version on publish</div>
+          <div class="sm-setting-sub">Create a new immutable version record each time content is published to Truth</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Promotion Defaults -->
+  <div class="bill-section">
+    <div class="bill-section-title">Promotion defaults</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Default approval quorum</div>
+          <div class="sm-setting-sub">Minimum number of approvers needed to advance a Promotion Packet</div>
+        </div>
+        <div class="sm-setting-value">1 of 1 ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Escalation timeout</div>
+          <div class="sm-setting-sub">Time before an unanswered approval escalates to the next approver</div>
+        </div>
+        <div class="sm-setting-value">48 hours ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Required evidence types</div>
+          <div class="sm-setting-sub">Evidence categories that must be present in every Promotion Packet</div>
+        </div>
+        <div class="sm-setting-value">Source reference, Provenance ${CHV}</div>
+      </div>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderDomains() {
+  const DOMAIN_LIST = [
+    { id:'sales',   name:'Sales',   initials:'SA', color:'#3b82f6', steward:'Marcus Chen',      backup:'Elena Vasquez',  sections:4 },
+    { id:'hr',      name:'HR',      initials:'HR', color:'#8b5cf6', steward:'Sarah Kim',         backup:'James Okafor',   sections:2 },
+    { id:'finance', name:'Finance', initials:'FI', color:'#10b981', steward:'David Torres',      backup:'Priya Sharma',   sections:3 },
+    { id:'ops',     name:'Ops',     initials:'OP', color:'#f59e0b', steward:'Alex Rivera',       backup:'Morgan Lee',     sections:3 },
+    { id:'cs',      name:'CS',      initials:'CS', color:'#06b6d4', steward:'Layla Patel',       backup:'Carlos Mendez',  sections:2 },
+    { id:'legal',   name:'Legal',   initials:'LG', color:'#ef4444', steward:'Jordan Williams',   backup:null,             sections:1 },
+  ];
+
+  const rows = DOMAIN_LIST.map(d => `
+    <div class="sm-setting-row">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+        <div style="width:36px;height:36px;border-radius:10px;background:${d.color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span style="font-size:11px;font-weight:700;color:${d.color};letter-spacing:.3px">${d.initials}</span>
+        </div>
+        <div style="min-width:0">
+          <div class="sm-setting-label">${d.name}</div>
+          <div class="sm-setting-sub">Steward: ${d.steward}${d.backup ? ` &middot; Backup: ${d.backup}` : ' &middot; No backup steward'}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+        <span style="font-size:12px;color:var(--t3)">${d.sections} section${d.sections!==1?'s':''}</span>
+        <button style="height:28px;padding:0 10px;border-radius:var(--r6);background:var(--bg3);border:1px solid var(--line);font-size:12px;font-weight:500;color:var(--t2);cursor:pointer">Manage</button>
+      </div>
+    </div>
+  `).join('');
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+  <div class="bill-page-title">Domains</div>
+  <div class="bill-page-desc">Domain sections group your organization's knowledge by department or function. Each section has a designated steward responsible for maintaining Sandbox content and proposing promotions to Truth.</div>
+
+  <div class="bill-section">
+    <div class="bill-section-title" style="display:flex;align-items:center;justify-content:space-between">
+      Domain sections
+      <button style="height:30px;padding:0 12px;border-radius:var(--r8);background:var(--pri);border:none;font-size:12.5px;font-weight:500;color:#fff;cursor:pointer">+ Add domain</button>
+    </div>
+    <div class="ms-card">${rows}</div>
+  </div>
+
+  <div class="bill-section">
+    <div class="bill-section-title">Dependency mapping</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Cross-domain dependency visibility</div>
+          <div class="sm-setting-sub">Stewards can view which other domains their section depends on, and which depend on them</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Block promotion if upstream dependency has open conflict</div>
+          <div class="sm-setting-sub">Prevent a Promotion Packet from advancing if any upstream dependency has an unresolved conflict</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderActionGating() {
+  const GATE_RULES = [
+    { cat:'External messaging',          desc:'Outbound emails, SMS, and campaign messages sent to contacts or customers', mode:'block',   truth:true  },
+    { cat:'Payroll &amp; financial actions', desc:'Pay runs, expense approvals, vendor payments, wire transfers',              mode:'block',   truth:true  },
+    { cat:'Compliance outputs',          desc:'Regulatory filings, audit certificates, and formal compliance reports',     mode:'block',   truth:true  },
+    { cat:'Customer-facing documents',   desc:'Proposals, contracts, SOWs, and onboarding materials',                     mode:'degrade', truth:true  },
+    { cat:'Internal reports',            desc:'BI dashboards, executive summaries, and team-facing exports',              mode:'warn',    truth:false },
+    { cat:'Agent-triggered API calls',   desc:'External API requests initiated by AI agents on behalf of users',          mode:'off',     truth:false },
+  ];
+
+  const GATE_LOG = [
+    { time:'2h ago',    cat:'External messaging',          result:'pass',    agent:'Customer Outreach v2',  ref:'Sales · Q3 2026' },
+    { time:'5h ago',    cat:'Payroll &amp; financial',     result:'blocked', agent:'Expense Bot',           ref:'Truth missing: Finance/Payroll' },
+    { time:'Yesterday', cat:'Compliance output',           result:'pass',    agent:'SOC Review Agent',      ref:'Legal · Compliance 2026' },
+  ];
+
+  const modeChip = m => m==='block'
+    ? `<span style="display:inline-flex;background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.2);border-radius:20px;padding:2px 9px;font-size:11.5px;font-weight:600">Block</span>`
+    : m==='degrade'
+    ? `<span style="display:inline-flex;background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.2);border-radius:20px;padding:2px 9px;font-size:11.5px;font-weight:600">Degrade</span>`
+    : m==='warn'
+    ? `<span style="display:inline-flex;background:rgba(251,191,36,.07);color:#fbbf24;border:1px solid rgba(251,191,36,.15);border-radius:20px;padding:2px 9px;font-size:11.5px;font-weight:600">Warn</span>`
+    : `<span style="display:inline-flex;background:var(--bg3);color:var(--t3);border:1px solid var(--line);border-radius:20px;padding:2px 9px;font-size:11.5px;font-weight:600">Off</span>`;
+
+  const rows = GATE_RULES.map(r => `
+    <div class="sm-setting-row">
+      <div style="flex:1;min-width:0">
+        <div class="sm-setting-label">${r.cat}</div>
+        <div class="sm-setting-sub">${r.desc}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        ${modeChip(r.mode)}
+        <span style="font-size:12px;color:${r.truth?'var(--green)':'var(--t3)'}">Truth-only: ${r.truth?'On':'Off'}</span>
+      </div>
+    </div>
+  `).join('');
+
+  const logRows = GATE_LOG.map(l => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)">
+      <span style="font-size:11.5px;color:var(--t3);white-space:nowrap;width:76px">${l.time}</span>
+      <span style="display:inline-flex;background:${l.result==='pass'?'rgba(52,211,153,.1)':'rgba(248,113,113,.1)'};color:${l.result==='pass'?'var(--green)':'#f87171'};border-radius:20px;padding:1px 8px;font-size:11px;font-weight:600;flex-shrink:0">${l.result==='pass'?'PASS':'BLOCKED'}</span>
+      <span style="font-size:12.5px;color:var(--t2);flex:1;min-width:0">${l.cat} &middot; ${l.agent}</span>
+      <span style="font-size:11.5px;color:var(--t3);white-space:nowrap">${l.ref}</span>
+    </div>
+  `).join('');
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+  <div class="bill-page-title">Action Gating</div>
+  <div class="bill-page-desc">Define which action categories require Truth-plane inputs before they can execute. Gates are evaluated at run time — each decision is logged with the result, reason code, and the Truth references consulted.</div>
+
+  <div class="bill-section">
+    <div class="bill-section-title">Action categories</div>
+    <div class="ms-card">${rows}</div>
+  </div>
+
+  <div class="bill-section">
+    <div class="bill-section-title">Recent gate log</div>
+    <div class="ms-card" style="padding:0 20px">
+      ${logRows}
+      <div style="padding:12px 0 4px"><a style="font-size:12.5px;color:var(--pri);text-decoration:none" href="#/audit">View full gate log in Audit &rarr;</a></div>
+    </div>
+  </div>
+
+</div>`;
+}
+
+function renderResolutionRequests() {
+  const CHV = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  $('content').innerHTML = `
+<div class="sm-wrap">
+  <div class="bill-page-title">Resolution Requests</div>
+  <div class="bill-page-desc">Set workspace-wide defaults for Resolution Requests created in Governance Studio. Stewards can override these when creating individual requests. External responders get answer-only access — no plane access, request-scoped, and time-limited.</div>
+
+  <div class="bill-section">
+    <div class="bill-section-title">External responders</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Require NDA before access</div>
+          <div class="sm-setting-sub">External responders must sign an NDA before they can view the context package or submit an answer</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Required</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Default access expiry</div>
+          <div class="sm-setting-sub">Responder access to a Resolution Request is automatically revoked after this period</div>
+        </div>
+        <div class="sm-setting-value">30 days ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Auto-revoke on expiry</div>
+          <div class="sm-setting-sub">Revoke access automatically when the expiry date is reached, without manual action</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bill-section">
+    <div class="bill-section-title">Evidence &amp; context</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Require evidence attachment</div>
+          <div class="sm-setting-sub">Responders must attach at least one evidence file before their answer can be submitted</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Required</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Context package review by steward</div>
+          <div class="sm-setting-sub">The domain steward must review and approve what context is shared with each responder before access is granted</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Allow cross-department responders</div>
+          <div class="sm-setting-sub">Internal users from other departments can be invited as answer-only responders</div>
         </div>
         <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Allowed</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Approval Workflow Defaults -->
   <div class="bill-section">
-    <div class="bill-section-title">Approval Workflow Defaults</div>
+    <div class="bill-section-title">Audit &amp; retention</div>
     <div class="ms-card">
       <div class="sm-setting-row">
         <div>
-          <div class="sm-setting-label">Operations requiring approval</div>
-          <div class="sm-setting-sub">Action categories that must go through an approval workflow by default</div>
+          <div class="sm-setting-label">Resolution Request retention</div>
+          <div class="sm-setting-sub">How long closed Resolution Requests — answers, evidence, and audit trail — are kept before archiving</div>
         </div>
-        <div class="sm-setting-value">Agent deploy, Data connection <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="sm-setting-value">3 years ${CHV}</div>
       </div>
       <div class="sm-setting-row">
         <div>
-          <div class="sm-setting-label">Default approver role</div>
-          <div class="sm-setting-sub">Role required to approve operations when no specific approver is assigned</div>
-        </div>
-        <div class="sm-setting-value">Admin <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="sm-setting-row">
-        <div>
-          <div class="sm-setting-label">Default approval quorum</div>
-          <div class="sm-setting-sub">Minimum number of approvers needed to advance an item</div>
-        </div>
-        <div class="sm-setting-value">1 of 1 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="sm-setting-row">
-        <div>
-          <div class="sm-setting-label">Escalation timeout</div>
-          <div class="sm-setting-sub">Time before an unanswered approval request escalates to the next level</div>
-        </div>
-        <div class="sm-setting-value">48 hours <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Risk Scoring -->
-  <div class="bill-section">
-    <div class="bill-section-title">Risk Scoring</div>
-    <div class="ms-card">
-      <div class="sm-setting-row">
-        <div>
-          <div class="sm-setting-label">Risk score — alert threshold</div>
-          <div class="sm-setting-sub">Scores at or above this value trigger a notification to workspace admins</div>
-        </div>
-        <div class="sm-setting-value" style="display:flex;align-items:center;gap:8px;">
-          <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:20px;padding:2px 9px;font-size:12px;font-weight:600;">Medium · 50</span>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-      </div>
-      <div class="sm-setting-row">
-        <div>
-          <div class="sm-setting-label">Risk score — block threshold</div>
-          <div class="sm-setting-sub">Scores at or above this value automatically block the operation</div>
-        </div>
-        <div class="sm-setting-value" style="display:flex;align-items:center;gap:8px;">
-          <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.3);border-radius:20px;padding:2px 9px;font-size:12px;font-weight:600;">High · 80</span>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-      </div>
-      <div class="sm-setting-row">
-        <div>
-          <div class="sm-setting-label">Notify on score change</div>
-          <div class="sm-setting-sub">Alert Policy Managers when a resource crosses a risk threshold</div>
-        </div>
-        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Compliance Reporting -->
-  <div class="bill-section">
-    <div class="bill-section-title">Compliance Reporting</div>
-    <div class="ms-card">
-      <div class="sm-setting-row">
-        <div>
-          <div class="sm-setting-label">Active compliance frameworks</div>
-          <div class="sm-setting-sub">Reports and controls mapped to these frameworks are generated automatically</div>
-        </div>
-        <div class="sm-setting-value">SOC 2 Type II, ISO 27001 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="sm-setting-row">
-        <div>
-          <div class="sm-setting-label">Reporting frequency</div>
-          <div class="sm-setting-sub">How often compliance summary reports are generated and sent to Policy Managers</div>
-        </div>
-        <div class="sm-setting-value">Monthly <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="sm-setting-row">
-        <div>
-          <div class="sm-setting-label">Include audit log in reports</div>
-          <div class="sm-setting-sub">Attach the full audit log export to each compliance report</div>
+          <div class="sm-setting-label">Include in workspace audit log</div>
+          <div class="sm-setting-sub">All Resolution Request activity (opens, answers, revocations) is captured in the workspace audit trail</div>
         </div>
         <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
       </div>
