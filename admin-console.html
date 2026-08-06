@@ -7303,6 +7303,43 @@ html.theme-light .ms-input:disabled,html.theme-light .ms-input[readonly]{backgro
 html.theme-light .ms-select{background:var(--canvas);color:var(--t1);}
 html.theme-light .ms-theme-card{background:var(--bg2);}
 
+/* ── Studio Manage pages ─────────────────────────────────── */
+.sm-wrap{max-width:720px;padding:32px 24px 64px;}
+.sm-breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:28px;}
+.sm-breadcrumb-back{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;padding:4px 0;background:none;border:none;transition:color .12s;}
+.sm-breadcrumb-back:hover{color:var(--t1);}
+.sm-breadcrumb-sep{font-size:13px;color:var(--t3);opacity:.45;}
+.sm-breadcrumb-cur{font-size:13px;font-weight:600;color:var(--t1);}
+.sm-page-header{margin-bottom:32px;}
+.sm-page-title-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.sm-page-title{font-size:20px;font-weight:700;color:var(--t1);}
+.sm-page-desc{font-size:13px;color:var(--t3);line-height:1.55;}
+.sm-section-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;}
+.sm-section{margin-bottom:32px;}
+.sm-plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:var(--r12);overflow:hidden;}
+.sm-plan-cell{padding:16px 18px;border-right:1px solid var(--line);}
+.sm-plan-cell:last-child{border-right:none;}
+.sm-plan-cell-label{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.sm-plan-cell-value{font-size:15px;font-weight:600;color:var(--t1);}
+.sm-plan-cell-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.sm-setting-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);}
+.sm-setting-row:last-child{border-bottom:none;}
+.sm-setting-label{font-size:13px;font-weight:500;color:var(--t1);}
+.sm-setting-sub{font-size:11.5px;color:var(--t3);margin-top:2px;}
+.sm-setting-value{font-size:13px;color:var(--t2);font-weight:500;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sm-danger-card{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:var(--r12);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.sm-danger-label{font-size:13px;font-weight:600;color:var(--status-err,#f87171);}
+.sm-danger-desc{font-size:12px;color:var(--t3);margin-top:3px;}
+.sm-danger-btn{flex-shrink:0;padding:7px 16px;border-radius:var(--r6);font-size:13px;font-weight:500;border:1px solid rgba(248,113,113,.4);background:transparent;color:var(--status-err,#f87171);cursor:pointer;transition:background .12s;}
+.sm-danger-btn:hover{background:rgba(248,113,113,.1);}
+.sm-toggle{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--t2);}
+.sm-toggle-pill{width:30px;height:17px;border-radius:9px;background:var(--green);position:relative;flex-shrink:0;}
+.sm-toggle-pill.off{background:var(--bg3);border:1px solid var(--line);}
+.sm-toggle-pill::after{content:'';position:absolute;top:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:left .15s;left:15px;}
+.sm-toggle-pill.off::after{left:2px;}
+html.theme-light .sm-plan-cell{background:var(--canvas);}
+html.theme-light .sm-danger-card{background:rgba(220,38,38,.04);}
+
 /* ── Studios & Entitlements ──────────────────────────────── */
 .se-wrap{max-width:860px;padding:32px 24px 64px;}
 .se-header{margin-bottom:28px;}
@@ -11070,7 +11107,11 @@ function route() {
   } else if (parts[0]==='my-settings') {
     renderMySettings();
   } else if (parts[0]==='studios') {
-    renderStudiosEntitlements();
+    if (parts[1] && SE_STUDIOS.find(s=>s.id===parts[1])) {
+      renderStudioManage(parts[1]);
+    } else {
+      renderStudiosEntitlements();
+    }
   } else if (parts[0]==='people') {
     renderPeopleAccess();
   } else {
@@ -15728,7 +15769,7 @@ function renderStudiosEntitlements() {
           ${s.active ? `Plan: <strong>${s.plan}</strong> · Renews ${s.renewDate}` : `Not included in your current plan`}
         </div>
         ${s.active
-          ? `<button class="se-btn manage" onclick="toast('Studio management coming soon','info')">Manage</button>`
+          ? `<button class="se-btn manage" onclick="navigate('#/studios/${s.id}')">Manage</button>`
           : `<button class="se-btn contact" onclick="seOpenContact('${s.id}')">Contact sales</button>`
         }
       </div>
@@ -15748,6 +15789,155 @@ function renderStudiosEntitlements() {
     </div>
     <div class="se-modal-body" id="seModalBody"></div>
   </div>
+</div>`;
+}
+
+function renderStudioManage(studioId) {
+  const s = SE_STUDIOS.find(x => x.id === studioId);
+  if (!s) { navigate('#/studios'); return; }
+
+  const CONFIGS = {
+    gov: {
+      sections: [
+        {
+          title: 'Policy Settings',
+          rows: [
+            { label: 'Default policy enforcement mode', sub: 'Applied to new policies unless overridden', value: 'Strict' },
+            { label: 'Approval quorum', sub: 'Minimum approvers required to advance a policy', value: '2 of 3' },
+            { label: 'Auto-escalation timeout', sub: 'Time before an approval request escalates to the next level', value: '48 hours' },
+          ]
+        },
+        {
+          title: 'Audit & Compliance',
+          rows: [
+            { label: 'Audit log retention', sub: 'Logs older than this window are archived to cold storage', value: '2 years' },
+            { label: 'Compliance report export format', sub: 'Default format when exporting audit reports', value: 'PDF + JSON' },
+            { label: 'Real-time compliance alerts', sub: 'Notify Policy Managers when a violation is detected', value: 'enabled' },
+          ]
+        },
+      ]
+    },
+    ag: {
+      sections: [
+        {
+          title: 'Agent Limits',
+          rows: [
+            { label: 'Max concurrent agent runs', sub: 'Across all networks in this workspace', value: '50 runs' },
+            { label: 'Daily execution quota', sub: 'Total agent-minutes allowed per calendar day', value: '10,000 min / day' },
+            { label: 'Max execution timeout per run', sub: 'Hard ceiling before a run is force-stopped', value: '30 min' },
+          ]
+        },
+        {
+          title: 'Human-in-the-Loop Defaults',
+          rows: [
+            { label: 'Default HITL mode', sub: 'Applied to new agents unless the Builder overrides it', value: 'Review on error' },
+            { label: 'HITL response timeout', sub: 'Time before an unreviewed step is auto-escalated', value: '24 hours' },
+            { label: 'Require HITL for external API calls', sub: 'Force a human review step before any outbound API call', value: 'disabled' },
+          ]
+        },
+      ]
+    },
+    helix: {
+      sections: [
+        {
+          title: 'Data Retention',
+          rows: [
+            { label: 'Model version history', sub: 'Number of past versions kept per entity model', value: '25 versions' },
+            { label: 'Ingestion log retention', sub: 'How long raw ingestion event logs are stored', value: '1 year' },
+            { label: 'Deleted entity grace period', sub: 'Time before a soft-deleted entity is permanently removed', value: '30 days' },
+          ]
+        },
+        {
+          title: 'Compute & Pipelines',
+          rows: [
+            { label: 'Monthly compute quota', sub: 'Compute-hours allocated to pipeline runs per month', value: '500 hours' },
+            { label: 'Max concurrent pipeline runs', sub: 'Pipelines running in parallel at any given time', value: '10 pipelines' },
+            { label: 'Auto-snapshot on schema change', sub: 'Snapshot the previous version before any schema migration', value: 'enabled' },
+          ]
+        },
+      ]
+    },
+  };
+
+  const cfg = CONFIGS[studioId] || { sections: [] };
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="sm-breadcrumb">
+    <button class="sm-breadcrumb-back" onclick="navigate('#/studios')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Studios & Entitlements
+    </button>
+    <span class="sm-breadcrumb-sep">/</span>
+    <span class="sm-breadcrumb-cur">${s.name}</span>
+  </div>
+
+  <div class="sm-page-header">
+    <div class="sm-page-title-row">
+      <div class="se-ico ${s.ico}">${s.icoSvg}</div>
+      <div class="sm-page-title">${s.name}</div>
+    </div>
+    <div class="sm-page-desc">${s.desc}</div>
+  </div>
+
+  <!-- Plan & Entitlements -->
+  <div class="sm-section">
+    <div class="sm-section-title">Plan & Entitlements</div>
+    <div class="sm-plan-grid">
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Current plan</div>
+        <div class="sm-plan-cell-value">${s.plan}</div>
+        <div class="sm-plan-cell-sub">Workspace-wide</div>
+      </div>
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Renewal date</div>
+        <div class="sm-plan-cell-value">${s.renewDate}</div>
+        <div class="sm-plan-cell-sub">Annual contract</div>
+      </div>
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Licensed seats</div>
+        <div class="sm-plan-cell-value">Unlimited</div>
+        <div class="sm-plan-cell-sub">Enterprise tier</div>
+      </div>
+    </div>
+  </div>
+
+  ${cfg.sections.map(sec => `
+  <div class="sm-section">
+    <div class="sm-section-title">${sec.title}</div>
+    <div class="ms-card">
+      ${sec.rows.map(row => `
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">${row.label}</div>
+          <div class="sm-setting-sub">${row.sub}</div>
+        </div>
+        <div class="sm-setting-value">
+          ${row.value === 'enabled'
+            ? `<span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span>`
+            : row.value === 'disabled'
+            ? `<span class="sm-toggle"><span class="sm-toggle-pill off"></span>Disabled</span>`
+            : `<span>${row.value}</span>`
+          }
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`).join('')}
+
+  <!-- Danger Zone -->
+  <div class="sm-section">
+    <div class="sm-section-title">Actions</div>
+    <div class="sm-danger-card">
+      <div>
+        <div class="sm-danger-label">Revoke all active sessions</div>
+        <div class="sm-danger-desc">Immediately invalidates all running agent sessions and active user tokens in this studio.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('All sessions revoked — users will need to re-authenticate.','warning')">Revoke sessions</button>
+    </div>
+  </div>
+
 </div>`;
 }
 
