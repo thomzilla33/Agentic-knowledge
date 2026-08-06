@@ -15908,7 +15908,195 @@ function renderStudiosEntitlements() {
 </div>`;
 }
 
+function renderStudioManageGov() {
+  const s = SE_STUDIOS.find(x => x.id === 'gov');
+  const CHV = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  const adminLinks = [
+    { route:'governance-defaults', label:'Governance Defaults', desc:'Sandbox & Truth plane config, draft expiry, promotion defaults', ico:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L14 4.5V8c0 3-2.3 5.8-6 6.5C1.7 13.8-.6 11 0 8V4.5L8 1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>' },
+    { route:'domains',             label:'Domains',             desc:'Domain sections, stewards, backup stewards, dependency mapping',  ico:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="2.5" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="12" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="13" cy="12" r="1.8" stroke="currentColor" stroke-width="1.4"/><path d="M8 7.5v1.5M8 9l-3.5 1.5M8 9l3.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>' },
+    { route:'action-gating',       label:'Action Gating',       desc:'Truth-only requirements per action category, gate log',          ico:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>' },
+    { route:'resolution-requests', label:'Resolution Requests', desc:'NDA, expiry, auto-revoke, evidence & context defaults',          ico:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2C5.2 2 3 4.2 3 7c0 1.6.7 3 1.8 4H8l1.5 2.5L11 11h.2A5 5 0 0 0 8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>' },
+  ];
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+
+  <div class="sm-breadcrumb">
+    <button class="sm-breadcrumb-back" onclick="navigate('#/studios')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Studios & Entitlements
+    </button>
+    <span class="sm-breadcrumb-sep">/</span>
+    <span class="sm-breadcrumb-cur">${s.name}</span>
+  </div>
+
+  <div class="sm-page-header">
+    <div class="sm-page-title-row">
+      <div class="se-ico ${s.ico}">${s.icoSvg}</div>
+      <div class="sm-page-title">${s.name}</div>
+    </div>
+    <div class="sm-page-desc">Knowledge governance across two planes — Sandbox for drafts and Truth for verified content — with domain stewards, promotion workflows, Resolution Requests, and action gating.</div>
+  </div>
+
+  <!-- Plan & Entitlements -->
+  <div class="sm-section">
+    <div class="sm-section-title">Plan & Entitlements</div>
+    <div class="sm-plan-grid">
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Current plan</div>
+        <div class="sm-plan-cell-value">${s.plan}</div>
+        <div class="sm-plan-cell-sub">Workspace-wide</div>
+      </div>
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Renewal date</div>
+        <div class="sm-plan-cell-value">${s.renewDate}</div>
+        <div class="sm-plan-cell-sub">Annual contract</div>
+      </div>
+      <div class="sm-plan-cell">
+        <div class="sm-plan-cell-label">Licensed seats</div>
+        <div class="sm-plan-cell-value">Unlimited</div>
+        <div class="sm-plan-cell-sub">Enterprise tier</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Studio health -->
+  <div class="sm-section">
+    <div class="sm-section-title">Studio health</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:var(--r12);overflow:hidden">
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Domain sections</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">6</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">4 with sub-domains</div>
+      </div>
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Knowledge Bindings</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">14</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">11 Truth · 3 Blended</div>
+      </div>
+      <div style="padding:16px 18px;border-right:1px solid var(--line)">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Promotions pending</div>
+        <div style="font-size:22px;font-weight:700;color:#fbbf24;line-height:1">3</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">Awaiting approval</div>
+      </div>
+      <div style="padding:16px 18px">
+        <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Open Resolution Requests</div>
+        <div style="font-size:22px;font-weight:700;color:var(--t1);line-height:1">2</div>
+        <div style="font-size:11.5px;color:var(--t3);margin-top:4px">1 awaiting evidence</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature enablement -->
+  <div class="sm-section">
+    <div class="sm-section-title">Feature enablement</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Knowledge Bindings</div>
+          <div class="sm-setting-sub">Allow stewards to create bindings that attach domain sections to agents and workflows</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Resolution Requests</div>
+          <div class="sm-setting-sub">Allow stewards to open Resolution Requests and invite external responders</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">External responders</div>
+          <div class="sm-setting-sub">Allow Resolution Requests to be sent to users outside your organization (NDA required)</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Action gating</div>
+          <div class="sm-setting-sub">Enforce Truth-plane requirements on high-risk action categories at run time</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Plane badges in UI</div>
+          <div class="sm-setting-sub">Show Sandbox / Truth plane badges on all content lists and detail views across the studio</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill"></span>Enabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Access settings -->
+  <div class="sm-section">
+    <div class="sm-section-title">Access settings</div>
+    <div class="ms-card">
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Minimum role to read Truth Plane</div>
+          <div class="sm-setting-sub">Users below this role see Sandbox content only</div>
+        </div>
+        <div class="sm-setting-value">Steward ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Publish to Truth — restricted to</div>
+          <div class="sm-setting-sub">Only users with this role or above can finalize a promotion to Truth</div>
+        </div>
+        <div class="sm-setting-value">Workspace Admin ${CHV}</div>
+      </div>
+      <div class="sm-setting-row">
+        <div>
+          <div class="sm-setting-label">Steward self-invite sub-domains</div>
+          <div class="sm-setting-sub">Allow domain stewards to create sub-domains within their section without Admin approval</div>
+        </div>
+        <div class="sm-setting-value"><span class="sm-toggle"><span class="sm-toggle-pill off"></span>Disabled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin pages -->
+  <div class="sm-section">
+    <div class="sm-section-title">Governance settings</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${adminLinks.map(l => `
+      <button onclick="navigate('#/${l.route}')" style="text-align:left;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:16px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:12px">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--t2)">${l.ico}</div>
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px">${l.label}</div>
+          <div style="font-size:11.5px;color:var(--t3);line-height:1.5">${l.desc}</div>
+        </div>
+      </button>`).join('')}
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="sm-section">
+    <div class="sm-section-title">Actions</div>
+    <div class="sm-danger-card" style="margin-bottom:10px">
+      <div>
+        <div class="sm-danger-label">Revoke all active sessions</div>
+        <div class="sm-danger-desc">Immediately invalidates all running sessions and active user tokens in Governance Studio. Users will need to re-authenticate.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('All sessions revoked — users will need to re-authenticate.','warning')">Revoke sessions</button>
+    </div>
+    <div class="sm-danger-card">
+      <div>
+        <div class="sm-danger-label">Archive all stale Sandbox drafts</div>
+        <div class="sm-danger-desc">Move all Sandbox drafts past their auto-expiry window to the archive. This cannot be undone without contacting support.</div>
+      </div>
+      <button class="sm-danger-btn" onclick="toast('Stale drafts archived. Stewards have been notified.','warning')">Archive drafts</button>
+    </div>
+  </div>
+
+</div>`;
+}
+
 function renderStudioManage(studioId) {
+  if (studioId === 'gov') return renderStudioManageGov();
   const s = SE_STUDIOS.find(x => x.id === studioId);
   if (!s) { navigate('#/studios'); return; }
 
