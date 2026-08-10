@@ -10542,6 +10542,22 @@ function _renderPickerList() {
   }).join('');
 }
 
+function paRemoveMember(roleId, personId) {
+  const role = PA_ROLES.find(r => r.id === roleId);
+  if (role) role.memberIds = (role.memberIds||[]).filter(id => id !== personId);
+  if (PA_MEMBER_ROLES[personId]) PA_MEMBER_ROLES[personId] = PA_MEMBER_ROLES[personId].filter(id => id !== roleId);
+  toast('Member removed', 'info');
+  route();
+}
+
+function paRemoveRole(personId, roleId) {
+  const role = PA_ROLES.find(r => r.id === roleId);
+  if (role) role.memberIds = (role.memberIds||[]).filter(id => id !== personId);
+  if (PA_MEMBER_ROLES[personId]) PA_MEMBER_ROLES[personId] = PA_MEMBER_ROLES[personId].filter(id => id !== roleId);
+  toast('Role removed', 'info');
+  route();
+}
+
 function paPickerConfirm() {
   const sel = [..._pickerState.selected];
   if (!sel.length) { paClosePicker(); return; }
@@ -10968,7 +10984,10 @@ function renderRoleDetail(roleId) {
               <div class="sm-setting-sub">${escapeHtml(p.role)}</div>
             </div>
           </div>
-          <div class="sm-setting-value">${CHV}</div>
+          <div class="sm-setting-value" style="display:flex;align-items:center;gap:8px">
+            <button onclick="event.stopPropagation();paRemoveMember('${role.id}','${p.id}')" title="Remove from role" style="width:26px;height:26px;border-radius:6px;background:transparent;border:1px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);transition:background .12s,color .12s,border-color .12s" onmouseenter="this.style.background='var(--red-10,rgba(239,68,68,.1))';this.style.color='#ef4444';this.style.borderColor='rgba(239,68,68,.25)'" onmouseleave="this.style.background='transparent';this.style.color='var(--t3)';this.style.borderColor='transparent'"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+            ${CHV}
+          </div>
         </div>`).join('')
       : `<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px">No members assigned to this role</div>`;
     tabContent = `
@@ -11059,7 +11078,10 @@ function renderMemberDetail(personId) {
               <div class="sm-setting-sub">${Object.keys(r.grants||{}).length} permissions</div>
             </div>
           </div>
-          <div class="sm-setting-value">${CHV}</div>
+          <div class="sm-setting-value" style="display:flex;align-items:center;gap:8px">
+            <button onclick="event.stopPropagation();paRemoveRole('${personId}','${r.id}')" title="Remove role" style="width:26px;height:26px;border-radius:6px;background:transparent;border:1px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);transition:background .12s,color .12s,border-color .12s" onmouseenter="this.style.background='var(--red-10,rgba(239,68,68,.1))';this.style.color='#ef4444';this.style.borderColor='rgba(239,68,68,.25)'" onmouseleave="this.style.background='transparent';this.style.color='var(--t3)';this.style.borderColor='transparent'"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+            ${CHV}
+          </div>
         </div>`).join('')
       : `<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px">No roles assigned</div>`;
     tabContent = `
