@@ -10610,6 +10610,8 @@ function _wsRoleChipHTML(personId) {
 
 function _repaintPa() {
   const wrap = document.getElementById('paTableWrap'); if(!wrap) return;
+  const searchEl = document.getElementById('paSearch');
+  if (searchEl && searchEl.value !== _paState.search) searchEl.value = _paState.search;
   const rows = _paFiltered();
   const pendingRows = _paState.studio==='all' && !_paState.search ? PENDING_INVITES : [];
 
