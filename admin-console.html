@@ -783,199 +783,75 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
 .ssb-group{padding:8px 0 2px}
 /* ── Admin Console Home ─────────────────────────────────── */
 /* ═══════════════════════════════════════════════
-   ADMIN CONSOLE HOME — Full-center AI Chat
+   ADMIN CONSOLE HOME — Command Center
    ═══════════════════════════════════════════════ */
 .ac-home-wrap{
-  display:flex; flex-direction:column;
-  height:100%; padding:0; max-width:none;
-  box-sizing:border-box;
+  display:flex; flex-direction:column; height:100%;
+  padding:28px 32px 32px; box-sizing:border-box; max-width:none;
 }
-@keyframes ac-pulse{0%,100%{opacity:.3} 50%{opacity:.75}}
-
-/* ── Copilot outer — fills content area ── */
-.ac-copilot-outer{
-  position:relative; flex:1; display:flex; flex-direction:column;
-  padding:32px 40px 40px; min-height:0;
+.ac-home-header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px; flex-shrink:0;
 }
-.ac-copilot-outer::before{
-  content:'';
-  position:absolute; inset:0;
-  background:radial-gradient(ellipse 55% 45% at 50% 42%,
-    var(--pri-10) 0%, var(--teal-06) 50%, transparent 75%);
-  pointer-events:none; z-index:0;
-  animation:ac-halo 5s ease-in-out infinite alternate;
+.ac-home-title{font-size:18px; font-weight:700; color:var(--t1)}
+.ac-home-greeting{font-size:13px; color:var(--t3)}
+.ac-home-body{display:flex; gap:20px; flex:1; min-height:0; overflow:hidden}
+.ac-home-alerts{flex:0 0 35%; display:flex; flex-direction:column; overflow-y:auto}
+.ac-home-section-label{
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--t3); margin:0 0 12px; padding:0;
 }
-@keyframes ac-halo{from{opacity:.5} to{opacity:1}}
-
-/* ── Hero state (shown before first message) ── */
-.ac-hero{
-  flex:1; display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:0; padding:0 40px 48px; text-align:center;
-  animation:ac-hero-in .45s cubic-bezier(.2,.8,.4,1) both;
-  position:relative; z-index:1;
+.ac-alert-row{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:var(--r8); margin-bottom:6px;
+  background:var(--bg2); border:1px solid var(--line); min-height:44px;
 }
-@keyframes ac-hero-in{from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none}}
-@keyframes ac-hero-out{from{opacity:1;transform:none} to{opacity:0;transform:translateY(-10px)}}
-.ac-hero-icon{
-  width:64px; height:64px; border-radius:20px; margin-bottom:24px;
-  background:linear-gradient(135deg, var(--pri) 0%, var(--teal) 100%);
-  display:flex; align-items:center; justify-content:center;
-  box-shadow:0 0 48px var(--pri-30), 0 0 96px var(--teal-15);
+.ac-alert-row--skeleton{background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.06)}
+html.theme-light .ac-alert-row--skeleton{background:rgba(0,0,0,.04); border-color:rgba(0,0,0,.08)}
+.ac-alert-dot{width:8px; height:8px; border-radius:50%; background:#F97316; flex-shrink:0}
+.ac-alert-body{display:flex; flex-direction:column; gap:2px; flex:1}
+.ac-alert-section{font-size:11px; font-weight:600; color:var(--t3)}
+.ac-alert-desc{font-size:13px; color:var(--t1)}
+.ac-alert-cta{
+  font-size:12px; font-weight:600; color:var(--pri);
+  text-decoration:none; white-space:nowrap; flex-shrink:0;
 }
-.ac-hero-icon svg{display:block}
-.ac-hero-greeting{
-  font-size:28px; font-weight:700; color:var(--t1);
-  letter-spacing:-.025em; margin-bottom:10px; line-height:1.2;
+.ac-alert-cta:hover{text-decoration:underline}
+.ac-skeleton{height:12px; border-radius:6px; animation:ac-skeleton-pulse 2s ease-in-out infinite}
+.ac-skeleton--wide{background:rgba(255,255,255,.08); width:80%}
+.ac-skeleton--medium{background:rgba(255,255,255,.06); width:55%}
+html.theme-light .ac-skeleton--wide{background:rgba(0,0,0,.08)}
+html.theme-light .ac-skeleton--medium{background:rgba(0,0,0,.06)}
+@keyframes ac-skeleton-pulse{0%,100%{opacity:.5} 50%{opacity:1}}
+.ac-home-empty-note{font-size:12px; color:var(--t3); margin:10px 0 0; line-height:1.6; padding:0 2px}
+.ac-home-sections{flex:1; overflow-y:auto; min-height:0}
+.ac-section-group{margin-bottom:20px}
+.ac-section-group-label{
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--t3); margin:0 0 10px;
 }
-.ac-hero-sub{
-  font-size:14px; color:var(--t2); max-width:420px; line-height:1.65;
-}
-
-/* ── Chat zone — message scroll area (inactive until first message) ── */
-.ac-chat-zone{
-  display:none; flex:1; padding:24px 0 0;
-  flex-direction:column; gap:14px;
-  overflow-y:auto; min-height:0;
-  scrollbar-width:thin; scrollbar-color:var(--line) transparent;
-}
-.ac-chat-zone.active{display:flex}
-.ac-chat-inner{
-  display:flex; flex-direction:column; gap:14px;
-  max-width:760px; width:100%; margin:0 auto; padding:0 40px;
-}
-
-/* ── Input dock — always at bottom ── */
-.ac-dock{
-  flex-shrink:0; padding:16px 40px 32px;
-  display:flex; flex-direction:column; gap:10px;
-  max-width:760px; width:100%; margin:0 auto;
-  position:relative; z-index:1;
-}
-.ac-dock-starters{
-  display:flex; gap:8px; flex-wrap:wrap;
-  justify-content:center;
-}
-.ac-dock-input-row{
-  display:flex; align-items:center; gap:8px;
+.ac-section-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.ac-section-card{
   background:var(--bg2); border:1px solid var(--line);
-  border-radius:14px; padding:8px 8px 8px 16px;
-  transition:border-color .18s, box-shadow .18s;
+  border-radius:var(--r8); padding:14px;
+  display:flex; flex-direction:column; gap:6px;
 }
-.ac-dock-input-row:focus-within{
-  border-color:var(--pri-60);
-  box-shadow:0 0 0 3px var(--pri-12), 0 0 20px var(--pri-08);
+html.theme-light .ac-section-card{background:#fff}
+.ac-section-card--soon{opacity:.5; cursor:default; user-select:none}
+.ac-section-card--active{cursor:pointer; transition:border-color .14s, box-shadow .14s}
+.ac-section-card--active:hover{border-color:var(--pri); box-shadow:0 0 0 3px var(--pri-10)}
+.ac-card-name{font-size:13px; font-weight:600; color:var(--t1)}
+.ac-card-desc{font-size:12px; color:var(--t3); line-height:1.5; flex:1}
+.ac-card-footer{display:flex; align-items:center; gap:6px; margin-top:4px; flex-wrap:wrap}
+.ac-card-badge{font-size:11px; font-weight:600; border-radius:20px; padding:2px 8px}
+.ac-card-badge--soon{color:var(--t3); background:rgba(255,255,255,.05); border:1px solid var(--line)}
+html.theme-light .ac-card-badge--soon{background:rgba(0,0,0,.04)}
+.ac-card-badge--active{color:var(--status-ok,#22c55e); background:rgba(34,197,94,.1)}
+.ac-card-alert-badge{
+  font-size:11px; font-weight:700; color:#F97316;
+  background:rgba(249,115,22,.12); border-radius:20px; padding:2px 8px;
 }
-.ac-dock-input-row .ac-copilot-input{
-  border:none; background:transparent; padding:6px 0; border-radius:0;
-}
-.ac-dock-input-row .ac-copilot-input:focus{border-color:transparent; box-shadow:none}
-html.theme-light .ac-dock-input-row{background:#fff}
-.ac-dock-meta{
-  display:none; justify-content:flex-end; align-items:center;
-  padding:0 2px;
-}
-.ac-dock-meta.visible{display:flex}
-.ac-dock-reset{
-  display:flex; align-items:center; gap:5px;
-  background:none; border:none; cursor:pointer; font-family:inherit;
-  font-size:11px; color:var(--t3); padding:3px 6px; border-radius:6px;
-  transition:color .15s, background .15s;
-}
-.ac-dock-reset:hover{color:var(--t2); background:var(--pri-06)}
-.ac-dock-reset svg{opacity:.6}
-.ac-msg{display:flex; gap:8px; align-items:flex-start; animation:ac-msg-in .25s ease both}
-@keyframes ac-msg-in{from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none}}
-.ac-msg--ai .ac-msg-bubble{
-  background:var(--pri-08); border:1px solid var(--pri-18);
-  border-radius:4px 14px 14px 14px;
-  padding:10px 14px; font-size:13px; color:var(--t1); line-height:1.55;
-  max-width:92%; box-shadow:0 2px 8px var(--pri-06);
-}
-.ac-msg--user{flex-direction:row-reverse}
-.ac-msg--user .ac-msg-bubble{
-  background:var(--pri); border:1px solid rgba(43,127,255,.4);
-  border-radius:14px 4px 14px 14px;
-  padding:10px 14px; font-size:13px; color:#fff; line-height:1.55;
-  max-width:80%;
-}
-.ac-msg-icon{
-  width:26px; height:26px; border-radius:8px; flex-shrink:0; margin-top:2px;
-  background:linear-gradient(135deg, var(--pri), var(--teal));
-  display:flex; align-items:center; justify-content:center;
-}
-.ac-msg-icon svg{display:block}
 
-/* Typing indicator */
-.ac-typing-wrap{display:flex; gap:8px; align-items:center; animation:ac-msg-in .2s ease both}
-.ac-typing-bubble{
-  background:var(--pri-08); border:1px solid var(--pri-18);
-  border-radius:4px 14px 14px 14px; padding:10px 14px;
-  display:flex; gap:5px; align-items:center;
-}
-.ac-typing-dot{width:6px; height:6px; border-radius:50%; background:var(--pri); opacity:.5}
-.ac-typing-dot:nth-child(1){animation:ac-typing .9s ease-in-out infinite}
-.ac-typing-dot:nth-child(2){animation:ac-typing .9s ease-in-out .2s infinite}
-.ac-typing-dot:nth-child(3){animation:ac-typing .9s ease-in-out .4s infinite}
-@keyframes ac-typing{0%,100%{opacity:.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)}}
-
-/* Inline response widgets */
-.ac-msg-stat-grid{
-  display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:8px;
-}
-.ac-msg-stat{
-  background:rgba(255,255,255,.05); border:1px solid var(--line);
-  border-radius:8px; padding:8px 10px; text-align:center;
-}
-html.theme-light .ac-msg-stat{background:rgba(0,0,0,.03)}
-.ac-msg-stat--warn .ac-msg-stat-val{color:var(--status-error)}
-.ac-msg-stat-val{display:block; font-size:20px; font-weight:700; color:var(--t1); line-height:1}
-.ac-msg-stat-label{display:block; font-size:10px; color:var(--t3); margin-top:4px}
-.ac-msg-audit{display:flex; flex-direction:column; gap:6px; margin-top:8px}
-.ac-msg-audit-row{display:flex; gap:10px; font-size:12px; color:var(--t1)}
-.ac-msg-audit-time{color:var(--t3); flex-shrink:0; width:65px}
-.ac-msg-link{font-size:12px; font-weight:600; color:var(--pri); text-decoration:none}
-.ac-msg-link:hover{text-decoration:underline}
-.ac-msg-chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
-
-/* ── Quick-action chips ── */
-.ac-chip{
-  font-size:12px; font-weight:500; padding:5px 12px; border-radius:20px;
-  background:var(--pri-08); border:1px solid var(--pri-25);
-  color:var(--pri); cursor:pointer; font-family:inherit;
-  transition:background .15s, border-color .15s, box-shadow .15s, transform .12s;
-  white-space:nowrap;
-}
-.ac-chip:hover{
-  background:var(--pri-15); border-color:var(--pri-50);
-  box-shadow:0 0 10px var(--pri-20); transform:translateY(-1px);
-}
-.ac-chip--sm{font-size:11px; padding:4px 10px}
-
-/* ── Input ── */
-.ac-copilot-input{
-  flex:1; background:rgba(255,255,255,.05); border:1px solid var(--line);
-  border-radius:10px; padding:9px 14px; font-size:13px;
-  color:var(--t1); font-family:inherit; outline:none;
-  transition:border-color .18s, box-shadow .18s;
-}
-html.theme-light .ac-copilot-input{background:rgba(0,0,0,.03); color:var(--t1)}
-.ac-copilot-input::placeholder{color:var(--t3)}
-.ac-copilot-input:focus{
-  border-color:var(--pri-60);
-  box-shadow:0 0 0 3px var(--pri-12), 0 0 14px var(--pri-08);
-}
-.ac-copilot-send{
-  width:34px; height:34px; border-radius:10px; border:none; cursor:pointer;
-  background:var(--pri); display:flex; align-items:center; justify-content:center;
-  transition:background .15s, box-shadow .15s, transform .12s; flex-shrink:0;
-}
-.ac-copilot-send:hover{
-  background:var(--pri-hover);
-  box-shadow:0 0 14px var(--pri-45); transform:translateY(-1px);
-}
-.ac-copilot-send:active{transform:translateY(0)}
-.ac-copilot-send svg{display:block}
 
 .ssb-group + .ssb-group{margin-top:6px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.04)}
 .ssb-grp-h{
@@ -11747,207 +11623,78 @@ const AC_SECTIONS = [
     { id:'my-settings',  name:'My Settings',             desc:'Your personal preferences and account details',         state:'soon' },
   ]},
   { group:'Tenant', items:[
-    { id:'people',       name:'People & Access',          desc:'Manage users, roles, and workspace invitations',        state:'soon' },
-    { id:'organization', name:'Organization',             desc:'Configure your organization structure and details',     state:'active', route:'organization' },
-    { id:'identity',     name:'Identity & Security',      desc:'SSO, MFA, and authentication policies',                state:'active', route:'identity' },
-    { id:'studios',      name:'Studios & Entitlements',   desc:'Manage licensed products and studio access',           state:'active', route:'studios' },
-    { id:'billing',      name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'active', route:'billing' },
+    { id:'people',       name:'People & Access',          desc:'Manage users, roles, and workspace invitations',        state:'active', route:'people' },
+    { id:'organization', name:'Organization',             desc:'Configure your organization structure and details',     state:'soon' },
+    { id:'identity',     name:'Identity & Security',      desc:'SSO, MFA, and authentication policies',                state:'soon' },
+    { id:'studios',      name:'Studios & Entitlements',   desc:'Manage licensed products and studio access',           state:'soon' },
+    { id:'billing',      name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'soon' },
   ]},
   { group:'Platform', items:[
-    { id:'governance-defaults', name:'Governance Defaults',        desc:'Default policies applied across all studios',       state:'active', route:'governance-defaults' },
-    { id:'data-privacy',        name:'Data & Privacy',             desc:'Data retention, export, and compliance settings',   state:'active', route:'data-privacy' },
+    { id:'governance-defaults', name:'Governance Defaults',        desc:'Default policies applied across all studios',       state:'soon' },
+    { id:'data-privacy',        name:'Data & Privacy',             desc:'Data retention, export, and compliance settings',   state:'soon' },
     { id:'integrations',        name:'Integrations & Credentials', desc:'Authenticate and govern third-party connections',   state:'active', alert:1, route:'integrations' },
-    { id:'notifications',       name:'Notifications',              desc:'Alert channels, rules, and delivery preferences',   state:'active', route:'notifications' },
+    { id:'notifications',       name:'Notifications',              desc:'Alert channels, rules, and delivery preferences',   state:'soon' },
     { id:'audit',               name:'Audit & Compliance',         desc:'Activity logs and compliance reporting',            state:'active', route:'audit' },
   ]},
 ];
-
-/* ── Admin Copilot chat responses ── */
-const AC_RESPONSES = {
-  invite: function(msg) {
-    const m = msg.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i);
-    if (m) {
-      return `I'll invite <strong>${m[0]}</strong> to Contoso Ltd. Which studio should they access?<div class="ac-msg-chips"><button class="ac-chip ac-chip--sm" onclick="acConfirmInvite('${m[0]}','Agentic Studio')">Agentic Studio</button><button class="ac-chip ac-chip--sm" onclick="acConfirmInvite('${m[0]}','Governance Studio')">Governance Studio</button><button class="ac-chip ac-chip--sm" onclick="acConfirmInvite('${m[0]}','All Studios')">All Studios</button></div>`;
-    }
-    return `Sure — who would you like to invite? Provide their email address and I'll get it set up.`;
-  },
-  confirmInvite: function(email, studio) {
-    return `<strong>${email}</strong> has been invited to <strong>${studio}</strong>. They'll receive an email with setup instructions shortly. You can track their onboarding in <a class="ac-msg-link" href="#/people">People &amp; Access →</a>`;
-  },
-  status: function() {
-    return `Here's your workspace at a glance:<div class="ac-msg-stat-grid"><div class="ac-msg-stat"><span class="ac-msg-stat-val">47</span><span class="ac-msg-stat-label">Active users</span></div><div class="ac-msg-stat"><span class="ac-msg-stat-val">12</span><span class="ac-msg-stat-label">Integrations</span></div><div class="ac-msg-stat"><span class="ac-msg-stat-val">3</span><span class="ac-msg-stat-label">Studios active</span></div><div class="ac-msg-stat ac-msg-stat--warn"><span class="ac-msg-stat-val">1</span><span class="ac-msg-stat-label">Needs action</span></div></div>`;
-  },
-  integration: function() {
-    return `You have <strong>1 failing integration</strong>: <span style="color:var(--status-error);font-weight:600">Salesforce CRM</span> — authentication token expired 2 days ago.<br><br>This is affecting data sync for 3 workflows in Agentic Studio. <a class="ac-msg-link" href="#/integrations">Review integration →</a>`;
-  },
-  audit: function() {
-    return `Recent activity in Contoso Ltd:<div class="ac-msg-audit"><div class="ac-msg-audit-row"><span class="ac-msg-audit-time">2h ago</span><span>TG updated Governance policy defaults</span></div><div class="ac-msg-audit-row"><span class="ac-msg-audit-time">Yesterday</span><span>Salesforce CRM authentication failed</span></div><div class="ac-msg-audit-row"><span class="ac-msg-audit-time">2d ago</span><span>New user onboarded: ana.ruiz@contoso.com</span></div><div class="ac-msg-audit-row"><span class="ac-msg-audit-time">3d ago</span><span>Governance Studio entitlement renewed</span></div></div><br><a class="ac-msg-link" href="#/audit">Full audit log →</a>`;
-  },
-  fallback: function() {
-    return `I can help with user management, integration issues, workspace settings, and audit logs.<br><br>Try: <em>"Invite maria@company.com"</em>, <em>"Show workspace status"</em>, or <em>"What integrations are failing?"</em>`;
-  }
-};
-
-function acGetResponse(msg) {
-  const m = msg.toLowerCase();
-  if (m.includes('invit') || (m.includes('add') && m.includes('user'))) return AC_RESPONSES.invite(msg);
-  if (m.includes('status') || m.includes('overview') || m.includes('how many') || m.includes('workspace')) return AC_RESPONSES.status();
-  if (m.includes('integr') || m.includes('fail') || m.includes('salesforce') || m.includes('connect')) return AC_RESPONSES.integration();
-  if (m.includes('audit') || m.includes('log') || m.includes('activit') || m.includes('recent') || m.includes('history')) return AC_RESPONSES.audit();
-  return AC_RESPONSES.fallback();
-}
-
-function acConfirmInvite(email, studio) {
-  const msgs = document.getElementById('acMessages');
-  if (!msgs) return;
-  const userBubble = `<div class="ac-msg ac-msg--user"><div class="ac-msg-bubble">${studio}</div></div>`;
-  msgs.insertAdjacentHTML('beforeend', userBubble);
-  const typingId = acAddTyping();
-  setTimeout(function() {
-    acRemoveTyping(typingId);
-    acAddAIMessage(AC_RESPONSES.confirmInvite(email, studio));
-  }, 700);
-}
-
-function acAddTyping() {
-  const msgs = document.getElementById('acMessages');
-  if (!msgs) return null;
-  const id = 'ac-typing-' + Date.now();
-  msgs.insertAdjacentHTML('beforeend',
-    `<div class="ac-chat-inner"><div class="ac-typing-wrap" id="${id}">
-      <div class="ac-msg-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><path d="M7 4.5v3l1.5 1.5" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <div class="ac-typing-bubble"><div class="ac-typing-dot"></div><div class="ac-typing-dot"></div><div class="ac-typing-dot"></div></div>
-    </div></div>`
-  );
-  msgs.scrollTop = msgs.scrollHeight;
-  return id;
-}
-
-function acRemoveTyping(id) {
-  if (!id) return;
-  const el = document.getElementById(id);
-  if (el) {
-    const wrapper = el.closest('.ac-chat-inner') || el;
-    wrapper.remove();
-  }
-}
-
-function acAddAIMessage(html) {
-  const msgs = document.getElementById('acMessages');
-  if (!msgs) return;
-  msgs.insertAdjacentHTML('beforeend',
-    `<div class="ac-chat-inner"><div class="ac-msg ac-msg--ai">
-      <div class="ac-msg-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><path d="M5 7l1.5 1.5L9.5 5" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="ac-msg-bubble">${html}</div>
-    </div></div>`
-  );
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function acActivateChat() {
-  const hero = document.getElementById('acHero');
-  const chatZone = document.getElementById('acMessages');
-  const chips = document.getElementById('acChips');
-  const meta = document.getElementById('acDockMeta');
-  if (hero && hero.style.display !== 'none') {
-    hero.style.animation = 'ac-hero-out .22s ease both';
-    hero.addEventListener('animationend', function() { hero.style.display = 'none'; }, { once: true });
-  }
-  if (chatZone) chatZone.classList.add('active');
-  if (chips) chips.style.display = 'none';
-  if (meta) meta.classList.add('visible');
-}
-
-function acSendChip(btn, text) {
-  acActivateChat();
-  const msgs = document.getElementById('acMessages');
-  if (msgs) {
-    msgs.insertAdjacentHTML('beforeend', `<div class="ac-chat-inner"><div class="ac-msg ac-msg--user"><div class="ac-msg-bubble">${text}</div></div></div>`);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-  const typingId = acAddTyping();
-  setTimeout(function() {
-    acRemoveTyping(typingId);
-    acAddAIMessage(acGetResponse(text));
-  }, 800 + Math.random() * 400);
-}
-
-function acSend() {
-  const input = document.getElementById('acInput');
-  if (!input) return;
-  const msg = input.value.trim();
-  if (!msg) return;
-  input.value = '';
-  acActivateChat();
-  const msgs = document.getElementById('acMessages');
-  if (msgs) {
-    msgs.insertAdjacentHTML('beforeend', `<div class="ac-chat-inner"><div class="ac-msg ac-msg--user"><div class="ac-msg-bubble">${msg}</div></div></div>`);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-  const typingId = acAddTyping();
-  setTimeout(function() {
-    acRemoveTyping(typingId);
-    acAddAIMessage(acGetResponse(msg));
-  }, 750 + Math.random() * 500);
-}
 
 function renderAdminHome() {
   const el = document.getElementById('content');
   if (!el) return;
 
+  const sectionsHTML = AC_SECTIONS.map(function(group) {
+    const cardsHTML = group.items.map(function(item) {
+      if (item.state === 'active') {
+        const alertBadge = item.alert ? `<span class="ac-card-alert-badge">&#9888; ${item.alert}</span>` : '';
+        return `<div class="ac-section-card ac-section-card--active" onclick="navigate('#/${item.route}')" role="button" tabindex="0">
+          <div class="ac-card-name">${item.name}</div>
+          <div class="ac-card-desc">${item.desc}</div>
+          <div class="ac-card-footer">
+            <span class="ac-card-badge ac-card-badge--active">&#9679; Active</span>${alertBadge}
+          </div>
+        </div>`;
+      }
+      return `<div class="ac-section-card ac-section-card--soon">
+        <div class="ac-card-name">${item.name}</div>
+        <div class="ac-card-desc">${item.desc}</div>
+        <div class="ac-card-footer">
+          <span class="ac-card-badge ac-card-badge--soon">&#9675; Coming soon</span>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="ac-section-group">
+      <h3 class="ac-section-group-label">${group.group}</h3>
+      <div class="ac-section-cards">${cardsHTML}</div>
+    </div>`;
+  }).join('');
+
   el.innerHTML = `<div class="ac-home-wrap">
-    <div class="ac-copilot-outer">
-
-      <!-- Hero: shown before first message -->
-      <div class="ac-hero" id="acHero">
-        <div class="ac-hero-icon">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <circle cx="14" cy="14" r="9" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
-            <path d="M10 14.5C10 11.5 18 11.5 18 14.5C18 17.5 14 18.8 14 18.8C14 18.8 10 17.5 10 14.5Z" fill="rgba(255,255,255,.85)"/>
-            <circle cx="14" cy="9.5" r="1.4" fill="rgba(255,255,255,.85)"/>
-          </svg>
+    <div class="ac-home-header">
+      <span class="ac-home-title">Admin Console</span>
+      <span class="ac-home-greeting">Welcome back, TG &middot; Contoso Ltd</span>
+    </div>
+    <div class="ac-home-body">
+      <section class="ac-home-alerts">
+        <h2 class="ac-home-section-label">Needs Attention</h2>
+        <div class="ac-alert-row ac-alert-row--real">
+          <span class="ac-alert-dot"></span>
+          <div class="ac-alert-body">
+            <span class="ac-alert-section">Integrations &amp; Credentials</span>
+            <span class="ac-alert-desc">1 integration is failing</span>
+          </div>
+          <a class="ac-alert-cta" href="#/integrations">Review &#8594;</a>
         </div>
-        <div class="ac-hero-greeting">Good morning, TG.</div>
-        <div class="ac-hero-sub">
-          One thing needs your attention: <a class="ac-msg-link" href="#/integrations">Salesforce CRM</a> lost authentication 2 days ago and is affecting 3 active workflows.
+        <div class="ac-alert-row ac-alert-row--skeleton">
+          <div class="ac-skeleton ac-skeleton--wide"></div>
         </div>
-      </div>
-
-      <!-- Chat zone: appears after first message -->
-      <div class="ac-chat-zone" id="acMessages"></div>
-
-      <!-- Input dock: always at bottom -->
-      <div class="ac-dock">
-        <div class="ac-dock-meta" id="acDockMeta">
-          <button class="ac-dock-reset" onclick="renderAdminHome()" aria-label="New conversation">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M2 6a4 4 0 1 1 .5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              <path d="M2 8.5V6H4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            New conversation
-          </button>
+        <div class="ac-alert-row ac-alert-row--skeleton">
+          <div class="ac-skeleton ac-skeleton--medium"></div>
         </div>
-        <div class="ac-dock-starters" id="acChips">
-          <button class="ac-chip" onclick="acSendChip(this,'Invite a new user')">+ Invite user</button>
-          <button class="ac-chip" onclick="acSendChip(this,'Show workspace status')">Workspace status</button>
-          <button class="ac-chip" onclick="acSendChip(this,'What integrations are failing?')">Review integrations</button>
-          <button class="ac-chip" onclick="acSendChip(this,'Show recent audit activity')">Audit log</button>
-        </div>
-        <div class="ac-dock-input-row">
-          <input
-            class="ac-copilot-input" id="acInput"
-            placeholder="Ask anything about your workspace…"
-            onkeydown="if(event.key==='Enter')acSend()"
-            autocomplete="off"
-          />
-          <button class="ac-copilot-send" onclick="acSend()" aria-label="Send">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 13V3M3 8l5-5 5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
+        <p class="ac-home-empty-note">Items requiring action across all sections will appear here.</p>
+      </section>
+      <section class="ac-home-sections">
+        ${sectionsHTML}
+      </section>
     </div>
   </div>`;
 }
