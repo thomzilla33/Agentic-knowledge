@@ -7329,6 +7329,10 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .sm-setting-value{font-size:13px;color:var(--t2);font-weight:500;display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .sm-danger-card{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:var(--r12);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .sm-danger-label{font-size:13px;font-weight:600;color:var(--status-err,#f87171);}
+.sm-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:28px;}
+.sm-tab{padding:8px 14px;background:none;border:none;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s,border-color .12s;}
+.sm-tab:hover{color:var(--t1);}
+.sm-tab.active{color:var(--t1);border-bottom-color:var(--pri);font-weight:600;}
 .sm-danger-desc{font-size:12px;color:var(--t3);margin-top:3px;}
 .sm-danger-btn{flex-shrink:0;padding:7px 16px;border-radius:var(--r6);font-size:13px;font-weight:500;border:1px solid rgba(248,113,113,.4);background:transparent;color:var(--status-err,#f87171);cursor:pointer;transition:background .12s;}
 .sm-danger-btn:hover{background:rgba(248,113,113,.1);}
@@ -7740,7 +7744,11 @@ html.theme-light .se-confirm-summary{background:var(--bg2);}
           <div class="ssb-grp-h"><span class="ssb-grp-label">Tenant</span></div>
 
           <button class="ssb-item" data-route="people" onclick="navigate('#/people')">
-            <span class="ssb-item-label">People & Access</span>
+            <span class="ssb-item-label">Members</span>
+          </button>
+
+          <button class="ssb-item" data-route="roles" onclick="navigate('#/roles')">
+            <span class="ssb-item-label">Roles & Permissions</span>
           </button>
 
           <button class="ssb-item" data-route="organization" onclick="navigate('#/organization')">
@@ -8572,6 +8580,170 @@ const LAST_ACTIVE = {
   tg:'2h ago', mg:'Today', es:'1d ago', sb:'3d ago',
   dp:'Today', np:'1w ago', mc:'Today', sc:'4h ago', ap:'2w ago', jh:'5h ago'
 };
+
+/* ── Shared chevron icon ─────────────────────────────────────── */
+const CHV = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:.35"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/* ── Roles & Permissions ─────────────────────────────────────── */
+const PA_ROLES = [
+  { id:'super-admin',   name:'Super Admin',    system:true,  color:'#ef4444',
+    desc:'Full platform access — all studios, billing, and user management.',
+    memberIds:['tg','es'],
+    grants:{ as:'tenant', gov:'tenant', helix:'tenant', platform:'tenant' } },
+  { id:'tenant-admin',  name:'Tenant Admin',   system:true,  color:'#f59e0b',
+    desc:'Manage users, roles, studio entitlements, and workspace settings.',
+    memberIds:['mg','mc'],
+    grants:{ platform:'tenant', 'helix-sources':'tenant', 'helix-models':'tenant', 'as-workers':'tenant' } },
+  { id:'data-steward',  name:'Data Steward',   system:false, color:'#8b5cf6',
+    desc:'Maintain domains, propose and approve promotions to the Truth Plane.',
+    memberIds:['mg','dp','np'],
+    grants:{ gov:'tenant', 'helix-models':'tenant', 'helix-lineage':'tenant', 'helix-changelog':'tenant' } },
+  { id:'agent-builder', name:'Agent Builder',  system:false, color:'#3b82f6',
+    desc:'Create and deploy workers, networks, and workflows in Agentic Studio.',
+    memberIds:['tg','es','mc','jh'],
+    grants:{ 'as-workers':'tenant', 'as-networks':'team', 'as-workflows':'team', 'as-hitl':'team', 'helix-models':'own', 'helix-lineage':'own' } },
+  { id:'analyst',       name:'Analyst',        system:false, color:'#10b981',
+    desc:'Read access to Helix entity models, lineage, and Agentic Studio workers.',
+    memberIds:['np','dp','sc','ap'],
+    grants:{ 'helix-models':'tenant', 'helix-lineage':'tenant', 'helix-changelog':'own', 'as-workers-view':'team', 'as-networks-view':'team' } },
+  { id:'viewer',        name:'Viewer',         system:false, color:'#6b7280',
+    desc:'Read-only access to permitted studios and features.',
+    memberIds:['sb','sc'],
+    grants:{ 'helix-models':'own', 'gov-domains':'own', 'as-workers-view':'own' } },
+];
+
+/* Who has which roles */
+const PA_MEMBER_ROLES = {
+  tg: ['super-admin','agent-builder'],
+  mg: ['tenant-admin','data-steward'],
+  es: ['super-admin','agent-builder'],
+  sb: ['viewer'],
+  dp: ['data-steward','analyst'],
+  np: ['data-steward','analyst'],
+  mc: ['tenant-admin','agent-builder'],
+  sc: ['analyst','viewer'],
+  ap: ['analyst'],
+  jh: ['agent-builder'],
+};
+
+/* Permission tree — Studio → Feature → Action */
+const PA_PERM_TREE = [
+  { id:'as', label:'Agentic Studio', children:[
+    { id:'as-workers',   label:'Workers',   children:[
+      { id:'as-workers-view',   label:'View' },
+      { id:'as-workers-create', label:'Create' },
+      { id:'as-workers-edit',   label:'Edit' },
+      { id:'as-workers-delete', label:'Delete' },
+      { id:'as-workers-deploy', label:'Deploy' },
+    ]},
+    { id:'as-networks',  label:'Agent Networks', children:[
+      { id:'as-networks-view',   label:'View' },
+      { id:'as-networks-create', label:'Create' },
+      { id:'as-networks-edit',   label:'Edit' },
+      { id:'as-networks-delete', label:'Delete' },
+    ]},
+    { id:'as-workflows', label:'Workflows', children:[
+      { id:'as-workflows-view',    label:'View' },
+      { id:'as-workflows-create',  label:'Create' },
+      { id:'as-workflows-edit',    label:'Edit' },
+      { id:'as-workflows-delete',  label:'Delete' },
+      { id:'as-workflows-trigger', label:'Trigger' },
+    ]},
+    { id:'as-hitl', label:'Human-in-the-Loop', children:[
+      { id:'as-hitl-view',   label:'View queue' },
+      { id:'as-hitl-review', label:'Review & approve' },
+      { id:'as-hitl-reject', label:'Reject' },
+    ]},
+    { id:'as-workpacks', label:'Workpacks', children:[
+      { id:'as-workpacks-view',   label:'View' },
+      { id:'as-workpacks-create', label:'Create' },
+      { id:'as-workpacks-edit',   label:'Edit' },
+      { id:'as-workpacks-delete', label:'Delete' },
+    ]},
+  ]},
+  { id:'gov', label:'Governance Studio', children:[
+    { id:'gov-domains',    label:'Domains', children:[
+      { id:'gov-domains-view',   label:'View' },
+      { id:'gov-domains-manage', label:'Manage stewards' },
+      { id:'gov-domains-create', label:'Create' },
+      { id:'gov-domains-edit',   label:'Edit' },
+    ]},
+    { id:'gov-bindings',   label:'Knowledge Bindings', children:[
+      { id:'gov-bindings-view',   label:'View' },
+      { id:'gov-bindings-create', label:'Create' },
+      { id:'gov-bindings-edit',   label:'Edit' },
+      { id:'gov-bindings-delete', label:'Delete' },
+      { id:'gov-bindings-attach', label:'Attach to agent' },
+    ]},
+    { id:'gov-promotions', label:'Promotions', children:[
+      { id:'gov-promotions-view',    label:'View' },
+      { id:'gov-promotions-propose', label:'Propose' },
+      { id:'gov-promotions-approve', label:'Approve / attest' },
+      { id:'gov-promotions-publish', label:'Publish to Truth' },
+    ]},
+    { id:'gov-resolution', label:'Resolution Requests', children:[
+      { id:'gov-resolution-view',   label:'View' },
+      { id:'gov-resolution-create', label:'Create request' },
+      { id:'gov-resolution-invite', label:'Invite responders' },
+      { id:'gov-resolution-close',  label:'Close request' },
+    ]},
+    { id:'gov-gating', label:'Action Gating', children:[
+      { id:'gov-gating-view',  label:'View gates' },
+      { id:'gov-gating-edit',  label:'Edit rules' },
+      { id:'gov-gating-audit', label:'View gate log' },
+    ]},
+  ]},
+  { id:'helix', label:'Helix Data Studio', children:[
+    { id:'helix-sources',   label:'Data Sources', children:[
+      { id:'helix-sources-view',        label:'View' },
+      { id:'helix-sources-connect',     label:'Connect source' },
+      { id:'helix-sources-configure',   label:'Configure' },
+      { id:'helix-sources-disconnect',  label:'Disconnect' },
+    ]},
+    { id:'helix-models',    label:'Entity Models', children:[
+      { id:'helix-models-view',   label:'View' },
+      { id:'helix-models-create', label:'Create model' },
+      { id:'helix-models-edit',   label:'Edit model' },
+      { id:'helix-models-delete', label:'Delete model' },
+      { id:'helix-models-export', label:'Export' },
+    ]},
+    { id:'helix-pipelines', label:'Pipelines', children:[
+      { id:'helix-pipelines-view',   label:'View' },
+      { id:'helix-pipelines-create', label:'Create' },
+      { id:'helix-pipelines-edit',   label:'Edit' },
+      { id:'helix-pipelines-run',    label:'Run' },
+      { id:'helix-pipelines-delete', label:'Delete' },
+    ]},
+    { id:'helix-lineage',   label:'Lineage', children:[
+      { id:'helix-lineage-view',   label:'View lineage' },
+      { id:'helix-lineage-export', label:'Export' },
+    ]},
+    { id:'helix-changelog', label:'Changelog', children:[
+      { id:'helix-changelog-view', label:'View changelog' },
+      { id:'helix-changelog-pin',  label:'Pin decisions' },
+    ]},
+  ]},
+  { id:'platform', label:'Platform', children:[
+    { id:'plt-people',  label:'Users & Roles', children:[
+      { id:'plt-people-view',   label:'View members' },
+      { id:'plt-people-invite', label:'Invite members' },
+      { id:'plt-people-remove', label:'Remove members' },
+      { id:'plt-people-roles',  label:'Manage roles' },
+    ]},
+    { id:'plt-billing', label:'Billing', children:[
+      { id:'plt-billing-view',   label:'View billing' },
+      { id:'plt-billing-manage', label:'Manage subscription' },
+    ]},
+    { id:'plt-audit',   label:'Audit Log', children:[
+      { id:'plt-audit-view',   label:'View log' },
+      { id:'plt-audit-export', label:'Export log' },
+    ]},
+    { id:'plt-org',     label:'Organization', children:[
+      { id:'plt-org-view', label:'View' },
+      { id:'plt-org-edit', label:'Edit settings' },
+    ]},
+  ]},
+];
 
 /* Seed default "Who can use it" for an instance the first time it's read.
    Always includes the connector; adds 1-2 contextual groups by category. */
@@ -10279,7 +10451,7 @@ function _repaintPa() {
     </tr></thead>
     <tbody>
       ${rows.map(p => `
-      <tr class="users-row" onclick="openPeopleDrawer('${p.id}')">
+      <tr class="users-row" onclick="navigate('#/people/${p.id}')">
         <td>
           <div class="users-cell-name">
             <span class="who-avatar" style="background:${p.color}">${escapeHtml(p.initials)}</span>
@@ -10292,7 +10464,7 @@ function _repaintPa() {
         <td>${_wsRoleChipHTML(p.id)}</td>
         <td><div class="pa-studio-chips">${_studioChipsHTML(p.id)}</div></td>
         <td><span class="users-cell-role">${LAST_ACTIVE[p.id]||'—'}</span></td>
-        <td style="text-align:right"><span class="users-row-chevron">→</span></td>
+        <td style="text-align:right"><span class="users-row-chevron">${CHV}</span></td>
       </tr>`).join('')}
       ${pendingRows.map(inv => `
       <tr class="users-row pa-invite-row" onclick="toast('Pending invite — resend or revoke coming soon','info')">
@@ -10319,6 +10491,451 @@ function _repaintPa() {
     el.classList.toggle('is-on', _paState.studio === sid);
   });
 }
+
+/* ====================== ROLES & PERMISSIONS ====================== */
+
+/* ── Permission tree helpers ──────────────────────────────────── */
+function _ptFind(id, nodes) {
+  for (const n of (nodes||[])) {
+    if (n.id === id) return n;
+    const f = _ptFind(id, n.children);
+    if (f) return f;
+  }
+  return null;
+}
+function _ptAllIds(node) {
+  const ids = [node.id];
+  (node.children||[]).forEach(c => ids.push(..._ptAllIds(c)));
+  return ids;
+}
+function _ptParentOf(id, nodes, parent) {
+  for (const n of (nodes||[])) {
+    if (n.id === id) return parent;
+    const p = _ptParentOf(id, n.children, n);
+    if (p) return p;
+  }
+  return null;
+}
+
+/* ── Permission panel state ───────────────────────────────────── */
+let _pp = {
+  open:false, targetType:'role', targetId:null,
+  breadcrumb:[],   // [{id, label}]
+  explicit:{},     // { nodeId: accessLevel } — explicitly granted nodes
+  denied: new Set(), // nodes revoked from inherited
+};
+
+function _ppIsGranted(id) {
+  if (_pp.explicit[id]) return 'explicit';
+  if (_pp.denied.has(id)) return 'denied';
+  // check if any ancestor is explicitly granted
+  const parent = _ptParentOf(id, PA_PERM_TREE, null);
+  if (parent && _ppIsGranted(parent.id) !== 'off' && _ppIsGranted(parent.id) !== 'denied') return 'inherited';
+  return 'off';
+}
+
+function _ppCurrentNodes() {
+  if (!_pp.breadcrumb.length) return PA_PERM_TREE;
+  const last = _pp.breadcrumb[_pp.breadcrumb.length - 1];
+  return _ptFind(last.id, PA_PERM_TREE)?.children || [];
+}
+
+function paOpenPermPanel(targetType, targetId) {
+  const role = PA_ROLES.find(r => r.id === targetId);
+  _pp = {
+    open:true, targetType, targetId,
+    breadcrumb:[],
+    explicit: role ? Object.assign({}, role.grants) : {},
+    denied: new Set(),
+  };
+  _ppEnsureOverlay();
+  _ppRenderLevel();
+  requestAnimationFrame(() => {
+    document.getElementById('ppOverlay')?.classList.add('is-open');
+    document.getElementById('ppPanel')?.classList.add('is-open');
+  });
+}
+function paClosePermPanel() {
+  _pp.open = false;
+  document.getElementById('ppOverlay')?.classList.remove('is-open');
+  document.getElementById('ppPanel')?.classList.remove('is-open');
+}
+function _ppEnsureOverlay() {
+  if (document.getElementById('ppOverlay')) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="cap-drawer-overlay" id="ppOverlay" onclick="paClosePermPanel()"></div>
+    <aside class="cap-drawer" id="ppPanel" role="dialog" style="width:580px" aria-modal="true">
+      <div id="ppBody" style="display:flex;flex-direction:column;height:100%"></div>
+    </aside>`;
+  while (wrap.firstChild) document.body.appendChild(wrap.firstChild);
+}
+
+function paDrillIn(nodeId, nodeLabel) {
+  _pp.breadcrumb.push({ id:nodeId, label:nodeLabel });
+  _ppRenderLevel();
+}
+function paGoBack(idx) {
+  _pp.breadcrumb = _pp.breadcrumb.slice(0, idx);
+  _ppRenderLevel();
+}
+function paTogglePerm(nodeId) {
+  const node = _ptFind(nodeId, PA_PERM_TREE); if (!node) return;
+  const state = _ppIsGranted(nodeId);
+  if (state === 'explicit') {
+    // Revoke explicitly — remove this + all descendants from explicit
+    _ptAllIds(node).forEach(id => { delete _pp.explicit[id]; _pp.denied.delete(id); });
+  } else if (state === 'inherited') {
+    // Exclude this branch from inherited
+    _ptAllIds(node).forEach(id => { _pp.denied.add(id); delete _pp.explicit[id]; });
+  } else if (state === 'denied') {
+    // Restore: remove from denied (will fall back to inherited or off)
+    _ptAllIds(node).forEach(id => _pp.denied.delete(id));
+  } else {
+    // Grant: add this + all descendants
+    _ptAllIds(node).forEach(id => { if (!_pp.explicit[id]) _pp.explicit[id] = 'tenant'; _pp.denied.delete(id); });
+  }
+  _ppRenderLevel();
+}
+function paSetAccessLevel(nodeId, level) {
+  if (_pp.explicit[nodeId]) _pp.explicit[nodeId] = level;
+  _ppRenderLevel();
+}
+function paSavePerms() {
+  const role = PA_ROLES.find(r => r.id === _pp.targetId);
+  if (role) role.grants = Object.assign({}, _pp.explicit);
+  paClosePermPanel();
+  toast('Permissions saved', 'success');
+  // Re-render current page
+  setTimeout(() => {
+    if (location.hash.includes('/roles/')) renderRoleDetail(_pp.targetId);
+    else if (location.hash.includes('/people/')) renderMemberDetail(_pp.targetId);
+  }, 200);
+}
+
+function _ppRenderLevel() {
+  const body = document.getElementById('ppBody'); if (!body) return;
+  const nodes = _ppCurrentNodes();
+  const LEVELS = [['tenant','Tenant'],['team','Team'],['own','Own']];
+
+  const breadcrumbHtml = `<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:12px;color:var(--t3)">
+    <button onclick="paGoBack(0)" style="background:none;border:none;cursor:pointer;color:var(--t2);font-size:12px;padding:0">All</button>
+    ${_pp.breadcrumb.map((b,i) => `
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button onclick="paGoBack(${i+1})" style="background:none;border:none;cursor:pointer;color:${i===_pp.breadcrumb.length-1?'var(--t1)':'var(--t2)'};font-size:12px;padding:0">${escapeHtml(b.label)}</button>
+    `).join('')}
+  </div>`;
+
+  const rowsHtml = nodes.map(n => {
+    const state = _ppIsGranted(n.id);
+    const hasChildren = !!(n.children?.length);
+    const toggleOn = state === 'explicit' || state === 'inherited';
+    const toggleCls = state === 'inherited' ? 'sm-toggle-pill' : (toggleOn ? 'sm-toggle-pill' : 'sm-toggle-pill off');
+    const toggleStyle = state === 'inherited' ? 'opacity:.6' : '';
+    const levelVal = _pp.explicit[n.id] || (state==='inherited' ? 'tenant' : '');
+    const badge = state === 'inherited'
+      ? `<span style="font-size:10px;background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:1px 7px;color:var(--t3)">Inherited</span>`
+      : state === 'denied'
+      ? `<span style="font-size:10px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:20px;padding:1px 7px;color:#ef4444">Exception</span>`
+      : '';
+    const levelSelect = (toggleOn && levelVal)
+      ? `<select onchange="paSetAccessLevel('${n.id}',this.value)" style="background:var(--bg3);border:1px solid var(--line);border-radius:6px;font-size:11.5px;color:var(--t2);padding:2px 6px;cursor:pointer">
+          ${LEVELS.map(([v,l]) => `<option value="${v}" ${levelVal===v?'selected':''}>${l}</option>`).join('')}
+        </select>`
+      : '';
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid var(--line);min-height:48px">
+      <button onclick="paTogglePerm('${n.id}')" style="flex-shrink:0;background:none;border:none;cursor:pointer;padding:0">
+        <span class="sm-toggle" style="margin:0"><span class="sm-toggle-pill ${toggleOn?'':'off'}" style="${toggleStyle}"></span></span>
+      </button>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;color:var(--t1)">${escapeHtml(n.label)}</div>
+        ${badge}
+      </div>
+      ${levelSelect}
+      ${hasChildren
+        ? `<button onclick="paDrillIn('${n.id}','${escapeHtml(n.label)}')" style="background:none;border:none;cursor:pointer;color:var(--t3);padding:4px 6px;border-radius:6px;display:flex;align-items:center;gap:3px;font-size:12px" title="View sub-permissions">
+             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+           </button>`
+        : '<div style="width:26px"></div>'}
+    </div>`;
+  }).join('');
+
+  body.innerHTML = `
+    <header style="padding:16px 20px;border-bottom:1px solid var(--line);flex-shrink:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:14px;font-weight:600;color:var(--t1)">Assign permissions</div>
+        <button onclick="paClosePermPanel()" style="background:none;border:none;cursor:pointer;color:var(--t3);padding:4px">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      ${breadcrumbHtml}
+    </header>
+    <div style="font-size:12px;color:var(--t3);padding:8px 20px;background:var(--bg2);border-bottom:1px solid var(--line);flex-shrink:0">
+      Granting a parent grants all its children. Revoking a child only removes that branch.
+    </div>
+    <div style="flex:1;overflow-y:auto">${rowsHtml}</div>
+    <footer style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0">
+      <button onclick="paClosePermPanel()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:13px;color:var(--t2);cursor:pointer">Cancel</button>
+      <button onclick="paSavePerms()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:var(--pri);border:none;font-size:13px;font-weight:600;color:#fff;cursor:pointer">Save changes</button>
+    </footer>`;
+}
+
+/* ── Perm summary (read mode) ─────────────────────────────────── */
+function _ppGrantSummary(grants) {
+  if (!grants || !Object.keys(grants).length) {
+    return `<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px">No permissions assigned</div>`;
+  }
+  const LEVEL_COLORS = { tenant:'#3b82f6', team:'#8b5cf6', own:'#10b981' };
+  // Group by studio
+  const groups = {};
+  Object.entries(grants).forEach(([nodeId, level]) => {
+    const node = _ptFind(nodeId, PA_PERM_TREE); if (!node) return;
+    const studio = PA_PERM_TREE.find(s => nodeId === s.id || _ptFind(nodeId, s.children));
+    if (!studio) return;
+    if (!groups[studio.id]) groups[studio.id] = { label:studio.label, items:[] };
+    groups[studio.id].items.push({ node, level });
+  });
+  return Object.values(groups).map(g => `
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:8px">${escapeHtml(g.label)}</div>
+      ${g.items.map(({node, level}) => `
+        <div class="sm-setting-row" style="min-height:36px">
+          <div class="sm-setting-label">${escapeHtml(node.label)}</div>
+          <div class="sm-setting-value" style="gap:6px">
+            <span style="font-size:11px;font-weight:600;background:${LEVEL_COLORS[level]}22;border:1px solid ${LEVEL_COLORS[level]}44;border-radius:20px;padding:1px 8px;color:${LEVEL_COLORS[level]}">${level.charAt(0).toUpperCase()+level.slice(1)}</span>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+/* ── Roles list ───────────────────────────────────────────────── */
+function renderRoles() {
+  const rows = PA_ROLES.map(r => {
+    const memberCount = (r.memberIds||[]).length;
+    const permCount   = Object.keys(r.grants||{}).length;
+    return `
+    <div class="ms-card" style="margin-bottom:8px;cursor:pointer" onclick="navigate('#/roles/${r.id}')">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 18px">
+        <div style="width:34px;height:34px;border-radius:10px;background:${r.color}22;border:1px solid ${r.color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:${r.color}"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 12c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:13px;font-weight:600;color:var(--t1)">${escapeHtml(r.name)}</span>
+            ${r.system ? `<span style="font-size:10.5px;font-weight:600;background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:1px 8px;color:var(--t3)">System</span>` : ''}
+          </div>
+          <div style="font-size:12px;color:var(--t3);margin-top:2px">${escapeHtml(r.desc)}</div>
+        </div>
+        <div style="display:flex;gap:16px;flex-shrink:0;text-align:center">
+          <div><div style="font-size:16px;font-weight:700;color:var(--t1)">${memberCount}</div><div style="font-size:11px;color:var(--t3)">Members</div></div>
+          <div><div style="font-size:16px;font-weight:700;color:var(--t1)">${permCount}</div><div style="font-size:11px;color:var(--t3)">Permissions</div></div>
+        </div>
+        <div style="color:var(--t3);margin-left:8px">${CHV}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+  <div class="sm-page-header">
+    <div class="sm-page-title-row" style="justify-content:space-between">
+      <div class="sm-page-title">Roles & Permissions</div>
+      <button onclick="toast('Create role — coming soon','info')" style="height:34px;padding:0 14px;border-radius:var(--r8);background:var(--pri);border:none;font-size:13px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Create role
+      </button>
+    </div>
+    <div class="sm-page-desc">Define roles and assign permissions to control what members can see and do across all studios.</div>
+  </div>
+  <div class="sm-section">${rows}</div>
+</div>`;
+}
+
+/* ── Role detail ──────────────────────────────────────────────── */
+function renderRoleDetail(roleId) {
+  const role = PA_ROLES.find(r => r.id === roleId);
+  if (!role) { navigate('#/roles'); return; }
+  const tab = (location.hash.split('?tab=')[1] || 'overview');
+  const members = (role.memberIds||[]).map(id => MOCK_PEOPLE.find(p => p.id === id)).filter(Boolean);
+
+  const tabNav = (id, label) => `<button class="sm-tab ${tab===id?'active':''}" onclick="navigate('#/roles/${roleId}?tab=${id}')">${label}</button>`;
+
+  let tabContent = '';
+  if (tab === 'overview') {
+    tabContent = `
+      <div class="sm-section">
+        <div class="sm-section-title">Role details</div>
+        <div class="ms-card">
+          <div class="sm-setting-row"><div class="sm-setting-label">Name</div><div class="sm-setting-value">${escapeHtml(role.name)}</div></div>
+          <div class="sm-setting-row"><div class="sm-setting-label">Type</div><div class="sm-setting-value">${role.system ? 'System' : 'Custom'}</div></div>
+          <div class="sm-setting-row"><div class="sm-setting-label">Description</div><div class="sm-setting-value" style="max-width:360px;text-align:right;white-space:normal">${escapeHtml(role.desc)}</div></div>
+          <div class="sm-setting-row"><div class="sm-setting-label">Members</div><div class="sm-setting-value">${members.length}</div></div>
+          <div class="sm-setting-row"><div class="sm-setting-label">Permissions</div><div class="sm-setting-value">${Object.keys(role.grants||{}).length} granted</div></div>
+        </div>
+      </div>`;
+  } else if (tab === 'permissions') {
+    tabContent = `
+      <div class="sm-section">
+        <div class="sm-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Granted permissions</span>
+          <button onclick="paOpenPermPanel('role','${roleId}')" style="height:30px;padding:0 12px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--t2);cursor:pointer">Edit permissions</button>
+        </div>
+        <div class="ms-card" style="padding:16px 18px">${_ppGrantSummary(role.grants)}</div>
+      </div>`;
+  } else if (tab === 'members') {
+    const memberRows = members.length
+      ? members.map(p => `
+        <div class="sm-setting-row" style="cursor:pointer" onclick="navigate('#/people/${p.id}')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="who-avatar" style="background:${p.color};width:28px;height:28px;font-size:10px">${escapeHtml(p.initials)}</span>
+            <div>
+              <div class="sm-setting-label">${escapeHtml(p.name)}</div>
+              <div class="sm-setting-sub">${escapeHtml(p.role)}</div>
+            </div>
+          </div>
+          <div class="sm-setting-value">${CHV}</div>
+        </div>`).join('')
+      : `<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px">No members assigned to this role</div>`;
+    tabContent = `
+      <div class="sm-section">
+        <div class="sm-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Members (${members.length})</span>
+          <button onclick="toast('Assign member — coming soon','info')" style="height:30px;padding:0 12px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--t2);cursor:pointer">Assign member</button>
+        </div>
+        <div class="ms-card">${memberRows}</div>
+      </div>`;
+  }
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+  <div class="sm-breadcrumb">
+    <button class="sm-breadcrumb-back" onclick="navigate('#/roles')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Roles & Permissions
+    </button>
+    <span class="sm-breadcrumb-sep">/</span>
+    <span class="sm-breadcrumb-cur">${escapeHtml(role.name)}</span>
+  </div>
+  <div class="sm-page-header">
+    <div class="sm-page-title-row" style="justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:10px;background:${role.color}22;border:1px solid ${role.color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:${role.color}"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 12c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="sm-page-title">${escapeHtml(role.name)}</div>
+        ${role.system ? `<span style="font-size:11px;font-weight:600;background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--t3)">System</span>` : ''}
+      </div>
+      ${!role.system ? `<button onclick="toast('Edit role — coming soon','info')" style="height:32px;padding:0 12px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--t2);cursor:pointer">Edit</button>` : ''}
+    </div>
+    <div class="sm-page-desc">${escapeHtml(role.desc)}</div>
+  </div>
+  <div class="sm-tabs">${tabNav('overview','Overview')}${tabNav('permissions','Permissions')}${tabNav('members','Members')}</div>
+  ${tabContent}
+</div>`;
+}
+
+/* ── Member detail ────────────────────────────────────────────── */
+function renderMemberDetail(personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId);
+  if (!p) { navigate('#/people'); return; }
+  const tab = (location.hash.split('?tab=')[1] || 'overview');
+  const wsRole = WORKSPACE_ROLES[personId] || 'Member';
+  const roleIds = PA_MEMBER_ROLES[personId] || [];
+  const roles = roleIds.map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
+  const studios = STUDIO_MEMBERSHIPS[personId] || {};
+
+  const tabNav = (id, label) => `<button class="sm-tab ${tab===id?'active':''}" onclick="navigate('#/people/${personId}?tab=${id}')">${label}</button>`;
+
+  let tabContent = '';
+  if (tab === 'overview') {
+    const studioRows = Object.entries(studios).length
+      ? Object.entries(studios).map(([sid, sRole]) => {
+          const meta = PA_STUDIO_META[sid];
+          return `<div class="sm-setting-row">
+            <div><div class="sm-setting-label">${escapeHtml(meta?.label||sid)}</div></div>
+            <div class="sm-setting-value"><span class="pa-studio-chip ${meta?.cls||''}">${escapeHtml(sRole)}</span></div>
+          </div>`;
+        }).join('')
+      : `<div style="padding:16px;color:var(--t3);font-size:13px">No studio access assigned</div>`;
+    tabContent = `
+      <div class="sm-section">
+        <div class="sm-section-title">Profile</div>
+        <div class="ms-card">
+          <div class="sm-setting-row"><div class="sm-setting-label">Name</div><div class="sm-setting-value">${escapeHtml(p.name)}</div></div>
+          <div class="sm-setting-row"><div class="sm-setting-label">Job title</div><div class="sm-setting-value">${escapeHtml(p.role)}</div></div>
+          <div class="sm-setting-row"><div class="sm-setting-label">Workspace role</div><div class="sm-setting-value">${_wsRoleChipHTML(personId)}</div></div>
+          <div class="sm-setting-row"><div class="sm-setting-label">Last active</div><div class="sm-setting-value">${LAST_ACTIVE[personId]||'—'}</div></div>
+        </div>
+      </div>
+      <div class="sm-section">
+        <div class="sm-section-title">Studio access</div>
+        <div class="ms-card">${studioRows}</div>
+      </div>`;
+  } else if (tab === 'roles') {
+    const roleRows = roles.length
+      ? roles.map(r => `
+        <div class="sm-setting-row" style="cursor:pointer" onclick="navigate('#/roles/${r.id}')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:28px;height:28px;border-radius:8px;background:${r.color}22;border:1px solid ${r.color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style="color:${r.color}"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 12c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="sm-setting-label">${escapeHtml(r.name)}</div>
+              <div class="sm-setting-sub">${Object.keys(r.grants||{}).length} permissions</div>
+            </div>
+          </div>
+          <div class="sm-setting-value">${CHV}</div>
+        </div>`).join('')
+      : `<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px">No roles assigned</div>`;
+    tabContent = `
+      <div class="sm-section">
+        <div class="sm-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Assigned roles (${roles.length})</span>
+          <button onclick="toast('Assign role — coming soon','info')" style="height:30px;padding:0 12px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--t2);cursor:pointer">Assign role</button>
+        </div>
+        <div class="ms-card">${roleRows}</div>
+      </div>`;
+  } else if (tab === 'permissions') {
+    // Merge grants from all assigned roles
+    const merged = {};
+    roles.forEach(r => Object.entries(r.grants||{}).forEach(([k,v]) => { if (!merged[k]) merged[k] = v; }));
+    const sourceNote = roles.length
+      ? `<div style="font-size:12px;color:var(--t3);margin-bottom:12px">Effective permissions from: ${roles.map(r=>`<strong>${escapeHtml(r.name)}</strong>`).join(', ')}</div>`
+      : '';
+    tabContent = `
+      <div class="sm-section">
+        <div class="sm-section-title">Effective permissions</div>
+        <div class="ms-card" style="padding:16px 18px">${sourceNote}${_ppGrantSummary(merged)}</div>
+      </div>`;
+  }
+
+  $('content').innerHTML = `
+<div class="sm-wrap">
+  <div class="sm-breadcrumb">
+    <button class="sm-breadcrumb-back" onclick="navigate('#/people')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Members
+    </button>
+    <span class="sm-breadcrumb-sep">/</span>
+    <span class="sm-breadcrumb-cur">${escapeHtml(p.name)}</span>
+  </div>
+  <div class="sm-page-header">
+    <div class="sm-page-title-row">
+      <span class="who-avatar" style="background:${p.color};width:40px;height:40px;font-size:14px;border-radius:12px">${escapeHtml(p.initials)}</span>
+      <div>
+        <div class="sm-page-title">${escapeHtml(p.name)}</div>
+        <div style="font-size:13px;color:var(--t3)">${escapeHtml(p.role)}</div>
+      </div>
+      <span style="margin-left:6px">${_wsRoleChipHTML(personId)}</span>
+    </div>
+  </div>
+  <div class="sm-tabs">${tabNav('overview','Overview')}${tabNav('roles','Roles')}${tabNav('permissions','Permissions')}</div>
+  ${tabContent}
+</div>`;
+}
+
+/* ====================== PEOPLE & ACCESS (members list) ====================== */
 
 function renderPeopleAccess() {
   const total = MOCK_PEOPLE.length + PENDING_INVITES.length;
@@ -11139,7 +11756,7 @@ function renderAdminHome() {
 
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'home';
-  const parts = hash.split('/');
+  const parts = hash.split('/').map((p, i) => i > 0 ? p.split('?')[0] : p);
 
   // Sub-sidebar active state
   document.querySelectorAll('.ssb-item').forEach(b=>b.classList.remove('active'));
@@ -11159,7 +11776,8 @@ function route() {
     'action-gating':'action-gating',
     'resolution-requests':'resolution-requests',
     'data-privacy':'data-privacy',
-    'notifications':'notifications'
+    'notifications':'notifications',
+    'roles':'roles'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -11210,8 +11828,14 @@ function route() {
     } else {
       renderStudiosEntitlements();
     }
+  } else if (parts[0]==='people' && parts[1]) {
+    renderMemberDetail(parts[1]);
   } else if (parts[0]==='people') {
     renderPeopleAccess();
+  } else if (parts[0]==='roles' && parts[1]) {
+    renderRoleDetail(parts[1]);
+  } else if (parts[0]==='roles') {
+    renderRoles();
   } else if (parts[0]==='billing') {
     renderBilling();
   } else if (parts[0]==='organization') {
