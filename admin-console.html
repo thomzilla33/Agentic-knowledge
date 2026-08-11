@@ -10698,80 +10698,115 @@ function _ppRenderLevel() {
   const currentLabel = depth > 0 ? _pp.breadcrumb[depth-1].label : null;
   const parentLabel  = depth > 1 ? _pp.breadcrumb[depth-2].label : (depth===1 ? 'All permissions' : null);
 
-  // Header: two rows — title+close always, back+breadcrumb path when drilled in
+  // Studio identity map — colors + icons for top-level studios
+  const STUDIO_ID = {
+    as:       { color:'#6366f1', icon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="6" r="2.5"/><path d="M4.5 13c0-1.9 1.6-3.5 3.5-3.5s3.5 1.6 3.5 3.5"/><path d="M1.5 4.5h1M13.5 4.5h1M8 1.5v1"/></svg>' },
+    gov:      { color:'#10b981', icon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2L2 5v3c0 3 2.5 5.5 6 6.5C11.5 13.5 14 11 14 8V5L8 2z"/></svg>' },
+    helix:    { color:'#8b5cf6', icon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><ellipse cx="8" cy="4" rx="5" ry="2"/><path d="M3 4v4c0 1.1 2.2 2 5 2s5-.9 5-2V4"/><path d="M3 8v4c0 1.1 2.2 2 5 2s5-.9 5-2V8"/></svg>' },
+    platform: { color:'#64748b', icon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="3.5" rx="1"/><rect x="2" y="7" width="12" height="3.5" rx="1"/><rect x="2" y="12" width="12" height="2" rx="1"/></svg>' },
+  };
+
+  // Determine the current studio context (for drilled-in views)
+  const rootId = _pp.breadcrumb.length ? _pp.breadcrumb[0].id : null;
+  const studioMeta = rootId ? (STUDIO_ID[rootId] || STUDIO_ID.platform) : null;
+
+  // ── Header ──────────────────────────────────────────────────────
   const headerHtml = `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 0">
       ${depth > 0
-        ? `<button onclick="paGoBack(${depth-1})" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;padding:0;border-radius:6px" title="Back to ${escapeHtml(parentLabel)}">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ? `<button onclick="paGoBack(${depth-1})" style="display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:var(--t2);font-size:12.5px;font-weight:500;padding:0" aria-label="Back to ${escapeHtml(parentLabel)}">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L4 7l5 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             ${escapeHtml(parentLabel)}
            </button>`
-        : `<div style="font-size:14px;font-weight:600;color:var(--t1)">Assign permissions</div>`
+        : `<div style="font-size:15px;font-weight:600;color:var(--t1)">Assign permissions</div>`
       }
-      <button onclick="paClosePermPanel()" style="background:none;border:none;cursor:pointer;color:var(--t3);padding:4px;border-radius:6px">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <button onclick="paClosePermPanel()" aria-label="Close" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--t3);border-radius:6px;transition:background .12s" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='none'">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 1.5l10 10M11.5 1.5l-10 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
     </div>
     ${depth > 0
-      ? `<div style="padding:10px 20px 14px">
-          <div style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:6px">${escapeHtml(currentLabel)}</div>
-          <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap">
-            <button onclick="paGoBack(0)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:11px;padding:0">All</button>
-            ${_pp.breadcrumb.map((b,i) => `
-              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="opacity:.4"><path d="M2 1.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <button onclick="paGoBack(${i+1})" style="background:none;border:none;cursor:pointer;color:${i===depth-1?'var(--t2)':'var(--t3)'};font-size:11px;padding:0">${escapeHtml(b.label)}</button>
-            `).join('')}
+      ? `<div style="padding:10px 20px 16px;display:flex;align-items:center;gap:8px">
+          ${studioMeta ? `<div style="width:32px;height:32px;border-radius:9px;background:${studioMeta.color}22;border:1px solid ${studioMeta.color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${studioMeta.color}">${studioMeta.icon}</div>` : ''}
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--t1)">${escapeHtml(currentLabel)}</div>
+            <div style="display:flex;align-items:center;gap:3px;margin-top:2px;flex-wrap:wrap">
+              <button onclick="paGoBack(0)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:11px;padding:0;line-height:1">All</button>
+              ${_pp.breadcrumb.map((b,i) => `
+                <svg width="7" height="7" viewBox="0 0 8 8" fill="none" style="opacity:.35;flex-shrink:0"><path d="M2 1.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <button onclick="paGoBack(${i+1})" style="background:none;border:none;cursor:pointer;color:${i===depth-1?'var(--t2)':'var(--t3)'};font-size:11px;padding:0;line-height:1">${escapeHtml(b.label)}</button>
+              `).join('')}
+            </div>
           </div>
         </div>`
-      : `<div style="padding:4px 20px 14px;font-size:12px;color:var(--t3)">Select a studio to view its permissions</div>`
+      : `<div style="padding:4px 20px 14px;font-size:12.5px;color:var(--t3)">Toggle studios on, then set scope per permission group.</div>`
     }`;
 
+  // ── Rows ─────────────────────────────────────────────────────────
   const rowsHtml = nodes.map(n => {
     const state = _ppIsGranted(n.id);
     const hasChildren = !!(n.children?.length);
     const toggleOn = state === 'explicit' || state === 'inherited';
-    const toggleStyle = state === 'inherited' ? 'opacity:.55' : '';
-    const levelVal = _pp.explicit[n.id] || (state==='inherited' ? 'tenant' : '');
-    const badge = state === 'inherited'
-      ? `<span style="font-size:10px;background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:1px 7px;color:var(--t3)">Inherited</span>`
-      : state === 'denied'
-      ? `<span style="font-size:10px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:20px;padding:1px 7px;color:#ef4444">Exception</span>`
+    const isInherited = state === 'inherited';
+    const isDenied = state === 'denied';
+    const levelVal = _pp.explicit[n.id] || (isInherited ? 'tenant' : '');
+    const isTopLevel = depth === 0;
+
+    // Studio icon (top-level only)
+    const sMeta = STUDIO_ID[n.id];
+    const iconHtml = isTopLevel && sMeta
+      ? `<div style="width:36px;height:36px;border-radius:10px;background:${sMeta.color}22;border:1px solid ${sMeta.color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${sMeta.color}">${sMeta.icon}</div>`
       : '';
+
+    // Badge
+    const badge = isInherited
+      ? `<span style="display:inline-flex;align-items:center;font-size:10.5px;background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:1px 8px;color:var(--t3);margin-top:3px">Inherited</span>`
+      : isDenied
+      ? `<span style="display:inline-flex;align-items:center;font-size:10.5px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.22);border-radius:20px;padding:1px 8px;color:#ef4444;margin-top:3px">Exception</span>`
+      : '';
+
+    // Access level selector
     const levelSelect = (toggleOn && levelVal)
-      ? `<select onchange="event.stopPropagation();paSetAccessLevel('${n.id}',this.value)" style="background:var(--bg3);border:1px solid var(--line);border-radius:6px;font-size:11.5px;color:var(--t2);padding:2px 6px;cursor:pointer">
-          ${LEVELS.map(([v,l]) => `<option value="${v}" ${levelVal===v?'selected':''}>${l}</option>`).join('')}
+      ? `<select onclick="event.stopPropagation()" onchange="event.stopPropagation();paSetAccessLevel('${n.id}',this.value)" style="height:28px;padding:0 8px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;font-size:12px;color:var(--t2);cursor:pointer;outline:none;flex-shrink:0">
+          ${LEVELS.map(([v,l]) => `<option value="${v}"${levelVal===v?' selected':''}>${l}</option>`).join('')}
         </select>`
       : '';
-    const drillable = hasChildren
-      ? `onclick="paDrillIn('${n.id}','${escapeHtml(n.label)}')" style="cursor:pointer"`
-      : `style="cursor:default"`;
+
+    // Drill click (only on the row — NOT injecting a style attribute to avoid duplicate)
+    const rowClick = hasChildren ? `onclick="paDrillIn('${n.id}','${escapeHtml(n.label)}')"` : '';
+    const rowCursor = hasChildren ? 'pointer' : 'default';
+    const rowHover = hasChildren
+      ? `onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background=''"` : '';
+
     return `
-    <div ${drillable} style="display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid var(--line);min-height:52px;transition:background .1s${hasChildren?';cursor:pointer':''}" onmouseenter="if(${hasChildren})this.style.background='var(--hover)'" onmouseleave="this.style.background=''">
-      <button onclick="event.stopPropagation();paTogglePerm('${n.id}')" style="flex-shrink:0;background:none;border:none;cursor:pointer;padding:0">
-        <span class="sm-toggle" style="margin:0"><span class="sm-toggle-pill ${toggleOn?'':'off'}" style="${toggleStyle}"></span></span>
-      </button>
+    <div ${rowClick} ${rowHover} style="display:flex;align-items:center;gap:12px;padding:${isTopLevel?'14px':'11px'} 20px;border-bottom:1px solid var(--border,var(--line));cursor:${rowCursor};transition:background .12s;min-height:${isTopLevel?'62px':'48px'}">
+      ${iconHtml}
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:${hasChildren?'600':'500'};color:var(--t1)">${escapeHtml(n.label)}</div>
+        <div style="font-size:${isTopLevel?'13.5px':'13px'};font-weight:${hasChildren?'600':'500'};color:var(--t1);line-height:1.3">${escapeHtml(n.label)}</div>
         ${badge}
       </div>
       ${levelSelect}
+      <button onclick="event.stopPropagation();paTogglePerm('${n.id}')" aria-label="Toggle ${escapeHtml(n.label)}" style="flex-shrink:0;background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;opacity:${isInherited?.6:1};transition:opacity .12s">
+        <span class="sm-toggle" style="margin:0"><span class="sm-toggle-pill ${toggleOn?'':'off'}"></span></span>
+      </button>
       ${hasChildren
-        ? `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--t3);flex-shrink:0"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-        : '<div style="width:14px"></div>'}
+        ? `<svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="color:var(--t3);flex-shrink:0"><path d="M4 2l5 4.5-5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+        : `<div style="width:13px;flex-shrink:0"></div>`}
     </div>`;
   }).join('');
 
+  // ── Compose ───────────────────────────────────────────────────────
   body.innerHTML = `
-    <header style="border-bottom:1px solid var(--line);flex-shrink:0">
+    <header style="border-bottom:1px solid var(--border,var(--line));flex-shrink:0">
       ${headerHtml}
     </header>
-    <div style="font-size:11.5px;color:var(--t3);padding:7px 20px;background:var(--bg2);border-bottom:1px solid var(--line);flex-shrink:0">
-      Granting a parent grants all its children. Revoking a child only removes that branch.
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 20px;background:var(--bg2,var(--canvas));border-bottom:1px solid var(--border,var(--line));flex-shrink:0">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="color:var(--t3);flex-shrink:0"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 5.5v4M6.5 4h.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span style="font-size:11.5px;color:var(--t3);line-height:1.4">Granting a parent enables all its children. Revoking a child only removes that branch.</span>
     </div>
-    <div style="flex:1;overflow-y:auto">${rowsHtml}</div>
-    <footer style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0">
-      <button onclick="paClosePermPanel()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:13px;color:var(--t2);cursor:pointer">Cancel</button>
-      <button onclick="paSavePerms()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:var(--pri);border:none;font-size:13px;font-weight:600;color:#fff;cursor:pointer">Save changes</button>
+    <div style="flex:1;overflow-y:auto;overscroll-behavior:contain">${rowsHtml}</div>
+    <footer style="padding:14px 20px;border-top:1px solid var(--border,var(--line));display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-shrink:0">
+      <button onclick="paClosePermPanel()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:transparent;border:1px solid var(--border,var(--line));font-size:13px;color:var(--t2);cursor:pointer;transition:background .12s" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='transparent'">Cancel</button>
+      <button onclick="paSavePerms()" style="height:34px;padding:0 18px;border-radius:var(--r8);background:var(--pri);border:none;font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .12s" onmouseenter="this.style.opacity='.88'" onmouseleave="this.style.opacity='1'">Save changes</button>
     </footer>`;
 }
 
