@@ -8441,22 +8441,26 @@ const WORKSPACE_GROUPS = [
 /* Mock people directory — used by the per-instance "Who can use it" picker.
    Per Edgardo: access is granted to people or groups directly (not roles). */
 const MOCK_PEOPLE = [
-  { id:'tg',  name:'Thomas González',  initials:'TG', role:'CTO',                  color:'#10b981' },
-  { id:'mg',  name:'María González',   initials:'MG', role:'Head of Data',         color:'var(--int-cyan)' },
-  { id:'es',  name:'Edgardo Sierra',   initials:'ES', role:'VP Engineering',       color:'var(--purple-lt)' },
-  { id:'sb',  name:'Sebastián Blandón',initials:'SB', role:'Product Designer',     color:'#fbbf24' },
-  { id:'dp',  name:'Diana Pérez',      initials:'DP', role:'Solutions Architect',  color:'#ff7d7d' },
-  { id:'np',  name:'Naomi Park',       initials:'NP', role:'Data Engineer',        color:'#34d39c' },
-  { id:'mc',  name:'Marcus Chen',      initials:'MC', role:'Platform Lead',        color:'#a78bfa' },
-  { id:'sc',  name:'Sarah Chen',       initials:'SC', role:'Customer Success Lead',color:'#06B6D4' },
-  { id:'ap',  name:'Alex Park',        initials:'AP', role:'Finance Manager',      color:'#fbbf24' },
-  { id:'jh',  name:'Jordan Huerta',    initials:'JH', role:'Eng Manager',          color:'var(--int-cyan)' }
+  { id:'tg',  name:'Thomas González',    initials:'TG', role:'CTO',                  color:'#10b981' },
+  { id:'mg',  name:'María González',     initials:'MG', role:'Head of Data',         color:'var(--int-cyan)' },
+  { id:'es',  name:'Edgardo Sierra',     initials:'ES', role:'VP Engineering',       color:'var(--purple-lt)' },
+  { id:'sb',  name:'Sebastián Blandón', initials:'SB', role:'Product Designer',     color:'#fbbf24' },
+  { id:'dp',  name:'Diana Pérez',        initials:'DP', role:'Solutions Architect',  color:'#ff7d7d' },
+  { id:'np',  name:'Naomi Park',         initials:'NP', role:'Data Engineer',        color:'#34d39c' },
+  { id:'mc',  name:'Marcus Chen',        initials:'MC', role:'Platform Lead',        color:'#a78bfa' },
+  { id:'sc',  name:'Sarah Chen',         initials:'SC', role:'Customer Success Lead',color:'#06B6D4' },
+  { id:'ap',  name:'Alex Park',          initials:'AP', role:'Finance Manager',      color:'#fbbf24' },
+  { id:'jh',  name:'Jordan Huerta',      initials:'JH', role:'Eng Manager',          color:'var(--int-cyan)' },
+  { id:'ps',  name:'Priya Subramaniam',  initials:'PS', role:'Compliance Officer',   color:'#0ea5e9' },
+  { id:'ok',  name:'Omar Khalil',        initials:'OK', role:'External Consultant',  color:'#84cc16' },
+  { id:'lt',  name:'Layla Torres',       initials:'LT', role:'Ops Lead',             color:'#f97316' },
 ];
 
 /* ── People & Access — studio memberships ─────────────────── */
 const WORKSPACE_ROLES = {
   tg:'Super Admin', mg:'Admin', es:'Admin', sb:'Member',
-  dp:'Member', np:'Member', mc:'Admin', sc:'Member', ap:'Member', jh:'Member'
+  dp:'Member', np:'Member', mc:'Admin', sc:'Member', ap:'Member', jh:'Member',
+  ps:'Member', ok:'Member', lt:'Member',
 };
 
 /* Studio roles per studio (simple list for People & Access badges) */
@@ -8478,6 +8482,9 @@ const STUDIO_MEMBERSHIPS = {
   sc: { gov:'Viewer' },
   ap: {},
   jh: { ag:'Operator' },
+  ps: { gov:'Viewer', ag:'Viewer', helix:'Viewer' },
+  ok: { helix:'Analyst' },
+  lt: { ag:'Operator' },
 };
 
 /* Pending invites */
@@ -8488,7 +8495,8 @@ const PENDING_INVITES = [
 
 const LAST_ACTIVE = {
   tg:'2h ago', mg:'Today', es:'1d ago', sb:'3d ago',
-  dp:'Today', np:'1w ago', mc:'Today', sc:'4h ago', ap:'2w ago', jh:'5h ago'
+  dp:'Today', np:'1w ago', mc:'Today', sc:'4h ago', ap:'2w ago', jh:'5h ago',
+  ps:'Today', ok:'3d ago', lt:'3h ago',
 };
 
 /* ── Shared chevron icon ─────────────────────────────────────── */
@@ -8520,6 +8528,30 @@ const PA_ROLES = [
     desc:'Read-only access to permitted studios and features.',
     memberIds:['sb','sc'],
     grants:{ 'helix-models':'own', 'gov-domains':'own', 'as-workers-view':'own' } },
+  { id:'compliance-auditor', name:'Compliance Auditor', system:false, color:'#0ea5e9',
+    desc:'Read-only access across all studios for compliance oversight and audit purposes.',
+    memberIds:['ps'],
+    grants:{
+      'as-workers-view':'tenant', 'as-networks-view':'tenant', 'as-workflows-view':'tenant',
+      'as-hitl-view':'tenant', 'as-workpacks-view':'tenant',
+      'gov-domains-view':'tenant', 'gov-bindings-view':'tenant', 'gov-promotions-view':'tenant',
+      'gov-resolution-view':'tenant', 'gov-gating-view':'tenant',
+      'helix-sources-view':'tenant', 'helix-models-view':'tenant', 'helix-pipelines-view':'tenant',
+      'helix-lineage-view':'tenant', 'helix-changelog-view':'tenant',
+      'plt-people-view':'tenant', 'plt-billing-view':'tenant', 'plt-audit-view':'tenant', 'plt-org-view':'tenant',
+    }
+  },
+  { id:'ops-lead', name:'Ops Lead', system:false, color:'#f97316',
+    desc:'Trigger workflows, run pipelines, and review HITL queues without write access.',
+    memberIds:['lt'],
+    grants:{
+      'as-workers-view':'tenant', 'as-networks-view':'tenant',
+      'as-workflows-view':'tenant', 'as-workflows-trigger':'team',
+      'as-hitl-view':'tenant', 'as-hitl-review':'team', 'as-hitl-reject':'team',
+      'helix-pipelines-view':'tenant', 'helix-pipelines-run':'team',
+      'helix-models-view':'own', 'helix-lineage-view':'tenant',
+    }
+  },
 ];
 
 /* Who has which roles */
@@ -8534,6 +8566,25 @@ const PA_MEMBER_ROLES = {
   sc: ['analyst','viewer'],
   ap: ['analyst'],
   jh: ['agent-builder'],
+  ps: ['compliance-auditor'],
+  ok: [],   // no roles — pure hand-crafted individual permissions
+  lt: ['ops-lead'],
+};
+
+/* Per-member individual permission overrides (applied on top of role grants) */
+const PA_MEMBER_OVERRIDES = {
+  // María — can approve promotions but NOT publish (4-eyes separation of duties policy)
+  mg: { explicit:{}, denied:['gov-promotions-publish'] },
+  // Diana — extra HITL access granted individually for cross-team oversight
+  dp: { explicit:{ 'as-hitl-view':'tenant', 'as-hitl-review':'team' }, denied:[] },
+  // Jordan — safety policy: agent builder who cannot delete in any environment
+  jh: { explicit:{}, denied:['as-workers-delete','as-networks-delete','as-workflows-delete'] },
+  // Sarah — temporarily blocked from Agentic Studio read access (security review pending)
+  sc: { explicit:{}, denied:['as-workers-view','as-networks-view'] },
+  // Omar — no roles; these are his only permissions (minimum viable external access)
+  ok: { explicit:{ 'helix-models-view':'tenant', 'helix-lineage-view':'tenant', 'as-workers-view':'own' }, denied:[] },
+  // Layla — extra cross-studio governance visibility beyond the Ops Lead role
+  lt: { explicit:{ 'gov-promotions-view':'tenant', 'gov-gating-view':'tenant' }, denied:[] },
 };
 
 /* Permission tree — Studio → Feature → Action */
@@ -10613,14 +10664,33 @@ function _ppCurrentNodes() {
   return _ptFind(last.id, PA_PERM_TREE)?.children || [];
 }
 
+function _mergeRoleGrants(roleIds) {
+  const RANK = { tenant:3, team:2, own:1 };
+  const result = {};
+  roleIds.forEach(rid => {
+    const role = PA_ROLES.find(r => r.id === rid);
+    if (!role?.grants) return;
+    Object.entries(role.grants).forEach(([key, level]) => {
+      if (!result[key] || (RANK[level]||0) > (RANK[result[key]]||0)) result[key] = level;
+    });
+  });
+  return result;
+}
+
 function paOpenPermPanel(targetType, targetId) {
-  const role = PA_ROLES.find(r => r.id === targetId);
-  _pp = {
-    open:true, targetType, targetId,
-    breadcrumb:[],
-    explicit: role ? Object.assign({}, role.grants) : {},
-    denied: new Set(),
-  };
+  let explicit = {}, denied = new Set();
+  if (targetType === 'role') {
+    const role = PA_ROLES.find(r => r.id === targetId);
+    explicit = role ? Object.assign({}, role.grants) : {};
+  } else {
+    // Person: union role grants + individual overrides
+    const roleIds = PA_MEMBER_ROLES[targetId] || [];
+    const base = _mergeRoleGrants(roleIds);
+    const ov = PA_MEMBER_OVERRIDES[targetId] || {};
+    explicit = Object.assign({}, base, ov.explicit || {});
+    denied = new Set(ov.denied || []);
+  }
+  _pp = { open:true, targetType, targetId, breadcrumb:[], explicit, denied };
   _ppEnsureOverlay();
   _ppRenderLevel();
   document.getElementById('ppOverlay').style.display = 'flex';
@@ -11036,16 +11106,60 @@ function renderMemberDetail(personId) {
         <div class="ms-card">${roleRows}</div>
       </div>`;
   } else if (tab === 'permissions') {
-    // Merge grants from all assigned roles
-    const merged = {};
-    roles.forEach(r => Object.entries(r.grants||{}).forEach(([k,v]) => { if (!merged[k]) merged[k] = v; }));
+    const merged = _mergeRoleGrants(roleIds);
+    const ov = PA_MEMBER_OVERRIDES[personId] || {};
+    const individual = ov.explicit || {};
+    const denied = ov.denied || [];
+    // Build effective = merged + individual overrides
+    const effective = Object.assign({}, merged, individual);
+
     const sourceNote = roles.length
-      ? `<div style="font-size:12px;color:var(--t3);margin-bottom:12px">Effective permissions from: ${roles.map(r=>`<strong>${escapeHtml(r.name)}</strong>`).join(', ')}</div>`
-      : '';
+      ? `<div style="font-size:12px;color:var(--t3);margin-bottom:12px">Inherited from: ${roles.map(r=>`<strong>${escapeHtml(r.name)}</strong>`).join(', ')}</div>`
+      : `<div style="font-size:12px;color:var(--t3);margin-bottom:12px">No roles assigned — individual grants only.</div>`;
+
+    const overridesHtml = (() => {
+      const adds = Object.entries(individual);
+      const blocks = denied;
+      if (!adds.length && !blocks.length) return '';
+      let html = `<div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px">
+        <div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:10px;letter-spacing:.03em;text-transform:uppercase">Individual overrides</div>`;
+      const nodeLabel = id => {
+        const node = _ptFind(id, PA_PERM_TREE);
+        if (!node) return id;
+        const parent = _ptParentOf(id, PA_PERM_TREE, null);
+        return parent ? `${escapeHtml(parent.label)} › ${escapeHtml(node.label)}` : escapeHtml(node.label);
+      };
+      adds.forEach(([id, level]) => {
+        const node = _ptFind(id, PA_PERM_TREE);
+        if (!node) return;
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="color:#10b981;flex-shrink:0"><path d="M2 7l3.5 3.5L11 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="color:var(--t1)">${nodeLabel(id)}</span>
+          <span style="font-size:11px;color:var(--t3);background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:1px 7px">${escapeHtml(level)}</span>
+          <span style="font-size:11px;color:var(--t3)">(extra grant)</span>
+        </div>`;
+      });
+      blocks.forEach(id => {
+        const node = _ptFind(id, PA_PERM_TREE);
+        if (!node) return;
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="color:#ef4444;flex-shrink:0"><path d="M2 2l9 9M11 2l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span style="color:var(--t1)">${nodeLabel(id)}</span>
+          <span style="font-size:11px;color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:20px;padding:1px 7px">exception</span>
+          <span style="font-size:11px;color:var(--t3)">(role access blocked)</span>
+        </div>`;
+      });
+      html += '</div>';
+      return html;
+    })();
+
     tabContent = `
       <div class="sm-section">
-        <div class="sm-section-title">Effective permissions</div>
-        <div class="ms-card" style="padding:16px 18px">${sourceNote}${_ppGrantSummary(merged)}</div>
+        <div class="sm-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Effective permissions</span>
+          <button onclick="paOpenPermPanel('person','${personId}')" style="height:30px;padding:0 12px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--t2);cursor:pointer">Edit</button>
+        </div>
+        <div class="ms-card" style="padding:16px 18px">${sourceNote}${_ppGrantSummary(effective)}${overridesHtml}</div>
       </div>`;
   }
 
