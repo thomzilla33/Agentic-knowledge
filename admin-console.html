@@ -3613,6 +3613,13 @@ html.theme-light .pa-drawer-action-btn{background:#fff;border-color:var(--line);
 html.theme-light .pa-drawer-action-btn:hover{background:var(--hover);}
 .pa-invite-row td{color:var(--t3);}
 .pa-invite-row:hover{background:var(--hover)!important;}
+.pa-invite-actions{display:flex;align-items:center;gap:6px;justify-content:flex-end;opacity:0;transition:opacity .15s}
+.pa-invite-row:hover .pa-invite-actions{opacity:1}
+.pa-invite-btn{height:28px;padding:0 10px;border-radius:var(--r6);border:1px solid var(--line);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s}
+.pa-invite-btn.resend{background:transparent;color:var(--t2)}
+.pa-invite-btn.resend:hover{background:var(--bg3);border-color:var(--line2)}
+.pa-invite-btn.revoke{background:transparent;color:var(--status-error)}
+.pa-invite-btn.revoke:hover{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.3)}
 /* Studio-specific active states extending .users-filter */
 .users-filter.studio-gov.is-on{background:var(--green-10);border-color:var(--green-30);color:var(--green);}
 .users-filter.studio-gov.is-on .users-filter-badge{background:rgba(5,223,114,0.16);color:var(--green);}
@@ -10518,7 +10525,7 @@ function _repaintPa() {
         <td style="text-align:right"><span class="users-row-chevron">${CHV}</span></td>
       </tr>`).join('')}
       ${pendingRows.map(inv => `
-      <tr class="users-row pa-invite-row" onclick="toast('Pending invite — resend or revoke coming soon','info')">
+      <tr class="users-row pa-invite-row">
         <td>
           <div class="users-cell-name">
             <span class="who-avatar" style="background:var(--bg3);color:var(--t3);border:1px dashed var(--line)">?</span>
@@ -10531,7 +10538,12 @@ function _repaintPa() {
         <td>—</td>
         <td><div class="pa-studio-chips">${inv.studios.map(sid=>{ const m=PA_STUDIO_META[sid]; return `<span class="pa-studio-chip ${m.cls}">${m.label}</span>`; }).join('')}</div></td>
         <td><span class="pa-status pending"><span class="pa-status-dot"></span>Pending</span></td>
-        <td style="text-align:right"><span class="users-row-chevron" style="opacity:.4">→</span></td>
+        <td style="text-align:right">
+          <div class="pa-invite-actions">
+            <button class="pa-invite-btn resend" onclick="event.stopPropagation();resendInvite('${escapeHtml(inv.email)}')">Resend</button>
+            <button class="pa-invite-btn revoke" onclick="event.stopPropagation();revokeInvite('${escapeHtml(inv.email)}')">Revoke</button>
+          </div>
+        </td>
       </tr>`).join('')}
     </tbody>
   </table>`;
@@ -10809,7 +10821,7 @@ function renderRoles() {
   <div class="sm-page-header">
     <div class="sm-page-title-row" style="justify-content:space-between">
       <div class="sm-page-title">Roles & Permissions</div>
-      <button onclick="toast('Create role — coming soon','info')" style="height:34px;padding:0 14px;border-radius:var(--r8);background:var(--pri);border:none;font-size:13px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px">
+      <button onclick="openCreateRoleModal()" style="height:34px;padding:0 14px;border-radius:var(--r8);background:var(--pri);border:none;font-size:13px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Create role
       </button>
@@ -10897,7 +10909,7 @@ function renderRoleDetail(roleId) {
         <div class="sm-page-title">${escapeHtml(role.name)}</div>
         ${role.system ? `<span style="font-size:11px;font-weight:600;background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--t3)">System</span>` : ''}
       </div>
-      ${!role.system ? `<button onclick="toast('Edit role — coming soon','info')" style="height:32px;padding:0 12px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--t2);cursor:pointer">Edit</button>` : ''}
+      ${!role.system ? `<button onclick="openEditRoleModal('${roleId}')" style="height:32px;padding:0 12px;border-radius:var(--r8);background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--t2);cursor:pointer">Edit</button>` : ''}
     </div>
     <div class="sm-page-desc">${escapeHtml(role.desc)}</div>
   </div>
@@ -11056,6 +11068,155 @@ function renderPeopleAccess() {
 /* ====================== PEOPLE DRAWER ======================== */
 
 let _paDrawerState = { open:false, personId:null };
+
+/* ── Create Role modal ──────────────────────────────────────── */
+const ROLE_COLORS = ['#8B5CF6','#3B82F6','#10B981','#F59E0B','#EF4444','#EC4899'];
+
+function ensureCreateRoleModal() {
+  if (document.getElementById('crModalOverlay')) return;
+  const el = document.createElement('div');
+  el.innerHTML = `
+<div class="req-modal-overlay" id="crModalOverlay" onclick="if(event.target===this)closeCreateRoleModal()">
+  <div class="req-modal" style="max-width:480px" role="dialog" aria-modal="true" aria-labelledby="crModalTitle">
+    <div class="req-modal-h">
+      <div class="req-modal-h-ic" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.28);color:#8B5CF6">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5.5" r="2.8" stroke="currentColor" stroke-width="1.4"/><path d="M2 13.5c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M11.5 3v4M9.5 5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="req-modal-h-text">
+        <div class="req-modal-title" id="crModalTitle">Create role</div>
+        <div class="req-modal-sub">Define a custom role with specific permissions for your workspace.</div>
+      </div>
+      <button class="req-modal-close" onclick="closeCreateRoleModal()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="req-modal-body">
+      <div class="req-modal-grid is-full" style="gap:14px">
+        <div class="req-modal-field">
+          <label class="req-modal-field-l" for="crRoleName">Name <span class="req-req">*</span></label>
+          <input id="crRoleName" type="text" placeholder="e.g. Data Viewer" maxlength="60" oninput="crValidate()" autocomplete="off">
+          <div id="crNameError" style="font-size:11.5px;color:var(--status-error);display:none;margin-top:2px">Role name is required</div>
+        </div>
+        <div class="req-modal-field">
+          <label class="req-modal-field-l" for="crRoleDesc">Description</label>
+          <textarea id="crRoleDesc" rows="2" placeholder="What can members with this role do?" style="resize:none"></textarea>
+        </div>
+        <div class="req-modal-field">
+          <div class="req-modal-field-l">Color</div>
+          <div id="crColorPicker" style="display:flex;gap:8px;margin-top:2px">
+            ${ROLE_COLORS.map((c,i) => `
+            <button type="button" class="cr-color-swatch ${i===0?'is-selected':''}" data-color="${c}" style="width:26px;height:26px;border-radius:50%;background:${c};border:2px solid ${i===0?'#fff':'transparent'};cursor:pointer;transition:border-color .12s,transform .12s" onclick="crPickColor('${c}',this)" title="${c}"></button>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px 24px 18px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid rgba(255,255,255,0.06)">
+      <button onclick="closeCreateRoleModal()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:transparent;border:1px solid var(--line);font-size:13px;font-weight:500;color:var(--t2);cursor:pointer">Cancel</button>
+      <button id="crSubmitBtn" onclick="submitCreateRole()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:var(--pri);border:none;font-size:13px;font-weight:600;color:#fff;cursor:pointer;opacity:.4;pointer-events:none">Create role</button>
+    </div>
+  </div>
+</div>`;
+  document.body.appendChild(el.firstElementChild);
+}
+
+let _crSelectedColor = ROLE_COLORS[0];
+
+function crPickColor(color, btn) {
+  _crSelectedColor = color;
+  document.querySelectorAll('.cr-color-swatch').forEach(s => {
+    const selected = s.dataset.color === color;
+    s.style.borderColor = selected ? '#fff' : 'transparent';
+    s.style.transform = selected ? 'scale(1.15)' : 'scale(1)';
+    s.classList.toggle('is-selected', selected);
+  });
+}
+
+function crValidate() {
+  const name = document.getElementById('crRoleName')?.value.trim();
+  const btn  = document.getElementById('crSubmitBtn');
+  const err  = document.getElementById('crNameError');
+  if (!btn) return;
+  const valid = name && name.length > 0;
+  btn.style.opacity = valid ? '1' : '.4';
+  btn.style.pointerEvents = valid ? 'auto' : 'none';
+  if (err) err.style.display = 'none';
+}
+
+let _crEditingRoleId = null;
+
+function openCreateRoleModal() {
+  _crEditingRoleId = null;
+  _openRoleModal('Create role', 'Define a custom role with specific permissions for your workspace.', '', '', ROLE_COLORS[0], 'Create role');
+}
+
+function openEditRoleModal(roleId) {
+  const role = PA_ROLES.find(r => r.id === roleId);
+  if (!role) return;
+  _crEditingRoleId = roleId;
+  _openRoleModal('Edit role', 'Update this role\'s name, description, and color.', role.name, role.desc || '', role.color || ROLE_COLORS[0], 'Save changes');
+}
+
+function _openRoleModal(title, subtitle, name, desc, color, submitLabel) {
+  ensureCreateRoleModal();
+  _crSelectedColor = color;
+  const nameEl = document.getElementById('crRoleName');
+  const descEl = document.getElementById('crRoleDesc');
+  if (nameEl) nameEl.value = name;
+  if (descEl) descEl.value = desc;
+  document.getElementById('crModalTitle').textContent = title;
+  document.querySelector('#crModalOverlay .req-modal-sub').textContent = subtitle;
+  document.getElementById('crSubmitBtn').textContent = submitLabel;
+  document.querySelectorAll('.cr-color-swatch').forEach(s => {
+    const selected = s.dataset.color === color;
+    s.style.borderColor = selected ? '#fff' : 'transparent';
+    s.style.transform = selected ? 'scale(1.15)' : 'scale(1)';
+    s.classList.toggle('is-selected', selected);
+  });
+  crValidate();
+  document.getElementById('crModalOverlay').classList.add('is-open');
+  setTimeout(() => nameEl?.focus(), 80);
+}
+
+function closeCreateRoleModal() {
+  document.getElementById('crModalOverlay')?.classList.remove('is-open');
+}
+
+function submitCreateRole() {
+  const name = document.getElementById('crRoleName')?.value.trim();
+  if (!name) {
+    const err = document.getElementById('crNameError');
+    if (err) err.style.display = 'block';
+    return;
+  }
+  const desc = document.getElementById('crRoleDesc')?.value.trim() || '';
+  if (_crEditingRoleId) {
+    const idx = PA_ROLES.findIndex(r => r.id === _crEditingRoleId);
+    if (idx !== -1) {
+      PA_ROLES[idx] = { ...PA_ROLES[idx], name, desc, color: _crSelectedColor };
+    }
+    closeCreateRoleModal();
+    renderRoleDetail(_crEditingRoleId);
+    toast(`Role updated`, 'success');
+  } else {
+    const id = 'custom-' + name.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-' + Date.now().toString(36);
+    PA_ROLES.push({ id, name, desc, color: _crSelectedColor, system: false, memberIds: [], grants: {} });
+    closeCreateRoleModal();
+    navigate('#/roles/' + id);
+    toast(`Role "${name}" created`, 'success');
+  }
+}
+
+function resendInvite(email) {
+  toast(`Invitation resent to ${email}`, 'success');
+}
+
+function revokeInvite(email) {
+  if (!confirm(`Revoke invitation for ${email}?\n\nThey will no longer be able to use this invite link.`)) return;
+  const idx = PENDING_INVITES.findIndex(i => i.email === email);
+  if (idx !== -1) PENDING_INVITES.splice(idx, 1);
+  renderPeopleTable();
+  toast(`Invitation revoked for ${email}`, 'success');
+}
 
 function ensurePaDrawer() {
   if (document.getElementById('paDrawerOverlay')) return;
