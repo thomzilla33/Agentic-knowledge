@@ -10623,25 +10623,29 @@ function paOpenPermPanel(targetType, targetId) {
   };
   _ppEnsureOverlay();
   _ppRenderLevel();
-  requestAnimationFrame(() => {
-    document.getElementById('ppOverlay')?.classList.add('is-open');
-    document.getElementById('ppPanel')?.classList.add('is-open');
-  });
+  document.getElementById('ppOverlay').style.display = 'flex';
 }
 function paClosePermPanel() {
   _pp.open = false;
-  document.getElementById('ppOverlay')?.classList.remove('is-open');
-  document.getElementById('ppPanel')?.classList.remove('is-open');
+  const el = document.getElementById('ppOverlay');
+  if (el) el.style.display = 'none';
 }
 function _ppEnsureOverlay() {
-  if (document.getElementById('ppOverlay')) return;
-  const wrap = document.createElement('div');
-  wrap.innerHTML = `
-    <div class="cap-drawer-overlay" id="ppOverlay" onclick="paClosePermPanel()"></div>
-    <aside class="cap-drawer" id="ppPanel" role="dialog" style="width:580px" aria-modal="true">
-      <div id="ppBody" style="display:flex;flex-direction:column;height:100%"></div>
-    </aside>`;
-  while (wrap.firstChild) document.body.appendChild(wrap.firstChild);
+  const existing = document.getElementById('ppOverlay');
+  if (existing && existing.dataset.modal === '1') return;
+  // Remove stale drawer elements from old pattern
+  document.getElementById('ppOverlay')?.remove();
+  document.getElementById('ppPanel')?.remove();
+  const el = document.createElement('div');
+  el.dataset.modal = '1';
+  el.id = 'ppOverlay';
+  el.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);align-items:center;justify-content:center';
+  el.innerHTML = `
+    <div id="ppPanel" role="dialog" aria-modal="true" style="background:var(--surface,#1a1f2e);border:1px solid var(--border);border-radius:var(--r12,12px);width:520px;max-width:calc(100vw - 32px);max-height:calc(100vh - 80px);display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.4);overflow:hidden">
+      <div id="ppBody" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden"></div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click', e => { if (e.target === el) paClosePermPanel(); });
 }
 
 function paDrillIn(nodeId, nodeLabel) {
