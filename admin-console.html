@@ -8538,119 +8538,119 @@ const PA_MEMBER_ROLES = {
 
 /* Permission tree — Studio → Feature → Action */
 const PA_PERM_TREE = [
-  { id:'as', label:'Agentic Studio', children:[
-    { id:'as-workers',   label:'Workers',   children:[
-      { id:'as-workers-view',   label:'View' },
-      { id:'as-workers-create', label:'Create' },
-      { id:'as-workers-edit',   label:'Edit' },
-      { id:'as-workers-delete', label:'Delete' },
-      { id:'as-workers-deploy', label:'Deploy' },
+  { id:'as', label:'Agentic Studio', desc:'Build, run, and monitor AI workers and agent networks', children:[
+    { id:'as-workers',   label:'Workers',   desc:'AI workers that execute tasks automatically', children:[
+      { id:'as-workers-view',   label:'View',   desc:'See worker configurations, status, and run history' },
+      { id:'as-workers-create', label:'Create', desc:'Build new AI workers from templates or from scratch' },
+      { id:'as-workers-edit',   label:'Edit',   desc:'Modify worker prompts, tools, and configurations' },
+      { id:'as-workers-delete', label:'Delete', desc:'Permanently remove workers from the workspace' },
+      { id:'as-workers-deploy', label:'Deploy', desc:'Activate workers for live execution in production' },
     ]},
-    { id:'as-networks',  label:'Agent Networks', children:[
-      { id:'as-networks-view',   label:'View' },
-      { id:'as-networks-create', label:'Create' },
-      { id:'as-networks-edit',   label:'Edit' },
-      { id:'as-networks-delete', label:'Delete' },
+    { id:'as-networks',  label:'Agent Networks', desc:'Multi-agent graphs that orchestrate complex workflows', children:[
+      { id:'as-networks-view',   label:'View',   desc:'Browse agent network graphs and execution logs' },
+      { id:'as-networks-create', label:'Create', desc:'Design new multi-agent orchestration graphs' },
+      { id:'as-networks-edit',   label:'Edit',   desc:'Modify network topology and agent connections' },
+      { id:'as-networks-delete', label:'Delete', desc:'Remove networks from the workspace' },
     ]},
-    { id:'as-workflows', label:'Workflows', children:[
-      { id:'as-workflows-view',    label:'View' },
-      { id:'as-workflows-create',  label:'Create' },
-      { id:'as-workflows-edit',    label:'Edit' },
-      { id:'as-workflows-delete',  label:'Delete' },
-      { id:'as-workflows-trigger', label:'Trigger' },
+    { id:'as-workflows', label:'Workflows', desc:'Automated sequences triggered by events or schedules', children:[
+      { id:'as-workflows-view',    label:'View',    desc:'See workflow definitions and execution history' },
+      { id:'as-workflows-create',  label:'Create',  desc:'Build new automated workflows' },
+      { id:'as-workflows-edit',    label:'Edit',    desc:'Update workflow steps, triggers, and conditions' },
+      { id:'as-workflows-delete',  label:'Delete',  desc:'Remove workflows from the workspace' },
+      { id:'as-workflows-trigger', label:'Trigger', desc:'Manually start a workflow run on demand' },
     ]},
-    { id:'as-hitl', label:'Human-in-the-Loop', children:[
-      { id:'as-hitl-view',   label:'View queue' },
-      { id:'as-hitl-review', label:'Review & approve' },
-      { id:'as-hitl-reject', label:'Reject' },
+    { id:'as-hitl', label:'Human-in-the-Loop', desc:'Review queue for agent decisions that require human approval', children:[
+      { id:'as-hitl-view',   label:'View queue',      desc:'See pending agent decisions awaiting human review' },
+      { id:'as-hitl-review', label:'Review & approve', desc:'Evaluate and approve agent outputs before they proceed' },
+      { id:'as-hitl-reject', label:'Reject',           desc:'Block an agent decision and return it for rework' },
     ]},
-    { id:'as-workpacks', label:'Workpacks', children:[
-      { id:'as-workpacks-view',   label:'View' },
-      { id:'as-workpacks-create', label:'Create' },
-      { id:'as-workpacks-edit',   label:'Edit' },
-      { id:'as-workpacks-delete', label:'Delete' },
-    ]},
-  ]},
-  { id:'gov', label:'Governance Studio', children:[
-    { id:'gov-domains',    label:'Domains', children:[
-      { id:'gov-domains-view',   label:'View' },
-      { id:'gov-domains-manage', label:'Manage stewards' },
-      { id:'gov-domains-create', label:'Create' },
-      { id:'gov-domains-edit',   label:'Edit' },
-    ]},
-    { id:'gov-bindings',   label:'Knowledge Bindings', children:[
-      { id:'gov-bindings-view',   label:'View' },
-      { id:'gov-bindings-create', label:'Create' },
-      { id:'gov-bindings-edit',   label:'Edit' },
-      { id:'gov-bindings-delete', label:'Delete' },
-      { id:'gov-bindings-attach', label:'Attach to agent' },
-    ]},
-    { id:'gov-promotions', label:'Promotions', children:[
-      { id:'gov-promotions-view',    label:'View' },
-      { id:'gov-promotions-propose', label:'Propose' },
-      { id:'gov-promotions-approve', label:'Approve / attest' },
-      { id:'gov-promotions-publish', label:'Publish to Truth' },
-    ]},
-    { id:'gov-resolution', label:'Resolution Requests', children:[
-      { id:'gov-resolution-view',   label:'View' },
-      { id:'gov-resolution-create', label:'Create request' },
-      { id:'gov-resolution-invite', label:'Invite responders' },
-      { id:'gov-resolution-close',  label:'Close request' },
-    ]},
-    { id:'gov-gating', label:'Action Gating', children:[
-      { id:'gov-gating-view',  label:'View gates' },
-      { id:'gov-gating-edit',  label:'Edit rules' },
-      { id:'gov-gating-audit', label:'View gate log' },
+    { id:'as-workpacks', label:'Workpacks', desc:'Packaged configurations for deploying worker groups', children:[
+      { id:'as-workpacks-view',   label:'View',   desc:'Browse available workpacks and their contents' },
+      { id:'as-workpacks-create', label:'Create', desc:'Package worker configurations into reusable workpacks' },
+      { id:'as-workpacks-edit',   label:'Edit',   desc:'Update workpack contents and metadata' },
+      { id:'as-workpacks-delete', label:'Delete', desc:'Remove workpacks from the workspace' },
     ]},
   ]},
-  { id:'helix', label:'Helix Data Studio', children:[
-    { id:'helix-sources',   label:'Data Sources', children:[
-      { id:'helix-sources-view',        label:'View' },
-      { id:'helix-sources-connect',     label:'Connect source' },
-      { id:'helix-sources-configure',   label:'Configure' },
-      { id:'helix-sources-disconnect',  label:'Disconnect' },
+  { id:'gov', label:'Governance Studio', desc:'Manage data governance, policies, and knowledge integrity', children:[
+    { id:'gov-domains',    label:'Domains', desc:'Subject areas that group and classify data assets', children:[
+      { id:'gov-domains-view',   label:'View',            desc:'Browse domain definitions and their assigned stewards' },
+      { id:'gov-domains-manage', label:'Manage stewards', desc:'Assign and remove subject-matter stewards for a domain' },
+      { id:'gov-domains-create', label:'Create',          desc:'Define a new governance domain' },
+      { id:'gov-domains-edit',   label:'Edit',            desc:'Update domain name, description, and scope' },
     ]},
-    { id:'helix-models',    label:'Entity Models', children:[
-      { id:'helix-models-view',   label:'View' },
-      { id:'helix-models-create', label:'Create model' },
-      { id:'helix-models-edit',   label:'Edit model' },
-      { id:'helix-models-delete', label:'Delete model' },
-      { id:'helix-models-export', label:'Export' },
+    { id:'gov-bindings',   label:'Knowledge Bindings', desc:'Links between verified data context and AI agents', children:[
+      { id:'gov-bindings-view',   label:'View',          desc:'See all active bindings and their target agents' },
+      { id:'gov-bindings-create', label:'Create',        desc:'Create a new binding between a data source and an agent' },
+      { id:'gov-bindings-edit',   label:'Edit',          desc:'Update binding scope, filters, and priority' },
+      { id:'gov-bindings-delete', label:'Delete',        desc:'Permanently remove a knowledge binding' },
+      { id:'gov-bindings-attach', label:'Attach to agent', desc:'Link an existing binding to a specific AI worker' },
     ]},
-    { id:'helix-pipelines', label:'Pipelines', children:[
-      { id:'helix-pipelines-view',   label:'View' },
-      { id:'helix-pipelines-create', label:'Create' },
-      { id:'helix-pipelines-edit',   label:'Edit' },
-      { id:'helix-pipelines-run',    label:'Run' },
-      { id:'helix-pipelines-delete', label:'Delete' },
+    { id:'gov-promotions', label:'Promotions', desc:'Move content from Sandbox to the verified Truth plane', children:[
+      { id:'gov-promotions-view',    label:'View',             desc:'See promotion requests and their current status' },
+      { id:'gov-promotions-propose', label:'Propose',          desc:'Submit content for review and promotion to Truth' },
+      { id:'gov-promotions-approve', label:'Approve / attest', desc:'Review and sign off on a promotion request' },
+      { id:'gov-promotions-publish', label:'Publish to Truth', desc:'Finalize the promotion and publish to the verified plane' },
     ]},
-    { id:'helix-lineage',   label:'Lineage', children:[
-      { id:'helix-lineage-view',   label:'View lineage' },
-      { id:'helix-lineage-export', label:'Export' },
+    { id:'gov-resolution', label:'Resolution Requests', desc:'Open discussions to resolve data conflicts or ambiguities', children:[
+      { id:'gov-resolution-view',   label:'View',             desc:'See open and resolved conflict requests' },
+      { id:'gov-resolution-create', label:'Create request',   desc:'Open a new request to resolve a data conflict' },
+      { id:'gov-resolution-invite', label:'Invite responders', desc:'Add stakeholders to weigh in on a resolution' },
+      { id:'gov-resolution-close',  label:'Close request',    desc:'Mark a resolution request as complete' },
     ]},
-    { id:'helix-changelog', label:'Changelog', children:[
-      { id:'helix-changelog-view', label:'View changelog' },
-      { id:'helix-changelog-pin',  label:'Pin decisions' },
+    { id:'gov-gating', label:'Action Gating', desc:'Rules that require approval before specific agent actions run', children:[
+      { id:'gov-gating-view',  label:'View gates',   desc:'See all defined gates and the actions they protect' },
+      { id:'gov-gating-edit',  label:'Edit rules',   desc:'Configure gate conditions and required approvers' },
+      { id:'gov-gating-audit', label:'View gate log', desc:'Review the full history of gate decisions and overrides' },
     ]},
   ]},
-  { id:'platform', label:'Platform', children:[
-    { id:'plt-people',  label:'Users & Roles', children:[
-      { id:'plt-people-view',   label:'View members' },
-      { id:'plt-people-invite', label:'Invite members' },
-      { id:'plt-people-remove', label:'Remove members' },
-      { id:'plt-people-roles',  label:'Manage roles' },
+  { id:'helix', label:'Helix Data Studio', desc:'Connect data sources, model entities, and run pipelines', children:[
+    { id:'helix-sources',   label:'Data Sources', desc:'External systems connected as data inputs to the workspace', children:[
+      { id:'helix-sources-view',       label:'View',           desc:'Browse connected sources and their sync status' },
+      { id:'helix-sources-connect',    label:'Connect source', desc:'Add a new external data source to the workspace' },
+      { id:'helix-sources-configure',  label:'Configure',      desc:'Set sync frequency, filters, and field mappings' },
+      { id:'helix-sources-disconnect', label:'Disconnect',     desc:'Remove a source connection from the workspace' },
     ]},
-    { id:'plt-billing', label:'Billing', children:[
-      { id:'plt-billing-view',   label:'View billing' },
-      { id:'plt-billing-manage', label:'Manage subscription' },
+    { id:'helix-models',    label:'Entity Models', desc:'Structured definitions of business entities and their attributes', children:[
+      { id:'helix-models-view',   label:'View',         desc:'Browse models, their fields, and relationships' },
+      { id:'helix-models-create', label:'Create model', desc:'Define a new business entity and its schema' },
+      { id:'helix-models-edit',   label:'Edit model',   desc:'Modify fields, types, and relationships of a model' },
+      { id:'helix-models-delete', label:'Delete model', desc:'Remove an entity model from the workspace' },
+      { id:'helix-models-export', label:'Export',       desc:'Download model definitions as schema or documentation' },
     ]},
-    { id:'plt-audit',   label:'Audit Log', children:[
-      { id:'plt-audit-view',   label:'View log' },
-      { id:'plt-audit-export', label:'Export log' },
+    { id:'helix-pipelines', label:'Pipelines', desc:'Automated flows that move and transform data between systems', children:[
+      { id:'helix-pipelines-view',   label:'View',   desc:'Browse pipeline definitions and run history' },
+      { id:'helix-pipelines-create', label:'Create', desc:'Build a new data transformation pipeline' },
+      { id:'helix-pipelines-edit',   label:'Edit',   desc:'Modify pipeline steps, mappings, and triggers' },
+      { id:'helix-pipelines-run',    label:'Run',    desc:'Execute a pipeline run on demand' },
+      { id:'helix-pipelines-delete', label:'Delete', desc:'Remove a pipeline from the workspace' },
     ]},
-    { id:'plt-org',     label:'Organization', children:[
-      { id:'plt-org-view', label:'View' },
-      { id:'plt-org-edit', label:'Edit settings' },
+    { id:'helix-lineage',   label:'Lineage', desc:'Visual trace of where data originates and how it transforms', children:[
+      { id:'helix-lineage-view',   label:'View lineage', desc:'Trace data flow from source to destination visually' },
+      { id:'helix-lineage-export', label:'Export',       desc:'Download the lineage graph as a file or report' },
+    ]},
+    { id:'helix-changelog', label:'Changelog', desc:'Audit history of model and pipeline changes with decision pins', children:[
+      { id:'helix-changelog-view', label:'View changelog', desc:'See the full history of model and pipeline changes' },
+      { id:'helix-changelog-pin',  label:'Pin decisions',  desc:'Mark important changelog entries as key decisions' },
+    ]},
+  ]},
+  { id:'platform', label:'Platform', desc:'Manage workspace members, billing, and organization settings', children:[
+    { id:'plt-people',  label:'Users & Roles', desc:'Workspace membership, invitations, and access control', children:[
+      { id:'plt-people-view',   label:'View members',   desc:'See all workspace members and their assigned roles' },
+      { id:'plt-people-invite', label:'Invite members', desc:'Send invitations to add people to the workspace' },
+      { id:'plt-people-remove', label:'Remove members', desc:'Revoke a member\'s access and remove them from the workspace' },
+      { id:'plt-people-roles',  label:'Manage roles',   desc:'Create, edit, and assign permission roles to members' },
+    ]},
+    { id:'plt-billing', label:'Billing', desc:'Subscription plans, invoices, and payment methods', children:[
+      { id:'plt-billing-view',   label:'View billing',       desc:'See invoices, usage summary, and current plan details' },
+      { id:'plt-billing-manage', label:'Manage subscription', desc:'Upgrade, downgrade, or cancel the workspace plan' },
+    ]},
+    { id:'plt-audit',   label:'Audit Log', desc:'Full record of all workspace actions and security events', children:[
+      { id:'plt-audit-view',   label:'View log',   desc:'Browse the full history of workspace events by user and date' },
+      { id:'plt-audit-export', label:'Export log', desc:'Download audit log entries as CSV or JSON' },
+    ]},
+    { id:'plt-org',     label:'Organization', desc:'Workspace name, logo, and general configuration', children:[
+      { id:'plt-org-view', label:'View',          desc:'See workspace name, logo, and configuration details' },
+      { id:'plt-org-edit', label:'Edit settings', desc:'Update workspace name, logo, and general preferences' },
     ]},
   ]},
 ];
@@ -10782,6 +10782,7 @@ function _ppRenderLevel() {
       ${iconHtml}
       <div style="flex:1;min-width:0">
         <div style="font-size:${isTopLevel?'13.5px':'13px'};font-weight:${hasChildren?'600':'500'};color:var(--t1);line-height:1.3">${escapeHtml(n.label)}</div>
+        ${n.desc ? `<div style="font-size:11.5px;color:var(--t3);margin-top:2px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(n.desc)}</div>` : ''}
         ${badge}
       </div>
       ${levelSelect}
