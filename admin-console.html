@@ -11014,6 +11014,8 @@ function renderMemberDetail(personId) {
         <div style="font-size:13px;color:var(--t3)">${escapeHtml(p.role)}</div>
       </div>
       <span style="margin-left:6px">${_wsRoleChipHTML(personId)}</span>
+      <div style="flex:1"></div>
+      ${personId !== 'tg' ? `<button onclick="removeFromWorkspaceDirect('${personId}')" style="height:32px;padding:0 14px;border-radius:var(--r8);background:transparent;border:1px solid rgba(239,68,68,.3);color:#ef4444;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s" onmouseenter="this.style.background='rgba(239,68,68,.08)';this.style.borderColor='rgba(239,68,68,.5)'" onmouseleave="this.style.background='transparent';this.style.borderColor='rgba(239,68,68,.3)'">Remove from workspace</button>` : ''}
     </div>
   </div>
   <div class="sm-tabs">${tabNav('overview','Overview')}${tabNav('roles','Roles')}${tabNav('permissions','Permissions')}</div>
@@ -11322,6 +11324,42 @@ function revokeInvite(email) {
   toast(`Invitation revoked for ${email}`, 'success');
 }
 
+function removeFromWorkspaceDirect(personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId);
+  if (!p) return;
+  if (!confirm(`Remove ${p.name} from this workspace?\n\nThey will lose all studio access immediately. This cannot be undone.`)) return;
+  const idx = MOCK_PEOPLE.findIndex(x => x.id === personId);
+  if (idx !== -1) MOCK_PEOPLE.splice(idx, 1);
+  delete WORKSPACE_ROLES[personId];
+  delete STUDIO_MEMBERSHIPS[personId];
+  PA_ROLES.forEach(r => {
+    if (r.memberIds) r.memberIds = r.memberIds.filter(id => id !== personId);
+  });
+  navigate('#/people');
+  toast(`${p.name} has been removed from the workspace.`, 'success');
+}
+
+function removeFromWorkspace() {
+  const personId = _paDrawerState.personId;
+  const p = MOCK_PEOPLE.find(x => x.id === personId);
+  if (!p) return;
+  if (personId === 'tg') {
+    toast('You cannot remove the Super Admin from the workspace.', 'error');
+    return;
+  }
+  if (!confirm(`Remove ${p.name} from this workspace?\n\nThey will lose all studio access immediately. This cannot be undone.`)) return;
+  const idx = MOCK_PEOPLE.findIndex(x => x.id === personId);
+  if (idx !== -1) MOCK_PEOPLE.splice(idx, 1);
+  delete WORKSPACE_ROLES[personId];
+  delete STUDIO_MEMBERSHIPS[personId];
+  PA_ROLES.forEach(r => {
+    if (r.memberIds) r.memberIds = r.memberIds.filter(id => id !== personId);
+  });
+  closePeopleDrawer();
+  renderPeopleAccess();
+  toast(`${p.name} has been removed from the workspace.`, 'success');
+}
+
 function ensurePaDrawer() {
   if (document.getElementById('paDrawerOverlay')) return;
   const wrap = document.createElement('div');
@@ -11413,7 +11451,7 @@ function _paintPeopleDrawer() {
         <button class="pa-drawer-action-btn" onclick="toast('Edit access — coming in Phase 3','info'); closePeopleDrawer()">
           Edit studio access
         </button>
-        <button class="pa-drawer-action-btn danger" onclick="toast('Remove from workspace — coming in Phase 3','info'); closePeopleDrawer()">
+        <button class="pa-drawer-action-btn danger" onclick="removeFromWorkspace()">
           Remove from workspace
         </button>
       </div>
