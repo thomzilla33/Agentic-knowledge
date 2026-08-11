@@ -10962,7 +10962,10 @@ function renderMemberDetail(personId) {
         </div>
       </div>
       <div class="sm-section">
-        <div class="sm-section-title">Studio access</div>
+        <div class="sm-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Studio access</span>
+          ${personId !== 'tg' ? `<button onclick="openEditStudioModal('${personId}')" style="height:28px;padding:0 12px;border-radius:var(--r6);background:transparent;border:1px solid var(--border);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;transition:background .12s,border-color .12s" onmouseenter="this.style.background='var(--hover)';this.style.borderColor='var(--border2)'" onmouseleave="this.style.background='transparent';this.style.borderColor='var(--border)'">Edit</button>` : ''}
+        </div>
         <div class="ms-card">${studioRows}</div>
       </div>`;
   } else if (tab === 'roles') {
@@ -11332,6 +11335,91 @@ function revokeInvite(email) {
   if (idx !== -1) PENDING_INVITES.splice(idx, 1);
   renderPeopleTable();
   toast(`Invitation revoked for ${email}`, 'success');
+}
+
+function ensureEditStudioModal() {
+  if (document.getElementById('edit-studio-modal')) return;
+  const el = document.createElement('div');
+  el.id = 'edit-studio-modal';
+  el.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);align-items:center;justify-content:center';
+  el.innerHTML = `
+    <div style="background:var(--surface,#1a1f2e);border:1px solid var(--border);border-radius:var(--r12,12px);width:440px;max-width:calc(100vw - 32px);box-shadow:0 16px 48px rgba(0,0,0,.4)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0">
+        <div style="font-size:15px;font-weight:600;color:var(--t1)">Edit studio access</div>
+        <button onclick="closeEditStudioModal()" style="width:28px;height:28px;border-radius:6px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3)" onmouseenter="this.style.background='var(--hover)'" onmouseleave="this.style.background='transparent'">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div style="padding:16px 20px 0;color:var(--t3);font-size:12.5px">Toggle access per studio and assign a role.</div>
+      <div id="edit-studio-rows" style="padding:16px 20px;display:flex;flex-direction:column;gap:12px"></div>
+      <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
+        <button onclick="closeEditStudioModal()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:transparent;border:1px solid var(--border);color:var(--t2);font-size:13px;font-weight:500;cursor:pointer">Cancel</button>
+        <button id="edit-studio-save" onclick="submitEditStudio()" style="height:34px;padding:0 16px;border-radius:var(--r8);background:var(--pri);border:none;color:#fff;font-size:13px;font-weight:500;cursor:pointer">Save changes</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click', e => { if (e.target === el) closeEditStudioModal(); });
+}
+
+function openEditStudioModal(personId) {
+  ensureEditStudioModal();
+  const modal = document.getElementById('edit-studio-modal');
+  modal.dataset.personId = personId;
+  const current = STUDIO_MEMBERSHIPS[personId] || {};
+  const rowsEl = document.getElementById('edit-studio-rows');
+  rowsEl.innerHTML = Object.entries(PA_STUDIO_META).map(([sid, meta]) => {
+    const active = sid in current;
+    const currentRole = current[sid] || PA_STUDIO_ROLES[sid][0];
+    const roleOptions = PA_STUDIO_ROLES[sid].map(r =>
+      `<option value="${r}"${r === currentRole ? ' selected' : ''}>${r}</option>`
+    ).join('');
+    return `
+      <div style="border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px;background:var(--canvas)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1">
+            <input type="checkbox" id="esa-toggle-${sid}" ${active ? 'checked' : ''} onchange="esaToggle('${sid}')"
+              style="width:16px;height:16px;accent-color:var(--pri);cursor:pointer;flex-shrink:0">
+            <span style="font-size:13.5px;font-weight:500;color:var(--t1)">${meta.label} Studio</span>
+          </label>
+          <span class="pa-studio-chip ${meta.cls}" style="font-size:11px">${meta.label}</span>
+        </div>
+        <div id="esa-role-wrap-${sid}" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);${active ? '' : 'display:none'}">
+          <label style="font-size:12px;color:var(--t3);display:block;margin-bottom:6px">Role</label>
+          <select id="esa-role-${sid}" style="width:100%;height:32px;border-radius:var(--r6);border:1px solid var(--border);background:var(--surface);color:var(--t1);font-size:13px;padding:0 8px;cursor:pointer">
+            ${roleOptions}
+          </select>
+        </div>
+      </div>`;
+  }).join('');
+  modal.style.display = 'flex';
+}
+
+function esaToggle(sid) {
+  const cb = document.getElementById(`esa-toggle-${sid}`);
+  const wrap = document.getElementById(`esa-role-wrap-${sid}`);
+  wrap.style.display = cb.checked ? '' : 'none';
+}
+
+function closeEditStudioModal() {
+  const modal = document.getElementById('edit-studio-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function submitEditStudio() {
+  const modal = document.getElementById('edit-studio-modal');
+  const personId = modal.dataset.personId;
+  const updated = {};
+  Object.keys(PA_STUDIO_META).forEach(sid => {
+    const cb = document.getElementById(`esa-toggle-${sid}`);
+    if (cb && cb.checked) {
+      const sel = document.getElementById(`esa-role-${sid}`);
+      updated[sid] = sel ? sel.value : PA_STUDIO_ROLES[sid][0];
+    }
+  });
+  STUDIO_MEMBERSHIPS[personId] = updated;
+  closeEditStudioModal();
+  renderMemberDetail(personId);
+  toast('Studio access updated.', 'success');
 }
 
 function removeFromWorkspaceDirect(personId) {
