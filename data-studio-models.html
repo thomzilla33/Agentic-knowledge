@@ -1086,7 +1086,7 @@ html.theme-light .tb-search kbd{background:rgba(15,23,42,0.05)}
 .btn-primary:hover{background:var(--btn-primary-hover-bg)}
 .btn:disabled, .btn[disabled]{opacity:.45; cursor:not-allowed; pointer-events:none; box-shadow:none}
 
-/* ── DS FILTERS COMPONENT (.dsf-*) — from admin-console.html ── */
+/* ── DS FILTERS COMPONENT (.dsf-*) — from settings.html ── */
 .dsf-bar{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:16px}
 .dsf-left{display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1 1 auto; min-width:0}
 .dsf-search{display:flex; align-items:center; gap:8px; height:40px; padding:0 12px; min-width:240px; max-width:360px; flex:1 1 240px;
@@ -2453,7 +2453,7 @@ html.theme-light .tb-tip{background:#fff}
 .ttd-bulk-a{border:none; background:none; color:var(--t2); font-size:12px; font-weight:600; cursor:pointer}
 .ttd-bulk-a:hover{color:var(--t1)}
 .ttd-bulk-a.danger{color:var(--field-text-error,#dc2626)}
-.ttd-table{border:1px solid var(--card-border); border-radius:12px; overflow:hidden; background:var(--card-bg)}
+.ttd-table{border:1px solid var(--card-border); border-radius:12px; overflow-x:auto; background:var(--card-bg)}
 .ttd-thead{display:grid; align-items:center; gap:12px; padding:0 14px; height:52px; border-bottom:1px solid var(--card-border); background:var(--muted)}
 .ttd-th{display:flex; align-items:center; gap:6px; border:none; background:none; cursor:pointer; padding:0; font-family:inherit; text-align:left; color:var(--t2)}
 .ttd-th:hover{color:var(--t1)}
@@ -2852,7 +2852,7 @@ html:not(.theme-light) .mdw-seg.on{background:var(--surface-raised,#131C2E)}
   <span class="vtoggle-lbl">Scope</span>
   <div class="vtoggle-seg">
     <button id="scope-v1" class="on" onclick="setScope('v1')">V1</button>
-    <button id="scope-v1.5" onclick="setScope('v1.5')">V1.5</button>
+    <button id="scope-v1.5" onclick="setScope('v1.5')">V1.2</button>
     <button id="scope-v2" onclick="setScope('v2')">Full vision</button>
   </div>
   <button class="vtoggle-cl" onclick="showScopeChangelog()" title="Scope changelog — what each tier ships" aria-label="Scope changelog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5h7M5.5 8h7M5.5 12.5h4"/><circle cx="2.7" cy="3.5" r="1"/><circle cx="2.7" cy="8" r="1"/><circle cx="2.7" cy="12.5" r="1"/></svg></button>
@@ -2888,47 +2888,37 @@ html:not(.theme-light) .mdw-seg.on{background:var(--surface-raised,#131C2E)}
 </style>
 <script>
 window.SCOPE_CHANGELOG=[
- {tier:'v1',name:'V1 · Foundation',sub:'Browse &amp; understand the model',target:'This sprint',
+ {tier:'v1',name:'V1 · Foundation',sub:'Browse &amp; author the model',target:'This sprint',
   nw:[
-    'Four lists — Models · Entities · Tables · Reference Data (list / grid / table · filters · sort · pagination)',
-    'Entity detail (read-only) — Overview · Tables · Relationships',
-    'Table detail (read-only) — Overview · Columns · Data · Relationships',
-    'Reference detail (read-only) — Overview · Data · Referenced-by · Columns',
-    'Model detail — browse entities / tables / components',
-    'Column display — data type · enum · default · sensitivity · system/audit fields',
-    'Relationships — logical (Entity↔Entity) + physical (Table↔Table) + diagram',
-    'Slide-out previews · empty &amp; zero-result states'
+    'Four lists — Models · Entities · Tables · Reference Data (search · filters · pagination)',
+    'Card click → full detail page (read-only; Overview = basic info block)',
+    'Entity detail — Tables · Relationships',
+    'Table &amp; Reference detail — Columns · Relationships · Data',
+    'Model detail — Entities · Tables'
   ],
   up:[],
-  rm:['All authoring, governance &amp; advanced surfaces — deferred to V1.5 / Full vision']},
- {tier:'v1.5',name:'V1.5 · Expansion',sub:'Author &amp; govern',target:'Next sprint',
+  rm:['V1 is read-only browse — ALL editing moves to V1.2: the New button (create from scratch) · side panels (detail views · relationship form · filters · quick-preview) · create / edit / delete dialogs (columns · rows · relationships · reference items · indexes)','Publish / versioning · Marketplace · Create-with-AI · diagrams — later']},
+ {tier:'v1.5',name:'V1.2 · Expansion',sub:'Govern',target:'Next sprint',
   nw:[
-    'Create / publish — New model · entity · table · reference (minimum-creation rules)',
-    'Privileges — module capability · standard per-entity · custom · Manage roles',
-    'History &amp; audit — version history + rollback',
-    'Table Indexes (author) · Reference Settings (external sync + manual override)',
-    'Column editors — enum values · typed default values · sensitivity',
-    'Reference item import / export',
-    'Edit / deprecate / delete · create-time validation (naming · uniqueness · obligation)'
+    'Publish / save-to-version (edit → draft is V1; publish lands here)',
+    'Privileges tab — view-only standard privileges (system-generated)',
+    'API contracts — the 5 default virtual endpoints: enable / disable + description only',
+    'Side panels (slide-outs) — column · row · relationship detail views · entity-relationship form · per-column & saved filters · quick-preview panels',
+    'Editing dialogs — create / edit / delete columns · rows · relationships · reference items · indexes',
+    'Create from scratch — the New button: New model · entity · table · reference (no "Stewards")'
   ],
-  up:[
-    'Detail views gain authoring tabs — Privileges · History · Indexes · Settings',
-    'Publish shows a classified change list (additive / breaking / migrating)'
-  ],
-  rm:['API builder · AI modeling · association · catalog install · impact/migration — Full vision']},
- {tier:'v2',name:'Full vision',sub:'The complete experience',target:'Q4 2026',
+  up:['Entity detail gains Privileges + API tabs','All editing unlocks — the New button, side panels AND create/edit/delete dialogs (V1 is read-only browse)'],
+  rm:['Custom endpoints · custom privileges · API request/response customization — Full vision']},
+ {tier:'v2',name:'Full vision',sub:'The complete experience',target:'Later',
   nw:[
-    'API contract — two-pane builder (5 defaults + custom variants · access control · request/response · predefined filters · related entities · OpenAPI) — built',
+    'API contract two-pane builder — custom endpoints · request/response customization · predefined filters · OpenAPI',
+    'Marketplace — catalog Profile · Implement vs Clone install',
     'AI-assisted (ORI) modeling — describe → suggested entities / tables / columns / relationships',
-    'Standalone state &amp; association — Promote · Demote · Detach · associate into a model',
-    'Pre-built element catalog — Implement vs Clone install with preview &amp; conflict handling',
-    'Impact analysis + migration plan on publish',
-    'Cross-model relationships',
-    'Saved filter sets · bulk actions',
-    'Handoff to Admin Studio'
+    'Diagrams (relationships) · rich SlideOut previews',
+    'Custom privileges (tied to custom endpoints) · Reference-usage ("referenced by") · Indexes · Settings · History (generic screen)'
   ],
   up:['Every tab &amp; action unlocked'],
-  rm:['Nothing cut here. Deferred (no tier): sandbox &amp; release bundles · real persistence · physical migration execution']}
+  rm:['—']}
 ];
 window.showScopeChangelog=function(){
   var cur=(typeof SCOPE!=='undefined')?SCOPE:'v1';
@@ -3003,7 +2993,7 @@ const ENTITIES = [
     desc:'The cost-center hierarchy used to allocate journal lines and drive management reporting.',
     tables:[{id:'cost_center',alias:'Cost center',role:'Primary',cols:9,rows:'1.4K'}],
     rels:[{t:'Journal Entry',k:'one-to-many',s:false}], cperms:[], cprivs:[], ceps:[] },
-  { id:'product', name:'Product', model:'inventory_stock', domain:'Internal', status:'Pending changes', updated:'5h ago', owner:'dn', collab:['mr','sm'], external:1, records:'62K', tags:['ops','catalog'],
+  { id:'product', name:'Product', model:'inventory_stock', domain:'Internal', status:'Draft', updated:'5h ago', owner:'dn', collab:['mr','sm'], external:1, records:'62K', tags:['ops','catalog'],
     desc:'The product / SKU catalog with variants, pricing and reorder thresholds. Pending changes awaiting review.',
     tables:[{id:'product',alias:'Product',role:'Primary',cols:20,rows:'62K'},{id:'product_variant',alias:'Product variant',role:'Secondary',cols:10,rows:'240K'}],
     rels:[{t:'Warehouse',k:'many-to-many',s:false}], cperms:[{n:'Edit price',c:'Data'}], cprivs:[{n:'Catalog manager',p:[['Edit price','data'],['Update','']]}], ceps:[] },
@@ -3029,7 +3019,9 @@ const ENTITIES = [
     rels:[{t:'Account',k:'many-to-one',s:false}], cperms:[], cprivs:[], ceps:[] },
 ];
 
-const listState = { search:'', model:'all', domain:'all', status:'all', owner:'all', view:'list' };
+const listState = { search:'', model:'all', domain:'all', status:'all', owner:'all', view:'list', page:1, perPage:9 };
+function eListPage(p){ listState.page=p; renderEntities(); }
+function eListPer(n){ listState.perPage=+n; listState.page=1; renderEntities(); }
 let _dsfOpen = null;
 
 /* ── DS Filters component helpers ── */
@@ -3048,11 +3040,11 @@ function dsfDrop(id, placeholder, chip, options){
     <div class="dsf-menu" role="listbox">${options.map(o=>`<button class="dsf-menu-item ${o.selected?'is-sel':''}" type="button" onclick="event.stopPropagation();${o.onclick}"><span class="dsf-menu-check">${o.selected?_CHECK:''}</span><span class="dsf-menu-lbl">${escapeHtml(o.label)}</span>${o.count!=null?`<span class="dsf-menu-count">${o.count}</span>`:''}</button>`).join('')}</div>
   </div>`;
 }
-function setSearch(v){ listState.search=v; renderEntities(); setTimeout(()=>{const el=$('entSearch'); if(el){el.focus(); el.setSelectionRange(v.length,v.length);}},0); }
-function eSet(k,v){ listState[k]=v; renderEntities(); }
+function setSearch(v){ listState.search=v; listState.page=1; renderEntities(); setTimeout(()=>{const el=$('entSearch'); if(el){el.focus(); el.setSelectionRange(v.length,v.length);}},0); }
+function eSet(k,v){ listState[k]=v; if(k!=='page') listState.page=1; renderEntities(); }
 function _saveView(s,v){ try{ localStorage.setItem('dsm-view-'+s, v); }catch(e){} }
 function eView(v){ listState.view=v; _saveView('entities',v); renderEntities(); }
-function clearFilters(){ listState.model='all'; listState.domain='all'; listState.status='all'; listState.owner='all'; listState.tags=[]; renderEntities(); }
+function clearFilters(){ listState.model='all'; listState.domain='all'; listState.status='all'; listState.owner='all'; listState.tags=[]; listState.page=1; renderEntities(); }
 document.addEventListener('click', e=>{ if(_dsfOpen && !e.target.closest('.dsf-drop')){ _dsfOpen=null; _dsfRerender(); } });
 
 /* ── DS Pagination component (port of design-system/pagination.tsx) ── */
@@ -3111,19 +3103,23 @@ function renderEntities(){
   const stc=listState.status!=='all'?{label:listState.status,onremove:"eSet('status','all')"}:null;
   const oc=listState.owner!=='all'?{label:P(listState.owner).n,onremove:"eSet('owner','all')"}:null;
   const filtering=listState.model!=='all'||listState.domain!=='all'||listState.status!=='all'||listState.owner!=='all';
+  const _per=listState.perPage, _total=filtered.length, _pages=Math.max(1,Math.ceil(_total/_per));
+  const _page=Math.min(Math.max(1,listState.page),_pages);
+  const _vis=filtered.slice((_page-1)*_per,(_page-1)*_per+_per);
+  const _lpgn=_pagination({per:_per,total:_total,page:_page,opts:[9,25,50],id:'ent-lpgn',pageCall:p=>`eListPage(${p})`,perCall:n=>`eListPer(${n})`});
   $('content').innerHTML = pageShell('entities') + `
     <div class="tbar">
       <label class="dsf-search"><svg class="dsf-search-ic" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M11 11l3 3"/></svg><input id="entSearch" type="text" placeholder="Search entities…" value="${escapeHtml(listState.search)}" oninput="setSearch(this.value)" autocomplete="off"/></label>
       ${dsfDrop('fModel','Model', mc, [{label:'All models',selected:listState.model==='all',onclick:"dsfPickSingle();eSet('model','all')"}].concat(models.map(m=>({label:(_model(m)||{name:m}).name,count:ENTITIES.filter(e=>e.model===m).length,selected:listState.model===m,onclick:`dsfPickSingle();eSet('model','${m}')`}))))}
       ${dsfDrop('fDomain','Domain', dc, [{label:'All domains',selected:listState.domain==='all',onclick:"dsfPickSingle();eSet('domain','all')"}].concat(domains.map(d=>({label:d,count:ENTITIES.filter(e=>e.domain===d).length,selected:listState.domain===d,onclick:`dsfPickSingle();eSet('domain','${d}')`}))))}
-      ${dsfDrop('fStatus','Status', stc, [{label:'All statuses',selected:listState.status==='all',onclick:"dsfPickSingle();eSet('status','all')"}].concat(['Published','Draft','Pending changes','Deprecated'].map(s=>({label:s,selected:listState.status===s,onclick:`dsfPickSingle();eSet('status','${s}')`}))))}
+      ${dsfDrop('fStatus','Status', stc, [{label:'All statuses',selected:listState.status==='all',onclick:"dsfPickSingle();eSet('status','all')"}].concat(['Published','Draft','Deprecated'].map(s=>({label:s,selected:listState.status===s,onclick:`dsfPickSingle();eSet('status','${s}')`}))))}
       ${dsfDrop('fOwner','Owner', oc, [{label:'All owners',selected:listState.owner==='all',onclick:"dsfPickSingle();eSet('owner','all')"}].concat(owners.map(o=>({label:P(o).n,selected:listState.owner===o,onclick:`dsfPickSingle();eSet('owner','${o}')`}))))}
       <button class="flt-btn" onclick="openFilters('entities')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg> Filters${_fltCount('entities')?` <span class="flt-badge">${_fltCount('entities')}</span>`:''}</button>
       ${filtering ? `<button class="dsf-clear" onclick="clearFilters()">Clear</button>` : ''}
       <span class="tbar-spring"></span>
       ${viewToggle(listState,'eView')}
     </div>
-    ${listState.view==='table' ? dtblView('entities',filtered,_entCols(),'entities') : filtered.length===0 ? `<div class="empty"><div class="empty-t">No entities match</div>Try a different search or clear the filters.</div>` : listState.view==='grid' ? `<div class="mcard-grid">${filtered.map(entityCard).join('')}</div>` : `<div class="lrows">${filtered.map(entityRow).join('')}</div>`}
+    ${listState.view==='table' ? dtblView('entities',filtered,_entCols(),'entities') : filtered.length===0 ? `<div class="empty"><div class="empty-t">No entities match</div>Try a different search or clear the filters.</div>` : listState.view==='grid' ? `<div class="mcard-grid">${_vis.map(entityCard).join('')}</div>`+_lpgn : `<div class="lrows">${_vis.map(entityRow).join('')}</div>`+_lpgn}
     ${vcallout('v2','Models &amp; Marketplace — group entities and tables into publishable models, browse pre-built marketplace models, and generate entities with AI.')}
   `;
 }
@@ -3174,8 +3170,7 @@ function openPreview(id){ navigate('entities/'+id); return;
       <button class="btn" onclick="closeSlideout()">Close</button>
       <button class="btn btn-primary" onclick="closeSlideout();navigate('entities/${e.id}')">Open entity →</button>
     </div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false');
-  $('scrim').classList.add('open');
+  _soOpen();
 }
 let _soClearTimer;
 function closeSlideout(){ const so=$('slideout'); so.classList.remove('open'); so.setAttribute('aria-hidden','true'); $('scrim').classList.remove('open');
@@ -3267,8 +3262,7 @@ function entityOverviewTab(e){
       </div>
       <div class="ent-gov-r so-fields">
         <div class="so-field"><span class="so-field-l">Owner</span><span class="so-field-v"><span class="mtbl-inline">${av(own,'sm')}${escapeHtml(own.n)}</span></span></div>
-        <div class="so-field"><span class="so-field-l">Stewards</span><span class="so-field-v"><span class="mtbl-inline">${av(own,'sm')}${escapeHtml(own.n)}</span><span style="color:var(--t3);font-size:12px;margin-left:6px">+1 steward</span></span></div>
-        <div class="so-field"><span class="so-field-l">Category</span><span class="so-field-v">${cat}</span></div>
+                <div class="so-field"><span class="so-field-l">Category</span><span class="so-field-v">${cat}</span></div>
         <div class="so-field"><span class="so-field-l">Domain</span><span class="so-field-v">${escapeHtml(e.domain||'—')}</span></div>
         <div class="so-field"><span class="so-field-l">Sensitivity</span><span class="so-field-v">${_sensDot(sens)}${sens}</span></div>
         <div class="so-field"><span class="so-field-l">Last modified</span><span class="so-field-v">${escapeHtml(own.n)} · ${escapeHtml(e.updated||'—')}</span></div>
@@ -3282,10 +3276,10 @@ function entityOverviewTab(e){
       <div class="ent-er-ctrls"><div class="rel-vw">${seg('columns','Columns')}${seg('keys','Keys')}</div><button class="btn" style="height:32px" onclick="toast('Export — prototype')">${DL} Export</button></div></div>
     ${_erDiagram(nodes, er.edges, er.note)}</div>`;
   return `<div class="dsec ent-ident">${gov}</div>
-    <div class="ov-flabel" style="margin:2px 0 9px">Key metrics</div>
+    <div data-version="v2"><div class="ov-flabel" style="margin:2px 0 9px">Key metrics</div>
     <div class="md-tiles">${tiles.join('')}</div>
     ${internal}
-    ${_ovActivity('entity',e)}
+    ${_ovActivity('entity',e)}</div>
     ${vsoon('v2','AI-assisted (ORI) modeling — describe a change and get suggested tables, columns and relationships.')}
     ${vsoon('v2','Standalone state &amp; association — promote / demote / detach this entity and associate it across models.')}`;
 }
@@ -3363,7 +3357,7 @@ function _etTblCard(e,t){
 }
 function _tableExists(id){ return !!(typeof _table==='function'?_table(id):TABLES.find(t=>t.id===id)); }
 /* ── Relationships tab: Diagram / Cards / Table (port of TfdRelationshipsTab) ── */
-let _relViewMode='diagram';
+let _relViewMode='table';
 function setRelView(kind,id,v){ _relViewMode=v; if(kind==='table') renderTableDetail(id); else if(kind==='entity') renderEntityDetail(id); else renderReferenceDetail(id); }
 function _cardShort(k){ k=(k||'').toLowerCase(); if(k.indexOf('many-to-many')>=0) return 'N:M'; if(k.indexOf('one-to-many')>=0) return '1:N'; if(k.indexOf('many-to-one')>=0) return 'N:1'; if(k.indexOf('one-to-one')>=0) return '1:1'; return (k||'—').toUpperCase(); }
 const _ICO_DIAG='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="4" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6 4h2a2 2 0 0 1 2 2M6 12h2a2 2 0 0 0 2-2"/></svg>';
@@ -3387,17 +3381,20 @@ function _relDiagram(centerLabel, rels){
 }
 function _relView(kind, obj, centerLabel, rels){
   const id=obj.id, v=_relViewMode;
-  const seg=(mode,label,ic)=>`<button class="rel-vw-btn ${v===mode?'on':''}" onclick="setRelView('${kind}','${id}','${mode}')">${ic}<span>${label}</span></button>`;
+  const seg=(mode,label,ic)=>`<button class="rel-vw-btn ${v===mode?'on':''}"${mode==='diagram'?' data-version="v2"':''} onclick="setRelView('${kind}','${id}','${mode}')">${ic}<span>${label}</span></button>`;
   const toolbar=`<div class="ttd-head"><div class="ttd-head-l"><label class="dsf-search" style="max-width:220px;height:34px">${_HIC.search}<input type="text" placeholder="Search relationships…" oninput="toast('Search — prototype')" autocomplete="off"></label></div><div class="ttd-head-r"><div class="rel-vw">${seg('diagram','Diagram',_ICO_DIAG)}${seg('cards','Cards',_ICO_CARDS)}${seg('table','Table',_ICO_TBL2)}</div><button class="btn btn-primary" style="height:34px" onclick="_relAdd('${kind}','${id}')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Add relationship</button></div></div>`;
   let body;
+  // A7: when both directions are present, label an Outgoing and an Incoming (read-only) section.
+  const _grp = rels.some(r=>r.dir==='Incoming') && rels.some(r=>r.dir&&r.dir!=='Incoming');
+  const _rh=(r,i)=> (_grp && (i===0 || r.dir!==rels[i-1].dir)) ? `<div class="rel-sec-h" style="grid-column:1/-1;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t3);padding:${i?'16px 0 8px':'2px 0 8px'}">${r.dir==='Incoming'?'Incoming · edit at source':'Outgoing'}</div>` : '';
   if(!rels.length){ body=`<div class="placeholder" style="padding:38px">No relationships yet. Connect <b>${escapeHtml(centerLabel)}</b> to another ${kind==='reference'?'list':kind} via a foreign key.</div>`; }
   else if(v==='diagram'){ body=_relDiagram(centerLabel, rels); }
-  else if(v==='table'){ const gt='grid-template-columns:minmax(0,1fr) 96px 100px 120px 120px'; body=`<div class="ttd-table"><div class="ttd-thead cv-thead" style="${gt}"><span class="cv-th">Related</span><span class="cv-th">Cardinality</span><span class="cv-th">Strength</span><span class="cv-th">Direction</span><span class="cv-th">On delete</span></div>${rels.map((r,i)=>`<div class="ttd-tr cv-static" style="${gt};cursor:pointer" onclick="_relOpen('${kind}','${id}',${i})"><span class="cv-td"><span class="cv-field-d">${escapeHtml(r.target)}</span>${r.via?`<span class="cv-field-n" style="margin-left:6px">.${escapeHtml(r.via)}</span>`:''}</span><span class="cv-td"><span class="card-badge">${r.cardShort}</span></span><span class="cv-td">${r.strong?'<span class="cv-yes">Strong</span>':'<span class="cv-no">Weak</span>'}</span><span class="cv-td">${escapeHtml(r.dir||'Uni')}</span><span class="cv-td">${escapeHtml(r.del)}</span></div>`).join('')}</div>`; }
-  else { body=`<div class="rfb-list">${rels.map((r,i)=>`<div class="rfb-card" onclick="_relOpen('${kind}','${id}',${i})"><div class="rfb-top"><span class="idx-ic">${_HIC.link}</span><span class="rfb-col">${escapeHtml(centerLabel)}</span>${r.via?`<span class="cv-field-n">.${escapeHtml(r.via)}</span>`:''}${_ARROW}<span class="rfb-col">${escapeHtml(r.target)}</span><span class="card-badge">${r.cardShort}</span><span class="rfb-reqchip ${r.strong?'rfb-req':'rfb-opt'}">${r.strong?'Strong':'Weak'}</span><span style="flex:1"></span><span style="font-size:11px;color:var(--t3)">${escapeHtml(r.dir||'Uni')} · on delete ${escapeHtml(r.del)}</span></div>${r.desc?`<div class="rfb-desc">${escapeHtml(r.desc)}</div>`:''}</div>`).join('')}</div>`; }
+  else if(v==='table'){ const gt='grid-template-columns:minmax(0,1fr) 96px 100px 120px 120px'; body=`<div class="ttd-table"><div class="ttd-thead cv-thead" style="${gt}"><span class="cv-th">Related</span><span class="cv-th">Cardinality</span><span class="cv-th">Strength</span><span class="cv-th">Direction</span><span class="cv-th">On delete</span></div>${rels.map((r,i)=>`${_rh(r,i)}<div class="ttd-tr cv-static" style="${gt};cursor:pointer" onclick="_relOpen('${kind}','${id}',${i})"><span class="cv-td"><span class="cv-field-d">${escapeHtml(r.target)}</span>${r.via?`<span class="cv-field-n" style="margin-left:6px">.${escapeHtml(r.via)}</span>`:''}</span><span class="cv-td"><span class="card-badge">${r.cardShort}</span></span><span class="cv-td">${r.strong?'<span class="cv-yes">Strong</span>':'<span class="cv-no">Weak</span>'}</span><span class="cv-td">${escapeHtml(r.dir||'Uni')}</span><span class="cv-td">${escapeHtml(r.del)}</span></div>`).join('')}</div>`; }
+  else { body=`<div class="rfb-list">${rels.map((r,i)=>`${_rh(r,i)}<div class="rfb-card" onclick="_relOpen('${kind}','${id}',${i})"><div class="rfb-top"><span class="idx-ic">${_HIC.link}</span><span class="rfb-col">${escapeHtml(centerLabel)}</span>${r.via?`<span class="cv-field-n">.${escapeHtml(r.via)}</span>`:''}${_ARROW}<span class="rfb-col">${escapeHtml(r.target)}</span><span class="card-badge">${r.cardShort}</span><span class="rfb-reqchip ${r.strong?'rfb-req':'rfb-opt'}">${r.strong?'Strong':'Weak'}</span><span style="flex:1"></span><span style="font-size:11px;color:var(--t3)">${escapeHtml(r.dir||'Uni')} · on delete ${escapeHtml(r.del)}</span></div>${r.desc?`<div class="rfb-desc">${escapeHtml(r.desc)}</div>`:''}</div>`).join('')}</div>`; }
   return toolbar+body;
 }
 /* ── Entity Relationships tab — rich (diagram + list · scope · incoming · new-rel slideout) ── */
-const _erState={ent:null,search:'',dir:'all',card:'all',scope:'all',view:'diagramlist'};
+const _erState={ent:null,search:'',dir:'all',card:'all',scope:'all',view:'list'};
 const _ERUR='<svg class="erel-ur" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l6-6M6 5h5v5"/></svg>';
 const _ERSWAP='<svg width="15" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h10M10 2l2 2-2 2M14 8H4M6 6l-2 2 2 2"/></svg>';
 function _erReset(id){ if(_erState.ent!==id){ _erState.ent=id; _erState.search=''; _erState.dir='all'; _erState.card='all'; _erState.scope='all'; _erState.view='diagramlist'; } }
@@ -3421,7 +3418,7 @@ function relsTab(e){
   const dc=st.dir!=='all'?{label:st.dir,onremove:"erSet('dir','all')"}:null;
   const cc=st.card!=='all'?{label:st.card,onremove:"erSet('card','all')"}:null;
   const sc=st.scope!=='all'?{label:st.scope==='intra'?'Intra-model':'Cross-model',onremove:"erSet('scope','all')"}:null;
-  const seg=(v,l)=>`<button class="rel-vw-btn ${st.view===v?'on':''}" onclick="erView('${v}')">${l}</button>`;
+  const seg=(v,l)=>`<button class="rel-vw-btn ${st.view===v?'on':''}"${(v==='diagram'||v==='diagramlist')?' data-version="v2"':''} onclick="erView('${v}')">${l}</button>`;
   const toolbar=`<div class="tbar md-tbar">
       <label class="dsf-search">${_MDIC.search}<input id="erSearch" type="text" placeholder="Search related entity or nav name…" value="${escapeHtml(st.search)}" oninput="erSet('search',this.value)" autocomplete="off"></label>
       ${dsfDrop('erDir','Direction',dc,[{label:'All directions',selected:st.dir==='all',onclick:"dsfPickSingle();erSet('dir','all')"}].concat(['Bidirectional','Unidirectional'].map(x=>({label:x,selected:st.dir===x,onclick:`dsfPickSingle();erSet('dir','${x}')`}))))}
@@ -3436,7 +3433,8 @@ function relsTab(e){
   const listCards = rows.length ? rows.map(({r,i})=>_entRelCard(e,r,i)).join('') : `<div class="empty" style="padding:30px"><div class="empty-t">No relationships match</div>Adjust the filters or add a new relationship.</div>`;
   const incBlock = incoming.length ? `<div class="erel-inc-h">Incoming relationships from other entities <span class="erel-inc-c">${incoming.length}</span></div>${incoming.map(x=>_entIncCard(e,x)).join('')}` : '';
   const list=`<div class="erel-list">${listCards}${incBlock}</div>`;
-  let body = st.view==='diagram' ? diagram : st.view==='list' ? list : diagram+list;
+  const vw = SCOPE!=='v2' ? 'list' : st.view; // V1/V1.2: list-mode only — the ER diagram is Full vision
+  let body = vw==='diagram' ? diagram : vw==='list' ? list : diagram+list;
   return toolbar+body+vsoon('v2','Cross-model relationships — link entities across different models (Full vision).');
 }
 function _entRelCard(e,r,idx){
@@ -3489,6 +3487,8 @@ function openEntRelForm(entId, idx){ const e=_entById(entId); if(!e) return; con
 function _erFormSet(k,v){ const d=_erDraft; if(!d) return; d[k]=v;
   if(k==='target'){ const c=_erCandidates(_entById(d.entId)).find(x=>x.name===v); d.scope=c?c.scope:''; }
   if((k==='target'||k==='k')&&!d.navEdited) _erAutoNav(d); _renderEntRelForm(); }
+function _erValidDraft(d){ return !!(d&&d.k&&d.target&&d.target!=='—'&&d.strength&&d.comp&&d.dir&&(d.navChild||'').trim()&&(d.navParent||'').trim()); } // A8: all mandatory (*) fields present
+function _erValidate(){ const b=$('erCreateBtn'); if(b) b.disabled=!_erValidDraft(_erDraft); }
 function _renderEntRelForm(){ const d=_erDraft; if(!d) return; const e=_entById(d.entId); if(!e) return;
   const cands=_erCandidates(e); const cardShort=_cardShort(d.k); const editing=d.idx!=null;
   const cardSeg=[['one-to-one','1:1','One-to-one'],['one-to-many','1:N','One-to-many'],['many-to-many','N:M','Many-to-many']]
@@ -3509,15 +3509,15 @@ function _renderEntRelForm(){ const d=_erDraft; if(!d) return; const e=_entById(
       </div>
       <div class="erf-lbl">Direction <span class="erf-req">*</span></div><div class="erf-seg erf-seg-2">${dirSeg}</div>
       <div class="erf-row">
-        <div><div class="erf-lbl">Nav name → child <span class="erf-req">*</span></div><input class="minput md-name-mono" value="${escapeHtml(d.navChild)}" oninput="_erDraft.navChild=this.value;_erDraft.navEdited=true" autocomplete="off"></div>
-        <div><div class="erf-lbl">Nav name → parent <span class="erf-req">*</span></div><input class="minput md-name-mono" value="${escapeHtml(d.navParent)}" oninput="_erDraft.navParent=this.value;_erDraft.navEdited=true" autocomplete="off"></div>
+        <div><div class="erf-lbl">Nav name → child <span class="erf-req">*</span></div><input class="minput md-name-mono" value="${escapeHtml(d.navChild)}" oninput="_erDraft.navChild=this.value;_erDraft.navEdited=true;_erValidate()" autocomplete="off"></div>
+        <div><div class="erf-lbl">Nav name → parent <span class="erf-req">*</span></div><input class="minput md-name-mono" value="${escapeHtml(d.navParent)}" oninput="_erDraft.navParent=this.value;_erDraft.navEdited=true;_erValidate()" autocomplete="off"></div>
       </div>
       <div class="erf-sec-t">Entity-level constraints</div><div class="erf-note">No entity-level constraints defined.</div><button class="btn erf-addc" onclick="toast('Add constraint — prototype')">${_MDIC.plus} Add constraint</button>
       <div class="erf-sec-t">Physical implementation <span class="so-locked">read-only</span></div>
       <div class="erf-phys">${_MDIC.warn} No physical implementation yet. Add an FK column in a table of <b>${escapeHtml(e.name)}</b> that references a table of <b>${escapeHtml(d.target||'the related entity')}</b>.</div>
       <div class="erf-lbl">Description</div><textarea class="mtextarea" placeholder="What does this relationship represent at the business level?" oninput="_erDraft.desc=this.value">${escapeHtml(d.desc)}</textarea>
     </div>
-    <div class="so-foot"><button class="btn" onclick="closeSlideout()">Cancel</button><button class="btn btn-primary" onclick="saveEntRel()">${_MDIC.plus}${editing?'Save changes':'Create relationship'}</button></div>`;
+    <div class="so-foot"><button class="btn" onclick="closeSlideout()">Cancel</button><button class="btn btn-primary" id="erCreateBtn" ${_erValidDraft(d)?'':'disabled'} onclick="saveEntRel()">${_MDIC.plus}${editing?'Save changes':'Create relationship'}</button></div>`;
   _soOpen();
 }
 function saveEntRel(){ const d=_erDraft; if(!d) return; const e=_entById(d.entId); if(!e) return; e.rels=e.rels||[];
@@ -3551,7 +3551,7 @@ function privTab(e){
       <div class="priv-sec-sub">Predefined system privileges every entity has. Assign which roles hold them; the privileges themselves can’t be edited.</div>
       <div class="priv-list">${_STD_PRIV_DEFS.map(p=>_entStdPrivRow(e,p)).join('')}</div>
     </div>
-    <div class="dsec">
+    <div class="dsec" data-version="v2">
       <div class="priv-sec-h"><div class="dsec-t">Custom privileges <span class="dsec-count">${cprivs.length}</span></div>
         <div class="priv-sec-actions"><label class="dsf-search" style="max-width:220px;height:34px">${_MDIC.search}<input id="cpSearch" type="text" placeholder="Search privileges…" value="${escapeHtml(_cpSearch)}" oninput="cpSearch(this.value)" autocomplete="off"></label>
           <button class="btn btn-primary" onclick="openCreateCustomPriv('${e.id}')">${_MDIC.plus} New custom privilege</button></div></div>
@@ -3572,7 +3572,7 @@ function _entStdPrivRow(e,p){
       <div class="priv-row-tx"><div class="priv-row-top"><span class="priv-row-name">${p.n}</span><span class="priv-sym">${p.k}</span></div>
         <div class="priv-row-desc">${p.desc}</div></div></div>
     <div class="priv-row-r"><div class="priv-roles">${_roleRow(roles)}</div>
-      <button class="btn priv-manage" onclick="openManageRoles('${e.id}','${p.k}')">${_MDIC.gear} Manage roles</button></div></div>`;
+      <button class="btn priv-manage" data-version="v2" onclick="openManageRoles('${e.id}','${p.k}')">${_MDIC.gear} Manage roles</button></div></div>`;
 }
 function _entCustPrivRow(e,pv,idx){
   return `<div class="priv-row">
@@ -3600,7 +3600,7 @@ function openManageRoles(entId,key){
     <div class="modal-body"><div class="cp-hint" style="margin-bottom:12px">Select which roles hold this privilege.</div>
       <div class="mr-list">${_ROLE_POOL.map(r=>`<label class="mr-opt"><input type="checkbox" class="mr-cb" value="${escapeHtml(r)}" ${current.has(r)?'checked':''}><span>${escapeHtml(r)}</span></label>`).join('')}</div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveManageRoles()">Save roles</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function saveManageRoles(){ const d=_mrDraft; if(!d) return; const e=_entById(d.entId); if(!e) return;
   const roles=[...document.querySelectorAll('.mr-cb')].filter(cb=>cb.checked).map(cb=>cb.value);
@@ -3629,7 +3629,7 @@ function _renderCreateCustomPriv(){ const d=_cpDraft; if(!d) return; const e=_en
       ${picker}${permsBody}
     </div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" ${canCreate?'':'disabled style="opacity:.5;cursor:not-allowed"'} onclick="saveCreateCustomPriv()">Create privilege</button></div></div>`;
-  $('modalScrim').classList.add('open'); setTimeout(()=>{const el=$('cp_name'); if(el&&!d.name)el.focus();},50);
+  _modalOpen(); setTimeout(()=>{const el=$('cp_name'); if(el&&!d.name)el.focus();},50);
 }
 function _cpSetName(v){ _cpDraft.name=v; if(!_cpDraft.symEdited){ const s=_cpSym(_entById(_cpDraft.entId),v); _cpDraft.sym=s; const el=$('cp_sym'); if(el)el.value=s; } _cpUpdateCreateBtn(); }
 function _cpUpdateCreateBtn(){ const btn=document.querySelector('#modalScrim .modal-foot .btn-primary'); if(!btn)return; const ok=!!((_cpDraft.name||'').trim()&&_cpDraft.perms.length); btn.disabled=!ok; btn.style.opacity=ok?'':'.5'; btn.style.cursor=ok?'':'not-allowed'; }
@@ -3715,7 +3715,23 @@ function _apiC(e,ep){
 function _apiCtx(k){ const e=_entById(detailState.id); const ep=_apiEndpoints(e).find(x=>x.key===k); return {e,ep,c:ep?_apiC(e,ep):null}; }
 
 /* ── render: shell ── */
+function _apiSimpleView(e){
+  // V1.2 API surface — the 5 default virtual endpoints, enable/disable + description only.
+  const eps=_apiEndpoints(e).filter(x=>!x.custom);
+  const onCount=eps.filter(x=>_apiC(e,x).enabled).length;
+  return `<div class="dsec">
+    <div class="api2-base" style="margin-bottom:14px"><span class="api2-base-l">Base URL</span><code>${escapeHtml(_apiBase(e))}</code><span class="api2-base-tag">v1</span><span class="api2-base-hint">${onCount} of ${eps.length} endpoints enabled</span></div>
+    <div class="priv-sec-sub" style="margin-bottom:10px">Auto-generated endpoints for ${escapeHtml(e.name)}. Toggle each on or off and set its description — the request/response builder and custom endpoints are Full vision.</div>
+    <div class="priv-list">${eps.map(ep=>{ const c=_apiC(e,ep); return `<div class="priv-row">
+      <div class="priv-row-l"><span class="method m-${ep.method.toLowerCase()}">${ep.method}</span>
+        <div class="priv-row-tx"><div class="priv-row-top"><span class="priv-row-name">${escapeHtml(ep.name)}</span><span style="font-size:10px;font-weight:600;color:var(--t3);border:1px solid var(--line);border-radius:5px;padding:1px 6px;text-transform:uppercase;letter-spacing:.03em">Default</span></div>
+          <div class="priv-row-desc"><code class="ep-path">${escapeHtml(ep.path)}</code> · ${escapeHtml(c.desc||'')}</div></div></div>
+      <div class="priv-row-r"><label class="apsw sm" title="${c.enabled?'Enabled':'Disabled'}"><input type="checkbox" ${c.enabled?'checked':''} onchange="apiToggleEnabled('${ep.key}')"><span class="apsw-tr"></span></label></div>
+    </div>`; }).join('')}</div>
+    ${vcallout('v2','Custom endpoints · request/response customization · predefined filters · OpenAPI — the full two-pane builder is Full vision.')}</div>`;
+}
 function apiTab(e){
+  if(SCOPE!=='v2') return _apiSimpleView(e);
   if(_apiState.entId!==e.id){ _apiState.entId=e.id; _apiState.sel='d_create'; _apiState.privPanel=null; }
   const eps=_apiEndpoints(e);
   if(!eps.find(x=>x.key===_apiState.sel)) _apiState.sel=eps[0].key;
@@ -3888,7 +3904,7 @@ function apiDefVal(k,f){
     </div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="_apiDvSave('${_jsq(k)}','${_jsq(f)}')">Save</button></div>
   </div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _apiDvMode(m){ const inp=$('apdvVal'); if(inp){ inp.disabled=(m==='none'); if(m!=='none') inp.focus(); } }
 function _apiDvSave(k,f){ const {c}=_apiCtx(k); if(!c)return; const m=(document.querySelector('input[name=apdvm]:checked')||{}).value||'none'; const v=($('apdvVal')||{}).value||''; c.req[f].def={mode:m,val:m==='none'?'':v}; if(m!=='none') c.req[f].include=true; closeModal(); renderEntityDetail(detailState.id); }
@@ -3908,16 +3924,17 @@ function openPublish(id){
     </div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="confirmPublish('${id}')">Publish changes</button></div>
   </div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function closeModal(){ $('modalScrim').classList.remove('open'); $('modalScrim').innerHTML=''; }
+function _modalOpen(){ if(SCOPE==='v1'){ toast('Editing dialogs open from V1.2 — switch scope to try them'); return; } const ms=$('modalScrim'); ms.classList.add('open'); }
 function confirmPublish(id){ const e=ENTITIES.find(x=>x.id===id); if(e) e.status='Published'; closeModal(); toast('“'+(e?e.name:'Entity')+'” published','ok'); renderEntityDetail(id); }
 
 /* ══════════════════════════════════════════════════════════════
    ENTITY DETAIL — deep CRUD: relationships · privileges · tables
    ══════════════════════════════════════════════════════════════ */
 function _entById(id){ return ENTITIES.find(x=>x.id===id) || _bridgeEnts[id] || null; }
-function _entEdited(e){ if(e.status==='Published') e.status='Pending changes'; e.updated='just now'; }
+function _entEdited(e){ if(e.status==='Published') e.status='Draft'; e.updated='just now'; }
 const _CARD_OPTS=[['one-to-one','1:1 · One to one'],['one-to-many','1:N · One to many'],['many-to-one','N:1 · Many to one'],['many-to-many','N:M · Many to many']];
 const _REL_DIRS=['Outgoing','Incoming','Bidirectional'];
 const _REL_DEL=['Restrict','Set null','Cascade','No action'];
@@ -3970,7 +3987,7 @@ function confirmRemoveRel(id,idx){ const e=_entById(id); if(!e) return; const r=
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Remove relationship?</div></div>
     <div class="modal-body">This removes the link <b>${escapeHtml(e.name)} → ${escapeHtml(r.t)}</b>. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_removeRel('${id}',${idx})">Remove</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _removeRel(id,idx){ const e=_entById(id); if(!e) return; (e.rels||[]).splice(idx,1); _entEdited(e); closeModal(); closeSlideout(); toast('Relationship removed','ok'); renderEntityDetail(id); }
 
@@ -4001,7 +4018,7 @@ function confirmRemovePerm(id,idx){ const e=_entById(id); if(!e) return; const p
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Remove “${escapeHtml(p.n)}”?</div></div>
     <div class="modal-body">This removes the custom permission from <b>${escapeHtml(e.name)}</b>. Privileges that reference it keep their other permissions.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_removeCustomPerm('${id}',${idx})">Remove</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _removeCustomPerm(id,idx){ const e=_entById(id); if(!e) return; (e.cperms||[]).splice(idx,1); _entEdited(e); closeModal(); toast('Permission removed','ok'); renderEntityDetail(id); }
 
@@ -4037,7 +4054,7 @@ function confirmRemovePriv(id,idx){ const e=_entById(id); if(!e) return; const p
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Remove “${escapeHtml(pv.n)}”?</div></div>
     <div class="modal-body">This removes the custom privilege from <b>${escapeHtml(e.name)}</b>. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_removeCustomPriv('${id}',${idx})">Remove</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _removeCustomPriv(id,idx){ const e=_entById(id); if(!e) return; (e.cprivs||[]).splice(idx,1); _entEdited(e); closeModal(); toast('Privilege removed','ok'); renderEntityDetail(id); }
 
@@ -4076,7 +4093,7 @@ function confirmRemoveEntTbl(id,idx){ const e=_entById(id); if(!e) return; const
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Remove “${escapeHtml(t.alias)}”?</div></div>
     <div class="modal-body">This removes the table from <b>${escapeHtml(e.name)}</b>. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_removeEntTbl('${id}',${idx})">Remove table</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _removeEntTbl(id,idx){ const e=_entById(id); if(!e) return; const t=(e.tables||[])[idx]; const nm=t?t.alias:'Table'; (e.tables||[]).splice(idx,1); _entEdited(e); closeModal(); toast('“'+nm+'” removed','ok'); renderEntityDetail(id); }
 let _toastTimer;
@@ -4204,7 +4221,7 @@ const TABLES = [
     {n:'debit',d:'Debit',t:'Decimal',sens:'Financial',desc:'Debit amount.'},
     {n:'credit',d:'Credit',t:'Decimal',sens:'Financial',desc:'Credit amount.'},
   ]},
-  {id:'cost_center', alias:'Cost center', model:'general_ledger', entity:'Cost Center', entityId:'cost_center', role:'Primary', status:'Archived', updated:'May 18, 2026', owner:'dp', collab:['em'], rows:'1.4K', tags:['finance'],
+  {id:'cost_center', alias:'Cost center', model:'general_ledger', entity:'Cost Center', entityId:'cost_center', role:'Primary', status:'Deprecated', updated:'May 18, 2026', owner:'dp', collab:['em'], rows:'1.4K', tags:['finance'],
    desc:'The primary table backing the Cost Center entity. Kept read-only for audit; replaced by the current finance dimension.', cols:[
     {n:'code',d:'Code',t:'Text',uq:1,req:1,desc:'Cost center code.'},
     {n:'name',d:'Name',t:'Text',desc:'Cost center name.'},
@@ -4273,7 +4290,7 @@ const TABLES = [
     {n:'status',d:'Status',t:'Enum',desc:'Approval state.',ev:[EV('draft','Draft',''),EV('approved','Approved',''),EV('retired','Retired','')]},
     {n:'effective_date',d:'Effective date',t:'Date',desc:'When the policy takes effect.'},
   ]},
-  {id:'partner', alias:'Partner', model:'partner_network', entity:'Partner', entityId:'partner', role:'Primary', status:'Archived', updated:'May 24, 2026', owner:'sc', collab:['mr'], rows:'12K', tags:['partners'],
+  {id:'partner', alias:'Partner', model:'partner_network', entity:'Partner', entityId:'partner', role:'Primary', status:'Deprecated', updated:'May 24, 2026', owner:'sc', collab:['mr'], rows:'12K', tags:['partners'],
    desc:'The primary table backing the Partner entity. Superseded by the accounts hierarchy in CRM Core.', cols:[
     {n:'name',d:'Name',t:'Text',req:1,desc:'Partner name.'},
     {n:'type',d:'Type',t:'Enum',desc:'Partner type.',ev:[EV('reseller','Reseller',''),EV('referral','Referral',''),EV('technology','Technology','')]},
@@ -4288,14 +4305,16 @@ function _typeCls(t){ return {Text:'t-text',Integer:'t-num',Decimal:'t-num',Bool
 function _sensCls(s){ return s==='PII'?'pii':s==='Financial'?'fin':'conf'; }
 
 /* Tables LIST */
-const tablesListState = { search:'', model:'all', entity:'all', type:'all', status:'all', view:'list' };
-function tlSearch(v){ tablesListState.search=v; renderTablesList(); setTimeout(()=>{const el=$('tblSearch'); if(el){el.focus(); el.setSelectionRange(v.length,v.length);}},0); }
-function tlEntity(v){ tablesListState.entity=v; renderTablesList(); }
-function tlModel(v){ tablesListState.model=v; renderTablesList(); }
-function tlType(v){ tablesListState.type=v; renderTablesList(); }
-function tlStatus(v){ tablesListState.status=v; renderTablesList(); }
+const tablesListState = { search:'', model:'all', entity:'all', type:'all', status:'all', view:'list', page:1, perPage:9 };
+function tlSearch(v){ tablesListState.search=v; tablesListState.page=1; renderTablesList(); setTimeout(()=>{const el=$('tblSearch'); if(el){el.focus(); el.setSelectionRange(v.length,v.length);}},0); }
+function tlEntity(v){ tablesListState.entity=v; tablesListState.page=1; renderTablesList(); }
+function tlModel(v){ tablesListState.model=v; tablesListState.page=1; renderTablesList(); }
+function tlType(v){ tablesListState.type=v; tablesListState.page=1; renderTablesList(); }
+function tlStatus(v){ tablesListState.status=v; tablesListState.page=1; renderTablesList(); }
 function tlView(v){ tablesListState.view=v; _saveView('tables',v); renderTablesList(); }
-function tlClear(){ tablesListState.model='all'; tablesListState.entity='all'; tablesListState.type='all'; tablesListState.status='all'; tablesListState.tags=[]; renderTablesList(); }
+function tlClear(){ tablesListState.model='all'; tablesListState.entity='all'; tablesListState.type='all'; tablesListState.status='all'; tablesListState.tags=[]; tablesListState.page=1; renderTablesList(); }
+function tlListPage(p){ tablesListState.page=p; renderTablesList(); }
+function tlListPer(n){ tablesListState.perPage=+n; tablesListState.page=1; renderTablesList(); }
 function _tablesFiltered(){
   const q=tablesListState.search.toLowerCase();
   return TABLES.filter(t=>{
@@ -4320,19 +4339,23 @@ function renderTablesList(){
   const tc=tablesListState.type!=='all'?{label:tablesListState.type,onremove:"tlType('all')"}:null;
   const stc=tablesListState.status!=='all'?{label:tablesListState.status, onremove:"tlStatus('all')"}:null;
   const filtering=tablesListState.model!=='all'||tablesListState.entity!=='all'||tablesListState.type!=='all'||tablesListState.status!=='all';
+  const _per=tablesListState.perPage, _total=filtered.length, _pages=Math.max(1,Math.ceil(_total/_per));
+  const _page=Math.min(Math.max(1,tablesListState.page),_pages);
+  const _vis=filtered.slice((_page-1)*_per,(_page-1)*_per+_per);
+  const _lpgn=_pagination({per:_per,total:_total,page:_page,opts:[9,25,50],id:'tbl-lpgn',pageCall:p=>`tlListPage(${p})`,perCall:n=>`tlListPer(${n})`});
   $('content').innerHTML = pageShell('tables') + `
     <div class="tbar">
       <label class="dsf-search"><svg class="dsf-search-ic" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M11 11l3 3"/></svg><input id="tblSearch" type="text" placeholder="Search tables…" value="${escapeHtml(tablesListState.search)}" oninput="tlSearch(this.value)" autocomplete="off"/></label>
       ${dsfDrop('tblModel','Model', mc, [{label:'All models',selected:tablesListState.model==='all',onclick:"dsfPickSingle();tlModel('all')"}].concat(models.map(m=>({label:(_model(m)||{name:m}).name,count:TABLES.filter(t=>t.model===m).length,selected:tablesListState.model===m,onclick:`dsfPickSingle();tlModel('${m}')`}))))}
       ${dsfDrop('tblEntity','Entity', ec, [{label:'All entities',selected:tablesListState.entity==='all',onclick:"dsfPickSingle();tlEntity('all')"}].concat(ents.map(e=>({label:e.name,selected:tablesListState.entity===e.id,onclick:`dsfPickSingle();tlEntity('${e.id}')`}))))}
       ${dsfDrop('tblType','Type', tc, [{label:'All types',selected:tablesListState.type==='all',onclick:"dsfPickSingle();tlType('all')"},{label:'Primary',count:TABLES.filter(t=>t.role==='Primary').length,selected:tablesListState.type==='Primary',onclick:"dsfPickSingle();tlType('Primary')"},{label:'Secondary',count:TABLES.filter(t=>t.role==='Secondary').length,selected:tablesListState.type==='Secondary',onclick:"dsfPickSingle();tlType('Secondary')"}])}
-      ${dsfDrop('tblStatus','Status', stc, [{label:'All statuses',selected:tablesListState.status==='all',onclick:"dsfPickSingle();tlStatus('all')"}].concat(['Published','Draft','Archived'].map(s=>({label:s,count:TABLES.filter(t=>t.status===s).length,selected:tablesListState.status===s,onclick:`dsfPickSingle();tlStatus('${s}')`}))))}
+      ${dsfDrop('tblStatus','Status', stc, [{label:'All statuses',selected:tablesListState.status==='all',onclick:"dsfPickSingle();tlStatus('all')"}].concat(['Published','Draft','Deprecated'].map(s=>({label:s,count:TABLES.filter(t=>t.status===s).length,selected:tablesListState.status===s,onclick:`dsfPickSingle();tlStatus('${s}')`}))))}
       <button class="flt-btn" onclick="openFilters('tables')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg> Filters${_fltCount('tables')?` <span class="flt-badge">${_fltCount('tables')}</span>`:''}</button>
       ${filtering?`<button class="dsf-clear" onclick="tlClear()">Clear</button>`:''}
       <span class="tbar-spring"></span>
       ${viewToggle(tablesListState,'tlView')}
     </div>
-    ${tablesListState.view==='table' ? dtblView('tables',filtered,_tblCols(),'tables') : filtered.length===0?`<div class="empty"><div class="empty-t">No tables match</div>Try a different search or clear the filters.</div>` : tablesListState.view==='grid' ? `<div class="mcard-grid">${filtered.map(tableCard).join('')}</div>` : `<div class="lrows">${filtered.map(tableRow).join('')}</div>`}`;
+    ${tablesListState.view==='table' ? dtblView('tables',filtered,_tblCols(),'tables') : filtered.length===0?`<div class="empty"><div class="empty-t">No tables match</div>Try a different search or clear the filters.</div>` : tablesListState.view==='grid' ? `<div class="mcard-grid">${_vis.map(tableCard).join('')}</div>`+_lpgn : `<div class="lrows">${_vis.map(tableRow).join('')}</div>`+_lpgn}`;
 }
 function tableRow(t){
   const relN=(t.rels?t.rels.length:0);
@@ -4408,11 +4431,11 @@ function tableOverviewTab(t){
      `<span class="col-type ${_typeCls(c.t)}">${c.t}</span>`,
      [c.pk&&'PK',c.uq&&'UQ',c.req&&'REQ',c.idx&&'IDX'].filter(Boolean).map(f=>`<span class="flag on">${f}</span>`).join(' ')||'<span style="color:var(--field-placeholder)">—</span>'
   ])):`<div class="ov-empty">No columns yet.</div>`;
-  return `<div class="md-tiles">${tiles.join('')}</div>
-    <div class="dsec ov-sub"><div class="dsec-h"><div class="dsec-t">Columns preview<span class="dsec-sub">showing ${Math.min(6,cols.length)} of ${cols.length}</span></div><a class="md-sec-link" onclick="setTableTab('columns')">View all columns →</a></div>${preview}</div>
-    <div class="dsec ov-sub"><div class="dsec-h"><div class="dsec-t">About this table</div></div><div style="font-size:13px;color:var(--t2);line-height:1.6">${escapeHtml(t.desc||'No description yet.')}</div>
+  return `<div class="dsec ov-sub"><div class="dsec-h"><div class="dsec-t">About this table</div></div><div style="font-size:13px;color:var(--t2);line-height:1.6">${escapeHtml(t.desc||'No description yet.')}</div>
        <div class="lrow-foot" style="margin-left:0;margin-top:12px"><span class="lrow-owner">${av(P(t.owner),'sm')}${escapeHtml(P(t.owner).n)}</span><span class="lrow-sep">·</span><span>entity ${escapeHtml(t.entity||'—')}</span><span class="lrow-sep">·</span><span class="mini-badge ${t.role==='Primary'?'mb-primary':'mb-secondary'}">${escapeHtml(t.role||'Secondary')}</span><span class="lrow-sep">·</span><span>Updated ${escapeHtml(t.updated||'—')}</span></div></div>
-    ${_ovActivity('table',t)}`;
+    <div data-version="v2"><div class="md-tiles">${tiles.join('')}</div>
+    <div class="dsec ov-sub"><div class="dsec-h"><div class="dsec-t">Columns preview<span class="dsec-sub">showing ${Math.min(6,cols.length)} of ${cols.length}</span></div><a class="md-sec-link" onclick="setTableTab('columns')">View all columns →</a></div>${preview}</div>
+    ${_ovActivity('table',t)}</div>`;
 }
 
 /* ── Table Indexes tab ── */
@@ -4461,7 +4484,7 @@ function openCreateIndex(tableId){
       <div class="mfield"><label class="mfield-l">WHERE clause <span style="color:var(--field-placeholder);font-weight:400">· partial index only</span></label><input class="minput" id="niWhere" placeholder="status = 'active'" autocomplete="off"></div>
     </div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewIndex('${tableId}')">Add index</button></div></div>`;
-  $('modalScrim').classList.add('open'); setTimeout(()=>{const el=$('niName'); if(el)el.focus();},50);
+  _modalOpen(); setTimeout(()=>{const el=$('niName'); if(el)el.focus();},50);
 }
 function saveNewIndex(tableId){
   const t=_table(tableId); if(!t) return; _tblIndexes(t);
@@ -4479,7 +4502,7 @@ function confirmRemoveIndex(tid,name){ const t=_table(tid); if(!t) return; _tblI
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Delete index?</div></div>
     <div class="modal-body">This drops <code>${escapeHtml(name)}</code>. Queries relying on it may slow down until another index covers them.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_removeIndex('${tid}','${name}')">Delete index</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _removeIndex(tid,name){ const t=_table(tid); if(!t) return; _tblIndexes(t); t._idx=(t._idx||[]).filter(i=>i.name!==name);
   if(t.status==='Published') t.status='Draft'; closeModal(); toast('Index “'+name+'” deleted','ok'); renderTableDetail(tid); }
@@ -4555,21 +4578,26 @@ function openColumn(tableId, colName){
         <div class="so-field"><span class="so-field-l">Masking</span><span class="so-field-v">${c.sens==='PII'?'Last 4 shown':c.sens?'Fully masked':'None'}</span></div>
       </div></div>
       <div class="so-sec"><div class="so-sec-h">Display</div><div class="so-fields"><div class="so-field"><span class="so-field-l">Format</span><span class="so-field-v">${escapeHtml(c.fmt||'Default')}</span></div></div></div>
-      <div class="so-sec"><div class="so-sec-h">References</div><div style="font-size:12.5px;color:var(--field-placeholder)">Where this column is used (queries · widgets · metrics) — <span style="color:var(--field-text)">V1.5</span></div></div>
     </div>
-    <div class="so-foot"><button class="btn btn-danger" style="margin-right:auto" onclick="confirmDeleteColumn('${tableId}','${colName}')">${_RM_IC.del} Delete</button><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="openEditColumn('${tableId}','${colName}')">Edit column</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+    <div class="so-foot"><button class="btn btn-danger" style="margin-right:auto" onclick="confirmDeleteColumn('${tableId}','${colName}')">${_RM_IC.del} Delete</button><button class="btn" onclick="_dupColumn('${tableId}','${colName}')">Duplicate</button><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="openEditColumn('${tableId}','${colName}')">Edit column</button></div>`;
+  _soOpen();
 }
 function confirmDeleteColumn(tableId,colName){ const t=_table(tableId); const c=t?t.cols.find(x=>x.n===colName):null; if(!c) return;
   if(c.pk){ toast('Can’t delete the primary key column'); return; }
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Delete “${escapeHtml(c.d)}”?</div></div>
     <div class="modal-body">This drops the column <code>${escapeHtml(t.id)}.${escapeHtml(c.n)}</code> from the schema. On publish it runs against the physical tenant table and <b>can't be undone</b>.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_deleteColumn('${tableId}','${colName}')">Delete column</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _deleteColumn(tableId,colName){ const t=_table(tableId); if(!t) return; const c=t.cols.find(x=>x.n===colName); const nm=c?c.d:colName;
   t.cols=t.cols.filter(x=>x.n!==colName); t.rels=(t.rels||[]).filter(r=>r.via!==colName); t._rows=null;
   if(t.status==='Published') t.status='Draft'; closeModal(); closeSlideout(); toast('Column “'+nm+'” deleted','ok'); renderTableDetail(tableId);
+}
+function _dupColumn(tableId,colName){ const t=_table(tableId); if(!t) return; const i=t.cols.findIndex(x=>x.n===colName); if(i<0) return; const c=t.cols[i];
+  let base=c.n+'_copy', n=base, k=2; while(t.cols.some(x=>x.n===n)) n=base+'_'+(k++);
+  const dup={...c, n, d:(c.d||c.n)+' (copy)', pk:false, uq:false}; // a copy is never the PK and starts non-unique to avoid clashes
+  t.cols=[...t.cols.slice(0,i+1), dup, ...t.cols.slice(i+1)]; t._rows=null;
+  if(t.status==='Published') t.status='Draft'; closeSlideout(); toast('Column “'+(c.d||c.n)+'” duplicated','ok'); renderTableDetail(tableId);
 }
 
 /* Create / edit column (modal + pre-save safety) */
@@ -4583,7 +4611,7 @@ function openCreateColumn(tableId){
       <div class="mfield"><label class="mfield-l">Description <span style="color:var(--field-placeholder);font-weight:400">· required for the LLM</span></label><textarea class="mtextarea" id="ncDesc" placeholder="What this column holds and how it's used."></textarea></div>
     </div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewColumn('${tableId}')">Add column</button></div></div>`;
-  $('modalScrim').classList.add('open'); setTimeout(()=>{const el=$('ncName'); if(el)el.focus();},50);
+  _modalOpen(); setTimeout(()=>{const el=$('ncName'); if(el)el.focus();},50);
 }
 function saveNewColumn(tableId){
   const t=_table(tableId); const name=($('ncName').value||'').trim().toLowerCase().replace(/\s+/g,'_');
@@ -4607,7 +4635,7 @@ function openEditColumn(tableId, colName){
       <div class="mfield"><label class="mfield-l">Description</label><textarea class="mtextarea" id="ecDesc">${escapeHtml(c.desc||'')}</textarea></div>
     </div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveColumn('${tableId}','${colName}')">Save changes</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function saveColumn(tableId, colName){
   const t=_table(tableId); const c=t.cols.find(x=>x.n===colName); if(!c) return;
@@ -4632,7 +4660,7 @@ function openPublishTable(id){
     <div class="modal-body">Publishing applies your column changes to the live schema. This alters a <b>physical tenant table</b> — some changes can't be undone.
       <div class="impact"><div class="impact-row"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg><span>Apply pending column additions / edits</span></div><div class="impact-row"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#facc15" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"/></svg><span>May rebuild indexes — can take ~30s</span></div></div>
     </div><div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="confirmPublishTable('${id}')">Publish changes</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function confirmPublishTable(id){ const t=_table(id); if(t) t.status='Published'; closeModal(); toast('“'+(t?t.alias:'Table')+'” published','ok'); renderTableDetail(id); }
 
@@ -4660,19 +4688,22 @@ function openAddRelationship(tid){
      <div class="mfield"><label class="mfield-l">Type</label><select class="mselect" id="arKind"><option value="many-to-one">Many-to-one — FK on ${escapeHtml(t.alias)}</option><option value="one-to-one">One-to-one</option><option value="one-to-many">One-to-many</option><option value="many-to-many">Many-to-many — junction table</option></select></div>
      <div class="mfield"><label class="mfield-l">Related table</label><select class="mselect" id="arTarget">${opts}</select></div>
      <div class="mfield"><label class="mfield-l">Via column</label><input class="minput" id="arVia" placeholder="e.g. vehicle_id" autocomplete="off"></div>
-     <div class="mrow"><div class="mfield"><label class="mfield-l">On delete</label><select class="mselect" id="arDel"><option>restrict</option><option>cascade</option><option>set null</option></select></div><div class="mfield"><label class="mfield-l">On update</label><select class="mselect" id="arUpd"><option>cascade</option><option>restrict</option></select></div></div>
+     <div class="mrow"><div class="mfield"><label class="mfield-l">On delete</label><select class="mselect" id="arDel"><option>restrict</option><option>cascade</option><option>set null</option><option>no action</option></select></div><div class="mfield"><label class="mfield-l">On update</label><select class="mselect" id="arUpd"><option>cascade</option><option>restrict</option><option>no action</option></select></div></div>
+     <div class="mfield"><label class="mfield-l">Required</label><select class="mselect" id="arReq"><option value="">Optional — the foreign key can be null</option><option value="1">Required — NOT NULL</option></select></div>
+     <div class="mfield"><label class="mfield-l">Description</label><input class="minput" id="arDesc" placeholder="What this relationship represents…" autocomplete="off"></div>
    </div></div>
    <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveRelationship('${tid}')">Add relationship</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
   setTimeout(()=>{const sel=$('arTarget'),via=$('arVia'); const upd=()=>{ if(via&&!via.value) via.value=sel.value+'_id'; }; if(sel){sel.onchange=upd; upd();}},30);
 }
 function saveRelationship(tid){
   const t=_table(tid); const kind=$('arKind').value, target=$('arTarget').value, via=($('arVia').value||target+'_id').trim(), del=$('arDel').value, upd=$('arUpd').value;
+  const req=!!($('arReq')&&$('arReq').value), desc=($('arDesc')?$('arDesc').value.trim():'');
   if(kind==='many-to-many'){ closeModal(); toast('Junction table “'+tid+'_'+target+'” created','ok'); }
   else {
-    t.rels.push({via, target, kind, onDelete:del, onUpdate:upd, req:false});
+    t.rels.push({via, target, kind, onDelete:del, onUpdate:upd, req, desc});
     if((kind==='many-to-one'||kind==='one-to-one') && !t.cols.find(c=>c.n===via)){
-      t.cols.push({n:via, d:via.replace(/_/g,' ').replace(/^\w/,ch=>ch.toUpperCase()), t:'Reference', ref:target, uq:kind==='one-to-one'||undefined, desc:'Relationship to '+target+'.'});
+      t.cols.push({n:via, d:via.replace(/_/g,' ').replace(/^\w/,ch=>ch.toUpperCase()), t:'Reference', ref:target, uq:kind==='one-to-one'||undefined, req:req||undefined, desc:desc||('Relationship to '+target+'.')}); // Required removes nullability on the FK column
       t._rows=null;
     }
     if(t.status==='Published') t.status='Draft'; closeModal(); toast('Relationship added','ok');
@@ -4687,9 +4718,9 @@ function openTblRelDetail(id,i){
       <div class="so-head"><div><div class="so-title">${escapeHtml(t.alias)} ${_ARROW} ${escapeHtml(tgt?tgt.alias:_refId(r.target))}</div><div class="so-internal">Outgoing relationship</div></div><button class="so-close" onclick="closeSlideout()" aria-label="Close">✕</button></div>
       <div class="so-body"><div class="so-fields">
         ${F('Related table',tgt?_entityChip(tgt.id,tgt.alias):escapeHtml(_refId(r.target)))}${F('Cardinality',`<span class="card-badge">${_cardShort(r.kind)}</span>`)}
-        ${F('Foreign key',`<span class="mono">${escapeHtml(r.via)}</span>`)}${F('On delete',escapeHtml(r.onDelete||'restrict'))}${F('On update',escapeHtml(r.onUpdate||'cascade'))}${F('Required',r.req?'<span class="cv-yes">Yes</span>':'<span class="cv-no">No</span>')}
+        ${F('Foreign key',`<span class="mono">${escapeHtml(r.via)}</span>`)}${F('On delete',escapeHtml(r.onDelete||'restrict'))}${F('On update',escapeHtml(r.onUpdate||'cascade'))}${F('Required',r.req?'<span class="cv-yes">Yes</span>':'<span class="cv-no">No</span>')}${F('Description',r.desc?escapeHtml(r.desc):'<span style="color:var(--field-placeholder)">—</span>')}
       </div></div>
-      <div class="so-foot"><button class="btn btn-danger" style="margin-right:auto" onclick="confirmRemoveTblRel('${id}',${i})">${_RM_IC.del} Remove</button>${tgt?`<button class="btn btn-primary" onclick="closeSlideout();navigate('tables/${tgt.id}')">${_MDIC.open} Open table</button>`:''}</div>`;
+      <div class="so-foot"><button class="btn btn-danger" style="margin-right:auto" onclick="confirmRemoveTblRel('${id}',${i})">${_RM_IC.del} Remove</button><button class="btn" onclick="openEditTblRel('${id}',${i})">Edit</button>${tgt?`<button class="btn btn-primary" onclick="closeSlideout();navigate('tables/${tgt.id}')">${_MDIC.open} Open table</button>`:''}</div>`;
   } else {
     const inc=TABLES.filter(x=>x.id!==t.id).flatMap(x=>(x.rels||[]).filter(r=>_refId(r.target)===t.id).map(r=>({src:x,via:r.via,kind:r.kind}))); const r=inc[i-out.length]; if(!r) return;
     $('slideout').innerHTML=`
@@ -4701,11 +4732,28 @@ function openTblRelDetail(id,i){
   }
   _soOpen();
 }
+function openEditTblRel(id,i){ const t=_table(id); if(!t) return; const r=(t.rels||[])[i]; if(!r) return; const tgt=_table(_refId(r.target));
+  $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-purple-bg);color:var(--tag-purple-fg);border-color:var(--tag-purple-bd)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 10a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M10 6a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4" stroke-linecap="round"/></svg></div><div class="modal-title">Edit relationship</div></div>
+   <div class="modal-body"><div class="mform">
+     <div class="mfield"><label class="mfield-l">Related table</label><input class="minput" value="${escapeHtml(tgt?tgt.alias:_refId(r.target))}" disabled style="opacity:.65"></div>
+     <div class="mfield"><label class="mfield-l">Foreign key</label><input class="minput mono" value="${escapeHtml(r.via)}" disabled style="opacity:.65"></div>
+     <div class="mrow"><div class="mfield"><label class="mfield-l">On delete</label><select class="mselect" id="erDel">${['restrict','cascade','set null','no action'].map(o=>`<option ${(r.onDelete||'restrict')===o?'selected':''}>${o}</option>`).join('')}</select></div><div class="mfield"><label class="mfield-l">On update</label><select class="mselect" id="erUpd">${['cascade','restrict','no action'].map(o=>`<option ${(r.onUpdate||'cascade')===o?'selected':''}>${o}</option>`).join('')}</select></div></div>
+     <div class="mfield"><label class="mfield-l">Required</label><select class="mselect" id="erReq"><option value="" ${!r.req?'selected':''}>Optional — the foreign key can be null</option><option value="1" ${r.req?'selected':''}>Required — NOT NULL</option></select></div>
+     <div class="mfield"><label class="mfield-l">Description</label><input class="minput" id="erDesc" value="${escapeHtml(r.desc||'')}" placeholder="What this relationship represents…" autocomplete="off"></div>
+   </div></div>
+   <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditTblRel('${id}',${i})">Save changes</button></div></div>`;
+  _modalOpen();
+}
+function saveEditTblRel(id,i){ const t=_table(id); if(!t) return; const r=(t.rels||[])[i]; if(!r) return;
+  r.onDelete=$('erDel').value; r.onUpdate=$('erUpd').value; r.req=!!($('erReq')&&$('erReq').value); r.desc=($('erDesc')?$('erDesc').value.trim():'');
+  const col=t.cols.find(c=>c.t==='Reference'&&c.n===r.via); if(col) col.req=r.req||undefined; // Required removes nullability on the FK column
+  if(t.status==='Published') t.status='Draft'; closeModal(); closeSlideout(); toast('Relationship updated','ok'); renderTableDetail(id);
+}
 function confirmRemoveTblRel(id,i){ const t=_table(id); if(!t) return; const r=(t.rels||[])[i]; if(!r) return; const tgt=_table(_refId(r.target));
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Remove relationship?</div></div>
     <div class="modal-body">This removes the link <b>${escapeHtml(t.alias)} → ${escapeHtml(tgt?tgt.alias:_refId(r.target))}</b> and its <code>${escapeHtml(r.via)}</code> foreign key column. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_removeTblRel('${id}',${i})">Remove</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _removeTblRel(id,i){ const t=_table(id); if(!t) return; const r=(t.rels||[])[i]; if(!r) return;
   t.rels.splice(i,1); t.cols=t.cols.filter(c=>!(c.t==='Reference'&&c.n===r.via&&c.ref===r.target)); t._rows=null;
@@ -4753,18 +4801,57 @@ function dataPerPage(tid,n){ dataState.perPage=+n; dataState.page=1; renderTable
 function dataSelToggle(tid,id){ const s=dataState; s.sel=s.sel||new Set(); s.sel.has(id)?s.sel.delete(id):s.sel.add(id); renderTableDetail(tid); }
 function dataSelAll(tid,ids){ const s=dataState; s.sel=s.sel||new Set(); const all=ids.length&&ids.every(i=>s.sel.has(i)); ids.forEach(i=>all?s.sel.delete(i):s.sel.add(i)); renderTableDetail(tid); }
 function dataSelClear(tid){ dataState.sel=new Set(); renderTableDetail(tid); }
+/* A4: per-column dynamic filters — type-aware operators, multiple columns at once */
+function _cfActive(f){ return !!(f && ((f.val!=null&&f.val!=='')||(f.val2!=null&&f.val2!=='')) ); }
+function _matchColFilter(cell,f){
+  const s=String(cell==null?'':cell);
+  switch(f.op){
+    case 'contains': return s.toLowerCase().includes(String(f.val).toLowerCase());
+    case 'equals':   return s.toLowerCase()===String(f.val).toLowerCase();
+    case 'starts':   return s.toLowerCase().startsWith(String(f.val).toLowerCase());
+    case 'is':       return s===String(f.val);
+    case '=': case '>': case '<': case '>=': case '<=': {
+      const a=parseFloat(s), b=parseFloat(f.val); if(isNaN(a)||isNaN(b)) return false;
+      return f.op==='='?a===b:f.op==='>'?a>b:f.op==='<'?a<b:f.op==='>='?a>=b:a<=b;
+    }
+    case 'between': {
+      const d=Date.parse(s); if(isNaN(d)) return false;
+      const d1=f.val?Date.parse(f.val):null, d2=f.val2?Date.parse(f.val2):null;
+      return (d1==null||d>=d1)&&(d2==null||d<=d2+864e5-1);
+    }
+    default: return true;
+  }
+}
+function _colFilterControl(c,f){
+  const val=(f&&f.val)||'', val2=(f&&f.val2)||'', op=(f&&f.op)||'';
+  if(c.t==='Boolean') return `<select class="mselect cf-op" data-col="${escapeHtml(c.n)}" style="flex:1"><option value="">Any</option><option value="true" ${val==='true'?'selected':''}>True</option><option value="false" ${val==='false'?'selected':''}>False</option></select>`;
+  if(c.t==='Enum'&&c.ev&&c.ev.length) return `<select class="mselect cf-op" data-col="${escapeHtml(c.n)}" style="flex:1"><option value="">Any</option>${c.ev.map(v=>{const o=Array.isArray(v)?v[0]:v;const l=Array.isArray(v)?(v[1]||v[0]):v;return `<option value="${escapeHtml(o)}" ${val===o?'selected':''}>${escapeHtml(l)}</option>`;}).join('')}</select>`;
+  if(c.t==='Integer'||c.t==='Decimal') return `<select class="mselect cf-numop" data-col="${escapeHtml(c.n)}" style="max-width:64px">${['=','>','<','>=','<='].map(o=>`<option ${op===o?'selected':''}>${o}</option>`).join('')}</select><input class="minput cf-numv" data-col="${escapeHtml(c.n)}" type="number" value="${escapeHtml(val)}" placeholder="value" style="flex:1">`;
+  if(c.t==='Date'||c.t==='Timestamp') return `<input class="minput cf-d1" data-col="${escapeHtml(c.n)}" type="date" value="${escapeHtml(val)}" style="flex:1"><span style="font-size:11px;color:var(--t3)">to</span><input class="minput cf-d2" data-col="${escapeHtml(c.n)}" type="date" value="${escapeHtml(val2)}" style="flex:1">`;
+  return `<select class="mselect cf-txtop" data-col="${escapeHtml(c.n)}" style="max-width:110px">${[['contains','contains'],['equals','equals'],['starts','starts with']].map(([v,l])=>`<option value="${v}" ${op===v?'selected':''}>${l}</option>`).join('')}</select><input class="minput cf-txtv" data-col="${escapeHtml(c.n)}" value="${escapeHtml(val)}" placeholder="value" style="flex:1">`;
+}
+function _readColFilter(c){
+  const q=sel=>document.querySelector(sel+'[data-col="'+CSS.escape(c.n)+'"]');
+  if(c.t==='Boolean'||(c.t==='Enum'&&c.ev&&c.ev.length)){ const v=(q('.cf-op')||{}).value||''; return v?{op:'is',val:v}:null; }
+  if(c.t==='Integer'||c.t==='Decimal'){ const op=(q('.cf-numop')||{}).value||'='; const v=(q('.cf-numv')||{}).value||''; return v!==''?{op,val:v}:null; }
+  if(c.t==='Date'||c.t==='Timestamp'){ const v=(q('.cf-d1')||{}).value||''; const v2=(q('.cf-d2')||{}).value||''; return (v||v2)?{op:'between',val:v,val2:v2}:null; }
+  const op=(q('.cf-txtop')||{}).value||'contains'; const v=(q('.cf-txtv')||{}).value||''; return v.trim()!==''?{op,val:v.trim()}:null;
+}
 function openTblFilters(id){
-  const t=_table(id); const cols=t.cols.slice(0,8); const cf=dataState.colFilter||{col:(cols[0]||{n:''}).n,text:''};
+  const t=_table(id); const cfs=dataState.colFilters||{};
   $('slideout').innerHTML=`
     <div class="so-head"><div class="so-title">Filters</div><button class="so-close" onclick="closeSlideout()" aria-label="Close">✕</button></div>
-    <div class="so-body"><div class="flt-sec"><div class="flt-sec-h">Column contains</div>
-      <div class="mfield"><label class="mfield-l">Column</label><select class="mselect" id="tfCol">${cols.map(c=>`<option value="${escapeHtml(c.n)}" ${c.n===cf.col?'selected':''}>${escapeHtml(c.d||c.n)}</option>`).join('')}</select></div>
-      <div class="mfield" style="margin-top:10px"><label class="mfield-l">Contains</label><input class="minput" id="tfText" value="${escapeHtml(cf.text||'')}" placeholder="e.g. active" autocomplete="off"></div></div></div>
+    <div class="so-body"><div class="flt-sec"><div class="flt-sec-h">Filter by column</div>
+      ${t.cols.map(c=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--card-border)">
+        <div style="width:150px;flex-shrink:0;display:flex;align-items:center;gap:6px;min-width:0"><span class="col-type ${_typeCls(c.t)}">${c.t}</span><span style="font-size:12.5px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(c.d||c.n)}</span></div>
+        <div style="flex:1;display:flex;gap:6px;align-items:center;min-width:0">${_colFilterControl(c,cfs[c.n])}</div>
+      </div>`).join('')}
+    </div></div>
     <div class="so-foot"><button class="btn" onclick="clearTblFilters('${id}')">Clear all</button><button class="btn btn-primary" onclick="applyTblFilters('${id}')">Apply filters</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
 }
-function applyTblFilters(id){ dataState.colFilter={col:$('tfCol').value,text:($('tfText').value||'').trim()}; dataState.page=1; closeSlideout(); renderTableDetail(id); }
-function clearTblFilters(id){ dataState.colFilter=null; dataState.page=1; closeSlideout(); renderTableDetail(id); }
+function applyTblFilters(id){ const t=_table(id); const out={}; t.cols.forEach(c=>{ const f=_readColFilter(c); if(f) out[c.n]=f; }); dataState.colFilters=out; dataState.page=1; closeSlideout(); renderTableDetail(id); }
+function clearTblFilters(id){ dataState.colFilters={}; dataState.page=1; closeSlideout(); renderTableDetail(id); }
 function _tblDataKebab(btn,id){ _openPop(btn, `
   <button class="pop-item" onclick="_closePop();openImportWizard('${id}','table')"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10V2M5 5l3-3 3 3M3 11v2h10v-2"/></svg>Import records…</button>
   <button class="pop-item" onclick="_closePop();toast('Exported records to CSV','ok')"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></svg>Export all as CSV</button>
@@ -4773,25 +4860,27 @@ function openTblBulkDelete(id,n){
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 1.5 1 13.5h14L8 1.5Z"/><path d="M8 6.5v3M8 11.5h.01" stroke-linecap="round"/></svg></div><div class="modal-title">Delete ${n} record${n===1?'':'s'}?</div></div>
     <div class="modal-body">This permanently removes the selected record${n===1?'':'s'} from live tenant data. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" style="background:var(--field-text-error,#dc2626);border-color:transparent" onclick="dataSelClear('${id}');closeModal();toast('${n} record${n===1?'':'s'} deleted','ok')">Delete</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function dataTab(t){
   const s=dataState; const rows=_mockRows(t); const q=(s.search||'').toLowerCase(); const per=s.perPage||25;
-  const cols=t.cols.slice(0,6);
+  const cols=t.cols; // A1: render all columns with lateral scroll (was slice(0,6))
   let filtered=q?rows.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))):rows.slice();
-  if(s.colFilter&&s.colFilter.text){ const cf=s.colFilter; filtered=filtered.filter(r=>String(r[cf.col]||'').toLowerCase().includes(cf.text.toLowerCase())); }
+  const _cfs=Object.entries(s.colFilters||{}).filter(([,f])=>_cfActive(f)); // A4: per-column filters (AND across columns)
+  if(_cfs.length) filtered=filtered.filter(r=>_cfs.every(([col,f])=>_matchColFilter(r[col],f)));
   if(s.sortCol){ const c=s.sortCol; filtered.sort((a,b)=>{ const va=(''+(c==='__id'?a.__id:(a[c]||''))).toLowerCase(), vb=(''+(c==='__id'?b.__id:(b[c]||''))).toLowerCase(); const cmp=va<vb?-1:va>vb?1:0; return s.sortDir==='desc'?-cmp:cmp; }); }
   const total=filtered.length, pages=Math.max(1,Math.ceil(total/per)), page=Math.min(Math.max(1,s.page||1),pages);
   const start=(page-1)*per, end=Math.min(start+per,total), vis=filtered.slice(start,end);
   s.sel=s.sel||new Set(); const ids=vis.map(r=>r.__id); const allSel=ids.length&&ids.every(i=>s.sel.has(i)); const selN=s.sel.size;
-  const gt=`grid-template-columns:38px 150px ${cols.map(()=>'minmax(0,1fr)').join(' ')}`;
+  const _minW=38+150+cols.length*172+56; // A1: force lateral scroll when columns exceed the viewport
+  const gt=`grid-template-columns:38px 150px ${cols.map(()=>'minmax(160px,1fr)').join(' ')};min-width:${_minW}px`;
   const HCOLS=[{key:'__id',disp:'ID',name:'__id'}].concat(cols.map(c=>({key:c.n,disp:c.d,name:c.n})));
   const cb=(ck,onc)=>`<button class="mv-check ${ck?'on':''}" onclick="event.stopPropagation();${onc}" role="checkbox" aria-checked="${ck}">${ck?'<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>':''}</button>`;
   const sortIc=(col)=>{ if(s.sortCol!==col) return '<svg class="ttd-sort" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 6.5L8 3.5l3 3M5 9.5l3 3 3-3" opacity=".5"/></svg>'; return s.sortDir==='asc'?'<svg class="ttd-sort on" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9.5L8 5.5l4 4"/></svg>':'<svg class="ttd-sort on" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6.5L8 10.5l4-4"/></svg>'; };
   return `<div class="ttd-head">
      <div class="ttd-head-l">
        <label class="dsf-search" style="max-width:250px;height:34px"><svg class="dsf-search-ic" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M11 11l3 3"/></svg><input id="dataSearch" type="text" placeholder="Search records…" value="${escapeHtml(s.search||'')}" oninput="dataSearchInput('${t.id}',this.value)" autocomplete="off"></label>
-       <button class="btn ttd-tool ${s.colFilter&&s.colFilter.text?'has-active':''}" style="height:34px" onclick="openTblFilters('${t.id}')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12M4 8h8M6.5 12.5h3"/></svg> Filters${s.colFilter&&s.colFilter.text?'<span class="mk-fcount">1</span>':''}</button>
+       <button class="btn ttd-tool ${_cfs.length?'has-active':''}" style="height:34px" onclick="openTblFilters('${t.id}')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12M4 8h8M6.5 12.5h3"/></svg> Filters${_cfs.length?`<span class="mk-fcount">${_cfs.length}</span>`:''}</button>
      </div>
      <div class="ttd-head-r">
        <span class="ttd-fresh">Updated ${escapeHtml(t.updated)}</span>
@@ -4827,9 +4916,11 @@ function openRecord(tid, idx){
     <div class="so-body"><div class="so-fields">
       ${allCols.map(c=>`<div class="so-field"><span class="so-field-l">${escapeHtml(c.d)}${c.system?' <span class="so-locked" style="font-size:10px">sys</span>':''}</span><span class="so-field-v ${c.t==='UUID'||c.t==='Reference'?'mono':''}">${c.system?_fmtVal(c,_mockVal(c,idx)):_fmtVal(c,r[c.n])}</span></div>`).join('')}
     </div></div>
-    <div class="so-foot"><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="openEditRecord('${tid}',${idx})">Edit record</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+    <div class="so-foot"><button class="btn btn-danger" style="margin-right:auto" onclick="_deleteRecord('${tid}',${idx})">${_RM_IC.del} Delete row</button><button class="btn" onclick="_dupRecord('${tid}',${idx})">${_RM_IC.dup} Duplicate</button><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="openEditRecord('${tid}',${idx})">Edit record</button></div>`;
+  _soOpen();
 }
+function _deleteRecord(tid,idx){ const t=_table(tid); const rows=_mockRows(t); if(idx<0||idx>=rows.length) return; rows.splice(idx,1); closeSlideout(); toast('Record deleted','ok'); renderTableDetail(tid); }
+function _dupRecord(tid,idx){ const t=_table(tid); const rows=_mockRows(t); const r=rows[idx]; if(!r) return; const c=JSON.parse(JSON.stringify(r)); c.__id=_mockId(rows.length); rows.splice(idx+1,0,c); closeSlideout(); toast('Record duplicated','ok'); renderTableDetail(tid); }
 function _recField(c, val){
   const v=val==null?'':val;
   if(c.t==='Enum'&&c.ev) return `<select class="mselect" id="rf_${c.n}">${c.ev.map(e=>`<option value="${e[0]}" ${e[0]===v?'selected':''}>${escapeHtml(e[1])}</option>`).join('')}</select>`;
@@ -4845,7 +4936,7 @@ function openAddRecord(tid){
   $('modalScrim').innerHTML=`<div class="modal" style="max-height:86vh;overflow:auto"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-informative-bg);color:var(--tag-informative-fg);border-color:var(--tag-informative-bd)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg></div><div class="modal-title">Add record to ${escapeHtml(t.alias)}</div></div>
     <div class="modal-body">${_recordForm(t,null)}</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveRecord('${tid}',-1)">Add record</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function openEditRecord(tid, idx){
   const t=_table(tid); const r=_mockRows(t)[idx]; if(!r) return;
@@ -4853,7 +4944,7 @@ function openEditRecord(tid, idx){
   $('modalScrim').innerHTML=`<div class="modal" style="max-height:86vh;overflow:auto"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-informative-bg);color:var(--tag-informative-fg);border-color:var(--tag-informative-bd)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11 2.5l2.5 2.5L6 12.5 3 13l.5-3L11 2.5Z" stroke-linejoin="round"/></svg></div><div class="modal-title">Edit record</div></div>
     <div class="modal-body">${_recordForm(t,r)}</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveRecord('${tid}',${idx})">Save changes</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function saveRecord(tid, idx){
   const t=_table(tid); const rows=_mockRows(t);
@@ -4910,7 +5001,7 @@ const REFDATA = [
     RV('service_email','Service email','Transactional — always on.',true,'2022-05-25'),
     RV('legacy_optout','Legacy opt-out','Pre-GDPR flag.',false,'2018-01-01','2022-05-25'),
   ]},
-  {id:'cost_centers_2024', name:'Cost centers (2024)', category:'Finance', origin:'From catalog', status:'Archived', updated:'May 22, 2026', owner:'em', collab:['dp'], fields:6, referencedBy:0, tags:['finance'],
+  {id:'cost_centers_2024', name:'Cost centers (2024)', category:'Finance', origin:'From catalog', status:'Deprecated', updated:'May 22, 2026', owner:'em', collab:['dp'], fields:6, referencedBy:0, tags:['finance'],
    desc:'Archived 2024 cost-center hierarchy kept read-only for audit. Replaced by the current finance dimension.',
    usedBy:[], values:[
     RV('cc_1000','Sales','2024 sales cost center.',false,'2024-01-01','2024-12-31'),
@@ -4994,11 +5085,13 @@ function _originBadge(o){ return `<span class="chip">${o==='From catalog'?'<svg 
 function _refUsedBy(id){ const r=_ref(id); return (r&&r.usedBy)||[]; }
 
 /* Reference LIST */
-const refListState = { search:'', category:'all', status:'all', origin:'all', view:'list' };
-function rlSearch(v){ refListState.search=v; renderReferenceList(); setTimeout(()=>{const el=$('refSearch'); if(el){el.focus(); el.setSelectionRange(v.length,v.length);}},0); }
-function rlSet(k,v){ refListState[k]=v; renderReferenceList(); }
+const refListState = { search:'', category:'all', status:'all', origin:'all', view:'list', page:1, perPage:9 };
+function rlSearch(v){ refListState.search=v; refListState.page=1; renderReferenceList(); setTimeout(()=>{const el=$('refSearch'); if(el){el.focus(); el.setSelectionRange(v.length,v.length);}},0); }
+function rlSet(k,v){ refListState[k]=v; if(k!=='page') refListState.page=1; renderReferenceList(); }
 function rlView(v){ refListState.view=v; _saveView('reference',v); renderReferenceList(); }
-function rlClear(){ refListState.category='all'; refListState.status='all'; refListState.origin='all'; refListState.tags=[]; renderReferenceList(); }
+function rlClear(){ refListState.category='all'; refListState.status='all'; refListState.origin='all'; refListState.tags=[]; refListState.page=1; renderReferenceList(); }
+function rlListPage(p){ refListState.page=p; renderReferenceList(); }
+function rlListPer(n){ refListState.perPage=+n; refListState.page=1; renderReferenceList(); }
 function _refFiltered(){
   const q=refListState.search.toLowerCase();
   return REFDATA.filter(r=>{
@@ -5018,18 +5111,22 @@ function renderReferenceList(){
   const stc=refListState.status!=='all'?{label:refListState.status, onremove:"rlSet('status','all')"}:null;
   const oc=refListState.origin!=='all'?{label:refListState.origin, onremove:"rlSet('origin','all')"}:null;
   const filtering=refListState.category!=='all'||refListState.status!=='all'||refListState.origin!=='all';
+  const _per=refListState.perPage, _total=filtered.length, _pages=Math.max(1,Math.ceil(_total/_per));
+  const _page=Math.min(Math.max(1,refListState.page),_pages);
+  const _vis=filtered.slice((_page-1)*_per,(_page-1)*_per+_per);
+  const _lpgn=_pagination({per:_per,total:_total,page:_page,opts:[9,25,50],id:'ref-lpgn',pageCall:p=>`rlListPage(${p})`,perCall:n=>`rlListPer(${n})`});
   $('content').innerHTML = pageShell('reference') + `
     <div class="tbar">
       <label class="dsf-search"><svg class="dsf-search-ic" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M11 11l3 3"/></svg><input id="refSearch" type="text" placeholder="Search reference lists…" value="${escapeHtml(refListState.search)}" oninput="rlSearch(this.value)" autocomplete="off"></label>
       ${dsfDrop('rlCat','Category', cc, [{label:'All categories',selected:refListState.category==='all',onclick:"dsfPickSingle();rlSet('category','all')"}].concat(cats.map(c=>({label:c,count:REFDATA.filter(r=>r.category===c).length,selected:refListState.category===c,onclick:`dsfPickSingle();rlSet('category','${c}')`}))))}
-      ${dsfDrop('rlStatus','Status', stc, [{label:'All statuses',selected:refListState.status==='all',onclick:"dsfPickSingle();rlSet('status','all')"}].concat(['Published','Draft','Archived'].map(s=>({label:s,count:REFDATA.filter(r=>r.status===s).length,selected:refListState.status===s,onclick:`dsfPickSingle();rlSet('status','${s}')`}))))}
+      ${dsfDrop('rlStatus','Status', stc, [{label:'All statuses',selected:refListState.status==='all',onclick:"dsfPickSingle();rlSet('status','all')"}].concat(['Published','Draft','Deprecated'].map(s=>({label:s,count:REFDATA.filter(r=>r.status===s).length,selected:refListState.status===s,onclick:`dsfPickSingle();rlSet('status','${s}')`}))))}
       ${dsfDrop('rlOrigin','Origin', oc, [{label:'All origins',selected:refListState.origin==='all',onclick:"dsfPickSingle();rlSet('origin','all')"}].concat(['Custom','From catalog'].map(o=>({label:o,count:REFDATA.filter(r=>r.origin===o).length,selected:refListState.origin===o,onclick:`dsfPickSingle();rlSet('origin','${o}')`}))))}
       <button class="flt-btn" onclick="openFilters('reference')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg> Filters${_fltCount('reference')?` <span class="flt-badge">${_fltCount('reference')}</span>`:''}</button>
       ${filtering?`<button class="dsf-clear" onclick="rlClear()">Clear</button>`:''}
       <span class="tbar-spring"></span>
       ${viewToggle(refListState,'rlView')}
     </div>
-    ${refListState.view==='table' ? dtblView('reference',filtered,_refCols(),'reference') : filtered.length===0?`<div class="empty"><div class="empty-t">No reference data matches</div>Try a different search or clear the filters.</div>` : refListState.view==='grid' ? `<div class="mcard-grid">${filtered.map(refCard).join('')}</div>` : `<div class="lrows">${filtered.map(refRow).join('')}</div>`}`;
+    ${refListState.view==='table' ? dtblView('reference',filtered,_refCols(),'reference') : filtered.length===0?`<div class="empty"><div class="empty-t">No reference data matches</div>Try a different search or clear the filters.</div>` : refListState.view==='grid' ? `<div class="mcard-grid">${_vis.map(refCard).join('')}</div>`+_lpgn : `<div class="lrows">${_vis.map(refRow).join('')}</div>`+_lpgn}`;
 }
 function refRow(r){
   return `<div class="lrow" onclick="openRefPreview('${r.id}')">
@@ -5056,7 +5153,8 @@ let refDetailState = { id:null, tab:'overview', search:'', page:1, showInactive:
 function renderReferenceDetail(id){
   _dsfRerender = function(){ renderReferenceDetail(refDetailState.id); };
   const r=_ref(id); if(!r){ location.hash='#/reference'; return; }
-  const tab=refDetailState.tab;
+  const tab0=refDetailState.tab;
+  const tab=(TAB_VER[tab0] && SCOPE_TIERS.indexOf(TAB_VER[tab0])>SCOPE_TIERS.indexOf(SCOPE))?'overview':tab0; // gated ref tab (refby/history/settings) → overview below its tier
   const used=_refUsedBy(id);
   const pending = r.status!=='Published';
   const relN = r.referencedBy>0?1:0;
@@ -5068,7 +5166,7 @@ function renderReferenceDetail(id){
       <div class="dh-title-row">${_catIcon(r.category)}<span class="dh-title">${escapeHtml(r.name)}</span></div>
       <div class="rfd-internal"><code>${escapeHtml(_refInternal(r))}</code><span class="rfd-lock" title="Internal name — cannot be changed after creation"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="10" height="6" rx="1.3"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg></span></div>
       <div class="dh-title-row" style="margin-top:10px">${_stPill(r.status)}${_originBadge(r.origin)}${_catBadge(r.category)}<span class="rfd-sens"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M8 1.5l5.5 2v4c0 3.2-2.3 5.6-5.5 6.5-3.2-.9-5.5-3.3-5.5-6.5v-4L8 1.5Z"/></svg>${escapeHtml(r.sensitivity||'Internal')}</span></div>
-    </div><div class="dh-actions">${pending?`<button class="btn btn-primary" onclick="publishReference('${id}')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10"/></svg>Publish</button>`:`<button class="btn" onclick="toast('No pending changes')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>Published</button>`}<button class="btn" style="width:40px;padding:0" aria-label="More actions" onclick="_refKebab(this,'${id}')"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></div></div>
+    </div><div class="dh-actions"><span data-version="v1.5">${pending?`<button class="btn btn-primary" onclick="publishReference('${id}')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10"/></svg>Publish</button>`:`<button class="btn" onclick="toast('No pending changes')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>Published</button>`}</span><button class="btn" style="width:40px;padding:0" aria-label="More actions" onclick="_refKebab(this,'${id}')"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></div></div>
     <div class="mtabs">${tabs.map(([tid,label])=>`<button class="mtab ${tab===tid?'active':''}" ${TAB_VER[tid]?`data-version="${TAB_VER[tid]}"`:''} onclick="setRefTab('${tid}')">${label}${cnt[tid]!=null?` <span style="font-size:11px;font-weight:700;color:var(--field-placeholder);background:var(--muted);padding:1px 6px;border-radius:6px;margin-left:2px">${cnt[tid]}</span>`:''}</button>`).join('')}</div>
     <div id="rpanel">${tab==='overview'?refOverviewTab(r):tab==='data'?refDataTab(r):tab==='refby'?refReferencedByTab(r):tab==='columns'?refColumnsTab(r):tab==='relationships'?refRelTab(r):tab==='settings'?refSettingsTab(r):_historyTab('reference',r)}</div>`;
   if(tab==='relationships'&&_relViewMode==='diagram') setTimeout(_diagInit,0);
@@ -5150,7 +5248,7 @@ function _detailDelete(surface,id){ const cfg=_surfCfg(surface); if(!cfg) return
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Delete “${escapeHtml(nm)}”?</div></div>
     <div class="modal-body">${blocked?`This ${label} can't be deleted — <b>${blocked} column${blocked===1?'':'s'}</b> still reference it. Remove those references first.`:`This permanently removes the ${label} from the prototype. This can't be undone.`}</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">${blocked?'Close':'Cancel'}</button>${blocked?'':`<button class="btn btn-danger" onclick="_detailDoDelete('${surface}','${id}')">Delete ${label}</button>`}</div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _detailDoDelete(surface,id){ const cfg=_surfCfg(surface); if(!cfg) return; const i=cfg.arr.findIndex(r=>r.id===id); if(i<0) return; const nm=cfg.arr[i][cfg.nameKey];
   cfg.arr.splice(i,1); if(surface==='models') _mdReset&&_mdReset(id);
@@ -5182,12 +5280,12 @@ function refSettingsTab(r){
     ${row('Origin','Where this list came from.',`<span style="font-size:13px;color:var(--t2)">${escapeHtml(r.origin)}</span>`)}
     ${row('Owner','Accountable for this list.',`<span class="lrow-owner">${av(P(r.owner),'sm')}${escapeHtml(P(r.owner).n)}</span>`)}
     <div class="rset-danger"><div class="rset-danger-h">Danger zone</div>
-      <div class="rset-row" style="border:none;padding:6px 0"><div class="rset-row-l"><span class="rset-row-t">${r.status==='Archived'?'Restore this list':'Archive this list'}</span><span class="rset-row-d">${r.status==='Archived'?'Make it available for new records again.':'Hide from new records; keep for history.'}</span></div><button class="btn" onclick="refArchive('${r.id}')">${r.status==='Archived'?'Restore':'Archive'}</button></div>
+      <div class="rset-row" style="border:none;padding:6px 0"><div class="rset-row-l"><span class="rset-row-t">${r.status==='Deprecated'?'Restore this list':'Deprecate this list'}</span><span class="rset-row-d">${r.status==='Deprecated'?'Make it available for new records again.':'Mark superseded; keep for history, hide from new records.'}</span></div><button class="btn" onclick="refArchive('${r.id}')">${r.status==='Deprecated'?'Restore':'Deprecate'}</button></div>
       <div class="rset-row" style="border:none;padding:6px 0"><div class="rset-row-l"><span class="rset-row-t">Delete this list</span><span class="rset-row-d">${r.referencedBy>0?`Blocked — ${r.referencedBy} columns reference it.`:'Permanently remove this list.'}</span></div><button class="btn" style="color:var(--field-text-error,#dc2626);border-color:rgba(220,38,38,.3)" onclick="_detailDelete('reference','${r.id}')">Delete</button></div>
     </div></div>`;
 }
 function refSetName(id,v){ const r=_ref(id); if(!r) return; v=(v||'').trim(); if(!v) return; if(!r.internal) r.internal=_refInternal(r); /* pin internal before rename — it's locked */ r.name=v; if(r.status==='Published') r.status='Draft'; renderReferenceDetail(id); }
-function refArchive(id){ const r=_ref(id); if(!r) return; r.status=r.status==='Archived'?'Draft':'Archived'; toast(r.status==='Archived'?'“'+r.name+'” archived':'“'+r.name+'” restored','ok'); renderReferenceDetail(id); }
+function refArchive(id){ const r=_ref(id); if(!r) return; r.status=r.status==='Deprecated'?'Draft':'Deprecated'; toast(r.status==='Deprecated'?'“'+r.name+'” deprecated':'“'+r.name+'” restored','ok'); renderReferenceDetail(id); }
 function refColumnsTab(r){
   const schema=REF_SCHEMA.slice(0, r.fields||REF_SCHEMA.length);
   return _colsView('reference', r, schema, false);
@@ -5211,11 +5309,11 @@ function refOverviewTab(r){
   ];
   const preRows=vals.slice(0,8);
   const preview=preRows.length?`<table class="ref-preview"><thead><tr><th>Code</th><th>Label</th><th>Status</th></tr></thead><tbody>${preRows.map(v=>`<tr><td class="ref-preview-key">${escapeHtml(v.code)}</td><td>${escapeHtml(v.label)}</td><td><span class="rstat ${v.active?'on':'off'}"><span class="rstat-dot"></span>${v.active?'Active':'Inactive'}</span></td></tr>`).join('')}</tbody></table>`:`<div class="ov-empty">No items yet.</div>`;
-  return `<div class="md-tiles">${tiles.join('')}</div>
-    <div class="dsec ov-sub"><div class="dsec-h"><div class="dsec-t">Items preview<span class="dsec-sub">showing ${Math.min(8,vals.length)} of ${vals.length}</span></div><a class="md-sec-link" onclick="setRefTab('data')">View all data →</a></div>${preview}</div>
-    <div class="dsec ov-sub"><div class="dsec-h"><div class="dsec-t">About this reference list</div></div><div style="font-size:13px;color:var(--t2);line-height:1.6">${escapeHtml(r.desc||'No description yet.')}</div>
+  return `<div class="dsec ov-sub"><div class="dsec-h"><div class="dsec-t">About this reference list</div></div><div style="font-size:13px;color:var(--t2);line-height:1.6">${escapeHtml(r.desc||'No description yet.')}</div>
        <div class="lrow-foot" style="margin-left:0;margin-top:12px"><span class="lrow-owner">${av(P(r.owner),'sm')}${escapeHtml(P(r.owner).n)}</span><span class="lrow-sep">·</span><span>${escapeHtml(r.category||'Reference')}</span><span class="lrow-sep">·</span><span>${escapeHtml(r.origin||'Custom')}</span><span class="lrow-sep">·</span><span>Updated ${escapeHtml(r.updated||'—')}</span></div></div>
-    ${_ovActivity('reference',r)}`;
+    <div data-version="v2"><div class="md-tiles">${tiles.join('')}</div>
+    <div class="dsec ov-sub"><div class="dsec-h"><div class="dsec-t">Items preview<span class="dsec-sub">showing ${Math.min(8,vals.length)} of ${vals.length}</span></div><a class="md-sec-link" onclick="setRefTab('data')">View all data →</a></div>${preview}</div>
+    ${_ovActivity('reference',r)}</div>`;
 }
 
 /* ── Reference "Referenced by" tab ── */
@@ -5287,7 +5385,7 @@ function openRefByDetail(refId,i){
       </div></div>
     </div>
     <div class="so-foot"><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="closeSlideout();navigate('tables/${x.tableId}')">Open table</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
 }
 
 /* Reference value — slide-out + create/edit */
@@ -5308,14 +5406,14 @@ function openRefValue(refId, code){
       </div><div style="font-size:12px;color:var(--field-text);margin-top:10px;line-height:1.5">${escapeHtml(v.description||'No description.')}</div></div>
     </div>
     <div class="so-foot"><button class="btn" onclick="toggleRefValueActive('${refId}','${escapeHtml(v.code)}')">${v.active?'Deactivate':'Reactivate'}</button><button class="btn" style="color:var(--field-text-error,#dc2626)" onclick="openRefItemDelete('${refId}','${escapeHtml(v.code)}')">Delete</button><span style="flex:1"></span><button class="btn btn-primary" onclick="openEditRefValue('${refId}','${escapeHtml(v.code)}')">Edit item</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
 }
 function openRefItemDelete(refId, code){
   const r=_ref(refId); const v=r.values.find(x=>x.code===code); if(!v) return; closeSlideout();
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 1.5 1 13.5h14L8 1.5Z"/><path d="M8 6.5v3M8 11.5h.01" stroke-linecap="round"/></svg></div><div class="modal-title">Delete “${escapeHtml(v.label)}”?</div></div>
     <div class="modal-body">Removes <code>${escapeHtml(v.code)}</code> from <b>${escapeHtml(r.name)}</b>.${r.referencedBy>0?` <span style="color:var(--field-text-error,#dc2626)">${r.referencedBy} columns reference this list.</span>`:''}</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" style="background:var(--field-text-error,#dc2626);border-color:transparent" onclick="_delRefItem('${refId}','${escapeHtml(code)}')">Delete</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _delRefItem(refId,code){ const r=_ref(refId); r.values=r.values.filter(v=>v.code!==code); if(r.status==='Published') r.status='Draft'; closeModal(); toast('Item deleted','ok'); renderReferenceDetail(refId); }
 function toggleRefValueActive(refId, code){
@@ -5359,7 +5457,7 @@ function openRefItem(refId, mode, code){
       }).join('')}
     </div>
     <div class="so-foot"><button class="btn" onclick="closeSlideout()">Cancel</button><button class="btn btn-primary" onclick="saveRefItem('${refId}','${mode}','${code||''}')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>${mode==='edit'?'Save changes':'Create item'}</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
   setTimeout(()=>{const el=$('ri_label'); if(el)el.focus();},60);
 }
 function saveRefItem(refId, mode, code){
@@ -5386,7 +5484,7 @@ function openRefFilters(id){
       <div class="flt-sec"><div class="flt-sec-h">Description</div>${radio('fltDesc','descFilter','all',df,'Any')}${radio('fltDesc','descFilter','has',df,'Has description')}${radio('fltDesc','descFilter','missing',df,'Missing description')}</div>
     </div>
     <div class="so-foot"><button class="btn" onclick="clearRefFilters('${id}')">Clear all</button><button class="btn btn-primary" onclick="applyRefFilters('${id}')">Apply filters</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
 }
 /* ── Reference Data: overflow kebab (import / export) ── */
 function _refDataKebab(btn,id){ _openPop(btn, `
@@ -5399,7 +5497,7 @@ function openRefBulkStatus(id){
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-informative-bg);color:var(--tag-informative-fg);border-color:var(--tag-informative-bd)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 8h8M10 5l3 3-3 3"/></svg></div><div class="modal-title">Change status · ${n} item${n===1?'':'s'}</div></div>
     <div class="modal-body"><div class="mform"><div class="mfield"><label class="mfield-l">New status</label><select class="mselect" id="bulkStatus"><option value="Active">Active</option><option value="Deprecated">Deprecated</option><option value="Archived">Archived</option></select></div><div style="font-size:12.5px;color:var(--t2);margin-top:6px">Applies to the ${n} selected item${n===1?'':'s'}. Deprecated / Archived items stay for history but are hidden from new records.</div></div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="applyRefBulkStatus('${id}')">Apply</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function applyRefBulkStatus(id){ const r=_ref(id); const sel=refDetailState.sel||new Set(); const n=sel.size; const active=($('bulkStatus').value==='Active'); r.values.forEach(v=>{ if(sel.has(v.code)) v.active=active; }); if(r.status==='Published') r.status='Draft'; refDetailState.sel=new Set(); closeModal(); toast('Status updated for '+n+' item'+(n===1?'':'s'),'ok'); renderReferenceDetail(id); }
 /* ── Reference Data: bulk delete ── */
@@ -5408,7 +5506,7 @@ function openRefBulkDelete(id){
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 1.5 1 13.5h14L8 1.5Z"/><path d="M8 6.5v3M8 11.5h.01" stroke-linecap="round"/></svg></div><div class="modal-title">Delete ${n} item${n===1?'':'s'}?</div></div>
     <div class="modal-body">This removes the selected value${n===1?'':'s'} from <b>${escapeHtml(r.name)}</b>.${r.referencedBy>0?` <span style="color:var(--field-text-error,#dc2626)">${r.referencedBy} columns reference this list — records using ${n===1?'it':'them'} would fail validation.</span>`:''}</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" style="background:var(--field-text-error,#dc2626);border-color:transparent" onclick="applyRefBulkDelete('${id}')">Delete</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function applyRefBulkDelete(id){ const r=_ref(id); const sel=refDetailState.sel||new Set(); const n=sel.size; r.values=r.values.filter(v=>!sel.has(v.code)); if(r.status==='Published') r.status='Draft'; refDetailState.sel=new Set(); closeModal(); toast(n+' item'+(n===1?'':'s')+' deleted','ok'); renderReferenceDetail(id); }
 /* ── Reference Data: import wizard (5 steps) ── */
@@ -5431,7 +5529,7 @@ function _renderImport(id){
   $('modalScrim').innerHTML=`<div class="modal modal-imp"><div class="modal-head"><div class="modal-title">Import ${noun} · ${escapeHtml(name)}</div><button class="so-close" onclick="closeModal()" aria-label="Close">✕</button></div>
     <div class="modal-body">${stepper}<div class="imp-body">${body}</div></div>
     <div class="modal-foot"><button class="btn" onclick="${st===0?'closeModal()':`_impNav('${id}',-1)`}">${st===0?'Cancel':'Back'}</button><button class="btn btn-primary" onclick="${isLast?`_impFinish('${id}')`:`_impNav('${id}',1)`}">${isLast?('Import 15 '+noun):'Continue'}</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _impFinish(id){ const kind=_impState.kind||'reference'; if(kind==='table'){ closeModal(); toast('Imported 15 records','ok'); renderTableDetail(id); return; } const r=_ref(id); [['emea','EMEA region'],['apac','APAC region'],['latam','LATAM region']].forEach(a=>{ if(!r.values.find(v=>v.code===a[0])) r.values.push(RV(a[0],a[1],'Imported region.',true,'')); }); if(r.status==='Published') r.status='Draft'; closeModal(); toast('Imported 15 items','ok'); renderReferenceDetail(id); }
 function openEditRefValue(refId, code){ openRefItem(refId,'edit',code); }
@@ -5468,7 +5566,7 @@ function openImportRef(refId){
       <div style="font-size:12px;color:var(--t2);margin-top:12px;display:flex;gap:8px;align-items:flex-start"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--primary)" stroke-width="1.6" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6"/><path d="M8 7.5v3.5M8 5h.01" stroke-linecap="round"/></svg><span>Rows are matched by <b>code</b> — existing codes update in place, new codes are added. Integration-fed reference data arrives through <b>Sources</b> instead.</span></div>
     </div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="_impRun('${refId}')">Import</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _impPick(){ toast('File picker — mock (prototype)'); }
 function _impRun(refId){
@@ -5488,7 +5586,7 @@ function openCreateReference(){
       <div style="font-size:12px;color:var(--t2);display:flex;gap:8px;align-items:flex-start"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--primary)" stroke-width="1.6" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6"/><path d="M8 7.5v3.5M8 5h.01" stroke-linecap="round"/></svg><span>Starts empty with the standard <b>code · label · description · active · validity</b> schema. Add values or import them next.</span></div>
     </div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewReference()">Create</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
   setTimeout(()=>{const nm=$('crName'),cd=$('crCode'); if(nm){nm.focus(); nm.oninput=()=>{ if(cd) cd.value=nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''); };}},50);
 }
 function saveNewReference(){
@@ -5513,7 +5611,7 @@ function openCreateEntity(){
       <div style="font-size:12px;color:var(--t2);display:flex;gap:8px;align-items:flex-start"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--primary)" stroke-width="1.6" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6"/><path d="M8 7.5v3.5M8 5h.01" stroke-linecap="round"/></svg><span>A <b>primary table</b> is created automatically — every entity needs at least one. Publish when you're ready to apply it to the live schema.</span></div>
     </div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewEntity()">Create entity</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
   setTimeout(()=>{const nm=$('ceName'),cd=$('ceCode'); if(nm){nm.focus(); nm.oninput=()=>{ if(cd) cd.value='ent_'+_slug(nm.value); };}},50);
 }
 function saveNewEntity(){
@@ -5539,7 +5637,7 @@ function openCreateTable(){
       <div style="font-size:12px;color:var(--t2);display:flex;gap:8px;align-items:flex-start"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--primary)" stroke-width="1.6" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6"/><path d="M8 7.5v3.5M8 5h.01" stroke-linecap="round"/></svg><span>The <b>7 system columns</b> (id, tenant, audit) are added automatically. Add your own columns next.</span></div>
     </div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewTable()">Create table</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
   setTimeout(()=>{const nm=$('ctName'),cd=$('ctCode'); if(nm){nm.focus(); nm.oninput=()=>{ if(cd) cd.value=_slug(nm.value); };}},50);
 }
 function saveNewTable(){
@@ -5560,7 +5658,7 @@ function saveNewTable(){
 const SCOPE_TIERS = ['v1','v1.5','v2'];
 let SCOPE = 'v1';
 /* Which detail tabs belong to which scope (untagged = V1 · browse). Authoring/govern → V1.5, API builder → Full vision. */
-const TAB_VER = { privileges:'v1.5', history:'v1.5', settings:'v1.5', indexes:'v1.5', api:'v2' };
+const TAB_VER = { privileges:'v1.5', history:'v2', settings:'v2', indexes:'v2', api:'v1.5', refby:'v2', components:'v2', diagram:'v2' };
 function vcallout(tier,text){ return `<div class="vcallout" data-version="${tier}"><span class="vcallout-tag">${tier==='v2'?'Full vision':tier==='v1.5'?'V1.5':'V1'}</span><span>${text}</span></div>`; }
 /* coming-soon annotation — shown at scopes BELOW `tier`, hidden once you reach the tier that ships it */
 function vsoon(tier,text){ return `<div class="vcallout vcallout-soon" data-soon="${tier}"><span class="vcallout-tag">${tier==='v2'?'Full vision':tier==='v1.5'?'V1.5':'V1'} · coming</span><span>${text}</span></div>`; }
@@ -5570,7 +5668,7 @@ function applyScope(){
   /* coming-soon callouts: visible only BELOW their tier, hidden once you reach it (where the real feature lives) */
   document.querySelectorAll('[data-soon]').forEach(el=>{ const ti=SCOPE_TIERS.indexOf(el.getAttribute('data-soon')); el.style.display = (ti>si)?'':'none'; });
   SCOPE_TIERS.forEach(t=>{ const b=$('scope-'+t); if(b) b.classList.toggle('on', t===SCOPE); });
-  const foot=document.querySelector('.sb-foot'); if(foot) foot.textContent = (SCOPE==='v1'?'V1 · Foundation':SCOPE==='v1.5'?'V1.5 · Expansion':'Full vision')+' scope';
+  const foot=document.querySelector('.sb-foot'); if(foot) foot.textContent = (SCOPE==='v1'?'V1 · Foundation':SCOPE==='v1.5'?'V1.2 · Expansion':'Full vision')+' scope';
 }
 function setScope(t){ SCOPE=t; applyScope(); }
 /* Draggable Scope toggle — so it never blocks proto functionality underneath it */
@@ -5647,7 +5745,7 @@ const MODELS=[
    desc:'Physical and digital assets, custody chains and depreciation schedules for the operations team.'},
   {id:'general_ledger', name:'General Ledger', origin:'Implemented', category:'Finance', status:'Published', entities:12, version:'v5.1', owner:'em', collab:['dp'], updated:'May 18, 2026', tags:['finance','core','gold'],
    desc:'Chart of accounts, journals, cost centers and fiscal periods. The accounting backbone synced from the marketplace.'},
-  {id:'inventory_stock', name:'Inventory & Stock', origin:'Implemented', category:'Operations', status:'Pending changes', entities:9, version:'v2.1', owner:'dn', collab:['mr','sm'], updated:'5h ago', tags:['ops','inventory'],
+  {id:'inventory_stock', name:'Inventory & Stock', origin:'Implemented', category:'Operations', status:'Draft', entities:9, version:'v2.1', owner:'dn', collab:['mr','sm'], updated:'5h ago', tags:['ops','inventory'],
    desc:'Warehouses, SKUs, lots and stock movements with reorder thresholds. Pending changes awaiting review.'},
   {id:'iot_telemetry', name:'IoT Telemetry', origin:'Implemented', category:'IoT', status:'Published', entities:6, version:'v1.3', owner:'jc', collab:['tk'], updated:'May 20, 2026', tags:['iot','streaming'],
    desc:'Devices, sensor streams, readings and alert thresholds. High-volume time-series ingest from the field.'},
@@ -5728,17 +5826,21 @@ function renderModels(){
   const stChip=modelsState.status!=='all'?{label:modelsState.status,onremove:"mSet('status','all')"}:null;
   const ownChip=modelsState.owner!=='all'?{label:P(modelsState.owner).n,onremove:"mSet('owner','all')"}:null;
   const filtering=modelsState.category!=='all'||modelsState.origin!=='all'||modelsState.status!=='all'||modelsState.owner!=='all';
+  const _per=modelsState.perPage, _total=alpha.length, _pages=Math.max(1,Math.ceil(_total/_per));
+  const _page=Math.min(Math.max(1,modelsState.page),_pages);
+  const _vis=alpha.slice((_page-1)*_per,(_page-1)*_per+_per);
+  const _lpgn=_pagination({per:_per,total:_total,page:_page,opts:[9,25,50],id:'mdl-lpgn',pageCall:p=>`mTablePage(${p})`,perCall:n=>`mPerPage(${n})`});
   const body = modelsState.view==='table'
     ? modelTableView(filtered)
     : modelsState.view==='list'
-    ? `<div class="dtable">${alpha.map(modelRow).join('')||`<div class="empty" style="padding:44px">No models match.</div>`}</div>`
-    : `<div class="mcard-grid">${alpha.map(modelCard).join('')}</div>${filtered.length===0?`<div class="empty" style="padding:44px">No models match your filters.</div>`:''}`;
+    ? (_total===0?`<div class="empty" style="padding:44px">No models match.</div>`:`<div class="dtable">${_vis.map(modelRow).join('')}</div>`+_lpgn)
+    : (_total===0?`<div class="empty" style="padding:44px">No models match your filters.</div>`:`<div class="mcard-grid">${_vis.map(modelCard).join('')}</div>`+_lpgn);
   $('content').innerHTML = pageShell('models') + `
     <div class="tbar">
       <label class="dsf-search"><svg class="dsf-search-ic" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M11 11l3 3"/></svg><input id="mdlSearch" type="text" placeholder="Search models…" value="${escapeHtml(modelsState.search)}" oninput="mSearch(this.value)" autocomplete="off"></label>
       ${dsfDrop('mCat','Category',catChip,[{label:'All categories',selected:modelsState.category==='all',onclick:"dsfPickSingle();mSet('category','all')"}].concat(cats.map(c=>({label:c,count:MODELS.filter(m=>m.category===c).length,selected:modelsState.category===c,onclick:`dsfPickSingle();mSet('category','${c}')`}))))}
       ${dsfDrop('mOri','Origin',oriChip,[{label:'All origins',selected:modelsState.origin==='all',onclick:"dsfPickSingle();mSet('origin','all')"}].concat(['Custom','Implemented','Cloned'].map(o=>({label:o,count:MODELS.filter(m=>m.origin===o).length,selected:modelsState.origin===o,onclick:`dsfPickSingle();mSet('origin','${o}')`}))))}
-      ${dsfDrop('mSt','Status',stChip,[{label:'All statuses',selected:modelsState.status==='all',onclick:"dsfPickSingle();mSet('status','all')"}].concat(['Published','Draft','Pending changes','Deprecated'].map(s=>({label:s,selected:modelsState.status===s,onclick:`dsfPickSingle();mSet('status','${s}')`}))))}
+      ${dsfDrop('mSt','Status',stChip,[{label:'All statuses',selected:modelsState.status==='all',onclick:"dsfPickSingle();mSet('status','all')"}].concat(['Published','Draft','Deprecated'].map(s=>({label:s,selected:modelsState.status===s,onclick:`dsfPickSingle();mSet('status','${s}')`}))))}
       ${dsfDrop('mOwn','Owner',ownChip,[{label:'All owners',selected:modelsState.owner==='all',onclick:"dsfPickSingle();mSet('owner','all')"}].concat(owners.map(o=>({label:P(o).n,selected:modelsState.owner===o,onclick:`dsfPickSingle();mSet('owner','${o}')`}))))}
       ${filtering?`<button class="dsf-clear" onclick="mClear()">Clear filters</button>`:''}
       <span class="tbar-spring"></span>
@@ -5978,6 +6080,7 @@ function _erModelNodes(m, md){
   return {nodes, edges, note: md.ents.length>4?`Showing 4 of ${md.ents.length} entities`:''};
 }
 function openModelPreview(id){
+  if(SCOPE==='v1'){ navigate('models/'+id); return; } // V1: card click → full detail (preview slideout is V1.2+)
   const m=_model(id); if(!m) return;
   const e=m.entities; const md=_md(m); const er=_erModelNodes(m, md);
   const stats=[['Entities',md.counts.entities],['Tables',md.counts.tables],['Relations',md.relations],['Components',md.counts.components]];
@@ -6001,7 +6104,7 @@ function openModelPreview(id){
       ${m.tags&&m.tags.length?`<div class="so-sec"><div class="so-sec-h">Tags</div><div style="display:flex;flex-wrap:wrap;gap:6px">${m.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div></div>`:''}
     </div>
     <div class="so-foot mp-foot"><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="closeSlideout();navigate('models/${m.id}')"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7M13 3L7 9"/><path d="M10 13H3V6"/></svg> Open model</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
   _diagInit();
 }
 
@@ -6068,6 +6171,7 @@ function _pvHead3(icon,name,status,subtitle){ return `<div class="so-head mp-hea
     <div class="mp-head-r"><button class="so-close" onclick="closeSlideout()" aria-label="Close">✕</button></div>
   </div>`; }
 function openEntityPreview(id){
+  if(SCOPE==='v1'){ navigate('entities/'+id); return; } // V1: card click → full detail (preview slideout is V1.2+)
   const e=ENTITIES.find(x=>x.id===id); if(!e) return;
   const tbls=e.tables||[]; const rels=e.rels||[];
   const cols=tbls.reduce((n,t)=>n+(t.cols||0),0); const added=1+(cols%4);
@@ -6087,6 +6191,7 @@ function openEntityPreview(id){
   _soOpen(); setTimeout(_diagInit,0);
 }
 function openTablePreview(id){
+  if(SCOPE==='v1'){ navigate('tables/'+id); return; } // V1: card click → full detail (preview slideout is V1.2+)
   const t=_table(id); if(!t) return;
   const out=(t.rels||[]).map(r=>({target:(_table(r.target)||{}).alias||_relTargetName(r.target)||r.target,cardShort:_cardShort(r.kind),strong:true,dir:'Outgoing',del:'Restrict'}));
   const inc=TABLES.filter(x=>x.id!==t.id).flatMap(x=>(x.rels||[]).filter(r=>_refId(r.target)===t.id).map(r=>({target:x.alias,cardShort:_cardShort(_invKind(r.kind)),strong:true,dir:'Incoming',del:'Restrict'})));
@@ -6118,6 +6223,7 @@ function _refItemsSection(r){
     <a class="pv-viewall" onclick="closeSlideout();navigate('reference/${r.id}');setTimeout(()=>setRefTab('data'),40)">View all items ›</a>`;
 }
 function openRefPreview(id){
+  if(SCOPE==='v1'){ navigate('reference/'+id); return; } // V1: card click → full detail (preview slideout is V1.2+)
   const r=_ref(id); if(!r) return;
   const vals=r.values||[]; const active=vals.filter(v=>v.active).length;
   const stats=[['Items',vals.length],['Referenced by',r.referencedBy||0],['Active',active],['Fields',r.fields||_REF_SCHEMA.length]];
@@ -6284,11 +6390,12 @@ function renderModelDetail(id){
   _dsfRerender=()=>renderModelDetail(modelDetailState.id);
   const md=_md(m); const tab=modelDetailState.tab; const pending=m.status!=='Published';
   const tabs=[['overview','Overview',null],['entities','Entities',md.counts.entities],['tables','Tables',md.counts.tables],['components','Components',md.counts.components]];
+  const tabEff=(TAB_VER[tab] && SCOPE_TIERS.indexOf(TAB_VER[tab])>SCOPE_TIERS.indexOf(SCOPE))?'overview':tab; // gated model tab (Components=v2) → overview below its tier
   const acts=`<span class="md-userav" title="You">SB</span>
     <button class="btn md-hbtn" onclick="setModelTab('overview');modelDetailState.sec.about=true;renderModelDetail('${id}')">${_MDIC.edit} Edit</button>
-    <button class="btn btn-primary md-hbtn" onclick="publishModel('${id}')">${_MDIC.pub} Publish</button>
+    <button class="btn btn-primary md-hbtn" data-version="v1.5" onclick="publishModel('${id}')">${_MDIC.pub} Publish</button>
     <button class="md-icobtn" onclick="event.stopPropagation();openRowMenu('models','${id}',this)" aria-label="More actions">${_MDIC.dots}</button>`;
-  const body = tab==='entities'?_mdEntitiesTab(m,md) : tab==='tables'?_mdTablesTab(m,md) : tab==='components'?_mdComponentsTab(m,md) : _mdOverview(m,md);
+  const body = tabEff==='entities'?_mdEntitiesTab(m,md) : tabEff==='tables'?_mdTablesTab(m,md) : tabEff==='components'?_mdComponentsTab(m,md) : _mdOverview(m,md);
   $('content').innerHTML=`
     <div class="md-crumbrow">${_crumbs([{label:'Models',href:'#/models'},{label:m.name}])}<div class="md-pageacts">${acts}</div></div>
     <div class="detail-head md-head"><div class="dh-l">
@@ -6297,7 +6404,7 @@ function renderModelDetail(id){
       <div class="dh-desc" style="margin-top:8px">${escapeHtml(m.desc)}</div>
       <div class="md-meta"><span class="lrow-owner">${av(P(m.owner),'sm')}${escapeHtml(P(m.owner).n)}</span><span class="md-dot">·</span><span>${escapeHtml(m.origin)}</span>${m.tags&&m.tags.length?`<span class="md-dot">·</span>${m.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}`:''}</div>
     </div><div class="dh-actions"><button class="btn md-settings" onclick="openModelSettings('${id}')">${_MDIC.gear} Settings</button><button class="btn" style="width:40px;padding:0" aria-label="More actions" onclick="_detailKebab(this,'models','${id}')"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg></button></div></div>
-    <div class="mtabs md-tabs">${tabs.map(([tid,label,c])=>`<button class="mtab ${tab===tid?'active':''}" onclick="setModelTab('${tid}')">${label}${c!=null?`<span class="mtab-c">${c}</span>`:''}</button>`).join('')}</div>
+    <div class="mtabs md-tabs">${tabs.map(([tid,label,c])=>`<button class="mtab ${tabEff===tid?'active':''}" ${TAB_VER[tid]?`data-version="${TAB_VER[tid]}"`:''} onclick="setModelTab('${tid}')">${label}${c!=null?`<span class="mtab-c">${c}</span>`:''}</button>`).join('')}</div>
     <div id="mpanel">${body}</div>`;
   if(tab==='overview' && modelDetailState.sec.diagram && md.counts.entities) _diagInit();
   if(tab==='entities' && modelDetailState.ent.selEntId && (modelDetailState.ent.subtab==='diagram'||modelDetailState.ent.subtab==='relationships')) setTimeout(_diagInit,0);
@@ -6323,14 +6430,14 @@ function openModelSettings(id){
       </div>
     </div></div>
     <div class="so-foot"><span style="flex:1"></span><button class="btn btn-primary" onclick="closeSlideout()">Done</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
 }
-function mdArchive(id){ const m=_model(id); if(m) m.status='Archived'; closeSlideout(); toast('“'+(m?m.name:'Model')+'” archived','ok'); renderModelDetail(id); }
+function mdArchive(id){ const m=_model(id); if(m) m.status='Deprecated'; closeSlideout(); toast('“'+(m?m.name:'Model')+'” deprecated','ok'); renderModelDetail(id); }
 function mdDelete(id){ const m=_model(id); const nm=m?m.name:'Model'; closeSlideout();
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 1.5 1 13.5h14L8 1.5Z"/><path d="M8 6.5v3M8 11.5h.01" stroke-linecap="round"/></svg></div><div class="modal-title">Delete “${escapeHtml(nm)}”?</div></div>
     <div class="modal-body">This permanently removes the model and its entities, tables and components. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" style="background:var(--field-text-error,#dc2626);border-color:transparent" onclick="_mdDoDelete('${id}')">Delete model</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _mdDoDelete(id){ const i=MODELS.findIndex(x=>x.id===id); if(i>=0) MODELS.splice(i,1); closeModal(); toast('Model deleted','ok'); location.hash='#/models'; }
 function _mdRefocus(fid,v){ setTimeout(()=>{ const el=$(fid); if(el){ el.focus(); el.setSelectionRange(v.length,v.length); } },0); }
@@ -6352,14 +6459,14 @@ function _mdOverview(m,md){
     _mdTile(md.crossN,'Cross-model',_MDIC.open),
     `<div class="md-tile md-tile-pub"><div class="md-tile-l" style="margin:0 0 6px">Last published</div><div class="md-tile-pubv">1d ago · ${escapeHtml(P(m.owner).n)}</div>${md.draftEnts?`<a class="md-tile-warn" onclick="setModelTab('entities')">${_MDIC.warn}${md.draftEnts} draft entit${md.draftEnts===1?'y':'ies'} to publish</a>`:`<span class="md-tile-ok">All entities published</span>`}</div>`,
   ];
-  return `<div class="md-tiles">${tiles.join('')}</div>
+  return `${_mdSec('about','About this model',`<span style="font-size:11.5px;color:var(--t3)">Changes save automatically</span>`,s.about,_mdAbout(m))}
+    <div data-version="v2"><div class="md-tiles">${tiles.join('')}</div>
     ${_mdSec('diagram','Model diagram',`${md.counts.entities} entities · ${md.relations} relations`,s.diagram, md.counts.entities?_mdDiagram(m,md):'<div class="placeholder" style="padding:28px">No entities to diagram yet.</div>')}
-    ${_mdSec('about','About this model',`<span style="font-size:11.5px;color:var(--t3)">Changes save automatically</span>`,s.about,_mdAbout(m))}
-    ${_mdSec('activity','Recent activity','',s.activity,_mdActivity(m,md))}`;
+    ${_mdSec('activity','Recent activity','',s.activity,_mdActivity(m,md))}</div>`;
 }
 const MD_CATS=['CRM','Finance','Operations','Compliance','Business','Analytical'];
 const _mdOwners=()=>Object.keys(PEOPLE).filter(k=>k!=='svc'&&k!=='dp');
-function _mdEdited(m){ if(m.status==='Published') m.status='Pending changes'; m.updated='just now'; }
+function _mdEdited(m){ if(m.status==='Published') m.status='Draft'; m.updated='just now'; }
 function mdSetField(id,k,v){ const m=_model(id); if(!m) return; m[k]=(k==='name'?v.trim():v); _mdEdited(m); renderModelDetail(id); }
 function mdAddTag(id,v){ v=(v||'').trim().toLowerCase().replace(/\s+/g,'-'); if(!v) return; const m=_model(id); m.tags=m.tags||[]; if(!m.tags.includes(v)) m.tags.push(v); _mdEdited(m); renderModelDetail(id); _mdRefocus('mdTagIn',''); }
 function mdRemoveTag(id,t){ const m=_model(id); m.tags=(m.tags||[]).filter(x=>x!==t); _mdEdited(m); renderModelDetail(id); }
@@ -6382,8 +6489,7 @@ function _mdAbout(m){
     </div>
     <div class="md-form-row">
       <div class="mfield"><label class="mfield-l">Owner</label><select class="mselect" onchange="mdSetOwner('${m.id}',this.value)">${_mdOwners().map(k=>`<option value="${k}" ${k===m.owner?'selected':''}>${escapeHtml(P(k).n)}</option>`).join('')}</select></div>
-      <div class="mfield"><label class="mfield-l">Stewards</label><div class="md-stewards">${stewards.map(k=>`<span class="md-steward-chip">${av(P(k),'sm')}${escapeHtml(P(k).n)}<button class="md-tag-x" onclick="mdRemoveSteward('${m.id}','${k}')" aria-label="Remove steward">×</button></span>`).join('')}<button class="md-add-steward" onclick="mdAddSteward('${m.id}')">${_MDIC.plus} Add steward</button></div></div>
-    </div></div>`;
+          </div></div>`;
 }
 function _mdCount(el){ const c=$('mdDescCount'); if(c){ const n=el.value.length; c.textContent=n+' / 180'; c.classList.toggle('over',n>180); } }
 function _mdActivity(m,md){
@@ -6522,7 +6628,7 @@ function openHistEvent(kind,id,idx){
       <div class="hist-immutable">${_HIC.shield} This audit entry is immutable and retained for 7 years for compliance.</div>
     </div>
     <div class="so-foot"><button class="btn" onclick="closeSlideout()">Close</button><button class="btn btn-primary" onclick="toast('Audit record exported','ok')">Export record</button></div>`;
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
 }
 
 /* ── shared: mini table + view toggle (grid/table) ── */
@@ -6587,7 +6693,9 @@ function _mdEntListRow(m,e){
 const _EXP_IC='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></svg>';
 const _CHEVL='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l-4 4 4 4"/></svg>';
 function _mdEntWorkspace(m,md,e){
-  const sub=modelDetailState.ent.subtab||'overview';
+  const sub0=modelDetailState.ent.subtab||'overview';
+  const _si=SCOPE_TIERS.indexOf(SCOPE);
+  const sub=(TAB_VER[sub0] && SCOPE_TIERS.indexOf(TAB_VER[sub0])>_si) ? 'overview' : sub0; // gated sub-tab (diagram/privileges) → fall back to overview below its tier
   const rail=md.ents.map(x=>`<button class="mdw-rail-item ${x.id===e.id?'on':''}" onclick="mdSelectEnt('${m.id}','${x.id}')"><span class="mdw-rail-ic">${_MDIC.ent}</span><span class="mdw-rail-name">${escapeHtml(x.name)}</span><span class="mdw-rail-r">${x.pii?`<span class="mdw-lock">${_MDIC.lock}</span>`:''}<span class="mdw-dot ${x.status==='Published'?'pub':x.status==='Draft'?'draft':'pend'}"></span></span></button>`).join('');
   const tabs=[['overview','Overview'],['diagram','Diagram'],['tables','Tables'],['relationships','Relationships'],['privileges','Privileges']];
   const body = sub==='diagram'?_mdwDiagram(m,md,e) : sub==='tables'?_mdwTables(m,md,e) : sub==='relationships'?_mdwRelationships(m,md,e) : sub==='privileges'?_mdwPrivileges(m,md,e) : _mdwOverview(m,md,e);
@@ -6628,8 +6736,8 @@ function _mdwOverview(m,md,e){
         <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-top:10px">${escapeHtml(e.desc)}</div>
         <div class="lrow-foot" style="margin-left:0;margin-top:12px"><span class="lrow-owner">${av(P(e.owner),'sm')}${escapeHtml(P(e.owner).n)}</span>${stewards.length?`<span class="lrow-sep">·</span>${avStack(stewards,3)}<span style="font-size:12px;color:var(--t3)">+${stewards.length} steward${stewards.length===1?'':'s'}</span>`:''}<span class="lrow-sep">·</span><span style="font-size:12px;color:var(--t3)">Updated ${escapeHtml(e.updated)}</span></div>
       </div></div>
-    <div class="mdw-sec-t">Key metrics</div><div class="md-tiles mdw-metrics">${metrics.join('')}</div>
-    ${_mdwActivity(m,e)}`;
+    <div data-version="v2"><div class="mdw-sec-t">Key metrics</div><div class="md-tiles mdw-metrics">${metrics.join('')}</div>
+    ${_mdwActivity(m,e)}</div>`;
 }
 function _mdwDiagram(m,md,e){
   const mode=modelDetailState.ent.diagMode||'columns';
@@ -6676,7 +6784,7 @@ function _mdwRelationships(m,md,e){
   const out=_mdwEnsureRels(m,md,e); const inc=_mdwIncoming(m,md,e); const crossN=out.filter(r=>r.cross).length;
   const diagRels=out.map(r=>({target:r.t,cardShort:_cardShort(r.k),strong:!r.cross,dir:'Outgoing',del:r.del})).concat(inc.map(r=>({target:r.t,cardShort:_cardShort(r.k),strong:true,dir:'Incoming',del:r.del})));
   return `<div class="mdw-rel-head"><span class="mdw-rel-h-t">${_HIC.link} Relationships</span><span class="mdw-rel-h-c">${out.length} outgoing · ${inc.length} incoming · ${crossN} cross-model</span></div>
-    ${diagRels.length?_relDiagram(e.name,diagRels):'<div class="placeholder" style="padding:28px">No relationships yet.</div>'}
+    <div data-version="v2">${diagRels.length?_relDiagram(e.name,diagRels):'<div class="placeholder" style="padding:28px">No relationships yet.</div>'}</div>
     <div class="mdw-rel-toolbar"><label class="dsf-search" style="max-width:260px;height:34px">${_HIC.search}<input type="text" placeholder="Search related entity…" oninput="toast('Search — prototype')" autocomplete="off"></label><span style="flex:1"></span><button class="btn btn-primary" style="height:34px" onclick="openMdwRelForm('${m.id}','${e.id}',null)">${_MDIC.plus} New relationship</button></div>
     <div class="mdw-rel-list">${out.map((r,i)=>_mdwRelCard(m,e,r,i)).join('')||'<div class="placeholder" style="padding:24px">No outgoing relationships yet.</div>'}</div>
     ${inc.length?`<div class="mdw-rel-inc-h">Incoming relationships from other entities <span class="mdw-rel-h-c">${inc.length}</span></div><div class="mdw-rel-list">${inc.map(r=>_mdwIncCard(m,e,r)).join('')}</div>`:''}`;
@@ -6768,7 +6876,7 @@ function _renderMdwPrivForm(){
       ${d.perms.length?`<div class="mdw-perm-chips">${d.perms.map((p,i)=>`<span class="perm-chip ${p[1]}">${escapeHtml(p[0])}<button class="md-tag-x" onclick="_mdwPrivDraft.perms.splice(${i},1);_renderMdwPrivForm()" aria-label="Remove">×</button></span>`).join('')}</div>`:`<div class="mdw-perm-empty">${_MDIC.lock}<div style="font-weight:600;color:var(--t2);margin-top:6px">No permissions yet</div><div style="font-size:12px;color:var(--t3)">This privilege won't grant anything until it includes at least one permission.</div></div>`}
     </div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveMdwPriv()">${d.idx!=null?'Save changes':'Create privilege'}</button></div></div>`;
-  $('modalScrim').classList.add('open'); setTimeout(()=>{const el=$('cp_name'); if(el&&!d.name)el.focus();},50);
+  _modalOpen(); setTimeout(()=>{const el=$('cp_name'); if(el&&!d.name)el.focus();},50);
 }
 function saveMdwPriv(){
   const d=_mdwPrivDraft; if(!d) return; const c=_mdCtx(d.mid); const e=c.md.ents.find(x=>x.id===d.eid); const cprivs=_mdwEnsureCprivs(c.m,e);
@@ -6802,7 +6910,7 @@ function _renderPermBrowser(){
         ${p.subs.length?`<div class="pb-sub-h">Sub-permissions <span class="mdw-rel-h-c">${p.subs.length}</span></div>${subs}`:'<div class="pb-nosubs">No sub-permissions.</div>'}
       </div></div>
     <div class="pb-foot"><span class="pb-foot-n">${b.sel.size} permission${b.sel.size===1?'':'s'} selected</span><div><button class="btn" onclick="_renderMdwPrivForm()">Cancel</button><button class="btn btn-primary" ${b.sel.size?'':'disabled style="opacity:.5"'} onclick="_permBrowserApply()">${_MDIC.plus} Add permissions</button></div></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _permToggle(k){ const s=_permBrowse.sel; s.has(k)?s.delete(k):s.add(k); _renderPermBrowser(); }
 function _permBrowserApply(){ const b=_permBrowse; const d=_mdwPrivDraft; b.sel.forEach(k=>{ if(!d.perms.find(p=>p[0]===k)) d.perms.push([k, k.includes('PII')?'data':'api']); }); _permBrowse=null; _renderMdwPrivForm(); }
@@ -6954,9 +7062,13 @@ function saveMdtwCol(mid,tid,idx){
 }
 function _mdtwColMenu(mid,tid,idx,btn){ _mdKebab(btn,[
     {ic:_MDIC.edit,label:'Edit',act:`openMdtwColForm('${mid}','${tid}',${idx})`},
+    {ic:_RM_IC.dup||_MDIC.copy,label:'Duplicate',act:`_mdtwDupCol('${mid}','${tid}',${idx})`},
     'sep',
     {ic:_RM_IC.del,label:'Delete',act:`_mdtwRemoveCol('${mid}','${tid}',${idx})`,danger:true},
   ]); }
+function _mdtwDupCol(mid,tid,idx){ const c=_mdCtx(mid); if(!c) return; const t=c.md.tables.find(x=>x.id===tid); if(!t) return; const cols=_mdtwCols(t); const col=cols[idx]; if(!col) return;
+  let base=col.n+'_copy', n=base, k=2; while(cols.some(x=>x.n===n)) n=base+'_'+(k++);
+  cols.splice(idx+1,0,{...col,n,d:(col.d||col.n)+' (copy)',pk:false,uq:false}); t.cols=cols.length; t._widx=null; _mdEdited(c.m); toast('Column duplicated','ok'); renderModelDetail(mid); }
 function _mdtwRemoveCol(mid,tid,idx){ const c=_mdCtx(mid); if(!c) return; const t=c.md.tables.find(x=>x.id===tid); const cols=_mdtwCols(t); const col=cols[idx];
   if(col&&col.pk){ toast('Can’t delete the primary key column'); return; }
   cols.splice(idx,1); t.cols=cols.length; t._widx=null; _mdEdited(c.m); toast('Column deleted','ok'); renderModelDetail(mid); }
@@ -7153,7 +7265,7 @@ function _mdSync(m,md){
   m.entities=md.ents.length; _mdEdited(m);
 }
 function _mdColNames(n){ const base=['id','name','code','status','description','created_at','updated_at','owner_id','external_id','is_active','notes','type','source','region','amount','priority']; return base.slice(0,Math.max(1,Math.min(base.length,n||6))); }
-function _soOpen(){ $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open'); }
+function _soOpen(){ if(SCOPE==='v1'){ toast('Side panels open from V1.2 — switch scope to preview them'); return; } const so=$('slideout'); so.classList.add('open'); so.setAttribute('aria-hidden','false'); $('scrim').classList.add('open'); }
 function _mdKebab(btn,items){
   closeRowMenu();
   const it=x=> x==='sep' ? '<div class="rowmenu-sep"></div>' : `<button class="rowmenu-item ${x.danger?'danger':''}" onclick="closeRowMenu();${x.act}">${x.ic}${x.label}</button>`;
@@ -7223,7 +7335,7 @@ function confirmAssociateEntities(mid){ const ids=[..._assocSel]; if(!ids.length
     <div class="modal-body">You're about to associate ${picks.length} standalone entit${picks.length===1?'y':'ies'} to <b>${escapeHtml(m.name)}</b>. This changes their status from Standalone to being contained in ${escapeHtml(m.name)}.
       <div class="assoc-chips">${chips}</div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="_doAssociate('${mid}')">Confirm and associate</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _doAssociate(mid){
   const c=_mdCtx(mid); if(!c) return; const {m,md}=c; const ids=[..._assocSel];
@@ -7252,7 +7364,7 @@ function openCreateEntityModal(mid){
       <div style="font-size:12px;color:var(--t2);display:flex;gap:8px;align-items:flex-start"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--primary)" stroke-width="1.6" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6"/><path d="M8 7.5v3.5M8 5h.01" stroke-linecap="round"/></svg><span>An entity groups the tables, columns and relationships for one business concept — add its columns after creating.</span></div>
     </div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveMdEntity('${mid}','')">${_MDIC.plus} Create entity</button></div></div>`;
-  $('modalScrim').classList.add('open'); setTimeout(()=>{const el=$('mde_name'); if(el)el.focus();},50);
+  _modalOpen(); setTimeout(()=>{const el=$('mde_name'); if(el)el.focus();},50);
 }
 function openMdEntityForm(id,entId){
   const c=_mdCtx(id); if(!c) return; const {m}=c; const e=entId?_mdEnt(id,entId):null; const owners=_mdOwners();
@@ -7368,7 +7480,7 @@ function confirmMdRemoveEnt(id,entId){ const e=_mdEnt(id,entId); if(!e) return; 
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Remove “${escapeHtml(e.name)}”?</div></div>
     <div class="modal-body">This removes the entity and its ${e.tables} table${e.tables===1?'':'s'} from <b>${escapeHtml(mn)}</b>. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_mdRemoveEnt('${id}','${entId}')">Remove entity</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _mdRemoveEnt(id,entId){ const c=_mdCtx(id); if(!c) return; const {m,md}=c; const e=md.ents.find(x=>x.id===entId); const nm=e?e.name:'Entity';
   md.ents=md.ents.filter(x=>x.id!==entId); md.tables=md.tables.filter(t=>t.entityId!==entId);
@@ -7432,7 +7544,7 @@ function confirmMdRemoveTbl(id,tblId){ const c=_mdCtx(id); if(!c) return; const 
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Remove “${escapeHtml(t.name)}”?</div></div>
     <div class="modal-body">This removes the table from <b>${escapeHtml(c.m.name)}</b>. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_mdRemoveTbl('${id}','${tblId}')">Remove table</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _mdRemoveTbl(id,tblId){ const c=_mdCtx(id); if(!c) return; const {m,md}=c; const t=md.tables.find(x=>x.id===tblId); const nm=t?t.name:'Table';
   md.tables=md.tables.filter(x=>x.id!==tblId); _mdSync(m,md); closeModal(); closeSlideout(); toast('“'+nm+'” removed','ok'); renderModelDetail(id); }
@@ -7499,7 +7611,7 @@ function confirmMdRemoveComp(id,sub,idx){ const c=_mdCtx(id); if(!c) return; con
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))">${_RM_IC.del}</div><div class="modal-title">Remove “${escapeHtml(x.name)}”?</div></div>
     <div class="modal-body">This removes the component from <b>${escapeHtml(c.m.name)}</b>. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_mdRemoveComp('${id}','${sub}',${idx})">Remove</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _mdRemoveComp(id,sub,idx){ const c=_mdCtx(id); if(!c) return; const {m,md}=c; const x=md[sub][idx]; const nm=x?x.name:'Component';
   md[sub].splice(idx,1); _mdSync(m,md); closeModal(); closeSlideout(); toast('“'+nm+'” removed','ok'); renderModelDetail(id); }
@@ -7514,7 +7626,7 @@ function openCreateModel(){
       <div style="font-size:12px;color:var(--t2);display:flex;gap:8px;align-items:flex-start"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--primary)" stroke-width="1.6" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6"/><path d="M8 7.5v3.5M8 5h.01" stroke-linecap="round"/></svg><span>A model is a container — add entities, tables and reference data to it after creating.</span></div>
     </div></div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveNewModel()">Create model</button></div></div>`;
-  $('modalScrim').classList.add('open'); setTimeout(()=>{const el=$('nmName'); if(el)el.focus();},50);
+  _modalOpen(); setTimeout(()=>{const el=$('nmName'); if(el)el.focus();},50);
 }
 function saveNewModel(){
   const name=($('nmName').value||'').trim(); if(!name){ toast('Enter a name'); return; }
@@ -7533,7 +7645,7 @@ function _fltCfg(surface){
   if(surface==='entities'){ const rows=ENTITIES; return {label:'Entities', state:listState, render:renderEntities, groups:[
     {key:'model',label:'Model',options:uniq(rows.map(r=>r.model)).map(v=>({value:v,label:(_model(v)||{name:v}).name,count:cnt(rows,'model',v)}))},
     {key:'domain',label:'Domain',options:uniq(rows.map(r=>r.domain)).map(v=>({value:v,label:v,count:cnt(rows,'domain',v)}))},
-    {key:'status',label:'Status',options:['Published','Draft','Pending changes','Deprecated'].map(v=>({value:v,label:v,count:cnt(rows,'status',v)}))},
+    {key:'status',label:'Status',options:['Published','Draft','Deprecated'].map(v=>({value:v,label:v,count:cnt(rows,'status',v)}))},
     {key:'owner',label:'Owner',options:uniq(rows.map(r=>r.owner)).map(v=>({value:v,label:P(v).n,count:cnt(rows,'owner',v)}))},
     {key:'tags',label:'Tags',multi:true,options:tagOpts(rows)},
   ]}; }
@@ -7541,13 +7653,13 @@ function _fltCfg(surface){
     {key:'model',label:'Model',options:uniq(rows.map(r=>r.model)).map(v=>({value:v,label:(_model(v)||{name:v}).name,count:cnt(rows,'model',v)}))},
     {key:'entity',label:'Entity',options:uniq(rows.map(r=>r.entityId)).map(v=>({value:v,label:(ENTITIES.find(e=>e.id===v)||{}).name||v,count:cnt(rows,'entityId',v)}))},
     {key:'type',label:'Type',options:['Primary','Secondary'].map(v=>({value:v,label:v,count:cnt(rows,'role',v)}))},
-    {key:'status',label:'Status',options:['Published','Draft','Archived'].map(v=>({value:v,label:v,count:cnt(rows,'status',v)}))},
+    {key:'status',label:'Status',options:['Published','Draft','Deprecated'].map(v=>({value:v,label:v,count:cnt(rows,'status',v)}))},
     {key:'tags',label:'Tags',multi:true,options:tagOpts(rows)},
   ]}; }
   const rows=REFDATA; return {label:'Reference Data', state:refListState, render:renderReferenceList, groups:[
     {key:'category',label:'Category',options:uniq(rows.map(r=>r.category)).map(v=>({value:v,label:v,count:cnt(rows,'category',v)}))},
     {key:'origin',label:'Origin',options:['Custom','From catalog'].map(v=>({value:v,label:v,count:cnt(rows,'origin',v)}))},
-    {key:'status',label:'Status',options:['Published','Draft','Archived'].map(v=>({value:v,label:v,count:cnt(rows,'status',v)}))},
+    {key:'status',label:'Status',options:['Published','Draft','Deprecated'].map(v=>({value:v,label:v,count:cnt(rows,'status',v)}))},
     {key:'tags',label:'Tags',multi:true,options:tagOpts(rows)},
   ]};
 }
@@ -7557,7 +7669,7 @@ function openFilters(surface){
   const cfg=_fltCfg(surface); const st=cfg.state;
   _fltDraft={surface}; cfg.groups.forEach(g=>{ _fltDraft[g.key]= g.multi ? (st[g.key]||[]).slice() : (st[g.key]||'all'); });
   _renderFilters();
-  $('slideout').classList.add('open'); $('slideout').setAttribute('aria-hidden','false'); $('scrim').classList.add('open');
+  _soOpen();
 }
 function _renderFilters(){
   const cfg=_fltCfg(_fltDraft.surface), d=_fltDraft;
@@ -7584,8 +7696,8 @@ function _fltApply(){ const cfg=_fltCfg(_fltDraft.surface), st=cfg.state; cfg.gr
 function _surfCfg(surface){ return ({
   models:   {arr:MODELS,   render:renderModels,        nameKey:'name',  route:'models',    published:'Published', archived:'Deprecated'},
   entities: {arr:ENTITIES, render:renderEntities,      nameKey:'name',  route:'entities',  published:'Published', archived:'Deprecated'},
-  tables:   {arr:TABLES,   render:renderTablesList,    nameKey:'alias', route:'tables',    published:'Published', archived:'Archived'},
-  reference:{arr:REFDATA,  render:renderReferenceList, nameKey:'name',  route:'reference', published:'Published', archived:'Archived'},
+  tables:   {arr:TABLES,   render:renderTablesList,    nameKey:'alias', route:'tables',    published:'Published', archived:'Deprecated'},
+  reference:{arr:REFDATA,  render:renderReferenceList, nameKey:'name',  route:'reference', published:'Published', archived:'Deprecated'},
 })[surface]; }
 const _RM_IC={
   open:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7M13 3L7 9"/><path d="M11 13H4a1 1 0 0 1-1-1V5"/></svg>',
@@ -7603,14 +7715,11 @@ function openRowMenu(surface,id,btn){
   const cfg=_surfCfg(surface); const row=cfg.arr.find(r=>r.id===id); if(!row) return;
   const isPub=row.status===cfg.published;
   const item=(ic,label,act,danger)=>`<button class="rowmenu-item ${danger?'danger':''}" onclick="${act}">${ic}${label}</button>`;
+  // V1: card kebab keeps only "Open" (go to details). Duplicate / Export / Publish / Archive / Delete
+  // are deferred — destructive actions live inside the detail, not on the card.
+  void isPub;
   const html=[
     item(_RM_IC.open,'Open',`_rowAct('${surface}','${id}','open')`),
-    item(_RM_IC.dup,'Duplicate',`_rowAct('${surface}','${id}','duplicate')`),
-    item(_RM_IC.exp,'Export JSON',`_rowAct('${surface}','${id}','export')`),
-    '<div class="rowmenu-sep"></div>',
-    isPub ? item(_RM_IC.arch,'Archive',`_rowAct('${surface}','${id}','archive')`) : item(_RM_IC.pub,'Publish',`_rowAct('${surface}','${id}','publish')`),
-    '<div class="rowmenu-sep"></div>',
-    item(_RM_IC.del,'Delete',`_rowAct('${surface}','${id}','delete')`,true),
   ].join('');
   const div=document.createElement('div'); div.id='rowmenu'; div.className='rowmenu'; div.innerHTML=html;
   document.body.appendChild(div);
@@ -7635,7 +7744,7 @@ function _rowConfirmDelete(surface,id){
   $('modalScrim').innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-ic" style="background:var(--tag-error-bg,rgba(224,82,82,0.14));color:var(--tag-error-fg,#f87171);border-color:var(--tag-error-bd,rgba(224,82,82,0.3))"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.5 8a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1l.5-8"/></svg></div><div class="modal-title">Delete ${escapeHtml(nm)}?</div></div>
     <div class="modal-body">This removes <b>${escapeHtml(nm)}</b> from the prototype. This can't be undone.</div>
     <div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="_rowDelete('${surface}','${id}')">Delete</button></div></div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
 }
 function _rowDelete(surface,id){ const cfg=_surfCfg(surface), i=cfg.arr.findIndex(r=>r.id===id); if(i<0) return; const nm=cfg.arr[i][cfg.nameKey]; cfg.arr.splice(i,1); closeModal(); toast('“'+nm+'” deleted','ok'); cfg.render(); }
 
@@ -7799,7 +7908,7 @@ function openMarketplaceModal(){
     <div class="mkt-modal-body" id="mktBody"></div>
     <div class="mkt-modal-foot" id="mktFoot"></div>
   </div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
   _dsfRerender=_renderMktBody;
   _renderMktBody();
 }
@@ -7924,11 +8033,10 @@ function renderFromScratch(){
         </div>
         <div class="fs-grid">
           <div class="fs-field"><label class="fs-l">Owner <span class="fs-req">*</span></label><div class="fs-owner">${av(P(fsState.owner),'sm')}<span class="fs-owner-n">${escapeHtml(P(fsState.owner).n)}</span><span class="fs-you">You</span><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;color:var(--t3)"><path d="M4 6l4 4 4-4"/></svg></div><div class="fs-help">Responsible person or team. Defaults to you.</div></div>
-          <div class="fs-field"><label class="fs-l">Stewards</label><button class="md-add-steward" onclick="toast('Add stewards')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Add stewards</button><div class="fs-help">People who review quality and approve changes.</div></div>
-        </div>
+                  </div>
       </section>
       <div class="fs-foot">
-        <button class="btn" onclick="navigate('models/new')">Cancel</button>
+        <button class="btn" onclick="navigate('models')">Cancel</button>
         <span class="tbar-spring"></span>
         <span class="fs-foot-hint" id="fsHint">${fsState.display.trim()&&fsState.desc.trim()?'Ready to create':'Complete the required fields to continue'}</span>
         <button class="btn btn-primary" id="fsCreateBtn" ${fsState.display.trim()&&fsState.desc.trim()?'':'disabled'} onclick="fsCreate()">Create model <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l4 4-4 4"/></svg></button>
@@ -8001,7 +8109,7 @@ function renderAIAssist(){
       <div class="ai-pane ai-prev-pane" id="aiPrev">${_aiPrevHTML()}</div>
     </div>
     <div class="ai-foot">
-      <button class="btn" onclick="navigate('models/new')">Cancel</button>
+      <button class="btn" onclick="navigate('models')">Cancel</button>
       <span class="tbar-spring"></span>
       <button class="ai-foot-link" onclick="aiStartOver()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 1 1 1.5 3.5M3 8V5M3 8h3"/></svg> Start over</button>
       <span class="ai-foot-or">${ready?'Or accept the current proposal':'Answer the questions to generate a model'}</span>
@@ -8111,7 +8219,7 @@ function openEntityMarketplaceModal(mid){
     <div class="mkt-modal-body" id="emktBody"></div>
     <div class="mkt-modal-foot" id="emktFoot"></div>
   </div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
   _dsfRerender=_renderEmktBody;
   _renderEmktBody();
 }
@@ -8274,11 +8382,10 @@ function renderEntFromScratch(){
         </div>
         <div class="fs-grid">
           <div class="fs-field"><label class="fs-l">Owner <span class="fs-req">*</span></label><div class="fs-owner">${av(P(efsState.owner),'sm')}<span class="fs-owner-n">${escapeHtml(P(efsState.owner).n)}</span><span class="fs-you">You</span><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;color:var(--t3)"><path d="M4 6l4 4 4-4"/></svg></div><div class="fs-help">Responsible person or team. Defaults to you.</div></div>
-          <div class="fs-field"><label class="fs-l">Stewards</label><button class="md-add-steward" onclick="toast('Add stewards')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Add stewards</button><div class="fs-help">People who review quality and approve changes.</div></div>
-        </div>
+                  </div>
       </section>
       <div class="fs-foot">
-        <button class="btn" onclick="navigate('entities/new')">Cancel</button>
+        <button class="btn" onclick="navigate('entities')">Cancel</button>
         <span class="tbar-spring"></span>
         <span class="fs-foot-hint" id="efsHint">${efsState.display.trim()&&efsState.desc.trim()?'Ready to create':'Complete the required fields to continue'}</span>
         <button class="btn btn-primary" id="efsCreateBtn" ${efsState.display.trim()&&efsState.desc.trim()?'':'disabled'} onclick="efsCreate()">Create entity <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l4 4-4 4"/></svg></button>
@@ -8339,7 +8446,7 @@ function renderEntAIAssist(){
       <div class="ai-pane ai-prev-pane" id="entAiPrev">${_entAiPrevHTML()}</div>
     </div>
     <div class="ai-foot">
-      <button class="btn" onclick="navigate('entities/new')">Cancel</button>
+      <button class="btn" onclick="navigate('entities')">Cancel</button>
       <span class="tbar-spring"></span>
       <button class="ai-foot-link" onclick="entAiStartOver()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 1 1 1.5 3.5M3 8V5M3 8h3"/></svg> Start over</button>
       <span class="ai-foot-or">${ready?'Or accept the current proposal':'Answer the questions to generate an entity'}</span>
@@ -8442,7 +8549,7 @@ function openTableMarketplaceModal(mid){
     <div class="mkt-modal-body" id="tmktBody"></div>
     <div class="mkt-modal-foot" id="tmktFoot"></div>
   </div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
   _dsfRerender=_renderTmktBody;
   _renderTmktBody();
 }
@@ -8600,12 +8707,11 @@ function renderTblFromScratch(){
         <div class="fs-field"><div class="fs-l-row"><label class="fs-l">Tags</label><button class="fs-ai-link" onclick="tfsSuggestTags()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M8 2l1.2 3.1L12.3 6 9.2 7.2 8 10.3 6.8 7.2 3.7 6l3.1-.9L8 2Z"/></svg>Suggest tags</button></div><div class="fs-tagbox">${tfsState.tags.map(t=>`<span class="md-tag-chip">${escapeHtml(t)}<button class="md-tag-x" onclick="tfsTagDel('${escapeHtml(t)}')" aria-label="Remove">×</button></span>`).join('')}<input class="md-tag-in" placeholder="Add tags…" onkeydown="if(event.key==='Enter'){event.preventDefault();tfsTagAdd(this.value);this.value='';}"></div><div class="fs-help">Free-form labels for classification.</div></div>
         <div class="fs-grid">
           <div class="fs-field"><label class="fs-l">Owner <span class="fs-req">*</span></label><div class="fs-owner">${av(P(tfsState.owner),'sm')}<span class="fs-owner-n">${escapeHtml(P(tfsState.owner).n)}</span><span class="fs-you">You</span><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;color:var(--t3)"><path d="M4 6l4 4 4-4"/></svg></div><div class="fs-help">Responsible person or team. Defaults to you.</div></div>
-          <div class="fs-field"><label class="fs-l">Stewards</label><button class="md-add-steward" onclick="toast('Add stewards')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Add stewards</button><div class="fs-help">People who review quality and approve changes.</div></div>
-        </div>
+                  </div>
         <div class="fs-field"><label class="fs-l">Icon</label><div class="fs-icon-sel" onclick="toast('Icon picker')"><span class="fs-icon-tile">${_COL_IC}</span><span class="fs-icon-name">ViewTable</span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" style="margin-left:6px;color:var(--t3)"><circle cx="8" cy="8" r="2"/><path d="M8 2.4v1.6M8 12v1.6M13.6 8H12M4 8H2.4M11.9 4.1l-1.1 1.1M5.2 10.8l-1.1 1.1M11.9 11.9l-1.1-1.1M5.2 5.2L4.1 4.1"/></svg></div><div class="fs-help">Visual identifier for the table.</div></div>
       </section>
       <div class="fs-foot">
-        <button class="btn" onclick="navigate('tables/new')">Cancel</button>
+        <button class="btn" onclick="navigate('tables')">Cancel</button>
         <span class="tbar-spring"></span>
         <span class="fs-foot-hint" id="tfsHint">${tfsState.display.trim()&&tfsState.desc.trim()?'Ready to create':'Complete the required fields to continue'}</span>
         <button class="btn btn-primary" id="tfsCreateBtn" ${tfsState.display.trim()&&tfsState.desc.trim()?'':'disabled'} onclick="tfsCreate()">Create table <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l4 4-4 4"/></svg></button>
@@ -8665,7 +8771,7 @@ function renderTblAIAssist(){
       <div class="ai-pane ai-prev-pane" id="tblAiPrev">${_tblAiPrevHTML()}</div>
     </div>
     <div class="ai-foot">
-      <button class="btn" onclick="navigate('tables/new')">Cancel</button>
+      <button class="btn" onclick="navigate('tables')">Cancel</button>
       <span class="tbar-spring"></span>
       <button class="ai-foot-link" onclick="tblAiStartOver()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 1 1 1.5 3.5M3 8V5M3 8h3"/></svg> Start over</button>
       <span class="ai-foot-or">${ready?'Or accept the current proposal':'Answer the questions to generate a table'}</span>
@@ -8763,7 +8869,7 @@ function openRefMarketplaceModal(){
     <div class="mkt-modal-body" id="rmktBody"></div>
     <div class="mkt-modal-foot" id="rmktFoot"></div>
   </div>`;
-  $('modalScrim').classList.add('open');
+  _modalOpen();
   _dsfRerender=_renderRmktBody;
   _renderRmktBody();
 }
@@ -8917,11 +9023,10 @@ function renderRefFromScratch(){
         <div class="fs-field"><div class="fs-l-row"><label class="fs-l">Tags</label><button class="fs-ai-link" onclick="rfsSuggestTags()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M8 2l1.2 3.1L12.3 6 9.2 7.2 8 10.3 6.8 7.2 3.7 6l3.1-.9L8 2Z"/></svg>Suggest tags</button></div><div class="fs-tagbox">${rfsState.tags.map(t=>`<span class="md-tag-chip">${escapeHtml(t)}<button class="md-tag-x" onclick="rfsTagDel('${escapeHtml(t)}')" aria-label="Remove">×</button></span>`).join('')}<input class="md-tag-in" placeholder="Add tags…" onkeydown="if(event.key==='Enter'){event.preventDefault();rfsTagAdd(this.value);this.value='';}"></div><div class="fs-help">Free-form labels for classification.</div></div>
         <div class="fs-grid">
           <div class="fs-field"><label class="fs-l">Owner <span class="fs-req">*</span></label><div class="fs-owner">${av(P(rfsState.owner),'sm')}<span class="fs-owner-n">${escapeHtml(P(rfsState.owner).n)}</span><span class="fs-you">You</span><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;color:var(--t3)"><path d="M4 6l4 4 4-4"/></svg></div><div class="fs-help">Responsible person or team. Defaults to you.</div></div>
-          <div class="fs-field"><label class="fs-l">Stewards</label><button class="md-add-steward" onclick="toast('Add stewards')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Add stewards</button><div class="fs-help">People who review quality and approve changes.</div></div>
-        </div>
+                  </div>
       </section>
       <div class="fs-foot">
-        <button class="btn" onclick="navigate('reference/new')">Cancel</button>
+        <button class="btn" onclick="navigate('reference')">Cancel</button>
         <span class="tbar-spring"></span>
         <span class="fs-foot-hint" id="rfsHint">${rfsState.display.trim()&&rfsState.desc.trim()?'Ready to create':'Complete the required fields to continue'}</span>
         <button class="btn btn-primary" id="rfsCreateBtn" ${rfsState.display.trim()&&rfsState.desc.trim()?'':'disabled'} onclick="rfsCreate()">Create list <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l4 4-4 4"/></svg></button>
@@ -8981,7 +9086,7 @@ function renderRefAIAssist(){
       <div class="ai-pane ai-prev-pane" id="refAiPrev">${_refAiPrevHTML()}</div>
     </div>
     <div class="ai-foot">
-      <button class="btn" onclick="navigate('reference/new')">Cancel</button>
+      <button class="btn" onclick="navigate('reference')">Cancel</button>
       <span class="tbar-spring"></span>
       <button class="ai-foot-link" onclick="refAiStartOver()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 1 1 1.5 3.5M3 8V5M3 8h3"/></svg> Start over</button>
       <span class="ai-foot-or">${ready?'Or accept the current proposal':'Answer the questions to generate a list'}</span>
@@ -9018,6 +9123,8 @@ function route(){
   _dsfOpen = null; _pgnOpenId = null; _mktModel = null; closeSlideout(); closeModal();
   const parts = (location.hash.replace(/^#\/?/,'') || 'models').split('/');
   const r = parts[0];
+  if(SCOPE==='v1' && parts[1]==='new'){ toast('Creating opens from V1.2 — switch scope to try it'); location.hash='#/'+r; return; } // V1 is read-only browse — no create
+  if(SCOPE!=='v2' && parts[1]==='new' && parts[2]!=='scratch') parts[2]='scratch'; // V1.2: New = Start from scratch only (Marketplace catalog + Create-with-AI are Full vision)
   if(r==='models' && parts[1]==='new'){ if(parts[2]==='scratch') renderFromScratch(); else if(parts[2]==='ai'){ _aiReset(); renderAIAssist(); } else { renderModels(); openMarketplaceModal(); } }
   else if(r==='models' && parts[1]){ if(modelDetailState.id!==parts[1]) modelDetailState.tab='overview'; modelDetailState.id=parts[1]; renderModelDetail(parts[1]); }
   else if(r==='models'){ renderModels(); }
