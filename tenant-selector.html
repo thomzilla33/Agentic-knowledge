@@ -1771,67 +1771,57 @@ function signOut() {
 
 const TOUR_LS_STEP = 'aims-tour-selector-step';
 const TOUR_LS_DONE = 'aims-tour-selector-seen';
+const PAGE_ON_TOUR_FINISH = 'admin-console.html?tour=entry';
 let tourState = { active: false, stepIndex: 0 };
 let _tourLastFocus = null;
 
 const TOUR_STEPS = [
   {
-    title: 'Your Workspace Selector',
-    body: 'Every organization you belong to lives here. This tour covers <strong>search, sorting, studios, and sign-out</strong>. Use <strong>← →</strong> or the buttons to navigate.',
+    title: 'Your workspaces',
+    body: 'Authentication complete — every organization on your account is listed here. This tour covers <strong>search, sorting, studios, and navigation</strong>. Use <strong>← →</strong> or the buttons to move between steps.',
   },
   {
     title: 'Search workspaces',
-    body: 'Type a name, industry, or role to instantly filter your workspaces. Press <strong>⌘K</strong> from anywhere on this page to jump straight to the search bar.',
+    body: 'Type a name, industry, or role to instantly filter the list. Press <strong>⌘K</strong> from anywhere on this page to jump straight to the search bar.',
     target: '#searchInput',
     scrollToTarget: false,
   },
   {
     title: 'Sort order',
-    body: 'Cycle through <strong>Last visited → A–Z → Role</strong>. The sort resets when you search, so you always see the most relevant result first.',
+    body: 'Cycle through <strong>Last visited → A–Z → Role</strong>. The sort resets when you search so the most relevant result always appears first.',
     target: '#sortBtn',
     scrollToTarget: false,
   },
   {
     title: 'Your active workspace',
-    body: 'The <strong>hero card</strong> at the top is your most recently visited workspace. The green pulse confirms it\'s your active session — pick up exactly where you left off.',
+    body: 'The <strong>hero card</strong> at the top is your most recently visited workspace. The green pulse confirms it\'s your current session — pick up exactly where you left off.',
     target: '.card-hero',
     scrollToTarget: false,
     setup: () => { closeAll(); closeUserMenu(); },
   },
   {
     title: 'Active workspace badge',
-    body: 'This badge and timestamp live <strong>inside the identity block</strong>, not in the action footer. That keeps last-visit visible even before you decide where to go.',
+    body: 'The badge and timestamp sit inside the identity block, visible before you decide where to go. The green pulse is live — it disappears once your session expires.',
     target: '.active-badge',
     scrollToTarget: false,
   },
   {
-    title: 'Jump to a studio directly',
-    body: 'The studio chips on each card are <strong>clickable shortcuts</strong>. Click Data Studio, Agentic, Governance, or Work Surfaces to land there instantly — no dropdown, no second click.',
-    target: '#sl-avance',
+    title: 'Where you left off',
+    body: 'Each card shows <strong>which studio you visited last and when</strong>. Scan the right column to pick up your work without opening anything first.',
+    target: '.last-visit',
     scrollToTarget: false,
-    setup: () => { closeAll(); },
-  },
-  {
-    title: 'Home chip goes to your inbox',
-    body: 'The <strong>Home</strong> chip on every card opens that workspace\'s home inbox — your work queue and recent activity. The colored studio chips jump you straight to a specific tool.',
-    target: '#sl-avance',
-    scrollToTarget: false,
-    setup: () => { closeAll(); },
-  },
-  {
-    title: 'Single-studio workspace',
-    body: 'NorthBridge Capital has access to <strong>Data Studio only</strong>. The chip is the shortcut — click it to go straight there. Enter workspace still takes you to the home inbox.',
-    target: '#sl-northbridge',
-    scrollToTarget: true,
     setup: () => { closeAll(); closeUserMenu(); render(TENANTS, false); },
   },
   {
-    title: 'Always a way back',
-    body: 'Every studio shows a <strong>← Workspaces</strong> pill in the top-left corner. One click returns you here so you can jump to a different organization without losing your place.',
+    title: 'Open a studio directly',
+    body: 'Click any studio chip to go straight there — <strong>no dropdown, no second click</strong>. The redirect icon confirms it\'s a direct navigation link. Each chip lands you inside that studio\'s main view.',
+    target: '#sl-avance',
+    scrollToTarget: false,
+    setup: () => { closeAll(); },
   },
   {
     title: 'Load more workspaces',
-    body: 'Workspaces beyond the first 5 are collapsed to keep the page scannable. The button tells you exactly how many are hidden — click it to reveal them.',
+    body: 'Workspaces beyond the first 5 are collapsed to keep the page scannable. The button tells you exactly how many are hidden — click to reveal them.',
     target: '.load-more-btn',
     scrollToTarget: true,
     setup: () => {
@@ -1841,18 +1831,11 @@ const TOUR_STEPS = [
     },
   },
   {
-    title: 'Account menu',
-    body: 'Your user pill in the top-right opens a <strong>dropdown with account settings</strong>, activity log, and sign-out. Click the chevron to expand it.',
-    target: '#userPill',
+    title: 'Enter Governance Studio',
+    body: 'Let\'s open a studio. Click <strong>Finish</strong> to enter the Governance Studio for Avance Financial — the tour continues inside.',
+    target: '#sl-avance',
     scrollToTarget: false,
-    setup: () => { closeAll(); closeUserMenu(); },
-  },
-  {
-    title: 'Sign out',
-    body: 'Click <strong>Sign out</strong> to securely end your session. AIMS-OS invalidates your token server-side — you\'ll be redirected back to the sign-in screen.',
-    target: '#signOutBtn',
-    scrollToTarget: false,
-    setup: () => { closeAll(); openUserMenu(); },
+    setup: () => { closeAll(); closeUserMenu(); render(TENANTS, false); },
   },
 ];
 
@@ -1884,6 +1867,9 @@ function endTour(finished){
   closeAll(); closeUserMenu();
   _tourRefreshTriggerLabel();
   if(_tourLastFocus && _tourLastFocus.focus){ try{ _tourLastFocus.focus(); }catch(e){} }
+  if(finished && typeof PAGE_ON_TOUR_FINISH !== 'undefined'){
+    setTimeout(() => { location.href = PAGE_ON_TOUR_FINISH; }, 350);
+  }
 }
 function tourNext(){ if(tourState.stepIndex>=TOUR_STEPS.length-1){ endTour(true); return; } tourState.stepIndex++; _tourSave(); paintTourStep(); }
 function tourPrev(){ if(tourState.stepIndex<=0) return; tourState.stepIndex--; _tourSave(); paintTourStep(); }

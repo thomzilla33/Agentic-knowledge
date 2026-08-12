@@ -19470,6 +19470,46 @@ const TOUR_STEPS = [
 ];
 
 let tourState = { active:false, stepIndex:0 };
+let _entryTour = false;
+
+const ENTRY_TOUR_STEPS = [
+  {
+    title: 'Inside Governance Studio',
+    body: 'You\'ve entered the <strong>Governance Studio</strong> for Avance Financial. This is where your team manages data policies, access controls, and compliance workflows.',
+  },
+  {
+    title: 'Left sidebar',
+    body: 'The <strong>sidebar</strong> lists every module in this studio — Policies, Domain Management, Requests, and Audit Log. Click any item to navigate. Your current section is highlighted.',
+    target: '#mainSidebar',
+  },
+  {
+    title: 'Back to workspaces',
+    body: 'The <strong>← Workspaces</strong> link in the bottom-left returns you to the workspace selector at any time — switch organizations or open a different studio in one click.',
+    target: '.back-to-ws',
+  },
+  {
+    title: 'Sign out',
+    body: 'Click your <strong>avatar</strong> in the top-right to open the account menu, then choose <strong>Sign out</strong> to end your session securely. AIMS-OS invalidates your token server-side — you\'re redirected to the sign-in screen.',
+    target: '#tbAvatarBtn',
+    setup: () => {
+      const um = document.getElementById('tbUserMenu');
+      if (um && um.classList.contains('open')) {
+        um.classList.remove('open'); um.setAttribute('aria-hidden', 'true');
+        const btn = document.getElementById('tbAvatarBtn');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    },
+  },
+];
+
+function startEntryTour() {
+  _entryTour = true;
+  tourState = { active:true, stepIndex:0 };
+  try { localStorage.setItem('aims-tour-seen','1'); } catch(e){}
+  const btn = $('tourTrigger'); if(btn) btn.classList.add('tour-active');
+  $('tourOverlay').classList.add('active');
+  paintTourStep();
+}
 
 function startTour() {
   tourState = { active:true, stepIndex:0 };
@@ -19480,19 +19520,23 @@ function startTour() {
 }
 
 function endTour() {
+  const wasEntry = _entryTour;
+  _entryTour = false;
   tourState.active = false;
-  $('tourTrigger').classList.remove('tour-active');
-  $('tourTrigger').classList.add('seen');
+  const trigBtn = $('tourTrigger');
+  if(trigBtn){ trigBtn.classList.remove('tour-active'); trigBtn.classList.add('seen'); }
   $('tourOverlay').classList.remove('active');
   $('tourSpotlight').classList.remove('active');
   $('tourPopover').classList.remove('active');
   // Close studio switcher if the tour left it open
   const switcher = document.getElementById('studioSwitcher');
   if (switcher) { switcher.classList.remove('open'); switcher.setAttribute('aria-hidden', 'true'); }
+  if (wasEntry) { setTimeout(() => { location.href = 'login.html'; }, 400); }
 }
 
 function tourNext() {
-  if (tourState.stepIndex >= TOUR_STEPS.length - 1) { endTour(); return; }
+  const STEPS = _entryTour ? ENTRY_TOUR_STEPS : TOUR_STEPS;
+  if (tourState.stepIndex >= STEPS.length - 1) { endTour(); return; }
   tourState.stepIndex++;
   paintTourStep();
 }
@@ -19505,9 +19549,10 @@ function tourPrev() {
 
 function paintTourStep() {
   if (!tourState.active) return;
-  const step = TOUR_STEPS[tourState.stepIndex];
+  const STEPS = _entryTour ? ENTRY_TOUR_STEPS : TOUR_STEPS;
+  const step = STEPS[tourState.stepIndex];
   const isFirst = tourState.stepIndex === 0;
-  const isLast = tourState.stepIndex === TOUR_STEPS.length - 1;
+  const isLast = tourState.stepIndex === STEPS.length - 1;
 
   // Apply mode + persona overrides BEFORE route
   if (step.mode && state.mode !== step.mode) {
@@ -19554,14 +19599,14 @@ function paintTourStep() {
     // Render popover content
     popover.innerHTML = `
       <div class="tour-popover-header">
-        <span class="tour-popover-step">Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}</span>
+        <span class="tour-popover-step">Step ${tourState.stepIndex+1} of ${STEPS.length}</span>
         <button class="tour-popover-skip" onclick="endTour()">Skip tour</button>
       </div>
       <div class="tour-popover-title">${step.title}</div>
       <div class="tour-popover-body">${step.body}</div>
       <div class="tour-popover-footer">
         <div class="tour-progress">
-          ${TOUR_STEPS.map((_, i) => `<div class="tour-progress-dot ${i===tourState.stepIndex?'current':i<tourState.stepIndex?'done':''}"></div>`).join('')}
+          ${STEPS.map((_, i) => `<div class="tour-progress-dot ${i===tourState.stepIndex?'current':i<tourState.stepIndex?'done':''}"></div>`).join('')}
         </div>
         ${!isFirst ? `<button class="tour-btn tour-btn-prev" onclick="tourPrev()">← Back</button>` : ''}
         <button class="tour-btn tour-btn-next" onclick="${isLast?'endTour()':'tourNext()'}">${isLast?'Finish':'Next →'}</button>
@@ -20393,6 +20438,19 @@ paintShellControls();
 
 route();
 initBackLink();
+
+// Honor ?tour=entry from workspace selector — start the orientation tour
+(function honorTourEntryParam(){
+  try {
+    const p = new URLSearchParams(location.search).get('tour');
+    if (p === 'entry') {
+      const url = new URL(location.href);
+      url.searchParams.delete('tour');
+      history.replaceState({}, '', url.pathname + (url.search || '') + (url.hash || ''));
+      setTimeout(startEntryTour, 450);
+    }
+  } catch(e){}
+})();
 </script>
 
 <!-- ── Prototype floating control panel ─────────────────────────────── -->
