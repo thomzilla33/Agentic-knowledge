@@ -258,6 +258,11 @@ export function TenantSelectorScreen() {
   }
 
   const n = filtered.length;
+  const isSearching = query.trim() !== '';
+  const heroTenant = !isSearching ? (TENANTS.find(t => t.recent) ?? TENANTS[0]) : null;
+  const listTenants = !isSearching
+    ? filtered.filter(t => t.id !== heroTenant?.id)
+    : filtered;
 
   return (
     <div className="min-h-screen bg-[var(--canvas)]">
@@ -303,7 +308,16 @@ export function TenantSelectorScreen() {
           </span>
         </div>
         <h1 className="text-[26px] font-semibold text-[var(--color-text-title)] tracking-tight mb-1.5">
-          Welcome back, {firstName}
+          Welcome back,{' '}
+          <span style={{
+            color: 'var(--primary)',
+            textDecoration: 'underline',
+            textDecorationColor: 'color-mix(in srgb, var(--primary) 35%, transparent)',
+            textDecorationThickness: '2px',
+            textUnderlineOffset: '5px',
+          }}>
+            {firstName}
+          </span>
         </h1>
         <p className="text-sm text-[var(--color-text-subtitle)] mb-7">
           You have access to{' '}
@@ -348,17 +362,46 @@ export function TenantSelectorScreen() {
             <p className="text-xs text-[var(--color-caption)]">Try a different search term</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            {filtered.map(tenant => (
-              <TenantCard
-                key={tenant.id}
-                tenant={tenant}
-                isDropdownOpen={openId === tenant.id}
-                onEnter={handleEnter}
-                onToggleDropdown={toggleDropdown}
-              />
-            ))}
-          </div>
+          <>
+            {/* ── Hero: pick up where you left off ── */}
+            {heroTenant && (
+              <div className="mb-5">
+                <p className="text-xs text-[var(--color-text-subtitle)] mb-2.5 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-pulse flex-shrink-0" />
+                  Pick up where you left off
+                </p>
+                <TenantCard
+                  tenant={heroTenant}
+                  featured
+                  isDropdownOpen={openId === heroTenant.id}
+                  onEnter={handleEnter}
+                  onToggleDropdown={toggleDropdown}
+                />
+              </div>
+            )}
+
+            {/* ── Other workspaces ── */}
+            {listTenants.length > 0 && (
+              <>
+                {heroTenant && (
+                  <p className="text-[10.5px] font-semibold tracking-[0.1em] uppercase text-[var(--color-caption)] mb-2">
+                    Other workspaces
+                  </p>
+                )}
+                <div className="flex flex-col gap-1.5">
+                  {listTenants.map(tenant => (
+                    <TenantCard
+                      key={tenant.id}
+                      tenant={tenant}
+                      isDropdownOpen={openId === tenant.id}
+                      onEnter={handleEnter}
+                      onToggleDropdown={toggleDropdown}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </>
         )}
       </main>
 
@@ -443,28 +486,45 @@ export function TenantSelectorScreen() {
 
 interface TenantCardProps {
   tenant: TenantAccess;
+  featured?: boolean;
   isDropdownOpen: boolean;
   onEnter: (tenantId: string, destination: Product | 'home') => void;
   onToggleDropdown: (tenantId: string, e: React.MouseEvent) => void;
 }
 
-function TenantCard({ tenant, isDropdownOpen, onEnter: _onEnter, onToggleDropdown }: TenantCardProps) {
+function TenantCard({ tenant, featured = false, isDropdownOpen, onEnter: _onEnter, onToggleDropdown }: TenantCardProps) {
   const role = ROLE_STYLES[tenant.role];
 
   return (
-    <div className="flex items-center gap-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-5 py-4 hover:border-[var(--primary)]/40 hover:shadow-sm transition-all duration-200">
+    <div
+      className={[
+        'flex items-center gap-4 bg-[var(--surface)] border rounded-xl transition-all duration-200',
+        featured
+          ? 'px-6 py-5 border-[var(--primary)]/30 hover:border-[var(--primary)]/55 hover:shadow-md shadow-sm'
+          : 'px-5 py-3 border-[var(--border)] hover:border-[var(--primary)]/40 hover:shadow-sm',
+      ].join(' ')}
+      style={featured
+        ? { background: 'color-mix(in srgb, var(--primary) 3%, var(--surface))' }
+        : undefined}
+    >
 
-      {/* Avatar — uses only --primary or --ac-teal tokens */}
+      {/* Avatar */}
       <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center text-[12px] font-bold flex-shrink-0 tracking-wider text-white"
+        className={[
+          'rounded-xl flex items-center justify-center font-bold flex-shrink-0 tracking-wider text-white',
+          featured ? 'w-12 h-12 text-[13px]' : 'w-9 h-9 text-[11px]',
+        ].join(' ')}
         style={{ background: `var(${tenant.avatarToken})` }}
       >
         {tenant.initials}
       </div>
 
       {/* Identity */}
-      <div className="flex-[0_0_200px] min-w-0">
-        <div className="text-[13.5px] font-semibold text-[var(--color-text-title)] tracking-tight truncate mb-1.5">
+      <div className={featured ? 'flex-[0_0_220px] min-w-0' : 'flex-[0_0_190px] min-w-0'}>
+        <div className={[
+          'font-semibold text-[var(--color-text-title)] tracking-tight truncate mb-1.5',
+          featured ? 'text-[15px]' : 'text-[13px]',
+        ].join(' ')}>
           {tenant.name}
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
@@ -477,19 +537,13 @@ function TenantCard({ tenant, isDropdownOpen, onEnter: _onEnter, onToggleDropdow
           >
             {role.label}
           </span>
-          {tenant.recent && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[var(--primary)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-pulse" />
-              Recent
-            </span>
-          )}
         </div>
       </div>
 
       {/* Divider */}
       <div className="self-stretch w-px bg-[var(--border)] flex-shrink-0" />
 
-      {/* Studio chips — neutral DS pattern, icon provides studio identity */}
+      {/* Studio chips */}
       <div className="flex-1 flex flex-wrap gap-x-4 gap-y-1.5 items-center">
         {tenant.studios.map(studio => {
           const meta = STUDIO_META[studio];
@@ -512,7 +566,7 @@ function TenantCard({ tenant, isDropdownOpen, onEnter: _onEnter, onToggleDropdow
         </span>
         <Button
           variant="primary"
-          size="sm"
+          size={featured ? 'md' : 'sm'}
           onClick={e => onToggleDropdown(tenant.id, e)}
           aria-expanded={isDropdownOpen}
           aria-label="Select workspace destination"
