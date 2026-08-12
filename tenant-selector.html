@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AIMS-OS — Select Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: linear-gradient(155.58deg, #020618 14.2%, #0f172b 50%, #020618 85.8%);
+      --surface: #0b1221;
+      --surface-2: #101929;
+      --border: rgba(255,255,255,.07);
+      --border-hover: rgba(43,127,255,.38);
+      --text-1: #f1f5f9;
+      --text-2: #64748b;
+      --text-3: #3d5068;
+      --accent: #2B7FFF;
+      --accent-h: #4a93ff;
+      --cyan: #06B6D4;
+      --emerald: #10B981;
+      --blue: #3B82F6;
+      --purple: #A78BFA;
+      --amber: #F59E0B;
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      background-attachment: fixed;
+      color: var(--text-1);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ─── Topbar ─────────────────────────────────────────────── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(2,6,24,.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #2B7FFF 0%, #06B6D4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-1);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .help-link {
+      font-size: 12px;
+      color: var(--text-2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color .15s;
+    }
+    .help-link:hover { color: var(--text-1); }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px 4px 5px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      user-select: none;
+    }
+    .user-pill:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.13); }
+
+    .user-av {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2B7FFF, #06B6D4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .03em;
+    }
+
+    .user-email {
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    /* ─── Hero ───────────────────────────────────────────────── */
+    .hero {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 52px 28px 32px;
+    }
+
+    .eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--accent);
+      opacity: .6;
+    }
+
+    .hero-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -.015em;
+      margin-bottom: 6px;
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .hero-sub strong { color: var(--text-1); font-weight: 600; }
+
+    /* ─── Search ─────────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 380px;
+    }
+
+    .search-ico {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      display: flex;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 9px 12px 9px 34px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-1);
+      outline: none;
+      transition: border-color .15s, background .15s;
+    }
+    .search-input::placeholder { color: var(--text-3); }
+    .search-input:focus {
+      border-color: rgba(43,127,255,.35);
+      background: rgba(43,127,255,.03);
+    }
+
+    .count-pill {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 0 4px;
+    }
+
+    /* ─── Grid ───────────────────────────────────────────────── */
+    .main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 4px 28px 40px;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ─── Card ───────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 20px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      overflow: visible;
+      transition: border-color .18s ease, box-shadow .18s ease;
+      animation: cardUp .24s ease both;
+    }
+
+    @keyframes cardUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 4px 24px rgba(0,0,0,.28), 0 0 0 1px rgba(43,127,255,.07) inset;
+    }
+
+    .tenant-av {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      flex-shrink: 0;
+    }
+
+    .card-identity {
+      flex: 0 0 210px;
+      min-width: 0;
+    }
+
+    .card-divider {
+      width: 1px;
+      align-self: stretch;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .card-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 5px;
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .badge-industry {
+      background: rgba(255,255,255,.06);
+      color: var(--text-2);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+
+    .badge-platform-admin { background: rgba(43,127,255,.13); color: #60A5FA; border: 1px solid rgba(43,127,255,.22); }
+    .badge-org-admin      { background: rgba(6,182,212,.12);  color: #22D3EE; border: 1px solid rgba(6,182,212,.22);  }
+    .badge-member         { background: rgba(16,185,129,.1);  color: #34D399; border: 1px solid rgba(16,185,129,.2);  }
+    .badge-viewer         { background: rgba(100,116,139,.1); color: #94A3B8; border: 1px solid rgba(100,116,139,.2); }
+
+    .recent-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #60A5FA;
+    }
+
+    .recent-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 2.4s ease infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .35; }
+    }
+
+    /* Studios — horizontal */
+    .studios-list {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px 20px;
+      align-items: center;
+    }
+
+    .studio-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .studio-ico {
+      width: 13px;
+      height: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .studio-name {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      letter-spacing: -.005em;
+      white-space: nowrap;
+    }
+
+    /* ─── Page footer ───────────────────────────────────────────── */
+    .page-footer {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 28px 48px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .footer-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .footer-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #2B7FFF 0%, #06B6D4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: .7;
+    }
+
+    .footer-text {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    /* Actions */
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .last-visit {
+      font-size: 10.5px;
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+
+    /* ─── Split button ───────────────────────────────────────── */
+    .split-btn {
+      display: flex;
+      align-items: stretch;
+      border-radius: 8px;
+      overflow: visible;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .btn-main {
+      padding: 7px 13px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px 0 0 8px;
+      transition: background .14s;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .btn-main:hover { background: var(--accent-h); }
+
+    .btn-sep {
+      width: 1px;
+      background: rgba(255,255,255,.18);
+      flex-shrink: 0;
+    }
+
+    .btn-drop {
+      width: 30px;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 8px 8px 0;
+      transition: background .14s;
+      flex-shrink: 0;
+    }
+    .btn-drop:hover { background: var(--accent-h); }
+
+    .btn-drop-ico {
+      transition: transform .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-drop.is-open .btn-drop-ico { transform: rotate(180deg); }
+
+    /* ─── Studio dropdown ────────────────────────────────────── */
+    .studio-dd {
+      position: absolute;
+      bottom: calc(100% + 7px);
+      right: 0;
+      background: #0e1726;
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 11px;
+      padding: 5px;
+      min-width: 215px;
+      box-shadow: 0 20px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.03) inset;
+      z-index: 200;
+      display: none;
+    }
+
+    .studio-dd.is-open {
+      display: block;
+      animation: ddIn .13s ease;
+    }
+
+    @keyframes ddIn {
+      from { opacity: 0; transform: translateY(5px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .dd-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 4px 9px 5px;
+    }
+
+    .dd-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 9px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background .1s;
+      user-select: none;
+    }
+    .dd-item:hover { background: rgba(255,255,255,.06); }
+    .dd-item:active { background: rgba(255,255,255,.09); }
+
+    .dd-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dd-text { flex: 1; min-width: 0; }
+
+    .dd-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-1);
+    }
+
+    .dd-hint {
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .dd-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 3px 0;
+    }
+
+    /* ─── Empty state ────────────────────────────────────────── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 64px 20px;
+    }
+
+    .empty-ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      color: var(--text-3);
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+
+    .empty-hint { font-size: 12px; color: var(--text-3); }
+
+    /* ─── Toast ──────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: #131f31;
+      border: 1px solid rgba(43,127,255,.25);
+      border-radius: 10px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-1);
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      z-index: 9999;
+      transition: transform .22s cubic-bezier(.34,1.56,.64,1), opacity .22s;
+      opacity: 0;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .toast-pip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      animation: blink 1.4s ease infinite;
+    }
+
+    .toast-arrow {
+      color: var(--text-3);
+      display: flex;
+      align-items: center;
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .topbar   { padding: 0 16px; }
+      .hero     { padding: 32px 16px 24px; }
+      .main     { padding: 0 16px 80px; }
+      .hero-title { font-size: 22px; }
+      .user-email { display: none; }
+      .grid     { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Topbar ─────────────────────────────────────────── -->
+  <header class="topbar">
+    <a class="logo" href="index.html">
+      <div class="logo-mark">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="2" fill="white"/>
+          <circle cx="2.5" cy="2.5" r="1.2" fill="white" opacity=".55"/>
+          <circle cx="11.5" cy="2.5" r="1.2" fill="white" opacity=".55"/>
+          <circle cx="2.5" cy="11.5" r="1.2" fill="white" opacity=".55"/>
+          <circle cx="11.5" cy="11.5" r="1.2" fill="white" opacity=".55"/>
+        </svg>
+      </div>
+      <span class="logo-text">AIMS-OS</span>
+    </a>
+
+    <div class="topbar-right">
+      <span class="help-link">Help</span>
+      <div class="user-pill">
+        <div class="user-av">TG</div>
+        <span class="user-email">thomas.gonzalez@aimsos.ai</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Hero ──────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="eyebrow">Workspace Selection</div>
+    <h1 class="hero-title">Welcome back, Thomas</h1>
+    <p class="hero-sub" id="heroSub">
+      You have access to <strong id="tenantCount">5</strong> organizations. Select a workspace to continue.
+    </p>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-ico">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <input
+          id="searchInput"
+          class="search-input"
+          type="text"
+          placeholder="Search organizations…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <span class="count-pill" id="countPill">5 workspaces</span>
+    </div>
+  </section>
+
+  <!-- ── Cards ─────────────────────────────────────────── -->
+  <main class="main">
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────── -->
+  <footer class="page-footer">
+    <div class="footer-rule"></div>
+    <div class="footer-brand">
+      <div class="footer-mark">
+        <svg width="9" height="9" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="2" fill="white"/>
+          <circle cx="2.5" cy="2.5" r="1.2" fill="white" opacity=".55"/>
+          <circle cx="11.5" cy="2.5" r="1.2" fill="white" opacity=".55"/>
+          <circle cx="2.5" cy="11.5" r="1.2" fill="white" opacity=".55"/>
+          <circle cx="11.5" cy="11.5" r="1.2" fill="white" opacity=".55"/>
+        </svg>
+      </div>
+      <span class="footer-text">AIMS-OS</span>
+    </div>
+    <div class="footer-rule"></div>
+  </footer>
+
+  <!-- ── Toast ─────────────────────────────────────────── -->
+  <div class="toast" id="toast">
+    <span class="toast-pip"></span>
+    <span id="toastMsg">Navigating…</span>
+    <span class="toast-arrow">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M2.5 6h7M7 3.5L9.5 6 7 8.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </div>
+
+<script>
+// ─── Studio registry ─────────────────────────────────────────────────────────
+
+const STUDIOS = {
+  admin: {
+    key: 'admin',
+    label: 'Admin Console',
+    short: 'Admin',
+    hint: 'Settings, people & access',
+    color: '#06B6D4',
+    bg: 'rgba(6,182,212,.11)',
+    border: 'rgba(6,182,212,.24)',
+    chipIcon: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="2" stroke="#06B6D4" stroke-width="1.4"/>
+      <circle cx="3" cy="3" r="1.3" stroke="#06B6D4" stroke-width="1.3"/>
+      <circle cx="13" cy="3" r="1.3" stroke="#06B6D4" stroke-width="1.3"/>
+      <circle cx="3" cy="13" r="1.3" stroke="#06B6D4" stroke-width="1.3"/>
+      <circle cx="13" cy="13" r="1.3" stroke="#06B6D4" stroke-width="1.3"/>
+      <path d="M4.1 4.1l2.4 2.4M11.9 4.1L9.5 6.5M4.1 11.9l2.4-2.4M11.9 11.9L9.5 9.5" stroke="#06B6D4" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>`,
+    ddIcon: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="2" stroke="#06B6D4" stroke-width="1.4"/>
+      <circle cx="3" cy="3" r="1.3" stroke="#06B6D4" stroke-width="1.3"/>
+      <circle cx="13" cy="3" r="1.3" stroke="#06B6D4" stroke-width="1.3"/>
+      <circle cx="3" cy="13" r="1.3" stroke="#06B6D4" stroke-width="1.3"/>
+      <circle cx="13" cy="13" r="1.3" stroke="#06B6D4" stroke-width="1.3"/>
+      <path d="M4.1 4.1l2.4 2.4M11.9 4.1L9.5 6.5M4.1 11.9l2.4-2.4M11.9 11.9L9.5 9.5" stroke="#06B6D4" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>`,
+  },
+  data: {
+    key: 'data',
+    label: 'Data Studio',
+    short: 'Data',
+    hint: 'Models, schemas & pipelines',
+    color: '#10B981',
+    bg: 'rgba(16,185,129,.11)',
+    border: 'rgba(16,185,129,.24)',
+    chipIcon: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="3" width="12" height="10" rx="1.2" stroke="#10B981" stroke-width="1.3"/>
+      <path d="M2 6.5h12M5.5 3v10" stroke="#10B981" stroke-width="1.1" stroke-linecap="round"/>
+    </svg>`,
+    ddIcon: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="3" width="12" height="10" rx="1.2" stroke="#10B981" stroke-width="1.3"/>
+      <path d="M2 6.5h12M5.5 3v10" stroke="#10B981" stroke-width="1.1" stroke-linecap="round"/>
+    </svg>`,
+  },
+  agentic: {
+    key: 'agentic',
+    label: 'Agentic Studio',
+    short: 'Agentic',
+    hint: 'Agent networks & workflows',
+    color: '#3B82F6',
+    bg: 'rgba(59,130,246,.11)',
+    border: 'rgba(59,130,246,.24)',
+    chipIcon: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="5" r="2.5" stroke="#3B82F6" stroke-width="1.3"/>
+      <path d="M3.5 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="#3B82F6" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>`,
+    ddIcon: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="5" r="2.5" stroke="#3B82F6" stroke-width="1.3"/>
+      <path d="M3.5 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="#3B82F6" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>`,
+  },
+  governance: {
+    key: 'governance',
+    label: 'Governance Studio',
+    short: 'Governance',
+    hint: 'Policies & compliance',
+    color: '#A78BFA',
+    bg: 'rgba(167,139,250,.11)',
+    border: 'rgba(167,139,250,.24)',
+    chipIcon: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2L3 4.5v4C3 11.5 5.2 13.8 8 14c2.8-.2 5-2.5 5-5.5v-4L8 2z" stroke="#A78BFA" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M5.5 8l1.8 1.8 3-3" stroke="#A78BFA" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+    ddIcon: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2L3 4.5v4C3 11.5 5.2 13.8 8 14c2.8-.2 5-2.5 5-5.5v-4L8 2z" stroke="#A78BFA" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M5.5 8l1.8 1.8 3-3" stroke="#A78BFA" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+  },
+};
+
+// ─── Role registry ────────────────────────────────────────────────────────────
+
+const ROLES = {
+  'platform-admin': { label: 'Platform Admin', cls: 'badge-platform-admin' },
+  'org-admin':      { label: 'Org Admin',       cls: 'badge-org-admin'      },
+  'member':         { label: 'Member',           cls: 'badge-member'         },
+  'viewer':         { label: 'Viewer',           cls: 'badge-viewer'         },
+};
+
+// ─── Tenant fixtures ──────────────────────────────────────────────────────────
+
+const TENANTS = [
+  {
+    id: 'avance',
+    name: 'Avance Financial',
+    industry: 'FinTech',
+    description: 'Financial operations intelligence across 12 business units. Automated compliance monitoring, real-time risk assessment, and GL reconciliation agents.',
+    role: 'platform-admin',
+    studios: ['admin', 'data', 'agentic', 'governance'],
+    lastVisited: '2h ago',
+    recent: true,
+    color: '#2B7FFF',
+    initials: 'AF',
+  },
+  {
+    id: 'demo',
+    name: 'Demo Sandbox',
+    industry: 'Sandbox',
+    description: 'Internal test environment with synthetic data. Use for prototyping agent configurations, testing integrations, and simulating role-based access scenarios.',
+    role: 'platform-admin',
+    studios: ['admin', 'data', 'agentic', 'governance'],
+    lastVisited: 'Earlier today',
+    recent: true,
+    color: '#06B6D4',
+    initials: 'DS',
+  },
+  {
+    id: 'meridian',
+    name: 'Meridian Health',
+    industry: 'Healthcare',
+    description: 'Clinical workflow automation for a 3-hospital network. HIPAA-compliant agent routing, patient data orchestration, and automated audit trails.',
+    role: 'member',
+    studios: ['data', 'agentic'],
+    lastVisited: '3 days ago',
+    recent: false,
+    color: '#10B981',
+    initials: 'MH',
+  },
+  {
+    id: 'solis',
+    name: 'Solis Retail Group',
+    industry: 'Retail',
+    description: 'Omnichannel inventory and demand planning across 240 SKUs. Supply chain intelligence with ERP and POS integrations across 14 store locations.',
+    role: 'org-admin',
+    studios: ['admin', 'data', 'agentic'],
+    lastVisited: '1 week ago',
+    recent: false,
+    color: '#F59E0B',
+    initials: 'SR',
+  },
+  {
+    id: 'northbridge',
+    name: 'NorthBridge Capital',
+    industry: 'Wealth Mgmt',
+    description: 'Portfolio analytics and client reporting pipeline across 3 fund structures. Read-only access for compliance audit and data lineage review.',
+    role: 'viewer',
+    studios: ['data'],
+    lastVisited: '2 weeks ago',
+    recent: false,
+    color: '#8B5CF6',
+    initials: 'NC',
+  },
+];
+
+// ─── Build helpers ────────────────────────────────────────────────────────────
+
+function studioList(keys) {
+  return keys.map(k => {
+    const s = STUDIOS[k];
+    return `<div class="studio-row">
+      <span class="studio-ico">${s.chipIcon}</span>
+      <span class="studio-name">${s.label}</span>
+    </div>`;
+  }).join('');
+}
+
+function dropdownItems(tenantId, keys) {
+  const homeRow = `
+    <div class="dd-item" onclick="go('${tenantId}','home')">
+      <div class="dd-icon" style="background:rgba(255,255,255,.06)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M2 7l6-5 6 5v7a1 1 0 01-1 1H3a1 1 0 01-1-1V7z" stroke="#64748b" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M6 14V9h4v5" stroke="#64748b" stroke-width="1.3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="dd-text">
+        <div class="dd-name">Home</div>
+        <div class="dd-hint">Your work inbox</div>
+      </div>
+    </div>`;
+
+  const studioRows = keys.map(k => {
+    const s = STUDIOS[k];
+    return `
+      <div class="dd-item" onclick="go('${tenantId}','${k}')">
+        <div class="dd-icon" style="background:${s.bg}">${s.ddIcon}</div>
+        <div class="dd-text">
+          <div class="dd-name">${s.label}</div>
+          <div class="dd-hint">${s.hint}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="dd-label">Go directly to</div>
+    ${homeRow}
+    <div class="dd-sep"></div>
+    ${studioRows}
+  `;
+}
+
+function buildCard(tenant, idx) {
+  const role = ROLES[tenant.role];
+
+  // For single-studio tenants the main button names the studio
+  const ctaText = tenant.studios.length === 1
+    ? `Go to ${STUDIOS[tenant.studios[0]].short}`
+    : 'Enter workspace';
+
+  const recentHtml = tenant.recent
+    ? `<span class="recent-badge"><span class="recent-dot"></span>Recent</span>`
+    : '';
+
+  return `
+    <div class="card" style="animation-delay:${idx * 45}ms">
+      <!-- avatar -->
+      <div class="tenant-av" style="background:${tenant.color}18;border:1px solid ${tenant.color}30;color:${tenant.color}">
+        ${tenant.initials}
+      </div>
+
+      <!-- identity -->
+      <div class="card-identity">
+        <div class="card-name">${tenant.name}</div>
+        <div class="badge-row">
+          <span class="badge badge-industry">${tenant.industry}</span>
+          <span class="badge ${role.cls}">${role.label}</span>
+          ${recentHtml}
+        </div>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <!-- studios -->
+      <div class="studios-list">${studioList(tenant.studios)}</div>
+
+      <!-- actions -->
+      <div class="card-actions">
+        <span class="last-visit">Last visited ${tenant.lastVisited}</span>
+        <div class="split-btn" id="sb-${tenant.id}">
+          <button class="btn-main" onclick="go('${tenant.id}','home')">${ctaText}</button>
+          <div class="btn-sep"></div>
+          <button
+            class="btn-drop"
+            id="bd-${tenant.id}"
+            onclick="toggleDd('${tenant.id}',event)"
+            aria-label="Choose which studio to open"
+            aria-expanded="false"
+          >
+            <span class="btn-drop-ico">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M2 3.5L5 6.5L8 3.5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+          <div class="studio-dd" id="dd-${tenant.id}">
+            ${dropdownItems(tenant.id, tenant.studios)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+
+function render(list) {
+  const grid = document.getElementById('grid');
+
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div class="empty">
+        <div class="empty-ico">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="empty-title">No workspaces found</div>
+        <div class="empty-hint">Try a different search term</div>
+      </div>`;
+  } else {
+    grid.innerHTML = list.map((t, i) => buildCard(t, i)).join('');
+  }
+
+  const n = list.length;
+  document.getElementById('countPill').textContent = `${n} workspace${n !== 1 ? 's' : ''}`;
+}
+
+// ─── Search ───────────────────────────────────────────────────────────────────
+
+document.getElementById('searchInput').addEventListener('input', function () {
+  const q = this.value.trim().toLowerCase();
+  const filtered = q
+    ? TENANTS.filter(t =>
+        t.name.toLowerCase().includes(q) ||
+        t.industry.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q) ||
+        ROLES[t.role].label.toLowerCase().includes(q)
+      )
+    : TENANTS;
+  closeAll();
+  render(filtered);
+});
+
+// ─── Dropdown ─────────────────────────────────────────────────────────────────
+
+let activeDd = null;
+
+function toggleDd(id, e) {
+  e.stopPropagation();
+  const dd      = document.getElementById(`dd-${id}`);
+  const btn     = document.getElementById(`bd-${id}`);
+  const isOpen  = dd.classList.contains('is-open');
+
+  closeAll();
+
+  if (!isOpen) {
+    dd.classList.add('is-open');
+    btn.classList.add('is-open');
+    btn.setAttribute('aria-expanded', 'true');
+    activeDd = id;
+  }
+}
+
+function closeAll() {
+  if (activeDd) {
+    document.getElementById(`dd-${activeDd}`)?.classList.remove('is-open');
+    const btn = document.getElementById(`bd-${activeDd}`);
+    btn?.classList.remove('is-open');
+    btn?.setAttribute('aria-expanded', 'false');
+    activeDd = null;
+  }
+}
+
+document.addEventListener('click', closeAll);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+// ─── Navigation (simulated) ───────────────────────────────────────────────────
+
+function go(tenantId, destination) {
+  closeAll();
+  const tenant = TENANTS.find(t => t.id === tenantId);
+  const msg = destination === 'home'
+    ? `Entering ${tenant.name}`
+    : `Opening ${STUDIOS[destination].label} in ${tenant.name}`;
+  toast(msg);
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+
+let _toastTimer;
+function toast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
+  const el = document.getElementById('toast');
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+
+render(TENANTS);
+</script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+/*
+ * AIMS OS Design System — CSS Token Layer
+ * Source: github.com/cachilupis/aims-os-design-system · src/index.css
+ * Figma: v6rmYKA2zmyXWOahlxLOeI — "Semantic Color Tokens"
+ *
+ * Admin console runs in light mode. Tokens defined in :root are dark-mode
+ * defaults; .light overrides are applied via <html class="light">.
+ */
+
+/* ── Dark-mode defaults (required as baseline) ─────────────────────────── */
+:root {
+  --canvas:              #0A0E1A;
+  --surface:             #0D1120;
+  --surface-raised:      #131C2E;
+
+  --primary:             #2b7fff;
+  --primary-foreground:  #ffffff;
+  --foreground:          #ffffffcc;
+  --muted-foreground:    #ffffff99;
+  --destructive:         #e05252;
+  --border:              #ffffff1a;
+
+  /* Field */
+  --field-bg:              rgba(255,255,255,0.1);
+  --field-border:          rgba(255,255,255,0.1);
+  --field-border-hover:    rgba(255,255,255,0.2);
+  --field-border-focus:    #2b7fff;
+  --field-text:            rgba(255,255,255,0.6);
+  --field-placeholder:     rgba(255,255,255,0.3);
+  --field-label:           rgba(255,255,255,0.6);
+  --field-supporting:      rgba(255,255,255,0.6);
+  --field-icon:            rgba(255,255,255,0.3);
+  --field-border-error:    #fb2c36;
+  --field-text-error:      #ff6467;
+  --field-text-success:    #6ee7b7;
+
+  /* Button */
+  --btn-primary-bg:          #2b7fff;
+  --btn-primary-hover-bg:    #002f80;
+  --btn-primary-active-bg:   #001a5c;
+  --btn-primary-ring:        #2b7fff;
+  --btn-secondary-bg:          rgba(255,255,255,0.1);
+  --btn-secondary-fg:          rgba(255,255,255,0.6);
+  --btn-secondary-border:      rgba(255,255,255,0.1);
+  --btn-secondary-hover-bg:    rgba(255,255,255,0.08);
+  --btn-secondary-hover-bd:    rgba(255,255,255,0.2);
+  --btn-secondary-focus-bd:    rgba(255,255,255,0.15);
+  --btn-secondary-disabled-bg: rgba(255,255,255,0.05);
+  --btn-secondary-disabled-bd: rgba(255,255,255,0.15);
+  --btn-secondary-disabled-fg: rgba(255,255,255,0.3);
+  --btn-secondary-active-bg:   rgba(255,255,255,0.2);
+  --btn-secondary-ring:        rgba(255,255,255,0.25);
+  --btn-tertiary-fg:           rgba(255,255,255,0.6);
+  --btn-tertiary-hover-bg:     rgba(255,255,255,0.05);
+  --btn-tertiary-focus-bg:     rgba(255,255,255,0.08);
+  --btn-tertiary-active-bg:    rgba(255,255,255,0.12);
+  --btn-warning-bg:          #e05252;
+  --btn-warning-hover-bg:    #b91c1c;
+  --btn-warning-active-bg:   #991b1b;
+  --btn-warning-ring:        #e05252;
+
+  /* Toggle */
+  --toggle-track-off:          rgba(255,255,255,0.10);
+  --toggle-border-off:         rgba(255,255,255,0.30);
+  --toggle-thumb-off:          rgba(255,255,255,0.60);
+  --toggle-track-on:           #2b7fff;
+  --toggle-thumb-on:           #ffffff;
+  --toggle-track-off-disabled: rgba(255,255,255,0.05);
+  --toggle-border-off-disabled: rgba(255,255,255,0.15);
+  --toggle-track-on-disabled:  #80afff;
+  --toggle-thumb-disabled:     rgba(255,255,255,0.30);
+
+  /* Spinner */
+  --spinner-primary-fill:  var(--primary);
+  --spinner-primary-track: rgba(33,115,255,0.15);
+  --spinner-bw-fill:       rgba(255,255,255,0.80);
+  --spinner-bw-track:      rgba(255,255,255,0.10);
+
+  /* Semantic text */
+  --color-text-title:    rgba(255,255,255,0.80);
+  --color-text-subtitle: rgba(255,255,255,0.60);
+  --color-text-disabled: rgba(255,255,255,0.30);
+  --color-caption:       rgba(255,255,255,0.40);
+
+  /* Surface accents */
+  --color-surface-error-subtle:   rgba(220,38,38,0.14);
+  --color-surface-success-subtle: rgba(0,169,127,0.15);
+  --color-surface-alert-subtle:   rgba(217,119,6,0.15);
+
+  /* Admin console semantic aliases */
+  --ac-blue:    var(--primary);
+  --ac-teal:    #09E2AB;
+  --ac-surface: var(--field-bg);
+  --ac-surface2: #131C2E;
+  --ac-text:    var(--field-text);
+  --ac-muted:   var(--field-supporting);
+  --ac-border:  var(--border);
+  --ac-danger:  var(--destructive);
+
+  /* Sidebar — always dark navy regardless of color mode */
+  --ac-sidebar:             #131C2E;
+  --ac-sidebar-border:      rgba(255,255,255,0.08);
+  --ac-sidebar-text:        rgba(255,255,255,0.70);
+  --ac-sidebar-text-muted:  rgba(255,255,255,0.40);
+  --ac-sidebar-active-bg:   rgba(33,115,255,0.18);
+  --ac-sidebar-active-text: #ffffff;
+  --ac-sidebar-hover-bg:    rgba(255,255,255,0.06);
+}
+
+/* ── Light mode overrides (admin console always runs .light) ─────────────── */
+.light {
+  --canvas:              #E4ECF7;
+  --surface:             #F2F7FF;
+  --surface-raised:      #EBF2FF;
+
+  --primary:             #2173ff;
+  --primary-foreground:  #ffffff;
+  --foreground:          #1a1a1a;
+  --muted-foreground:    #5c5c5c;
+  --destructive:         #d32f2f;
+  --border:              rgba(33,115,255,0.13);
+
+  /* Field */
+  --field-bg:              #ffffff;
+  --field-border:          #5c5c5c;
+  --field-border-hover:    #2a2a2a;
+  --field-border-focus:    #2173ff;
+  --field-text:            #2a2a2a;
+  --field-placeholder:     #bababa;
+  --field-label:           #2a2a2a;
+  --field-supporting:      #5c5c5c;
+  --field-icon:            #bababa;
+  --field-border-error:    #d32f2f;
+  --field-text-error:      #5f2120;
+  --field-text-success:    #003328;
+
+  /* Button */
+  --btn-primary-bg:          #2173ff;
+  --btn-primary-hover-bg:    #002f80;
+  --btn-primary-active-bg:   #001a5c;
+  --btn-primary-ring:        #2173ff;
+  --btn-secondary-bg:          #ffffff;
+  --btn-secondary-fg:          #2a2a2a;
+  --btn-secondary-border:      #5c5c5c;
+  --btn-secondary-hover-bg:    #f2f2f2;
+  --btn-secondary-hover-bd:    #d9d9d9;
+  --btn-secondary-focus-bd:    #bababa;
+  --btn-secondary-disabled-bg: #fafafa;
+  --btn-secondary-disabled-bd: #bababa;
+  --btn-secondary-disabled-fg: #bababa;
+  --btn-secondary-active-bg:   rgba(0,0,0,0.078);
+  --btn-secondary-ring:        rgba(0,0,0,0.15);
+  --btn-tertiary-fg:           #2a2a2a;
+  --btn-tertiary-hover-bg:     #fafafa;
+  --btn-tertiary-focus-bg:     #f2f2f2;
+  --btn-tertiary-active-bg:    #ebebeb;
+  --btn-warning-bg:          #d32f2f;
+  --btn-warning-hover-bg:    #b91c1c;
+  --btn-warning-active-bg:   #991b1b;
+  --btn-warning-ring:        #d32f2f;
+
+  /* Toggle */
+  --toggle-track-off:          rgba(242,242,242,1.00);
+  --toggle-border-off:         rgba(92,92,92,1.00);
+  --toggle-thumb-off:          rgba(42,42,42,1.00);
+  --toggle-track-on:           #2173ff;
+  --toggle-thumb-on:           #ffffff;
+  --toggle-track-off-disabled: rgba(242,242,242,1.00);
+  --toggle-border-off-disabled: rgba(186,186,186,1.00);
+  --toggle-track-on-disabled:  #80afff;
+  --toggle-thumb-disabled:     rgba(186,186,186,1.00);
+
+  /* Spinner */
+  --spinner-primary-fill:  var(--primary);
+  --spinner-primary-track: rgba(33,115,255,0.15);
+  --spinner-bw-fill:       rgba(0,0,0,0.70);
+  --spinner-bw-track:      rgba(0,0,0,0.10);
+
+  /* Semantic text */
+  --color-text-title:    rgba(42,42,42,0.80);
+  --color-text-subtitle: #5c5c5c;
+  --color-text-disabled: #bababa;
+  --color-caption:       #9ca3af;
+
+  /* Surface accents */
+  --color-surface-error-subtle:   #fdeded;
+  --color-surface-success-subtle: #e5fdf8;
+  --color-surface-alert-subtle:   #fff4e5;
+
+  /* Admin console semantic aliases */
+  --ac-blue:    var(--primary);
+  --ac-teal:    #09E2AB;
+  --ac-surface: var(--field-bg);
+  --ac-surface2: #fafafa;
+  --ac-text:    var(--field-text);
+  --ac-muted:   var(--field-supporting);
+  --ac-border:  var(--border);
+  --ac-danger:  var(--destructive);
+
+  /* Sidebar — always dark navy regardless of color mode */
+  --ac-sidebar:             #131C2E;
+  --ac-sidebar-border:      rgba(255,255,255,0.08);
+  --ac-sidebar-text:        rgba(255,255,255,0.70);
+  --ac-sidebar-text-muted:  rgba(255,255,255,0.40);
+  --ac-sidebar-active-bg:   rgba(33,115,255,0.18);
+  --ac-sidebar-active-text: #ffffff;
+  --ac-sidebar-hover-bg:    rgba(255,255,255,0.06);
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--field-text);
+  background: var(--ac-surface2);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  margin: 0;
+}
+
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+
+#root { height: 100vh; display: flex; flex-direction: column; }
+
+/* ── Spinner ────────────────────────────────────────────────────────────── */
+@keyframes spinner-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spinner-base {
+  border-radius: 50%;
+  border-style: solid;
+  display: inline-block;
+  flex-shrink: 0;
+  animation: spinner-spin 0.7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .spinner-base { animation: none; opacity: 0.6; }
+}
+
+/* ── Focus ring ─────────────────────────────────────────────────────────── */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
