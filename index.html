@@ -540,23 +540,27 @@
       white-space: nowrap;
     }
 
-    /* ─── Enter workspace button ─────────────────────────────── */
+    /* ─── Enter workspace button (ghost fallback) ────────────── */
     .btn-main {
-      padding: 7px 14px;
-      background: var(--accent);
-      color: #fff;
+      padding: 6px 13px;
+      background: transparent;
+      color: var(--text-2);
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 500;
       font-family: inherit;
-      border: none;
+      border: 1px solid rgba(255,255,255,.14);
       cursor: pointer;
       border-radius: 8px;
-      transition: background .14s;
+      transition: border-color .14s, color .14s, background .14s;
       white-space: nowrap;
       line-height: 1;
       flex-shrink: 0;
     }
-    .btn-main:hover { background: var(--accent-h); }
+    .btn-main:hover {
+      border-color: rgba(255,255,255,.28);
+      color: var(--text-1);
+      background: rgba(255,255,255,.05);
+    }
 
     /* ─── Empty state ────────────────────────────────────────── */
     .empty {
