@@ -801,6 +801,30 @@
   </div>
 
 <script>
+// ─── Selected destinations ────────────────────────────────────────────────────
+
+const selectedStudios = {}; // { [tenantId]: studioKey | 'home' }
+
+function selectStudio(tenantId, studioKey) {
+  selectedStudios[tenantId] = studioKey;
+  const btn = document.getElementById(`bm-${tenantId}`);
+  if (btn) {
+    btn.textContent = studioKey === 'home'
+      ? 'Enter workspace'
+      : `Go to ${STUDIOS[studioKey].short}`;
+  }
+  closeAll();
+}
+
+function mainBtnClick(tenantId, e) {
+  const dest = selectedStudios[tenantId];
+  if (dest !== undefined) {
+    go(tenantId, dest);
+  } else {
+    toggleDd(tenantId, e);
+  }
+}
+
 // ─── Studio registry ─────────────────────────────────────────────────────────
 
 const STUDIOS = {
@@ -945,7 +969,7 @@ function studioList(keys) {
 
 function dropdownItems(tenantId, keys) {
   const homeRow = `
-    <div class="dd-item" onclick="go('${tenantId}','home')">
+    <div class="dd-item" onclick="selectStudio('${tenantId}','home')">
       <div class="dd-icon" style="background:rgba(255,255,255,.06)">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
           <path d="M2 7l6-5 6 5v7a1 1 0 01-1 1H3a1 1 0 01-1-1V7z" stroke="#64748b" stroke-width="1.3" stroke-linejoin="round"/>
@@ -961,7 +985,7 @@ function dropdownItems(tenantId, keys) {
   const studioRows = keys.map(k => {
     const s = STUDIOS[k];
     return `
-      <div class="dd-item" onclick="go('${tenantId}','${k}')">
+      <div class="dd-item" onclick="selectStudio('${tenantId}','${k}')">
         <div class="dd-icon" style="background:${s.bg}">${s.ddIcon}</div>
         <div class="dd-text">
           <div class="dd-name">${s.label}</div>
@@ -1010,7 +1034,7 @@ function buildCard(tenant, idx, featured = false) {
       <div class="card-actions">
         <span class="last-visit">Last visited ${tenant.lastVisited}</span>
         <div class="split-btn" id="sb-${tenant.id}">
-          <button class="btn-main" onclick="go('${tenant.id}','home')">${ctaText}</button>
+          <button class="btn-main" id="bm-${tenant.id}" onclick="mainBtnClick('${tenant.id}', event)">${ctaText}</button>
           <div class="btn-sep"></div>
           <button
             class="btn-drop"

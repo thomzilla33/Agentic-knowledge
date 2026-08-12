@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Product } from '../types';
 import { useApp } from '../context/AppContext';
-import { Button } from '../components/primitives/Button';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -198,6 +197,7 @@ export function TenantSelectorScreen() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [dropAnchor, setDropAnchor] = useState<{ top: number; right: number } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [selectedDests, setSelectedDests] = useState<Record<string, Product | 'home'>>({});
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const firstName = principal?.name.split(' ')[0] ?? 'there';
@@ -230,6 +230,12 @@ export function TenantSelectorScreen() {
     setToast(msg);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2600);
+  }
+
+  function handleSelectDest(tenantId: string, dest: Product | 'home') {
+    setSelectedDests(prev => ({ ...prev, [tenantId]: dest }));
+    setOpenId(null);
+    setDropAnchor(null);
   }
 
   function handleEnter(tenantId: string, destination: Product | 'home') {
@@ -373,6 +379,7 @@ export function TenantSelectorScreen() {
                 <TenantCard
                   tenant={heroTenant}
                   featured
+                  selectedDest={selectedDests[heroTenant.id] ?? null}
                   isDropdownOpen={openId === heroTenant.id}
                   onEnter={handleEnter}
                   onToggleDropdown={toggleDropdown}
@@ -393,6 +400,7 @@ export function TenantSelectorScreen() {
                     <TenantCard
                       key={tenant.id}
                       tenant={tenant}
+                      selectedDest={selectedDests[tenant.id] ?? null}
                       isDropdownOpen={openId === tenant.id}
                       onEnter={handleEnter}
                       onToggleDropdown={toggleDropdown}
@@ -420,7 +428,7 @@ export function TenantSelectorScreen() {
             </div>
 
             <button
-              onClick={() => handleEnter(openId, 'home')}
+              onClick={() => handleSelectDest(openId, 'home')}
               className="w-full flex items-center gap-2.5 px-2.5 py-2 text-left hover:bg-[var(--field-bg)] transition-colors rounded-lg focus-ring"
             >
               <div className="w-7 h-7 rounded-lg bg-[var(--field-bg)] flex items-center justify-center flex-shrink-0 text-[var(--color-text-subtitle)]">
@@ -442,7 +450,7 @@ export function TenantSelectorScreen() {
               return (
                 <button
                   key={studio}
-                  onClick={() => handleEnter(openId, studio)}
+                  onClick={() => handleSelectDest(openId, studio)}
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 text-left hover:bg-[var(--field-bg)] transition-colors rounded-lg focus-ring"
                 >
                   <div className="w-7 h-7 rounded-lg bg-[var(--field-bg)] flex items-center justify-center flex-shrink-0 text-[var(--color-text-subtitle)]">
@@ -487,12 +495,13 @@ export function TenantSelectorScreen() {
 interface TenantCardProps {
   tenant: TenantAccess;
   featured?: boolean;
+  selectedDest?: Product | 'home' | null;
   isDropdownOpen: boolean;
   onEnter: (tenantId: string, destination: Product | 'home') => void;
   onToggleDropdown: (tenantId: string, e: React.MouseEvent) => void;
 }
 
-function TenantCard({ tenant, featured = false, isDropdownOpen, onEnter: _onEnter, onToggleDropdown }: TenantCardProps) {
+function TenantCard({ tenant, featured = false, selectedDest = null, isDropdownOpen, onEnter, onToggleDropdown }: TenantCardProps) {
   const role = ROLE_STYLES[tenant.role];
 
   return (
@@ -560,26 +569,59 @@ function TenantCard({ tenant, featured = false, isDropdownOpen, onEnter: _onEnte
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-        <span className="text-[10.5px] text-[var(--color-caption)] whitespace-nowrap">
-          Last visited {tenant.lastVisited}
-        </span>
-        <Button
-          variant="primary"
-          size={featured ? 'md' : 'sm'}
-          onClick={e => onToggleDropdown(tenant.id, e)}
-          aria-expanded={isDropdownOpen}
-          aria-label="Select workspace destination"
-        >
-          Enter workspace
-          <svg
-            width="10" height="10" viewBox="0 0 10 10" fill="none"
-            className={`transition-transform duration-150 ${isDropdownOpen ? 'rotate-180' : ''}`}
-          >
-            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </Button>
-      </div>
+      {(() => {
+        const destMeta = selectedDest && selectedDest !== 'home'
+          ? STUDIO_META[selectedDest as Product]
+          : null;
+        const btnLabel = destMeta ? `Go to ${destMeta.short}` : 'Enter workspace';
+        const base = [
+          'inline-flex items-center justify-center font-medium transition-all duration-200',
+          'border border-transparent text-white',
+          'bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover-bg)]',
+          'active:bg-[var(--btn-primary-active-bg)] disabled:opacity-50',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--btn-primary-ring)]',
+        ].join(' ');
+        const szMain = featured ? 'px-4 py-2 text-sm gap-2' : 'px-3 py-1.5 text-xs gap-1.5';
+        const szChev = featured ? 'px-2.5 py-2' : 'px-2 py-1.5';
+        const rLeft  = featured ? 'rounded-l-lg' : 'rounded-l-md';
+        const rRight = featured ? 'rounded-r-lg' : 'rounded-r-md';
+        return (
+          <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+            <span className="text-[10.5px] text-[var(--color-caption)] whitespace-nowrap">
+              Last visited {tenant.lastVisited}
+            </span>
+            <div className="flex items-center">
+              <button
+                className={`${base} ${szMain} ${rLeft}`}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (selectedDest) {
+                    onEnter(tenant.id, selectedDest);
+                  } else {
+                    onToggleDropdown(tenant.id, e);
+                  }
+                }}
+              >
+                {btnLabel}
+              </button>
+              <div className="w-px self-stretch bg-white/20 flex-shrink-0" />
+              <button
+                className={`${base} ${szChev} ${rRight}`}
+                onClick={e => onToggleDropdown(tenant.id, e)}
+                aria-expanded={isDropdownOpen}
+                aria-label="Choose destination"
+              >
+                <svg
+                  width="10" height="10" viewBox="0 0 10 10" fill="none"
+                  className={`transition-transform duration-150 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                >
+                  <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );
