@@ -6234,8 +6234,8 @@ html.theme-light .lock-overlay-p{color:var(--t2)}
    action buttons in tables. */
 .tour-trigger{
   position:fixed; bottom:18px; left:18px; z-index:80;
-  display:inline-flex; align-items:center; gap:0;
-  padding:0; height:38px; width:38px;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:0 16px 0 12px; height:38px;
   border-radius:9999px;
   background:linear-gradient(135deg,var(--cyan) 0%,var(--purple) 100%);
   color:#fff; border:none; cursor:pointer;
@@ -6243,14 +6243,10 @@ html.theme-light .lock-overlay-p{color:var(--t2)}
   letter-spacing:.005em;
   white-space:nowrap; overflow:hidden;
   box-shadow:0 8px 24px var(--cyan-36), 0 2px 8px rgba(0,0,0,0.28);
-  transition:width .22s cubic-bezier(.18,.84,.34,1.1),
-             gap .22s, padding .22s, transform .15s, box-shadow .15s;
+  transition:transform .15s, box-shadow .15s;
 }
 .tour-trigger:hover,
 .tour-trigger:focus-visible{
-  width:104px;
-  gap:6px;
-  padding:0 16px 0 12px;
   transform:translateY(-2px);
   box-shadow:0 14px 32px var(--cyan-50), 0 4px 12px rgba(0,0,0,0.36);
   outline:none;
