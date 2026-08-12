@@ -450,17 +450,21 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 3px 8px 3px 5px;
+      padding: 3px 8px 3px 6px;
       border-radius: 5px;
       background: transparent;
-      border: none;
+      border: 1px solid transparent;
       cursor: pointer;
       font-family: inherit;
-      transition: background .12s;
+      transition: background .13s, border-color .13s, color .13s;
       text-decoration: none;
     }
-    .studio-chip:hover { background: rgba(255,255,255,.07); }
-    .studio-chip:active { background: rgba(255,255,255,.11); }
+    .studio-chip:hover {
+      background: rgba(43,127,255,.12);
+      border-color: rgba(43,127,255,.25);
+    }
+    .studio-chip:hover .studio-name { color: var(--text-1); }
+    .studio-chip:active { background: rgba(43,127,255,.2); border-color: rgba(43,127,255,.4); }
     .studio-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
     .studio-ico {
