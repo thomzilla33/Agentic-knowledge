@@ -2891,23 +2891,25 @@ window.SCOPE_CHANGELOG=[
  {tier:'v1',name:'V1 · Foundation',sub:'Browse &amp; author the model',target:'This sprint',
   nw:[
     'Four lists — Models · Entities · Tables · Reference Data (search · filters · pagination)',
-    'Card click → full detail page (read-only; Overview = basic info block)',
-    'Entity detail — Tables · Relationships',
+    'Create from scratch — the New button → Start from Scratch (Owner · Category · Tags · Description; no "Stewards")',
+    'Card click → full editable detail (Overview = basic info block); edit → save-to-draft',
+    'Entity detail — Tables · Relationships (+ entity-relationship authoring)',
     'Table &amp; Reference detail — Columns · Relationships · Data',
-    'Model detail — Entities · Tables'
+    'Column full-detail editor — Schema · Rules · Sensitivity · Display + create / edit / duplicate / delete (internal name locked; system columns collapsed)',
+    'Data authoring — add / edit / delete rows (dynamic form) · per-column filters · row detail · lateral scroll',
+    'Relationship authoring — list mode · create (1-1 / 1-N / N-N) · edit (on-delete / on-update / description)',
+    'States: Published · Draft · Deprecated',
+    'Model detail — Entities · Tables (add entity = associate an orphan or create new)'
   ],
   up:[],
-  rm:['V1 is read-only browse — ALL editing moves to V1.2: the New button (create from scratch) · side panels (detail views · relationship form · filters · quick-preview) · create / edit / delete dialogs (columns · rows · relationships · reference items · indexes)','Publish / versioning · Marketplace · Create-with-AI · diagrams — later']},
+  rm:['Publish / versioning banner · SlideOut preview (nice-to-have) · Marketplace catalog · Create-with-AI · ER diagrams · Referenced-by · Indexes / Settings / History — later']},
  {tier:'v1.5',name:'V1.2 · Expansion',sub:'Govern',target:'Next sprint',
   nw:[
-    'Publish / save-to-version (edit → draft is V1; publish lands here)',
+    'Publish / save-to-version (edit → draft is V1; the publish banner lands here)',
     'Privileges tab — view-only standard privileges (system-generated)',
-    'API contracts — the 5 default virtual endpoints: enable / disable + description only',
-    'Side panels (slide-outs) — column · row · relationship detail views · entity-relationship form · per-column & saved filters · quick-preview panels',
-    'Editing dialogs — create / edit / delete columns · rows · relationships · reference items · indexes',
-    'Create from scratch — the New button: New model · entity · table · reference (no "Stewards")'
+    'API contracts — the 5 default virtual endpoints: enable / disable + description only'
   ],
-  up:['Entity detail gains Privileges + API tabs','All editing unlocks — the New button, side panels AND create/edit/delete dialogs (V1 is read-only browse)'],
+  up:['Entity detail gains Privileges + API tabs'],
   rm:['Custom endpoints · custom privileges · API request/response customization — Full vision']},
  {tier:'v2',name:'Full vision',sub:'The complete experience',target:'Later',
   nw:[
@@ -3927,7 +3929,7 @@ function openPublish(id){
   _modalOpen();
 }
 function closeModal(){ $('modalScrim').classList.remove('open'); $('modalScrim').innerHTML=''; }
-function _modalOpen(){ if(SCOPE==='v1'){ toast('Editing dialogs open from V1.2 — switch scope to try them'); return; } const ms=$('modalScrim'); ms.classList.add('open'); }
+function _modalOpen(){ const ms=$('modalScrim'); ms.classList.add('open'); }
 function confirmPublish(id){ const e=ENTITIES.find(x=>x.id===id); if(e) e.status='Published'; closeModal(); toast('“'+(e?e.name:'Entity')+'” published','ok'); renderEntityDetail(id); }
 
 /* ══════════════════════════════════════════════════════════════
@@ -5776,7 +5778,7 @@ function pageShell(active){
   const tab=(id,label)=>`<button class="mtab ${active===id?'active':''}" onclick="navigate('${id}')">${label}</button>`;
   const ACT={models:['New model','models/new'],entities:['New entity','entities/new'],tables:['New table','tables/new'],reference:['New reference list','reference/new']};
   const a=ACT[active]||ACT.models;
-  return `<div class="page-head"><h1 class="page-h1">Models</h1><button class="btn btn-primary" data-version="v1.5" onclick="navigate('${a[1]}')">${_MDIC.plus} ${a[0]}</button></div>
+  return `<div class="page-head"><h1 class="page-h1">Models</h1><button class="btn btn-primary" onclick="navigate('${a[1]}')">${_MDIC.plus} ${a[0]}</button></div>
     <div class="mtabs mtabs-lg">${tab('models','Models')}${tab('entities','Entities')}${tab('tables','Tables')}${tab('reference','Reference Data')}</div>`;
 }
 
@@ -7265,7 +7267,7 @@ function _mdSync(m,md){
   m.entities=md.ents.length; _mdEdited(m);
 }
 function _mdColNames(n){ const base=['id','name','code','status','description','created_at','updated_at','owner_id','external_id','is_active','notes','type','source','region','amount','priority']; return base.slice(0,Math.max(1,Math.min(base.length,n||6))); }
-function _soOpen(){ if(SCOPE==='v1'){ toast('Side panels open from V1.2 — switch scope to preview them'); return; } const so=$('slideout'); so.classList.add('open'); so.setAttribute('aria-hidden','false'); $('scrim').classList.add('open'); }
+function _soOpen(){ const so=$('slideout'); so.classList.add('open'); so.setAttribute('aria-hidden','false'); $('scrim').classList.add('open'); }
 function _mdKebab(btn,items){
   closeRowMenu();
   const it=x=> x==='sep' ? '<div class="rowmenu-sep"></div>' : `<button class="rowmenu-item ${x.danger?'danger':''}" onclick="closeRowMenu();${x.act}">${x.ic}${x.label}</button>`;
@@ -9123,8 +9125,7 @@ function route(){
   _dsfOpen = null; _pgnOpenId = null; _mktModel = null; closeSlideout(); closeModal();
   const parts = (location.hash.replace(/^#\/?/,'') || 'models').split('/');
   const r = parts[0];
-  if(SCOPE==='v1' && parts[1]==='new'){ toast('Creating opens from V1.2 — switch scope to try it'); location.hash='#/'+r; return; } // V1 is read-only browse — no create
-  if(SCOPE!=='v2' && parts[1]==='new' && parts[2]!=='scratch') parts[2]='scratch'; // V1.2: New = Start from scratch only (Marketplace catalog + Create-with-AI are Full vision)
+  if(SCOPE!=='v2' && parts[1]==='new' && parts[2]!=='scratch') parts[2]='scratch'; // V1 / V1.2: New = Start from scratch only (Marketplace catalog + Create-with-AI are Full vision)
   if(r==='models' && parts[1]==='new'){ if(parts[2]==='scratch') renderFromScratch(); else if(parts[2]==='ai'){ _aiReset(); renderAIAssist(); } else { renderModels(); openMarketplaceModal(); } }
   else if(r==='models' && parts[1]){ if(modelDetailState.id!==parts[1]) modelDetailState.tab='overview'; modelDetailState.id=parts[1]; renderModelDetail(parts[1]); }
   else if(r==='models'){ renderModels(); }
@@ -9274,6 +9275,7 @@ try{
   if(localStorage.getItem('dsm-collapsed')==='1'){ document.body.classList.add('sb-collapsed'); const b=$('sbToggle'); if(b){ b.title='Expand sidebar'; b.setAttribute('aria-label','Expand sidebar'); } }
 }catch(e){}
 _themeIcon();
+try{ const _qsScope=new URLSearchParams(location.search).get('scope'); if(_qsScope && SCOPE_TIERS.indexOf(_qsScope)>=0) SCOPE=_qsScope; }catch(e){} // deep-link: ?scope=v1.5 opens the authoring tier
 route();
 
 /* Re-apply scope after every dynamic re-render of the content area */
@@ -9283,5 +9285,18 @@ route();
   applyScope();
 })();
 </script>
+
+  <style>
+  .back-to-ws{position:fixed;top:10px;left:10px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:6px 12px 6px 8px;background:rgba(11,18,33,.88);border:1px solid rgba(255,255,255,.12);border-radius:20px;font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;text-decoration:none;backdrop-filter:blur(12px);transition:background .15s,border-color .15s,color .15s,transform .15s;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+  .back-to-ws:hover{background:rgba(20,32,60,.95);border-color:rgba(43,127,255,.4);color:#fff;transform:translateX(-1px)}
+  .back-to-ws svg{opacity:.6;transition:opacity .15s}
+  .back-to-ws:hover svg{opacity:1}
+  </style>
+  <a class="back-to-ws" href="index.html">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Workspaces
+  </a>
 </body>
 </html>
