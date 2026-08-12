@@ -276,15 +276,15 @@ export function TenantSelectorScreen() {
       {/* ── Topbar ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 h-14 flex items-center justify-between px-7 bg-[var(--field-bg)] backdrop-blur-sm border-b border-[var(--border)] shadow-sm">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-[7px] bg-[var(--primary)] flex items-center justify-center flex-shrink-0">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="7" r="2" fill="white"/>
-              <circle cx="2.5" cy="2.5" r="1.2" fill="white" opacity=".55"/>
-              <circle cx="11.5" cy="2.5" r="1.2" fill="white" opacity=".55"/>
-              <circle cx="2.5" cy="11.5" r="1.2" fill="white" opacity=".55"/>
-              <circle cx="11.5" cy="11.5" r="1.2" fill="white" opacity=".55"/>
-            </svg>
-          </div>
+          <svg width="28" height="21" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+            <defs>
+              <linearGradient id="aims-grad-ts" gradientUnits="userSpaceOnUse" x1="998.9767" y1="471.5211" x2="729.8956" y2="931.9746">
+                <stop offset="0" stopColor="#09E2AB"/>
+                <stop offset="1" stopColor="#1B72FF"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#aims-grad-ts)" d="M1120.01,802.69L880.38,387.64c-16.78-29.06-46.83-46.41-80.38-46.41c-33.55,0-63.6,17.35-80.38,46.41L479.99,802.69c-4.22,7.31-4.22,16.32,0,23.64c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82l99.34-172.07l78.87,136.61h-41.78c-7.86-12.37-21.64-20.62-37.35-20.62c-24.4,0-44.25,19.85-44.25,44.25s19.85,44.25,44.25,44.25c15.71,0,29.49-8.25,37.35-20.62h82.72c8.45,0,16.25-4.51,20.47-11.82c4.22-7.31,4.22-16.32,0-23.64L760.56,595.17c-4.22-7.31-12.03-11.82-20.47-11.82c-8.45,0-16.25,4.51-20.47,11.82l-112.99,195.7h-65.22l219.16-379.59c8.23-14.26,22.97-22.77,39.43-22.77c16.46,0,31.2,8.51,39.43,22.77l219.16,379.59h-65.22l-154.21-267.1c3.24-6.15,5.09-13.13,5.09-20.55c0-24.4-19.85-44.25-44.25-44.25s-44.25,19.85-44.25,44.25c0,23.79,18.89,43.21,42.46,44.16l161.05,278.94c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82C1124.23,819.02,1124.23,810.01,1120.01,802.69z"/>
+          </svg>
           <span className="text-xs font-bold tracking-[0.15em] uppercase text-[var(--color-text-title)]">
             AIMS-OS
           </span>
