@@ -76,6 +76,15 @@
       letter-spacing: .15em;
       text-transform: uppercase;
       color: var(--text-1);
+      display: flex;
+      align-items: center;
+    }
+    .logo-aims { color: #fff; }
+    .logo-os {
+      background: linear-gradient(to top, #1B72FF, #09E2AB);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .topbar-right {
@@ -131,9 +140,10 @@
       max-width: 980px;
       margin: 0 auto;
       padding: 52px 28px 32px;
+      position: relative;
     }
 
-    .eyebrow {
+.eyebrow {
       font-size: 10.5px;
       font-weight: 700;
       letter-spacing: .13em;
@@ -152,6 +162,29 @@
       height: 1px;
       background: var(--accent);
       opacity: .6;
+    }
+
+    /* ─── Eyebrow pulse dot ─────────────────────────────────── */
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .pulse-dot::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: var(--emerald);
+      opacity: .3;
+      animation: pulse-ring 2.4s ease infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { transform: scale(1); opacity: .3; }
+      50%       { transform: scale(2); opacity: 0; }
     }
 
     .hero-title {
@@ -181,7 +214,7 @@
     .search-wrap {
       position: relative;
       flex: 1;
-      max-width: 380px;
+      max-width: 480px;
     }
 
     .search-ico {
@@ -218,8 +251,31 @@
       color: var(--text-2);
       white-space: nowrap;
       flex-shrink: 0;
-      padding: 0 4px;
+      padding: 5px 11px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
     }
+
+    /* ─── Search ⌘K hint ─────────────────────────────────────── */
+    .search-kbd {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: var(--text-3);
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 5px;
+      pointer-events: none;
+      transition: opacity .2s;
+      user-select: none;
+    }
+    .search-wrap:focus-within .search-kbd { opacity: 0; }
 
     /* ─── Grid ───────────────────────────────────────────────── */
     .main {
@@ -246,7 +302,7 @@
       gap: 18px;
       position: relative;
       overflow: visible;
-      transition: border-color .18s ease, box-shadow .18s ease;
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
       animation: cardUp .24s ease both;
     }
 
@@ -255,9 +311,39 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      .card { animation: none; }
+      .pulse-dot::after { animation: none; }
+    }
+
+    /* ─── Show-more button ───────────────────────────────────── */
+    .show-more-btn {
+      width: 100%;
+      padding: 11px 16px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-2);
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .show-more-btn:hover {
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.12);
+      color: var(--text-1);
+    }
+
     .card:hover {
       border-color: var(--border-hover);
-      box-shadow: 0 4px 24px rgba(0,0,0,.28), 0 0 0 1px rgba(43,127,255,.07) inset;
+      box-shadow: 0 6px 28px rgba(0,0,0,.32), 0 0 0 1px rgba(43,127,255,.08) inset;
+      transform: translateY(-1px);
     }
 
     .tenant-av {
@@ -276,6 +362,9 @@
     .card-identity {
       flex: 0 0 210px;
       min-width: 0;
+    }
+    .card-hero .card-identity {
+      flex: 0 0 280px;
     }
 
     .card-divider {
@@ -645,35 +734,120 @@
     }
 
     /* ─── Section labels ─────────────────────────────────────── */
-    .section-label-hero {
-      font-size: 12px;
-      font-weight: 500;
+    .section-label-hero,
+    .section-label-other {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .09em;
+      text-transform: uppercase;
       color: var(--text-2);
-      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 7px;
     }
+    .section-label-hero { margin-bottom: 10px; }
+    .section-label-other { margin: 20px 0 8px; }
 
-    .section-label-other {
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: .1em;
-      text-transform: uppercase;
+    /* ─── Card description (hero only) ──────────────────────────── */
+    .card-desc {
+      font-size: 11.5px;
       color: var(--text-3);
-      margin: 18px 0 8px;
+      line-height: 1.5;
+      margin-top: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+
+    /* ─── Sort button ────────────────────────────────────────────── */
+    .sort-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .sort-btn:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.13); color: var(--text-1); }
+    .sort-btn svg { flex-shrink: 0; opacity: .6; }
+
+    /* ─── Single-tenant redirect banner ─────────────────────────── */
+    .redirect-banner {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(43,127,255,.08);
+      border: 1px solid rgba(43,127,255,.22);
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+    .redirect-banner-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .redirect-banner-text {
+      flex: 1;
+      font-size: 12.5px;
+      color: var(--text-2);
+    }
+    .redirect-banner-text strong { color: var(--text-1); font-weight: 600; }
+    .redirect-cancel {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color .15s, color .15s;
+      white-space: nowrap;
+    }
+    .redirect-cancel:hover { border-color: rgba(255,255,255,.18); color: var(--text-1); }
+    .redirect-progress {
+      height: 2px;
+      width: 100%;
+      background: rgba(43,127,255,.18);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .redirect-progress-bar {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: progress-fill 2.4s linear forwards;
+    }
+    @keyframes progress-fill {
+      from { width: 0%; }
+      to   { width: 100%; }
     }
 
     /* ─── Hero card variant ──────────────────────────────────── */
     .card-hero {
       padding: 18px 22px;
-      border-color: rgba(43,127,255,.28);
-      background: rgba(43,127,255,.04);
-      box-shadow: 0 2px 12px rgba(0,0,0,.22);
+      border-color: rgba(43,127,255,.42);
+      background: rgba(43,127,255,.065);
+      box-shadow: 0 0 0 1px rgba(43,127,255,.15) inset, 0 6px 24px rgba(0,0,0,.32);
     }
     .card-hero:hover {
-      border-color: rgba(43,127,255,.5);
-      box-shadow: 0 6px 28px rgba(0,0,0,.38), 0 0 0 1px rgba(43,127,255,.08) inset;
+      border-color: rgba(43,127,255,.60);
+      box-shadow: 0 0 0 1px rgba(43,127,255,.18) inset, 0 10px 36px rgba(0,0,0,.44);
     }
     .card-hero .tenant-av {
       width: 48px;
@@ -684,7 +858,7 @@
 
     /* Compact secondary cards */
     .card-compact {
-      padding: 11px 20px;
+      padding: 9px 20px;
     }
     .card-compact .tenant-av {
       width: 36px;
@@ -705,6 +879,295 @@
       .user-email { display: none; }
       .grid     { grid-template-columns: 1fr; }
     }
+
+    /* ─── Fix 1: Active indicator on hero card ───────────────── */
+    .active-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-top: 5px;
+    }
+    .active-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 0 rgba(16,185,129,.4);
+      animation: activePulse 2s ease infinite;
+      flex-shrink: 0;
+    }
+    @keyframes activePulse {
+      0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.4); }
+      70%  { box-shadow: 0 0 0 5px rgba(16,185,129,0); }
+      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+    .hero-last-visit {
+      font-size: 10.5px;
+      color: var(--text-3);
+      white-space: nowrap;
+      margin-top: 4px;
+    }
+
+    /* ─── Fix 2: Focus rings (a11y) ─────────────────────────── */
+    *:focus { outline: none; }
+    *:focus-visible {
+      outline: 2px solid rgba(43,127,255,.65);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    .card:focus-visible {
+      outline: 2px solid rgba(43,127,255,.5);
+      outline-offset: 0;
+      border-radius: 12px;
+    }
+    .btn-main:focus-visible,
+    .btn-drop:focus-visible {
+      outline: 2px solid rgba(255,255,255,.5);
+      outline-offset: 1px;
+    }
+
+    /* ─── Fix 4: User menu dropdown ──────────────────────────── */
+    .user-pill {
+      cursor: pointer;
+      position: relative;
+    }
+    .user-pill-chevron {
+      display: flex;
+      align-items: center;
+      color: var(--text-3);
+      transition: color .15s, transform .15s;
+      flex-shrink: 0;
+    }
+    .user-pill:hover .user-pill-chevron { color: var(--text-2); }
+    .user-pill.is-open .user-pill-chevron { transform: rotate(180deg); }
+
+    .user-menu {
+      position: fixed;
+      top: 52px;
+      right: 20px;
+      background: #0e1726;
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 12px;
+      padding: 5px;
+      min-width: 224px;
+      box-shadow: 0 20px 48px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03) inset;
+      z-index: 500;
+      display: none;
+      animation: ddIn .13s ease;
+    }
+    .user-menu.is-open { display: block; }
+
+    .user-menu-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .user-menu-av {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .user-menu-info { min-width: 0; }
+    .user-menu-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-menu-email {
+      font-size: 10.5px;
+      color: var(--text-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .user-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 9px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      transition: background .1s, color .1s;
+      user-select: none;
+      font-family: inherit;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+    .user-menu-item:hover { background: rgba(255,255,255,.06); color: var(--text-1); }
+    .user-menu-item.danger { color: #f87171; }
+    .user-menu-item.danger:hover { background: rgba(248,113,113,.08); color: #fca5a5; }
+    .user-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* ─── Fix 5: Loading skeleton ────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton-base {
+      background: linear-gradient(90deg, rgba(255,255,255,.04) 25%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.04) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s ease infinite;
+      border-radius: 6px;
+    }
+    .skeleton-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .sk-av  { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; }
+    .sk-col { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+    .sk-line { height: 10px; }
+    .sk-line.w-40 { width: 40%; }
+    .sk-line.w-25 { width: 25%; }
+    .sk-line.w-60 { width: 60%; }
+    .sk-btn { width: 120px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+
+    /* ─── Fix 5: Error state ─────────────────────────────────── */
+    .error-state {
+      text-align: center;
+      padding: 56px 20px;
+    }
+    .error-ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      color: #f87171;
+    }
+    .error-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+    .error-hint { font-size: 12px; color: var(--text-3); margin-bottom: 16px; }
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .retry-btn:hover { background: rgba(255,255,255,.08); color: var(--text-1); border-color: rgba(255,255,255,.13); }
+
+    /* ─── Tour engine ────────────────────────────────────────── */
+    .tour-trigger{position:fixed;bottom:18px;left:18px;z-index:80;display:inline-flex;align-items:center;gap:0;padding:0;height:38px;width:38px;border-radius:9999px;background:linear-gradient(135deg,#06B6D4 0%,#A78BFA 100%);color:#fff;border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;box-shadow:0 8px 24px rgba(6,182,212,.36),0 2px 8px rgba(0,0,0,.28);transition:width .22s cubic-bezier(.18,.84,.34,1.1),gap .22s,padding .22s,transform .15s,box-shadow .15s}
+    .tour-trigger:hover,.tour-trigger:focus-visible{width:116px;gap:6px;padding:0 16px 0 12px;transform:translateY(-2px);box-shadow:0 14px 32px rgba(6,182,212,.50),0 4px 12px rgba(0,0,0,.36);outline:none}
+    .tour-trigger svg{flex-shrink:0;margin-left:1px}
+    .tour-trigger-pulse{position:absolute;inset:0;border-radius:inherit;border:2px solid rgba(6,182,212,.6);animation:tourPulse 2s ease-out infinite;pointer-events:none}
+    .tour-trigger.seen .tour-trigger-pulse{display:none}
+    .tour-trigger.tour-active{display:none}
+    @keyframes tourPulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+    .tour-mask{position:fixed;z-index:9000;background:rgba(4,8,18,.55);pointer-events:auto;display:none}
+    .tour-mask.active{display:block}
+    .tour-spotlight{position:fixed;z-index:9001;pointer-events:none;border-radius:14px;border:2px solid #06B6D4;box-shadow:0 0 0 4px rgba(6,182,212,.18),0 0 32px rgba(6,182,212,.55),0 0 64px rgba(6,182,212,.25);background:transparent;transition:all .28s cubic-bezier(.4,0,.2,1);opacity:0}
+    .tour-spotlight.active{opacity:1;animation:tourSpotlightPulse 2s ease-in-out infinite}
+    @keyframes tourSpotlightPulse{0%,100%{box-shadow:0 0 0 4px rgba(6,182,212,.18),0 0 32px rgba(6,182,212,.55),0 0 64px rgba(6,182,212,.25)}50%{box-shadow:0 0 0 6px rgba(6,182,212,.28),0 0 48px rgba(6,182,212,.70),0 0 96px rgba(6,182,212,.35)}}
+    .tour-popover{position:fixed;z-index:9002;width:360px;max-width:calc(100vw - 32px);background:linear-gradient(180deg,rgba(20,28,48,.98) 0%,rgba(13,19,35,.98) 100%);border:1px solid rgba(255,255,255,.14);border-radius:12px;backdrop-filter:blur(24px) saturate(1.8);box-shadow:0 16px 48px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04);padding:18px 20px;opacity:0;transform:scale(.96) translateY(4px);pointer-events:none;transition:opacity .2s ease-out,transform .25s cubic-bezier(.34,1.56,.64,1)}
+    .tour-popover.active{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}
+    .tour-popover.is-sheet{left:8px !important;right:8px;top:auto !important;bottom:8px;width:auto;max-width:none}
+    .tour-popover-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .tour-popover-step{font-size:10.5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:#06B6D4;padding:2px 8px;border-radius:10px;background:rgba(6,182,212,.10);border:1px solid rgba(6,182,212,.25)}
+    .tour-popover-restart{background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,.38);font-size:11px;padding:4px 6px;border-radius:5px;font-family:inherit}
+    .tour-popover-restart:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.92)}
+    .tour-popover-skip{margin-left:auto;background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,.38);font-size:11px;padding:4px 8px;border-radius:5px;font-family:inherit}
+    .tour-popover-skip:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.92)}
+    .tour-popover-title{font-size:16px;font-weight:700;color:rgba(255,255,255,.92);line-height:1.3;margin-bottom:8px}
+    .tour-popover-body{font-size:13px;line-height:1.6;color:rgba(255,255,255,.60);margin-bottom:16px}
+    .tour-popover-body strong,.tour-popover-body b{color:rgba(255,255,255,.92);font-weight:600}
+    .tour-popover-footer{display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.10)}
+    .tour-progress{display:inline-flex;gap:4px;flex:1}
+    .tour-progress-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.08);transition:background .15s,transform .15s}
+    .tour-progress-dot.current{background:#06B6D4;transform:scale(1.4)}
+    .tour-progress-dot.done{background:rgba(6,182,212,.45)}
+    .tour-btn{padding:7px 14px;font-size:12.5px;font-weight:600;border-radius:6px;cursor:pointer;border:none;font-family:inherit;transition:.14s}
+    .tour-btn-prev{background:transparent;color:rgba(255,255,255,.60);border:1px solid rgba(255,255,255,.10)}
+    .tour-btn-prev:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.92)}
+    .tour-btn-next{background:linear-gradient(135deg,#06B6D4 0%,#155DFC 100%);color:#fff;box-shadow:0 2px 8px rgba(6,182,212,.30)}
+    .tour-btn-next:hover{transform:translateY(-1px)}
+    .tour-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    @media(prefers-reduced-motion:reduce){.tour-spotlight,.tour-spotlight.active{animation:none;transition:none}.tour-popover{transition:none;transform:none}.tour-trigger-pulse{display:none}}
+    @media(max-width:520px){.tour-trigger{bottom:14px;left:14px}}
+
+    /* ─── Load more ──────────────────────────────────────────── */
+    .load-more-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .load-more-rule { flex: 1; height: 1px; background: var(--border); }
+    .load-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-3);
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .load-more-btn:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); color: var(--text-2); }
+    .load-more-btn:focus-visible { outline: 2px solid rgba(43,127,255,.5); outline-offset: 2px; }
+    .load-more-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 16px;
+      padding: 0 4px;
+      background: rgba(255,255,255,.07);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-3);
+    }
   </style>
 </head>
 <body>
@@ -713,42 +1176,72 @@
   <header class="topbar">
     <a class="logo" href="index.html">
       <div class="logo-mark">
-        <svg width="28" height="21" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg">
+        <svg width="26" height="20" viewBox="479 340 646 499" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="aims-grad-nav" gradientUnits="userSpaceOnUse" x1="998.9767" y1="471.5211" x2="729.8956" y2="931.9746">
-              <stop offset="0" style="stop-color:#09E2AB"/>
-              <stop offset="1" style="stop-color:#1B72FF"/>
+              <stop offset="0" stop-color="#09E2AB"/>
+              <stop offset="1" stop-color="#1B72FF"/>
             </linearGradient>
           </defs>
-          <path fill="url(#aims-grad-nav)" d="M1120.01,802.69L880.38,387.64c-16.78-29.06-46.83-46.41-80.38-46.41c-33.55,0-63.6,17.35-80.38,46.41
-            L479.99,802.69c-4.22,7.31-4.22,16.32,0,23.64c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82
-            l99.34-172.07l78.87,136.61h-41.78c-7.86-12.37-21.64-20.62-37.35-20.62c-24.4,0-44.25,19.85-44.25,44.25s19.85,44.25,44.25,44.25
-            c15.71,0,29.49-8.25,37.35-20.62h82.72c8.45,0,16.25-4.51,20.47-11.82c4.22-7.31,4.22-16.32,0-23.64L760.56,595.17
-            c-4.22-7.31-12.03-11.82-20.47-11.82c-8.45,0-16.25,4.51-20.47,11.82l-112.99,195.7h-65.22l219.16-379.59
-            c8.23-14.26,22.97-22.77,39.43-22.77c16.46,0,31.2,8.51,39.43,22.77l219.16,379.59h-65.22l-154.21-267.1
-            c3.24-6.15,5.09-13.13,5.09-20.55c0-24.4-19.85-44.25-44.25-44.25s-44.25,19.85-44.25,44.25c0,23.79,18.89,43.21,42.46,44.16
-            l161.05,278.94c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82
-            C1124.23,819.02,1124.23,810.01,1120.01,802.69z"/>
+          <path fill="url(#aims-grad-nav)" d="M1120.01,802.69L880.38,387.64c-16.78-29.06-46.83-46.41-80.38-46.41c-33.55,0-63.6,17.35-80.38,46.41L479.99,802.69c-4.22,7.31-4.22,16.32,0,23.64c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82l99.34-172.07l78.87,136.61h-41.78c-7.86-12.37-21.64-20.62-37.35-20.62c-24.4,0-44.25,19.85-44.25,44.25s19.85,44.25,44.25,44.25c15.71,0,29.49-8.25,37.35-20.62h82.72c8.45,0,16.25-4.51,20.47-11.82c4.22-7.31,4.22-16.32,0-23.64L760.56,595.17c-4.22-7.31-12.03-11.82-20.47-11.82c-8.45,0-16.25,4.51-20.47,11.82l-112.99,195.7h-65.22l219.16-379.59c8.23-14.26,22.97-22.77,39.43-22.77c16.46,0,31.2,8.51,39.43,22.77l219.16,379.59h-65.22l-154.21-267.1c3.24-6.15,5.09-13.13,5.09-20.55c0-24.4-19.85-44.25-44.25-44.25s-44.25,19.85-44.25,44.25c0,23.79,18.89,43.21,42.46,44.16l161.05,278.94c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82C1124.23,819.02,1124.23,810.01,1120.01,802.69z"/>
         </svg>
       </div>
-      <span class="logo-text">AIMS-OS</span>
+      <span class="logo-text"><span class="logo-aims">AIMS</span><span class="logo-os">OS</span></span>
     </a>
 
     <div class="topbar-right">
       <span class="help-link">Help</span>
-      <div class="user-pill">
+      <div class="user-pill" id="userPill" onclick="toggleUserMenu(event)" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
         <div class="user-av">TG</div>
         <span class="user-email">thomas.gonzalez@aimsos.ai</span>
+        <span class="user-pill-chevron">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
       </div>
     </div>
   </header>
 
+  <!-- ── User menu ─────────────────────────────────────────── -->
+  <div class="user-menu" id="userMenu" role="menu">
+    <div class="user-menu-header">
+      <div class="user-menu-av">TG</div>
+      <div class="user-menu-info">
+        <div class="user-menu-name">Thomas Gonzalez</div>
+        <div class="user-menu-email">thomas.gonzalez@aimsos.ai</div>
+      </div>
+    </div>
+    <button class="user-menu-item" role="menuitem" onclick="closeUserMenu()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M3 13.5c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Account settings
+    </button>
+    <button class="user-menu-item" role="menuitem" onclick="closeUserMenu()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Activity log
+    </button>
+    <div class="user-menu-sep"></div>
+    <button class="user-menu-item danger" id="signOutBtn" role="menuitem" onclick="signOut()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+        <path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Sign out
+    </button>
+  </div>
+
   <!-- ── Hero ──────────────────────────────────────────── -->
   <section class="hero">
-    <div class="eyebrow">Workspace Selection</div>
-    <h1 class="hero-title">Welcome back, <span class="name-accent">Thomas</span></h1>
+    <div class="eyebrow"><span class="pulse-dot"></span>Workspace Selection</div>
+    <h1 class="hero-title"><span id="greetPrefix">Welcome back, </span><span class="name-accent">Thomas</span></h1>
     <p class="hero-sub" id="heroSub">
-      You have access to <strong id="tenantCount">5</strong> organizations. Select a workspace to continue.
+      You have access to <strong id="tenantCount">8</strong> organizations.
     </p>
 
     <div class="toolbar">
@@ -767,8 +1260,15 @@
           autocomplete="off"
           spellcheck="false"
         />
+        <span class="search-kbd">⌘K</span>
       </div>
       <span class="count-pill" id="countPill">5 workspaces</span>
+      <button class="sort-btn" id="sortBtn" onclick="cycleSortOrder()" title="Change sort order">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+          <path d="M3 4h10M5 8h6M7 12h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span id="sortLabel">Last visited</span>
+      </button>
     </div>
   </section>
 
@@ -782,25 +1282,17 @@
     <div class="footer-rule"></div>
     <div class="footer-brand">
       <div class="footer-mark">
-        <svg width="18" height="14" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg">
+        <svg width="18" height="14" viewBox="479 340 646 499" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="aims-grad-footer" gradientUnits="userSpaceOnUse" x1="998.9767" y1="471.5211" x2="729.8956" y2="931.9746">
-              <stop offset="0" style="stop-color:#09E2AB"/>
-              <stop offset="1" style="stop-color:#1B72FF"/>
+              <stop offset="0" stop-color="#09E2AB"/>
+              <stop offset="1" stop-color="#1B72FF"/>
             </linearGradient>
           </defs>
-          <path fill="url(#aims-grad-footer)" d="M1120.01,802.69L880.38,387.64c-16.78-29.06-46.83-46.41-80.38-46.41c-33.55,0-63.6,17.35-80.38,46.41
-            L479.99,802.69c-4.22,7.31-4.22,16.32,0,23.64c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82
-            l99.34-172.07l78.87,136.61h-41.78c-7.86-12.37-21.64-20.62-37.35-20.62c-24.4,0-44.25,19.85-44.25,44.25s19.85,44.25,44.25,44.25
-            c15.71,0,29.49-8.25,37.35-20.62h82.72c8.45,0,16.25-4.51,20.47-11.82c4.22-7.31,4.22-16.32,0-23.64L760.56,595.17
-            c-4.22-7.31-12.03-11.82-20.47-11.82c-8.45,0-16.25,4.51-20.47,11.82l-112.99,195.7h-65.22l219.16-379.59
-            c8.23-14.26,22.97-22.77,39.43-22.77c16.46,0,31.2,8.51,39.43,22.77l219.16,379.59h-65.22l-154.21-267.1
-            c3.24-6.15,5.09-13.13,5.09-20.55c0-24.4-19.85-44.25-44.25-44.25s-44.25,19.85-44.25,44.25c0,23.79,18.89,43.21,42.46,44.16
-            l161.05,278.94c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82
-            C1124.23,819.02,1124.23,810.01,1120.01,802.69z"/>
+          <path fill="url(#aims-grad-footer)" d="M1120.01,802.69L880.38,387.64c-16.78-29.06-46.83-46.41-80.38-46.41c-33.55,0-63.6,17.35-80.38,46.41L479.99,802.69c-4.22,7.31-4.22,16.32,0,23.64c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82l99.34-172.07l78.87,136.61h-41.78c-7.86-12.37-21.64-20.62-37.35-20.62c-24.4,0-44.25,19.85-44.25,44.25s19.85,44.25,44.25,44.25c15.71,0,29.49-8.25,37.35-20.62h82.72c8.45,0,16.25-4.51,20.47-11.82c4.22-7.31,4.22-16.32,0-23.64L760.56,595.17c-4.22-7.31-12.03-11.82-20.47-11.82c-8.45,0-16.25,4.51-20.47,11.82l-112.99,195.7h-65.22l219.16-379.59c8.23-14.26,22.97-22.77,39.43-22.77c16.46,0,31.2,8.51,39.43,22.77l219.16,379.59h-65.22l-154.21-267.1c3.24-6.15,5.09-13.13,5.09-20.55c0-24.4-19.85-44.25-44.25-44.25s-44.25,19.85-44.25,44.25c0,23.79,18.89,43.21,42.46,44.16l161.05,278.94c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82C1124.23,819.02,1124.23,810.01,1120.01,802.69z"/>
         </svg>
       </div>
-      <span class="footer-text">AIMS-OS</span>
+      <span class="footer-text"><span class="logo-aims">AIMS</span><span class="logo-os">OS</span></span>
     </div>
     <div class="footer-rule"></div>
   </footer>
@@ -819,26 +1311,13 @@
 <script>
 // ─── Selected destinations ────────────────────────────────────────────────────
 
-const selectedStudios = {}; // { [tenantId]: studioKey | 'home' }
-
 function selectStudio(tenantId, studioKey) {
-  selectedStudios[tenantId] = studioKey;
-  const btn = document.getElementById(`bm-${tenantId}`);
-  if (btn) {
-    btn.textContent = studioKey === 'home'
-      ? 'Enter workspace'
-      : `Go to ${STUDIOS[studioKey].short}`;
-  }
   closeAll();
+  go(tenantId, studioKey);
 }
 
 function mainBtnClick(tenantId, e) {
-  const dest = selectedStudios[tenantId];
-  if (dest !== undefined) {
-    go(tenantId, dest);
-  } else {
-    toggleDd(tenantId, e);
-  }
+  go(tenantId, 'home');
 }
 
 // ─── Studio registry ─────────────────────────────────────────────────────────
@@ -990,6 +1469,42 @@ const TENANTS = [
     color: '#8B5CF6',
     initials: 'NC',
   },
+  {
+    id: 'vertex',
+    name: 'Vertex Logistics',
+    industry: 'Logistics',
+    description: 'Fleet routing optimization and warehouse automation across 6 distribution centers. Real-time shipment tracking and carrier reconciliation agents.',
+    role: 'member',
+    studios: ['agentic', 'ws'],
+    lastVisited: '3 weeks ago',
+    recent: false,
+    color: '#0EA5E9',
+    initials: 'VL',
+  },
+  {
+    id: 'cascade',
+    name: 'Cascade Analytics',
+    industry: 'Analytics',
+    description: 'Self-serve data platform for 8 internal business units. Semantic layer governance, metric definitions, and automated data quality monitoring.',
+    role: 'org-admin',
+    studios: ['data', 'governance'],
+    lastVisited: '1 month ago',
+    recent: false,
+    color: '#EC4899',
+    initials: 'CA',
+  },
+  {
+    id: 'ironclad',
+    name: 'Ironclad Legal',
+    industry: 'LegalTech',
+    description: 'Contract lifecycle automation across 4 practice groups. AI-assisted clause extraction, obligation tracking, and renewal alert agents.',
+    role: 'viewer',
+    studios: ['data', 'agentic'],
+    lastVisited: '6 weeks ago',
+    recent: false,
+    color: '#D97706',
+    initials: 'IL',
+  },
 ];
 
 // ─── Build helpers ────────────────────────────────────────────────────────────
@@ -1046,8 +1561,19 @@ function buildCard(tenant, idx, featured = false) {
     ? `Go to ${STUDIOS[tenant.studios[0]].short}`
     : 'Enter workspace';
 
+  const sizeClass = featured ? 'card-hero' : 'card-compact';
+
+  const activeIndicator = featured ? `
+    <div class="active-badge">
+      <span class="active-pulse"></span>
+      Active workspace
+    </div>
+    <div class="hero-last-visit">Last visited ${tenant.lastVisited}</div>` : '';
+
+  const lastVisitRow = featured ? '' : `<span class="last-visit">Last visited ${tenant.lastVisited}</span>`;
+
   return `
-    <div class="card ${featured ? 'card-hero' : 'card-compact'}" style="animation-delay:${idx * 45}ms">
+    <div class="card ${sizeClass}" style="animation-delay:${idx * 45}ms" tabindex="0" role="button">
       <!-- avatar -->
       <div class="tenant-av" style="background:${tenant.color}18;border:1px solid ${tenant.color}30;color:${tenant.color}">
         ${tenant.initials}
@@ -1060,6 +1586,7 @@ function buildCard(tenant, idx, featured = false) {
           <span class="badge badge-industry">${tenant.industry}</span>
           <span class="badge ${role.cls}">${role.label}</span>
         </div>
+        ${activeIndicator}
       </div>
 
       <div class="card-divider"></div>
@@ -1069,7 +1596,7 @@ function buildCard(tenant, idx, featured = false) {
 
       <!-- actions -->
       <div class="card-actions">
-        <span class="last-visit">Last visited ${tenant.lastVisited}</span>
+        ${lastVisitRow}
         <div class="split-btn" id="sb-${tenant.id}">
           <button class="btn-main" id="bm-${tenant.id}" onclick="mainBtnClick('${tenant.id}', event)">${ctaText}</button>
           <div class="btn-sep"></div>
@@ -1094,13 +1621,50 @@ function buildCard(tenant, idx, featured = false) {
     </div>`;
 }
 
+// ─── Load more ────────────────────────────────────────────────────────────────
+
+const COMPACT_LIMIT = 5;
+const LOAD_MORE_BATCH = 3;
+let _visibleCount = COMPACT_LIMIT;
+let _currentList = [];
+
+function loadMore() {
+  _visibleCount += LOAD_MORE_BATCH;
+  renderCompactList();
+}
+
+function renderCompactList() {
+  const rest = _currentList.slice(1);
+  const visible = rest.slice(0, _visibleCount);
+  const hidden  = rest.length - visible.length;
+
+  let html = visible.map((t, i) => buildCard(t, i + 1, false)).join('');
+
+  if (hidden > 0) {
+    html += `
+      <div class="load-more-wrap">
+        <div class="load-more-rule"></div>
+        <button class="load-more-btn" onclick="loadMore()">
+          Show more
+          <span class="load-more-count">${hidden}</span>
+        </button>
+        <div class="load-more-rule"></div>
+      </div>`;
+  }
+
+  const container = document.getElementById('compact-list');
+  if (container) container.innerHTML = html;
+}
+
 // ─── Render ───────────────────────────────────────────────────────────────────
 
 function render(list, searching = false) {
-  const grid = document.getElementById('grid');
+  const gridEl = document.getElementById('grid');
+  gridEl.className = 'grid';
+  _currentList = list;
 
   if (list.length === 0) {
-    grid.innerHTML = `
+    gridEl.innerHTML = `
       <div class="empty">
         <div class="empty-ico">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -1115,29 +1679,49 @@ function render(list, searching = false) {
     const hero = list[0];
     const rest  = list.slice(1);
     let html = `
-      <div class="section-label-hero">
-        <span class="recent-dot"></span>
-        Pick up where you left off
-      </div>
+      <div class="section-label-hero">Pick up where you left off</div>
       ${buildCard(hero, 0, true)}
     `;
     if (rest.length > 0) {
       html += `<div class="section-label-other">Other workspaces</div>`;
-      html += rest.map((t, i) => buildCard(t, i + 1)).join('');
+      html += `<div id="compact-list"></div>`;
     }
-    grid.innerHTML = html;
+    gridEl.innerHTML = html;
+    renderCompactList();
   } else {
-    grid.innerHTML = list.map((t, i) => buildCard(t, i)).join('');
+    gridEl.innerHTML = list.map((t, i) => buildCard(t, i, false)).join('');
   }
 
   const n = list.length;
   document.getElementById('countPill').textContent = `${n} workspace${n !== 1 ? 's' : ''}`;
+  const countEl = document.getElementById('tenantCount');
+  if (countEl) countEl.textContent = TENANTS.length;
+}
+
+// ─── Sort ─────────────────────────────────────────────────────────────────────
+
+const SORT_CYCLES = ['recent', 'alpha', 'role'];
+const SORT_LABELS = { recent: 'Last visited', alpha: 'A–Z', role: 'Role' };
+const ROLE_ORDER  = ['platform-admin', 'org-admin', 'member', 'viewer'];
+let sortIdx = 0;
+
+function applySort(list) {
+  const order = SORT_CYCLES[sortIdx];
+  if (order === 'alpha')  return [...list].sort((a, b) => a.name.localeCompare(b.name));
+  if (order === 'role')   return [...list].sort((a, b) => ROLE_ORDER.indexOf(a.role) - ROLE_ORDER.indexOf(b.role));
+  return list; // 'recent' = original fixture order
+}
+
+function cycleSortOrder() {
+  sortIdx = (sortIdx + 1) % SORT_CYCLES.length;
+  document.getElementById('sortLabel').textContent = SORT_LABELS[SORT_CYCLES[sortIdx]];
+  triggerRender();
 }
 
 // ─── Search ───────────────────────────────────────────────────────────────────
 
-document.getElementById('searchInput').addEventListener('input', function () {
-  const q = this.value.trim().toLowerCase();
+function triggerRender() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
   const filtered = q
     ? TENANTS.filter(t =>
         t.name.toLowerCase().includes(q) ||
@@ -1146,8 +1730,11 @@ document.getElementById('searchInput').addEventListener('input', function () {
       )
     : TENANTS;
   closeAll();
-  render(filtered, !!q);
-});
+  _visibleCount = COMPACT_LIMIT;
+  render(applySort(filtered), !!q);
+}
+
+document.getElementById('searchInput').addEventListener('input', () => triggerRender());
 
 // ─── Dropdown ─────────────────────────────────────────────────────────────────
 
@@ -1184,13 +1771,22 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); 
 
 // ─── Navigation (simulated) ───────────────────────────────────────────────────
 
+const STUDIO_URLS = {
+  home:       'admin-console.html',
+  data:       'data-studio-models.html',
+  agentic:    'agentic-studio.html',
+  governance: 'governance-studio.html',
+  ws:         'admin-console.html',
+};
+
 function go(tenantId, destination) {
   closeAll();
   const tenant = TENANTS.find(t => t.id === tenantId);
-  const msg = destination === 'home'
-    ? `Entering ${tenant.name}`
-    : `Opening ${STUDIOS[destination].label} in ${tenant.name}`;
-  toast(msg);
+  const dest   = destination ?? 'home';
+  const url    = STUDIO_URLS[dest] ?? 'admin-console.html';
+  const label  = dest === 'home' ? tenant.name : STUDIOS[dest].label;
+  toast(`Entering ${label}…`);
+  setTimeout(() => { window.location.href = url; }, 900);
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
@@ -1204,9 +1800,353 @@ function toast(msg) {
   _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
+// ─── Dynamic greeting ─────────────────────────────────────────────────────────
+
+(function() {
+  const h = new Date().getHours();
+  const prefix = h < 12 ? 'Good morning, ' : h < 17 ? 'Good afternoon, ' : 'Good evening, ';
+  const el = document.getElementById('greetPrefix');
+  if (el) el.textContent = prefix;
+})();
+
+// ─── ⌘K / Ctrl+K → focus search ──────────────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    const inp = document.getElementById('searchInput');
+    if (inp) { inp.focus(); inp.select(); }
+  }
+});
+
+// ─── Single-tenant auto-redirect ─────────────────────────────────────────────
+
+let _redirectTimer = null;
+
+function startSingleTenantRedirect(tenant) {
+  const grid = document.getElementById('grid');
+  const banner = document.createElement('div');
+  banner.className = 'redirect-banner';
+  banner.id = 'redirectBanner';
+  banner.innerHTML = `
+    <div class="redirect-banner-row">
+      <div class="redirect-banner-text">
+        You only have one workspace. Redirecting to <strong>${tenant.name}</strong>…
+      </div>
+      <button class="redirect-cancel" onclick="cancelRedirect()">Cancel</button>
+    </div>
+    <div class="redirect-progress"><div class="redirect-progress-bar" id="redirectBar"></div></div>`;
+  grid.insertAdjacentElement('beforebegin', banner);
+  _redirectTimer = setTimeout(() => go(tenant.id, 'home'), 2400);
+}
+
+function cancelRedirect() {
+  clearTimeout(_redirectTimer);
+  const banner = document.getElementById('redirectBanner');
+  if (banner) banner.remove();
+}
+
+// ─── User menu ────────────────────────────────────────────────────────────────
+
+let _userMenuOpen = false;
+
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  _userMenuOpen ? closeUserMenu() : openUserMenu();
+}
+
+function openUserMenu() {
+  _userMenuOpen = true;
+  document.getElementById('userMenu').classList.add('is-open');
+  document.getElementById('userPill').classList.add('is-open');
+  document.getElementById('userPill').setAttribute('aria-expanded', 'true');
+  closeAll();
+}
+
+function closeUserMenu() {
+  _userMenuOpen = false;
+  document.getElementById('userMenu').classList.remove('is-open');
+  document.getElementById('userPill').classList.remove('is-open');
+  document.getElementById('userPill').setAttribute('aria-expanded', 'false');
+}
+
+document.addEventListener('click', e => {
+  if (_userMenuOpen && !document.getElementById('userMenu').contains(e.target)) {
+    closeUserMenu();
+  }
+});
+
+document.getElementById('userPill').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleUserMenu(e); }
+  if (e.key === 'Escape') closeUserMenu();
+});
+
+// ─── Loading skeleton ──────────────────────────────────────────────────────────
+
+function skeletonCard(hero = false) {
+  return `
+    <div class="skeleton-card" style="padding:${hero ? '20px 24px' : '15px 20px'}">
+      <div class="sk-av skeleton-base"></div>
+      <div class="sk-col">
+        <div class="sk-line w-40 skeleton-base"></div>
+        <div class="sk-line w-25 skeleton-base"></div>
+        ${hero ? '<div class="sk-line w-60 skeleton-base" style="margin-top:6px"></div>' : ''}
+      </div>
+      <div class="sk-btn skeleton-base" style="margin-left:auto"></div>
+    </div>`;
+}
+
+function showSkeleton() {
+  const gridEl = document.getElementById('grid');
+  gridEl.innerHTML = `
+    <div class="section-label-hero" style="opacity:.4">Pick up where you left off</div>
+    ${skeletonCard(true)}
+    <div class="section-label-other" style="opacity:.4;margin-top:16px">Other workspaces</div>
+    ${skeletonCard()}${skeletonCard()}${skeletonCard()}`;
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
-render(TENANTS, false);
+showSkeleton();
+setTimeout(() => {
+  render(TENANTS, false);
+  if (TENANTS.length === 1) startSingleTenantRedirect(TENANTS[0]);
+}, 2000);
+
+// ─── Sign out ──────────────────────────────────────────────────────────────────
+
+function signOut() {
+  closeUserMenu();
+  window.location.href = 'login.html';
+}
+
+// ─── Selector tour steps ──────────────────────────────────────────────────────
+
+const TOUR_LS_STEP = 'aims-tour-selector-step';
+const TOUR_LS_DONE = 'aims-tour-selector-seen';
+let tourState = { active: false, stepIndex: 0 };
+let _tourLastFocus = null;
+
+const TOUR_STEPS = [
+  {
+    title: 'Your Workspace Selector',
+    body: 'Every organization you belong to lives here. This tour covers <strong>search, sorting, studios, and sign-out</strong>. Use <strong>← →</strong> or the buttons to navigate.',
+  },
+  {
+    title: 'Search organizations',
+    body: 'Type a name, industry, or role to instantly filter across all your workspaces. Press <strong>⌘K</strong> from anywhere on this page to jump to the search bar.',
+    target: '#searchInput',
+    scrollToTarget: false,
+  },
+  {
+    title: 'Sort order',
+    body: 'Cycle through <strong>Last visited → A–Z → Role</strong>. The sort resets when you search, so you always see the most relevant result first.',
+    target: '#sortBtn',
+    scrollToTarget: false,
+  },
+  {
+    title: 'Your active workspace',
+    body: 'The <strong>hero card</strong> at the top is your most recently visited workspace. The green pulse confirms it\'s your active session — pick up exactly where you left off.',
+    target: '.card-hero',
+    scrollToTarget: false,
+    setup: () => { closeAll(); closeUserMenu(); },
+  },
+  {
+    title: 'Active workspace badge',
+    body: 'This badge and timestamp live <strong>inside the identity block</strong>, not in the action footer. That keeps last-visit visible even before you decide where to go.',
+    target: '.active-badge',
+    scrollToTarget: false,
+  },
+  {
+    title: 'Go directly to a Studio',
+    body: 'The split button has two parts: <strong>Enter workspace</strong> (home inbox) and the <strong>chevron dropdown</strong> to jump straight to Data, Agentic, Governance, or Work Surfaces.',
+    target: '#sb-avance',
+    scrollToTarget: false,
+    setup: () => {
+      closeAll();
+      const dd = document.getElementById('dd-avance');
+      const btn = document.getElementById('bd-avance');
+      if (dd) dd.classList.add('is-open');
+      if (btn) { btn.classList.add('is-open'); btn.setAttribute('aria-expanded','true'); }
+      activeDd = 'avance';
+    },
+  },
+  {
+    title: 'Load more workspaces',
+    body: 'Workspaces beyond the first 5 are collapsed to keep the page scannable. Click <strong>Show more</strong> to reveal them — the count badge shows exactly how many are hidden.',
+    target: '.load-more-btn',
+    scrollToTarget: true,
+    setup: () => {
+      closeAll(); closeUserMenu();
+      _visibleCount = COMPACT_LIMIT;
+      render(TENANTS, false);
+    },
+  },
+  {
+    title: 'Account menu',
+    body: 'Your user pill in the top-right opens a <strong>dropdown with account settings</strong>, activity log, and sign-out. Click the chevron to expand it.',
+    target: '#userPill',
+    scrollToTarget: false,
+    setup: () => { closeAll(); closeUserMenu(); },
+  },
+  {
+    title: 'Sign out',
+    body: 'Click <strong>Sign out</strong> to securely end your session. AIMS-OS invalidates your token server-side — you\'ll be redirected back to the sign-in screen.',
+    target: '#signOutBtn',
+    scrollToTarget: false,
+    setup: () => { closeAll(); openUserMenu(); },
+  },
+];
+
+// ─── Tour engine ──────────────────────────────────────────────────────────────
+
+function _tourSave(){ try{ localStorage.setItem(TOUR_LS_STEP, String(tourState.stepIndex)); }catch(e){} }
+function _tourClearProgress(){ try{ localStorage.removeItem(TOUR_LS_STEP); localStorage.setItem(TOUR_LS_DONE,'1'); }catch(e){} }
+
+function startTour(){
+  let i=0;
+  try{ const s=localStorage.getItem(TOUR_LS_STEP); if(s!=null && +s>0 && +s<TOUR_STEPS.length) i=+s; }catch(e){}
+  startTourAt(i);
+}
+function restartTour(){ startTourAt(0); }
+function startTourAt(i){
+  tourState={ active:true, stepIndex:Math.max(0,Math.min(i|0,TOUR_STEPS.length-1)) };
+  _tourLastFocus=document.activeElement;
+  const t=document.getElementById('tourTrigger'); if(t) t.classList.add('tour-active');
+  paintTourStep();
+}
+function endTour(finished){
+  tourState.active=false;
+  const t=document.getElementById('tourTrigger');
+  if(t){ t.classList.remove('tour-active'); t.classList.add('seen'); }
+  ['tourMaskT','tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.remove('active'); });
+  const sp=document.getElementById('tourSpotlight'); if(sp) sp.classList.remove('active');
+  const po=document.getElementById('tourPopover'); if(po) po.classList.remove('active');
+  finished ? _tourClearProgress() : _tourSave();
+  closeAll(); closeUserMenu();
+  _tourRefreshTriggerLabel();
+  if(_tourLastFocus && _tourLastFocus.focus){ try{ _tourLastFocus.focus(); }catch(e){} }
+}
+function tourNext(){ if(tourState.stepIndex>=TOUR_STEPS.length-1){ endTour(true); return; } tourState.stepIndex++; _tourSave(); paintTourStep(); }
+function tourPrev(){ if(tourState.stepIndex<=0) return; tourState.stepIndex--; _tourSave(); paintTourStep(); }
+
+function paintTourStep(){
+  if(!tourState.active) return;
+  const step=TOUR_STEPS[tourState.stepIndex];
+  const isFirst=tourState.stepIndex===0, isLast=tourState.stepIndex===TOUR_STEPS.length-1;
+  if(typeof step.setup==='function'){ try{ step.setup(); }catch(e){} }
+  setTimeout(()=>{
+    const popover=document.getElementById('tourPopover'), spotlight=document.getElementById('tourSpotlight');
+    popover.innerHTML=`
+      <div class="tour-popover-header">
+        <span class="tour-popover-step">Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}</span>
+        ${!isFirst?`<button class="tour-popover-restart" onclick="restartTour()">Restart</button>`:''}
+        <button class="tour-popover-skip" onclick="endTour(false)">Skip tour</button>
+      </div>
+      <div class="tour-popover-title" id="tourTitle">${step.title}</div>
+      <div class="tour-popover-body">${step.body}</div>
+      <div class="tour-popover-footer">
+        <div class="tour-progress">${TOUR_STEPS.map((_,i)=>`<div class="tour-progress-dot ${i===tourState.stepIndex?'current':i<tourState.stepIndex?'done':''}"></div>`).join('')}</div>
+        ${!isFirst?`<button class="tour-btn tour-btn-prev" onclick="tourPrev()">← Back</button>`:''}
+        <button class="tour-btn tour-btn-next" onclick="${isLast?'endTour(true)':'tourNext()'}">${isLast?'Finish':'Next →'}</button>
+      </div>`;
+    const targetEl=step.target ? document.querySelector(step.target) : null;
+    if(targetEl){
+      const place=()=>{ _tourPlace(targetEl.getBoundingClientRect(), popover, spotlight); };
+      setTimeout(place, step.scrollToTarget ? 700 : 80);
+      if(step.scrollToTarget) setTimeout(place, 1200);
+    } else {
+      _tourMaskFull(); spotlight.classList.remove('active'); _tourCenter(popover);
+    }
+    const live=document.getElementById('tourLive');
+    if(live) live.textContent=`Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}. ${step.title}`;
+    const nextBtn=popover.querySelector('.tour-btn-next'); if(nextBtn) setTimeout(()=>nextBtn.focus(),80);
+  }, step.setup ? 180 : 50);
+}
+
+function _tourPlace(rect, popover, spotlight){
+  const pad=6;
+  spotlight.style.left=(rect.left-pad)+'px'; spotlight.style.top=(rect.top-pad)+'px';
+  spotlight.style.width=(rect.width+pad*2)+'px'; spotlight.style.height=(rect.height+pad*2)+'px';
+  spotlight.classList.add('active');
+  _tourMask(rect,pad);
+  if(window.innerWidth<560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  popover.classList.remove('is-sheet');
+  const pw=360, ph=popover.offsetHeight||260, m=16, W=window.innerWidth, H=window.innerHeight;
+  let top, left;
+  if(rect.bottom+ph+m<H){ top=rect.bottom+16; left=Math.min(Math.max(rect.left,16),W-pw-16); }
+  else if(rect.top-ph-m>0){ top=rect.top-ph-16; left=Math.min(Math.max(rect.left,16),W-pw-16); }
+  else { top=(H-ph)/2; left=(W-pw)/2; }
+  popover.style.left=left+'px'; popover.style.top=top+'px'; popover.classList.add('active');
+}
+function _tourMask(rect,pad){
+  const W=window.innerWidth,H=window.innerHeight;
+  const top=Math.max(0,rect.top-pad),bot=Math.min(H,rect.bottom+pad),lft=Math.max(0,rect.left-pad),rgt=Math.min(W,rect.right+pad);
+  const set=(id,l,t,w,h)=>{ const e=document.getElementById(id); e.style.left=l+'px'; e.style.top=t+'px'; e.style.width=Math.max(0,w)+'px'; e.style.height=Math.max(0,h)+'px'; e.classList.add('active'); };
+  set('tourMaskT',0,0,W,top); set('tourMaskB',0,bot,W,H-bot); set('tourMaskL',0,top,lft,bot-top); set('tourMaskR',rgt,top,W-rgt,bot-top);
+}
+function _tourMaskFull(){
+  const T=document.getElementById('tourMaskT'); T.style.left='0'; T.style.top='0'; T.style.width='100vw'; T.style.height='100vh'; T.classList.add('active');
+  ['tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); e.classList.remove('active'); });
+}
+function _tourCenter(popover){
+  if(window.innerWidth<560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  popover.classList.remove('is-sheet');
+  popover.style.left=((window.innerWidth-360)/2)+'px'; popover.style.top=((window.innerHeight-(popover.offsetHeight||260))/2)+'px';
+  popover.classList.add('active');
+}
+
+document.addEventListener('keydown',(e)=>{
+  if(!tourState.active) return;
+  if(e.key==='Escape'){ endTour(false); }
+  else if(e.key==='ArrowRight'){ e.preventDefault(); tourNext(); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); tourPrev(); }
+});
+document.addEventListener('keydown',(e)=>{
+  if(!tourState.active || e.key!=='Tab') return;
+  const po=document.getElementById('tourPopover');
+  const f=po.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+  if(!f.length) return;
+  const first=f[0], last=f[f.length-1];
+  if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
+
+function _tourRefreshTriggerLabel(){
+  const t=document.getElementById('tourTrigger'); if(!t) return;
+  const label=t.querySelector('.tour-trigger-label');
+  let saved=null; try{ saved=localStorage.getItem(TOUR_LS_STEP); }catch(e){}
+  if(saved!=null && +saved>0 && +saved<TOUR_STEPS.length){ if(label) label.textContent='Continue'; t.classList.add('seen'); }
+  else{ if(label) label.textContent='Demo'; try{ if(localStorage.getItem(TOUR_LS_DONE)) t.classList.add('seen'); }catch(e){} }
+}
+
+(function tourInit(){
+  _tourRefreshTriggerLabel();
+  try{
+    const q=new URLSearchParams(window.location.search).get('tour');
+    if(q!=null){
+      const n=parseInt(q,10);
+      if(!isNaN(n)){
+        // wait for skeleton to clear before starting
+        setTimeout(()=>startTourAt(Math.max(0,n-1)), 2200);
+      }
+    }
+  }catch(e){}
+})();
 </script>
+
+  <!-- ── Tour markup ─────────────────────────────────────────── -->
+  <button class="tour-trigger" id="tourTrigger" onclick="startTour()" aria-label="Start product demo">
+    <span class="tour-trigger-pulse"></span>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2l11 6-11 6V2z" fill="currentColor"/></svg>
+    <span class="tour-trigger-label">Demo</span>
+  </button>
+  <div class="tour-mask" id="tourMaskT"></div>
+  <div class="tour-mask" id="tourMaskR"></div>
+  <div class="tour-mask" id="tourMaskB"></div>
+  <div class="tour-mask" id="tourMaskL"></div>
+  <div class="tour-spotlight" id="tourSpotlight"></div>
+  <div class="tour-popover" id="tourPopover" role="dialog" aria-modal="true" aria-labelledby="tourTitle"></div>
+  <div class="tour-sr-only" id="tourLive" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>

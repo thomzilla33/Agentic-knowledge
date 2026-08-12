@@ -3,403 +3,2150 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>AIMS-OS — Prototype Hub</title>
+  <title>AIMS-OS — Select Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    /* App/Background — from DS Figma (node 12655:211436). Theme-aware:
-   dark = diagonal navy gradient · light = subtle blue-white radial glow. */
-:root{
-  --ds-app-bg-dark: linear-gradient(155.58deg, #020618 14.2%, #0f172b 50%, #020618 85.8%);
-  --ds-app-bg-light: radial-gradient(130% 130% at 18% 96%, #f6f9ff 0%, #ffffff 78%);
-  --app-bg: var(--ds-app-bg-dark);
-  --app-fg: #e2e8f0;
-}
-@media (prefers-color-scheme: light){ :root{ --app-bg: var(--ds-app-bg-light); --app-fg: #0f172a; } }
-html.theme-dark{ --app-bg: var(--ds-app-bg-dark); --app-fg: #e2e8f0; }
-html.theme-light{ --app-bg: var(--ds-app-bg-light); --app-fg: #0f172a; }
-body{font-family:'Inter',system-ui,sans-serif;background:var(--app-bg);background-attachment:fixed;color:var(--app-fg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
-    .logo{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2B7FFF;margin-bottom:12px}
-    h1{font-size:28px;font-weight:700;color:var(--app-fg);margin-bottom:8px;text-align:center}
-    .sub{font-size:14px;color:#64748b;margin-bottom:48px;text-align:center;max-width:520px;line-height:1.55}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,360px));gap:16px;width:100%;max-width:760px;justify-content:center}
-    .card{background:#0c1428;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s;display:flex;flex-direction:column;gap:10px}
-    .card:hover{border-color:rgba(6,182,212,.45);transform:translateY(-2px)}
-    .card-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
-    .card-title{font-size:15px;font-weight:700;color:#f1f5f9}
-    .card-desc{font-size:12px;color:#64748b;line-height:1.6}
-    .card-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;width:fit-content}
-    .tag-cyan{background:rgba(6,182,212,.1);color:#06B6D4;border:1px solid rgba(6,182,212,.22)}
-    .tag-emerald{background:rgba(16,185,129,.10);color:#10B981;border:1px solid rgba(16,185,129,.22)}
-    .tag-blue{background:rgba(59,130,246,.10);color:#3B82F6;border:1px solid rgba(59,130,246,.22)}
-.tag-purple{background:rgba(167,139,250,.10);color:#A78BFA;border:1px solid rgba(167,139,250,.22)}
-.tag-green{background:rgba(34,197,94,.10);color:#22C55E;border:1px solid rgba(34,197,94,.22)}
-    .coming{margin-top:32px;font-size:11px;color:#475569;letter-spacing:.05em;text-transform:uppercase}
-    .ft{margin-top:48px;font-size:11px;color:#334155;text-align:center;line-height:1.6}
-    .ft a{color:#64748b;text-decoration:none}
-    .ft a:hover{color:#94a3b8}
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: linear-gradient(155.58deg, #020618 14.2%, #0f172b 50%, #020618 85.8%);
+      --surface: #0b1221;
+      --surface-2: #101929;
+      --border: rgba(255,255,255,.07);
+      --border-hover: rgba(43,127,255,.38);
+      --text-1: #f1f5f9;
+      --text-2: #64748b;
+      --text-3: #3d5068;
+      --accent: #2B7FFF;
+      --accent-h: #4a93ff;
+      --cyan: #06B6D4;
+      --emerald: #10B981;
+      --blue: #3B82F6;
+      --purple: #A78BFA;
+      --amber: #F59E0B;
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      background-attachment: fixed;
+      color: var(--text-1);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ─── Topbar ─────────────────────────────────────────────── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(2,6,24,.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+    }
+    .logo-aims { color: #fff; }
+    .logo-os {
+      background: linear-gradient(to top, #1B72FF, #09E2AB);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .help-link {
+      font-size: 12px;
+      color: var(--text-2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color .15s;
+    }
+    .help-link:hover { color: var(--text-1); }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px 4px 5px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      user-select: none;
+    }
+    .user-pill:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.13); }
+
+    .user-av {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2B7FFF, #06B6D4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .03em;
+    }
+
+    .user-email {
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    /* ─── Hero ───────────────────────────────────────────────── */
+    .hero {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 52px 28px 32px;
+      position: relative;
+    }
+
+.eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--accent);
+      opacity: .6;
+    }
+
+    /* ─── Eyebrow pulse dot ─────────────────────────────────── */
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .pulse-dot::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: var(--emerald);
+      opacity: .3;
+      animation: pulse-ring 2.4s ease infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { transform: scale(1); opacity: .3; }
+      50%       { transform: scale(2); opacity: 0; }
+    }
+
+    .hero-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -.015em;
+      margin-bottom: 6px;
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .hero-sub strong { color: var(--text-1); font-weight: 600; }
+
+    /* ─── Search ─────────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 480px;
+    }
+
+    .search-ico {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      display: flex;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 9px 12px 9px 34px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-1);
+      outline: none;
+      transition: border-color .15s, background .15s;
+    }
+    .search-input::placeholder { color: var(--text-3); }
+    .search-input:focus {
+      border-color: rgba(43,127,255,.35);
+      background: rgba(43,127,255,.03);
+    }
+
+    .count-pill {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 5px 11px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+
+    /* ─── Search ⌘K hint ─────────────────────────────────────── */
+    .search-kbd {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: var(--text-3);
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 5px;
+      pointer-events: none;
+      transition: opacity .2s;
+      user-select: none;
+    }
+    .search-wrap:focus-within .search-kbd { opacity: 0; }
+
+    /* ─── Grid ───────────────────────────────────────────────── */
+    .main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 4px 28px 40px;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ─── Card ───────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 20px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      overflow: visible;
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+      animation: cardUp .24s ease both;
+    }
+
+    @keyframes cardUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card { animation: none; }
+      .pulse-dot::after { animation: none; }
+    }
+
+    /* ─── Show-more button ───────────────────────────────────── */
+    .show-more-btn {
+      width: 100%;
+      padding: 11px 16px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-2);
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .show-more-btn:hover {
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.12);
+      color: var(--text-1);
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 6px 28px rgba(0,0,0,.32), 0 0 0 1px rgba(43,127,255,.08) inset;
+      transform: translateY(-1px);
+    }
+
+    .tenant-av {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      flex-shrink: 0;
+    }
+
+    .card-identity {
+      flex: 0 0 210px;
+      min-width: 0;
+    }
+    .card-hero .card-identity {
+      flex: 0 0 280px;
+    }
+
+    .card-divider {
+      width: 1px;
+      align-self: stretch;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .card-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 5px;
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .badge-industry {
+      background: rgba(255,255,255,.06);
+      color: var(--text-2);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+
+    .badge-platform-admin { background: rgba(43,127,255,.13); color: #60A5FA; border: 1px solid rgba(43,127,255,.22); }
+    .badge-org-admin      { background: rgba(6,182,212,.12);  color: #22D3EE; border: 1px solid rgba(6,182,212,.22);  }
+    .badge-member         { background: rgba(16,185,129,.1);  color: #34D399; border: 1px solid rgba(16,185,129,.2);  }
+    .badge-viewer         { background: rgba(100,116,139,.1); color: #94A3B8; border: 1px solid rgba(100,116,139,.2); }
+
+    .recent-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #60A5FA;
+    }
+
+    .recent-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 2.4s ease infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .35; }
+    }
+
+    /* Studios — horizontal */
+    .studios-list {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px 20px;
+      align-items: center;
+    }
+
+    .studio-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .studio-ico {
+      width: 13px;
+      height: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .studio-name {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      letter-spacing: -.005em;
+      white-space: nowrap;
+    }
+
+    /* ─── Page footer ───────────────────────────────────────────── */
+    .page-footer {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 28px 48px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .footer-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .footer-mark {
+      width: 18px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: .7;
+    }
+
+    .footer-text {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    /* Actions */
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .last-visit {
+      font-size: 10.5px;
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+
+    /* ─── Split button ───────────────────────────────────────── */
+    .split-btn {
+      display: flex;
+      align-items: stretch;
+      border-radius: 8px;
+      overflow: visible;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .btn-main {
+      padding: 7px 13px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px 0 0 8px;
+      transition: background .14s;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .btn-main:hover { background: var(--accent-h); }
+
+    .btn-sep {
+      width: 1px;
+      background: rgba(255,255,255,.18);
+      flex-shrink: 0;
+    }
+
+    .btn-drop {
+      width: 30px;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 8px 8px 0;
+      transition: background .14s;
+      flex-shrink: 0;
+    }
+    .btn-drop:hover { background: var(--accent-h); }
+
+    .btn-drop-ico {
+      transition: transform .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-drop.is-open .btn-drop-ico { transform: rotate(180deg); }
+
+    /* ─── Studio dropdown ────────────────────────────────────── */
+    .studio-dd {
+      position: absolute;
+      bottom: calc(100% + 7px);
+      right: 0;
+      background: #0e1726;
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 11px;
+      padding: 5px;
+      min-width: 215px;
+      box-shadow: 0 20px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.03) inset;
+      z-index: 200;
+      display: none;
+    }
+
+    .studio-dd.is-open {
+      display: block;
+      animation: ddIn .13s ease;
+    }
+
+    @keyframes ddIn {
+      from { opacity: 0; transform: translateY(5px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .dd-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 4px 9px 5px;
+    }
+
+    .dd-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 9px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background .1s;
+      user-select: none;
+    }
+    .dd-item:hover { background: rgba(255,255,255,.06); }
+    .dd-item:active { background: rgba(255,255,255,.09); }
+
+    .dd-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dd-text { flex: 1; min-width: 0; }
+
+    .dd-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-1);
+    }
+
+    .dd-hint {
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .dd-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 3px 0;
+    }
+
+    /* ─── Empty state ────────────────────────────────────────── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 64px 20px;
+    }
+
+    .empty-ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      color: var(--text-3);
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+
+    .empty-hint { font-size: 12px; color: var(--text-3); }
+
+    /* ─── Toast ──────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: #131f31;
+      border: 1px solid rgba(43,127,255,.25);
+      border-radius: 10px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-1);
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      z-index: 9999;
+      transition: transform .22s cubic-bezier(.34,1.56,.64,1), opacity .22s;
+      opacity: 0;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .toast-pip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      animation: blink 1.4s ease infinite;
+    }
+
+    .toast-arrow {
+      color: var(--text-3);
+      display: flex;
+      align-items: center;
+    }
+
+    /* ─── Greeting accent ───────────────────────────────────── */
+    .name-accent {
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-color: rgba(43,127,255,.35);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 5px;
+    }
+
+    /* ─── Section labels ─────────────────────────────────────── */
+    .section-label-hero,
+    .section-label-other {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .section-label-hero { margin-bottom: 10px; }
+    .section-label-other { margin: 20px 0 8px; }
+
+    /* ─── Card description (hero only) ──────────────────────────── */
+    .card-desc {
+      font-size: 11.5px;
+      color: var(--text-3);
+      line-height: 1.5;
+      margin-top: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+
+    /* ─── Sort button ────────────────────────────────────────────── */
+    .sort-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .sort-btn:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.13); color: var(--text-1); }
+    .sort-btn svg { flex-shrink: 0; opacity: .6; }
+
+    /* ─── Single-tenant redirect banner ─────────────────────────── */
+    .redirect-banner {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(43,127,255,.08);
+      border: 1px solid rgba(43,127,255,.22);
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+    .redirect-banner-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .redirect-banner-text {
+      flex: 1;
+      font-size: 12.5px;
+      color: var(--text-2);
+    }
+    .redirect-banner-text strong { color: var(--text-1); font-weight: 600; }
+    .redirect-cancel {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color .15s, color .15s;
+      white-space: nowrap;
+    }
+    .redirect-cancel:hover { border-color: rgba(255,255,255,.18); color: var(--text-1); }
+    .redirect-progress {
+      height: 2px;
+      width: 100%;
+      background: rgba(43,127,255,.18);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .redirect-progress-bar {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: progress-fill 2.4s linear forwards;
+    }
+    @keyframes progress-fill {
+      from { width: 0%; }
+      to   { width: 100%; }
+    }
+
+    /* ─── Hero card variant ──────────────────────────────────── */
+    .card-hero {
+      padding: 18px 22px;
+      border-color: rgba(43,127,255,.42);
+      background: rgba(43,127,255,.065);
+      box-shadow: 0 0 0 1px rgba(43,127,255,.15) inset, 0 6px 24px rgba(0,0,0,.32);
+    }
+    .card-hero:hover {
+      border-color: rgba(43,127,255,.60);
+      box-shadow: 0 0 0 1px rgba(43,127,255,.18) inset, 0 10px 36px rgba(0,0,0,.44);
+    }
+    .card-hero .tenant-av {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    /* Compact secondary cards */
+    .card-compact {
+      padding: 9px 20px;
+    }
+    .card-compact .tenant-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      font-size: 11px;
+    }
+    .card-compact .card-name {
+      font-size: 13.5px;
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .topbar   { padding: 0 16px; }
+      .hero     { padding: 32px 16px 24px; }
+      .main     { padding: 0 16px 80px; }
+      .hero-title { font-size: 22px; }
+      .user-email { display: none; }
+      .grid     { grid-template-columns: 1fr; }
+    }
+
+    /* ─── Fix 1: Active indicator on hero card ───────────────── */
+    .active-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-top: 5px;
+    }
+    .active-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 0 rgba(16,185,129,.4);
+      animation: activePulse 2s ease infinite;
+      flex-shrink: 0;
+    }
+    @keyframes activePulse {
+      0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.4); }
+      70%  { box-shadow: 0 0 0 5px rgba(16,185,129,0); }
+      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+    .hero-last-visit {
+      font-size: 10.5px;
+      color: var(--text-3);
+      white-space: nowrap;
+      margin-top: 4px;
+    }
+
+    /* ─── Fix 2: Focus rings (a11y) ─────────────────────────── */
+    *:focus { outline: none; }
+    *:focus-visible {
+      outline: 2px solid rgba(43,127,255,.65);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    .card:focus-visible {
+      outline: 2px solid rgba(43,127,255,.5);
+      outline-offset: 0;
+      border-radius: 12px;
+    }
+    .btn-main:focus-visible,
+    .btn-drop:focus-visible {
+      outline: 2px solid rgba(255,255,255,.5);
+      outline-offset: 1px;
+    }
+
+    /* ─── Fix 4: User menu dropdown ──────────────────────────── */
+    .user-pill {
+      cursor: pointer;
+      position: relative;
+    }
+    .user-pill-chevron {
+      display: flex;
+      align-items: center;
+      color: var(--text-3);
+      transition: color .15s, transform .15s;
+      flex-shrink: 0;
+    }
+    .user-pill:hover .user-pill-chevron { color: var(--text-2); }
+    .user-pill.is-open .user-pill-chevron { transform: rotate(180deg); }
+
+    .user-menu {
+      position: fixed;
+      top: 52px;
+      right: 20px;
+      background: #0e1726;
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 12px;
+      padding: 5px;
+      min-width: 224px;
+      box-shadow: 0 20px 48px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03) inset;
+      z-index: 500;
+      display: none;
+      animation: ddIn .13s ease;
+    }
+    .user-menu.is-open { display: block; }
+
+    .user-menu-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .user-menu-av {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .user-menu-info { min-width: 0; }
+    .user-menu-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-menu-email {
+      font-size: 10.5px;
+      color: var(--text-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .user-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 9px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      transition: background .1s, color .1s;
+      user-select: none;
+      font-family: inherit;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+    .user-menu-item:hover { background: rgba(255,255,255,.06); color: var(--text-1); }
+    .user-menu-item.danger { color: #f87171; }
+    .user-menu-item.danger:hover { background: rgba(248,113,113,.08); color: #fca5a5; }
+    .user-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* ─── Fix 5: Loading skeleton ────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton-base {
+      background: linear-gradient(90deg, rgba(255,255,255,.04) 25%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.04) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s ease infinite;
+      border-radius: 6px;
+    }
+    .skeleton-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .sk-av  { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; }
+    .sk-col { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+    .sk-line { height: 10px; }
+    .sk-line.w-40 { width: 40%; }
+    .sk-line.w-25 { width: 25%; }
+    .sk-line.w-60 { width: 60%; }
+    .sk-btn { width: 120px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+
+    /* ─── Fix 5: Error state ─────────────────────────────────── */
+    .error-state {
+      text-align: center;
+      padding: 56px 20px;
+    }
+    .error-ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      color: #f87171;
+    }
+    .error-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+    .error-hint { font-size: 12px; color: var(--text-3); margin-bottom: 16px; }
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .retry-btn:hover { background: rgba(255,255,255,.08); color: var(--text-1); border-color: rgba(255,255,255,.13); }
+
+    /* ─── Tour engine ────────────────────────────────────────── */
+    .tour-trigger{position:fixed;bottom:18px;left:18px;z-index:80;display:inline-flex;align-items:center;gap:0;padding:0;height:38px;width:38px;border-radius:9999px;background:linear-gradient(135deg,#06B6D4 0%,#A78BFA 100%);color:#fff;border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;box-shadow:0 8px 24px rgba(6,182,212,.36),0 2px 8px rgba(0,0,0,.28);transition:width .22s cubic-bezier(.18,.84,.34,1.1),gap .22s,padding .22s,transform .15s,box-shadow .15s}
+    .tour-trigger:hover,.tour-trigger:focus-visible{width:116px;gap:6px;padding:0 16px 0 12px;transform:translateY(-2px);box-shadow:0 14px 32px rgba(6,182,212,.50),0 4px 12px rgba(0,0,0,.36);outline:none}
+    .tour-trigger svg{flex-shrink:0;margin-left:1px}
+    .tour-trigger-pulse{position:absolute;inset:0;border-radius:inherit;border:2px solid rgba(6,182,212,.6);animation:tourPulse 2s ease-out infinite;pointer-events:none}
+    .tour-trigger.seen .tour-trigger-pulse{display:none}
+    .tour-trigger.tour-active{display:none}
+    @keyframes tourPulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+    .tour-mask{position:fixed;z-index:9000;background:rgba(4,8,18,.55);pointer-events:auto;display:none}
+    .tour-mask.active{display:block}
+    .tour-spotlight{position:fixed;z-index:9001;pointer-events:none;border-radius:14px;border:2px solid #06B6D4;box-shadow:0 0 0 4px rgba(6,182,212,.18),0 0 32px rgba(6,182,212,.55),0 0 64px rgba(6,182,212,.25);background:transparent;transition:all .28s cubic-bezier(.4,0,.2,1);opacity:0}
+    .tour-spotlight.active{opacity:1;animation:tourSpotlightPulse 2s ease-in-out infinite}
+    @keyframes tourSpotlightPulse{0%,100%{box-shadow:0 0 0 4px rgba(6,182,212,.18),0 0 32px rgba(6,182,212,.55),0 0 64px rgba(6,182,212,.25)}50%{box-shadow:0 0 0 6px rgba(6,182,212,.28),0 0 48px rgba(6,182,212,.70),0 0 96px rgba(6,182,212,.35)}}
+    .tour-popover{position:fixed;z-index:9002;width:360px;max-width:calc(100vw - 32px);background:linear-gradient(180deg,rgba(20,28,48,.98) 0%,rgba(13,19,35,.98) 100%);border:1px solid rgba(255,255,255,.14);border-radius:12px;backdrop-filter:blur(24px) saturate(1.8);box-shadow:0 16px 48px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04);padding:18px 20px;opacity:0;transform:scale(.96) translateY(4px);pointer-events:none;transition:opacity .2s ease-out,transform .25s cubic-bezier(.34,1.56,.64,1)}
+    .tour-popover.active{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}
+    .tour-popover.is-sheet{left:8px !important;right:8px;top:auto !important;bottom:8px;width:auto;max-width:none}
+    .tour-popover-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .tour-popover-step{font-size:10.5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:#06B6D4;padding:2px 8px;border-radius:10px;background:rgba(6,182,212,.10);border:1px solid rgba(6,182,212,.25)}
+    .tour-popover-restart{background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,.38);font-size:11px;padding:4px 6px;border-radius:5px;font-family:inherit}
+    .tour-popover-restart:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.92)}
+    .tour-popover-skip{margin-left:auto;background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,.38);font-size:11px;padding:4px 8px;border-radius:5px;font-family:inherit}
+    .tour-popover-skip:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.92)}
+    .tour-popover-title{font-size:16px;font-weight:700;color:rgba(255,255,255,.92);line-height:1.3;margin-bottom:8px}
+    .tour-popover-body{font-size:13px;line-height:1.6;color:rgba(255,255,255,.60);margin-bottom:16px}
+    .tour-popover-body strong,.tour-popover-body b{color:rgba(255,255,255,.92);font-weight:600}
+    .tour-popover-footer{display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.10)}
+    .tour-progress{display:inline-flex;gap:4px;flex:1}
+    .tour-progress-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.08);transition:background .15s,transform .15s}
+    .tour-progress-dot.current{background:#06B6D4;transform:scale(1.4)}
+    .tour-progress-dot.done{background:rgba(6,182,212,.45)}
+    .tour-btn{padding:7px 14px;font-size:12.5px;font-weight:600;border-radius:6px;cursor:pointer;border:none;font-family:inherit;transition:.14s}
+    .tour-btn-prev{background:transparent;color:rgba(255,255,255,.60);border:1px solid rgba(255,255,255,.10)}
+    .tour-btn-prev:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.92)}
+    .tour-btn-next{background:linear-gradient(135deg,#06B6D4 0%,#155DFC 100%);color:#fff;box-shadow:0 2px 8px rgba(6,182,212,.30)}
+    .tour-btn-next:hover{transform:translateY(-1px)}
+    .tour-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    @media(prefers-reduced-motion:reduce){.tour-spotlight,.tour-spotlight.active{animation:none;transition:none}.tour-popover{transition:none;transform:none}.tour-trigger-pulse{display:none}}
+    @media(max-width:520px){.tour-trigger{bottom:14px;left:14px}}
+
+    /* ─── Load more ──────────────────────────────────────────── */
+    .load-more-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .load-more-rule { flex: 1; height: 1px; background: var(--border); }
+    .load-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-3);
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .load-more-btn:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); color: var(--text-2); }
+    .load-more-btn:focus-visible { outline: 2px solid rgba(43,127,255,.5); outline-offset: 2px; }
+    .load-more-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 16px;
+      padding: 0 4px;
+      background: rgba(255,255,255,.07);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-3);
+    }
   </style>
 </head>
 <body>
-  <div class="logo">AIMS-OS</div>
-  <h1>Prototype Hub</h1>
-  <p class="sub">Design prototypes for the next generation of agentic operations. Three cross-functional surfaces from Edgardo's model: Admin Studio authenticates, Data Studio maps the data flow, Agent Studio configures the tools agents can call.</p>
 
-  <div class="grid">
-    <a class="card" href="admin-console.html">
-      <div class="card-ico" style="background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.22)">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="2" stroke="#06B6D4" stroke-width="1.2"/>
-          <circle cx="3" cy="3" r="1.4" stroke="#06B6D4" stroke-width="1.2"/>
-          <circle cx="13" cy="3" r="1.4" stroke="#06B6D4" stroke-width="1.2"/>
-          <circle cx="3" cy="13" r="1.4" stroke="#06B6D4" stroke-width="1.2"/>
-          <circle cx="13" cy="13" r="1.4" stroke="#06B6D4" stroke-width="1.2"/>
-          <path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4" stroke="#06B6D4" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- ── Topbar ─────────────────────────────────────────── -->
+  <header class="topbar">
+    <a class="logo" href="index.html">
+      <div class="logo-mark">
+        <svg width="26" height="20" viewBox="479 340 646 499" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="aims-grad-nav" gradientUnits="userSpaceOnUse" x1="998.9767" y1="471.5211" x2="729.8956" y2="931.9746">
+              <stop offset="0" stop-color="#09E2AB"/>
+              <stop offset="1" stop-color="#1B72FF"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#aims-grad-nav)" d="M1120.01,802.69L880.38,387.64c-16.78-29.06-46.83-46.41-80.38-46.41c-33.55,0-63.6,17.35-80.38,46.41L479.99,802.69c-4.22,7.31-4.22,16.32,0,23.64c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82l99.34-172.07l78.87,136.61h-41.78c-7.86-12.37-21.64-20.62-37.35-20.62c-24.4,0-44.25,19.85-44.25,44.25s19.85,44.25,44.25,44.25c15.71,0,29.49-8.25,37.35-20.62h82.72c8.45,0,16.25-4.51,20.47-11.82c4.22-7.31,4.22-16.32,0-23.64L760.56,595.17c-4.22-7.31-12.03-11.82-20.47-11.82c-8.45,0-16.25,4.51-20.47,11.82l-112.99,195.7h-65.22l219.16-379.59c8.23-14.26,22.97-22.77,39.43-22.77c16.46,0,31.2,8.51,39.43,22.77l219.16,379.59h-65.22l-154.21-267.1c3.24-6.15,5.09-13.13,5.09-20.55c0-24.4-19.85-44.25-44.25-44.25s-44.25,19.85-44.25,44.25c0,23.79,18.89,43.21,42.46,44.16l161.05,278.94c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82C1124.23,819.02,1124.23,810.01,1120.01,802.69z"/>
         </svg>
       </div>
-      <div class="card-title">Admin Console</div>
-      <div class="card-desc">Workspace configuration, integrations, people & access, audit, governance, and billing. The unified control plane for AIMS OS — accessible from any studio.</div>
-      <span class="card-tag tag-cyan">Platform · Admin</span>
+      <span class="logo-text"><span class="logo-aims">AIMS</span><span class="logo-os">OS</span></span>
     </a>
 
-    <a class="card" href="data-studio.html">
-      <div class="card-ico" style="background:rgba(16,185,129,.10);border:1px solid rgba(16,185,129,.22)">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-          <rect x="2" y="3" width="12" height="10" rx="1.2" stroke="#10B981" stroke-width="1.2"/>
-          <path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10" stroke="#10B981" stroke-width="1.1" stroke-linecap="round"/>
-        </svg>
+    <div class="topbar-right">
+      <span class="help-link">Help</span>
+      <div class="user-pill" id="userPill" onclick="toggleUserMenu(event)" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+        <div class="user-av">TG</div>
+        <span class="user-email">thomas.gonzalez@aimsos.ai</span>
+        <span class="user-pill-chevron">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
       </div>
-      <div class="card-title">Data Studio</div>
-      <div class="card-desc">Where data actually flows. Field mapping, table definitions, schema versions, templates. Cross-functional with Admin Studio — only shows integrations that are authenticated with Data Sync.</div>
-      <span class="card-tag tag-emerald">Data · Cross-functional</span>
-    </a>
+    </div>
+  </header>
 
-    <a class="card" href="data-studio-models.html">
-      <div class="card-ico" style="background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.22)">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-          <rect x="2" y="2" width="5" height="5" rx="1" stroke="#3B82F6" stroke-width="1.2"/>
-          <rect x="9" y="2" width="5" height="5" rx="1" stroke="#3B82F6" stroke-width="1.2"/>
-          <rect x="2" y="9" width="5" height="5" rx="1" stroke="#3B82F6" stroke-width="1.2"/>
-          <rect x="9" y="9" width="5" height="5" rx="1" stroke="#3B82F6" stroke-width="1.2"/>
-        </svg>
+  <!-- ── User menu ─────────────────────────────────────────── -->
+  <div class="user-menu" id="userMenu" role="menu">
+    <div class="user-menu-header">
+      <div class="user-menu-av">TG</div>
+      <div class="user-menu-info">
+        <div class="user-menu-name">Thomas Gonzalez</div>
+        <div class="user-menu-email">thomas.gonzalez@aimsos.ai</div>
       </div>
-      <div class="card-title">Data Studio · Models</div>
-      <div class="card-desc">Model the data layer. Entities, tables, relationships, reference data and per-entity API contracts — the semantic schema agents and products build on. The modeling surface for Data Studio.</div>
-      <span class="card-tag tag-blue">Data · Modeling</span>
-    </a>
-
-    <a class="card" href="helix-data-studio.html">
-      <div class="card-ico" style="background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.22)">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#22C55E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 2c0 3 6 3 6 6s-6 3-6 6"/>
-          <path d="M11 2c0 3-6 3-6 6s6 3 6 6"/>
-          <path d="M6 4.2h4M5.2 8h5.6M6 11.8h4"/>
-        </svg>
-      </div>
-      <div class="card-title">Helix Data Studio</div>
-      <div class="card-desc">Governed data ingestion — connect certified sources, map to the canonical schema, resolve drift and activate. V1 sprint scope with a live version switcher (V1 → V3), decision pins and the cross-tenant clone/diff flow.</div>
-      <span class="card-tag tag-green">Ingestion · V1</span>
-    </a>
-
-    <a class="card" href="agent-tools.html">
-      <div class="card-ico" style="background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.22)">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-          <rect x="1.5" y="4.5" width="4" height="3" rx=".8" stroke="#A78BFA" stroke-width="1.2"/>
-          <rect x="6.5" y="1.5" width="4" height="3" rx=".8" stroke="#A78BFA" stroke-width="1.2"/>
-          <rect x="6.5" y="7.5" width="4" height="3" rx=".8" stroke="#A78BFA" stroke-width="1.2"/>
-          <path d="M5.5 6h1M5.5 3H6a.5.5 0 01.5.5v1" stroke="#A78BFA" stroke-width="1" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="card-title">Agent Studio · Tools</div>
-      <div class="card-desc">What agents can actually do. Tools and pre-configured wrappers per integration — Edgardo's "Lego pieces for agents". Cross-functional with Admin Studio, shows only Tools capability (no Data Sync).</div>
-      <span class="card-tag tag-purple">Agents · Cross-functional</span>
-    </a>
+    </div>
+    <button class="user-menu-item" role="menuitem" onclick="closeUserMenu()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M3 13.5c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Account settings
+    </button>
+    <button class="user-menu-item" role="menuitem" onclick="closeUserMenu()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Activity log
+    </button>
+    <div class="user-menu-sep"></div>
+    <button class="user-menu-item danger" id="signOutBtn" role="menuitem" onclick="signOut()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+        <path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Sign out
+    </button>
   </div>
 
-  <p class="coming">More prototypes coming soon</p>
+  <!-- ── Hero ──────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="eyebrow"><span class="pulse-dot"></span>Workspace Selection</div>
+    <h1 class="hero-title"><span id="greetPrefix">Welcome back, </span><span class="name-accent">Thomas</span></h1>
+    <p class="hero-sub" id="heroSub">
+      You have access to <strong id="tenantCount">8</strong> organizations.
+    </p>
 
-  <p class="ft">
-    AIMS-OS · Internal prototype — not for public distribution<br>
-    <a href="docs/spec.md">View the design spec →</a>
-  </p>
-<!-- ===== AIMS-OS Demo WalkMe (guided tour) ===== -->
-<style>
-/* Floating trigger (bottom-left; label swaps Demo <-> Continue) */
-.tour-trigger{
-  position:fixed; bottom:18px; left:18px; z-index:80;
-  display:inline-flex; align-items:center; gap:0; padding:0; height:38px; width:38px;
-  border-radius:9999px; background:linear-gradient(135deg,#06B6D4 0%,#A78BFA 100%);
-  color:#fff; border:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600;
-  white-space:nowrap; overflow:hidden;
-  box-shadow:0 8px 24px rgba(6,182,212,.36), 0 2px 8px rgba(0,0,0,.28);
-  transition:width .22s cubic-bezier(.18,.84,.34,1.1), gap .22s, padding .22s, transform .15s, box-shadow .15s;
-}
-.tour-trigger:hover, .tour-trigger:focus-visible{
-  width:112px; gap:6px; padding:0 16px 0 12px; transform:translateY(-2px);
-  box-shadow:0 14px 32px rgba(6,182,212,.50), 0 4px 12px rgba(0,0,0,.36); outline:none;
-}
-.tour-trigger svg{flex-shrink:0; margin-left:1px}
-.tour-trigger-pulse{position:absolute; inset:0; border-radius:inherit; border:2px solid rgba(6,182,212,.6); animation:tourPulse 2s ease-out infinite; pointer-events:none}
-.tour-trigger.seen .tour-trigger-pulse{display:none}
-.tour-trigger.tour-active{display:none}
-@keyframes tourPulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.25);opacity:0}}
-@media (max-width:520px){.tour-trigger{bottom:14px; left:14px}}
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-ico">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <input
+          id="searchInput"
+          class="search-input"
+          type="text"
+          placeholder="Search organizations…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <span class="search-kbd">⌘K</span>
+      </div>
+      <span class="count-pill" id="countPill">5 workspaces</span>
+      <button class="sort-btn" id="sortBtn" onclick="cycleSortOrder()" title="Change sort order">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+          <path d="M3 4h10M5 8h6M7 12h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span id="sortLabel">Last visited</span>
+      </button>
+    </div>
+  </section>
 
-/* Interactive mask = 4 dim strips around the target (leaves a clickable hole) */
-.tour-mask{position:fixed; z-index:150; background:rgba(4,8,18,.55); pointer-events:auto; display:none}
-.tour-mask.active{display:block}
-html.theme-light .tour-mask{background:rgba(15,23,42,.32)}
+  <!-- ── Cards ─────────────────────────────────────────── -->
+  <main class="main">
+    <div class="grid" id="grid"></div>
+  </main>
 
-/* Spotlight ring — sits over the hole, never blocks clicks */
-.tour-spotlight{
-  position:fixed; z-index:155; pointer-events:none; border-radius:14px; border:2px solid var(--cyan,#06B6D4);
-  box-shadow:0 0 0 4px rgba(6,182,212,.18), 0 0 32px rgba(6,182,212,.55), 0 0 64px rgba(6,182,212,.25);
-  background:transparent; transition:all .28s cubic-bezier(.4,0,.2,1); opacity:0;
-}
-.tour-spotlight.active{opacity:1; animation:tourSpotlightPulse 2s ease-in-out infinite}
-@keyframes tourSpotlightPulse{
-  0%,100%{box-shadow:0 0 0 4px rgba(6,182,212,.18), 0 0 32px rgba(6,182,212,.55), 0 0 64px rgba(6,182,212,.25)}
-  50%{box-shadow:0 0 0 6px rgba(6,182,212,.28), 0 0 48px rgba(6,182,212,.70), 0 0 96px rgba(6,182,212,.35)}
-}
-html.theme-light .tour-spotlight{border-color:var(--accent,#2B7FFF); box-shadow:0 0 0 4px rgba(43,127,255,.18), 0 0 32px rgba(43,127,255,.50), 0 0 64px rgba(43,127,255,.20)}
+  <!-- ── Footer ───────────────────────────────────────── -->
+  <footer class="page-footer">
+    <div class="footer-rule"></div>
+    <div class="footer-brand">
+      <div class="footer-mark">
+        <svg width="18" height="14" viewBox="479 340 646 499" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="aims-grad-footer" gradientUnits="userSpaceOnUse" x1="998.9767" y1="471.5211" x2="729.8956" y2="931.9746">
+              <stop offset="0" stop-color="#09E2AB"/>
+              <stop offset="1" stop-color="#1B72FF"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#aims-grad-footer)" d="M1120.01,802.69L880.38,387.64c-16.78-29.06-46.83-46.41-80.38-46.41c-33.55,0-63.6,17.35-80.38,46.41L479.99,802.69c-4.22,7.31-4.22,16.32,0,23.64c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82l99.34-172.07l78.87,136.61h-41.78c-7.86-12.37-21.64-20.62-37.35-20.62c-24.4,0-44.25,19.85-44.25,44.25s19.85,44.25,44.25,44.25c15.71,0,29.49-8.25,37.35-20.62h82.72c8.45,0,16.25-4.51,20.47-11.82c4.22-7.31,4.22-16.32,0-23.64L760.56,595.17c-4.22-7.31-12.03-11.82-20.47-11.82c-8.45,0-16.25,4.51-20.47,11.82l-112.99,195.7h-65.22l219.16-379.59c8.23-14.26,22.97-22.77,39.43-22.77c16.46,0,31.2,8.51,39.43,22.77l219.16,379.59h-65.22l-154.21-267.1c3.24-6.15,5.09-13.13,5.09-20.55c0-24.4-19.85-44.25-44.25-44.25s-44.25,19.85-44.25,44.25c0,23.79,18.89,43.21,42.46,44.16l161.05,278.94c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82C1124.23,819.02,1124.23,810.01,1120.01,802.69z"/>
+        </svg>
+      </div>
+      <span class="footer-text"><span class="logo-aims">AIMS</span><span class="logo-os">OS</span></span>
+    </div>
+    <div class="footer-rule"></div>
+  </footer>
 
-/* Popover */
-.tour-popover{
-  position:fixed; z-index:160; width:360px; max-width:calc(100vw - 32px);
-  background:linear-gradient(180deg, rgba(20,28,48,.98) 0%, rgba(13,19,35,.98) 100%);
-  border:1px solid var(--line-strong,rgba(255,255,255,.14)); border-radius:var(--r12,12px); backdrop-filter:blur(24px) saturate(1.8);
-  box-shadow:0 16px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04); padding:18px 20px;
-  opacity:0; transform:scale(.96) translateY(4px); pointer-events:none;
-  transition:opacity .2s ease-out, transform .25s cubic-bezier(.34,1.56,.64,1);
-}
-.tour-popover.active{opacity:1; transform:scale(1) translateY(0); pointer-events:auto}
-html.theme-light .tour-popover{background:linear-gradient(180deg,#FFF 0%,#FAFBFC 100%); box-shadow:0 16px 48px rgba(15,23,42,.18), 0 0 0 1px rgba(15,23,42,.04)}
-/* Responsive: dock as a bottom sheet on narrow screens */
-.tour-popover.is-sheet{left:8px !important; right:8px; top:auto !important; bottom:8px; width:auto; max-width:none}
-.tour-popover-header{display:flex; align-items:center; gap:8px; margin-bottom:8px}
-.tour-popover-step{font-size:10.5px; font-weight:700; letter-spacing:.10em; text-transform:uppercase; color:var(--cyan,#06B6D4); padding:2px 8px; border-radius:10px; background:rgba(6,182,212,.10); border:1px solid rgba(6,182,212,.25)}
-.tour-popover-restart{background:transparent; border:none; cursor:pointer; color:var(--t3,rgba(255,255,255,.38)); font-size:11px; padding:4px 6px; border-radius:5px; font-family:inherit}
-.tour-popover-restart:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
-.tour-popover-skip{margin-left:auto; background:transparent; border:none; cursor:pointer; color:var(--t3,rgba(255,255,255,.38)); font-size:11px; padding:4px 8px; border-radius:5px; font-family:inherit}
-.tour-popover-skip:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
-.tour-popover-title{font-size:16px; font-weight:700; color:var(--t1,rgba(255,255,255,.92)); line-height:1.3; margin-bottom:8px}
-.tour-popover-body{font-size:13px; line-height:1.6; color:var(--t2,rgba(255,255,255,.60)); margin-bottom:16px}
-.tour-popover-body strong,.tour-popover-body b{color:var(--t1,rgba(255,255,255,.92)); font-weight:600}
-.tour-popover-body code{font-family:'SF Mono',Menlo,monospace; font-size:12px; background:rgba(6,182,212,.10); color:var(--cyan,#06B6D4); padding:1.5px 5px; border-radius:4px}
-.tour-popover-footer{display:flex; align-items:center; gap:10px; padding-top:12px; border-top:1px solid var(--line,rgba(255,255,255,.10))}
-.tour-progress{display:inline-flex; gap:4px; flex:1}
-.tour-progress-dot{width:6px; height:6px; border-radius:50%; background:var(--hover-strong,rgba(255,255,255,.08)); transition:background .15s, transform .15s}
-.tour-progress-dot.current{background:var(--cyan,#06B6D4); transform:scale(1.4)}
-.tour-progress-dot.done{background:rgba(6,182,212,.45)}
-.tour-btn{padding:7px 14px; font-size:12.5px; font-weight:600; border-radius:var(--r6,6px); cursor:pointer; border:none; font-family:inherit; transition:.14s}
-.tour-btn-prev{background:transparent; color:var(--t2,rgba(255,255,255,.60)); border:1px solid var(--line,rgba(255,255,255,.10))}
-.tour-btn-prev:hover{background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,rgba(255,255,255,.92))}
-.tour-btn-next{background:linear-gradient(135deg,#06B6D4 0%,#155DFC 100%); color:#fff; box-shadow:0 2px 8px rgba(6,182,212,.30)}
-.tour-btn-next:hover{transform:translateY(-1px)}
-
-/* Visually-hidden live region (screen-reader step announcements) */
-.tour-sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
-
-/* Accessibility: honor reduced-motion */
-@media (prefers-reduced-motion: reduce){
-  .tour-spotlight, .tour-spotlight.active{animation:none; transition:none}
-  .tour-popover{transition:none; transform:none}
-  .tour-trigger-pulse{display:none}
-}
-</style>
-
-
-
-<button class="tour-trigger" id="tourTrigger" onclick="startTour()" aria-label="Start product demo">
-  <span class="tour-trigger-pulse"></span>
-  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2l11 6-11 6V2z" fill="currentColor"/></svg>
-  <span class="tour-trigger-label">Demo</span>
-</button>
-<div class="tour-mask" id="tourMaskT"></div>
-<div class="tour-mask" id="tourMaskR"></div>
-<div class="tour-mask" id="tourMaskB"></div>
-<div class="tour-mask" id="tourMaskL"></div>
-<div class="tour-spotlight" id="tourSpotlight"></div>
-<div class="tour-popover" id="tourPopover" role="dialog" aria-modal="true" aria-labelledby="tourTitle"></div>
-<div class="tour-sr-only" id="tourLive" aria-live="polite" aria-atomic="true"></div>
-
-
+  <!-- ── Toast ─────────────────────────────────────────── -->
+  <div class="toast" id="toast">
+    <span class="toast-pip"></span>
+    <span id="toastMsg">Navigating…</span>
+    <span class="toast-arrow">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M2.5 6h7M7 3.5L9.5 6 7 8.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </div>
 
 <script>
-/* --- Author these for THIS surface. target = real selector; route = real hash. --- */
-const TOUR_STEPS = [
-  { title:'AIMS-OS Prototype Hub', body:'Three cross-functional surfaces from the engineering model. About 30 seconds — use <strong>&larr; &rarr;</strong> or the buttons.' },
-  { title:'Admin Studio · Integrations', body:'Global activation and authentication — the control plane for credentials, access and audit.', target:'.grid > a:nth-child(1)', scrollToTarget:true },
-  { title:'Data Studio', body:'Where data actually flows — field mapping, tables, schema versions. Cross-functional with Admin Studio.', target:'.grid > a:nth-child(2)', scrollToTarget:true },
-  { title:'Agent Studio · Tools', body:'What agents can actually do — tools and wrappers per integration.', target:'.grid > a:nth-child(3)', scrollToTarget:true },
-  { title:'Pick a surface', body:'Open any card to explore its prototype. Press <strong>Esc</strong> to exit the tour.' }
+// ─── Selected destinations ────────────────────────────────────────────────────
+
+function selectStudio(tenantId, studioKey) {
+  closeAll();
+  go(tenantId, studioKey);
+}
+
+function mainBtnClick(tenantId, e) {
+  go(tenantId, 'home');
+}
+
+// ─── Studio registry ─────────────────────────────────────────────────────────
+
+const STUDIOS = {
+  data: {
+    key: 'data',
+    label: 'Data Studio',
+    short: 'Data',
+    hint: 'Models, schemas & pipelines',
+    color: '#10B981',
+    bg: 'rgba(16,185,129,.11)',
+    border: 'rgba(16,185,129,.24)',
+    chipIcon: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="3" width="12" height="10" rx="1.2" stroke="#10B981" stroke-width="1.3"/>
+      <path d="M2 6.5h12M5.5 3v10" stroke="#10B981" stroke-width="1.1" stroke-linecap="round"/>
+    </svg>`,
+    ddIcon: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="3" width="12" height="10" rx="1.2" stroke="#10B981" stroke-width="1.3"/>
+      <path d="M2 6.5h12M5.5 3v10" stroke="#10B981" stroke-width="1.1" stroke-linecap="round"/>
+    </svg>`,
+  },
+  agentic: {
+    key: 'agentic',
+    label: 'Agentic Studio',
+    short: 'Agentic',
+    hint: 'Agent networks & workflows',
+    color: '#3B82F6',
+    bg: 'rgba(59,130,246,.11)',
+    border: 'rgba(59,130,246,.24)',
+    chipIcon: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="5" r="2.5" stroke="#3B82F6" stroke-width="1.3"/>
+      <path d="M3.5 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="#3B82F6" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>`,
+    ddIcon: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="5" r="2.5" stroke="#3B82F6" stroke-width="1.3"/>
+      <path d="M3.5 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="#3B82F6" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>`,
+  },
+  governance: {
+    key: 'governance',
+    label: 'Governance Studio',
+    short: 'Governance',
+    hint: 'Policies & compliance',
+    color: '#A78BFA',
+    bg: 'rgba(167,139,250,.11)',
+    border: 'rgba(167,139,250,.24)',
+    chipIcon: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2L3 4.5v4C3 11.5 5.2 13.8 8 14c2.8-.2 5-2.5 5-5.5v-4L8 2z" stroke="#A78BFA" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M5.5 8l1.8 1.8 3-3" stroke="#A78BFA" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+    ddIcon: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2L3 4.5v4C3 11.5 5.2 13.8 8 14c2.8-.2 5-2.5 5-5.5v-4L8 2z" stroke="#A78BFA" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M5.5 8l1.8 1.8 3-3" stroke="#A78BFA" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+  },
+  ws: {
+    key: 'ws',
+    label: 'Work Surfaces',
+    short: 'Work Surfaces',
+    hint: 'Workspace & operations',
+    color: '#F59E0B',
+    bg: 'rgba(245,158,11,.11)',
+    border: 'rgba(245,158,11,.24)',
+    chipIcon: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="2" width="5" height="5" rx="1" stroke="#F59E0B" stroke-width="1.3"/>
+      <rect x="9" y="2" width="5" height="5" rx="1" stroke="#F59E0B" stroke-width="1.3"/>
+      <rect x="2" y="9" width="5" height="5" rx="1" stroke="#F59E0B" stroke-width="1.3"/>
+      <rect x="9" y="9" width="5" height="5" rx="1" stroke="#F59E0B" stroke-width="1.3"/>
+    </svg>`,
+    ddIcon: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="2" width="5" height="5" rx="1" stroke="#F59E0B" stroke-width="1.3"/>
+      <rect x="9" y="2" width="5" height="5" rx="1" stroke="#F59E0B" stroke-width="1.3"/>
+      <rect x="2" y="9" width="5" height="5" rx="1" stroke="#F59E0B" stroke-width="1.3"/>
+      <rect x="9" y="9" width="5" height="5" rx="1" stroke="#F59E0B" stroke-width="1.3"/>
+    </svg>`,
+  },
+};
+
+// ─── Role registry ────────────────────────────────────────────────────────────
+
+const ROLES = {
+  'platform-admin': { label: 'Platform Admin', cls: 'badge-platform-admin' },
+  'org-admin':      { label: 'Org Admin',       cls: 'badge-org-admin'      },
+  'member':         { label: 'Member',           cls: 'badge-member'         },
+  'viewer':         { label: 'Viewer',           cls: 'badge-viewer'         },
+};
+
+// ─── Tenant fixtures ──────────────────────────────────────────────────────────
+
+const TENANTS = [
+  {
+    id: 'avance',
+    name: 'Avance Financial',
+    industry: 'FinTech',
+    description: 'Financial operations intelligence across 12 business units. Automated compliance monitoring, real-time risk assessment, and GL reconciliation agents.',
+    role: 'platform-admin',
+    studios: ['data', 'agentic', 'governance', 'ws'],
+    lastVisited: '2h ago',
+    recent: true,
+    color: '#2B7FFF',
+    initials: 'AF',
+  },
+  {
+    id: 'demo',
+    name: 'Demo Sandbox',
+    industry: 'Sandbox',
+    description: 'Internal test environment with synthetic data. Use for prototyping agent configurations, testing integrations, and simulating role-based access scenarios.',
+    role: 'platform-admin',
+    studios: ['data', 'agentic', 'governance', 'ws'],
+    lastVisited: 'Earlier today',
+    recent: true,
+    color: '#06B6D4',
+    initials: 'DS',
+  },
+  {
+    id: 'meridian',
+    name: 'Meridian Health',
+    industry: 'Healthcare',
+    description: 'Clinical workflow automation for a 3-hospital network. HIPAA-compliant agent routing, patient data orchestration, and automated audit trails.',
+    role: 'member',
+    studios: ['data', 'agentic'],
+    lastVisited: '3 days ago',
+    recent: false,
+    color: '#10B981',
+    initials: 'MH',
+  },
+  {
+    id: 'solis',
+    name: 'Solis Retail Group',
+    industry: 'Retail',
+    description: 'Omnichannel inventory and demand planning across 240 SKUs. Supply chain intelligence with ERP and POS integrations across 14 store locations.',
+    role: 'org-admin',
+    studios: ['ws', 'data', 'agentic'],
+    lastVisited: '1 week ago',
+    recent: false,
+    color: '#F59E0B',
+    initials: 'SR',
+  },
+  {
+    id: 'northbridge',
+    name: 'NorthBridge Capital',
+    industry: 'Wealth Mgmt',
+    description: 'Portfolio analytics and client reporting pipeline across 3 fund structures. Read-only access for compliance audit and data lineage review.',
+    role: 'viewer',
+    studios: ['data'],
+    lastVisited: '2 weeks ago',
+    recent: false,
+    color: '#8B5CF6',
+    initials: 'NC',
+  },
+  {
+    id: 'vertex',
+    name: 'Vertex Logistics',
+    industry: 'Logistics',
+    description: 'Fleet routing optimization and warehouse automation across 6 distribution centers. Real-time shipment tracking and carrier reconciliation agents.',
+    role: 'member',
+    studios: ['agentic', 'ws'],
+    lastVisited: '3 weeks ago',
+    recent: false,
+    color: '#0EA5E9',
+    initials: 'VL',
+  },
+  {
+    id: 'cascade',
+    name: 'Cascade Analytics',
+    industry: 'Analytics',
+    description: 'Self-serve data platform for 8 internal business units. Semantic layer governance, metric definitions, and automated data quality monitoring.',
+    role: 'org-admin',
+    studios: ['data', 'governance'],
+    lastVisited: '1 month ago',
+    recent: false,
+    color: '#EC4899',
+    initials: 'CA',
+  },
+  {
+    id: 'ironclad',
+    name: 'Ironclad Legal',
+    industry: 'LegalTech',
+    description: 'Contract lifecycle automation across 4 practice groups. AI-assisted clause extraction, obligation tracking, and renewal alert agents.',
+    role: 'viewer',
+    studios: ['data', 'agentic'],
+    lastVisited: '6 weeks ago',
+    recent: false,
+    color: '#D97706',
+    initials: 'IL',
+  },
 ];
 
-const TOUR_LS_STEP = 'aims-tour-step';   // resume pointer
-const TOUR_LS_DONE = 'aims-tour-seen';   // completed once
-let tourState = { active:false, stepIndex:0 };
+// ─── Build helpers ────────────────────────────────────────────────────────────
+
+function studioList(keys) {
+  return keys.map(k => {
+    const s = STUDIOS[k];
+    return `<div class="studio-row">
+      <span class="studio-ico">${s.chipIcon}</span>
+      <span class="studio-name">${s.label}</span>
+    </div>`;
+  }).join('');
+}
+
+function dropdownItems(tenantId, keys) {
+  const homeRow = `
+    <div class="dd-item" onclick="selectStudio('${tenantId}','home')">
+      <div class="dd-icon" style="background:rgba(255,255,255,.06)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M2 7l6-5 6 5v7a1 1 0 01-1 1H3a1 1 0 01-1-1V7z" stroke="#64748b" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M6 14V9h4v5" stroke="#64748b" stroke-width="1.3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="dd-text">
+        <div class="dd-name">Home</div>
+        <div class="dd-hint">Your work inbox</div>
+      </div>
+    </div>`;
+
+  const studioRows = keys.map(k => {
+    const s = STUDIOS[k];
+    return `
+      <div class="dd-item" onclick="selectStudio('${tenantId}','${k}')">
+        <div class="dd-icon" style="background:${s.bg}">${s.ddIcon}</div>
+        <div class="dd-text">
+          <div class="dd-name">${s.label}</div>
+          <div class="dd-hint">${s.hint}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="dd-label">Go directly to</div>
+    ${homeRow}
+    <div class="dd-sep"></div>
+    ${studioRows}
+  `;
+}
+
+function buildCard(tenant, idx, featured = false) {
+  const role = ROLES[tenant.role];
+
+  const ctaText = tenant.studios.length === 1
+    ? `Go to ${STUDIOS[tenant.studios[0]].short}`
+    : 'Enter workspace';
+
+  const sizeClass = featured ? 'card-hero' : 'card-compact';
+
+  const activeIndicator = featured ? `
+    <div class="active-badge">
+      <span class="active-pulse"></span>
+      Active workspace
+    </div>
+    <div class="hero-last-visit">Last visited ${tenant.lastVisited}</div>` : '';
+
+  const lastVisitRow = featured ? '' : `<span class="last-visit">Last visited ${tenant.lastVisited}</span>`;
+
+  return `
+    <div class="card ${sizeClass}" style="animation-delay:${idx * 45}ms" tabindex="0" role="button">
+      <!-- avatar -->
+      <div class="tenant-av" style="background:${tenant.color}18;border:1px solid ${tenant.color}30;color:${tenant.color}">
+        ${tenant.initials}
+      </div>
+
+      <!-- identity -->
+      <div class="card-identity">
+        <div class="card-name">${tenant.name}</div>
+        <div class="badge-row">
+          <span class="badge badge-industry">${tenant.industry}</span>
+          <span class="badge ${role.cls}">${role.label}</span>
+        </div>
+        ${activeIndicator}
+      </div>
+
+      <div class="card-divider"></div>
+
+      <!-- studios -->
+      <div class="studios-list">${studioList(tenant.studios)}</div>
+
+      <!-- actions -->
+      <div class="card-actions">
+        ${lastVisitRow}
+        <div class="split-btn" id="sb-${tenant.id}">
+          <button class="btn-main" id="bm-${tenant.id}" onclick="mainBtnClick('${tenant.id}', event)">${ctaText}</button>
+          <div class="btn-sep"></div>
+          <button
+            class="btn-drop"
+            id="bd-${tenant.id}"
+            onclick="toggleDd('${tenant.id}',event)"
+            aria-label="Choose which studio to open"
+            aria-expanded="false"
+          >
+            <span class="btn-drop-ico">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M2 3.5L5 6.5L8 3.5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+          <div class="studio-dd" id="dd-${tenant.id}">
+            ${dropdownItems(tenant.id, tenant.studios)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─── Load more ────────────────────────────────────────────────────────────────
+
+const COMPACT_LIMIT = 5;
+const LOAD_MORE_BATCH = 3;
+let _visibleCount = COMPACT_LIMIT;
+let _currentList = [];
+
+function loadMore() {
+  _visibleCount += LOAD_MORE_BATCH;
+  renderCompactList();
+}
+
+function renderCompactList() {
+  const rest = _currentList.slice(1);
+  const visible = rest.slice(0, _visibleCount);
+  const hidden  = rest.length - visible.length;
+
+  let html = visible.map((t, i) => buildCard(t, i + 1, false)).join('');
+
+  if (hidden > 0) {
+    html += `
+      <div class="load-more-wrap">
+        <div class="load-more-rule"></div>
+        <button class="load-more-btn" onclick="loadMore()">
+          Show more
+          <span class="load-more-count">${hidden}</span>
+        </button>
+        <div class="load-more-rule"></div>
+      </div>`;
+  }
+
+  const container = document.getElementById('compact-list');
+  if (container) container.innerHTML = html;
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+
+function render(list, searching = false) {
+  const gridEl = document.getElementById('grid');
+  gridEl.className = 'grid';
+  _currentList = list;
+
+  if (list.length === 0) {
+    gridEl.innerHTML = `
+      <div class="empty">
+        <div class="empty-ico">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="empty-title">No workspaces found</div>
+        <div class="empty-hint">Try a different search term</div>
+      </div>`;
+  } else if (!searching) {
+    const hero = list[0];
+    const rest  = list.slice(1);
+    let html = `
+      <div class="section-label-hero">Pick up where you left off</div>
+      ${buildCard(hero, 0, true)}
+    `;
+    if (rest.length > 0) {
+      html += `<div class="section-label-other">Other workspaces</div>`;
+      html += `<div id="compact-list"></div>`;
+    }
+    gridEl.innerHTML = html;
+    renderCompactList();
+  } else {
+    gridEl.innerHTML = list.map((t, i) => buildCard(t, i, false)).join('');
+  }
+
+  const n = list.length;
+  document.getElementById('countPill').textContent = `${n} workspace${n !== 1 ? 's' : ''}`;
+  const countEl = document.getElementById('tenantCount');
+  if (countEl) countEl.textContent = TENANTS.length;
+}
+
+// ─── Sort ─────────────────────────────────────────────────────────────────────
+
+const SORT_CYCLES = ['recent', 'alpha', 'role'];
+const SORT_LABELS = { recent: 'Last visited', alpha: 'A–Z', role: 'Role' };
+const ROLE_ORDER  = ['platform-admin', 'org-admin', 'member', 'viewer'];
+let sortIdx = 0;
+
+function applySort(list) {
+  const order = SORT_CYCLES[sortIdx];
+  if (order === 'alpha')  return [...list].sort((a, b) => a.name.localeCompare(b.name));
+  if (order === 'role')   return [...list].sort((a, b) => ROLE_ORDER.indexOf(a.role) - ROLE_ORDER.indexOf(b.role));
+  return list; // 'recent' = original fixture order
+}
+
+function cycleSortOrder() {
+  sortIdx = (sortIdx + 1) % SORT_CYCLES.length;
+  document.getElementById('sortLabel').textContent = SORT_LABELS[SORT_CYCLES[sortIdx]];
+  triggerRender();
+}
+
+// ─── Search ───────────────────────────────────────────────────────────────────
+
+function triggerRender() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const filtered = q
+    ? TENANTS.filter(t =>
+        t.name.toLowerCase().includes(q) ||
+        t.industry.toLowerCase().includes(q) ||
+        ROLES[t.role].label.toLowerCase().includes(q)
+      )
+    : TENANTS;
+  closeAll();
+  _visibleCount = COMPACT_LIMIT;
+  render(applySort(filtered), !!q);
+}
+
+document.getElementById('searchInput').addEventListener('input', () => triggerRender());
+
+// ─── Dropdown ─────────────────────────────────────────────────────────────────
+
+let activeDd = null;
+
+function toggleDd(id, e) {
+  e.stopPropagation();
+  const dd      = document.getElementById(`dd-${id}`);
+  const btn     = document.getElementById(`bd-${id}`);
+  const isOpen  = dd.classList.contains('is-open');
+
+  closeAll();
+
+  if (!isOpen) {
+    dd.classList.add('is-open');
+    btn.classList.add('is-open');
+    btn.setAttribute('aria-expanded', 'true');
+    activeDd = id;
+  }
+}
+
+function closeAll() {
+  if (activeDd) {
+    document.getElementById(`dd-${activeDd}`)?.classList.remove('is-open');
+    const btn = document.getElementById(`bd-${activeDd}`);
+    btn?.classList.remove('is-open');
+    btn?.setAttribute('aria-expanded', 'false');
+    activeDd = null;
+  }
+}
+
+document.addEventListener('click', closeAll);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+// ─── Navigation (simulated) ───────────────────────────────────────────────────
+
+const STUDIO_URLS = {
+  home:       'admin-console.html',
+  data:       'data-studio-models.html',
+  agentic:    'agentic-studio.html',
+  governance: 'governance-studio.html',
+  ws:         'admin-console.html',
+};
+
+function go(tenantId, destination) {
+  closeAll();
+  const tenant = TENANTS.find(t => t.id === tenantId);
+  const dest   = destination ?? 'home';
+  const url    = STUDIO_URLS[dest] ?? 'admin-console.html';
+  const label  = dest === 'home' ? tenant.name : STUDIOS[dest].label;
+  toast(`Entering ${label}…`);
+  setTimeout(() => { window.location.href = url; }, 900);
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+
+let _toastTimer;
+function toast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
+  const el = document.getElementById('toast');
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ─── Dynamic greeting ─────────────────────────────────────────────────────────
+
+(function() {
+  const h = new Date().getHours();
+  const prefix = h < 12 ? 'Good morning, ' : h < 17 ? 'Good afternoon, ' : 'Good evening, ';
+  const el = document.getElementById('greetPrefix');
+  if (el) el.textContent = prefix;
+})();
+
+// ─── ⌘K / Ctrl+K → focus search ──────────────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    const inp = document.getElementById('searchInput');
+    if (inp) { inp.focus(); inp.select(); }
+  }
+});
+
+// ─── Single-tenant auto-redirect ─────────────────────────────────────────────
+
+let _redirectTimer = null;
+
+function startSingleTenantRedirect(tenant) {
+  const grid = document.getElementById('grid');
+  const banner = document.createElement('div');
+  banner.className = 'redirect-banner';
+  banner.id = 'redirectBanner';
+  banner.innerHTML = `
+    <div class="redirect-banner-row">
+      <div class="redirect-banner-text">
+        You only have one workspace. Redirecting to <strong>${tenant.name}</strong>…
+      </div>
+      <button class="redirect-cancel" onclick="cancelRedirect()">Cancel</button>
+    </div>
+    <div class="redirect-progress"><div class="redirect-progress-bar" id="redirectBar"></div></div>`;
+  grid.insertAdjacentElement('beforebegin', banner);
+  _redirectTimer = setTimeout(() => go(tenant.id, 'home'), 2400);
+}
+
+function cancelRedirect() {
+  clearTimeout(_redirectTimer);
+  const banner = document.getElementById('redirectBanner');
+  if (banner) banner.remove();
+}
+
+// ─── User menu ────────────────────────────────────────────────────────────────
+
+let _userMenuOpen = false;
+
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  _userMenuOpen ? closeUserMenu() : openUserMenu();
+}
+
+function openUserMenu() {
+  _userMenuOpen = true;
+  document.getElementById('userMenu').classList.add('is-open');
+  document.getElementById('userPill').classList.add('is-open');
+  document.getElementById('userPill').setAttribute('aria-expanded', 'true');
+  closeAll();
+}
+
+function closeUserMenu() {
+  _userMenuOpen = false;
+  document.getElementById('userMenu').classList.remove('is-open');
+  document.getElementById('userPill').classList.remove('is-open');
+  document.getElementById('userPill').setAttribute('aria-expanded', 'false');
+}
+
+document.addEventListener('click', e => {
+  if (_userMenuOpen && !document.getElementById('userMenu').contains(e.target)) {
+    closeUserMenu();
+  }
+});
+
+document.getElementById('userPill').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleUserMenu(e); }
+  if (e.key === 'Escape') closeUserMenu();
+});
+
+// ─── Loading skeleton ──────────────────────────────────────────────────────────
+
+function skeletonCard(hero = false) {
+  return `
+    <div class="skeleton-card" style="padding:${hero ? '20px 24px' : '15px 20px'}">
+      <div class="sk-av skeleton-base"></div>
+      <div class="sk-col">
+        <div class="sk-line w-40 skeleton-base"></div>
+        <div class="sk-line w-25 skeleton-base"></div>
+        ${hero ? '<div class="sk-line w-60 skeleton-base" style="margin-top:6px"></div>' : ''}
+      </div>
+      <div class="sk-btn skeleton-base" style="margin-left:auto"></div>
+    </div>`;
+}
+
+function showSkeleton() {
+  const gridEl = document.getElementById('grid');
+  gridEl.innerHTML = `
+    <div class="section-label-hero" style="opacity:.4">Pick up where you left off</div>
+    ${skeletonCard(true)}
+    <div class="section-label-other" style="opacity:.4;margin-top:16px">Other workspaces</div>
+    ${skeletonCard()}${skeletonCard()}${skeletonCard()}`;
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+
+showSkeleton();
+setTimeout(() => {
+  render(TENANTS, false);
+  if (TENANTS.length === 1) startSingleTenantRedirect(TENANTS[0]);
+}, 2000);
+
+// ─── Sign out ──────────────────────────────────────────────────────────────────
+
+function signOut() {
+  closeUserMenu();
+  window.location.href = 'login.html';
+}
+
+// ─── Selector tour steps ──────────────────────────────────────────────────────
+
+const TOUR_LS_STEP = 'aims-tour-selector-step';
+const TOUR_LS_DONE = 'aims-tour-selector-seen';
+let tourState = { active: false, stepIndex: 0 };
 let _tourLastFocus = null;
+
+const TOUR_STEPS = [
+  {
+    title: 'Your Workspace Selector',
+    body: 'Every organization you belong to lives here. This tour covers <strong>search, sorting, studios, and sign-out</strong>. Use <strong>← →</strong> or the buttons to navigate.',
+  },
+  {
+    title: 'Search organizations',
+    body: 'Type a name, industry, or role to instantly filter across all your workspaces. Press <strong>⌘K</strong> from anywhere on this page to jump to the search bar.',
+    target: '#searchInput',
+    scrollToTarget: false,
+  },
+  {
+    title: 'Sort order',
+    body: 'Cycle through <strong>Last visited → A–Z → Role</strong>. The sort resets when you search, so you always see the most relevant result first.',
+    target: '#sortBtn',
+    scrollToTarget: false,
+  },
+  {
+    title: 'Your active workspace',
+    body: 'The <strong>hero card</strong> at the top is your most recently visited workspace. The green pulse confirms it\'s your active session — pick up exactly where you left off.',
+    target: '.card-hero',
+    scrollToTarget: false,
+    setup: () => { closeAll(); closeUserMenu(); },
+  },
+  {
+    title: 'Active workspace badge',
+    body: 'This badge and timestamp live <strong>inside the identity block</strong>, not in the action footer. That keeps last-visit visible even before you decide where to go.',
+    target: '.active-badge',
+    scrollToTarget: false,
+  },
+  {
+    title: 'Go directly to a Studio',
+    body: 'The split button has two parts: <strong>Enter workspace</strong> (home inbox) and the <strong>chevron dropdown</strong> to jump straight to Data, Agentic, Governance, or Work Surfaces.',
+    target: '#sb-avance',
+    scrollToTarget: false,
+    setup: () => {
+      closeAll();
+      const dd = document.getElementById('dd-avance');
+      const btn = document.getElementById('bd-avance');
+      if (dd) dd.classList.add('is-open');
+      if (btn) { btn.classList.add('is-open'); btn.setAttribute('aria-expanded','true'); }
+      activeDd = 'avance';
+    },
+  },
+  {
+    title: 'Load more workspaces',
+    body: 'Workspaces beyond the first 5 are collapsed to keep the page scannable. Click <strong>Show more</strong> to reveal them — the count badge shows exactly how many are hidden.',
+    target: '.load-more-btn',
+    scrollToTarget: true,
+    setup: () => {
+      closeAll(); closeUserMenu();
+      _visibleCount = COMPACT_LIMIT;
+      render(TENANTS, false);
+    },
+  },
+  {
+    title: 'Account menu',
+    body: 'Your user pill in the top-right opens a <strong>dropdown with account settings</strong>, activity log, and sign-out. Click the chevron to expand it.',
+    target: '#userPill',
+    scrollToTarget: false,
+    setup: () => { closeAll(); closeUserMenu(); },
+  },
+  {
+    title: 'Sign out',
+    body: 'Click <strong>Sign out</strong> to securely end your session. AIMS-OS invalidates your token server-side — you\'ll be redirected back to the sign-in screen.',
+    target: '#signOutBtn',
+    scrollToTarget: false,
+    setup: () => { closeAll(); openUserMenu(); },
+  },
+];
+
+// ─── Tour engine ──────────────────────────────────────────────────────────────
 
 function _tourSave(){ try{ localStorage.setItem(TOUR_LS_STEP, String(tourState.stepIndex)); }catch(e){} }
 function _tourClearProgress(){ try{ localStorage.removeItem(TOUR_LS_STEP); localStorage.setItem(TOUR_LS_DONE,'1'); }catch(e){} }
 
-function startTour(){                 // resume where left off, else step 1
-  let i = 0;
-  try{ const s = localStorage.getItem(TOUR_LS_STEP); if (s!=null && +s>0 && +s<TOUR_STEPS.length) i = +s; }catch(e){}
+function startTour(){
+  let i=0;
+  try{ const s=localStorage.getItem(TOUR_LS_STEP); if(s!=null && +s>0 && +s<TOUR_STEPS.length) i=+s; }catch(e){}
   startTourAt(i);
 }
 function restartTour(){ startTourAt(0); }
 function startTourAt(i){
-  tourState = { active:true, stepIndex: Math.max(0, Math.min(i|0, TOUR_STEPS.length-1)) };
-  _tourLastFocus = document.activeElement;
-  const t = document.getElementById('tourTrigger'); if (t) t.classList.add('tour-active');
+  tourState={ active:true, stepIndex:Math.max(0,Math.min(i|0,TOUR_STEPS.length-1)) };
+  _tourLastFocus=document.activeElement;
+  const t=document.getElementById('tourTrigger'); if(t) t.classList.add('tour-active');
   paintTourStep();
 }
 function endTour(finished){
-  tourState.active = false;
-  const t = document.getElementById('tourTrigger'); if (t){ t.classList.remove('tour-active'); t.classList.add('seen'); }
+  tourState.active=false;
+  const t=document.getElementById('tourTrigger');
+  if(t){ t.classList.remove('tour-active'); t.classList.add('seen'); }
   ['tourMaskT','tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.remove('active'); });
   const sp=document.getElementById('tourSpotlight'); if(sp) sp.classList.remove('active');
   const po=document.getElementById('tourPopover'); if(po) po.classList.remove('active');
   finished ? _tourClearProgress() : _tourSave();
-  const sw=document.getElementById('studioSwitcher'); if(sw){ sw.classList.remove('open'); sw.setAttribute('aria-hidden','true'); }
+  closeAll(); closeUserMenu();
   _tourRefreshTriggerLabel();
-  if (_tourLastFocus && _tourLastFocus.focus){ try{ _tourLastFocus.focus(); }catch(e){} }
+  if(_tourLastFocus && _tourLastFocus.focus){ try{ _tourLastFocus.focus(); }catch(e){} }
 }
-function tourNext(){ if (tourState.stepIndex>=TOUR_STEPS.length-1){ endTour(true); return; } tourState.stepIndex++; _tourSave(); paintTourStep(); }
-function tourPrev(){ if (tourState.stepIndex<=0) return; tourState.stepIndex--; _tourSave(); paintTourStep(); }
+function tourNext(){ if(tourState.stepIndex>=TOUR_STEPS.length-1){ endTour(true); return; } tourState.stepIndex++; _tourSave(); paintTourStep(); }
+function tourPrev(){ if(tourState.stepIndex<=0) return; tourState.stepIndex--; _tourSave(); paintTourStep(); }
 
 function paintTourStep(){
-  if (!tourState.active) return;
-  const step = TOUR_STEPS[tourState.stepIndex];
-  const isFirst = tourState.stepIndex===0, isLast = tourState.stepIndex===TOUR_STEPS.length-1;
-
-  /* --- Orchestration hooks (all guarded — drop the ones this surface lacks) --- */
-  if (step.mode && typeof state==='object' && state.mode!==step.mode){
-    state.mode=step.mode; try{ localStorage.setItem('aims_mode',step.mode); }catch(e){}
-    document.documentElement.classList.toggle('mode-operate', step.mode==='operate');
-    if (typeof paintModeToggle==='function') paintModeToggle();
-  }
-  if (step.persona && typeof state==='object' && state.persona!==step.persona){
-    state.persona=step.persona; try{ localStorage.setItem('aims_persona',step.persona); }catch(e){}
-    if (typeof paintPersonaPill==='function') paintPersonaPill();
-  }
-  const sw=document.getElementById('studioSwitcher');
-  if (sw){ if (step.openSwitcher){ sw.classList.add('open'); sw.setAttribute('aria-hidden','false'); }
-           else if (sw.classList.contains('open')){ sw.classList.remove('open'); sw.setAttribute('aria-hidden','true'); } }
-  if (step.route && location.hash!==step.route){ location.hash=step.route; }
-  else if (step.route && step.mode && typeof route==='function'){ route(); }
-  if (step.detailTab && typeof setDetailTab==='function'){
-    setTimeout(()=>{ const slug=location.hash.split('/')[2]; if (slug) setDetailTab(slug, step.detailTab); }, 100);
-  }
-
+  if(!tourState.active) return;
+  const step=TOUR_STEPS[tourState.stepIndex];
+  const isFirst=tourState.stepIndex===0, isLast=tourState.stepIndex===TOUR_STEPS.length-1;
+  if(typeof step.setup==='function'){ try{ step.setup(); }catch(e){} }
   setTimeout(()=>{
     const popover=document.getElementById('tourPopover'), spotlight=document.getElementById('tourSpotlight');
-    popover.innerHTML = `
+    popover.innerHTML=`
       <div class="tour-popover-header">
         <span class="tour-popover-step">Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}</span>
-        ${!isFirst ? `<button class="tour-popover-restart" onclick="restartTour()">Restart</button>` : ''}
+        ${!isFirst?`<button class="tour-popover-restart" onclick="restartTour()">Restart</button>`:''}
         <button class="tour-popover-skip" onclick="endTour(false)">Skip tour</button>
       </div>
       <div class="tour-popover-title" id="tourTitle">${step.title}</div>
       <div class="tour-popover-body">${step.body}</div>
       <div class="tour-popover-footer">
         <div class="tour-progress">${TOUR_STEPS.map((_,i)=>`<div class="tour-progress-dot ${i===tourState.stepIndex?'current':i<tourState.stepIndex?'done':''}"></div>`).join('')}</div>
-        ${!isFirst ? `<button class="tour-btn tour-btn-prev" onclick="tourPrev()">← Back</button>` : ''}
+        ${!isFirst?`<button class="tour-btn tour-btn-prev" onclick="tourPrev()">← Back</button>`:''}
         <button class="tour-btn tour-btn-next" onclick="${isLast?'endTour(true)':'tourNext()'}">${isLast?'Finish':'Next →'}</button>
       </div>`;
-
-    const targetEl = step.target ? document.querySelector(step.target) : null;
-    if (targetEl){
-      if (step.scrollToTarget){
-        const sc=document.querySelector('.content'); const r=targetEl.getBoundingClientRect();
-        if (sc){ sc.scrollBy({ top:r.top - sc.getBoundingClientRect().top - 80, behavior:'smooth' }); }
-        else { targetEl.scrollIntoView({ behavior:'smooth', block:'start' }); }
-      }
-      const place = ()=>{ _tourPlace(targetEl.getBoundingClientRect(), popover, spotlight); };
-      setTimeout(place, step.scrollToTarget ? 700 : 50);
-      if (step.scrollToTarget) setTimeout(place, 1100);
+    const targetEl=step.target ? document.querySelector(step.target) : null;
+    if(targetEl){
+      const place=()=>{ _tourPlace(targetEl.getBoundingClientRect(), popover, spotlight); };
+      setTimeout(place, step.scrollToTarget ? 700 : 80);
+      if(step.scrollToTarget) setTimeout(place, 1200);
     } else {
       _tourMaskFull(); spotlight.classList.remove('active'); _tourCenter(popover);
     }
-
-    // a11y: announce + move focus into popover
-    const live=document.getElementById('tourLive'); if (live) live.textContent=`Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}. ${step.title}`;
-    const nextBtn=popover.querySelector('.tour-btn-next'); if (nextBtn) setTimeout(()=>nextBtn.focus(), 60);
-  }, step.route ? 250 : 50);
+    const live=document.getElementById('tourLive');
+    if(live) live.textContent=`Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}. ${step.title}`;
+    const nextBtn=popover.querySelector('.tour-btn-next'); if(nextBtn) setTimeout(()=>nextBtn.focus(),80);
+  }, step.setup ? 180 : 50);
 }
 
-/* Position spotlight ring + 4-strip mask (click-through hole) + popover */
 function _tourPlace(rect, popover, spotlight){
   const pad=6;
   spotlight.style.left=(rect.left-pad)+'px'; spotlight.style.top=(rect.top-pad)+'px';
   spotlight.style.width=(rect.width+pad*2)+'px'; spotlight.style.height=(rect.height+pad*2)+'px';
   spotlight.classList.add('active');
-  _tourMask(rect, pad);
-  if (window.innerWidth < 560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  _tourMask(rect,pad);
+  if(window.innerWidth<560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
   popover.classList.remove('is-sheet');
-  const pw=360, ph=popover.offsetHeight||280, m=16, W=window.innerWidth, H=window.innerHeight;
+  const pw=360, ph=popover.offsetHeight||260, m=16, W=window.innerWidth, H=window.innerHeight;
   let top, left;
-  if (rect.bottom+ph+m < H){ top=rect.bottom+16; left=Math.min(Math.max(rect.left,16), W-pw-16); }
-  else if (rect.top-ph-m > 0){ top=rect.top-ph-16; left=Math.min(Math.max(rect.left,16), W-pw-16); }
+  if(rect.bottom+ph+m<H){ top=rect.bottom+16; left=Math.min(Math.max(rect.left,16),W-pw-16); }
+  else if(rect.top-ph-m>0){ top=rect.top-ph-16; left=Math.min(Math.max(rect.left,16),W-pw-16); }
   else { top=(H-ph)/2; left=(W-pw)/2; }
   popover.style.left=left+'px'; popover.style.top=top+'px'; popover.classList.add('active');
 }
-function _tourMask(rect, pad){
-  const W=window.innerWidth, H=window.innerHeight;
-  const top=Math.max(0,rect.top-pad), bot=Math.min(H,rect.bottom+pad), lft=Math.max(0,rect.left-pad), rgt=Math.min(W,rect.right+pad);
+function _tourMask(rect,pad){
+  const W=window.innerWidth,H=window.innerHeight;
+  const top=Math.max(0,rect.top-pad),bot=Math.min(H,rect.bottom+pad),lft=Math.max(0,rect.left-pad),rgt=Math.min(W,rect.right+pad);
   const set=(id,l,t,w,h)=>{ const e=document.getElementById(id); e.style.left=l+'px'; e.style.top=t+'px'; e.style.width=Math.max(0,w)+'px'; e.style.height=Math.max(0,h)+'px'; e.classList.add('active'); };
-  set('tourMaskT',0,0,W,top);
-  set('tourMaskB',0,bot,W,H-bot);
-  set('tourMaskL',0,top,lft,bot-top);
-  set('tourMaskR',rgt,top,W-rgt,bot-top);
+  set('tourMaskT',0,0,W,top); set('tourMaskB',0,bot,W,H-bot); set('tourMaskL',0,top,lft,bot-top); set('tourMaskR',rgt,top,W-rgt,bot-top);
 }
 function _tourMaskFull(){
   const T=document.getElementById('tourMaskT'); T.style.left='0'; T.style.top='0'; T.style.width='100vw'; T.style.height='100vh'; T.classList.add('active');
   ['tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); e.classList.remove('active'); });
 }
 function _tourCenter(popover){
-  if (window.innerWidth < 560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  if(window.innerWidth<560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
   popover.classList.remove('is-sheet');
-  popover.style.left=((window.innerWidth-360)/2)+'px'; popover.style.top=((window.innerHeight-(popover.offsetHeight||280))/2)+'px';
+  popover.style.left=((window.innerWidth-360)/2)+'px'; popover.style.top=((window.innerHeight-(popover.offsetHeight||260))/2)+'px';
   popover.classList.add('active');
 }
 
-/* Keyboard nav (arrows / esc) */
 document.addEventListener('keydown',(e)=>{
-  if (!tourState.active) return;
-  if (e.key==='Escape'){ endTour(false); }
-  else if (e.key==='ArrowRight'){ e.preventDefault(); tourNext(); }
-  else if (e.key==='ArrowLeft'){ e.preventDefault(); tourPrev(); }
+  if(!tourState.active) return;
+  if(e.key==='Escape'){ endTour(false); }
+  else if(e.key==='ArrowRight'){ e.preventDefault(); tourNext(); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); tourPrev(); }
 });
-/* Focus-trap: keep Tab inside the popover while the tour is active */
 document.addEventListener('keydown',(e)=>{
-  if (!tourState.active || e.key!=='Tab') return;
+  if(!tourState.active || e.key!=='Tab') return;
   const po=document.getElementById('tourPopover');
   const f=po.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
-  if (!f.length) return;
+  if(!f.length) return;
   const first=f[0], last=f[f.length-1];
-  if (e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
-  else if (!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
 });
 
-/* Trigger label reflects resume state ("Continue" vs "Demo") */
 function _tourRefreshTriggerLabel(){
-  const t=document.getElementById('tourTrigger'); if (!t) return;
+  const t=document.getElementById('tourTrigger'); if(!t) return;
   const label=t.querySelector('.tour-trigger-label');
   let saved=null; try{ saved=localStorage.getItem(TOUR_LS_STEP); }catch(e){}
-  if (saved!=null && +saved>0 && +saved<TOUR_STEPS.length){ if (label) label.textContent='Continue'; t.classList.add('seen'); }
-  else { if (label) label.textContent='Demo'; try{ if (localStorage.getItem(TOUR_LS_DONE)) t.classList.add('seen'); }catch(e){} }
+  if(saved!=null && +saved>0 && +saved<TOUR_STEPS.length){ if(label) label.textContent='Continue'; t.classList.add('seen'); }
+  else{ if(label) label.textContent='Demo'; try{ if(localStorage.getItem(TOUR_LS_DONE)) t.classList.add('seen'); }catch(e){} }
 }
 
-/* Init: deep-link ?tour=N (1-based) auto-starts at that step; else set label */
 (function tourInit(){
   _tourRefreshTriggerLabel();
   try{
     const q=new URLSearchParams(window.location.search).get('tour');
-    if (q!=null){ const n=parseInt(q,10); if (!isNaN(n)){ startTourAt(Math.max(0,n-1)); } }
+    if(q!=null){
+      const n=parseInt(q,10);
+      if(!isNaN(n)){
+        // wait for skeleton to clear before starting
+        setTimeout(()=>startTourAt(Math.max(0,n-1)), 2200);
+      }
+    }
   }catch(e){}
 })();
 </script>
 
+  <!-- ── Tour markup ─────────────────────────────────────────── -->
+  <button class="tour-trigger" id="tourTrigger" onclick="startTour()" aria-label="Start product demo">
+    <span class="tour-trigger-pulse"></span>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2l11 6-11 6V2z" fill="currentColor"/></svg>
+    <span class="tour-trigger-label">Demo</span>
+  </button>
+  <div class="tour-mask" id="tourMaskT"></div>
+  <div class="tour-mask" id="tourMaskR"></div>
+  <div class="tour-mask" id="tourMaskB"></div>
+  <div class="tour-mask" id="tourMaskL"></div>
+  <div class="tour-spotlight" id="tourSpotlight"></div>
+  <div class="tour-popover" id="tourPopover" role="dialog" aria-modal="true" aria-labelledby="tourTitle"></div>
+  <div class="tour-sr-only" id="tourLive" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>
