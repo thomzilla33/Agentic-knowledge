@@ -1974,6 +1974,31 @@ const TOUR_STEPS = [
     },
   },
   {
+    title: 'One click — you\'re in',
+    body: 'Select any option from the dropdown and you land in that studio <strong>immediately</strong>. No button label change, no second click. The dropdown is a direct navigation shortcut.',
+    target: '#sb-avance',
+    scrollToTarget: false,
+    setup: () => {
+      closeAll();
+      const dd = document.getElementById('dd-avance');
+      const btn = document.getElementById('bd-avance');
+      if (dd) dd.classList.add('is-open');
+      if (btn) { btn.classList.add('is-open'); btn.setAttribute('aria-expanded','true'); }
+      activeDd = 'avance';
+    },
+  },
+  {
+    title: 'Single-studio workspace',
+    body: 'When a workspace only has one studio, the main button labels itself directly — <strong>Go to Data</strong> takes you there in one click. No dropdown step needed.',
+    target: '#sb-northbridge',
+    scrollToTarget: true,
+    setup: () => { closeAll(); closeUserMenu(); render(TENANTS, false); },
+  },
+  {
+    title: 'Always a way back',
+    body: 'Every studio shows a <strong>← Workspaces</strong> pill in the top-left corner. One click returns you here so you can jump to a different organization without losing your place.',
+  },
+  {
     title: 'Load more workspaces',
     body: 'Workspaces beyond the first 5 are collapsed to keep the page scannable. Click <strong>Show more</strong> to reveal them — the count badge shows exactly how many are hidden.',
     target: '.load-more-btn',
