@@ -1317,7 +1317,9 @@ function selectStudio(tenantId, studioKey) {
 }
 
 function mainBtnClick(tenantId, e) {
-  go(tenantId, 'home');
+  const tenant = TENANTS.find(t => t.id === tenantId);
+  const dest = tenant && tenant.studios.length === 1 ? tenant.studios[0] : 'home';
+  go(tenantId, dest);
 }
 
 // ─── Studio registry ─────────────────────────────────────────────────────────
