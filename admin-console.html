@@ -11725,60 +11725,51 @@ function renderRoleCreateModal() {
     </div>`;
 }
 
-const _STUDIOS_META = [
-  { id:'agentic',    name:'Agentic Studio',    color:'#06B6D4', prefix:'ag.',  desc:'AI workers, agentic networks, workflows, and human-in-the-loop escalations.' },
-  { id:'governance', name:'Governance Studio', color:'#10b981', prefix:'gov.', desc:'Governance policies, data domain management, and promotion approvals.' },
-  { id:'helix',      name:'Helix Data Studio', color:'#8b5cf6', prefix:'hx.',  desc:'Semantic model catalog, lineage graphs, and data source connectors.' },
-  { id:'platform',   name:'Platform',          color:'#64748b', prefix:'pl.',  desc:'Workspace settings, member management, billing, integrations, and audit log.' },
-];
-
-function _studioAccessForPerson(personId) {
+function _effectivePermsForPerson(personId) {
   const roles = (PA_MEMBER_ROLES[personId] || []).map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
-  const allPerms = new Set(roles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]));
-  const result = {};
-  _STUDIOS_META.forEach(s => { result[s.id] = [...allPerms].some(pid => pid.startsWith(s.prefix)); });
-  return result;
+  return new Set(roles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]));
 }
 
 function renderStudioAccessModal() {
   const pid = _paState.studioAccessPersonId;
   const p = MOCK_PEOPLE.find(x => x.id === pid);
   if (!p) return '';
-  const edits = _paState.studioAccessEdits;
+  const edits = _paState.studioAccessEdits; // Set of permIds
 
   return `
-    <div class="rc-modal" style="width:480px">
+    <div class="rc-modal" style="width:520px">
       <div class="rc-head">
         <div>
-          <div class="rc-title">Studio access</div>
+          <div class="rc-title">Manage permissions</div>
           <div style="font-size:12px;color:var(--t3);margin-top:2px">${escapeHtml(p.name)} · ${escapeHtml(p.email)}</div>
         </div>
         <button class="pm-drawer-close" onclick="paCloseStudioAccess()">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         </button>
       </div>
-      <div class="rc-body" style="padding:12px 20px">
-        <p style="font-size:12.5px;color:var(--t3);margin:0 0 16px;line-height:1.5">
-          Toggle access to each studio. Changes apply immediately and override inherited role permissions.
+      <div class="rc-body" style="padding:16px 20px">
+        <p style="font-size:12.5px;color:var(--t3);margin:0 0 18px;line-height:1.5">
+          Grant individual permissions directly to this member. These override permissions inherited from assigned roles.
         </p>
-        ${_STUDIOS_META.map(s => {
-          const on = edits[s.id];
-          return `
-          <div class="sa-studio-row">
-            <div class="sa-studio-icon" style="background:${s.color}18;border:1px solid ${s.color}30">
-              <div style="width:10px;height:10px;border-radius:50%;background:${s.color}"></div>
+        ${PA_PERM_TREE.map(studio => `
+          <div class="rd-perm-studio">
+            <div class="rd-perm-studio-head">
+              <div class="rd-perm-studio-dot" style="background:${studio.color}"></div>
+              <div class="rd-perm-studio-name">${escapeHtml(studio.studio)}</div>
             </div>
-            <div class="sa-studio-info">
-              <div class="sa-studio-name">${escapeHtml(s.name)}</div>
-              <div class="sa-studio-desc">${escapeHtml(s.desc)}</div>
-            </div>
-            <label class="ids-toggle" style="flex-shrink:0">
-              <input type="checkbox" ${on ? 'checked' : ''} onchange="paToggleStudioAccess('${s.id}',this.checked)">
-              <span class="ids-toggle-track"></span>
-              <span class="ids-toggle-thumb"></span>
-            </label>
-          </div>`;
-        }).join('')}
+            ${studio.perms.map(perm => {
+              const checked = edits.has(perm.id);
+              return `
+              <label class="rd-perm-row">
+                <input type="checkbox" class="rd-perm-check" ${checked ? 'checked' : ''}
+                  onchange="paToggleStudioAccess('${perm.id}',this.checked)">
+                <div class="rd-perm-label">
+                  <div style="font-size:12.5px;font-weight:500;color:var(--t1)">${escapeHtml(perm.label)}</div>
+                  <div style="font-size:11px;color:var(--t3);margin-top:1px">${escapeHtml(perm.desc)}</div>
+                </div>
+              </label>`;
+            }).join('')}
+          </div>`).join('')}
       </div>
       <div class="rc-foot">
         <button class="btn btn-ghost btn-sm" onclick="paCloseStudioAccess()">Cancel</button>
@@ -11790,7 +11781,7 @@ function renderStudioAccessModal() {
 function paOpenStudioAccess(personId) {
   _paState.studioAccessOpen = true;
   _paState.studioAccessPersonId = personId;
-  _paState.studioAccessEdits = _studioAccessForPerson(personId);
+  _paState.studioAccessEdits = _effectivePermsForPerson(personId);
   _paRerender();
 }
 function paCloseStudioAccess() {
@@ -11798,15 +11789,15 @@ function paCloseStudioAccess() {
   _paState.studioAccessOpen = false;
   _paRerender();
 }
-function paToggleStudioAccess(studioId, on) {
-  _paState.studioAccessEdits[studioId] = on;
+function paToggleStudioAccess(permId, on) {
+  if (on) _paState.studioAccessEdits.add(permId);
+  else _paState.studioAccessEdits.delete(permId);
 }
 function paSaveStudioAccess() {
   const pid = _paState.studioAccessPersonId;
   const p = MOCK_PEOPLE.find(x => x.id === pid);
-  const granted = _STUDIOS_META.filter(s => _paState.studioAccessEdits[s.id]).map(s => s.name);
   _paState.studioAccessOpen = false;
-  toast(`Studio access updated for ${p ? p.name : 'member'}${granted.length ? ': ' + granted.join(', ') : ' (all revoked)'}`, 'success');
+  toast(`Permissions updated for ${p ? p.name : 'member'}`, 'success');
   _paRerender();
 }
 
