@@ -7322,7 +7322,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .pa-role-card-name { font-size:13px; font-weight:600; color:var(--t1); }
 .pa-role-type-badge { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; border:1px solid transparent; white-space:nowrap; flex-shrink:0; }
 .pa-role-type-badge--system { background:var(--bg4,var(--bg3)); color:var(--t3); border-color:var(--line); }
-.pa-role-type-badge--custom { background:var(--pri-12); color:var(--pri); border-color:rgba(99,102,241,.3); }
+.pa-role-type-badge--custom { background:var(--pri-12); color:var(--pri); border-color:var(--pri-30); }
 .pa-role-card-desc { font-size:11.5px; color:var(--t3); margin-bottom:7px; line-height:1.4; }
 .pa-role-card-meta { display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--t3); margin-bottom:7px; }
 .pa-role-meta-sep { color:var(--t4,var(--t3)); opacity:.5; }
@@ -7550,21 +7550,21 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .rc-perm-sidebar-feat { padding:7px 16px 7px 28px; font-size:12.5px; color:var(--t2); cursor:pointer; border-radius:0; transition:background .1s,color .1s; display:flex; align-items:center; justify-content:space-between; gap:6px; }
 .rc-perm-sidebar-feat:hover { background:var(--hov); color:var(--t1); }
 .rc-perm-sidebar-feat--active { background:var(--bg3); color:var(--t1); font-weight:600; }
-.rc-perm-sidebar-feat-pill { font-size:10px; font-weight:700; padding:1px 6px; border-radius:20px; flex-shrink:0; }
+.rc-perm-sidebar-feat-pill { font-size:12px; font-weight:700; padding:1px 6px; border-radius:20px; flex-shrink:0; }
 .rc-perm-panel { flex:1; overflow-y:auto; padding:0; }
 .rc-perm-panel-head { padding:14px 20px 10px; border-bottom:1px solid var(--line); }
 .rc-perm-panel-title { font-size:13px; font-weight:700; color:var(--t1); }
-.rc-perm-panel-sub { font-size:11.5px; color:var(--t3); margin-top:2px; }
+.rc-perm-panel-sub { font-size:12px; color:var(--t3); margin-top:2px; }
 .rc-perm-row { display:flex; align-items:flex-start; gap:14px; padding:12px 20px; border-bottom:1px solid var(--line); transition:background .1s; }
 .rc-perm-row:last-child { border-bottom:none; }
-.rc-perm-row--changed { background:rgba(99,102,241,.04); }
+.rc-perm-row--changed { background:var(--pri-04); }
 .rc-perm-row-info { flex:1; min-width:0; }
 .rc-perm-row-name { font-size:13px; font-weight:500; color:var(--t1); }
-.rc-perm-row-desc { font-size:11.5px; color:var(--t3); margin-top:3px; line-height:1.45; }
-.rc-perm-row-badge { font-size:10px; font-weight:700; color:#ef4444; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); border-radius:4px; padding:1px 5px; display:inline-block; margin-left:6px; vertical-align:middle; }
+.rc-perm-row-desc { font-size:12px; color:var(--t3); margin-top:3px; line-height:1.45; }
+.rc-perm-row-badge { font-size:12px; font-weight:700; color:var(--red); background:var(--red-08); border:1px solid var(--red-20); border-radius:4px; padding:1px 5px; display:inline-block; margin-left:6px; vertical-align:middle; }
 /* Changes footer */
 .rc-changes-bar { padding:10px 20px; border-top:1px solid var(--line); display:flex; align-items:center; gap:10px; flex-shrink:0; }
-.rc-changes-badge { font-size:12px; font-weight:600; color:var(--pri); background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.2); border-radius:20px; padding:3px 10px; white-space:nowrap; }
+.rc-changes-badge { font-size:12px; font-weight:600; color:var(--pri); background:var(--pri-10); border:1px solid var(--pri-20); border-radius:20px; padding:3px 10px; white-space:nowrap; }
 .rc-changes-none { font-size:12px; color:var(--t3); }
 .rc-changes-undo { background:none; border:1px solid var(--line); border-radius:var(--r6); font-size:12px; color:var(--t2); padding:4px 10px; cursor:pointer; transition:background .12s,color .12s,border-color .12s; }
 .rc-changes-undo:hover { background:var(--hov); color:var(--t1); border-color:var(--t3); }
@@ -11893,7 +11893,7 @@ function _rcRenderPermPicker(permSet, selFeatId, ctx) {
         <div class="rc-perm-row-info">
           <div class="rc-perm-row-name">${escapeHtml(perm.label)}${perm.critical?'<span class="rc-perm-row-badge">CRITICAL</span>':''}</div>
           <div class="rc-perm-row-desc">${escapeHtml(perm.desc)}</div>
-          <div class="rc-perm-change-ind" style="font-size:10.5px;margin-top:4px;color:var(--pri);font-weight:600;${changed?'':'display:none'}">${changed?(wasOn?'Removed':'Added'):''}</div>
+          <div class="rc-perm-change-ind" style="font-size:12px;margin-top:4px;color:var(--pri);font-weight:600;${changed?'':'display:none'}">${changed?(wasOn?'Removed':'Added'):''}</div>
         </div>
         <label class="rd-sw" style="margin-top:2px">
           <input type="checkbox" ${on?'checked':''} onchange="paRoleTogglePerm('${ctx}','${perm.id}',this.checked)">
