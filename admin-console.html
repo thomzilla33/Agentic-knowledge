@@ -7430,6 +7430,53 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .org-danger-btn:hover { background:rgba(239,68,68,.1); border-color:#ef4444; }
 .org-id-mono { font-family:monospace; font-size:12px; letter-spacing:.03em; }
 
+/* ====================== IDENTITY & SECURITY ====================== */
+.ids-wrap { max-width:720px; padding:32px 24px 64px; }
+/* Auth method rows */
+.ids-method-list { display:flex; flex-direction:column; gap:0; }
+.ids-method { display:flex; align-items:center; gap:16px; padding:16px 0; border-bottom:1px solid var(--line); }
+.ids-method:last-child { border-bottom:none; }
+.ids-method-icon { width:38px; height:38px; border-radius:10px; background:var(--bg3); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ids-method-body { flex:1; }
+.ids-method-name { font-size:13px; font-weight:600; color:var(--t1); }
+.ids-method-desc { font-size:12px; color:var(--t3); margin-top:2px; }
+.ids-method-badge { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:2px 7px; border-radius:20px; }
+.ids-badge-required { background:rgba(100,116,139,.15); color:var(--t3); }
+.ids-badge-active { background:rgba(16,185,129,.12); color:#10b981; }
+/* Toggle */
+.ids-toggle { position:relative; width:36px; height:20px; flex-shrink:0; }
+.ids-toggle input { opacity:0; width:0; height:0; position:absolute; }
+.ids-toggle-track { position:absolute; inset:0; border-radius:20px; background:var(--bg3); border:1px solid var(--line); cursor:pointer; transition:background .2s,border-color .2s; }
+.ids-toggle input:checked ~ .ids-toggle-track { background:var(--pri); border-color:var(--pri); }
+.ids-toggle-thumb { position:absolute; top:3px; left:3px; width:14px; height:14px; border-radius:50%; background:#fff; transition:transform .2s; pointer-events:none; }
+.ids-toggle input:checked ~ .ids-toggle-thumb { transform:translateX(16px); }
+/* SSO config card */
+.ids-sso-config { background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); padding:16px; margin-top:16px; }
+.ids-sso-config-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--t3); margin-bottom:14px; }
+.ids-copy-row { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.ids-copy-label { font-size:11px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.04em; width:120px; flex-shrink:0; }
+.ids-copy-input { flex:1; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r8); padding:7px 10px; font-size:12px; font-family:monospace; color:var(--t2); outline:none; }
+.ids-copy-btn { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r8); padding:6px 10px; font-size:11px; font-weight:600; color:var(--t3); cursor:pointer; white-space:nowrap; transition:border-color .15s,color .15s; }
+.ids-copy-btn:hover { border-color:var(--pri); color:var(--pri); }
+.ids-upload-btn { background:none; border:1px dashed var(--line); border-radius:var(--r8); padding:10px 14px; font-size:12px; color:var(--t3); cursor:pointer; width:100%; text-align:center; transition:border-color .15s,color .15s; }
+.ids-upload-btn:hover { border-color:var(--pri); color:var(--pri); }
+/* MFA enforcement cards */
+.ids-mfa-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.ids-mfa-card { background:var(--bg3); border:2px solid var(--line); border-radius:var(--r12); padding:14px; cursor:pointer; transition:border-color .15s,box-shadow .15s; }
+.ids-mfa-card:hover { border-color:var(--pri-30); }
+.ids-mfa-card.active { border-color:var(--pri); box-shadow:0 0 0 3px var(--pri-10); }
+.ids-mfa-card-title { font-size:12px; font-weight:700; color:var(--t1); margin-bottom:4px; }
+.ids-mfa-card.active .ids-mfa-card-title { color:var(--pri); }
+.ids-mfa-card-desc { font-size:11px; color:var(--t3); line-height:1.4; }
+/* MFA methods checkboxes */
+.ids-check-list { display:flex; flex-direction:column; gap:10px; margin-top:16px; padding-top:16px; border-top:1px solid var(--line); }
+.ids-check-item { display:flex; align-items:center; gap:10px; }
+.ids-check-item input[type=checkbox] { width:15px; height:15px; accent-color:var(--pri); cursor:pointer; flex-shrink:0; }
+.ids-check-label { font-size:13px; color:var(--t1); font-weight:500; }
+.ids-check-desc { font-size:11px; color:var(--t3); margin-left:25px; margin-top:2px; }
+/* Session grid */
+.ids-session-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
 </style>
 <link rel="stylesheet" href="shared/notif-panel.css">
 </head>
@@ -7671,7 +7718,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
             <span class="ssb-item-label">Organization</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="identity">
+          <button class="ssb-item" data-route="identity" onclick="navigate('#/identity')">
             <span class="ssb-item-label">Identity & Security</span>
           </button>
 
@@ -11514,6 +11561,242 @@ function renderOrganization() {
 
 /* ====================== ORGANIZATION end ====================== */
 
+/* ====================== IDENTITY & SECURITY ====================== */
+
+let _idsState = {
+  mfaPolicy: 'admins',          // 'off' | 'optional' | 'admins' | 'all'
+  ssoEnabled: true,
+  googleEnabled: true,
+  emailEnabled: true,           // always true, can't disable
+  mfaAppEnabled: true,
+  mfaSmsEnabled: true,
+  mfaHwkEnabled: false,
+};
+
+function _idsRerender() { renderIdentity(); }
+
+function idsToggle(key) {
+  _idsState[key] = !_idsState[key];
+  _idsRerender();
+}
+
+function idsMfa(policy) {
+  _idsState.mfaPolicy = policy;
+  _idsRerender();
+}
+
+function renderIdentity() {
+  const s = _idsState;
+
+  const toggle = (key, disabled) => `
+    <label class="ids-toggle" title="${disabled ? 'Always required' : ''}">
+      <input type="checkbox" ${s[key] ? 'checked' : ''} ${disabled ? 'disabled' : ''} onchange="idsToggle('${key}')">
+      <span class="ids-toggle-track"></span>
+      <span class="ids-toggle-thumb"></span>
+    </label>`;
+
+  const mfaCard = (id, title, desc) => `
+    <div class="ids-mfa-card ${s.mfaPolicy===id?'active':''}" onclick="idsMfa('${id}')">
+      <div class="ids-mfa-card-title">${title}</div>
+      <div class="ids-mfa-card-desc">${desc}</div>
+    </div>`;
+
+  $('content').innerHTML = `
+<div class="ids-wrap">
+
+  <!-- AUTH METHODS -->
+  <div class="ms-section">
+    <div class="ms-section-title">Authentication methods</div>
+    <div class="ms-card">
+      <div class="ids-method-list">
+
+        <div class="ids-method">
+          <div class="ids-method-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="ids-method-body">
+            <div class="ids-method-name">Email &amp; Password <span class="ids-method-badge ids-badge-required" style="margin-left:6px;">Always on</span></div>
+            <div class="ids-method-desc">Members sign in with their workspace email and a password.</div>
+          </div>
+          ${toggle('emailEnabled', true)}
+        </div>
+
+        <div class="ids-method">
+          <div class="ids-method-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="ids-method-body">
+            <div class="ids-method-name">Google SSO ${s.googleEnabled ? '<span class="ids-method-badge ids-badge-active" style="margin-left:6px;">Active</span>' : ''}</div>
+            <div class="ids-method-desc">Members can sign in with their Google Workspace account.</div>
+          </div>
+          ${toggle('googleEnabled', false)}
+        </div>
+
+        <div class="ids-method">
+          <div class="ids-method-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="ids-method-body">
+            <div class="ids-method-name">SAML 2.0 — Azure AD ${s.ssoEnabled ? '<span class="ids-method-badge ids-badge-active" style="margin-left:6px;">Configured</span>' : ''}</div>
+            <div class="ids-method-desc">Enterprise SSO via your organization's identity provider.</div>
+          </div>
+          ${toggle('ssoEnabled', false)}
+        </div>
+
+      </div>
+
+      ${s.ssoEnabled ? `
+      <div class="ids-sso-config">
+        <div class="ids-sso-config-title">SAML configuration</div>
+
+        <div class="ids-copy-row">
+          <span class="ids-copy-label">Entity ID</span>
+          <input class="ids-copy-input" readonly value="https://auth.aimsos.ai/saml/contoso/metadata" />
+          <button class="ids-copy-btn" onclick="navigator.clipboard.writeText('https://auth.aimsos.ai/saml/contoso/metadata');toast('Copied','success')">Copy</button>
+        </div>
+        <div class="ids-copy-row">
+          <span class="ids-copy-label">ACS URL</span>
+          <input class="ids-copy-input" readonly value="https://auth.aimsos.ai/saml/contoso/acs" />
+          <button class="ids-copy-btn" onclick="navigator.clipboard.writeText('https://auth.aimsos.ai/saml/contoso/acs');toast('Copied','success')">Copy</button>
+        </div>
+        <div class="ids-copy-row" style="margin-bottom:0;">
+          <span class="ids-copy-label">IdP Metadata</span>
+          <button class="ids-upload-btn" onclick="toast('IdP metadata upload coming soon','info')">↑ Upload IdP metadata XML or paste URL</button>
+        </div>
+      </div>` : ''}
+    </div>
+  </div>
+
+  <!-- MFA -->
+  <div class="ms-section">
+    <div class="ms-section-title">Multi-factor authentication</div>
+    <div class="ms-card">
+      <div style="font-size:13px;color:var(--t3);margin-bottom:16px;">Require a second factor when members sign in.</div>
+      <div class="ids-mfa-grid">
+        ${mfaCard('off',   'Off',            'MFA is never required. Members may opt in.')}
+        ${mfaCard('optional','Optional',     'Members are encouraged but not required to enroll.')}
+        ${mfaCard('admins','Admins only',    'Workspace Admins must use MFA. Others may opt in.')}
+        ${mfaCard('all',  'All members',     'Every member must enroll before accessing the workspace.')}
+      </div>
+      <div class="ids-check-list">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:4px;">Allowed second factors</div>
+        <div>
+          <div class="ids-check-item">
+            <input type="checkbox" id="mfa-app" ${s.mfaAppEnabled?'checked':''} onchange="idsToggle('mfaAppEnabled')">
+            <label class="ids-check-label" for="mfa-app">Authenticator app (TOTP)</label>
+          </div>
+          <div class="ids-check-desc">Google Authenticator, Authy, 1Password, etc.</div>
+        </div>
+        <div>
+          <div class="ids-check-item">
+            <input type="checkbox" id="mfa-sms" ${s.mfaSmsEnabled?'checked':''} onchange="idsToggle('mfaSmsEnabled')">
+            <label class="ids-check-label" for="mfa-sms">SMS / Text message</label>
+          </div>
+          <div class="ids-check-desc">One-time code sent to a verified phone number.</div>
+        </div>
+        <div>
+          <div class="ids-check-item">
+            <input type="checkbox" id="mfa-hwk" ${s.mfaHwkEnabled?'checked':''} onchange="idsToggle('mfaHwkEnabled')">
+            <label class="ids-check-label" for="mfa-hwk">Hardware security key (WebAuthn)</label>
+          </div>
+          <div class="ids-check-desc">YubiKey, Touch ID, Windows Hello, and other FIDO2 authenticators.</div>
+        </div>
+      </div>
+      <div class="ms-save-row">
+        <button class="ms-btn-save" onclick="toast('MFA policy saved','success')">Save policy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION & PASSWORD -->
+  <div class="ms-section">
+    <div class="ms-section-title">Session &amp; password policy</div>
+    <div class="ms-card">
+      <div class="ids-session-grid">
+        <div class="ms-field">
+          <label class="ms-label">Session timeout</label>
+          <select class="ms-select">
+            <option>1 hour</option>
+            <option selected>8 hours</option>
+            <option>24 hours</option>
+            <option>7 days</option>
+            <option>Never (not recommended)</option>
+          </select>
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">Password expiration</label>
+          <select class="ms-select">
+            <option>30 days</option>
+            <option>60 days</option>
+            <option>90 days</option>
+            <option selected>180 days</option>
+            <option>Never</option>
+          </select>
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">Minimum password length</label>
+          <select class="ms-select">
+            <option>8 characters</option>
+            <option selected>12 characters</option>
+            <option>16 characters</option>
+            <option>20 characters</option>
+          </select>
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">Password complexity</label>
+          <select class="ms-select">
+            <option>Letters only</option>
+            <option>Letters + numbers</option>
+            <option selected>Letters + numbers + symbols</option>
+          </select>
+        </div>
+      </div>
+      <div class="ms-save-row">
+        <button class="ms-btn-save" onclick="toast('Session policy saved','success')">Save policy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE SESSIONS -->
+  <div class="ms-section">
+    <div class="ms-section-title">Active sessions</div>
+    <div class="ms-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--t1);">47 active sessions across 13 members</div>
+          <div style="font-size:12px;color:var(--t3);margin-top:3px;">Last audit: today at 9:14 AM</div>
+        </div>
+        <button class="org-danger-btn" onclick="toast('All sessions revoked — members will need to sign in again','success')" style="white-space:nowrap;">Revoke all sessions</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:var(--r8);overflow:hidden;">
+        ${[
+          { name:'Thomas González', email:'thomas.gonzalez@contoso.com', device:'Chrome · macOS', ip:'104.28.90.1', since:'Just now' },
+          { name:'Edgardo Sierra',  email:'edgardo.sierra@contoso.com',  device:'Chrome · Windows', ip:'52.14.201.88', since:'1h ago' },
+          { name:'María González',  email:'maria.gonzalez@contoso.com',  device:'Safari · macOS',   ip:'104.16.55.2',  since:'2h ago' },
+          { name:'Diana Pérez',     email:'diana.perez@contoso.com',     device:'Firefox · Linux',  ip:'18.220.14.9',  since:'3h ago' },
+          { name:'Naomi Park',      email:'naomi.park@contoso.com',      device:'Chrome · macOS',   ip:'35.173.90.5',  since:'4h ago' },
+        ].map((row, i) => `
+        <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:${i<4?'1px solid var(--line)':'none'};background:var(--bg2);">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:var(--t1);">${row.name}</div>
+            <div style="font-size:11px;color:var(--t3);">${row.email}</div>
+          </div>
+          <div style="font-size:12px;color:var(--t3);min-width:150px;">${row.device}</div>
+          <div style="font-size:11px;font-family:monospace;color:var(--t3);min-width:110px;">${row.ip}</div>
+          <div style="font-size:11px;color:var(--t3);min-width:60px;text-align:right;">${row.since}</div>
+          <button style="background:none;border:1px solid var(--line);border-radius:var(--r8);padding:4px 10px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;" onclick="toast('Session revoked','success')">Revoke</button>
+        </div>`).join('')}
+        <div style="padding:10px 16px;background:var(--bg2);font-size:12px;color:var(--t3);">+ 42 more sessions — <a href="#" style="color:var(--pri);text-decoration:none;" onclick="navigate('#/audit')">View in Audit log →</a></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+  `;
+}
+
+/* ====================== IDENTITY & SECURITY end ====================== */
+
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'home';
   const parts = hash.split('/');
@@ -11527,7 +11810,8 @@ function route() {
     'personal':'personal',
     'my-settings':'my-settings',
     'people':'people',
-    'organization':'organization'
+    'organization':'organization',
+    'identity':'identity'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -11576,6 +11860,8 @@ function route() {
     renderPeople(parts[1] || null);
   } else if (parts[0]==='organization') {
     renderOrganization();
+  } else if (parts[0]==='identity') {
+    renderIdentity();
   } else {
     renderHome();
   }
