@@ -11768,11 +11768,11 @@ function renderRoleCreateModal() {
           <label class="ms-label">Color</label>
           <div class="rc-color-row">
             ${colorOptions.map(c => `
-              <button class="rc-color-swatch ${s.roleCreateColor===c?'selected':''}" style="background:${c}"
-                onclick="_paState.roleCreateColor='${c}';_paRerender()"></button>`).join('')}
+              <button class="rc-color-swatch rc-color-swatch-create ${s.roleCreateColor===c?'selected':''}" style="background:${c}"
+                onclick="_paState.roleCreateColor='${c}';document.querySelectorAll('.rc-color-swatch-create').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"></button>`).join('')}
           </div>
         </div>
-        <div style="font-size:11.5px;font-weight:600;color:var(--t2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">Permissions</div>
+        <div class="ms-label" style="margin-bottom:12px">Permissions</div>
         ${PA_PERM_TREE.map(studio => `
           <div class="rd-perm-studio">
             <div class="rd-perm-studio-head">
@@ -11785,8 +11785,8 @@ function renderRoleCreateModal() {
                   ${s.roleCreatePerms.has(perm.id) ? 'checked' : ''}
                   onchange="paToggleCreatePerm('${perm.id}',this.checked)">
                 <div class="rd-perm-label">
-                  <div style="font-size:12.5px;font-weight:500;color:var(--t1)">${escapeHtml(perm.label)}</div>
-                  <div style="font-size:11px;color:var(--t3);margin-top:1px">${escapeHtml(perm.desc)}</div>
+                  <div class="rd-perm-name">${escapeHtml(perm.label)}</div>
+                  <div class="rd-perm-desc">${escapeHtml(perm.desc)}</div>
                 </div>
               </label>`).join('')}
           </div>`).join('')}
@@ -11826,31 +11826,30 @@ function renderRoleEditModal() {
             value="${escapeHtml(s.roleEditDesc)}"
             oninput="_paState.roleEditDesc=this.value">
         </div>
-        <div style="margin-bottom:20px">
-          <div class="ms-label" style="margin-bottom:8px">Role color</div>
-          <div style="display:flex;gap:8px">
-            ${colorOptions.map(c => `<button onclick="_paState.roleEditColor='${c}';document.querySelectorAll('.rc-color-swatch-edit').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')" class="rc-color-swatch rc-color-swatch-edit${s.roleEditColor===c?' selected':''}" style="background:${c}"></button>`).join('')}
+        <div class="ms-field full" style="margin-bottom:20px">
+          <label class="ms-label">Color</label>
+          <div class="rc-color-row">
+            ${colorOptions.map(c => `<button class="rc-color-swatch rc-color-swatch-edit${s.roleEditColor===c?' selected':''}" style="background:${c}"
+              onclick="_paState.roleEditColor='${c}';document.querySelectorAll('.rc-color-swatch-edit').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"></button>`).join('')}
           </div>
         </div>
-        <div class="ms-label" style="margin-bottom:10px">Permissions <span style="color:var(--t3);font-weight:400">(${editPerms.size} of ${Object.values(PA_ROLE_PERMS['workspace-admin']||new Set()).length||23} selected)</span></div>
-        <div style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r8);background:var(--bg1)">
-          ${PA_PERM_TREE.map(studio => `
-            <div class="rc-perm-studio">
-              <div class="rc-perm-studio-head">
-                <div class="rc-perm-dot" style="background:${studio.color}"></div>
-                <div class="rc-perm-studio-name">${escapeHtml(studio.studio)}</div>
+        <div class="ms-label" style="margin-bottom:12px">Permissions <span style="font-weight:400;color:var(--t3)">(${editPerms.size} of ${PA_PERM_TREE.reduce((t,s)=>t+s.perms.length,0)} selected)</span></div>
+        ${PA_PERM_TREE.map(studio => `
+          <div class="rd-perm-studio">
+            <div class="rd-perm-studio-head">
+              <div class="rd-perm-studio-dot" style="background:${studio.color}"></div>
+              <div class="rd-perm-studio-name">${escapeHtml(studio.studio)}</div>
+            </div>
+            ${studio.perms.map(perm => `
+            <label class="rd-perm-row">
+              <input type="checkbox" class="rd-perm-check" ${editPerms.has(perm.id)?'checked':''}
+                onchange="paToggleEditPerm('${perm.id}',this.checked)">
+              <div class="rd-perm-label">
+                <div class="rd-perm-name">${escapeHtml(perm.label)}</div>
+                <div class="rd-perm-desc">${escapeHtml(perm.desc)}</div>
               </div>
-              ${studio.perms.map(perm => `
-              <label class="rc-perm-row">
-                <input type="checkbox" class="rc-perm-check" ${editPerms.has(perm.id)?'checked':''}
-                  onchange="paToggleEditPerm('${perm.id}',this.checked)">
-                <div class="rc-perm-label">
-                  <div style="font-size:12.5px;font-weight:500;color:var(--t1)">${escapeHtml(perm.label)}</div>
-                  <div style="font-size:11px;color:var(--t3);margin-top:1px">${escapeHtml(perm.desc)}</div>
-                </div>
-              </label>`).join('')}
-            </div>`).join('')}
-        </div>
+            </label>`).join('')}
+          </div>`).join('')}
       </div>
       <div class="rc-foot">
         <button class="btn btn-ghost btn-sm" onclick="paCloseRoleEdit()">Cancel</button>
