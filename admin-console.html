@@ -790,7 +790,80 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
   height:100%; padding:0; max-width:none;
   box-sizing:border-box;
 }
-@keyframes ac-pulse{0%,100%{opacity:.3} 50%{opacity:.75}}
+@keyframes ac-pulse{0%,100%{opacity:.5} 50%{opacity:1}}
+
+/* ── Admin Console Command Center Home ────────────────── */
+.ac-cmd-wrap{
+  display:flex; flex-direction:column;
+  height:100%; padding:28px 32px; gap:24px;
+  box-sizing:border-box; overflow:auto;
+}
+.ac-cmd-header{
+  display:flex; align-items:baseline; justify-content:space-between;
+  flex-shrink:0;
+}
+.ac-cmd-title{font-size:18px; font-weight:700; color:var(--t1);}
+.ac-cmd-welcome{font-size:13px; color:var(--t3);}
+.ac-cmd-body{display:flex; gap:24px; flex:1; min-height:0;}
+
+/* Needs Attention */
+.ac-cmd-left{width:35%; flex-shrink:0; display:flex; flex-direction:column;}
+.ac-home-section-label{
+  font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--t3); margin-bottom:12px;
+}
+.ac-alert-row{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; border-radius:8px;
+  border:1px solid var(--line); background:var(--bg2);
+  margin-bottom:8px;
+}
+.ac-alert-row--real{min-height:60px;}
+.ac-alert-dot{width:8px; height:8px; border-radius:50%; background:#F97316; flex-shrink:0;}
+.ac-alert-body{flex:1; display:flex; flex-direction:column; gap:2px; min-width:0;}
+.ac-alert-section{font-size:12px; font-weight:600; color:var(--t1);}
+.ac-alert-desc{font-size:12px; color:var(--t2);}
+.ac-alert-cta{font-size:12px; font-weight:600; color:var(--pri); text-decoration:none; cursor:pointer; flex-shrink:0; white-space:nowrap;}
+.ac-alert-cta:hover{opacity:.75;}
+.ac-alert-row--skeleton{padding:16px 14px;}
+.ac-skeleton{height:14px; border-radius:4px; background:rgba(255,255,255,0.05); animation:ac-pulse 2s ease-in-out infinite;}
+.ac-skeleton--wide{width:85%;}
+.ac-skeleton--medium{width:60%;}
+.ac-home-empty-note{font-size:11px; color:var(--t3); margin-top:4px; padding:0 2px; line-height:1.5;}
+
+/* Sections Grid */
+.ac-cmd-right{flex:1; overflow:auto; display:flex; flex-direction:column; gap:24px;}
+.ac-section-group{display:flex; flex-direction:column; gap:8px;}
+.ac-section-group-label{
+  font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--t3);
+}
+.ac-section-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+.ac-section-card{
+  display:flex; flex-direction:column; gap:4px;
+  padding:14px 16px; border-radius:10px;
+  border:1px solid var(--line); background:var(--bg2);
+  transition:border-color .15s, background .15s;
+}
+.ac-section-card--active{cursor:pointer; opacity:1;}
+.ac-section-card--active:hover{border-color:var(--pri); background:var(--hover);}
+.ac-section-card--soon{opacity:.50; cursor:default;}
+.ac-card-name{font-size:13px; font-weight:600; color:var(--t1);}
+.ac-card-desc{font-size:12px; color:var(--t2); line-height:1.4; flex:1;}
+.ac-card-footer{display:flex; align-items:center; gap:8px; margin-top:6px;}
+.ac-card-badge{font-size:10px; font-weight:600; letter-spacing:.03em;}
+.ac-card-badge--active{color:var(--green);}
+.ac-card-badge--soon{color:var(--t3);}
+.ac-card-alert-badge{
+  font-size:10px; font-weight:600;
+  color:var(--amber); background:rgba(253,199,0,.10);
+  padding:1px 6px; border-radius:4px;
+}
+@media(max-width:900px){
+  .ac-cmd-body{flex-direction:column;}
+  .ac-cmd-left{width:100%;}
+  .ac-section-cards{grid-template-columns:repeat(2,1fr);}
+}
 
 /* ── Copilot outer — fills content area ── */
 .ac-copilot-outer{
@@ -10527,61 +10600,78 @@ function renderAdminHome() {
   const el = document.getElementById('content');
   if (!el) return;
 
-  el.innerHTML = `<div class="ac-home-wrap">
-    <div class="ac-copilot-outer">
+  el.innerHTML = `
+    <div class="ac-cmd-wrap">
 
-      <!-- Hero: shown before first message -->
-      <div class="ac-hero" id="acHero">
-        <div class="ac-hero-icon">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <circle cx="14" cy="14" r="9" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
-            <path d="M10 14.5C10 11.5 18 11.5 18 14.5C18 17.5 14 18.8 14 18.8C14 18.8 10 17.5 10 14.5Z" fill="rgba(255,255,255,.85)"/>
-            <circle cx="14" cy="9.5" r="1.4" fill="rgba(255,255,255,.85)"/>
-          </svg>
-        </div>
-        <div class="ac-hero-greeting">Good morning, TG.</div>
-        <div class="ac-hero-sub">
-          One thing needs your attention: <a class="ac-msg-link" href="#/integrations">Salesforce CRM</a> lost authentication 2 days ago and is affecting 3 active workflows.
-        </div>
+      <!-- Header -->
+      <div class="ac-cmd-header">
+        <span class="ac-cmd-title">Admin Console</span>
+        <span class="ac-cmd-welcome">Welcome back, TG · Contoso Ltd</span>
       </div>
 
-      <!-- Chat zone: appears after first message -->
-      <div class="ac-chat-zone" id="acMessages"></div>
+      <!-- Two-zone body -->
+      <div class="ac-cmd-body">
 
-      <!-- Input dock: always at bottom -->
-      <div class="ac-dock">
-        <div class="ac-dock-meta" id="acDockMeta">
-          <button class="ac-dock-reset" onclick="renderAdminHome()" aria-label="New conversation">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M2 6a4 4 0 1 1 .5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              <path d="M2 8.5V6H4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            New conversation
-          </button>
-        </div>
-        <div class="ac-dock-starters" id="acChips">
-          <button class="ac-chip" onclick="acSendChip(this,'Invite a new user')">+ Invite user</button>
-          <button class="ac-chip" onclick="acSendChip(this,'Show workspace status')">Workspace status</button>
-          <button class="ac-chip" onclick="acSendChip(this,'What integrations are failing?')">Review integrations</button>
-          <button class="ac-chip" onclick="acSendChip(this,'Show recent audit activity')">Audit log</button>
-        </div>
-        <div class="ac-dock-input-row">
-          <input
-            class="ac-copilot-input" id="acInput"
-            placeholder="Ask anything about your workspace…"
-            onkeydown="if(event.key==='Enter')acSend()"
-            autocomplete="off"
-          />
-          <button class="ac-copilot-send" onclick="acSend()" aria-label="Send">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 13V3M3 8l5-5 5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
+        <!-- LEFT: Needs Attention (35%) -->
+        <section class="ac-cmd-left">
+          <h2 class="ac-home-section-label">Needs Attention</h2>
+
+          <div class="ac-alert-row ac-alert-row--real">
+            <span class="ac-alert-dot"></span>
+            <div class="ac-alert-body">
+              <span class="ac-alert-section">Integrations &amp; Credentials</span>
+              <span class="ac-alert-desc">1 integration is failing</span>
+            </div>
+            <a class="ac-alert-cta" onclick="location.hash='#/integrations'">Review →</a>
+          </div>
+
+          <div class="ac-alert-row ac-alert-row--skeleton">
+            <div class="ac-skeleton ac-skeleton--wide"></div>
+          </div>
+          <div class="ac-alert-row ac-alert-row--skeleton">
+            <div class="ac-skeleton ac-skeleton--medium"></div>
+          </div>
+
+          <p class="ac-home-empty-note">
+            Items requiring action across all sections will appear here.
+          </p>
+        </section>
+
+        <!-- RIGHT: Section Grid (65%) -->
+        <section class="ac-cmd-right">
+          ${AC_SECTIONS.map(group => `
+            <div class="ac-section-group">
+              <h3 class="ac-section-group-label">${group.group}</h3>
+              <div class="ac-section-cards">
+                ${group.items.map(item => item.state === 'active' ? `
+                  <div class="ac-section-card ac-section-card--active"
+                    onclick="location.hash='#/${item.route}'"
+                    role="button" tabindex="0"
+                    onkeydown="if(event.key==='Enter'||event.key===' ')location.hash='#/${item.route}'">
+                    <div class="ac-card-name">${item.name}</div>
+                    <div class="ac-card-desc">${item.desc}</div>
+                    <div class="ac-card-footer">
+                      <span class="ac-card-badge ac-card-badge--active">● Active</span>
+                      ${item.alert ? `<span class="ac-card-alert-badge">⚠ ${item.alert}</span>` : ''}
+                    </div>
+                  </div>
+                ` : `
+                  <div class="ac-section-card ac-section-card--soon">
+                    <div class="ac-card-name">${item.name}</div>
+                    <div class="ac-card-desc">${item.desc}</div>
+                    <div class="ac-card-footer">
+                      <span class="ac-card-badge ac-card-badge--soon">○ Coming soon</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </section>
+
       </div>
-
     </div>
-  </div>`;
+  `;
 }
 
 function route() {
