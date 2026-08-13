@@ -7578,6 +7578,24 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .rc-color-swatch { width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .12s,border-color .12s; }
 .rc-color-swatch:hover { transform:scale(1.15); }
 .rc-color-swatch.selected { border-color:#fff; box-shadow:0 0 0 2px var(--pri); }
+/* ── 3-level permission tree (role create/edit modals) ── */
+.rc-tree { margin-top:4px; }
+.rc-tree-studio { margin-bottom:16px; }
+.rc-tree-s-head { display:flex; align-items:center; gap:8px; padding:6px 0; }
+.rc-tree-s-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.rc-tree-s-name { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--t3); flex:1; }
+.rc-tree-cb { width:14px; height:14px; accent-color:var(--pri); cursor:pointer; flex-shrink:0; margin-top:1px; }
+.rc-tree-count { font-size:10.5px; font-weight:600; color:var(--t3); background:var(--bg3); border:1px solid var(--line); border-radius:20px; padding:1px 7px; white-space:nowrap; flex-shrink:0; }
+.rc-tree-count--all { color:#10b981; background:rgba(16,185,129,.1); border-color:rgba(16,185,129,.25); }
+.rc-tree-count--some { color:#f59e0b; background:rgba(245,158,11,.1); border-color:rgba(245,158,11,.25); }
+.rc-tree-feats { padding-left:12px; border-left:2px solid var(--line); margin-left:7px; margin-top:2px; }
+.rc-tree-feat { margin-bottom:4px; }
+.rc-tree-f-head { display:flex; align-items:center; gap:8px; padding:5px 0; }
+.rc-tree-f-name { font-size:12.5px; font-weight:600; color:var(--t1); flex:1; }
+.rc-tree-leaves { padding-left:12px; border-left:2px solid var(--line); margin-left:7px; margin-top:1px; margin-bottom:6px; }
+.rc-tree-leaf { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-top:1px solid var(--line); }
+.rc-tree-leaf:first-child { border-top:none; }
+.rc-tree-leaf-info { flex:1; min-width:0; }
 /* Drawer tabs for role detail */
 .rd-tabs { display:flex; gap:0; border-bottom:1px solid var(--line); padding:0 20px; flex-shrink:0; }
 .rd-tab { background:none; border:none; padding:10px 14px; font-size:13px; font-weight:500; color:var(--t3); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .15s,border-color .15s; }
@@ -11157,6 +11175,8 @@ function renderPeople(subTab) {
       ${_paState.studioAccessOpen ? renderStudioAccessModal() : ''}
     </div>
   `;
+  if (_paState.roleCreateOpen) _rcInitTree('create');
+  if (_paState.roleEditId)     _rcInitTree('edit');
 }
 
 function renderPeopleMembers() {
@@ -11621,6 +11641,7 @@ function paCloseRoleEdit() {
 function paToggleEditPerm(permId, checked) {
   if (checked) _paState.roleEditPerms.add(permId);
   else _paState.roleEditPerms.delete(permId);
+  _rcUpdateCounts(_paState.roleEditPerms, 'edit');
 }
 function paSubmitRoleEdit() {
   const r = PA_ROLES.find(x => x.id === _paState.roleEditId); if (!r) return;
@@ -11739,6 +11760,103 @@ function renderRoleDetail(roleId) {
     </div>` : ''}`;
 }
 
+/* ── rc-tree: permission tree helpers shared by create + edit modals ── */
+function _rcLeaves(node) {
+  if (node.children && node.children[0] && node.children[0].children) {
+    return node.children.flatMap(f => (f.children || []).map(p => p.id));
+  }
+  return (node.children || []).map(p => p.id);
+}
+function _rcUpdateCounts(permSet, ctx) {
+  PERM_TREE.forEach(studio => {
+    const sLeaves = _rcLeaves(studio);
+    const sCount  = sLeaves.filter(id => permSet.has(id)).length;
+    const sCb     = document.querySelector(`.rc-tree-cb[data-scope="s"][data-id="${studio.id}"][data-ctx="${ctx}"]`);
+    const sEl     = document.querySelector(`.rc-tree-count[data-scope="s"][data-id="${studio.id}"][data-ctx="${ctx}"]`);
+    if (sCb) { sCb.checked = sCount === sLeaves.length; sCb.indeterminate = sCount > 0 && sCount < sLeaves.length; }
+    if (sEl) {
+      sEl.className = 'rc-tree-count' + (sCount === sLeaves.length ? ' rc-tree-count--all' : sCount > 0 ? ' rc-tree-count--some' : '');
+      sEl.textContent = sCount + '/' + sLeaves.length;
+    }
+    studio.children.forEach(feat => {
+      const fLeaves = (feat.children || []).map(p => p.id);
+      const fCount  = fLeaves.filter(id => permSet.has(id)).length;
+      const fCb     = document.querySelector(`.rc-tree-cb[data-scope="f"][data-id="${feat.id}"][data-ctx="${ctx}"]`);
+      const fEl     = document.querySelector(`.rc-tree-count[data-scope="f"][data-id="${feat.id}"][data-ctx="${ctx}"]`);
+      if (fCb) { fCb.checked = fCount === fLeaves.length; fCb.indeterminate = fCount > 0 && fCount < fLeaves.length; }
+      if (fEl) {
+        fEl.className = 'rc-tree-count' + (fCount === fLeaves.length ? ' rc-tree-count--all' : fCount > 0 ? ' rc-tree-count--some' : '');
+        fEl.textContent = fCount + '/' + fLeaves.length;
+      }
+    });
+  });
+}
+function _rcToggleFeature(featId, checked, ctx) {
+  const permSet = ctx === 'create' ? _paState.roleCreatePerms : _paState.roleEditPerms;
+  const feat = PERM_TREE.flatMap(s => s.children).find(f => f.id === featId);
+  if (!feat) return;
+  const ids = (feat.children || []).map(p => p.id);
+  ids.forEach(id => checked ? permSet.add(id) : permSet.delete(id));
+  ids.forEach(id => { const cb = document.querySelector(`.rc-tree-cb[data-scope="p"][data-id="${id}"][data-ctx="${ctx}"]`); if (cb) cb.checked = checked; });
+  _rcUpdateCounts(permSet, ctx);
+}
+function _rcToggleStudio(studioId, checked, ctx) {
+  const permSet = ctx === 'create' ? _paState.roleCreatePerms : _paState.roleEditPerms;
+  const studio = PERM_TREE.find(s => s.id === studioId);
+  if (!studio) return;
+  const leaves = _rcLeaves(studio);
+  leaves.forEach(id => checked ? permSet.add(id) : permSet.delete(id));
+  leaves.forEach(id => { const cb = document.querySelector(`.rc-tree-cb[data-scope="p"][data-id="${id}"][data-ctx="${ctx}"]`); if (cb) cb.checked = checked; });
+  studio.children.forEach(feat => { const cb = document.querySelector(`.rc-tree-cb[data-scope="f"][data-id="${feat.id}"][data-ctx="${ctx}"]`); if (cb) { cb.checked = checked; cb.indeterminate = false; } });
+  _rcUpdateCounts(permSet, ctx);
+}
+function _rcInitTree(ctx) {
+  const permSet = ctx === 'create' ? _paState.roleCreatePerms : _paState.roleEditPerms;
+  if (permSet) _rcUpdateCounts(permSet, ctx);
+}
+function _rcRenderTree(permSet, ctx) {
+  return '<div class="rc-tree">' + PERM_TREE.map(studio => {
+    const sLeaves = _rcLeaves(studio);
+    const sCount  = sLeaves.filter(id => permSet.has(id)).length;
+    const sCls    = sCount === sLeaves.length ? ' rc-tree-count--all' : sCount > 0 ? ' rc-tree-count--some' : '';
+    return `<div class="rc-tree-studio">
+      <div class="rc-tree-s-head">
+        <input type="checkbox" class="rc-tree-cb" data-scope="s" data-id="${studio.id}" data-ctx="${ctx}"
+          ${sCount === sLeaves.length ? 'checked' : ''}
+          onchange="_rcToggleStudio('${studio.id}',this.checked,'${ctx}')">
+        <div class="rc-tree-s-dot" style="background:${studio.color}"></div>
+        <span class="rc-tree-s-name">${escapeHtml(studio.label)}</span>
+        <span class="rc-tree-count${sCls}" data-scope="s" data-id="${studio.id}" data-ctx="${ctx}">${sCount}/${sLeaves.length}</span>
+      </div>
+      <div class="rc-tree-feats">` +
+      studio.children.map(feat => {
+        const fLeaves = (feat.children || []).map(p => p.id);
+        const fCount  = fLeaves.filter(id => permSet.has(id)).length;
+        const fCls    = fCount === fLeaves.length ? ' rc-tree-count--all' : fCount > 0 ? ' rc-tree-count--some' : '';
+        return `<div class="rc-tree-feat">
+          <div class="rc-tree-f-head">
+            <input type="checkbox" class="rc-tree-cb" data-scope="f" data-id="${feat.id}" data-ctx="${ctx}"
+              ${fCount === fLeaves.length ? 'checked' : ''}
+              onchange="_rcToggleFeature('${feat.id}',this.checked,'${ctx}')">
+            <span class="rc-tree-f-name">${escapeHtml(feat.label)}</span>
+            <span class="rc-tree-count${fCls}" data-scope="f" data-id="${feat.id}" data-ctx="${ctx}">${fCount}/${fLeaves.length}</span>
+          </div>
+          <div class="rc-tree-leaves">` +
+          (feat.children || []).map(perm => `<label class="rc-tree-leaf">
+            <input type="checkbox" class="rc-tree-cb" data-scope="p" data-id="${perm.id}" data-ctx="${ctx}"
+              ${permSet.has(perm.id) ? 'checked' : ''}
+              onchange="${ctx === 'create' ? 'paToggleCreatePerm' : 'paToggleEditPerm'}('${perm.id}',this.checked)">
+            <div class="rc-tree-leaf-info">
+              <div class="rd-perm-name">${escapeHtml(perm.label)}</div>
+              <div class="rd-perm-desc">${escapeHtml(perm.desc)}</div>
+            </div>
+          </label>`).join('') +
+          `</div></div>`;
+      }).join('') +
+      `</div></div>`;
+  }).join('') + '</div>';
+}
+
 function renderRoleCreateModal() {
   const s = _paState;
   const colorOptions = ['#6366f1','#06B6D4','#10b981','#f59e0b','#ef4444','#8b5cf6'];
@@ -11772,24 +11890,8 @@ function renderRoleCreateModal() {
                 onclick="_paState.roleCreateColor='${c}';document.querySelectorAll('.rc-color-swatch-create').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"></button>`).join('')}
           </div>
         </div>
-        <div class="ms-label" style="margin-bottom:12px">Permissions</div>
-        ${PA_PERM_TREE.map(studio => `
-          <div class="rd-perm-studio">
-            <div class="rd-perm-studio-head">
-              <div class="rd-perm-studio-dot" style="background:${studio.color}"></div>
-              <div class="rd-perm-studio-name">${escapeHtml(studio.studio)}</div>
-            </div>
-            ${studio.perms.map(perm => `
-              <label class="rd-perm-row">
-                <input type="checkbox" class="rd-perm-check"
-                  ${s.roleCreatePerms.has(perm.id) ? 'checked' : ''}
-                  onchange="paToggleCreatePerm('${perm.id}',this.checked)">
-                <div class="rd-perm-label">
-                  <div class="rd-perm-name">${escapeHtml(perm.label)}</div>
-                  <div class="rd-perm-desc">${escapeHtml(perm.desc)}</div>
-                </div>
-              </label>`).join('')}
-          </div>`).join('')}
+        <div class="ms-label" style="margin-bottom:10px">Permissions</div>
+        ${_rcRenderTree(s.roleCreatePerms, 'create')}
       </div>
       <div class="rc-foot">
         <button class="btn btn-ghost btn-sm" onclick="paCloseRoleCreate()">Cancel</button>
@@ -11833,23 +11935,8 @@ function renderRoleEditModal() {
               onclick="_paState.roleEditColor='${c}';document.querySelectorAll('.rc-color-swatch-edit').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"></button>`).join('')}
           </div>
         </div>
-        <div class="ms-label" style="margin-bottom:12px">Permissions <span style="font-weight:400;color:var(--t3)">(${editPerms.size} of ${PA_PERM_TREE.reduce((t,s)=>t+s.perms.length,0)} selected)</span></div>
-        ${PA_PERM_TREE.map(studio => `
-          <div class="rd-perm-studio">
-            <div class="rd-perm-studio-head">
-              <div class="rd-perm-studio-dot" style="background:${studio.color}"></div>
-              <div class="rd-perm-studio-name">${escapeHtml(studio.studio)}</div>
-            </div>
-            ${studio.perms.map(perm => `
-            <label class="rd-perm-row">
-              <input type="checkbox" class="rd-perm-check" ${editPerms.has(perm.id)?'checked':''}
-                onchange="paToggleEditPerm('${perm.id}',this.checked)">
-              <div class="rd-perm-label">
-                <div class="rd-perm-name">${escapeHtml(perm.label)}</div>
-                <div class="rd-perm-desc">${escapeHtml(perm.desc)}</div>
-              </div>
-            </label>`).join('')}
-          </div>`).join('')}
+        <div class="ms-label" style="margin-bottom:10px">Permissions</div>
+        ${_rcRenderTree(editPerms, 'edit')}
       </div>
       <div class="rc-foot">
         <button class="btn btn-ghost btn-sm" onclick="paCloseRoleEdit()">Cancel</button>
@@ -12152,6 +12239,7 @@ function paCloseRoleCreate() {
 function paToggleCreatePerm(permId, checked) {
   if (checked) _paState.roleCreatePerms.add(permId);
   else _paState.roleCreatePerms.delete(permId);
+  _rcUpdateCounts(_paState.roleCreatePerms, 'create');
 }
 function paSubmitRoleCreate() {
   const name = _paState.roleCreateName.trim();
