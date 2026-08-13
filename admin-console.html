@@ -7405,6 +7405,31 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .pm-invite-body { padding:20px; }
 .pm-invite-foot { padding:14px 20px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:flex-end; }
 
+/* ====================== ORGANIZATION ====================== */
+.org-wrap { max-width: 720px; padding: 32px 24px 64px; }
+.org-logo-row { display:flex; align-items:center; gap:20px; margin-bottom:24px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+.org-logo { width:72px; height:72px; border-radius:14px; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:800; color:#fff; flex-shrink:0; letter-spacing:.02em; }
+.org-logo-meta { flex:1; }
+.org-logo-name { font-size:18px; font-weight:600; color:var(--t1); line-height:1.2; }
+.org-logo-sub { font-size:12px; color:var(--t3); margin-top:3px; }
+.org-logo-btn { background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); padding:7px 14px; font-size:12px; font-weight:600; color:var(--t2); cursor:pointer; transition:border-color .15s; }
+.org-logo-btn:hover { border-color:var(--pri); color:var(--pri); }
+.org-meta-tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:0; }
+.org-meta-tile { background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); padding:14px 16px; }
+.org-meta-label { font-size:10px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--t3); margin-bottom:6px; }
+.org-meta-value { font-size:13px; font-weight:600; color:var(--t1); display:flex; align-items:center; gap:6px; }
+.org-meta-copy { background:none; border:none; cursor:pointer; color:var(--t3); padding:0; display:flex; align-items:center; opacity:.7; }
+.org-meta-copy:hover { opacity:1; color:var(--pri); }
+.org-plan-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(99,102,241,.15); color:#818cf8; font-size:11px; font-weight:700; padding:3px 8px; border-radius:20px; letter-spacing:.04em; }
+.org-danger-card { border:1px solid rgba(239,68,68,.3); border-radius:var(--r12); overflow:hidden; }
+.org-danger-action { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid rgba(239,68,68,.15); }
+.org-danger-action:last-child { border-bottom:none; }
+.org-danger-label { font-size:13px; font-weight:600; color:var(--t1); margin-bottom:3px; }
+.org-danger-desc { font-size:12px; color:var(--t3); }
+.org-danger-btn { background:none; border:1px solid rgba(239,68,68,.5); border-radius:var(--r8); padding:7px 14px; font-size:12px; font-weight:600; color:#ef4444; cursor:pointer; white-space:nowrap; transition:background .15s,border-color .15s; }
+.org-danger-btn:hover { background:rgba(239,68,68,.1); border-color:#ef4444; }
+.org-id-mono { font-family:monospace; font-size:12px; letter-spacing:.03em; }
+
 </style>
 <link rel="stylesheet" href="shared/notif-panel.css">
 </head>
@@ -7642,7 +7667,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
             <span class="ssb-item-label">People & Access</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="organization">
+          <button class="ssb-item" data-route="organization" onclick="navigate('#/organization')">
             <span class="ssb-item-label">Organization</span>
           </button>
 
@@ -11304,6 +11329,191 @@ function paMemberMenu(event, personId) {
 
 /* ====================== PEOPLE & ACCESS end ====================== */
 
+/* ====================== ORGANIZATION ====================== */
+
+const MOCK_ORG = {
+  name: 'Contoso Ltd',
+  displayName: 'Contoso',
+  website: 'https://contoso.com',
+  industry: 'Financial Services',
+  size: '1,001–5,000',
+  supportEmail: 'it-admin@contoso.com',
+  billingEmail: 'billing@contoso.com',
+  legalName: 'Contoso Financial Group, Inc.',
+  taxId: 'US-84-1234567',
+  address: '350 Fifth Avenue, Suite 6700\nNew York, NY 10118\nUnited States',
+  workspaceId: 'ws_contoso_a1b2c3d4',
+  region: 'US East (AWS us-east-1)',
+  plan: 'Enterprise',
+  created: 'Jan 12, 2025',
+  memberCount: 13,
+};
+
+function renderOrganization() {
+  const o = MOCK_ORG;
+  $('content').innerHTML = `
+<div class="org-wrap">
+
+  <!-- PROFILE -->
+  <div class="ms-section">
+    <div class="ms-section-title">Organization profile</div>
+    <div class="ms-card">
+      <div class="org-logo-row">
+        <div class="org-logo">CO</div>
+        <div class="org-logo-meta">
+          <div class="org-logo-name">${o.name}</div>
+          <div class="org-logo-sub">Workspace logo · Shown to members and in emails</div>
+        </div>
+        <button class="org-logo-btn" onclick="toast('Logo upload coming soon','info')">Upload logo</button>
+      </div>
+      <div class="ms-form-grid">
+        <div class="ms-field full">
+          <label class="ms-label">Organization name</label>
+          <input class="ms-input" type="text" value="${o.name}" />
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">Display name</label>
+          <input class="ms-input" type="text" value="${o.displayName}" />
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">Website</label>
+          <input class="ms-input" type="url" value="${o.website}" />
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">Industry</label>
+          <select class="ms-select">
+            <option>Financial Services</option>
+            <option>Healthcare</option>
+            <option>Technology</option>
+            <option>Manufacturing</option>
+            <option>Retail</option>
+            <option>Education</option>
+            <option>Government</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">Company size</label>
+          <select class="ms-select">
+            <option>1–50</option>
+            <option>51–200</option>
+            <option>201–1,000</option>
+            <option selected>1,001–5,000</option>
+            <option>5,001–10,000</option>
+            <option>10,000+</option>
+          </select>
+        </div>
+        <div class="ms-field full">
+          <label class="ms-label">Support contact email</label>
+          <input class="ms-input" type="email" value="${o.supportEmail}" />
+        </div>
+      </div>
+      <div class="ms-save-row">
+        <button class="ms-btn-save" onclick="toast('Organization profile saved','success')">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKSPACE INFO -->
+  <div class="ms-section">
+    <div class="ms-section-title">Workspace</div>
+    <div class="ms-card">
+      <div class="org-meta-tiles">
+        <div class="org-meta-tile">
+          <div class="org-meta-label">Workspace ID</div>
+          <div class="org-meta-value">
+            <span class="org-id-mono">${o.workspaceId}</span>
+            <button class="org-meta-copy" onclick="navigator.clipboard.writeText('${o.workspaceId}');toast('Copied','success')" title="Copy">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="org-meta-tile">
+          <div class="org-meta-label">Plan</div>
+          <div class="org-meta-value"><span class="org-plan-badge">★ ${o.plan}</span></div>
+        </div>
+        <div class="org-meta-tile">
+          <div class="org-meta-label">Region</div>
+          <div class="org-meta-value">${o.region}</div>
+        </div>
+        <div class="org-meta-tile">
+          <div class="org-meta-label">Created</div>
+          <div class="org-meta-value">${o.created}</div>
+        </div>
+        <div class="org-meta-tile">
+          <div class="org-meta-label">Members</div>
+          <div class="org-meta-value">${o.memberCount}</div>
+        </div>
+        <div class="org-meta-tile">
+          <div class="org-meta-label">Data residency</div>
+          <div class="org-meta-value">United States</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT & LEGAL -->
+  <div class="ms-section">
+    <div class="ms-section-title">Contact &amp; Legal</div>
+    <div class="ms-card">
+      <div class="ms-form-grid">
+        <div class="ms-field">
+          <label class="ms-label">Billing contact email</label>
+          <input class="ms-input" type="email" value="${o.billingEmail}" />
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">Legal entity name</label>
+          <input class="ms-input" type="text" value="${o.legalName}" />
+        </div>
+        <div class="ms-field">
+          <label class="ms-label">VAT / Tax ID</label>
+          <input class="ms-input" type="text" value="${o.taxId}" />
+        </div>
+        <div class="ms-field full">
+          <label class="ms-label">Billing address</label>
+          <textarea class="ms-input" rows="3" style="resize:vertical;line-height:1.5;">${o.address}</textarea>
+        </div>
+      </div>
+      <div class="ms-save-row">
+        <button class="ms-btn-save" onclick="toast('Contact details saved','success')">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DANGER ZONE -->
+  <div class="ms-section">
+    <div class="ms-section-title">Danger zone</div>
+    <div class="org-danger-card">
+      <div class="org-danger-action">
+        <div>
+          <div class="org-danger-label">Transfer workspace ownership</div>
+          <div class="org-danger-desc">Assign a new primary owner. You will lose admin privileges.</div>
+        </div>
+        <button class="org-danger-btn" onclick="toast('Transfer ownership — contact support to proceed','info')">Transfer ownership</button>
+      </div>
+      <div class="org-danger-action">
+        <div>
+          <div class="org-danger-label">Export workspace data</div>
+          <div class="org-danger-desc">Download a full archive of members, models, agents, and audit logs.</div>
+        </div>
+        <button class="org-danger-btn" onclick="toast('Export queued — you will receive an email when ready','success')">Request export</button>
+      </div>
+      <div class="org-danger-action">
+        <div>
+          <div class="org-danger-label">Delete this workspace</div>
+          <div class="org-danger-desc">Permanently removes all data. This action cannot be undone.</div>
+        </div>
+        <button class="org-danger-btn" onclick="toast('Contact support to delete your workspace','info')">Delete workspace</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+  `;
+}
+
+/* ====================== ORGANIZATION end ====================== */
+
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'home';
   const parts = hash.split('/');
@@ -11316,7 +11526,8 @@ function route() {
     'widgets':'widgets',
     'personal':'personal',
     'my-settings':'my-settings',
-    'people':'people'
+    'people':'people',
+    'organization':'organization'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -11363,6 +11574,8 @@ function route() {
     renderMySettings();
   } else if (parts[0]==='people') {
     renderPeople(parts[1] || null);
+  } else if (parts[0]==='organization') {
+    renderOrganization();
   } else {
     renderHome();
   }
