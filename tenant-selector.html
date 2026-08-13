@@ -324,18 +324,6 @@
       background: var(--field-bg);
     }
 
-    .count-pill {
-      font-size: 11.5px;
-      font-weight: 500;
-      color: var(--text-2);
-      white-space: nowrap;
-      flex-shrink: 0;
-      padding: 5px 11px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-    }
-
     /* ─── Search ⌘K hint ─────────────────────────────────────── */
     .search-kbd {
       position: absolute;
@@ -371,8 +359,8 @@
 
     /* ─── Card ───────────────────────────────────────────────── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: var(--card-default-bg);
+      border: 1px solid var(--card-default-border);
       border-radius: 12px;
       padding: 15px 20px;
       display: flex;
@@ -1374,7 +1362,6 @@
         />
         <span class="search-kbd">⌘K</span>
       </div>
-      <span class="count-pill" id="countPill">5 workspaces</span>
       <button class="sort-btn" id="sortBtn" onclick="cycleSortOrder()" title="Change sort order">
         <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
           <path d="M3 4h10M5 8h6M7 12h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -1778,8 +1765,6 @@ function render(list, searching = false) {
     gridEl.innerHTML = list.map((t, i) => buildCard(t, i, false)).join('');
   }
 
-  const n = list.length;
-  document.getElementById('countPill').textContent = `${n} workspace${n !== 1 ? 's' : ''}`;
   const countEl = document.getElementById('tenantCount');
   if (countEl) countEl.textContent = TENANTS.length;
 }
