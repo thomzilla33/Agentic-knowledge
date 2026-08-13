@@ -7477,6 +7477,53 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 /* Session grid */
 .ids-session-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
+/* ====================== STUDIOS & ENTITLEMENTS ====================== */
+.ste-wrap { max-width:860px; padding:32px 24px 64px; }
+/* License banner */
+.ste-license-bar { background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.08)); border:1px solid rgba(99,102,241,.25); border-radius:var(--r12); padding:20px 24px; display:flex; align-items:center; gap:20px; margin-bottom:32px; }
+.ste-license-icon { width:44px; height:44px; border-radius:12px; background:rgba(99,102,241,.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#818cf8; }
+.ste-license-body { flex:1; }
+.ste-license-title { font-size:15px; font-weight:700; color:var(--t1); }
+.ste-license-sub { font-size:12px; color:var(--t3); margin-top:3px; }
+.ste-license-badges { display:flex; gap:8px; margin-top:8px; }
+.ste-lic-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+.ste-lic-badge.enterprise { background:rgba(99,102,241,.15); color:#818cf8; border:1px solid rgba(99,102,241,.3); }
+.ste-lic-badge.renews { background:rgba(16,185,129,.1); color:#10b981; border:1px solid rgba(16,185,129,.25); }
+.ste-renew-btn { background:none; border:1px solid var(--line); border-radius:var(--r8); padding:8px 16px; font-size:12px; font-weight:600; color:var(--t2); cursor:pointer; white-space:nowrap; transition:border-color .15s,color .15s; }
+.ste-renew-btn:hover { border-color:var(--pri); color:var(--pri); }
+/* Studio card grid */
+.ste-studio-grid { display:grid; grid-template-columns:1fr; gap:16px; }
+.ste-studio-card { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12); overflow:hidden; }
+.ste-studio-head { display:flex; align-items:center; gap:16px; padding:20px; }
+.ste-studio-ico { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ste-studio-meta { flex:1; }
+.ste-studio-name { font-size:15px; font-weight:700; color:var(--t1); }
+.ste-studio-desc { font-size:12px; color:var(--t3); margin-top:3px; }
+.ste-studio-status { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; margin-top:6px; }
+.ste-status-on  { background:rgba(16,185,129,.1);  color:#10b981; border:1px solid rgba(16,185,129,.25); }
+.ste-status-off { background:rgba(100,116,139,.1); color:var(--t3); border:1px solid var(--line); }
+.ste-studio-toggle { flex-shrink:0; }
+/* Seat meter */
+.ste-seat-bar-wrap { display:flex; flex-direction:column; gap:4px; margin-top:4px; min-width:160px; text-align:right; }
+.ste-seat-label { font-size:11px; color:var(--t3); }
+.ste-seat-track { height:4px; background:var(--bg3); border-radius:4px; overflow:hidden; }
+.ste-seat-fill  { height:100%; border-radius:4px; background:var(--pri); }
+.ste-seat-fill.warn { background:#f59e0b; }
+.ste-seat-fill.over { background:#ef4444; }
+/* Feature flags table */
+.ste-features { border-top:1px solid var(--line); }
+.ste-features-head { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; cursor:pointer; user-select:none; }
+.ste-features-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--t3); }
+.ste-features-toggle-lbl { font-size:11px; color:var(--pri); cursor:pointer; }
+.ste-feature-row { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; border-top:1px solid var(--line); }
+.ste-feature-row:last-child { padding-bottom:14px; }
+.ste-feature-name { font-size:13px; color:var(--t1); font-weight:500; }
+.ste-feature-desc { font-size:11px; color:var(--t3); margin-top:1px; }
+.ste-feature-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 7px; border-radius:20px; }
+.ste-tag-included { background:rgba(16,185,129,.1); color:#10b981; }
+.ste-tag-addon    { background:rgba(249,115,22,.1);  color:#f97316; }
+.ste-tag-beta     { background:rgba(99,102,241,.12); color:#818cf8; }
+
 </style>
 <link rel="stylesheet" href="shared/notif-panel.css">
 </head>
@@ -7722,7 +7769,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
             <span class="ssb-item-label">Identity & Security</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="studios">
+          <button class="ssb-item" data-route="studios" onclick="navigate('#/studios')">
             <span class="ssb-item-label">Studios & Entitlements</span>
           </button>
 
@@ -11797,6 +11844,181 @@ function renderIdentity() {
 
 /* ====================== IDENTITY & SECURITY end ====================== */
 
+/* ====================== STUDIOS & ENTITLEMENTS ====================== */
+
+const MOCK_STUDIOS = [
+  {
+    id: 'agentic',
+    name: 'Agentic Studio',
+    desc: 'Build, deploy, and monitor AI workers and agentic networks.',
+    color: '#06B6D4', bg: 'rgba(6,182,212,.12)', border: 'rgba(6,182,212,.25)',
+    enabled: true,
+    seatsUsed: 9, seatsTotal: 15,
+    features: [
+      { name: 'AI Workers',            desc: 'Build and run individual AI agents',              tag: 'included', on: true  },
+      { name: 'Agentic Networks',       desc: 'Multi-agent orchestration graphs',                tag: 'included', on: true  },
+      { name: 'Human-in-the-Loop',      desc: 'Manual review gates for agent actions',           tag: 'included', on: true  },
+      { name: 'Workflow Builder',       desc: 'Visual drag-and-drop workflow canvas',             tag: 'included', on: true  },
+      { name: 'Agent Analytics',        desc: 'Usage metrics and cost tracking per agent',       tag: 'addon',    on: true  },
+      { name: 'Custom Tool Registry',   desc: 'Register private tools and MCP servers',          tag: 'addon',    on: false },
+      { name: 'Agentic Sandbox',        desc: 'Isolated dev environment for agent testing',      tag: 'beta',     on: true  },
+    ],
+  },
+  {
+    id: 'governance',
+    name: 'Governance Studio',
+    desc: 'Define data policies, knowledge bindings, and promotion workflows.',
+    color: '#10b981', bg: 'rgba(16,185,129,.12)', border: 'rgba(16,185,129,.25)',
+    enabled: true,
+    seatsUsed: 5, seatsTotal: 10,
+    features: [
+      { name: 'Policy Engine',          desc: 'Define and enforce workspace-wide data policies',  tag: 'included', on: true  },
+      { name: 'Knowledge Bindings',     desc: 'Link data sources to governed model definitions',  tag: 'included', on: true  },
+      { name: 'Promotion Packets',      desc: 'Staged approval workflows for model changes',      tag: 'included', on: true  },
+      { name: 'Domain Management',      desc: 'Organize models into governed data domains',       tag: 'included', on: true  },
+      { name: 'Resolution Requests',    desc: 'Conflict resolution queue for data owners',        tag: 'addon',    on: true  },
+      { name: 'Compliance Reports',     desc: 'Automated SOC 2 / GDPR evidence export',          tag: 'addon',    on: false },
+    ],
+  },
+  {
+    id: 'helix',
+    name: 'Helix Data Studio',
+    desc: 'Governed data ingestion, model authoring, and lineage tracking.',
+    color: '#8b5cf6', bg: 'rgba(139,92,246,.12)', border: 'rgba(139,92,246,.25)',
+    enabled: true,
+    seatsUsed: 4, seatsTotal: 8,
+    features: [
+      { name: 'Data Connectors',        desc: 'Ingest from databases, APIs, and file sources',   tag: 'included', on: true  },
+      { name: 'Model Definitions',      desc: 'Author and version semantic data models',          tag: 'included', on: true  },
+      { name: 'Lineage Graph',          desc: 'Visual data lineage from source to consumer',      tag: 'included', on: true  },
+      { name: 'Changelog & Versioning', desc: 'Track all model changes with decision pins',       tag: 'included', on: true  },
+      { name: 'Scope Switcher',         desc: '4-tier scope (workspace / domain / project / personal)', tag: 'included', on: true },
+      { name: 'Advanced Profiling',     desc: 'Statistical data quality profiling per field',     tag: 'addon',    on: false },
+    ],
+  },
+];
+
+let _steState = {
+  expanded: { agentic: true, governance: false, helix: false },
+  studioEnabled: { agentic: true, governance: true, helix: true },
+  featureOn: Object.fromEntries(
+    MOCK_STUDIOS.flatMap(s => s.features.map(f => [`${s.id}__${f.name}`, f.on]))
+  ),
+};
+
+function steToggleStudio(id) {
+  _steState.studioEnabled[id] = !_steState.studioEnabled[id];
+  renderStudiosEntitlements();
+}
+
+function steToggleFeature(key) {
+  _steState.featureOn[key] = !_steState.featureOn[key];
+  renderStudiosEntitlements();
+}
+
+function steToggleExpand(id) {
+  _steState.expanded[id] = !_steState.expanded[id];
+  renderStudiosEntitlements();
+}
+
+function renderStudiosEntitlements() {
+  const st = _steState;
+
+  const toggle = (key, onchange) => `
+    <label class="ids-toggle">
+      <input type="checkbox" ${st.studioEnabled[key] || st.featureOn[key] !== undefined && st.featureOn[key] ? 'checked' : ''} onchange="${onchange}">
+      <span class="ids-toggle-track"></span>
+      <span class="ids-toggle-thumb"></span>
+    </label>`;
+
+  const studioCard = (s) => {
+    const enabled = st.studioEnabled[s.id];
+    const pct = Math.round(s.seatsUsed / s.seatsTotal * 100);
+    const fillClass = pct >= 100 ? 'over' : pct >= 80 ? 'warn' : '';
+    const expanded = st.expanded[s.id];
+
+    const featureRows = s.features.map(f => {
+      const key = `${s.id}__${f.name}`;
+      const on = st.featureOn[key];
+      const tagClass = { included:'ste-tag-included', addon:'ste-tag-addon', beta:'ste-tag-beta' }[f.tag];
+      return `
+      <div class="ste-feature-row">
+        <div>
+          <div class="ste-feature-name">${f.name} <span class="ste-feature-tag ${tagClass}">${f.tag}</span></div>
+          <div class="ste-feature-desc">${f.desc}</div>
+        </div>
+        <label class="ids-toggle" style="margin-left:16px;">
+          <input type="checkbox" ${on ? 'checked' : ''} onchange="steToggleFeature('${key}')">
+          <span class="ids-toggle-track"></span>
+          <span class="ids-toggle-thumb"></span>
+        </label>
+      </div>`;
+    }).join('');
+
+    return `
+    <div class="ste-studio-card">
+      <div class="ste-studio-head">
+        <div class="ste-studio-ico" style="background:${s.bg};border:1px solid ${s.border};">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="${s.color}" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="${s.color}" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ste-studio-meta">
+          <div class="ste-studio-name">${s.name}</div>
+          <div class="ste-studio-desc">${s.desc}</div>
+          <div class="ste-studio-status ${enabled ? 'ste-status-on' : 'ste-status-off'}">
+            ${enabled ? '● Enabled' : '○ Disabled'}
+          </div>
+        </div>
+        <div class="ste-seat-bar-wrap">
+          <div class="ste-seat-label">${s.seatsUsed} / ${s.seatsTotal} seats used</div>
+          <div class="ste-seat-track"><div class="ste-seat-fill ${fillClass}" style="width:${pct}%"></div></div>
+        </div>
+        <label class="ids-toggle ste-studio-toggle" style="margin-left:20px;">
+          <input type="checkbox" ${enabled ? 'checked' : ''} onchange="steToggleStudio('${s.id}')">
+          <span class="ids-toggle-track"></span>
+          <span class="ids-toggle-thumb"></span>
+        </label>
+      </div>
+      <div class="ste-features">
+        <div class="ste-features-head" onclick="steToggleExpand('${s.id}')">
+          <span class="ste-features-title">Feature entitlements (${s.features.length})</span>
+          <span class="ste-features-toggle-lbl">${expanded ? '▲ Collapse' : '▼ Expand'}</span>
+        </div>
+        ${expanded ? featureRows : ''}
+      </div>
+    </div>`;
+  };
+
+  $('content').innerHTML = `
+<div class="ste-wrap">
+
+  <!-- LICENSE BANNER -->
+  <div class="ste-license-bar">
+    <div class="ste-license-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="ste-license-body">
+      <div class="ste-license-title">Enterprise License — Contoso Ltd</div>
+      <div class="ste-license-sub">3 studios licensed · 33 total seats · License ID: LIC-2025-CNT-00142</div>
+      <div class="ste-license-badges">
+        <span class="ste-lic-badge enterprise">★ Enterprise</span>
+        <span class="ste-lic-badge renews">Renews Jan 12, 2026</span>
+      </div>
+    </div>
+    <button class="ste-renew-btn" onclick="toast('Contact your account manager to manage your license','info')">Manage license</button>
+  </div>
+
+  <!-- STUDIO CARDS -->
+  <div class="ms-section-title" style="margin-bottom:16px;">Studios</div>
+  <div class="ste-studio-grid">
+    ${MOCK_STUDIOS.map(studioCard).join('')}
+  </div>
+
+</div>
+  `;
+}
+
+/* ====================== STUDIOS & ENTITLEMENTS end ====================== */
+
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'home';
   const parts = hash.split('/');
@@ -11811,7 +12033,8 @@ function route() {
     'my-settings':'my-settings',
     'people':'people',
     'organization':'organization',
-    'identity':'identity'
+    'identity':'identity',
+    'studios':'studios'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -11862,6 +12085,8 @@ function route() {
     renderOrganization();
   } else if (parts[0]==='identity') {
     renderIdentity();
+  } else if (parts[0]==='studios') {
+    renderStudiosEntitlements();
   } else {
     renderHome();
   }
