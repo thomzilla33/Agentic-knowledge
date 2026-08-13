@@ -7535,13 +7535,40 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 /* Role create modal */
 .rc-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); z-index:200; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
 .rc-overlay.open { opacity:1; pointer-events:all; }
-.rc-modal { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12); width:560px; max-width:calc(100vw - 32px); max-height:90vh; display:flex; flex-direction:column; box-shadow:0 24px 64px rgba(0,0,0,.5); }
+.rc-modal { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12); width:760px; max-width:calc(100vw - 32px); max-height:90vh; display:flex; flex-direction:column; box-shadow:0 24px 64px rgba(0,0,0,.5); }
 .rc-head { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--line); flex-shrink:0; }
 .rc-title { font-size:15px; font-weight:700; color:var(--t1); }
 .rc-body { flex:1; overflow-y:auto; padding:20px; }
-.rc-modal-fields { padding:16px 20px; border-bottom:1px solid var(--line); flex-shrink:0; }
-.rc-perm-picker { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:180px; }
-.rc-foot { padding:14px 20px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
+.rc-modal-fields { padding:14px 20px 0; flex-shrink:0; display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
+.rc-modal-fields .ms-field.full { grid-column:1/-1; }
+.rc-modal-fields .rc-color-row-wrap { grid-column:1/-1; padding-bottom:14px; border-bottom:1px solid var(--line); }
+/* Split permission picker */
+.rc-perm-picker { flex:1; display:flex; overflow:hidden; min-height:240px; }
+.rc-perm-sidebar { width:200px; flex-shrink:0; border-right:1px solid var(--line); overflow-y:auto; padding:8px 0; }
+.rc-perm-sidebar-studio { padding:8px 16px 4px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--t3); display:flex; align-items:center; gap:6px; }
+.rc-perm-sidebar-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.rc-perm-sidebar-feat { padding:7px 16px 7px 28px; font-size:12.5px; color:var(--t2); cursor:pointer; border-radius:0; transition:background .1s,color .1s; display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.rc-perm-sidebar-feat:hover { background:var(--hov); color:var(--t1); }
+.rc-perm-sidebar-feat--active { background:var(--bg3); color:var(--t1); font-weight:600; }
+.rc-perm-sidebar-feat-pill { font-size:10px; font-weight:700; padding:1px 6px; border-radius:20px; flex-shrink:0; }
+.rc-perm-panel { flex:1; overflow-y:auto; padding:0; }
+.rc-perm-panel-head { padding:14px 20px 10px; border-bottom:1px solid var(--line); }
+.rc-perm-panel-title { font-size:13px; font-weight:700; color:var(--t1); }
+.rc-perm-panel-sub { font-size:11.5px; color:var(--t3); margin-top:2px; }
+.rc-perm-row { display:flex; align-items:flex-start; gap:14px; padding:12px 20px; border-bottom:1px solid var(--line); transition:background .1s; }
+.rc-perm-row:last-child { border-bottom:none; }
+.rc-perm-row--changed { background:rgba(99,102,241,.04); }
+.rc-perm-row-info { flex:1; min-width:0; }
+.rc-perm-row-name { font-size:13px; font-weight:500; color:var(--t1); }
+.rc-perm-row-desc { font-size:11.5px; color:var(--t3); margin-top:3px; line-height:1.45; }
+.rc-perm-row-badge { font-size:10px; font-weight:700; color:#ef4444; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); border-radius:4px; padding:1px 5px; display:inline-block; margin-left:6px; vertical-align:middle; }
+/* Changes footer */
+.rc-changes-bar { padding:10px 20px; border-top:1px solid var(--line); display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.rc-changes-badge { font-size:12px; font-weight:600; color:var(--pri); background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.2); border-radius:20px; padding:3px 10px; white-space:nowrap; }
+.rc-changes-none { font-size:12px; color:var(--t3); }
+.rc-changes-undo { background:none; border:1px solid var(--line); border-radius:var(--r6); font-size:12px; color:var(--t2); padding:4px 10px; cursor:pointer; transition:background .12s,color .12s,border-color .12s; }
+.rc-changes-undo:hover { background:var(--hov); color:var(--t1); border-color:var(--t3); }
+.rc-foot { padding:12px 20px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
 /* Permission tree drill-down */
 .pt-breadcrumb { display:flex; align-items:center; gap:5px; padding:10px 20px; border-bottom:1px solid var(--line); flex-shrink:0; flex-wrap:wrap; min-height:40px; }
 .pt-back { background:none; border:none; color:var(--t2); cursor:pointer; padding:4px 6px; border-radius:6px; display:flex; align-items:center; transition:background .12s,color .12s; }
@@ -11099,6 +11126,8 @@ let _paState = {
   roleCreateColor: '#6366f1',
   roleCreatePerms: new Set(),
   roleCreatePermPath: [],
+  roleCreatePermSel: null,
+  roleCreateOrigPerms: new Set(),
   // Role edit
   roleEditId: null,
   roleEditName: '',
@@ -11106,6 +11135,8 @@ let _paState = {
   roleEditColor: '#6366f1',
   roleEditPerms: new Set(),
   roleEditPermPath: [],
+  roleEditPermSel: null,
+  roleEditOrigPerms: new Set(),
   // Role delete
   roleDeleteId: null,
   // Editable perm overrides for existing custom roles
@@ -11646,7 +11677,9 @@ function paOpenRoleEdit(roleId) {
   _paState.roleEditDesc = r.desc;
   _paState.roleEditColor = r.color;
   _paState.roleEditPerms = new Set(perms);
+  _paState.roleEditOrigPerms = new Set(perms);
   _paState.roleEditPermPath = [];
+  _paState.roleEditPermSel = _rcDefaultSel();
   renderPeople();
 }
 function paCloseRoleEdit() {
@@ -11790,118 +11823,193 @@ function renderRoleDetail(roleId) {
     </div>` : ''}`;
 }
 
-/* ── Role create/edit permission picker — shared drill-down renderer ── */
+/* ── Role create/edit permission picker — split sidebar + panel layout ── */
 function _rcPermSet(ctx) {
   return ctx === 'create' ? _paState.roleCreatePerms : _paState.roleEditPerms;
 }
-function _rcPermPath(ctx) {
-  return ctx === 'create' ? _paState.roleCreatePermPath : _paState.roleEditPermPath;
+function _rcOrigPerms(ctx) {
+  return ctx === 'create' ? _paState.roleCreateOrigPerms : _paState.roleEditOrigPerms;
 }
-function _rcSetPermPath(ctx, path) {
-  if (ctx === 'create') _paState.roleCreatePermPath = path;
-  else _paState.roleEditPermPath = path;
+function _rcPermSel(ctx) {
+  return ctx === 'create' ? _paState.roleCreatePermSel : _paState.roleEditPermSel;
 }
-function _rcRenderPermPicker(permSet, path, ctx) {
-  const currentNode = path.length > 0 ? _ptFindNode(path) : null;
-  const currentNodes = currentNode ? (currentNode.children || []) : PERM_TREE;
-  const isLeafLevel = currentNodes.length > 0 && !currentNodes[0].children;
-  const studioNode = path.length > 0 ? PERM_TREE.find(s => s.id === path[0]) : null;
-  const studioColor = studioNode ? studioNode.color : null;
-
-  const crumbs = [{ label:'Permissions', depth:0 }];
-  for (let i = 0; i < path.length; i++) {
-    const n = _ptFindNode(path.slice(0, i + 1));
-    if (n) crumbs.push({ label: n.label, depth: i + 1 });
+function _rcSetPermSel(ctx, featId) {
+  if (ctx === 'create') _paState.roleCreatePermSel = featId;
+  else _paState.roleEditPermSel = featId;
+}
+function _rcDefaultSel() {
+  return PERM_TREE[0] && PERM_TREE[0].children[0] ? PERM_TREE[0].children[0].id : null;
+}
+function _rcFindFeat(featId) {
+  for (const s of PERM_TREE) {
+    for (const f of (s.children || [])) { if (f.id === featId) return { studio: s, feat: f }; }
   }
-  const breadcrumbHtml = crumbs.map((c, i) => {
-    const isLast = i === crumbs.length - 1;
-    if (isLast) return `<span class="pt-crumb pt-crumb--active">${escapeHtml(c.label)}</span>`;
-    return `<span class="pt-crumb pt-crumb--link" onclick="paRolePermNav('${ctx}',${c.depth})">${escapeHtml(c.label)}</span><span class="pt-crumb-sep">›</span>`;
-  }).join('');
+  return null;
+}
+function _rcChangeCount(permSet, origPerms) {
+  const all = PERM_TREE.flatMap(s => _ptLeaves(s));
+  return all.filter(id => permSet.has(id) !== origPerms.has(id)).length;
+}
+function _rcRenderPermPicker(permSet, selFeatId, ctx) {
+  const origPerms = _rcOrigPerms(ctx);
+  const changes = _rcChangeCount(permSet, origPerms);
 
-  const totalLeaves = PERM_TREE.flatMap(s => _ptLeaves(s));
-  const granted = totalLeaves.filter(id => permSet.has(id)).length;
-  const badgeStyle = granted > 0 ? 'color:#10b981;background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.2)' : '';
-
-  const studioBarHtml = studioNode ? `
-    <div class="pt-studio-bar">
-      <div class="pt-studio-dot-lg" style="background:${studioColor}"></div>
-      <span class="pt-studio-name">${escapeHtml(studioNode.label)}</span>
-    </div>` : '';
-
-  const rowsHtml = currentNodes.map((node, idx) => {
-    const isLeaf = !node.children;
-    const leaves = _ptLeaves(node);
-    const state = _ptCheckedState(node, permSet);
-    const leafGranted = leaves.filter(id => permSet.has(id)).length;
-    const accentColor = isLeafLevel ? (studioColor || '#64748b') : (node.color || studioColor || '#64748b');
-    const pillClass = state === 'all' ? 'pt-count-pill--all' : state === 'some' ? 'pt-count-pill--some' : 'pt-count-pill--none';
-    const pillLabel = state === 'all' ? `All ${leaves.length}` : state === 'none' ? `0 / ${leaves.length}` : `${leafGranted} / ${leaves.length}`;
-    const divider = idx > 0 ? '<div class="pt-divider"></div>' : '';
-    return `${divider}
-      <div class="pt-row ${!isLeaf ? 'pt-row--drill' : 'pt-row--leaf'} pt-row--accented" style="border-left-color:${accentColor}">
-        <label class="pt-check-wrap" onclick="event.stopPropagation()">
-          <input type="checkbox" class="pt-check" ${state==='all'?'checked':''} ${state==='some'?'data-indet="1"':''}
-            onchange="paRoleToggleNode('${ctx}','${node.id}',this.checked)">
-        </label>
-        <div class="pt-row-body ${!isLeaf ? 'pt-row-body--drill' : ''}" onclick="${!isLeaf ? `paRoleDrillIn('${ctx}','${node.id}')` : 'void 0'}">
-          <div class="pt-dot" style="background:${accentColor}"></div>
-          <div class="pt-row-info">
-            <div class="pt-row-label">${escapeHtml(node.label)}</div>
-            ${node.desc ? `<div class="pt-row-desc">${escapeHtml(node.desc)}</div>` : ''}
-          </div>
-          ${!isLeaf ? `
-            <span class="pt-count-pill ${pillClass}">${pillLabel}</span>
-            <svg class="pt-chevron" width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>` : ''}
-        </div>
+  // Sidebar
+  const sidebarHtml = PERM_TREE.map(studio => {
+    const studioLeaves = _ptLeaves(studio);
+    const studioGranted = studioLeaves.filter(id => permSet.has(id)).length;
+    const studioState = studioGranted === 0 ? 'none' : studioGranted === studioLeaves.length ? 'all' : 'some';
+    const pillBg = studioState === 'all' ? '#10b981' : studioState === 'some' ? '#f59e0b' : 'var(--t3)';
+    const featsHtml = (studio.children || []).map(feat => {
+      const fLeaves = _ptLeaves(feat);
+      const fGranted = fLeaves.filter(id => permSet.has(id)).length;
+      const isActive = feat.id === selFeatId;
+      const fChanged = fLeaves.some(id => permSet.has(id) !== origPerms.has(id));
+      const pillStyle = fGranted === fLeaves.length
+        ? 'color:#10b981;background:rgba(16,185,129,.12)'
+        : fGranted > 0 ? 'color:#f59e0b;background:rgba(245,158,11,.12)'
+        : 'color:var(--t3);background:var(--bg3)';
+      return `<div class="rc-perm-sidebar-feat${isActive?' rc-perm-sidebar-feat--active':''}"
+        onclick="paRoleSelFeat('${ctx}','${feat.id}')">
+        <span>${escapeHtml(feat.label)}${fChanged ? ' <span style="width:5px;height:5px;border-radius:50%;background:var(--pri);display:inline-block;margin-left:3px;vertical-align:middle"></span>' : ''}</span>
+        <span class="rc-perm-sidebar-feat-pill" id="rc-feat-pill-${ctx}-${feat.id}" style="${pillStyle}">${fGranted}/${fLeaves.length}</span>
       </div>`;
+    }).join('');
+    return `<div class="rc-perm-sidebar-studio">
+        <div class="rc-perm-sidebar-dot" style="background:${studio.color}"></div>
+        ${escapeHtml(studio.label)}
+      </div>${featsHtml}`;
   }).join('');
 
-  return `
-    <div class="pt-breadcrumb">
-      ${path.length > 0 ? `<button class="pt-back" onclick="paRolePermBack('${ctx}')">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>` : ''}
-      ${breadcrumbHtml}
-      <span class="pt-total-badge" style="${badgeStyle}">${granted} / ${totalLeaves.length} granted</span>
-    </div>
-    ${studioBarHtml}
-    <div class="pt-rows">${rowsHtml}</div>`;
+  // Panel
+  const found = selFeatId ? _rcFindFeat(selFeatId) : null;
+  const panelHtml = found ? (() => {
+    const { studio, feat } = found;
+    const permsHtml = (feat.children || []).map(perm => {
+      const on = permSet.has(perm.id);
+      const wasOn = origPerms.has(perm.id);
+      const changed = on !== wasOn;
+      return `<div class="rc-perm-row${changed?' rc-perm-row--changed':''}" data-perm-id="${perm.id}-${ctx}">
+        <div class="rc-perm-row-info">
+          <div class="rc-perm-row-name">${escapeHtml(perm.label)}${perm.critical?'<span class="rc-perm-row-badge">CRITICAL</span>':''}</div>
+          <div class="rc-perm-row-desc">${escapeHtml(perm.desc)}</div>
+          <div class="rc-perm-change-ind" style="font-size:10.5px;margin-top:4px;color:var(--pri);font-weight:600;${changed?'':'display:none'}">${changed?(wasOn?'Removed':'Added'):''}</div>
+        </div>
+        <label class="rd-sw" style="margin-top:2px">
+          <input type="checkbox" ${on?'checked':''} onchange="paRoleTogglePerm('${ctx}','${perm.id}',this.checked)">
+          <span class="rd-sw-track"></span>
+          <span class="rd-sw-thumb"></span>
+        </label>
+      </div>`;
+    }).join('');
+    return `<div class="rc-perm-panel-head" style="border-left:3px solid ${studio.color}">
+      <div class="rc-perm-panel-title">${escapeHtml(feat.label)}</div>
+      <div class="rc-perm-panel-sub">${escapeHtml(studio.label)}</div>
+    </div>${permsHtml}`;
+  })() : `<div style="padding:40px 20px;text-align:center;color:var(--t3);font-size:13px">Select a category from the left</div>`;
+
+  // Changes bar
+  const changesHtml = `<div class="rc-changes-bar">
+    ${changes > 0
+      ? `<span class="rc-changes-badge">${changes} change${changes>1?'s':''}</span>
+         <button class="rc-changes-undo" onclick="paRoleUndoAll('${ctx}')">Undo all</button>`
+      : `<span class="rc-changes-none">No changes yet</span>`}
+  </div>`;
+
+  return `<div class="rc-perm-sidebar">${sidebarHtml}</div>
+    <div class="rc-perm-panel">${panelHtml}</div>
+    <div id="rc-changes-bar-${ctx}" style="display:none">${changesHtml}</div>`;
 }
 function _rcRerenderPermPicker(ctx) {
   const picker = document.getElementById(`rc-perm-picker-${ctx}`);
   if (!picker) return;
-  picker.innerHTML = _rcRenderPermPicker(_rcPermSet(ctx), _rcPermPath(ctx), ctx);
-  _ptSetIndeterminate();
+  picker.innerHTML = _rcRenderPermPicker(_rcPermSet(ctx), _rcPermSel(ctx), ctx);
+  _rcRerenderChanges(ctx);
 }
-function paRoleDrillIn(ctx, nodeId) {
-  _rcSetPermPath(ctx, [..._rcPermPath(ctx), nodeId]);
-  _rcRerenderPermPicker(ctx);
-}
-function paRolePermBack(ctx) {
-  _rcSetPermPath(ctx, _rcPermPath(ctx).slice(0, -1));
-  _rcRerenderPermPicker(ctx);
-}
-function paRolePermNav(ctx, depth) {
-  _rcSetPermPath(ctx, _rcPermPath(ctx).slice(0, depth));
-  _rcRerenderPermPicker(ctx);
-}
-function paRoleToggleNode(ctx, nodeId, checked) {
-  function find(nodes, id) {
-    for (const n of nodes) {
-      if (n.id === id) return n;
-      if (n.children) { const f = find(n.children, id); if (f) return f; }
-    }
-    return null;
-  }
-  const node = find(PERM_TREE, nodeId);
-  if (!node) return;
+function _rcRerenderChanges(ctx) {
   const permSet = _rcPermSet(ctx);
-  _ptLeaves(node).forEach(id => checked ? permSet.add(id) : permSet.delete(id));
+  const origPerms = _rcOrigPerms(ctx);
+  const changes = _rcChangeCount(permSet, origPerms);
+  const bar = document.getElementById(`rc-changes-${ctx}`);
+  if (!bar) return;
+  if (changes > 0) {
+    bar.innerHTML = `<span class="rc-changes-badge">${changes} change${changes>1?'s':''}</span>
+      <button class="rc-changes-undo" onclick="paRoleUndoAll('${ctx}')">Undo all</button>`;
+  } else {
+    bar.innerHTML = `<span class="rc-changes-none">No changes yet</span>`;
+  }
+  // Also update sidebar pills for the active feat
+  const sel = _rcPermSel(ctx);
+  if (sel) {
+    document.querySelectorAll(`[data-feat-pill="${ctx}"]`).forEach(el => {
+      const featId = el.dataset.featId;
+      const found = _rcFindFeat(featId);
+      if (!found) return;
+      const leaves = _ptLeaves(found.feat);
+      const granted = leaves.filter(id => permSet.has(id)).length;
+      const style = granted === leaves.length ? 'color:#10b981;background:rgba(16,185,129,.12)'
+        : granted > 0 ? 'color:#f59e0b;background:rgba(245,158,11,.12)'
+        : 'color:var(--t3);background:var(--bg3)';
+      el.style.cssText = style; el.textContent = `${granted}/${leaves.length}`;
+    });
+  }
+}
+function paRoleSelFeat(ctx, featId) {
+  _rcSetPermSel(ctx, featId);
   _rcRerenderPermPicker(ctx);
 }
+function paRoleTogglePerm(ctx, permId, checked) {
+  const permSet = _rcPermSet(ctx);
+  checked ? permSet.add(permId) : permSet.delete(permId);
+  // Partial update: only re-render the changes bar, keep panel in place
+  const changes = _rcChangeCount(permSet, _rcOrigPerms(ctx));
+  const bar = document.getElementById(`rc-changes-${ctx}`);
+  if (bar) {
+    bar.innerHTML = changes > 0
+      ? `<span class="rc-changes-badge">${changes} change${changes>1?'s':''}</span>
+         <button class="rc-changes-undo" onclick="paRoleUndoAll('${ctx}')">Undo all</button>`
+      : `<span class="rc-changes-none">No changes yet</span>`;
+  }
+  // Update the toggled row's changed indicator
+  const row = document.querySelector(`[data-perm-id="${permId}-${ctx}"]`);
+  if (row) {
+    const wasOn = _rcOrigPerms(ctx).has(permId);
+    const changed = checked !== wasOn;
+    row.classList.toggle('rc-perm-row--changed', changed);
+    const ind = row.querySelector('.rc-perm-change-ind');
+    if (ind) ind.textContent = changed ? (wasOn ? 'Removed' : 'Added') : '';
+    if (ind) ind.style.display = changed ? '' : 'none';
+  }
+  // Update sidebar pill for the current feature
+  const sel = _rcPermSel(ctx);
+  if (sel) {
+    const found = _rcFindFeat(sel);
+    if (found) {
+      const leaves = _ptLeaves(found.feat);
+      const granted = leaves.filter(id => permSet.has(id)).length;
+      const pill = document.getElementById(`rc-feat-pill-${ctx}-${sel}`);
+      if (pill) {
+        const s = granted === leaves.length ? 'color:#10b981;background:rgba(16,185,129,.12)'
+          : granted > 0 ? 'color:#f59e0b;background:rgba(245,158,11,.12)'
+          : 'color:var(--t3);background:var(--bg3)';
+        pill.style.cssText = s; pill.textContent = `${granted}/${leaves.length}`;
+      }
+      // Update studio dot indicator in sidebar
+      const changed = leaves.some(id => permSet.has(id) !== _rcOrigPerms(ctx).has(id));
+      const dot = document.getElementById(`rc-feat-dot-${ctx}-${sel}`);
+      if (dot) dot.style.display = changed ? '' : 'none';
+    }
+  }
+}
+function paRoleUndoAll(ctx) {
+  const orig = _rcOrigPerms(ctx);
+  if (ctx === 'create') _paState.roleCreatePerms = new Set(orig);
+  else _paState.roleEditPerms = new Set(orig);
+  _rcRerenderPermPicker(ctx);
+}
+/* legacy stubs kept for paToggleCreatePerm / paToggleEditPerm */
+function _rcPermPath(ctx) { return []; }
+function _rcSetPermPath(ctx, p) {}
 
 function renderRoleCreateModal() {
   const s = _paState;
@@ -11916,20 +12024,20 @@ function renderRoleCreateModal() {
         </button>
       </div>
       <div class="rc-modal-fields">
-        <div class="ms-field full" style="margin-bottom:12px">
+        <div class="ms-field" style="margin-bottom:12px">
           <label class="ms-label">Role name</label>
           <input class="ms-input" type="text" placeholder="e.g. Data Analyst" maxlength="60"
             value="${escapeHtml(s.roleCreateName)}"
             oninput="_paState.roleCreateName=this.value">
         </div>
-        <div class="ms-field full" style="margin-bottom:12px">
+        <div class="ms-field" style="margin-bottom:12px">
           <label class="ms-label">Description</label>
           <input class="ms-input" type="text" placeholder="What can members with this role do?" maxlength="120"
             value="${escapeHtml(s.roleCreateDesc)}"
             oninput="_paState.roleCreateDesc=this.value">
         </div>
-        <div class="ms-field full">
-          <label class="ms-label">Color</label>
+        <div class="rc-color-row-wrap" style="padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:0;grid-column:1/-1">
+          <label class="ms-label" style="margin-bottom:6px">Color</label>
           <div class="rc-color-row">
             ${colorOptions.map(c => `
               <button class="rc-color-swatch rc-color-swatch-create ${s.roleCreateColor===c?'selected':''}" style="background:${c}"
@@ -11938,7 +12046,10 @@ function renderRoleCreateModal() {
         </div>
       </div>
       <div class="rc-perm-picker" id="rc-perm-picker-create">
-        ${_rcRenderPermPicker(s.roleCreatePerms, s.roleCreatePermPath, 'create')}
+        ${_rcRenderPermPicker(s.roleCreatePerms, s.roleCreatePermSel || _rcDefaultSel(), 'create')}
+      </div>
+      <div class="rc-changes-bar" id="rc-changes-create">
+        <span class="rc-changes-none">No changes yet</span>
       </div>
       <div class="rc-foot">
         <button class="btn btn-ghost btn-sm" onclick="paCloseRoleCreate()">Cancel</button>
@@ -11962,20 +12073,20 @@ function renderRoleEditModal() {
         </button>
       </div>
       <div class="rc-modal-fields">
-        <div class="ms-field full" style="margin-bottom:12px">
+        <div class="ms-field" style="margin-bottom:12px">
           <label class="ms-label">Role name</label>
           <input class="ms-input" type="text" placeholder="Role name" maxlength="60"
             value="${escapeHtml(s.roleEditName)}"
             oninput="_paState.roleEditName=this.value">
         </div>
-        <div class="ms-field full" style="margin-bottom:12px">
+        <div class="ms-field" style="margin-bottom:12px">
           <label class="ms-label">Description</label>
           <input class="ms-input" type="text" placeholder="What can members with this role do?" maxlength="120"
             value="${escapeHtml(s.roleEditDesc)}"
             oninput="_paState.roleEditDesc=this.value">
         </div>
-        <div class="ms-field full">
-          <label class="ms-label">Color</label>
+        <div class="rc-color-row-wrap" style="padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:0;grid-column:1/-1">
+          <label class="ms-label" style="margin-bottom:6px">Color</label>
           <div class="rc-color-row">
             ${colorOptions.map(c => `<button class="rc-color-swatch rc-color-swatch-edit${s.roleEditColor===c?' selected':''}" style="background:${c}"
               onclick="_paState.roleEditColor='${c}';document.querySelectorAll('.rc-color-swatch-edit').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"></button>`).join('')}
@@ -11983,7 +12094,10 @@ function renderRoleEditModal() {
         </div>
       </div>
       <div class="rc-perm-picker" id="rc-perm-picker-edit">
-        ${_rcRenderPermPicker(s.roleEditPerms, s.roleEditPermPath, 'edit')}
+        ${_rcRenderPermPicker(s.roleEditPerms, s.roleEditPermSel || _rcDefaultSel(), 'edit')}
+      </div>
+      <div class="rc-changes-bar" id="rc-changes-edit">
+        <span class="rc-changes-none">No changes yet</span>
       </div>
       <div class="rc-foot">
         <button class="btn btn-ghost btn-sm" onclick="paCloseRoleEdit()">Cancel</button>
@@ -12298,7 +12412,9 @@ function paOpenRoleCreate() {
   _paState.roleCreateDesc = '';
   _paState.roleCreateColor = '#6366f1';
   _paState.roleCreatePerms = new Set();
+  _paState.roleCreateOrigPerms = new Set();
   _paState.roleCreatePermPath = [];
+  _paState.roleCreatePermSel = _rcDefaultSel();
   _paRerender();
 }
 function paCloseRoleCreate() {
