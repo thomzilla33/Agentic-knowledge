@@ -26,6 +26,64 @@
       --blue: #3B82F6;
       --purple: #A78BFA;
       --amber: #F59E0B;
+      /* DS CardContainer tokens */
+      --card-default-bg: rgba(255,255,255,0.06);
+      --card-default-border: rgba(255,255,255,0.10);
+      --card-default-hover-bd: rgba(255,255,255,0.18);
+      --card-default-hover-shadow: 8px 8px 16px 0 rgba(0,0,0,.08),0 0 4px 1px rgba(255,255,255,.4),0 0 14px 0 rgba(255,255,255,.15);
+      --card-primary-bg: rgba(43,127,255,0.08);
+      --card-primary-border: rgba(43,127,255,0.22);
+      --card-primary-hover-bd: #2b7fff;
+      --card-primary-hover-shadow: 8px 8px 16px 0 rgba(0,0,0,.08),0 0 4px 1px rgba(33,115,255,.4),0 0 14px 0 rgba(33,115,255,.15);
+      --card-green-bg: #0a1f1a;
+      --card-green-border: rgba(0,201,80,0.30);
+      --card-green-hover-bd: #34d399;
+      --card-green-hover-shadow: 8px 8px 16px 0 rgba(0,0,0,.08),0 0 4px 1px rgba(0,201,79,.4),0 0 14px 0 rgba(0,201,79,.15);
+      --card-purple-bg: #120520;
+      --card-purple-border: rgba(173,70,255,0.20);
+      --card-purple-hover-bd: #a855f7;
+      --card-purple-hover-shadow: 8px 8px 16px 0 rgba(0,0,0,.08),0 0 4px 1px rgba(173,69,255,.4),0 0 14px 0 rgba(173,69,255,.15);
+      --card-orange-bg: #1a0e00;
+      --card-orange-border: rgba(237,107,3,0.25);
+      --card-orange-hover-bd: #f59e0b;
+      --card-orange-hover-shadow: 8px 8px 16px 0 rgba(0,0,0,.08),0 0 4px 1px rgba(237,107,3,.4),0 0 14px 0 rgba(237,107,3,.15);
+      --card-yellow-bg: #1a1200;
+      --card-yellow-border: rgba(245,158,11,0.25);
+      --card-yellow-hover-bd: #fbbf24;
+      --card-yellow-hover-shadow: 8px 8px 16px 0 rgba(0,0,0,.08),0 0 4px 1px rgba(252,199,0,.4),0 0 14px 0 rgba(252,199,0,.15);
+      --card-limegreen-bg: #111a04;
+      --card-limegreen-border: rgba(189,238,73,0.20);
+      --card-limegreen-hover-bd: #84cc16;
+      --card-limegreen-hover-shadow: 8px 8px 16px 0 rgba(0,0,0,.08),0 0 4px 1px rgba(189,237,74,.4),0 0 14px 0 rgba(189,237,74,.15);
+      --card-lightblue-bg: #071828;
+      --card-lightblue-border: rgba(81,162,255,0.20);
+      --card-lightblue-hover-bd: #38bdf8;
+      --card-lightblue-hover-shadow: 8px 8px 16px 0 rgba(0,0,0,.08),0 0 4px 1px rgba(82,163,255,.4),0 0 14px 0 rgba(82,163,255,.15);
+      /* DS Badge tokens */
+      --badge-success: #05df72;
+      --badge-in-progress: #2b7fff;
+      --badge-neutral: rgba(255,255,255,0.50);
+      /* DS Tag tokens */
+      --tag-secondary-bg: rgba(255,255,255,0.10); --tag-secondary-bd: rgba(255,255,255,0.10); --tag-secondary-fg: rgba(255,255,255,0.60);
+      --tag-informative-bg: rgba(21,93,252,0.15); --tag-informative-bd: #2b7fff;              --tag-informative-fg: rgba(255,255,255,0.80);
+      --tag-success-bg: #0a1f1a;                  --tag-success-bd: #34d399;                  --tag-success-fg: #6ee7b7;
+      --tag-neutral-bg: rgba(255,255,255,0.08);   --tag-neutral-bd: rgba(255,255,255,0.10);   --tag-neutral-fg: rgba(255,255,255,0.60);
+      --tag-purple-bg: #120520;                   --tag-purple-bd: #a855f7;                   --tag-purple-fg: #d8b4fe;
+      --tag-limegreen-bg: #111a04;                --tag-limegreen-bd: #84cc16;                --tag-limegreen-fg: #bdef49;
+      --tag-lightblue-bg: #071828;                --tag-lightblue-bd: #38bdf8;                --tag-lightblue-fg: #7dd3fc;
+      --tag-yellow-bg: #1a1200;                   --tag-yellow-bd: #f59e0b;                   --tag-yellow-fg: #fbbf24;
+      --tag-orange-bg: #1a0e00;                   --tag-orange-bd: #f97316;                   --tag-orange-fg: #fdba74;
+      /* DS Filters tokens */
+      --field-bg: rgba(255,255,255,0.06);
+      --field-border: rgba(255,255,255,0.10);
+      --field-border-hover: rgba(255,255,255,0.20);
+      --field-icon: rgba(255,255,255,0.30);
+      --fi-sort-icon: rgba(255,255,255,0.40);
+      --fi-sort-text: rgba(255,255,255,0.65);
+      /* DS InformativeCard tokens */
+      --ic-informative-bg: rgba(33,115,255,0.12);
+      --ic-informative-icon: #A8C8FF;
+      --ic-informative-text: #A8C8FF;
     }
 
     html, body {
@@ -164,12 +222,33 @@
       opacity: .6;
     }
 
-    /* ─── Eyebrow pulse dot ─────────────────────────────────── */
-    .pulse-dot {
-      width: 6px;
-      height: 6px;
+    /* ─── DS Badge dot (success = #05df72) ─────────────────── */
+    .ds-badge {
+      display: inline-flex;
+      flex-shrink: 0;
       border-radius: 50%;
-      background: var(--emerald);
+    }
+    .ds-badge-success {
+      width: 8px;
+      height: 8px;
+      background: var(--badge-success, #05df72);
+      position: relative;
+    }
+    .ds-badge-success::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: var(--badge-success, #05df72);
+      opacity: .28;
+      animation: pulse-ring 2.4s ease infinite;
+    }
+    /* Legacy alias used in eyebrow */
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--badge-success, #05df72);
       flex-shrink: 0;
       position: relative;
     }
@@ -178,12 +257,12 @@
       position: absolute;
       inset: -3px;
       border-radius: 50%;
-      background: var(--emerald);
-      opacity: .3;
+      background: var(--badge-success, #05df72);
+      opacity: .28;
       animation: pulse-ring 2.4s ease infinite;
     }
     @keyframes pulse-ring {
-      0%, 100% { transform: scale(1); opacity: .3; }
+      0%, 100% { transform: scale(1); opacity: .28; }
       50%       { transform: scale(2); opacity: 0; }
     }
 
@@ -230,8 +309,8 @@
     .search-input {
       width: 100%;
       padding: 9px 12px 9px 34px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
+      background: var(--field-bg);
+      border: 1px solid var(--field-border);
       border-radius: 8px;
       font-size: 13px;
       font-family: inherit;
@@ -239,10 +318,10 @@
       outline: none;
       transition: border-color .15s, background .15s;
     }
-    .search-input::placeholder { color: var(--text-3); }
+    .search-input::placeholder { color: var(--field-icon); }
     .search-input:focus {
-      border-color: rgba(43,127,255,.35);
-      background: rgba(43,127,255,.03);
+      border-color: var(--field-border-hover);
+      background: var(--field-bg);
     }
 
     .count-pill {
@@ -340,11 +419,7 @@
       color: var(--text-1);
     }
 
-    .card:hover {
-      border-color: var(--border-hover);
-      box-shadow: 0 6px 28px rgba(0,0,0,.32), 0 0 0 1px rgba(43,127,255,.08) inset;
-      transform: translateY(-1px);
-    }
+    /* hover handled per card-v-* variant */
 
     .tenant-av {
       width: 40px;
@@ -392,6 +467,7 @@
       flex-wrap: wrap;
     }
 
+    /* ─── DS Tag base structure ──────────────────────────────── */
     .badge {
       display: inline-flex;
       align-items: center;
@@ -399,20 +475,22 @@
       font-size: 10px;
       font-weight: 600;
       padding: 2px 7px;
-      border-radius: 20px;
+      height: 20px;
+      border-radius: 8px;
+      border: 1px solid transparent;
       white-space: nowrap;
     }
 
-    .badge-industry {
-      background: rgba(255,255,255,.06);
-      color: var(--text-2);
-      border: 1px solid rgba(255,255,255,.09);
-    }
-
-    .badge-platform-admin { background: rgba(43,127,255,.13); color: #60A5FA; border: 1px solid rgba(43,127,255,.22); }
-    .badge-org-admin      { background: rgba(6,182,212,.12);  color: #22D3EE; border: 1px solid rgba(6,182,212,.22);  }
-    .badge-member         { background: rgba(16,185,129,.1);  color: #34D399; border: 1px solid rgba(16,185,129,.2);  }
-    .badge-viewer         { background: rgba(100,116,139,.1); color: #94A3B8; border: 1px solid rgba(100,116,139,.2); }
+    /* DS Tag variants — colors from token layer */
+    .ds-tag-secondary   { background: var(--tag-secondary-bg);   border-color: var(--tag-secondary-bd);   color: var(--tag-secondary-fg);   }
+    .ds-tag-informative { background: var(--tag-informative-bg);  border-color: var(--tag-informative-bd);  color: var(--tag-informative-fg);  }
+    .ds-tag-success     { background: var(--tag-success-bg);     border-color: var(--tag-success-bd);     color: var(--tag-success-fg);     }
+    .ds-tag-neutral     { background: var(--tag-neutral-bg);     border-color: var(--tag-neutral-bd);     color: var(--tag-neutral-fg);     }
+    .ds-tag-purple      { background: var(--tag-purple-bg);      border-color: var(--tag-purple-bd);      color: var(--tag-purple-fg);      }
+    .ds-tag-limegreen   { background: var(--tag-limegreen-bg);   border-color: var(--tag-limegreen-bd);   color: var(--tag-limegreen-fg);   }
+    .ds-tag-lightblue   { background: var(--tag-lightblue-bg);   border-color: var(--tag-lightblue-bd);   color: var(--tag-lightblue-fg);   }
+    .ds-tag-yellow      { background: var(--tag-yellow-bg);      border-color: var(--tag-yellow-bd);      color: var(--tag-yellow-fg);      }
+    .ds-tag-orange      { background: var(--tag-orange-bg);      border-color: var(--tag-orange-bd);      color: var(--tag-orange-fg);      }
 
     .recent-badge {
       display: inline-flex;
@@ -699,26 +777,26 @@
     }
 
 
-    /* ─── Sort button ────────────────────────────────────────────── */
+    /* ─── DS Filters: sort control ──────────────────────────────── */
     .sort-btn {
       display: flex;
       align-items: center;
       gap: 5px;
       padding: 5px 11px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
-      border-radius: 20px;
+      background: var(--field-bg);
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
       font-size: 11.5px;
       font-weight: 500;
-      color: var(--text-2);
+      color: var(--fi-sort-text);
       cursor: pointer;
       font-family: inherit;
       white-space: nowrap;
       transition: background .15s, border-color .15s, color .15s;
       flex-shrink: 0;
     }
-    .sort-btn:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.13); color: var(--text-1); }
-    .sort-btn svg { flex-shrink: 0; opacity: .6; }
+    .sort-btn:hover { background: rgba(255,255,255,.09); border-color: var(--field-border-hover); color: var(--text-1); }
+    .sort-btn svg { flex-shrink: 0; color: var(--fi-sort-icon); }
 
     /* ─── Single-tenant redirect banner ─────────────────────────── */
     .redirect-banner {
@@ -776,22 +854,119 @@
       to   { width: 100%; }
     }
 
-    /* ─── Hero card variant ──────────────────────────────────── */
+    /* ─── Hero card (size only) ──────────────────────────────── */
     .card-hero {
       padding: 18px 22px;
-      border-color: rgba(43,127,255,.42);
-      background: rgba(43,127,255,.065);
-      box-shadow: 0 0 0 1px rgba(43,127,255,.15) inset, 0 6px 24px rgba(0,0,0,.32);
-    }
-    .card-hero:hover {
-      border-color: rgba(43,127,255,.60);
-      box-shadow: 0 0 0 1px rgba(43,127,255,.18) inset, 0 10px 36px rgba(0,0,0,.44);
     }
     .card-hero .tenant-av {
       width: 48px;
       height: 48px;
       border-radius: 12px;
       font-size: 13px;
+    }
+
+    /* ─── DS CardContainer variants ──────────────────────────── */
+    .card-v-default {
+      background: var(--card-default-bg);
+      border-color: var(--card-default-border);
+    }
+    .card-v-default:hover {
+      border-color: var(--card-default-hover-bd);
+      box-shadow: var(--card-default-hover-shadow);
+      transform: translateY(-1px);
+    }
+    .card-v-primary {
+      background: var(--card-primary-bg);
+      border-color: var(--card-primary-border);
+    }
+    .card-v-primary:hover {
+      border-color: var(--card-primary-hover-bd);
+      box-shadow: var(--card-primary-hover-shadow);
+      transform: translateY(-1px);
+    }
+    .card-v-green {
+      background: var(--card-green-bg);
+      border-color: var(--card-green-border);
+    }
+    .card-v-green:hover {
+      border-color: var(--card-green-hover-bd);
+      box-shadow: var(--card-green-hover-shadow);
+      transform: translateY(-1px);
+    }
+    .card-v-purple {
+      background: var(--card-purple-bg);
+      border-color: var(--card-purple-border);
+    }
+    .card-v-purple:hover {
+      border-color: var(--card-purple-hover-bd);
+      box-shadow: var(--card-purple-hover-shadow);
+      transform: translateY(-1px);
+    }
+    .card-v-orange {
+      background: var(--card-orange-bg);
+      border-color: var(--card-orange-border);
+    }
+    .card-v-orange:hover {
+      border-color: var(--card-orange-hover-bd);
+      box-shadow: var(--card-orange-hover-shadow);
+      transform: translateY(-1px);
+    }
+    .card-v-yellow {
+      background: var(--card-yellow-bg);
+      border-color: var(--card-yellow-border);
+    }
+    .card-v-yellow:hover {
+      border-color: var(--card-yellow-hover-bd);
+      box-shadow: var(--card-yellow-hover-shadow);
+      transform: translateY(-1px);
+    }
+    .card-v-limegreen {
+      background: var(--card-limegreen-bg);
+      border-color: var(--card-limegreen-border);
+    }
+    .card-v-limegreen:hover {
+      border-color: var(--card-limegreen-hover-bd);
+      box-shadow: var(--card-limegreen-hover-shadow);
+      transform: translateY(-1px);
+    }
+    .card-v-lightblue {
+      background: var(--card-lightblue-bg);
+      border-color: var(--card-lightblue-border);
+    }
+    .card-v-lightblue:hover {
+      border-color: var(--card-lightblue-hover-bd);
+      box-shadow: var(--card-lightblue-hover-shadow);
+      transform: translateY(-1px);
+    }
+
+    /* ─── InformativeCard banner (informative state) ─────────── */
+    .ic-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--ic-informative-bg);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .ic-banner-icon {
+      flex-shrink: 0;
+      color: var(--ic-informative-icon);
+      display: flex;
+      align-items: center;
+    }
+    .ic-banner-text {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ic-informative-text);
+      flex: 1;
+    }
+    .ic-banner-sub {
+      font-size: 11.5px;
+      font-weight: 400;
+      color: var(--ic-informative-icon);
+      opacity: .75;
+      margin-top: 1px;
     }
 
     /* Compact secondary cards */
@@ -829,18 +1004,18 @@
       margin-top: 5px;
     }
     .active-pulse {
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: #10B981;
-      box-shadow: 0 0 0 0 rgba(16,185,129,.4);
+      background: var(--badge-success, #05df72);
+      box-shadow: 0 0 0 0 rgba(5,223,114,.4);
       animation: activePulse 2s ease infinite;
       flex-shrink: 0;
     }
     @keyframes activePulse {
-      0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.4); }
-      70%  { box-shadow: 0 0 0 5px rgba(16,185,129,0); }
-      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+      0%   { box-shadow: 0 0 0 0 rgba(5,223,114,.4); }
+      70%  { box-shadow: 0 0 0 5px rgba(5,223,114,0); }
+      100% { box-shadow: 0 0 0 0 rgba(5,223,114,0); }
     }
     .hero-last-visit {
       font-size: 10.5px;
@@ -1326,10 +1501,10 @@ const STUDIOS = {
 // ─── Role registry ────────────────────────────────────────────────────────────
 
 const ROLES = {
-  'platform-admin': { label: 'Platform Admin', cls: 'badge-platform-admin' },
-  'org-admin':      { label: 'Org Admin',       cls: 'badge-org-admin'      },
-  'member':         { label: 'Member',           cls: 'badge-member'         },
-  'viewer':         { label: 'Viewer',           cls: 'badge-viewer'         },
+  'platform-admin': { label: 'Platform Admin', cls: 'ds-tag-informative' },
+  'org-admin':      { label: 'Org Admin',       cls: 'ds-tag-lightblue'  },
+  'member':         { label: 'Member',           cls: 'ds-tag-success'    },
+  'viewer':         { label: 'Viewer',           cls: 'ds-tag-secondary'  },
 };
 
 // ─── Tenant fixtures ──────────────────────────────────────────────────────────
@@ -1347,6 +1522,8 @@ const TENANTS = [
     recent: true,
     color: '#2B7FFF',
     initials: 'AF',
+    cardVariant: 'primary',
+    industryTag: 'ds-tag-informative',
   },
   {
     id: 'demo',
@@ -1360,6 +1537,8 @@ const TENANTS = [
     recent: true,
     color: '#06B6D4',
     initials: 'DS',
+    cardVariant: 'default',
+    industryTag: 'ds-tag-neutral',
   },
   {
     id: 'meridian',
@@ -1373,6 +1552,8 @@ const TENANTS = [
     recent: false,
     color: '#10B981',
     initials: 'MH',
+    cardVariant: 'green',
+    industryTag: 'ds-tag-success',
   },
   {
     id: 'solis',
@@ -1386,6 +1567,8 @@ const TENANTS = [
     recent: false,
     color: '#F59E0B',
     initials: 'SR',
+    cardVariant: 'limegreen',
+    industryTag: 'ds-tag-limegreen',
   },
   {
     id: 'northbridge',
@@ -1399,6 +1582,8 @@ const TENANTS = [
     recent: false,
     color: '#8B5CF6',
     initials: 'NC',
+    cardVariant: 'yellow',
+    industryTag: 'ds-tag-yellow',
   },
   {
     id: 'vertex',
@@ -1412,6 +1597,8 @@ const TENANTS = [
     recent: false,
     color: '#0EA5E9',
     initials: 'VL',
+    cardVariant: 'orange',
+    industryTag: 'ds-tag-orange',
   },
   {
     id: 'cascade',
@@ -1425,6 +1612,8 @@ const TENANTS = [
     recent: false,
     color: '#EC4899',
     initials: 'CA',
+    cardVariant: 'purple',
+    industryTag: 'ds-tag-purple',
   },
   {
     id: 'ironclad',
@@ -1438,6 +1627,8 @@ const TENANTS = [
     recent: false,
     color: '#D97706',
     initials: 'IL',
+    cardVariant: 'lightblue',
+    industryTag: 'ds-tag-lightblue',
   },
 ];
 
@@ -1457,6 +1648,7 @@ function studioChips(tenantId, keys) {
 function buildCard(tenant, idx, featured = false) {
   const role = ROLES[tenant.role];
   const sizeClass = featured ? 'card-hero' : 'card-compact';
+  const variantClass = `card-v-${tenant.cardVariant || 'default'}`;
 
   const lastStudioLabel = tenant.lastStudio ? STUDIOS[tenant.lastStudio].label : null;
   const lastVisitCopy = lastStudioLabel
@@ -1465,7 +1657,7 @@ function buildCard(tenant, idx, featured = false) {
 
   const activeIndicator = featured ? `
     <div class="active-badge">
-      <span class="active-pulse"></span>
+      <span class="ds-badge ds-badge-success active-pulse"></span>
       Active workspace
     </div>
     <div class="hero-last-visit">${lastVisitCopy}</div>` : '';
@@ -1473,7 +1665,7 @@ function buildCard(tenant, idx, featured = false) {
   const lastVisitRow = featured ? '' : `<span class="last-visit">${lastVisitCopy}</span>`;
 
   return `
-    <div class="card ${sizeClass}" style="animation-delay:${idx * 45}ms" tabindex="0" role="button">
+    <div class="card ${sizeClass} ${variantClass}" style="animation-delay:${idx * 45}ms" tabindex="0" role="button">
       <!-- avatar -->
       <div class="tenant-av" style="background:${tenant.color}18;border:1px solid ${tenant.color}30;color:${tenant.color}">
         ${tenant.initials}
@@ -1483,7 +1675,7 @@ function buildCard(tenant, idx, featured = false) {
       <div class="card-identity">
         <div class="card-name">${tenant.name}</div>
         <div class="badge-row">
-          <span class="badge badge-industry">${tenant.industry}</span>
+          <span class="badge ${tenant.industryTag || 'ds-tag-neutral'}">${tenant.industry}</span>
           <span class="badge ${role.cls}">${role.label}</span>
         </div>
         ${activeIndicator}
@@ -1559,8 +1751,21 @@ function render(list, searching = false) {
   } else if (!searching) {
     const hero = list[0];
     const rest  = list.slice(1);
+    const heroLastStudio = hero.lastStudio ? STUDIOS[hero.lastStudio].label : null;
+    const heroVisitLine  = heroLastStudio ? `${hero.name} · Last in ${heroLastStudio} · ${hero.lastVisited}` : `${hero.name} · ${hero.lastVisited}`;
     let html = `
-      <div class="section-label-hero">Pick up where you left off</div>
+      <div class="ic-banner">
+        <span class="ic-banner-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M8 5h.01M7.25 7.5H8v3.5h.75" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div>
+          <div class="ic-banner-text">Pick up where you left off</div>
+          <div class="ic-banner-sub">${heroVisitLine}</div>
+        </div>
+      </div>
       ${buildCard(hero, 0, true)}
     `;
     if (rest.length > 0) {
