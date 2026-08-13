@@ -7594,28 +7594,49 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .rc-body { flex:1; overflow-y:auto; padding:20px; }
 .rc-foot { padding:14px 20px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:flex-end; }
 /* Permission tree drill-down */
-.pt-breadcrumb { display:flex; align-items:center; gap:5px; padding:10px 20px; border-bottom:1px solid var(--line); flex-shrink:0; flex-wrap:wrap; }
-.pt-back { background:none; border:none; color:var(--t3); cursor:pointer; padding:2px 4px; border-radius:4px; display:flex; align-items:center; }
+.pt-breadcrumb { display:flex; align-items:center; gap:5px; padding:10px 20px; border-bottom:1px solid var(--line); flex-shrink:0; flex-wrap:wrap; min-height:40px; }
+.pt-back { background:none; border:none; color:var(--t2); cursor:pointer; padding:4px 6px; border-radius:6px; display:flex; align-items:center; transition:background .12s,color .12s; }
 .pt-back:hover { color:var(--t1); background:var(--hov); }
-.pt-crumb { font-size:11.5px; color:var(--t3); }
-.pt-crumb--link { cursor:pointer; color:var(--pri); }
+.pt-crumb { font-size:12px; color:var(--t3); }
+.pt-crumb--link { cursor:pointer; color:var(--pri); font-weight:500; }
 .pt-crumb--link:hover { text-decoration:underline; }
 .pt-crumb--active { font-weight:600; color:var(--t1); }
-.pt-crumb-sep { color:var(--t3); font-size:11px; }
-.pt-total-badge { margin-left:auto; font-size:10.5px; color:var(--t3); background:var(--bg3); border-radius:20px; padding:2px 8px; }
-.pt-rows { flex:1; overflow-y:auto; padding:8px 0; }
-.pt-row { display:flex; align-items:center; gap:0; padding:0 12px 0 8px; min-height:52px; transition:background .1s; }
-.pt-row:hover { background:var(--hov); }
-.pt-check-wrap { display:flex; align-items:center; justify-content:center; width:36px; flex-shrink:0; cursor:pointer; }
+.pt-crumb-sep { color:var(--t3); font-size:11px; margin:0 1px; }
+.pt-total-badge { margin-left:auto; font-size:10.5px; font-weight:600; color:var(--t2); background:var(--bg3); border:1px solid var(--line); border-radius:20px; padding:2px 9px; white-space:nowrap; }
+/* Studio header inside drill-down */
+.pt-studio-bar { display:flex; align-items:center; gap:10px; padding:12px 20px 8px; flex-shrink:0; }
+.pt-studio-dot-lg { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.pt-studio-name { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--t3); }
+/* Rows */
+.pt-rows { flex:1; overflow-y:auto; padding:4px 0 8px; min-height:120px; }
+/* Drill rows (group/studio level) */
+.pt-row { display:flex; align-items:center; gap:0; padding:0 16px 0 0; min-height:56px; transition:background .12s; border-left:3px solid transparent; }
+.pt-row--drill { cursor:default; }
+.pt-row--drill:hover { background:var(--hov); }
+.pt-row--drill:hover .pt-chevron { color:var(--t1); transform:translateX(2px); }
+.pt-row--leaf { border-left:3px solid transparent; }
+.pt-row--leaf:hover { background:var(--hov); }
+/* Left accent bar (studio color) */
+.pt-row--accented { border-left-width:3px; }
+.pt-check-wrap { display:flex; align-items:center; justify-content:center; width:44px; flex-shrink:0; cursor:pointer; }
 .pt-check { width:15px; height:15px; accent-color:var(--pri); cursor:pointer; }
 .pt-row-body { display:flex; align-items:center; gap:10px; flex:1; min-width:0; padding:10px 0; }
 .pt-row-body--drill { cursor:pointer; }
 .pt-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 .pt-row-info { flex:1; min-width:0; }
 .pt-row-label { font-size:13px; font-weight:500; color:var(--t1); }
-.pt-row-desc { font-size:11.5px; color:var(--t3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.pt-count { font-size:11.5px; font-weight:600; flex-shrink:0; }
-.pt-chevron { color:var(--t3); flex-shrink:0; }
+.pt-row-desc { font-size:12px; color:var(--t3); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* Count pill */
+.pt-count-pill { display:inline-flex; align-items:center; font-size:11px; font-weight:700; border-radius:20px; padding:2px 8px; flex-shrink:0; border:1px solid transparent; }
+.pt-count-pill--all { color:#10b981; background:rgba(16,185,129,.1); border-color:rgba(16,185,129,.25); }
+.pt-count-pill--some { color:#f59e0b; background:rgba(245,158,11,.1); border-color:rgba(245,158,11,.25); }
+.pt-count-pill--none { color:var(--t3); background:var(--bg3); border-color:var(--line); }
+/* Chevron */
+.pt-chevron { color:var(--t3); flex-shrink:0; transition:color .12s, transform .12s; margin-left:4px; }
+/* Avatar chip in header */
+.pt-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+/* Section divider inside rows */
+.pt-divider { height:1px; background:var(--line); margin:4px 20px; }
 /* Color picker */
 .rc-color-row { display:flex; gap:8px; margin-top:8px; }
 .rc-color-swatch { width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .12s,border-color .12s; }
@@ -11830,16 +11851,21 @@ function renderStudioAccessModal() {
   const permSet = _paState.studioAccessEdits;
   const path = _paState.studioAccessPath;
 
-  // Resolve current level nodes
+  // Resolve current level
   const currentNode = path.length > 0 ? _ptFindNode(path) : null;
   const currentNodes = currentNode ? (currentNode.children || []) : PERM_TREE;
   const isLeafLevel = currentNodes.length > 0 && !currentNodes[0].children;
 
-  // Studio color context
+  // Studio color context (inherited for sub-levels)
   const studioNode = path.length > 0 ? PERM_TREE.find(s => s.id === path[0]) : null;
   const studioColor = studioNode ? studioNode.color : null;
 
-  // Breadcrumb: [{label, depth}]
+  // Avatar color from name
+  const avatarColors = ['#6366f1','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6'];
+  const avatarColor = avatarColors[(p.name.charCodeAt(0) || 0) % avatarColors.length];
+  const avatarInitial = p.name.charAt(0).toUpperCase();
+
+  // Breadcrumb
   const crumbs = [{ label:'Workspace', depth:0 }];
   for (let i = 0; i < path.length; i++) {
     const n = _ptFindNode(path.slice(0, i + 1));
@@ -11851,49 +11877,72 @@ function renderStudioAccessModal() {
     return `<span class="pt-crumb pt-crumb--link" onclick="paPermNav(${c.depth})">${escapeHtml(c.label)}</span><span class="pt-crumb-sep">›</span>`;
   }).join('');
 
-  // Count totals for footer badge
+  // Total granted badge
   const totalLeaves = PERM_TREE.flatMap(s => _ptLeaves(s));
   const grantedTotal = totalLeaves.filter(id => permSet.has(id)).length;
+  const totalCount = totalLeaves.length;
 
-  const rowsHtml = currentNodes.map(node => {
+  // Studio context bar (shown when inside a studio)
+  const studioBarHtml = studioNode ? `
+    <div class="pt-studio-bar">
+      <div class="pt-studio-dot-lg" style="background:${studioColor}"></div>
+      <span class="pt-studio-name">${escapeHtml(studioNode.label)}</span>
+    </div>` : '';
+
+  // Rows
+  const rowsHtml = currentNodes.map((node, idx) => {
     const isLeaf = !node.children;
     const leaves = _ptLeaves(node);
     const state = _ptCheckedState(node, permSet);
     const granted = leaves.filter(id => permSet.has(id)).length;
     const checkedAttr = state === 'all' ? 'checked' : '';
     const indetAttr = state === 'some' ? 'data-indet="1"' : '';
-    const dotColor = isLeafLevel ? (studioColor || '#64748b') : (node.color || studioColor || '#64748b');
 
-    return `
-      <div class="pt-row">
+    // Color: studio-level uses node.color, feature/leaf inherit studioColor
+    const accentColor = isLeafLevel
+      ? (studioColor || '#64748b')
+      : (node.color || studioColor || '#64748b');
+
+    // Count pill class
+    const pillClass = state === 'all' ? 'pt-count-pill--all'
+      : state === 'some' ? 'pt-count-pill--some' : 'pt-count-pill--none';
+    const pillLabel = state === 'all' ? `All ${leaves.length}`
+      : state === 'none' ? `0 / ${leaves.length}` : `${granted} / ${leaves.length}`;
+
+    const divider = idx > 0 ? '<div class="pt-divider"></div>' : '';
+
+    return `${divider}
+      <div class="pt-row ${!isLeaf ? 'pt-row--drill' : 'pt-row--leaf'} pt-row--accented"
+           style="border-left-color:${accentColor}">
         <label class="pt-check-wrap" onclick="event.stopPropagation()">
           <input type="checkbox" class="pt-check" ${checkedAttr} ${indetAttr}
             onchange="paTogglePermNode('${node.id}',this.checked)">
         </label>
         <div class="pt-row-body ${!isLeaf ? 'pt-row-body--drill' : ''}"
           onclick="${!isLeaf ? `paPermDrillIn('${node.id}')` : 'void 0'}">
-          <div class="pt-dot" style="background:${dotColor}"></div>
+          <div class="pt-dot" style="background:${accentColor}"></div>
           <div class="pt-row-info">
             <div class="pt-row-label">${escapeHtml(node.label)}</div>
             ${node.desc ? `<div class="pt-row-desc">${escapeHtml(node.desc)}</div>` : ''}
           </div>
           ${!isLeaf ? `
-            <span class="pt-count" style="color:${state==='all'?'var(--primary)':state==='some'?'#f59e0b':'var(--t3)'}">
-              ${granted}/${leaves.length}
-            </span>
-            <svg class="pt-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none">
-              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <span class="pt-count-pill ${pillClass}">${pillLabel}</span>
+            <svg class="pt-chevron" width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>` : ''}
         </div>
       </div>`;
   }).join('');
 
   return `
-    <div class="rc-modal" style="width:520px">
+    <div class="rc-modal" style="width:540px">
       <div class="rc-head">
-        <div>
-          <div class="rc-title">Manage permissions</div>
-          <div style="font-size:12px;color:var(--t3);margin-top:2px">${escapeHtml(p.name)} · ${escapeHtml(p.email)}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="pt-avatar" style="background:${avatarColor}">${avatarInitial}</div>
+          <div>
+            <div class="rc-title">${escapeHtml(p.name)}</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:1px">${escapeHtml(p.email)} · Edit permissions</div>
+          </div>
         </div>
         <button class="pm-drawer-close" onclick="paCloseStudioAccess()">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -11901,11 +11950,12 @@ function renderStudioAccessModal() {
       </div>
       <div class="pt-breadcrumb">
         ${path.length > 0 ? `<button class="pt-back" onclick="paPermBack()">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>` : ''}
         ${breadcrumbHtml}
-        <span class="pt-total-badge">${grantedTotal} granted</span>
+        <span class="pt-total-badge" style="${grantedTotal > 0 ? 'color:#10b981;background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.2)' : ''}">${grantedTotal} / ${totalCount} granted</span>
       </div>
+      ${studioBarHtml}
       <div class="pt-rows">${rowsHtml}</div>
       <div class="rc-foot">
         <button class="btn btn-ghost btn-sm" onclick="paCloseStudioAccess()">Cancel</button>
