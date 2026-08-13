@@ -544,76 +544,6 @@ html.persona-user [data-admin-only]{display:none !important}
 html.theme-light .tb-user-menu{border-color:rgba(255,255,255,0.12); box-shadow:0 8px 32px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.20)}
 
 /* ── Prototype floating panel ───────────────────────────────────────── */
-.proto-panel{
-  position:fixed; bottom:20px; right:20px; z-index:99999;
-  background:var(--menu-bg); backdrop-filter:blur(14px);
-  border:1px solid var(--pri-35);
-  border-radius:12px; min-width:192px;
-  box-shadow:0 4px 24px rgba(0,0,0,0.50), 0 0 0 1px var(--pri-10);
-  font-family:inherit; user-select:none;
-  transition:box-shadow .15s;
-}
-.proto-panel:hover{box-shadow:0 6px 28px rgba(0,0,0,0.60), 0 0 0 1px var(--pri-22)}
-.proto-handle{
-  display:flex; align-items:center; gap:7px;
-  padding:8px 8px 8px 12px; cursor:grab; border-radius:12px 12px 0 0;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-}
-.proto-handle:active{cursor:grabbing}
-.proto-panel.proto-collapsed .proto-handle{border-bottom:none; border-radius:12px}
-.proto-ic{color:var(--pri); flex-shrink:0; display:flex; align-items:center}
-.proto-title{
-  font-size:10px; font-weight:700; text-transform:uppercase;
-  letter-spacing:.09em; color:rgba(255,255,255,0.38); flex:1;
-}
-.proto-toggle-collapse{
-  background:none; border:none; padding:3px; cursor:pointer;
-  color:rgba(255,255,255,0.25); display:flex; align-items:center;
-  border-radius:5px; transition:color .15s, background .15s; flex-shrink:0;
-}
-.proto-toggle-collapse:hover{color:rgba(255,255,255,0.65); background:rgba(255,255,255,0.08)}
-.proto-toggle-collapse svg{transition:transform .2s}
-.proto-panel.proto-collapsed .proto-toggle-collapse svg{transform:rotate(180deg)}
-.proto-body{padding:10px 12px 12px; display:flex; flex-direction:column; gap:8px}
-.proto-panel.proto-collapsed .proto-body{display:none}
-.proto-row{display:flex; align-items:center; gap:8px}
-.proto-row-label{font-size:11px; color:rgba(255,255,255,0.40); min-width:36px; flex-shrink:0}
-.proto-row-value{font-size:11px; font-weight:600; color:rgba(255,255,255,0.72)}
-.proto-switch{
-  width:34px; height:19px; border-radius:10px;
-  background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.14);
-  position:relative; cursor:pointer; flex-shrink:0;
-  transition:background .2s, border-color .2s;
-}
-.proto-switch.on{background:var(--pri-30); border-color:var(--pri-55)}
-.proto-switch-thumb{
-  width:13px; height:13px; border-radius:50%;
-  background:rgba(255,255,255,0.45);
-  position:absolute; top:2px; left:2px;
-  transition:left .2s, background .2s;
-}
-.proto-switch.on .proto-switch-thumb{left:17px; background:var(--pri)}
-.proto-divider{height:1px; background:rgba(255,255,255,0.07); margin:2px 0}
-.proto-mode-btns{display:flex; gap:4px}
-.proto-mode-btn{
-  display:inline-flex; align-items:center; gap:4px;
-  padding:3px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.10);
-  background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.45);
-  font-size:11px; font-weight:500; cursor:pointer; font-family:inherit;
-  transition:background .15s, color .15s, border-color .15s;
-}
-.proto-mode-btn:hover{background:rgba(255,255,255,0.10); color:rgba(255,255,255,0.75)}
-.proto-mode-btn.active{
-  background:var(--pri-20); border-color:var(--pri-45);
-  color:#fff;
-}
-.proto-mode-badge{
-  font-size:10px; font-weight:700; background:#F5A623; color:#000;
-  border-radius:50%; width:14px; height:14px;
-  display:inline-flex; align-items:center; justify-content:center;
-  line-height:1;
-}
-.proto-mode-badge:empty{display:none}
 html.theme-light .tb-um-item:hover,
 html.theme-light .tb-um-workspace:hover{background:rgba(0,0,0,0.04)}
 html.theme-light .tb-um-signout:hover{background:var(--red-600-05)}
@@ -18260,13 +18190,6 @@ function paintModeToggle() {
   // Topbar badge
   const badge = document.getElementById('tbOperateBadge');
   if (badge) badge.textContent = countStr;
-  // Proto panel buttons
-  const pb = document.getElementById('protoModeBrowse');
-  const po = document.getElementById('protoModeOperate');
-  if (pb) pb.classList.toggle('active', state.mode === 'browse');
-  if (po) po.classList.toggle('active', state.mode === 'operate');
-  const protoBadge = document.getElementById('protoOperateBadge');
-  if (protoBadge) protoBadge.textContent = countStr;
 }
 
 // Admin vs User: how much surface do we expose
@@ -18286,58 +18209,11 @@ function togglePersona() {
 
 function paintPersonaPill() {
   const isUser = state.persona === 'user';
-  // Proto panel
-  const sw = document.getElementById('protoPersonaSwitch');
-  const lbl = document.getElementById('protoPersonaLabel');
-  if (sw) sw.classList.toggle('on', isUser);
-  if (lbl) lbl.textContent = isUser ? 'End-user view' : 'Admin Console';
   // DOM persona class
   document.documentElement.classList.toggle('persona-user', isUser);
   // Operate tab visibility
   const operateBtn = document.querySelector('.tb-mode-btn[data-mode="operate"]');
   if (operateBtn) operateBtn.style.display = isUser ? 'none' : '';
-}
-
-// ── Prototype panel drag + collapse ────────────────────────────────────
-(function() {
-  let drag = null;
-  document.addEventListener('DOMContentLoaded', function() {
-    const handle = document.getElementById('protoHandle');
-    const panel  = document.getElementById('protoPanel');
-    if (!handle || !panel) return;
-
-    handle.addEventListener('mousedown', function(e) {
-      if (e.target.closest('.proto-toggle-collapse')) return;
-      if (e.button !== 0) return;
-      const rect = panel.getBoundingClientRect();
-      drag = { startX: e.clientX, startY: e.clientY, origX: rect.left, origY: rect.top };
-      panel.style.right = 'auto'; panel.style.bottom = 'auto';
-      panel.style.left = rect.left + 'px'; panel.style.top = rect.top + 'px';
-      document.addEventListener('mousemove', onDragMove);
-      document.addEventListener('mouseup', onDragEnd);
-      e.preventDefault();
-    });
-
-    function onDragMove(e) {
-      if (!drag) return;
-      let nx = drag.origX + (e.clientX - drag.startX);
-      let ny = drag.origY + (e.clientY - drag.startY);
-      nx = Math.max(0, Math.min(window.innerWidth  - panel.offsetWidth,  nx));
-      ny = Math.max(0, Math.min(window.innerHeight - panel.offsetHeight, ny));
-      panel.style.left = nx + 'px'; panel.style.top = ny + 'px';
-    }
-
-    function onDragEnd() {
-      drag = null;
-      document.removeEventListener('mousemove', onDragMove);
-      document.removeEventListener('mouseup', onDragEnd);
-    }
-  });
-})();
-
-function toggleProtoPanel(e) {
-  if (e) e.stopPropagation();
-  document.getElementById('protoPanel').classList.toggle('proto-collapsed');
 }
 
 // Paint mode + persona controls on initial load
@@ -18865,45 +18741,6 @@ initBackLink();
 </script>
 
 <!-- ── Prototype floating control panel ─────────────────────────────── -->
-<div class="proto-panel" id="protoPanel">
-  <div class="proto-handle" id="protoHandle">
-    <span class="proto-ic">
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M10 2L14 6L6 14L2 10L10 2Z" stroke="var(--pri)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M13 3L14 6" stroke="var(--pri)" stroke-width="1.5" stroke-linecap="round"/>
-        <circle cx="5" cy="11" r="1" fill="var(--teal)"/>
-      </svg>
-    </span>
-    <span class="proto-title">Prototype</span>
-    <button class="proto-toggle-collapse" id="protoCollapseBtn" onclick="toggleProtoPanel(event)" title="Collapse">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 7.5L6 4l3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-  </div>
-  <div class="proto-body" id="protoBody">
-    <div class="proto-row">
-      <span class="proto-row-label">View</span>
-      <div class="proto-switch" id="protoPersonaSwitch" onclick="togglePersona()">
-        <div class="proto-switch-thumb"></div>
-      </div>
-      <span class="proto-row-value" id="protoPersonaLabel">Admin Console</span>
-    </div>
-    <div class="proto-divider"></div>
-    <div class="proto-row">
-      <span class="proto-row-label">Mode</span>
-      <div class="proto-mode-btns" role="group">
-        <button class="proto-mode-btn active" id="protoModeBrowse" onclick="setMode('browse')" type="button">
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Browse
-        </button>
-        <button class="proto-mode-btn" id="protoModeOperate" onclick="setMode('operate')" type="button">
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 13h12M4 13V8M7.5 13V5M11 13V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Operate
-          <span class="proto-mode-badge" id="protoOperateBadge"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 <script>
 window.NOTIF_DATA = [
   { id:'st1', source:'system',      eventType:'security',   severity:'critical', title:'SSO certificate expiring in 24 hours',    desc:'SAML certificate for Contoso Ltd. workspace expires Aug 6. Upload replacement now.',           time:'2h ago',    day:'today',     unread:true  },
