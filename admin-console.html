@@ -7325,6 +7325,86 @@ html.theme-light .ms-input:disabled,html.theme-light .ms-input[readonly]{backgro
 html.theme-light .ms-select{background:var(--canvas);color:var(--t1);}
 html.theme-light .ms-theme-card{background:var(--bg2);}
 
+/* ====================== PEOPLE & ACCESS ====================== */
+.pa-wrap { max-width: 1100px; padding-bottom: 64px; }
+.pa-tabs { display:flex; gap:2px; border-bottom:1px solid var(--line); margin-bottom:24px; }
+.pa-tab { background:none; border:none; padding:10px 16px; font-size:13px; font-weight:500; color:var(--t2); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s, border-color .12s; border-radius:var(--r6) var(--r6) 0 0; }
+.pa-tab:hover { color:var(--t1); }
+.pa-tab.active { color:var(--pri); border-bottom-color:var(--pri); font-weight:600; }
+.pa-tab-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; background:var(--bg3); border-radius:9px; font-size:10.5px; font-weight:700; color:var(--t2); margin-left:5px; }
+.pa-tab.active .pa-tab-count { background:var(--pri-12); color:var(--pri); }
+.pa-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+.pa-search { flex:1; min-width:200px; max-width:320px; height:32px; padding:0 10px 0 32px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r6); font-size:13px; color:var(--t1); outline:none; }
+.pa-search:focus { border-color:var(--pri); }
+.pa-search-wrap { position:relative; flex:1; min-width:200px; max-width:320px; }
+.pa-search-icon { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--t3); pointer-events:none; }
+.pa-filter-select { height:32px; padding:0 10px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r6); font-size:13px; color:var(--t1); cursor:pointer; outline:none; }
+.pa-filter-select:focus { border-color:var(--pri); }
+.pa-filter-count { font-size:12px; color:var(--t3); margin-left:auto; }
+.pm-table { width:100%; border-collapse:collapse; }
+.pm-table thead th { font-size:11px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.05em; padding:8px 12px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; }
+.pm-table tbody tr { border-bottom:1px solid var(--line); cursor:pointer; transition:background .1s; }
+.pm-table tbody tr:hover { background:var(--hover); }
+.pm-table tbody tr:last-child { border-bottom:none; }
+.pm-table td { padding:12px 12px; vertical-align:middle; font-size:13px; color:var(--t1); }
+.pm-identity { display:flex; align-items:center; gap:10px; }
+.pm-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
+.pm-name { font-size:13px; font-weight:600; color:var(--t1); line-height:1.2; }
+.pm-email { font-size:11.5px; color:var(--t3); line-height:1.2; margin-top:1px; }
+.pm-roles { display:flex; flex-wrap:wrap; gap:4px; }
+.pm-role-chip { display:inline-flex; align-items:center; gap:4px; height:20px; padding:0 7px; border-radius:10px; font-size:10.5px; font-weight:600; border:1px solid transparent; white-space:nowrap; }
+.pm-status { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; padding:3px 8px; border-radius:10px; white-space:nowrap; }
+.pm-status-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.pm-status.active { background:rgba(16,185,129,.12); color:#10b981; }
+.pm-status.active .pm-status-dot { background:#10b981; }
+.pm-status.invited { background:rgba(245,158,11,.12); color:#f59e0b; }
+.pm-status.invited .pm-status-dot { background:#f59e0b; }
+.pm-status.suspended { background:rgba(239,68,68,.12); color:#ef4444; }
+.pm-status.suspended .pm-status-dot { background:#ef4444; }
+.pm-action-btn { background:none; border:none; color:var(--t3); cursor:pointer; padding:4px 6px; border-radius:var(--r6); opacity:0; transition:opacity .1s, background .1s, color .1s; }
+.pm-table tbody tr:hover .pm-action-btn { opacity:1; }
+.pm-action-btn:hover { background:var(--hover); color:var(--t1); }
+.pm-drawer-avatar { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700; color:#fff; flex-shrink:0; }
+.pm-drawer-identity { display:flex; align-items:center; gap:14px; padding:20px; border-bottom:1px solid var(--line); }
+.pm-drawer-name { font-size:16px; font-weight:700; color:var(--t1); line-height:1.2; }
+.pm-drawer-meta { font-size:12px; color:var(--t3); margin-top:3px; }
+.pm-drawer-tabs { display:flex; gap:0; border-bottom:1px solid var(--line); padding:0 20px; }
+.pm-drawer-tab { background:none; border:none; padding:10px 14px; font-size:13px; font-weight:500; color:var(--t2); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s, border-color .12s; }
+.pm-drawer-tab.active { color:var(--pri); border-bottom-color:var(--pri); font-weight:600; }
+.pm-drawer-section { margin-bottom:20px; }
+.pm-drawer-section-h { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+.pm-role-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); margin-bottom:6px; }
+.pm-role-row-name { font-size:13px; font-weight:600; color:var(--t1); }
+.pm-role-row-desc { font-size:11.5px; color:var(--t3); margin-top:2px; }
+.pm-role-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-right:8px; }
+.pm-remove-btn { background:none; border:none; color:var(--t3); cursor:pointer; padding:3px 6px; border-radius:var(--r6); font-size:11px; transition:background .1s, color .1s; }
+.pm-remove-btn:hover { background:rgba(239,68,68,.12); color:#ef4444; }
+.pm-add-role-btn { display:flex; align-items:center; gap:6px; width:100%; padding:9px 12px; background:transparent; border:1px dashed var(--line); border-radius:var(--r8); font-size:12px; color:var(--t3); cursor:pointer; transition:border-color .12s, color .12s; margin-top:4px; }
+.pm-add-role-btn:hover { border-color:var(--pri); color:var(--pri); }
+.pm-stat-row { display:flex; gap:12px; margin-bottom:16px; }
+.pm-stat-tile { flex:1; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); padding:12px 14px; }
+.pm-stat-v { font-size:22px; font-weight:700; color:var(--t1); line-height:1; }
+.pm-stat-l { font-size:11px; color:var(--t3); margin-top:4px; }
+.pm-note-banner { display:flex; align-items:flex-start; gap:8px; padding:10px 12px; background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.25); border-radius:var(--r8); margin-bottom:12px; font-size:12px; color:var(--t2); line-height:1.4; }
+.pm-suspend-banner { background:rgba(239,68,68,.08); border-color:rgba(239,68,68,.25); }
+.pm-danger-zone { padding:14px; background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.2); border-radius:var(--r8); margin-top:8px; }
+.pm-danger-zone-h { font-size:12px; font-weight:700; color:#ef4444; margin-bottom:8px; }
+.pm-activity-row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line); }
+.pm-activity-row:last-child { border-bottom:none; }
+.pm-activity-dot { width:8px; height:8px; border-radius:50%; background:var(--t3); flex-shrink:0; margin-top:4px; }
+.pm-activity-event { font-size:12.5px; color:var(--t1); line-height:1.35; }
+.pm-activity-time { font-size:11px; color:var(--t3); margin-top:2px; }
+.pm-empty { text-align:center; padding:48px 24px; }
+.pm-empty-h { font-size:14px; font-weight:600; color:var(--t1); margin-bottom:6px; }
+.pm-empty-p { font-size:13px; color:var(--t3); }
+.pm-invite-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); z-index:200; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+.pm-invite-overlay.open { opacity:1; pointer-events:all; }
+.pm-invite-modal { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12); width:440px; max-width:calc(100vw - 32px); box-shadow:0 20px 60px rgba(0,0,0,.4); }
+.pm-invite-head { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--line); }
+.pm-invite-title { font-size:15px; font-weight:700; color:var(--t1); }
+.pm-invite-body { padding:20px; }
+.pm-invite-foot { padding:14px 20px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:flex-end; }
+
 </style>
 <link rel="stylesheet" href="shared/notif-panel.css">
 </head>
@@ -7558,7 +7638,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
         <div class="ssb-group">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Tenant</span></div>
 
-          <button class="ssb-item disabled" data-route="people">
+          <button class="ssb-item" data-route="people" onclick="navigate('#/people')">
             <span class="ssb-item-label">People & Access</span>
           </button>
 
@@ -8326,17 +8406,46 @@ const WORKSPACE_GROUPS = [
 /* Mock people directory — used by the per-instance "Who can use it" picker.
    Per Edgardo: access is granted to people or groups directly (not roles). */
 const MOCK_PEOPLE = [
-  { id:'tg',  name:'Thomas González',  initials:'TG', role:'CTO',                  color:'#10b981' },
-  { id:'mg',  name:'María González',   initials:'MG', role:'Head of Data',         color:'var(--int-cyan)' },
-  { id:'es',  name:'Edgardo Sierra',   initials:'ES', role:'VP Engineering',       color:'var(--purple-lt)' },
-  { id:'sb',  name:'Sebastián Blandón',initials:'SB', role:'Product Designer',     color:'#fbbf24' },
-  { id:'dp',  name:'Diana Pérez',      initials:'DP', role:'Solutions Architect',  color:'#ff7d7d' },
-  { id:'np',  name:'Naomi Park',       initials:'NP', role:'Data Engineer',        color:'#34d39c' },
-  { id:'mc',  name:'Marcus Chen',      initials:'MC', role:'Platform Lead',        color:'#a78bfa' },
-  { id:'sc',  name:'Sarah Chen',       initials:'SC', role:'Customer Success Lead',color:'#06B6D4' },
-  { id:'ap',  name:'Alex Park',        initials:'AP', role:'Finance Manager',      color:'#fbbf24' },
-  { id:'jh',  name:'Jordan Huerta',    initials:'JH', role:'Eng Manager',          color:'var(--int-cyan)' }
+  { id:'tg',  name:'Thomas González',   initials:'TG', role:'CTO',                   color:'#10b981',  email:'thomas.gonzalez@contoso.com',   status:'active',    lastActive:'Just now',     joinDate:'Jan 12, 2025' },
+  { id:'mg',  name:'María González',    initials:'MG', role:'Head of Data',          color:'#06B6D4',  email:'maria.gonzalez@contoso.com',    status:'active',    lastActive:'2h ago',       joinDate:'Jan 12, 2025' },
+  { id:'es',  name:'Edgardo Sierra',    initials:'ES', role:'VP Engineering',        color:'#a78bfa',  email:'edgardo.sierra@contoso.com',    status:'active',    lastActive:'1h ago',       joinDate:'Jan 12, 2025' },
+  { id:'sb',  name:'Sebastián Blandón', initials:'SB', role:'Product Designer',      color:'#fbbf24',  email:'sebastian.blandon@contoso.com', status:'active',    lastActive:'Yesterday',    joinDate:'Feb 3, 2025' },
+  { id:'dp',  name:'Diana Pérez',       initials:'DP', role:'Solutions Architect',   color:'#ff7d7d',  email:'diana.perez@contoso.com',       status:'active',    lastActive:'3h ago',       joinDate:'Mar 10, 2025' },
+  { id:'np',  name:'Naomi Park',        initials:'NP', role:'Data Engineer',         color:'#34d39c',  email:'naomi.park@contoso.com',        status:'active',    lastActive:'4h ago',       joinDate:'Feb 28, 2025' },
+  { id:'mc',  name:'Marcus Chen',       initials:'MC', role:'Platform Lead',         color:'#a78bfa',  email:'marcus.chen@contoso.com',       status:'active',    lastActive:'5h ago',       joinDate:'Mar 15, 2025' },
+  { id:'sc',  name:'Sarah Chen',        initials:'SC', role:'Customer Success Lead', color:'#06B6D4',  email:'sarah.chen@contoso.com',        status:'suspended', lastActive:'3 days ago',   joinDate:'Apr 1, 2025',  suspendedReason:'Pending access review' },
+  { id:'ap',  name:'Alex Park',         initials:'AP', role:'Finance Manager',       color:'#fbbf24',  email:'alex.park@contoso.com',         status:'active',    lastActive:'2 days ago',   joinDate:'Jan 12, 2025' },
+  { id:'jh',  name:'Jordan Huerta',     initials:'JH', role:'Eng Manager',           color:'#06B6D4',  email:'jordan.huerta@contoso.com',     status:'active',    lastActive:'Yesterday',    joinDate:'May 5, 2025' },
+  { id:'ps',  name:'Priya Subramaniam', initials:'PS', role:'Compliance Officer',    color:'#0ea5e9',  email:'priya.subramaniam@contoso.com', status:'invited',   lastActive:'Never',        joinDate:'Aug 10, 2026',  invitedDate:'Aug 10, 2026' },
+  { id:'ok',  name:'Omar Khalil',       initials:'OK', role:'External Consultant',   color:'#84cc16',  email:'omar.khalil@consulting.io',     status:'active',    lastActive:'1 week ago',   joinDate:'Jul 20, 2026' },
+  { id:'lt',  name:'Layla Torres',      initials:'LT', role:'Ops Lead',              color:'#f97316',  email:'layla.torres@contoso.com',      status:'active',    lastActive:'Today',        joinDate:'Aug 1, 2026' },
 ];
+
+/* Platform-level roles — separate from studio-scoped STUDIO_ROLES */
+const PA_ROLES = [
+  { id:'workspace-admin',     label:'Workspace Admin',     system:true,  color:'#6366f1', desc:'Full control over workspace settings, members, studios, and billing',                      memberIds:['tg','mg','es'] },
+  { id:'developer',           label:'Developer',           system:true,  color:'#10b981', desc:'Build and deploy integrations, agents, and custom workflows',                             memberIds:['es','sb','dp','mc','jh'] },
+  { id:'viewer',              label:'Viewer',              system:true,  color:'#64748b', desc:'Read-only access across all non-sensitive studio content',                                memberIds:['sc','ap','lt'] },
+  { id:'agent-builder',       label:'Agent Builder',       system:false, color:'#f97316', desc:'Create and manage AI workers, agentic networks, and workflow definitions',               memberIds:['sb','dp','jh','lt'] },
+  { id:'data-steward',        label:'Data Steward',        system:false, color:'#8b5cf6', desc:'Manage model definitions, governance policies, and data lineage graphs',                 memberIds:['mg','np'] },
+  { id:'compliance-auditor',  label:'Compliance Auditor',  system:false, color:'#0ea5e9', desc:'Read-only access to audit logs, governance events, and lineage — no write permissions',  memberIds:['ok'] },
+];
+
+const PA_MEMBER_ROLES = {
+  tg: ['workspace-admin'],
+  mg: ['workspace-admin', 'data-steward'],
+  es: ['workspace-admin', 'developer'],
+  sb: ['developer', 'agent-builder'],
+  dp: ['developer', 'agent-builder'],
+  np: ['data-steward'],
+  mc: ['developer'],
+  sc: ['viewer'],
+  ap: ['viewer'],
+  jh: ['developer', 'agent-builder'],
+  ps: [],
+  ok: ['compliance-auditor'],
+  lt: ['viewer', 'agent-builder'],
+};
 
 /* Seed default "Who can use it" for an instance the first time it's read.
    Always includes the connector; adds 1-2 contextual groups by category. */
@@ -10674,6 +10783,527 @@ function renderAdminHome() {
   `;
 }
 
+/* ====================== PEOPLE & ACCESS ====================== */
+
+let _paState = {
+  tab: 'members',
+  memberSearch: '',
+  memberStatus: 'all',
+  memberRole: '',
+  memberDetailId: null,
+  memberDrawerTab: 'overview',
+  inviteOpen: false,
+};
+
+function renderPeople(subTab) {
+  if (subTab) _paState.tab = subTab;
+  const activeTab = _paState.tab;
+
+  const activeCount = MOCK_PEOPLE.filter(p => p.status === 'active').length;
+  const invitedCount = MOCK_PEOPLE.filter(p => p.status === 'invited').length;
+  const suspendedCount = MOCK_PEOPLE.filter(p => p.status === 'suspended').length;
+
+  $('content').innerHTML = `
+    <div class="breadcrumb">
+      <span class="crumb-current">People &amp; Access</span>
+    </div>
+    <div class="ph">
+      <div class="ph-top">
+        <div class="ph-text">
+          <div class="ph-h1">People &amp; Access</div>
+          <div class="ph-sub">Manage workspace members, roles, and permission assignments across all studios.</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-primary btn-sm" onclick="paOpenInvite()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="margin-right:4px"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Invite member
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pa-wrap">
+      <div class="pa-tabs">
+        <button class="pa-tab ${activeTab==='members'?'active':''}" onclick="renderPeople('members')">
+          Members <span class="pa-tab-count">${MOCK_PEOPLE.length}</span>
+        </button>
+        <button class="pa-tab ${activeTab==='roles'?'active':''}" onclick="renderPeople('roles')">
+          Roles &amp; Permissions <span class="pa-tab-count">${PA_ROLES.length}</span>
+        </button>
+      </div>
+
+      ${activeTab === 'members' ? renderPeopleMembers() : renderPeopleRolesList()}
+    </div>
+
+    <!-- Member detail drawer -->
+    <div class="drawer-overlay ${_paState.memberDetailId ? 'open' : ''}" onclick="paCloseDrawer()"></div>
+    <div class="drawer ${_paState.memberDetailId ? 'open' : ''}" id="pmDrawer">
+      ${_paState.memberDetailId ? renderMemberDrawer(_paState.memberDetailId) : ''}
+    </div>
+
+    <!-- Invite modal -->
+    <div class="pm-invite-overlay ${_paState.inviteOpen ? 'open' : ''}" onclick="if(event.target===this)paCloseInvite()">
+      ${_paState.inviteOpen ? renderInviteModal() : ''}
+    </div>
+  `;
+}
+
+function renderPeopleMembers() {
+  const q = _paState.memberSearch.toLowerCase();
+  const statusFilter = _paState.memberStatus;
+  const roleFilter = _paState.memberRole;
+
+  let people = MOCK_PEOPLE.filter(p => {
+    if (q && !p.name.toLowerCase().includes(q) && !p.email.toLowerCase().includes(q) && !p.role.toLowerCase().includes(q)) return false;
+    if (statusFilter !== 'all' && p.status !== statusFilter) return false;
+    if (roleFilter) {
+      const memberRoles = PA_MEMBER_ROLES[p.id] || [];
+      if (!memberRoles.includes(roleFilter)) return false;
+    }
+    return true;
+  });
+
+  const statusOptions = [
+    { value:'all', label:'All statuses' },
+    { value:'active', label:'Active' },
+    { value:'invited', label:'Invited' },
+    { value:'suspended', label:'Suspended' },
+  ];
+
+  return `
+    <div class="pa-filters">
+      <div class="pa-search-wrap">
+        <svg class="pa-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <input class="pa-search" type="text" placeholder="Search by name, email, or title…"
+          value="${escapeHtml(_paState.memberSearch)}"
+          oninput="_paState.memberSearch=this.value;_paRerender()"
+          id="paMemberSearch"/>
+      </div>
+      <select class="pa-filter-select" onchange="_paState.memberStatus=this.value;_paRerender()">
+        ${statusOptions.map(o => `<option value="${o.value}" ${_paState.memberStatus===o.value?'selected':''}>${o.label}</option>`).join('')}
+      </select>
+      <select class="pa-filter-select" onchange="_paState.memberRole=this.value;_paRerender()">
+        <option value="">All roles</option>
+        ${PA_ROLES.map(r => `<option value="${r.id}" ${_paState.memberRole===r.id?'selected':''}>${escapeHtml(r.label)}</option>`).join('')}
+      </select>
+      <span class="pa-filter-count">${people.length} of ${MOCK_PEOPLE.length} members</span>
+    </div>
+
+    ${people.length === 0 ? `
+      <div class="pm-empty">
+        <div class="pm-empty-h">No members match these filters</div>
+        <div class="pm-empty-p">Try changing the search or filter criteria.</div>
+      </div>
+    ` : `
+    <table class="pm-table">
+      <thead>
+        <tr>
+          <th style="width:280px">Member</th>
+          <th style="width:160px">Title</th>
+          <th>Roles</th>
+          <th style="width:100px">Status</th>
+          <th style="width:110px">Last active</th>
+          <th style="width:32px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${people.map(p => {
+          const memberRoles = (PA_MEMBER_ROLES[p.id] || []).map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
+          return `
+          <tr onclick="paOpenDrawer('${p.id}')">
+            <td>
+              <div class="pm-identity">
+                <div class="pm-avatar" style="background:${p.color}">${escapeHtml(p.initials)}</div>
+                <div>
+                  <div class="pm-name">${escapeHtml(p.name)}</div>
+                  <div class="pm-email">${escapeHtml(p.email)}</div>
+                </div>
+              </div>
+            </td>
+            <td style="color:var(--t2)">${escapeHtml(p.role)}</td>
+            <td>
+              <div class="pm-roles">
+                ${memberRoles.length > 0
+                  ? memberRoles.slice(0,3).map(r => `
+                      <span class="pm-role-chip" style="background:${r.color}18;color:${r.color};border-color:${r.color}30">
+                        ${escapeHtml(r.label)}
+                      </span>`).join('') + (memberRoles.length > 3 ? `<span class="pm-role-chip" style="background:var(--bg3);color:var(--t3);border-color:var(--line)">+${memberRoles.length-3}</span>` : '')
+                  : `<span style="font-size:12px;color:var(--t3)">${p.status==='invited' ? 'Pending acceptance' : 'No roles'}</span>`
+                }
+              </div>
+            </td>
+            <td>
+              <span class="pm-status ${p.status}">
+                <span class="pm-status-dot"></span>
+                ${p.status === 'active' ? 'Active' : p.status === 'invited' ? 'Invited' : 'Suspended'}
+              </span>
+            </td>
+            <td style="color:var(--t3);font-size:12px">${escapeHtml(p.lastActive)}</td>
+            <td>
+              <button class="pm-action-btn" onclick="event.stopPropagation();paMemberMenu(event,'${p.id}')" title="Actions">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <circle cx="8" cy="3" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="8" cy="13" r="1.2"/>
+                </svg>
+              </button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`}
+  `;
+}
+
+function renderPeopleRolesList() {
+  const systemRoles = PA_ROLES.filter(r => r.system);
+  const customRoles = PA_ROLES.filter(r => !r.system);
+
+  const renderRole = (r) => {
+    const members = (r.memberIds || []).map(id => MOCK_PEOPLE.find(p => p.id === id)).filter(Boolean);
+    return `
+      <tr onclick="toast('${escapeHtml(r.label)} role detail — coming next','info')" style="cursor:pointer">
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:28px;height:28px;border-radius:var(--r6);background:${r.color}20;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="width:10px;height:10px;border-radius:50%;background:${r.color}"></div>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--t1)">${escapeHtml(r.label)}${r.system?` <span style="font-size:10px;font-weight:600;color:var(--t3);background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin-left:4px">System</span>`:''}
+              </div>
+              <div style="font-size:11.5px;color:var(--t3);margin-top:2px">${escapeHtml(r.desc)}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div style="display:flex;align-items:center;gap:-6px">
+            ${members.slice(0,5).map((m,i) => `<div class="pm-avatar" style="width:24px;height:24px;font-size:9px;background:${m.color};margin-left:${i>0?'-6px':'0'};border:2px solid var(--bg2)" title="${escapeHtml(m.name)}">${escapeHtml(m.initials)}</div>`).join('')}
+            ${members.length > 5 ? `<span style="font-size:11px;color:var(--t3);margin-left:4px">+${members.length-5}</span>` : ''}
+            ${members.length === 0 ? `<span style="font-size:12px;color:var(--t3)">No members</span>` : ''}
+          </div>
+        </td>
+        <td style="color:var(--t3);font-size:12px">${members.length} ${members.length===1?'member':'members'}</td>
+        <td>
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="color:var(--t3)">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </td>
+      </tr>`;
+  };
+
+  return `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="toast('Create custom role — coming soon','info')">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="margin-right:4px"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        New role
+      </button>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">System roles</div>
+    <table class="pm-table" style="margin-bottom:24px">
+      <thead><tr>
+        <th>Role</th><th>Members</th><th style="width:80px">Count</th><th style="width:32px"></th>
+      </tr></thead>
+      <tbody>${systemRoles.map(renderRole).join('')}</tbody>
+    </table>
+
+    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Custom roles</div>
+    <table class="pm-table">
+      <thead><tr>
+        <th>Role</th><th>Members</th><th style="width:80px">Count</th><th style="width:32px"></th>
+      </tr></thead>
+      <tbody>${customRoles.map(renderRole).join('')}</tbody>
+    </table>
+  `;
+}
+
+function renderMemberDrawer(personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId); if (!p) return '';
+  const memberRoles = (PA_MEMBER_ROLES[p.id] || []).map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
+  const tab = _paState.memberDrawerTab;
+
+  const activityEvents = {
+    tg: [
+      { event:'Logged in', time:'Just now', detail:'' },
+      { event:'Invited Priya Subramaniam', time:'Aug 10, 2026', detail:'Role: Compliance Officer' },
+      { event:'Updated workspace billing plan', time:'Jul 28, 2026', detail:'' },
+    ],
+    mg: [
+      { event:'Logged in', time:'2h ago', detail:'' },
+      { event:'Edited governance policy', time:'Aug 11, 2026', detail:'Governance Studio' },
+      { event:'Published model "Customer Churn v3"', time:'Aug 5, 2026', detail:'Helix Studio' },
+    ],
+    sc: [
+      { event:'Logged in', time:'3 days ago', detail:'' },
+      { event:'Account suspended', time:'Aug 9, 2026', detail:'Pending access review' },
+      { event:'Accessed Customer Success agent', time:'Aug 8, 2026', detail:'Agentic Studio' },
+    ],
+    ok: [
+      { event:'Logged in', time:'1 week ago', detail:'' },
+      { event:'Viewed audit log (read-only)', time:'Jul 28, 2026', detail:'' },
+      { event:'Added as External Consultant', time:'Jul 20, 2026', detail:'Individual grants only' },
+    ],
+    ps: [
+      { event:'Invitation sent', time:'Aug 10, 2026', detail:'Email: priya.subramaniam@contoso.com' },
+    ],
+    jh: [
+      { event:'Logged in', time:'Yesterday', detail:'' },
+      { event:'Deployed "Invoice Processor" worker', time:'Aug 8, 2026', detail:'Agentic Studio' },
+      { event:'Delete permissions restricted by admin', time:'Jul 30, 2026', detail:'Workers, Networks, Workflows' },
+    ],
+  }[p.id] || [
+    { event:'Logged in', time:p.lastActive, detail:'' },
+    { event:'Joined workspace', time:p.joinDate, detail:'' },
+  ];
+
+  let overviewContent = '';
+  if (p.status === 'suspended') {
+    overviewContent += `<div class="pm-note-banner pm-suspend-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#ef4444" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#ef4444"/></svg><div><strong style="color:#ef4444">Account suspended</strong> — ${escapeHtml(p.suspendedReason || 'Access restricted by admin.')} This member cannot log in.</div></div>`;
+  }
+  if (p.status === 'invited') {
+    overviewContent += `<div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Invitation sent ${escapeHtml(p.invitedDate||p.joinDate)} — awaiting acceptance. <a href="#" onclick="toast('Invitation resent','success');return false" style="color:var(--pri)">Resend →</a></div></div>`;
+  }
+  if (p.id === 'ok') {
+    overviewContent += `<div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#f59e0b" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#f59e0b"/></svg><div>External account — access is limited to individual permission grants only. Changes require admin approval.</div></div>`;
+  }
+
+  const statStudios = memberRoles.length > 0 ? '4 studios' : '0 studios';
+  overviewContent += `
+    <div class="pm-drawer-section">
+      <div class="pm-drawer-section-h">Assigned roles</div>
+      ${memberRoles.length === 0
+        ? `<div style="font-size:12.5px;color:var(--t3);padding:10px 0">${p.status==='invited'?'Roles will apply once the invitation is accepted.':'No platform roles assigned. Use individual permission grants or assign a role below.'}</div>`
+        : memberRoles.map(r => `
+          <div class="pm-role-row">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div class="pm-role-dot" style="background:${r.color};margin-top:4px"></div>
+              <div>
+                <div class="pm-role-row-name">${escapeHtml(r.label)}${r.system?` <span style="font-size:10px;color:var(--t3);font-weight:500">· System</span>`:''}
+                </div>
+                <div class="pm-role-row-desc">${escapeHtml(r.desc)}</div>
+              </div>
+            </div>
+            ${p.id !== 'tg' ? `<button class="pm-remove-btn" onclick="paRemoveRole('${p.id}','${r.id}')" title="Remove role">Remove</button>` : ''}
+          </div>`).join('')
+      }
+      ${p.id !== 'tg' ? `<button class="pm-add-role-btn" onclick="toast('Role picker coming soon','info')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Assign a role…
+      </button>` : ''}
+    </div>
+
+    <div class="pm-drawer-section">
+      <div class="pm-drawer-section-h">Studio access</div>
+      <div class="pm-stat-row">
+        <div class="pm-stat-tile"><div class="pm-stat-v">${memberRoles.length}</div><div class="pm-stat-l">Roles assigned</div></div>
+        <div class="pm-stat-tile"><div class="pm-stat-v">${memberRoles.length > 0 ? '4' : '0'}</div><div class="pm-stat-l">Studios with access</div></div>
+        <div class="pm-stat-tile"><div class="pm-stat-v">${p.status === 'active' ? 'Yes' : '—'}</div><div class="pm-stat-l">Can log in</div></div>
+      </div>
+    </div>
+
+    ${p.status !== 'invited' ? `
+    <div class="pm-drawer-section">
+      <div class="pm-drawer-section-h">Danger zone</div>
+      <div class="pm-danger-zone">
+        ${p.status === 'suspended'
+          ? `<div class="pm-danger-zone-h">Reinstate access</div>
+             <button class="btn btn-ghost btn-sm" onclick="paReinstate('${p.id}')">Reinstate member</button>`
+          : `<div class="pm-danger-zone-h">Suspend or remove</div>
+             <div style="display:flex;gap:8px;flex-wrap:wrap">
+               <button class="btn btn-ghost btn-sm" onclick="paSuspend('${p.id}')">Suspend access</button>
+               <button class="btn btn-danger btn-sm" onclick="paRemoveMember('${p.id}')">Remove from workspace</button>
+             </div>`
+        }
+      </div>
+    </div>` : ''}
+  `;
+
+  const permContent = `
+    <div class="pm-drawer-section">
+      <div class="pm-drawer-section-h">Effective permissions</div>
+      ${memberRoles.length === 0
+        ? `<div style="font-size:12.5px;color:var(--t3);padding:10px 0">No roles assigned — no inherited permissions. Any access comes from individual grants.</div>`
+        : `<div style="font-size:12.5px;color:var(--t2);margin-bottom:12px;line-height:1.5">Permissions are inherited from <strong style="color:var(--t1)">${memberRoles.map(r=>r.label).join(', ')}</strong>. The highest scope across all roles applies for each permission.</div>
+           ${[
+             { studio:'Agentic Studio', perms:['View workers', 'Run workers', 'Create workflows'] },
+             { studio:'Governance Studio', perms:['View policies', 'View promotions'] },
+             { studio:'Helix Studio', perms:['View models', 'View lineage'] },
+             { studio:'Platform', perms:['View settings'] },
+           ].filter(() => memberRoles.length > 0).map(s => `
+             <div style="margin-bottom:10px">
+               <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:5px">${escapeHtml(s.studio)}</div>
+               ${s.perms.map(perm => `
+                 <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="color:#10b981;flex-shrink:0"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                   <span style="font-size:12.5px;color:var(--t1)">${escapeHtml(perm)}</span>
+                   <span style="margin-left:auto;font-size:11px;color:var(--t3)">Tenant</span>
+                 </div>`).join('')}
+             </div>`).join('')}
+           <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="toast('Full permission panel — coming soon','info')">View all permissions →</button>`
+      }
+    </div>`;
+
+  const activityContent = `
+    <div class="pm-drawer-section">
+      <div class="pm-drawer-section-h">Recent activity</div>
+      <div>
+        ${activityEvents.map(e => `
+          <div class="pm-activity-row">
+            <div class="pm-activity-dot"></div>
+            <div>
+              <div class="pm-activity-event">${escapeHtml(e.event)}${e.detail ? ` <span style="color:var(--t3)">· ${escapeHtml(e.detail)}</span>` : ''}</div>
+              <div class="pm-activity-time">${escapeHtml(e.time)}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:12px">
+        <a href="#/audit" style="font-size:12px;color:var(--pri);text-decoration:none" onclick="paCloseDrawer();navigate('#/audit')">View full audit log →</a>
+      </div>
+    </div>`;
+
+  return `
+    <div class="pm-drawer-identity">
+      <div class="pm-drawer-avatar" style="background:${p.color}">${escapeHtml(p.initials)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="pm-drawer-name">${escapeHtml(p.name)}</div>
+          <span class="pm-status ${p.status}" style="font-size:10.5px;padding:2px 7px">
+            <span class="pm-status-dot"></span>
+            ${p.status === 'active' ? 'Active' : p.status === 'invited' ? 'Invited' : 'Suspended'}
+          </span>
+        </div>
+        <div class="pm-drawer-meta">${escapeHtml(p.role)} · ${escapeHtml(p.email)}</div>
+        <div class="pm-drawer-meta" style="margin-top:2px">Joined ${escapeHtml(p.joinDate)}</div>
+      </div>
+      <button class="drawer-close" onclick="paCloseDrawer()" aria-label="Close">✕</button>
+    </div>
+    <div class="pm-drawer-tabs">
+      <button class="pm-drawer-tab ${tab==='overview'?'active':''}" onclick="paSetDrawerTab('overview')">Overview</button>
+      <button class="pm-drawer-tab ${tab==='permissions'?'active':''}" onclick="paSetDrawerTab('permissions')">Permissions</button>
+      <button class="pm-drawer-tab ${tab==='activity'?'active':''}" onclick="paSetDrawerTab('activity')">Activity</button>
+    </div>
+    <div class="drawer-body">
+      ${tab === 'overview' ? overviewContent : tab === 'permissions' ? permContent : activityContent}
+    </div>
+  `;
+}
+
+function renderInviteModal() {
+  return `
+    <div class="pm-invite-modal">
+      <div class="pm-invite-head">
+        <div class="pm-invite-title">Invite member</div>
+        <button class="drawer-close" onclick="paCloseInvite()" aria-label="Close">✕</button>
+      </div>
+      <div class="pm-invite-body">
+        <div class="field-group">
+          <label class="field-label">Email address</label>
+          <input class="input" type="email" placeholder="name@company.com" id="inviteEmailInput" autofocus/>
+          <div class="field-help">Separate multiple addresses with commas to invite in bulk.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Assign role</label>
+          <select class="input" id="inviteRoleInput">
+            <option value="">No role (access via individual grants)</option>
+            ${PA_ROLES.map(r => `<option value="${r.id}">${escapeHtml(r.label)}</option>`).join('')}
+          </select>
+          <div class="field-help">Roles determine what studios and actions the invited user can access.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Personal message (optional)</label>
+          <textarea class="input" rows="2" placeholder="Add a note to the invite email…" style="resize:none"></textarea>
+        </div>
+      </div>
+      <div class="pm-invite-foot">
+        <button class="btn btn-ghost btn-sm" onclick="paCloseInvite()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="paSubmitInvite()">Send invite</button>
+      </div>
+    </div>`;
+}
+
+function _paRerender() {
+  const search = document.getElementById('paMemberSearch');
+  const scrollY = $('content') ? $('content').scrollTop : 0;
+  renderPeople();
+  const newSearch = document.getElementById('paMemberSearch');
+  if (newSearch && search) {
+    const v = search.value;
+    newSearch.focus();
+    newSearch.setSelectionRange(v.length, v.length);
+  }
+  if ($('content')) $('content').scrollTop = scrollY;
+}
+
+function paOpenDrawer(personId) {
+  _paState.memberDetailId = personId;
+  _paState.memberDrawerTab = 'overview';
+  renderPeople();
+}
+function paCloseDrawer() {
+  _paState.memberDetailId = null;
+  renderPeople();
+}
+function paSetDrawerTab(tab) {
+  _paState.memberDrawerTab = tab;
+  const d = $('pmDrawer');
+  if (d) d.innerHTML = renderMemberDrawer(_paState.memberDetailId);
+}
+function paOpenInvite() {
+  _paState.inviteOpen = true;
+  renderPeople();
+}
+function paCloseInvite() {
+  _paState.inviteOpen = false;
+  renderPeople();
+}
+function paSubmitInvite() {
+  const email = document.getElementById('inviteEmailInput');
+  const role = document.getElementById('inviteRoleInput');
+  const addr = email ? email.value.trim() : '';
+  if (!addr) { toast('Please enter an email address', 'error'); return; }
+  _paState.inviteOpen = false;
+  renderPeople();
+  toast(`Invitation sent to ${addr}`, 'success');
+}
+function paSuspend(personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId); if (!p) return;
+  p.status = 'suspended';
+  p.suspendedReason = 'Suspended by admin';
+  toast(`${p.name}'s access suspended`, 'success');
+  renderPeople();
+}
+function paReinstate(personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId); if (!p) return;
+  p.status = 'active';
+  delete p.suspendedReason;
+  toast(`${p.name} reinstated`, 'success');
+  renderPeople();
+}
+function paRemoveMember(personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId); if (!p) return;
+  toast(`${p.name} removed from workspace`, 'success');
+  _paState.memberDetailId = null;
+  renderPeople();
+}
+function paRemoveRole(personId, roleId) {
+  const roles = PA_MEMBER_ROLES[personId];
+  if (!roles) return;
+  const idx = roles.indexOf(roleId);
+  if (idx > -1) roles.splice(idx, 1);
+  const role = PA_ROLES.find(r => r.id === roleId);
+  const p = MOCK_PEOPLE.find(x => x.id === personId);
+  toast(`${role ? role.label : 'Role'} removed from ${p ? p.name : 'member'}`, 'success');
+  const d = $('pmDrawer');
+  if (d) d.innerHTML = renderMemberDrawer(personId);
+}
+function paMemberMenu(event, personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId); if (!p) return;
+  toast(`Actions: ${p.name} → use the row click to open details`, 'info');
+}
+
+/* ====================== PEOPLE & ACCESS end ====================== */
+
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'home';
   const parts = hash.split('/');
@@ -10685,7 +11315,8 @@ function route() {
     'distribution':'distribution',
     'widgets':'widgets',
     'personal':'personal',
-    'my-settings':'my-settings'
+    'my-settings':'my-settings',
+    'people':'people'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -10730,6 +11361,8 @@ function route() {
     renderPersonal();
   } else if (parts[0]==='my-settings') {
     renderMySettings();
+  } else if (parts[0]==='people') {
+    renderPeople(parts[1] || null);
   } else {
     renderHome();
   }
@@ -16567,6 +17200,7 @@ document.querySelectorAll('.ssb-item:not(.disabled)').forEach(b => {
     else if (r==='audit') navigate('#/audit');
     else if (r==='personal') navigate('#/personal');
     else if (r==='requests') navigate('#/requests');
+    else if (r==='people') navigate('#/people');
   });
 });
 document.querySelectorAll('.ssb-item.disabled').forEach(b => {
