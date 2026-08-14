@@ -7457,14 +7457,14 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .ste-wrap { max-width:860px; padding:32px 24px 64px; }
 /* License banner */
 .ste-license-bar { background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.08)); border:1px solid rgba(99,102,241,.25); border-radius:var(--r12); padding:20px 24px; display:flex; align-items:center; gap:20px; margin-bottom:32px; }
-.ste-license-icon { width:44px; height:44px; border-radius:12px; background:rgba(99,102,241,.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#818cf8; }
+.ste-license-icon { width:44px; height:44px; border-radius:12px; background:var(--indigo-15); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--indigo); }
 .ste-license-body { flex:1; }
 .ste-license-title { font-size:15px; font-weight:700; color:var(--t1); }
 .ste-license-sub { font-size:12px; color:var(--t3); margin-top:3px; }
 .ste-license-badges { display:flex; gap:8px; margin-top:8px; }
-.ste-lic-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
-.ste-lic-badge.enterprise { background:rgba(99,102,241,.15); color:#818cf8; border:1px solid rgba(99,102,241,.3); }
-.ste-lic-badge.renews { background:rgba(16,185,129,.1); color:#10b981; border:1px solid rgba(16,185,129,.25); }
+.ste-lic-badge { font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; }
+.ste-lic-badge.enterprise { background:var(--indigo-15); color:var(--indigo); border:1px solid rgba(99,102,241,.3); }
+.ste-lic-badge.renews { background:var(--green-10); color:var(--green); border:1px solid var(--green-25); }
 .ste-renew-btn { background:none; border:1px solid var(--line); border-radius:var(--r8); padding:8px 16px; font-size:12px; font-weight:600; color:var(--t2); cursor:pointer; white-space:nowrap; transition:border-color .15s,color .15s; }
 .ste-renew-btn:hover { border-color:var(--pri); color:var(--pri); }
 /* Studio card grid */
@@ -7475,30 +7475,30 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .ste-studio-meta { flex:1; }
 .ste-studio-name { font-size:15px; font-weight:700; color:var(--t1); }
 .ste-studio-desc { font-size:12px; color:var(--t3); margin-top:3px; }
-.ste-studio-status { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; margin-top:6px; }
-.ste-status-on  { background:rgba(16,185,129,.1);  color:#10b981; border:1px solid rgba(16,185,129,.25); }
+.ste-studio-status { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; padding:3px 9px; border-radius:20px; margin-top:6px; }
+.ste-status-on  { background:var(--green-10); color:var(--green); border:1px solid var(--green-25); }
 .ste-status-off { background:rgba(100,116,139,.1); color:var(--t3); border:1px solid var(--line); }
 .ste-studio-toggle { flex-shrink:0; }
 /* Seat meter */
 .ste-seat-bar-wrap { display:flex; flex-direction:column; gap:4px; margin-top:4px; min-width:160px; text-align:right; }
-.ste-seat-label { font-size:11px; color:var(--t3); }
+.ste-seat-label { font-size:12px; color:var(--t3); }
 .ste-seat-track { height:4px; background:var(--bg3); border-radius:4px; overflow:hidden; }
 .ste-seat-fill  { height:100%; border-radius:4px; background:var(--pri); }
-.ste-seat-fill.warn { background:#f59e0b; }
-.ste-seat-fill.over { background:#ef4444; }
+.ste-seat-fill.warn { background:var(--amber); }
+.ste-seat-fill.over { background:var(--red); }
 /* Feature flags table */
 .ste-features { border-top:1px solid var(--line); }
 .ste-features-head { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; cursor:pointer; user-select:none; }
 .ste-features-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--t3); }
-.ste-features-toggle-lbl { font-size:11px; color:var(--pri); cursor:pointer; }
+.ste-features-toggle-lbl { font-size:12px; color:var(--pri); cursor:pointer; }
 .ste-feature-row { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; border-top:1px solid var(--line); }
 .ste-feature-row:last-child { padding-bottom:14px; }
 .ste-feature-name { font-size:13px; color:var(--t1); font-weight:500; }
-.ste-feature-desc { font-size:11px; color:var(--t3); margin-top:1px; }
+.ste-feature-desc { font-size:12px; color:var(--t3); margin-top:1px; }
 .ste-feature-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 7px; border-radius:20px; }
-.ste-tag-included { background:rgba(16,185,129,.1); color:#10b981; }
+.ste-tag-included { background:var(--green-10); color:var(--green); }
 .ste-tag-addon    { background:rgba(249,115,22,.1);  color:#f97316; }
-.ste-tag-beta     { background:rgba(99,102,241,.12); color:#818cf8; }
+.ste-tag-beta     { background:var(--indigo-15); color:var(--indigo); }
 
 /* ====================== ROLE DETAIL & CREATE ====================== */
 /* Permission tree */
@@ -12546,7 +12546,7 @@ function renderOrganization() {
           <div class="org-meta-label">Workspace ID</div>
           <div class="org-meta-value">
             <span class="org-id-mono">${o.workspaceId}</span>
-            <button class="org-meta-copy" onclick="navigator.clipboard.writeText('${o.workspaceId}');toast('Copied','success')" title="Copy">
+            <button class="org-meta-copy" onclick="navigator.clipboard.writeText('${o.workspaceId}');toast('Copied','success')" title="Copy" aria-label="Copy workspace ID">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
           </div>
@@ -12610,7 +12610,7 @@ function renderOrganization() {
       <div class="org-danger-action">
         <div>
           <div class="org-danger-label">Transfer workspace ownership</div>
-          <div class="org-danger-desc">Assign a new primary owner. You will lose admin privileges.</div>
+          <div class="org-danger-desc">The recipient becomes the primary owner. Your role will be adjusted to Tenant Admin.</div>
         </div>
         <button class="org-danger-btn" onclick="toast('Transfer ownership — contact support to proceed','info')">Transfer ownership</button>
       </div>
