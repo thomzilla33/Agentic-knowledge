@@ -11601,6 +11601,21 @@ function _paFindNode(id) {
   return null;
 }
 
+function _paPatchNodeToggle(n) {
+  const row = document.getElementById('parow-' + n.id);
+  if (!row) return;
+  const t = row.querySelector('.pa-toggle');
+  if (!t) return;
+  t.className = 'pa-toggle' + (n.state === 'g-direct' ? ' on' : '');
+  t.setAttribute('aria-checked', n.state === 'g-direct' ? 'true' : 'false');
+  t.title = n.state === 'g-direct' ? 'Granted' : 'Not granted';
+}
+
+function _paTrackChange(n) {
+  _paState.pendingChanges = (_paState.pendingChanges || []).filter(c => c.nodeId !== n.id);
+  _paState.pendingChanges.push({ nodeId: n.id, name: n.label, code: n.code, action: n.state === 'g-direct' ? 'grant' : 'revoke', scope: n.scope || 'Own' });
+}
+
 function paToggleUserPerm(nodeId) {
   const node = _paFindNode(nodeId);
   if (!node || node.locked) return;
@@ -11608,19 +11623,17 @@ function paToggleUserPerm(nodeId) {
   const wasGranted = node.state === 'g-direct';
   node.state = wasGranted ? '' : 'g-direct';
 
-  // Track as unsaved change
-  _paState.pendingChanges = (_paState.pendingChanges || []).filter(c => c.nodeId !== nodeId);
-  _paState.pendingChanges.push({ nodeId, name:node.label, code:node.code, action: wasGranted ? 'revoke' : 'grant', scope:node.scope||'Own' });
+  _paTrackChange(node);
+  _paPatchNodeToggle(node);
 
-  // Patch only the toggle in the DOM — no full re-render, no scroll reset
-  const row = document.getElementById('parow-' + nodeId);
-  if (row) {
-    const t = row.querySelector('.pa-toggle');
-    if (t) {
-      t.className = 'pa-toggle' + (node.state === 'g-direct' ? ' on' : '');
-      t.setAttribute('aria-checked', node.state === 'g-direct' ? 'true' : 'false');
-      t.title = node.state === 'g-direct' ? 'Granted' : 'Not granted';
-    }
+  // When turning a parent ON, cascade to all unlocked children
+  if (!wasGranted && node.children && node.children.length) {
+    node.children.forEach(child => {
+      if (child.locked) return;
+      child.state = 'g-direct';
+      _paTrackChange(child);
+      _paPatchNodeToggle(child);
+    });
   }
 
   // Update changes bar count label without re-rendering the whole view
