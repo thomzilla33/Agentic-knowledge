@@ -96,6 +96,7 @@
   --topbar-avatar-ring:rgba(43,127,255,0.30);
   --topbar-zone-hover-bg:rgba(255,255,255,0.04);
   --topbar-zone-hover-bd:rgba(43,127,255,0.45);
+  --shadow-glow-ai:4px 8px 12px 8px rgba(9,226,171,0.16);
   /* DS Sidebar tokens */
   --sb-bg:rgba(15,23,43,1);
   --sb-icon-default:rgba(128,175,255,0.90);
@@ -469,13 +470,13 @@ html.persona-user [data-admin-only]{display:none !important}
 .icon-btn.ai-btn{
   background:radial-gradient(circle at 61% 68%, var(--pri) 29%, var(--teal) 61%);
   border-radius:8px;
-  box-shadow:var(--teal-16) 4px 8px 12px 8px;
+  box-shadow:var(--shadow-glow-ai);
   color:#fff;
 }
 .icon-btn.ai-btn:hover{background:radial-gradient(circle at 61% 68%, var(--pri) 29%, var(--teal) 61%); opacity:.85; color:#fff}
 /* notif-bell-wrap / notif-bell-dot → shared/notif-panel.css */
 .tb-divider-v{
-  display:inline-block; width:1px; height:16px;
+  display:inline-block; width:1px; height:28px;
   background:var(--topbar-divider); margin:0 2px; flex-shrink:0; align-self:center;
 }
 
@@ -486,7 +487,7 @@ html.persona-user [data-admin-only]{display:none !important}
   width:136px;
   transition:border-color .12s;
 }
-.tb-identity:hover{border-color:var(--topbar-avatar-ring)}
+.tb-identity:hover{border-color:var(--topbar-zone-hover-bd)}
 .tb-ws-badge{
   display:inline-flex; align-items:center; gap:4px;
   padding:0 4px 0 0; background:transparent; border:none; cursor:pointer;
