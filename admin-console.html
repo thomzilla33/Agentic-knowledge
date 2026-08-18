@@ -11626,11 +11626,12 @@ function paToggleUserPerm(nodeId) {
   _paTrackChange(node);
   _paPatchNodeToggle(node);
 
-  // When turning a parent ON, cascade to all unlocked children
-  if (!wasGranted && node.children && node.children.length) {
+  // Parent acts as master switch — cascade ON and OFF to all unlocked children
+  if (node.children && node.children.length) {
+    const newState = node.state; // already flipped above
     node.children.forEach(child => {
       if (child.locked) return;
-      child.state = 'g-direct';
+      child.state = newState;
       _paTrackChange(child);
       _paPatchNodeToggle(child);
     });
