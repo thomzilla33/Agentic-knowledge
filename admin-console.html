@@ -11425,7 +11425,85 @@ const PA_USER_PERM_TREE = {
         { id:'gov-packs-view',   label:'View packs',   code:'governance.packs.view',   state:'g-direct' },
         { id:'gov-packs-create', label:'Create packs', code:'governance.packs.create', state:'' },
       ]},
-  ]
+  ],
+  datastudio: [
+    { id:'ds-models', label:'Data Models', code:'datastudio.models', expanded:true,
+      state:'g-role', role:'Data Steward', scope:'Tenant', locked:true,
+      children:[
+        { id:'ds-models-view',    label:'View models',     code:'datastudio.models.view',    state:'g-inh', scope:'Tenant', locked:true },
+        { id:'ds-models-author',  label:'Author models',   code:'datastudio.models.author',  state:'g-inh', scope:'Tenant', locked:true },
+        { id:'ds-models-publish', label:'Publish models',  code:'datastudio.models.publish', state:'', scope:'Tenant' },
+        { id:'ds-models-deprecate', label:'Deprecate models', code:'datastudio.models.deprecate', state:'', scope:'Tenant' },
+      ]},
+    { id:'ds-lineage', label:'Lineage', code:'datastudio.lineage', expanded:false, state:'g-direct', scope:'Tenant',
+      children:[
+        { id:'ds-lineage-view',  label:'View lineage graph', code:'datastudio.lineage.view',  state:'g-direct', scope:'Tenant' },
+        { id:'ds-lineage-trace', label:'Trace relationships', code:'datastudio.lineage.trace', state:'', scope:'Tenant' },
+      ]},
+    { id:'ds-connectors', label:'Connectors', code:'datastudio.connectors', expanded:false, state:'',
+      children:[
+        { id:'ds-conn-view',   label:'View connectors',    code:'datastudio.connectors.view',   state:'' },
+        { id:'ds-conn-manage', label:'Manage connectors',  code:'datastudio.connectors.manage', state:'' },
+        { id:'ds-conn-test',   label:'Test connections',   code:'datastudio.connectors.test',   state:'' },
+      ]},
+  ],
+  agentic: [
+    { id:'ag-workers', label:'AI Workers', code:'agentic.workers', expanded:true,
+      state:'g-role', role:'Data Steward', scope:'Tenant', locked:true,
+      children:[
+        { id:'ag-workers-view',   label:'View workers',    code:'agentic.workers.view',   state:'g-inh', scope:'Tenant', locked:true },
+        { id:'ag-workers-run',    label:'Run workers',     code:'agentic.workers.run',    state:'g-inh', scope:'Tenant', locked:true },
+        { id:'ag-workers-manage', label:'Manage workers',  code:'agentic.workers.manage', state:'', scope:'Tenant' },
+        { id:'ag-workers-deploy', label:'Deploy workers',  code:'agentic.workers.deploy', state:'', scope:'Tenant' },
+      ]},
+    { id:'ag-networks', label:'Agentic Networks', code:'agentic.networks', expanded:false, state:'',
+      children:[
+        { id:'ag-net-view',   label:'View networks',   code:'agentic.networks.view',   state:'' },
+        { id:'ag-net-manage', label:'Manage networks', code:'agentic.networks.manage', state:'' },
+      ]},
+    { id:'ag-hitl', label:'Human in the Loop', code:'agentic.hitl', expanded:false, state:'g-direct', scope:'Own',
+      children:[
+        { id:'ag-hitl-view',    label:'View handoffs',    code:'agentic.hitl.view',    state:'g-direct', scope:'Own' },
+        { id:'ag-hitl-approve', label:'Approve handoffs', code:'agentic.hitl.approve', state:'g-direct', scope:'Own' },
+        { id:'ag-hitl-config',  label:'Configure HITL',   code:'agentic.hitl.config',  state:'', scope:'Own' },
+      ]},
+    { id:'ag-workflows', label:'Workflows', code:'agentic.workflows', expanded:false, state:'',
+      children:[
+        { id:'ag-wf-view',   label:'View workflows',   code:'agentic.workflows.view',   state:'' },
+        { id:'ag-wf-manage', label:'Manage workflows', code:'agentic.workflows.manage', state:'' },
+      ]},
+  ],
+  admin: [
+    { id:'adm-members', label:'Members', code:'admin.members', expanded:true,
+      state:'g-role', role:'Workspace Admin', scope:'Tenant', locked:true,
+      children:[
+        { id:'adm-members-view',   label:'View members',   code:'admin.members.view',   state:'g-inh', scope:'Tenant', locked:true },
+        { id:'adm-members-invite', label:'Invite members', code:'admin.members.invite', state:'g-inh', scope:'Tenant', locked:true },
+        { id:'adm-members-remove', label:'Remove members', code:'admin.members.remove', state:'g-inh', scope:'Tenant', locked:true },
+        { id:'adm-members-suspend', label:'Suspend members', code:'admin.members.suspend', state:'', scope:'Tenant' },
+      ]},
+    { id:'adm-roles', label:'Roles & Permissions', code:'admin.roles', expanded:false, state:'g-direct', scope:'Tenant',
+      children:[
+        { id:'adm-roles-view',   label:'View roles',   code:'admin.roles.view',   state:'g-direct', scope:'Tenant' },
+        { id:'adm-roles-manage', label:'Manage roles', code:'admin.roles.manage', state:'', scope:'Tenant' },
+      ]},
+    { id:'adm-integrations', label:'Integrations', code:'admin.integrations', expanded:false, state:'',
+      children:[
+        { id:'adm-int-view',   label:'View integrations',   code:'admin.integrations.view',   state:'' },
+        { id:'adm-int-manage', label:'Manage integrations', code:'admin.integrations.manage', state:'' },
+        { id:'adm-int-auth',   label:'Authenticate connectors', code:'admin.integrations.auth', state:'' },
+      ]},
+    { id:'adm-audit', label:'Audit & Compliance', code:'admin.audit', expanded:false, state:'',
+      children:[
+        { id:'adm-audit-view',   label:'View audit log',    code:'admin.audit.view',   state:'' },
+        { id:'adm-audit-export', label:'Export audit data', code:'admin.audit.export', state:'' },
+      ]},
+    { id:'adm-billing', label:'Billing', code:'admin.billing', expanded:false, state:'',
+      children:[
+        { id:'adm-billing-view',   label:'View billing',   code:'admin.billing.view',   state:'' },
+        { id:'adm-billing-manage', label:'Manage billing', code:'admin.billing.manage', state:'' },
+      ]},
+  ],
 };
 
 /* ── DS avatar / tag / badge / button helpers ── */
@@ -11786,8 +11864,8 @@ function renderUserAccessView(personId) {
       <div class="pa-access-main">
         <!-- Studio tabs -->
         <div class="pa-tabs" style="margin-bottom:0;border-radius:12px 12px 0 0;overflow:hidden">
-          ${['governance','datastudio','admin','integrations'].map(t => `
-            <button class="pa-tab ${tab===t?'active':''}" onclick="_paState.userAccessTab='${t}';renderPeople()">${t==='datastudio'?'Data Studio':t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
+          ${[['governance','Governance'],['datastudio','Data Studio'],['agentic','Agentic'],['admin','Admin']].map(([k,label]) => `
+            <button class="pa-tab ${tab===k?'active':''}" onclick="_paState.userAccessTab='${k}';renderPeople()">${label}</button>`).join('')}
         </div>
 
         <!-- Tree container -->
@@ -11804,7 +11882,7 @@ function renderUserAccessView(personId) {
           </div>
           <!-- Tree rows -->
           <div role="tree" aria-label="${tab.charAt(0).toUpperCase()+tab.slice(1)} permissions">
-            ${tab==='governance' ? treeNodes.map(n=>_paRenderTreeNode(n,0)).join('') : `
+            ${treeNodes.length ? treeNodes.map(n=>_paRenderTreeNode(n,0)).join('') : `
               <div style="padding:48px 24px;text-align:center">
                 <div style="font-size:13px;font-weight:600;color:var(--color-text-subtitle);margin-bottom:4px">No permissions configured</div>
                 <div style="font-size:12px;color:var(--color-text-caption)">This studio has no permissions for this user.</div>
