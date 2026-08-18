@@ -256,6 +256,49 @@
   --r4:4px; --r6:6px; --r8:8px; --r10:10px; --r12:12px; --r14:14px; --r16:16px;
   /* Spacing scale (4px base) — for new code; existing values may be unchanged */
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px; --s8:48px;
+  /* ── DS Semantic Aliases (People & Access) ── */
+  --color-text-title:               rgba(255,255,255,0.80);
+  --color-text-subtitle:            rgba(255,255,255,0.60);
+  --color-text-body:                #94A3B8;
+  --color-text-label:               rgba(255,255,255,0.80);
+  --color-text-caption:             rgba(255,255,255,0.50);
+  --color-text-disabled:            rgba(255,255,255,0.30);
+  --color-text-negative:            #ffffff;
+  --color-text-success:             #6ee7b7;
+  --color-text-error:               #ff6467;
+  --color-border-neutral-lighter:   rgba(255,255,255,0.15);
+  --color-border-neutral-default:   rgba(255,255,255,0.10);
+  --color-border-neutral-subtle:    rgba(255,255,255,0.10);
+  --color-border-primary-default:   #2b7fff;
+  --color-surface-neutral-default:  rgba(255,255,255,0.06);
+  --color-surface-primary-subtle:   rgba(43,127,255,0.10);
+  /* Tags */
+  --tag-success-bg:#0a1f1a; --tag-success-bd:#34d399; --tag-success-fg:#6ee7b7;
+  --tag-secondary-bg:rgba(255,255,255,0.10); --tag-secondary-bd:rgba(255,255,255,0.10); --tag-secondary-fg:rgba(255,255,255,0.60);
+  --tag-primary-bg:#155dfc; --tag-primary-fg:#ffffff;
+  --tag-informative-bg:rgba(21,93,252,0.15); --tag-informative-bd:#2b7fff; --tag-informative-fg:rgba(255,255,255,0.80);
+  --tag-error-bg:#2d1515; --tag-error-bd:#e05252; --tag-error-fg:#ff6467;
+  --tag-alert-bg:#281e00; --tag-alert-bd:#f59e0b; --tag-alert-fg:#fcd34d;
+  --tag-limegreen-bg:#111a04; --tag-limegreen-bd:#84cc16; --tag-limegreen-fg:#bdef49;
+  --tag-yellow-bg:#281e00; --tag-yellow-bd:#fbbf24; --tag-yellow-fg:#fcd34d;
+  --tag-purple-bg:#120520; --tag-purple-bd:#a855f7; --tag-purple-fg:#d8b4fe;
+  --tag-lightblue-bg:#071828; --tag-lightblue-bd:#38bdf8; --tag-lightblue-fg:#7dd3fc;
+  --tag-neutral-bg:rgba(255,255,255,0.08); --tag-neutral-bd:rgba(255,255,255,0.10); --tag-neutral-fg:rgba(255,255,255,0.60);
+  /* Table */
+  --table-bg:transparent;
+  --table-header-bg:rgba(255,255,255,0.06);
+  --table-border:rgba(255,255,255,0.15);
+  --table-header-text:rgba(255,255,255,0.60);
+  --table-cell-text:#94A3B8;
+  --table-row-hover-bg:rgba(255,255,255,0.08);
+  --table-row-selected-bg:rgba(43,127,255,0.08);
+  /* Badge */
+  --badge-error:#ff6467; --badge-alert:#fdc700; --badge-in-progress:#2b7fff;
+  --badge-success:#05df72; --badge-neutral:rgba(255,255,255,0.50);
+  /* Avatar color palette */
+  --av-col-blue-bg:#2173ff; --av-col-green-bg:#059669; --av-col-red-bg:#dc2626;
+  --av-col-orange-bg:#c2410c; --av-col-purple-bg:#7c3aed; --av-col-limegreen-bg:#4d7c0f;
+  --av-col-lightblue-bg:#0284c7; --av-col-pink-bg:#be185d; --av-col-teal-bg:#0d9488; --av-col-amber-bg:#d97706;
 }
 html,body{height:100%}
 body{
@@ -7257,167 +7300,263 @@ html.theme-light .ms-select{background:var(--canvas);color:var(--t1);}
 html.theme-light .ms-theme-card{background:var(--bg2);}
 
 /* ====================== PEOPLE & ACCESS ====================== */
-.pa-wrap { padding-bottom: 64px; }
-.pa-tabs { display:flex; gap:2px; margin-bottom:24px; }
-.pa-tab { background:none; border:none; padding:10px 16px; font-size:13px; font-weight:500; color:var(--t2); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s, border-color .12s; border-radius:var(--r6) var(--r6) 0 0; }
-.pa-tab:hover { color:var(--t1); }
+
+/* ── Layout ── */
+.pa-wrap { padding-bottom:80px; }
+
+/* ── Tabs (DS underline tab style) ── */
+.pa-tabs { display:flex; gap:0; border-bottom:1px solid var(--color-border-neutral-lighter); margin-bottom:24px; }
+.pa-tab { background:none; border:none; padding:10px 16px; font-size:13px; font-weight:500; color:var(--color-text-subtitle); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .15s,border-color .15s; }
+.pa-tab:hover { color:var(--color-text-title); }
 .pa-tab.active { color:var(--pri); border-bottom-color:var(--pri); font-weight:600; }
-.pa-tab-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; background:var(--bg3); border-radius:9px; font-size:12px; font-weight:700; color:var(--t2); margin-left:5px; }
+.pa-tab-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; background:var(--bg3); border-radius:9px; font-size:11px; font-weight:700; color:var(--color-text-subtitle); margin-left:5px; }
 .pa-tab.active .pa-tab-count { background:var(--pri-12); color:var(--pri); }
+
+/* ── Filters bar ── */
 .pa-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
-.pa-search { flex:1; min-width:200px; max-width:320px; height:32px; padding:0 10px 0 32px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r6); font-size:13px; color:var(--t1); outline:none; }
-.pa-search:focus { border-color:var(--pri); }
-.pa-search-wrap { position:relative; flex:1; min-width:200px; max-width:320px; }
-.pa-search-icon { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--t3); pointer-events:none; }
-.pa-filter-select { height:32px; padding:0 10px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r6); font-size:13px; color:var(--t1); cursor:pointer; outline:none; }
-.pa-filter-select:focus { border-color:var(--pri); }
-.pa-filter-count { font-size:12px; color:var(--t3); margin-left:auto; }
-.pm-table { width:100%; border-collapse:collapse; }
-.pm-table thead th { font-size:11px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.05em; padding:8px 12px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; }
-.pm-table tbody tr { border-bottom:1px solid var(--line); cursor:pointer; transition:background .1s; }
-.pm-table tbody tr:hover { background:var(--hover); }
-.pm-table tbody tr:last-child { border-bottom:none; }
-.pm-table td { padding:12px 12px; vertical-align:middle; font-size:13px; color:var(--t1); }
-.pm-identity { display:flex; align-items:center; gap:10px; }
-.pm-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
-.pm-name { font-size:13px; font-weight:600; color:var(--t1); line-height:1.2; }
-.pm-email { font-size:12px; color:var(--t3); line-height:1.2; margin-top:1px; }
-.pm-roles { display:flex; flex-wrap:wrap; gap:4px; }
-.pm-role-chip { display:inline-flex; align-items:center; gap:4px; height:20px; padding:0 7px; border-radius:10px; font-size:12px; font-weight:600; border:1px solid transparent; white-space:nowrap; }
-.pm-status { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:3px 8px; border-radius:10px; white-space:nowrap; }
-.pm-status-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-.pm-status.active { background:var(--green-10); color:var(--green); }
-.pm-status.active .pm-status-dot { background:var(--green); }
-.pm-status.invited { background:var(--amber-08); color:var(--amber); }
-.pm-status.invited .pm-status-dot { background:var(--amber); }
-.pm-status.suspended { background:var(--red-12); color:var(--red); }
-.pm-status.suspended .pm-status-dot { background:var(--red); }
-.pm-action-btn { background:none; border:none; color:var(--t3); cursor:pointer; padding:4px 6px; border-radius:var(--r6); opacity:0; transition:opacity .1s, background .1s, color .1s; }
-.pm-table tbody tr:hover .pm-action-btn { opacity:1; }
-.pm-action-btn:hover { background:var(--hover); color:var(--t1); }
-.pm-drawer-avatar { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700; color:#fff; flex-shrink:0; }
-.pm-drawer-identity { display:flex; align-items:center; gap:14px; padding:20px; border-bottom:1px solid var(--line); }
-.pm-drawer-name { font-size:16px; font-weight:700; color:var(--t1); line-height:1.2; }
-.pm-drawer-meta { font-size:12px; color:var(--t3); margin-top:3px; }
-.pm-drawer-tabs { display:flex; gap:0; border-bottom:1px solid var(--line); padding:0 20px; }
-.pm-drawer-tab { background:none; border:none; padding:10px 14px; font-size:13px; font-weight:500; color:var(--t2); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s, border-color .12s; }
-.pm-drawer-tab.active { color:var(--pri); border-bottom-color:var(--pri); font-weight:600; }
-.pm-drawer-section { margin-bottom:20px; }
-.pm-drawer-section-h { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
-.pm-role-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); margin-bottom:6px; }
-.pm-role-row-name { font-size:13px; font-weight:600; color:var(--t1); }
-.pm-role-row-desc { font-size:12px; color:var(--t3); margin-top:2px; }
-.pm-role-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-right:8px; }
-.pm-remove-btn { background:none; border:none; color:var(--t3); cursor:pointer; height:24px; padding:0 10px; border-radius:var(--r6); font-size:12px; transition:background .1s, color .1s; }
-.pm-remove-btn:hover { background:var(--red-12); color:var(--red); }
-.pm-add-role-btn { display:flex; align-items:center; gap:6px; width:100%; padding:9px 12px; background:transparent; border:1px dashed var(--line); border-radius:var(--r8); font-size:12px; color:var(--t3); cursor:pointer; transition:border-color .12s, color .12s; margin-top:4px; }
-.pm-add-role-btn:hover { border-color:var(--pri); color:var(--pri); }
-/* Role card list (Roles & Permissions tab) */
-.pa-roles-list { display:flex; flex-direction:column; gap:8px; }
-.pa-role-card { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); cursor:pointer; transition:border-color .12s, background .12s; }
-.pa-role-card:hover { border-color:var(--line-strong); background:var(--hover); }
-.pa-role-card:hover .pa-role-action-btn { opacity:1; }
-.pa-role-card-icon { width:34px; height:34px; border-radius:var(--r8); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
-.pa-role-card-body { flex:1; min-width:0; }
-.pa-role-card-row1 { display:flex; align-items:center; gap:8px; margin-bottom:2px; }
-.pa-role-card-name { font-size:13px; font-weight:600; color:var(--t1); }
-.pa-role-type-badge { font-size:12px; font-weight:700; padding:2px 6px; border-radius:4px; border:1px solid transparent; white-space:nowrap; flex-shrink:0; }
-.pa-role-type-badge--system { background:var(--bg4,var(--bg3)); color:var(--t3); border-color:var(--line); }
-.pa-role-type-badge--custom { background:var(--pri-12); color:var(--pri); border-color:var(--pri-30); }
-.pa-role-card-desc { font-size:12px; color:var(--t3); margin-bottom:7px; line-height:1.4; }
-.pa-role-card-meta { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--t3); margin-bottom:7px; }
-.pa-role-meta-sep { color:var(--t4,var(--t3)); opacity:.5; }
-.pa-role-card-tags { display:flex; flex-wrap:wrap; gap:4px; }
-.pa-role-tag { display:inline-flex; align-items:center; font-size:12px; font-weight:600; padding:2px 7px; border-radius:20px; border:1px solid transparent; white-space:nowrap; }
-.pa-role-card-actions { display:flex; align-items:center; gap:3px; flex-shrink:0; margin-top:5px; }
-.pa-role-action-btn { background:none; border:none; color:var(--t3); cursor:pointer; padding:5px; border-radius:var(--r6); opacity:0; transition:opacity .12s, background .12s, color .12s; }
-.pa-role-action-btn--danger:hover { background:var(--red-12); color:var(--red); }
-.pa-role-action-btn:not(.pa-role-action-btn--danger):hover { background:var(--hover); color:var(--t1); }
-/* Role delete confirmation modal */
-.pa-delete-modal { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12,12px); padding:28px 28px 20px; width:420px; max-width:95vw; text-align:center; position:relative; }
-.pa-delete-modal-icon { width:44px; height:44px; border-radius:50%; background:var(--red-12); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
-.pa-delete-modal-title { font-size:15px; font-weight:700; color:var(--t1); margin-bottom:8px; }
-.pa-delete-modal-body { font-size:12.5px; color:var(--t3); line-height:1.5; margin-bottom:22px; }
-.pa-delete-modal-foot { display:flex; gap:8px; justify-content:center; }
-/* Role edit modal reuses rc-modal styles */
-.pm-stat-row { display:flex; gap:12px; margin-bottom:16px; }
-.pm-stat-tile { flex:1; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); padding:12px 14px; }
-.pm-stat-v { font-size:22px; font-weight:700; color:var(--t1); line-height:1; }
-.pm-stat-l { font-size:12px; color:var(--t3); margin-top:4px; }
-.pm-note-banner { display:flex; align-items:flex-start; gap:8px; padding:10px 12px; background:var(--amber-08); border:1px solid var(--amber-25); border-radius:var(--r8); margin-bottom:12px; font-size:12px; color:var(--t2); line-height:1.4; }
-.pm-suspend-banner { background:var(--red-08); border-color:rgba(239,68,68,.25); }
-.pm-danger-zone { padding:14px; background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.2); border-radius:var(--r8); margin-top:8px; }
-.pm-danger-zone-h { font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; }
-.pm-activity-row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line); }
-.pm-activity-row:last-child { border-bottom:none; }
-.pm-activity-dot { width:8px; height:8px; border-radius:50%; background:var(--t3); flex-shrink:0; margin-top:4px; }
-.pm-activity-event { font-size:12.5px; color:var(--t1); line-height:1.35; }
-.pm-activity-time { font-size:12px; color:var(--t3); margin-top:2px; }
-.pm-empty { text-align:center; padding:48px 24px; }
-.pm-empty-h { font-size:14px; font-weight:600; color:var(--t1); margin-bottom:6px; }
-.pm-empty-p { font-size:13px; color:var(--t3); }
-.pm-invite-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); z-index:200; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
-.pm-invite-overlay.open { opacity:1; pointer-events:all; }
-.pm-invite-modal { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r16); width:440px; max-width:calc(100vw - 32px); box-shadow:0 20px 60px rgba(0,0,0,.4); }
-.pm-invite-head { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--line); }
-.pm-invite-title { font-size:15px; font-weight:700; color:var(--t1); }
-.pm-invite-body { padding:20px; }
-.pm-invite-foot { padding:14px 20px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:flex-end; }
+.pa-search-wrap { position:relative; flex:1; min-width:180px; max-width:300px; }
+.pa-search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--color-text-disabled); pointer-events:none; }
+.pa-search { width:100%; height:32px; padding:0 10px 0 32px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:8px; font-size:13px; color:var(--color-text-title); outline:none; transition:border-color .15s; }
+.pa-search::placeholder { color:var(--color-text-disabled); }
+.pa-search:focus { border-color:var(--color-border-primary-default); }
+.pa-filter-select { height:32px; padding:0 28px 0 10px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:8px; font-size:13px; color:var(--color-text-title); cursor:pointer; outline:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; transition:border-color .15s; }
+.pa-filter-select:focus { border-color:var(--color-border-primary-default); }
+.pa-filter-count { font-size:12px; color:var(--color-text-caption); margin-left:auto; font-weight:500; }
 
-/* ── Role detail drawer header ── */
-.pm-drawer-head { display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid var(--line); flex-shrink:0; }
-.pm-drawer-role-icon { width:36px; height:36px; border-radius:var(--r8); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.pm-drawer-identity { flex:1; min-width:0; }
-.pm-drawer-role-name { font-size:15px; font-weight:700; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.pm-drawer-role-sub { font-size:12px; color:var(--t3); margin-top:2px; }
-.pm-drawer-close { width:28px; height:28px; border-radius:var(--r6); display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--t2); cursor:pointer; flex-shrink:0; transition:background .12s,color .12s; }
-.pm-drawer-close:hover { background:var(--hover); color:var(--t1); }
+/* ── DS Table — Members ── */
+.pa-table-wrap { background:var(--table-bg); border:1px solid var(--table-border); border-radius:12px; overflow:hidden; }
+.pa-table { width:100%; border-collapse:collapse; }
+.pa-table thead { background:var(--table-header-bg); }
+.pa-table thead th { font-size:12px; font-weight:500; color:var(--table-header-text); padding:10px 16px; text-align:left; border-bottom:1px solid var(--table-border); white-space:nowrap; }
+.pa-table tbody tr { border-bottom:1px solid var(--table-border); cursor:pointer; transition:background .12s; }
+.pa-table tbody tr:hover { background:var(--table-row-hover-bg); }
+.pa-table tbody tr:last-child { border-bottom:none; }
+.pa-table tbody tr.selected { background:var(--table-row-selected-bg); }
+.pa-table td { padding:0 16px; height:60px; vertical-align:middle; font-size:14px; color:var(--table-cell-text); }
 
-/* Studio access modal */
-.sa-studio-row { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
-.sa-studio-row:last-child { border-bottom:none; }
-.sa-studio-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.sa-studio-info { flex:1; min-width:0; }
-.sa-studio-name { font-size:13px; font-weight:600; color:var(--t1); margin-bottom:2px; }
-.sa-studio-desc { font-size:12px; color:var(--t3); line-height:1.45; }
+/* ── DS Avatar (circle initials) ── */
+.ds-av { display:flex; align-items:center; justify-content:center; border-radius:50%; font-weight:600; color:#fff; flex-shrink:0; border:1px solid rgba(43,127,255,0.30); }
+.ds-av-md { width:24px; height:24px; font-size:10px; }
+.ds-av-lg { width:32px; height:32px; font-size:12px; }
+.ds-av-xl { width:40px; height:40px; font-size:14px; }
+.ds-av-xxl { width:52px; height:52px; font-size:18px; font-weight:700; }
+
+/* ── DS Tag (inline label chips) ── */
+.ds-tag { display:inline-flex; align-items:center; gap:4px; border-radius:8px; border:1px solid transparent; font-weight:500; white-space:nowrap; }
+.ds-tag-sm { height:20px; padding:0 8px; font-size:12px; }
+.ds-tag-md { height:24px; padding:0 8px; font-size:14px; }
+.ds-tag--success    { background:var(--tag-success-bg);    border-color:var(--tag-success-bd);    color:var(--tag-success-fg); }
+.ds-tag--secondary  { background:var(--tag-secondary-bg);  border-color:var(--tag-secondary-bd);  color:var(--tag-secondary-fg); }
+.ds-tag--primary    { background:var(--tag-primary-bg);    border-color:transparent;              color:var(--tag-primary-fg); }
+.ds-tag--informative{ background:var(--tag-informative-bg);border-color:var(--tag-informative-bd);color:var(--tag-informative-fg); }
+.ds-tag--error      { background:var(--tag-error-bg);      border-color:var(--tag-error-bd);      color:var(--tag-error-fg); }
+.ds-tag--alert      { background:var(--tag-alert-bg);      border-color:var(--tag-alert-bd);      color:var(--tag-alert-fg); }
+.ds-tag--neutral    { background:var(--tag-neutral-bg);    border-color:var(--tag-neutral-bd);    color:var(--tag-neutral-fg); }
+.ds-tag--purple     { background:var(--tag-purple-bg);     border-color:var(--tag-purple-bd);     color:var(--tag-purple-fg); }
+.ds-tag--limegreen  { background:var(--tag-limegreen-bg);  border-color:var(--tag-limegreen-bd);  color:var(--tag-limegreen-fg); }
+.ds-tag--lightblue  { background:var(--tag-lightblue-bg);  border-color:var(--tag-lightblue-bd);  color:var(--tag-lightblue-fg); }
+
+/* ── DS Badge (8px status dot) ── */
+.ds-badge { display:inline-block; width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.ds-badge--success     { background:var(--badge-success); }
+.ds-badge--error       { background:var(--badge-error); }
+.ds-badge--alert       { background:var(--badge-alert); }
+.ds-badge--in-progress { background:var(--badge-in-progress); }
+.ds-badge--neutral     { background:var(--badge-neutral); }
+
+/* ── Member identity cell ── */
+.pa-member-identity { display:flex; align-items:center; gap:10px; }
+.pa-member-name { font-size:14px; font-weight:600; color:var(--color-text-title); line-height:1.2; }
+.pa-member-email { font-size:12px; color:var(--color-text-caption); line-height:1.2; margin-top:1px; }
+.pa-member-roles { display:flex; flex-wrap:wrap; gap:4px; }
+.pa-member-status { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:var(--color-text-subtitle); }
+.pa-member-last { font-size:13px; color:var(--color-text-caption); }
+
+/* ── Table row action buttons ── */
+.pa-row-actions { display:flex; align-items:center; gap:4px; opacity:0; transition:opacity .12s; }
+.pa-table tbody tr:hover .pa-row-actions { opacity:1; }
+.pa-row-btn { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:6px; background:none; border:none; color:var(--color-text-subtitle); cursor:pointer; transition:background .12s,color .12s; }
+.pa-row-btn:hover { background:var(--table-row-hover-bg); color:var(--color-text-title); }
+.pa-row-btn--danger:hover { background:var(--red-12); color:var(--red); }
+
+/* ── DS Button (sm variant exact DS spec) ── */
+.ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:12px; font-weight:600; white-space:nowrap; border-radius:8px; border:1px solid transparent; cursor:pointer; transition:all .15s; outline:none; }
+.ds-btn-sm { height:27px; padding:0 12px; font-size:12px; }
+.ds-btn-md { height:40px; padding:0 16px; font-size:14px; }
+.ds-btn--primary { background:var(--pri); color:#fff; border-color:transparent; }
+.ds-btn--primary:hover { background:#002f80; }
+.ds-btn--secondary { background:var(--bg3); color:var(--color-text-label); border-color:var(--color-border-neutral-default); }
+.ds-btn--secondary:hover { background:var(--hover); }
+.ds-btn--tertiary { background:transparent; color:var(--color-text-label); border-color:transparent; }
+.ds-btn--tertiary:hover { background:var(--hover); }
+.ds-btn--warning { background:#d32f2f; color:#fff; border-color:transparent; }
+.ds-btn--warning:hover { background:#b91c1c; }
+.ds-btn--main { background:radial-gradient(ellipse 100% 160% at 61% 68%,#2173ff 0%,#09e2ab 100%); color:#fff; border-color:transparent; box-shadow:0 0 20px rgba(43,127,255,0.35); }
+.ds-btn--main:hover { background:radial-gradient(ellipse 100% 160% at 59% 72%,#002f80 0%,#2173ff 40%,#09e2ab 100%); }
+
+/* ── Roles grid ── */
+.pa-roles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+.pa-role-card2 { background:var(--bg2); border:1px solid var(--color-border-neutral-default); border-radius:12px; overflow:hidden; cursor:pointer; transition:border-color .15s,box-shadow .15s; }
+.pa-role-card2:hover { border-color:var(--color-border-primary-default); box-shadow:0 4px 20px rgba(43,127,255,0.12); }
+.pa-role-card2-hdr { height:4px; }
+.pa-role-card2-body { padding:16px 18px 14px; }
+.pa-role-card2-name { font-size:14px; font-weight:700; color:var(--color-text-title); margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+.pa-role-card2-desc { font-size:12px; color:var(--color-text-caption); line-height:1.5; margin-bottom:14px; }
+.pa-role-card2-foot { display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid var(--color-border-neutral-subtle); }
+.pa-role-card2-members { display:flex; align-items:center; gap:8px; }
+.pa-role-avatars { display:flex; }
+.pa-role-avatars .ds-av { margin-left:-6px; border:2px solid var(--bg2); }
+.pa-role-avatars .ds-av:first-child { margin-left:0; }
+.pa-role-card2-actions { display:flex; gap:4px; }
+
+/* ── DS SlideOut drawer ── */
+.pa-slideout-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(4px); z-index:300; opacity:0; pointer-events:none; transition:opacity .2s; }
+.pa-slideout-overlay.open { opacity:1; pointer-events:all; }
+.pa-slideout { position:fixed; top:0; right:0; bottom:0; width:380px; background:rgba(13,17,32,0.96); backdrop-filter:blur(30px); border-left:1px solid var(--color-border-neutral-lighter); border-radius:24px 0 0 24px; box-shadow:-24px 0 60px rgba(0,0,0,.25); z-index:301; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); }
+.pa-slideout.open { transform:translateX(0); }
+.pa-slideout-head { display:flex; align-items:center; gap:12px; padding:20px 20px 16px; border-bottom:1px solid var(--color-border-neutral-subtle); flex-shrink:0; }
+.pa-slideout-title { font-size:15px; font-weight:700; color:var(--color-text-title); flex:1; min-width:0; }
+.pa-slideout-sub { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.pa-slideout-close { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--color-text-subtitle); cursor:pointer; transition:background .12s,color .12s; flex-shrink:0; }
+.pa-slideout-close:hover { background:var(--hover); color:var(--color-text-title); }
+.pa-slideout-body { flex:1; overflow-y:auto; padding:0; }
+.pa-slideout-body::-webkit-scrollbar { width:4px; }
+.pa-slideout-body::-webkit-scrollbar-thumb { background:var(--color-border-neutral-default); border-radius:2px; }
+.pa-slideout-tabs { display:flex; border-bottom:1px solid var(--color-border-neutral-subtle); padding:0 20px; flex-shrink:0; }
+.pa-slideout-tab { background:none; border:none; padding:10px 14px; font-size:13px; font-weight:500; color:var(--color-text-subtitle); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s,border-color .12s; }
+.pa-slideout-tab.active { color:var(--pri); border-bottom-color:var(--pri); font-weight:600; }
+.pa-slideout-section { padding:16px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.pa-slideout-section-h { font-size:11px; font-weight:700; color:var(--color-text-caption); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+.pa-slideout-foot { padding:14px 20px; border-top:1px solid var(--color-border-neutral-subtle); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
+
+/* ── Role row in member drawer ── */
+.pa-role-row2 { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:8px; margin-bottom:6px; }
+.pa-role-row2-info { flex:1; min-width:0; }
+.pa-role-row2-name { font-size:13px; font-weight:600; color:var(--color-text-title); }
+.pa-role-row2-desc { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.pa-remove-btn { background:none; border:none; color:var(--color-text-disabled); cursor:pointer; height:24px; padding:0 8px; border-radius:6px; font-size:12px; transition:background .12s,color .12s; display:flex; align-items:center; gap:4px; }
+.pa-remove-btn:hover { background:var(--red-12); color:var(--red); }
+.pa-add-role-btn { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:9px 12px; background:transparent; border:1px dashed var(--color-border-neutral-default); border-radius:8px; font-size:12px; font-weight:500; color:var(--color-text-caption); cursor:pointer; transition:border-color .12s,color .12s; margin-top:6px; }
+.pa-add-role-btn:hover { border-color:var(--pri); color:var(--pri); }
+
+/* ── DS Modal Dialog ── */
+.pa-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); z-index:400; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+.pa-modal-overlay.open { opacity:1; pointer-events:all; }
+.pa-modal { background:var(--bg2); border:1px solid var(--color-border-neutral-lighter); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.5); width:440px; max-width:calc(100vw - 32px); }
+.pa-modal-sm { width:400px; }
+.pa-modal-head { display:flex; align-items:flex-start; gap:12px; padding:20px 20px 16px; }
+.pa-modal-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pa-modal-icon--error   { background:rgba(239,68,68,0.12); }
+.pa-modal-icon--info    { background:var(--pri-12); }
+.pa-modal-icon--success { background:rgba(5,223,114,0.12); }
+.pa-modal-title { font-size:15px; font-weight:700; color:var(--color-text-title); margin-bottom:4px; }
+.pa-modal-desc  { font-size:13px; color:var(--color-text-body); line-height:1.5; }
+.pa-modal-body  { padding:0 20px 16px; }
+.pa-modal-foot  { padding:14px 20px; border-top:1px solid var(--color-border-neutral-subtle); display:flex; gap:8px; justify-content:flex-end; }
+.pa-modal-close { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--color-text-subtitle); cursor:pointer; margin-left:auto; transition:background .12s; }
+.pa-modal-close:hover { background:var(--hover); color:var(--color-text-title); }
+
+/* ── Form fields in modals/drawers ── */
+.pa-field { margin-bottom:14px; }
+.pa-label { font-size:12px; font-weight:600; color:var(--color-text-subtitle); margin-bottom:5px; display:block; }
+.pa-input { width:100%; height:40px; padding:0 12px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:8px; font-size:14px; color:var(--color-text-title); outline:none; transition:border-color .15s; box-sizing:border-box; }
+.pa-input::placeholder { color:var(--color-text-disabled); }
+.pa-input:focus { border-color:var(--color-border-primary-default); }
+.pa-textarea { width:100%; padding:10px 12px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:8px; font-size:14px; color:var(--color-text-title); outline:none; resize:vertical; min-height:72px; transition:border-color .15s; box-sizing:border-box; font-family:inherit; }
+.pa-textarea::placeholder { color:var(--color-text-disabled); }
+.pa-textarea:focus { border-color:var(--color-border-primary-default); }
+.pa-field-hint { font-size:11px; color:var(--color-text-caption); margin-top:4px; }
 
 /* ── Permission tree (V2 User Access view) ── */
 .pa-access-layout { display:flex; gap:20px; align-items:flex-start; }
 .pa-access-rail { width:300px; flex-shrink:0; display:flex; flex-direction:column; gap:14px; }
 .pa-access-main { flex:1; min-width:0; }
-.pa-eff-top { height:3px; background:linear-gradient(135deg,var(--pri) 0%,#09E2AB 100%); border-radius:var(--r12) var(--r12) 0 0; }
+.pa-eff-top { height:3px; background:linear-gradient(135deg,var(--pri) 0%,#09E2AB 100%); border-radius:12px 12px 0 0; }
 .pa-eff-stat { text-align:center; flex:1; }
 .pa-eff-num { font-size:20px; font-weight:700; color:var(--pri); line-height:1; }
-.pa-eff-lbl { font-size:11px; color:var(--t3); font-weight:500; margin-top:3px; }
-.pa-tree-row { display:flex; align-items:center; height:44px; border-bottom:1px solid var(--line); padding:0 16px; transition:background .12s; }
-.pa-tree-row:hover { background:var(--hover); }
+.pa-eff-lbl { font-size:11px; color:var(--color-text-caption); font-weight:500; margin-top:3px; }
+.pa-tree-row { display:flex; align-items:center; height:44px; border-bottom:1px solid var(--color-border-neutral-subtle); padding:0 16px; transition:background .12s; }
+.pa-tree-row:hover { background:var(--table-row-hover-bg); }
 .pa-tree-row:last-child { border-bottom:none; }
-.pa-tree-expand { width:20px; height:20px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--t3); flex-shrink:0; border-radius:4px; cursor:pointer; transition:background .12s; }
-.pa-tree-expand:hover { background:var(--hover); }
+.pa-tree-expand { width:20px; height:20px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--color-text-disabled); flex-shrink:0; border-radius:4px; cursor:pointer; transition:background .12s; }
+.pa-tree-expand:hover { background:var(--table-row-hover-bg); }
 .pa-tree-label { flex:1; min-width:0; margin-left:8px; }
-.pa-tree-name { font-size:13px; font-weight:500; color:var(--t1); }
-.pa-tree-code { font-size:11px; color:var(--t3); font-family:'SF Mono','Fira Code',monospace; font-weight:500; }
+.pa-tree-name { font-size:13px; font-weight:500; color:var(--color-text-title); }
+.pa-tree-code { font-size:11px; color:var(--color-text-caption); font-family:'SF Mono','Fira Code',monospace; }
 .pa-tree-meta { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-.pa-tree-scope { font-size:11px; font-weight:500; color:var(--t3); background:var(--bg3); border:1px solid var(--line); border-radius:4px; padding:1px 6px; }
-.pa-role-tag-sm { font-size:11px; font-weight:600; background:var(--green-10); color:var(--green); border-radius:4px; padding:1px 6px; display:flex; align-items:center; gap:3px; white-space:nowrap; }
-.pa-cb { width:20px; height:20px; border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border:2px solid var(--line); background:var(--bg2); cursor:pointer; transition:all .15s; }
+.pa-tree-scope { font-size:11px; font-weight:500; color:var(--color-text-caption); background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:4px; padding:1px 6px; }
+.pa-role-tag-sm { font-size:11px; font-weight:600; background:var(--tag-success-bg); color:var(--tag-success-fg); border:1px solid var(--tag-success-bd); border-radius:4px; padding:1px 6px; display:flex; align-items:center; gap:3px; white-space:nowrap; }
+.pa-cb { width:20px; height:20px; border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border:2px solid var(--color-border-neutral-default); background:var(--bg2); cursor:pointer; transition:all .15s; }
 .pa-cb.g-direct { background:var(--pri); border-color:var(--pri); }
-.pa-cb.g-role   { background:var(--green); border-color:var(--green); cursor:not-allowed; }
+.pa-cb.g-role   { background:var(--badge-success); border-color:var(--badge-success); cursor:not-allowed; }
 .pa-cb.g-inh    { background:var(--pri); border-color:#80AFFF; opacity:.55; cursor:not-allowed; }
 .pa-cb.g-denied { background:var(--red-12); border-color:var(--red); }
 .pa-cb.g-part   { background:var(--bg2); border-color:var(--pri); }
 .pa-cb.g-padd   { background:transparent; border:2px dashed var(--pri); }
 .pa-cb.g-pdeny  { background:transparent; border:2px dashed var(--red); opacity:.7; }
-.pa-changes-bar { position:fixed; bottom:0; left:var(--sidebar-w,230px); right:0; z-index:120; height:64px; background:var(--bg2); border-top:2px solid var(--pri); display:flex; align-items:center; justify-content:space-between; padding:0 32px; box-shadow:0 -4px 20px rgba(0,0,0,.12); transform:translateY(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); }
+
+/* ── Pending changes sticky bar ── */
+.pa-changes-bar { position:fixed; bottom:0; left:var(--sidebar-w,230px); right:0; z-index:120; height:64px; background:var(--bg2); border-top:2px solid var(--pri); display:flex; align-items:center; justify-content:space-between; padding:0 32px; box-shadow:0 -4px 20px rgba(0,0,0,.15); transform:translateY(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); }
 .pa-changes-bar.visible { transform:translateY(0); }
-.pa-roles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
-.pa-role-grid-card { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12); overflow:hidden; cursor:pointer; transition:box-shadow .15s; }
-.pa-role-grid-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.1); }
-.pa-role-grid-hdr { height:5px; }
-.pa-role-grid-body { padding:14px 18px; }
-.pa-role-grid-name { font-size:14px; font-weight:700; color:var(--t1); margin-bottom:4px; display:flex; align-items:center; gap:8px; }
-.pa-role-grid-desc { font-size:12px; color:var(--t3); line-height:1.4; margin-bottom:12px; }
-.pa-role-grid-foot { display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid var(--line); }
+
+/* ── Stat tiles ── */
+.pm-stat-row { display:flex; gap:12px; margin-bottom:16px; }
+.pm-stat-tile { flex:1; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:10px; padding:14px 16px; }
+.pm-stat-v { font-size:22px; font-weight:700; color:var(--color-text-title); line-height:1; }
+.pm-stat-l { font-size:12px; color:var(--color-text-caption); margin-top:4px; }
+
+/* ── Empty state ── */
+.pm-empty { text-align:center; padding:56px 24px; }
+.pm-empty-h { font-size:14px; font-weight:600; color:var(--color-text-title); margin-bottom:6px; }
+.pm-empty-p { font-size:13px; color:var(--color-text-caption); }
+
+/* ── Danger zone in member drawer ── */
+.pm-danger-zone { padding:14px; background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.2); border-radius:8px; margin-top:8px; }
+.pm-danger-zone-h { font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; }
+.pm-activity-row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.pm-activity-event { font-size:12.5px; color:var(--color-text-title); line-height:1.35; }
+.pm-activity-time { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+
+/* ── Studio access modal ── */
+.sa-studio-row { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.sa-studio-row:last-child { border-bottom:none; }
+.sa-studio-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sa-studio-info { flex:1; min-width:0; }
+.sa-studio-name { font-size:13px; font-weight:600; color:var(--color-text-title); margin-bottom:2px; }
+.sa-studio-desc { font-size:12px; color:var(--color-text-caption); line-height:1.45; }
+
+/* legacy aliases — kept for backward compat with existing render fns */
+.pa-roles-list { display:flex; flex-direction:column; gap:8px; }
+.pa-role-type-badge { font-size:11px; font-weight:700; padding:2px 6px; border-radius:6px; border:1px solid transparent; }
+.pa-role-type-badge--system { background:var(--tag-neutral-bg); color:var(--tag-neutral-fg); border-color:var(--tag-neutral-bd); }
+.pa-role-type-badge--custom { background:var(--tag-informative-bg); color:var(--tag-informative-fg); border-color:var(--tag-informative-bd); }
+/* backward-compat aliases for drawer/modal classes already used by other code */
+.pm-note-banner { display:flex; align-items:flex-start; gap:8px; padding:10px 12px; background:var(--amber-08); border:1px solid var(--amber-25); border-radius:8px; margin-bottom:12px; font-size:12px; color:var(--color-text-subtitle); line-height:1.4; }
+.pm-suspend-banner { background:var(--red-08); border-color:rgba(239,68,68,.25); }
+.pm-drawer-section { margin-bottom:20px; }
+.pm-drawer-section-h { font-size:11px; font-weight:700; color:var(--color-text-caption); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+.pm-drawer-close { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--color-text-subtitle); cursor:pointer; flex-shrink:0; transition:background .12s,color .12s; }
+.pm-drawer-close:hover { background:var(--hover); color:var(--color-text-title); }
+/* role detail drawer header — keep pm-drawer-* classes used by renderRoleDetail */
+.pm-drawer-head { display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); flex-shrink:0; }
+.pm-drawer-role-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pm-drawer-identity { flex:1; min-width:0; }
+.pm-drawer-role-name { font-size:15px; font-weight:700; color:var(--color-text-title); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pm-drawer-role-sub { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+/* invite overlay — kept for existing renderPeople() references */
+.pm-invite-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); z-index:400; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+.pm-invite-overlay.open { opacity:1; pointer-events:all; }
+.pm-invite-modal { background:var(--bg2); border:1px solid var(--color-border-neutral-lighter); border-radius:16px; width:440px; max-width:calc(100vw - 32px); box-shadow:0 20px 60px rgba(0,0,0,.5); }
+.pm-invite-head { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.pm-invite-title { font-size:15px; font-weight:700; color:var(--color-text-title); }
+.pm-invite-body { padding:20px; }
+.pm-invite-foot { padding:14px 20px; border-top:1px solid var(--color-border-neutral-subtle); display:flex; gap:8px; justify-content:flex-end; }
+/* pa-delete-modal kept for renderRoleDeleteModal */
+.pa-delete-modal { background:var(--bg2); border:1px solid var(--color-border-neutral-lighter); border-radius:16px; padding:28px 28px 20px; width:420px; max-width:95vw; text-align:center; position:relative; }
+.pa-delete-modal-icon { width:44px; height:44px; border-radius:50%; background:var(--red-12); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+.pa-delete-modal-title { font-size:15px; font-weight:700; color:var(--color-text-title); margin-bottom:8px; }
+.pa-delete-modal-body { font-size:13px; color:var(--color-text-body); line-height:1.5; margin-bottom:22px; }
+.pa-delete-modal-foot { display:flex; gap:8px; justify-content:center; }
 
 /* ====================== ORGANIZATION ====================== */
 .org-wrap { max-width: 720px; padding: 32px 24px 64px; }
@@ -11226,6 +11365,26 @@ const PA_USER_PERM_TREE = {
   ]
 };
 
+/* ── DS avatar / tag / badge / button helpers ── */
+const _PA_AV_COLORS = ['blue','green','orange','purple','teal','amber','red','limegreen','lightblue','pink'];
+function _paAvatarColor(id) {
+  const idx = id.split('').reduce((a,c) => ((a*31)+c.charCodeAt(0))>>>0, 0);
+  return _PA_AV_COLORS[idx % _PA_AV_COLORS.length];
+}
+function _paAvHTML(id, name, initials, sizeClass) {
+  const col = _paAvatarColor(id);
+  return `<div class="ds-av ${sizeClass}" style="background:var(--av-col-${col}-bg)">${escapeHtml(initials)}</div>`;
+}
+function _paTagHTML(label, variant, size) {
+  return `<span class="ds-tag ds-tag-${size||'sm'} ds-tag--${variant||'neutral'}">${escapeHtml(label)}</span>`;
+}
+function _paBadgeHTML(variant) {
+  return `<span class="ds-badge ds-badge--${variant}"></span>`;
+}
+function _paBtnHTML(label, variant, size, onclick, extraAttr) {
+  return `<button class="ds-btn ds-btn-${size||'sm'} ds-btn--${variant||'secondary'}" onclick="${onclick}" ${extraAttr||''}>${label}</button>`;
+}
+
 function _paCbHTML(state) {
   const chk = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
   const dash = (c) => `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
@@ -11570,7 +11729,7 @@ function renderPeopleMembers() {
 
   let people = MOCK_PEOPLE.filter(p => {
     if (q && !p.name.toLowerCase().includes(q) && !p.email.toLowerCase().includes(q) && !p.role.toLowerCase().includes(q)) return false;
-    if (statusFilter !== 'all' && p.status !== statusFilter) return false;
+    if (statusFilter && statusFilter !== 'all' && p.status !== statusFilter) return false;
     if (roleFilter) {
       const memberRoles = PA_MEMBER_ROLES[p.id] || [];
       if (!memberRoles.includes(roleFilter)) return false;
@@ -11578,31 +11737,22 @@ function renderPeopleMembers() {
     return true;
   });
 
-  const statusOptions = [
-    { value:'all', label:'All statuses' },
-    { value:'active', label:'Active' },
-    { value:'invited', label:'Invited' },
-    { value:'suspended', label:'Suspended' },
-  ];
+  const statusOpts = [{value:'all',label:'All statuses'},{value:'active',label:'Active'},{value:'invited',label:'Pending'},{value:'suspended',label:'Suspended'}];
+  const statusBadge = (s) => s==='active'?'success':s==='invited'?'alert':'error';
+  const statusLabel = (s) => s==='active'?'Active':s==='invited'?'Invited':'Suspended';
 
   return `
     <div class="pa-filters">
       <div class="pa-search-wrap">
-        <svg class="pa-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
-          <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/>
-          <path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-        </svg>
-        <input class="pa-search" type="text" placeholder="Search by name, email, or title…"
-          value="${escapeHtml(_paState.memberSearch)}"
-          oninput="_paState.memberSearch=this.value;_paRerender()"
-          id="paMemberSearch"/>
+        <svg class="pa-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <input class="pa-search" type="text" placeholder="Search by name, email or title…" value="${escapeHtml(_paState.memberSearch)}" oninput="_paState.memberSearch=this.value;_paRerender()" id="paMemberSearch"/>
       </div>
       <select class="pa-filter-select" onchange="_paState.memberStatus=this.value;_paRerender()">
-        ${statusOptions.map(o => `<option value="${o.value}" ${_paState.memberStatus===o.value?'selected':''}>${o.label}</option>`).join('')}
+        ${statusOpts.map(o=>`<option value="${o.value}" ${_paState.memberStatus===o.value?'selected':''}>${o.label}</option>`).join('')}
       </select>
       <select class="pa-filter-select" onchange="_paState.memberRole=this.value;_paRerender()">
         <option value="">All roles</option>
-        ${PA_ROLES.map(r => `<option value="${r.id}" ${_paState.memberRole===r.id?'selected':''}>${escapeHtml(r.label)}</option>`).join('')}
+        ${PA_ROLES.map(r=>`<option value="${r.id}" ${_paState.memberRole===r.id?'selected':''}>${escapeHtml(r.label)}</option>`).join('')}
       </select>
       <span class="pa-filter-count">${people.length} of ${MOCK_PEOPLE.length} members</span>
     </div>
@@ -11610,46 +11760,63 @@ function renderPeopleMembers() {
     ${people.length === 0 ? `
       <div class="pm-empty">
         <div class="pm-empty-h">No members match these filters</div>
-        <div class="pm-empty-p">Try changing the search or filter criteria.</div>
+        <div class="pm-empty-p">Try adjusting the search or filter criteria.</div>
       </div>
     ` : `
-    <div class="pa-roles-list">
-      ${people.map(p => {
-        const memberRoles = (PA_MEMBER_ROLES[p.id] || []).map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
-        return `
-        <div class="pa-role-card" onclick="paOpenDrawer('${p.id}')">
-          <div class="pm-avatar" style="width:36px;height:36px;font-size:13px;font-weight:700;background:${p.color};border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;margin-top:1px">
-            ${escapeHtml(p.initials)}
-          </div>
-          <div class="pa-role-card-body">
-            <div class="pa-role-card-row1">
-              <span class="pa-role-card-name">${escapeHtml(p.name)}</span>
-              <span class="pm-status ${p.status}">
-                <span class="pm-status-dot"></span>
-                ${p.status === 'active' ? 'Active' : p.status === 'invited' ? 'Invited' : 'Suspended'}
-              </span>
-            </div>
-            <div class="pa-role-card-desc">${escapeHtml(p.email)}${p.role ? ` · ${escapeHtml(p.role)}` : ''}</div>
-            ${memberRoles.length > 0
-              ? `<div class="pa-role-card-tags" style="margin-bottom:6px">
-                  ${memberRoles.map(r => `<span class="pa-role-tag" style="color:${r.color};background:${r.color}18;border-color:${r.color}30">${escapeHtml(r.label)}</span>`).join('')}
-                </div>`
-              : `<div style="font-size:11.5px;color:var(--t3);margin-bottom:6px">${p.status==='invited'?'Pending acceptance':'No roles assigned'}</div>`}
-            <div class="pa-role-card-meta">
-              <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>${escapeHtml(p.lastActive)}</span>
-            </div>
-          </div>
-          <div class="pa-role-card-actions" onclick="event.stopPropagation()">
-            <button class="pa-role-action-btn" title="View access" onclick="paOpenUserAccess('${p.id}')">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4v4.5C2 11.8 4.7 14.6 8 15.5c3.3-.9 6-3.7 6-7V4L8 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-            </button>
-            <button class="pa-role-action-btn" title="View details" onclick="paOpenDrawer('${p.id}')">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="8" rx="6.5" ry="4.5" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>
-            </button>
-          </div>
-        </div>`;
-      }).join('')}
+    <div class="pa-table-wrap">
+      <table class="pa-table">
+        <thead>
+          <tr>
+            <th style="width:280px">Member</th>
+            <th>Roles</th>
+            <th style="width:130px">Status</th>
+            <th style="width:130px">Last active</th>
+            <th style="width:80px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${people.map(p => {
+            const memberRoles = (PA_MEMBER_ROLES[p.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean);
+            const roleTags = memberRoles.map(r => {
+              const v = r.id==='workspace-admin'?'informative':r.system?'secondary':'neutral';
+              return _paTagHTML(r.label,v,'sm');
+            }).join('');
+            return `
+            <tr onclick="paOpenDrawer('${p.id}')">
+              <td>
+                <div class="pa-member-identity">
+                  ${_paAvHTML(p.id,p.name,p.initials,'ds-av-lg')}
+                  <div>
+                    <div class="pa-member-name">${escapeHtml(p.name)}</div>
+                    <div class="pa-member-email">${escapeHtml(p.email)}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="pa-member-roles">${roleTags||`<span style="font-size:12px;color:var(--color-text-disabled)">${p.status==='invited'?'Pending acceptance':'No roles'}</span>`}</div>
+              </td>
+              <td>
+                <div class="pa-member-status">
+                  ${_paBadgeHTML(statusBadge(p.status))}
+                  ${statusLabel(p.status)}
+                </div>
+              </td>
+              <td class="pa-member-last">${escapeHtml(p.lastActive)}</td>
+              <td onclick="event.stopPropagation()">
+                <div class="pa-row-actions">
+                  <button class="pa-row-btn" title="Manage permissions" onclick="paOpenUserAccess('${p.id}')">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4v4.5C2 11.8 4.7 14.6 8 15.5c3.3-.9 6-3.7 6-7V4L8 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                  </button>
+                  <button class="pa-row-btn" title="View details" onclick="paOpenDrawer('${p.id}')">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4M8 5.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  </button>
+                  ${p.status!=='suspended'?`<button class="pa-row-btn pa-row-btn--danger" title="Suspend member" onclick="event.stopPropagation();paSuspend('${p.id}')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M6 6l4 4M10 6l-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>`:''}
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
     </div>`}
   `;
 }
@@ -11666,33 +11833,40 @@ function _paRolePermCount(roleId) {
 }
 
 function renderPeopleRolesList() {
-  const renderRole = (r) => {
-    const members = (r.memberIds || []).map(id => MOCK_PEOPLE.find(p => p.id === id)).filter(Boolean);
-    const permCount = _paRolePermCount(r.id);
-    const studioTags = _paRoleStudioTags(r.id);
-
+  const renderRole2 = (r) => {
+    const members = (r.memberIds||[]).map(id=>MOCK_PEOPLE.find(p=>p.id===id)).filter(Boolean);
+    const visibleAvatars = members.slice(0,4);
+    const overflow = members.length - visibleAvatars.length;
+    const typeTag = r.system
+      ? _paTagHTML('System','neutral','sm')
+      : _paTagHTML('Custom','informative','sm');
     return `
-      <div class="pa-role-grid-card" onclick="paOpenRoleDetail('${r.id}')">
-        <div class="pa-role-grid-hdr" style="background:${r.color}"></div>
-        <div class="pa-role-grid-body">
-          <div class="pa-role-grid-name">
-            ${escapeHtml(r.label)}
-            <span class="pa-role-type-badge ${r.system ? 'pa-role-type-badge--system' : 'pa-role-type-badge--custom'}" style="font-size:11px">${r.system ? 'System' : 'Custom'}</span>
+      <div class="pa-role-card2" onclick="paOpenRoleDetail('${r.id}')">
+        <div class="pa-role-card2-hdr" style="background:${r.color}"></div>
+        <div class="pa-role-card2-body">
+          <div class="pa-role-card2-name">
+            <span>${escapeHtml(r.label)}</span>
+            ${typeTag}
           </div>
-          <div class="pa-role-grid-desc">${escapeHtml(r.desc)}</div>
-          <div class="pa-role-grid-foot">
-            <span style="font-size:12px;color:var(--t3);font-weight:500">${members.length} member${members.length!==1?'s':''}</span>
-            <div style="display:flex;gap:5px" onclick="event.stopPropagation()">
-              ${!r.system ? `<button class="btn btn-ghost btn-sm" onclick="paOpenRoleEdit('${r.id}')">Edit</button>` : ''}
-              ${!r.system ? `<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="paOpenRoleDelete('${r.id}')">Delete</button>` : ''}
-              ${r.system ? `<button class="btn btn-ghost btn-sm" onclick="paOpenRoleDetail('${r.id}')">View</button>` : ''}
+          <div class="pa-role-card2-desc">${escapeHtml(r.desc)}</div>
+          <div class="pa-role-card2-foot">
+            <div class="pa-role-card2-members">
+              <div class="pa-role-avatars">
+                ${visibleAvatars.map(m=>_paAvHTML(m.id,m.name,m.initials,'ds-av-md')).join('')}
+                ${overflow>0?`<div class="ds-av ds-av-md" style="background:var(--bg3);color:var(--color-text-caption);font-size:9px;border:1px solid var(--color-border-neutral-default)">+${overflow}</div>`:''}
+              </div>
+              <span style="font-size:12px;color:var(--color-text-caption);margin-left:6px">${members.length} member${members.length!==1?'s':''}</span>
+            </div>
+            <div class="pa-role-card2-actions" onclick="event.stopPropagation()">
+              ${!r.system ? _paBtnHTML('Edit','tertiary','sm',`paOpenRoleEdit('${r.id}')`) : ''}
+              ${!r.system ? _paBtnHTML('Delete','tertiary','sm',`paOpenRoleDelete('${r.id}')`,`style="color:var(--red)"`) : ''}
+              ${r.system  ? _paBtnHTML('View','secondary','sm',`paOpenRoleDetail('${r.id}')`) : ''}
             </div>
           </div>
         </div>
       </div>`;
   };
-
-  return `<div class="pa-roles-grid">${PA_ROLES.map(renderRole).join('')}</div>`;
+  return `<div class="pa-roles-grid">${PA_ROLES.map(renderRole2).join('')}</div>`;
 }
 
 function renderMemberDrawer(personId) {
@@ -11734,46 +11908,42 @@ function renderMemberDrawer(personId) {
     { event:'Joined workspace', time:p.joinDate, detail:'' },
   ];
 
-  let overviewContent = '';
+  let overviewContent = '<div class="pa-slideout-body" style="display:contents">';
   if (p.status === 'suspended') {
-    overviewContent += `<div class="pm-note-banner pm-suspend-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#ef4444" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#ef4444"/></svg><div><strong style="color:#ef4444">Account suspended</strong> — ${escapeHtml(p.suspendedReason || 'Access restricted by admin.')} This member cannot log in.</div></div>`;
+    overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner pm-suspend-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#ef4444" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#ef4444"/></svg><div><strong style="color:#ef4444">Account suspended</strong> — ${escapeHtml(p.suspendedReason || 'Access restricted by admin.')} This member cannot log in.</div></div></div>`;
   }
   if (p.status === 'invited') {
-    overviewContent += `<div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Invitation sent ${escapeHtml(p.invitedDate||p.joinDate)} — awaiting acceptance. <a href="#" onclick="toast('Invitation resent','success');return false" style="color:var(--pri)">Resend →</a></div></div>`;
+    overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Invitation sent ${escapeHtml(p.invitedDate||p.joinDate)} — awaiting acceptance. <a href="#" onclick="toast('Invitation resent','success');return false" style="color:var(--pri)">Resend →</a></div></div></div>`;
   }
   if (p.id === 'ok') {
-    overviewContent += `<div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#f59e0b" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#f59e0b"/></svg><div>External account — access is limited to individual permission grants only. Changes require admin approval.</div></div>`;
+    overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#f59e0b" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#f59e0b"/></svg><div>External account — access is limited to individual permission grants only. Changes require admin approval.</div></div></div>`;
   }
 
-  const statStudios = memberRoles.length > 0 ? '4 studios' : '0 studios';
   overviewContent += `
-    <div class="pm-drawer-section">
-      <div class="pm-drawer-section-h">Assigned roles</div>
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h">Assigned roles</div>
       ${memberRoles.length === 0
-        ? `<div style="font-size:12.5px;color:var(--t3);padding:10px 0">${p.status==='invited'?'Roles will apply once the invitation is accepted.':'No platform roles assigned. Use individual permission grants or assign a role below.'}</div>`
+        ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:10px 0">${p.status==='invited'?'Roles will apply once the invitation is accepted.':'No platform roles assigned. Use individual permission grants or assign a role below.'}</div>`
         : memberRoles.map(r => `
-          <div class="pm-role-row">
-            <div style="display:flex;align-items:flex-start;gap:8px">
-              <div class="pm-role-dot" style="background:${r.color};margin-top:4px"></div>
-              <div>
-                <div class="pm-role-row-name">${escapeHtml(r.label)}${r.system?` <span style="font-size:10px;color:var(--t3);font-weight:500">· System</span>`:''}
-                </div>
-                <div class="pm-role-row-desc">${escapeHtml(r.desc)}</div>
-              </div>
+          <div class="pa-role-row2">
+            <div style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0"></div>
+            <div class="pa-role-row2-info">
+              <div class="pa-role-row2-name">${escapeHtml(r.label)}${r.system?` <span style="font-size:10px;color:var(--color-text-caption);font-weight:500">· System</span>`:''}</div>
+              <div class="pa-role-row2-desc">${escapeHtml(r.desc)}</div>
             </div>
-            ${p.id !== 'tg' ? `<button class="pm-remove-btn" onclick="paRemoveRole('${p.id}','${r.id}')" title="Remove role">Remove</button>` : ''}
+            ${p.id !== 'tg' ? `<button class="pa-remove-btn" onclick="paRemoveRole('${p.id}','${r.id}')">Remove</button>` : ''}
           </div>`).join('')
       }
-      ${p.id !== 'tg' ? `<button class="pm-add-role-btn" onclick="toast('Role picker coming soon','info')">
+      ${p.id !== 'tg' ? `<button class="pa-add-role-btn" onclick="toast('Role picker coming soon','info')">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Assign a role…
       </button>` : ''}
     </div>
 
-    <div class="pm-drawer-section">
-      <div class="pm-drawer-section-h" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h" style="display:flex;justify-content:space-between;align-items:center">
         Studio access
-        <button class="btn btn-ghost btn-sm" onclick="paOpenStudioAccess('${p.id}')">Manage access…</button>
+        <button class="ds-btn ds-btn-sm ds-btn--tertiary" onclick="paOpenStudioAccess('${p.id}')">Manage…</button>
       </div>
       ${(() => {
         const STUDIOS_META = [
@@ -11784,39 +11954,40 @@ function renderMemberDrawer(personId) {
         ];
         const allPerms = new Set(memberRoles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]));
         const accessList = STUDIOS_META.filter(s => [...allPerms].some(pid => pid.startsWith(s.prefix)));
-        if (accessList.length === 0) return `<div style="font-size:12.5px;color:var(--t3);padding:6px 0">No studio access — assign a role or manage access directly.</div>`;
+        if (accessList.length === 0) return `<div style="font-size:12.5px;color:var(--color-text-caption);padding:6px 0">No studio access — assign a role or manage access directly.</div>`;
         return accessList.map(s => `
-          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">
             <div style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
-            <span style="font-size:12.5px;color:var(--t1);flex:1">${escapeHtml(s.name)}</span>
-            <span style="font-size:11px;color:#10b981;font-weight:500">Active</span>
+            <span style="font-size:12.5px;color:var(--color-text-title);flex:1">${escapeHtml(s.name)}</span>
+            <span style="font-size:11px;color:var(--badge-success);font-weight:500">Active</span>
           </div>`).join('');
       })()}
     </div>
 
     ${p.status !== 'invited' ? `
-    <div class="pm-drawer-section">
-      <div class="pm-drawer-section-h">Danger zone</div>
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h">Danger zone</div>
       <div class="pm-danger-zone">
         ${p.status === 'suspended'
           ? `<div class="pm-danger-zone-h">Reinstate access</div>
-             <button class="btn btn-ghost btn-sm" onclick="paReinstate('${p.id}')">Reinstate member</button>`
+             <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paReinstate('${p.id}')">Reinstate member</button>`
           : `<div class="pm-danger-zone-h">Suspend or remove</div>
              <div style="display:flex;gap:8px;flex-wrap:wrap">
-               <button class="btn btn-ghost btn-sm" onclick="paSuspend('${p.id}')">Suspend access</button>
-               <button class="btn btn-danger btn-sm" onclick="paRemoveMember('${p.id}')">Remove from workspace</button>
+               <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paSuspend('${p.id}')">Suspend access</button>
+               <button class="ds-btn ds-btn-sm ds-btn--warning" onclick="paRemoveMember('${p.id}')">Remove from workspace</button>
              </div>`
         }
       </div>
     </div>` : ''}
   `;
+  overviewContent += '</div>';
 
   const permContent = `
-    <div class="pm-drawer-section">
-      <div class="pm-drawer-section-h">Effective permissions</div>
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h">Effective permissions</div>
       ${memberRoles.length === 0
-        ? `<div style="font-size:12.5px;color:var(--t3);padding:10px 0">No roles assigned — no inherited permissions. Any access comes from individual grants.</div>`
-        : `<div style="font-size:12.5px;color:var(--t2);margin-bottom:12px;line-height:1.5">Permissions are inherited from <strong style="color:var(--t1)">${memberRoles.map(r=>r.label).join(', ')}</strong>. The highest scope across all roles applies for each permission.</div>
+        ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:10px 0">No roles assigned — no inherited permissions. Any access comes from individual grants.</div>`
+        : `<div style="font-size:12.5px;color:var(--color-text-subtitle);margin-bottom:12px;line-height:1.5">Permissions are inherited from <strong style="color:var(--color-text-title)">${memberRoles.map(r=>r.label).join(', ')}</strong>. The highest scope across all roles applies for each permission.</div>
            ${[
              { studio:'Agentic Studio', perms:['View workers', 'Run workers', 'Create workflows'] },
              { studio:'Governance Studio', perms:['View policies', 'View promotions'] },
@@ -11824,27 +11995,27 @@ function renderMemberDrawer(personId) {
              { studio:'Platform', perms:['View settings'] },
            ].filter(() => memberRoles.length > 0).map(s => `
              <div style="margin-bottom:10px">
-               <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:5px">${escapeHtml(s.studio)}</div>
+               <div style="font-size:11px;font-weight:700;color:var(--color-text-caption);margin-bottom:5px">${escapeHtml(s.studio)}</div>
                ${s.perms.map(perm => `
-                 <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
-                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="color:#10b981;flex-shrink:0"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                   <span style="font-size:12.5px;color:var(--t1)">${escapeHtml(perm)}</span>
-                   <span style="margin-left:auto;font-size:11px;color:var(--t3)">Tenant</span>
+                 <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">
+                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="color:var(--badge-success);flex-shrink:0"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                   <span style="font-size:12.5px;color:var(--color-text-title)">${escapeHtml(perm)}</span>
+                   <span style="margin-left:auto;font-size:11px;color:var(--color-text-caption)">Tenant</span>
                  </div>`).join('')}
              </div>`).join('')}
-           <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="toast('Full permission panel — coming soon','info')">View all permissions →</button>`
+           <button class="ds-btn ds-btn-sm ds-btn--tertiary" style="margin-top:8px" onclick="toast('Full permission panel — coming soon','info')">View all permissions →</button>`
       }
     </div>`;
 
   const activityContent = `
-    <div class="pm-drawer-section">
-      <div class="pm-drawer-section-h">Recent activity</div>
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h">Recent activity</div>
       <div>
         ${activityEvents.map(e => `
           <div class="pm-activity-row">
-            <div class="pm-activity-dot"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--color-text-caption);flex-shrink:0;margin-top:4px"></div>
             <div>
-              <div class="pm-activity-event">${escapeHtml(e.event)}${e.detail ? ` <span style="color:var(--t3)">· ${escapeHtml(e.detail)}</span>` : ''}</div>
+              <div class="pm-activity-event">${escapeHtml(e.event)}${e.detail ? ` <span style="color:var(--color-text-caption)">· ${escapeHtml(e.detail)}</span>` : ''}</div>
               <div class="pm-activity-time">${escapeHtml(e.time)}</div>
             </div>
           </div>`).join('')}
@@ -11854,28 +12025,31 @@ function renderMemberDrawer(personId) {
       </div>
     </div>`;
 
+  const statusBadgeV = p.status==='active'?'success':p.status==='invited'?'alert':'error';
+  const statusLabelV = p.status==='active'?'Active':p.status==='invited'?'Invited':'Suspended';
+
   return `
-    <div class="pm-drawer-identity">
-      <div class="pm-drawer-avatar" style="background:${p.color}">${escapeHtml(p.initials)}</div>
+    <div class="pa-slideout-head">
+      ${_paAvHTML(p.id,p.name,p.initials,'ds-av-xxl')}
       <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="pm-drawer-name">${escapeHtml(p.name)}</div>
-          <span class="pm-status ${p.status}">
-            <span class="pm-status-dot"></span>
-            ${p.status === 'active' ? 'Active' : p.status === 'invited' ? 'Invited' : 'Suspended'}
-          </span>
+        <div class="pa-slideout-title">${escapeHtml(p.name)}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+          ${_paBadgeHTML(statusBadgeV)}
+          <span style="font-size:12px;color:var(--color-text-caption)">${statusLabelV}</span>
+          <span style="color:var(--color-border-neutral-default)">·</span>
+          <span style="font-size:12px;color:var(--color-text-caption)">${escapeHtml(p.role)}</span>
         </div>
-        <div class="pm-drawer-meta">${escapeHtml(p.role)} · ${escapeHtml(p.email)}</div>
-        <div class="pm-drawer-meta" style="margin-top:2px">Joined ${escapeHtml(p.joinDate)}</div>
       </div>
-      <button class="drawer-close" onclick="paCloseDrawer()" aria-label="Close">✕</button>
+      <button class="pa-slideout-close" onclick="paCloseDrawer()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
     </div>
-    <div class="pm-drawer-tabs">
-      <button class="pm-drawer-tab ${tab==='overview'?'active':''}" onclick="paSetDrawerTab('overview')">Overview</button>
-      <button class="pm-drawer-tab ${tab==='permissions'?'active':''}" onclick="paSetDrawerTab('permissions')">Permissions</button>
-      <button class="pm-drawer-tab ${tab==='activity'?'active':''}" onclick="paSetDrawerTab('activity')">Activity</button>
+    <div class="pa-slideout-tabs">
+      <button class="pa-slideout-tab ${tab==='overview'?'active':''}" onclick="paSetDrawerTab('overview')">Overview</button>
+      <button class="pa-slideout-tab ${tab==='permissions'?'active':''}" onclick="paSetDrawerTab('permissions')">Permissions</button>
+      <button class="pa-slideout-tab ${tab==='activity'?'active':''}" onclick="paSetDrawerTab('activity')">Activity</button>
     </div>
-    <div class="drawer-body">
+    <div class="pa-slideout-body">
       ${tab === 'overview' ? overviewContent : tab === 'permissions' ? permContent : activityContent}
     </div>
   `;
