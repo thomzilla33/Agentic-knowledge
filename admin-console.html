@@ -7379,7 +7379,45 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .sa-studio-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .sa-studio-info { flex:1; min-width:0; }
 .sa-studio-name { font-size:13px; font-weight:600; color:var(--t1); margin-bottom:2px; }
-.sa-studio-desc { font-size:11.5px; color:var(--t3); line-height:1.45; }
+.sa-studio-desc { font-size:12px; color:var(--t3); line-height:1.45; }
+
+/* ── Permission tree (V2 User Access view) ── */
+.pa-access-layout { display:flex; gap:20px; align-items:flex-start; }
+.pa-access-rail { width:300px; flex-shrink:0; display:flex; flex-direction:column; gap:14px; }
+.pa-access-main { flex:1; min-width:0; }
+.pa-eff-top { height:3px; background:linear-gradient(135deg,var(--pri) 0%,#09E2AB 100%); border-radius:var(--r12) var(--r12) 0 0; }
+.pa-eff-stat { text-align:center; flex:1; }
+.pa-eff-num { font-size:20px; font-weight:700; color:var(--pri); line-height:1; }
+.pa-eff-lbl { font-size:11px; color:var(--t3); font-weight:500; margin-top:3px; }
+.pa-tree-row { display:flex; align-items:center; height:44px; border-bottom:1px solid var(--line); padding:0 16px; transition:background .12s; }
+.pa-tree-row:hover { background:var(--hover); }
+.pa-tree-row:last-child { border-bottom:none; }
+.pa-tree-expand { width:20px; height:20px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--t3); flex-shrink:0; border-radius:4px; cursor:pointer; transition:background .12s; }
+.pa-tree-expand:hover { background:var(--hover); }
+.pa-tree-label { flex:1; min-width:0; margin-left:8px; }
+.pa-tree-name { font-size:13px; font-weight:500; color:var(--t1); }
+.pa-tree-code { font-size:11px; color:var(--t3); font-family:'SF Mono','Fira Code',monospace; font-weight:500; }
+.pa-tree-meta { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.pa-tree-scope { font-size:11px; font-weight:500; color:var(--t3); background:var(--bg3); border:1px solid var(--line); border-radius:4px; padding:1px 6px; }
+.pa-role-tag-sm { font-size:11px; font-weight:600; background:var(--green-10); color:var(--green); border-radius:4px; padding:1px 6px; display:flex; align-items:center; gap:3px; white-space:nowrap; }
+.pa-cb { width:20px; height:20px; border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border:2px solid var(--line); background:var(--bg2); cursor:pointer; transition:all .15s; }
+.pa-cb.g-direct { background:var(--pri); border-color:var(--pri); }
+.pa-cb.g-role   { background:var(--green); border-color:var(--green); cursor:not-allowed; }
+.pa-cb.g-inh    { background:var(--pri); border-color:#80AFFF; opacity:.55; cursor:not-allowed; }
+.pa-cb.g-denied { background:var(--red-12); border-color:var(--red); }
+.pa-cb.g-part   { background:var(--bg2); border-color:var(--pri); }
+.pa-cb.g-padd   { background:transparent; border:2px dashed var(--pri); }
+.pa-cb.g-pdeny  { background:transparent; border:2px dashed var(--red); opacity:.7; }
+.pa-changes-bar { position:fixed; bottom:0; left:var(--sidebar-w,230px); right:0; z-index:120; height:64px; background:var(--bg2); border-top:2px solid var(--pri); display:flex; align-items:center; justify-content:space-between; padding:0 32px; box-shadow:0 -4px 20px rgba(0,0,0,.12); transform:translateY(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); }
+.pa-changes-bar.visible { transform:translateY(0); }
+.pa-roles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+.pa-role-grid-card { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12); overflow:hidden; cursor:pointer; transition:box-shadow .15s; }
+.pa-role-grid-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.1); }
+.pa-role-grid-hdr { height:5px; }
+.pa-role-grid-body { padding:14px 18px; }
+.pa-role-grid-name { font-size:14px; font-weight:700; color:var(--t1); margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.pa-role-grid-desc { font-size:12px; color:var(--t3); line-height:1.4; margin-bottom:12px; }
+.pa-role-grid-foot { display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid var(--line); }
 
 /* ====================== ORGANIZATION ====================== */
 .org-wrap { max-width: 720px; padding: 32px 24px 64px; }
@@ -11147,10 +11185,310 @@ let _paState = {
   studioAccessPersonId: null,
   studioAccessEdits: new Set(),
   studioAccessPath: [],
+  // V2: User permission tree
+  userAccessId: null,
+  userAccessTab: 'governance',
+  pendingChanges: [],
+  applyChangesOpen: false,
 };
+
+// ── Permission tree fixture (David Cardenas / governance tab) ──────────────
+const PA_USER_PERM_TREE = {
+  governance: [
+    { id:'gov-drives', label:'Drives', code:'governance.drive', expanded:true,
+      state:'g-role', role:'Manager', scope:'Tenant', locked:true,
+      children:[
+        { id:'gov-drives-view',   label:'View Drives',    code:'governance.drive.view',          state:'g-inh', via:'Drives', scope:'Tenant', locked:true },
+        { id:'gov-drives-up',     label:'Upload files',   code:'governance.drive.upload',        state:'g-inh', via:'Drives', scope:'Tenant', locked:true },
+        { id:'gov-drives-folder', label:'Create folders', code:'governance.drive.folder.create', state:'g-inh', via:'Drives', scope:'Tenant', locked:true },
+      ]},
+    { id:'gov-sandbox', label:'Sandboxes', code:'governance.sandbox', expanded:true,
+      state:'g-part', scope:'Own', partialCount:'4 of 6',
+      children:[
+        { id:'gov-sb-view',    label:'View Sandboxes',    code:'governance.sandbox.view',    state:'g-role',  role:'Manager', scope:'Own', locked:true },
+        { id:'gov-sb-det',     label:'Sandbox details',   code:'governance.sandbox.details', state:'g-inh',   via:'Sandboxes', scope:'Own' },
+        { id:'gov-sb-claims',  label:'View claims',       code:'governance.sandbox.claims',  state:'g-inh',   via:'Sandboxes', scope:'Own' },
+        { id:'gov-sb-bundles', label:'Manage bundles',    code:'governance.sandbox.bundles', state:'g-inh',   via:'Sandboxes', scope:'Own' },
+        { id:'gov-sb-sources', label:'Connect sources',   code:'governance.sandbox.sources', state:'g-denied' },
+        { id:'gov-sb-promo',   label:'Promote sandboxes', code:'governance.sandbox.promote', state:'g-pdeny' },
+      ]},
+    { id:'gov-truth', label:'Truth Plane', code:'governance.truthplane', expanded:false, state:'',
+      children:[
+        { id:'gov-truth-view',  label:'View truth plane', code:'governance.truthplane.view',  state:'' },
+        { id:'gov-truth-facts', label:'Manage facts',     code:'governance.truthplane.facts', state:'' },
+      ]},
+    { id:'gov-packs', label:'Promotion Packs', code:'governance.packs', expanded:false,
+      state:'g-part', partialCount:'1 pending',
+      children:[
+        { id:'gov-packs-view',   label:'View packs',   code:'governance.packs.view',   state:'g-padd' },
+        { id:'gov-packs-create', label:'Create packs', code:'governance.packs.create', state:'' },
+      ]},
+  ]
+};
+
+function _paCbHTML(state) {
+  const chk = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const dash = (c) => `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+  const plus = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+  const map = {
+    'g-direct': `<div class="pa-cb g-direct">${chk}</div>`,
+    'g-role':   `<div class="pa-cb g-role" title="Granted via role">${chk}</div>`,
+    'g-inh':    `<div class="pa-cb g-inh" title="Inherited">${chk}</div>`,
+    'g-denied': `<div class="pa-cb g-denied">${dash('var(--red)')}</div>`,
+    'g-part':   `<div class="pa-cb g-part">${dash('var(--pri)')}</div>`,
+    'g-padd':   `<div class="pa-cb g-padd">${plus}</div>`,
+    'g-pdeny':  `<div class="pa-cb g-pdeny">${dash('var(--red)')}</div>`,
+    '':         `<div class="pa-cb"></div>`,
+  };
+  return map[state] || map[''];
+}
+
+function _paChevron(expanded) {
+  return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(${expanded?0:-90}deg);transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>`;
+}
+
+function _paRenderTreeNode(node, depth) {
+  depth = depth || 0;
+  const indent = depth * 22;
+  const isParent = node.children && node.children.length;
+  let meta = '';
+  if (node.role)         meta += `<span class="pa-role-tag-sm"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>${escapeHtml(node.role)}</span>`;
+  if (node.via)          meta += `<span class="pa-tree-scope">via ${escapeHtml(node.via)}</span>`;
+  if (node.partialCount) meta += `<span style="font-size:11px;color:var(--t3)">${node.partialCount}</span>`;
+  if (node.locked && node.scope) meta += `<span class="pa-tree-scope">${node.scope}</span>`;
+  else if (node.scope && !node.locked && node.state && node.state!=='g-denied' && node.state!=='g-pdeny' && node.state!=='g-padd' && node.state!=='')
+    meta += `<select class="pa-tree-scope-sel" aria-label="Scope" style="font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-family:inherit;outline:none;cursor:pointer"><option${node.scope==='Own'?' selected':''}>Own</option><option${node.scope==='Tenant'?' selected':''}>Tenant</option></select>`;
+
+  let html = `<div class="pa-tree-row" role="treeitem" style="padding-left:${16+indent}px" id="parow-${node.id}">
+    ${isParent ? `<button class="pa-tree-expand" onclick="paToggleTree('${node.id}')" id="paexp-${node.id}" aria-label="Expand ${escapeHtml(node.label)}">${_paChevron(node.expanded)}</button>` : '<span style="width:20px;flex-shrink:0"></span>'}
+    ${_paCbHTML(node.state)}
+    <div class="pa-tree-label">
+      <div class="pa-tree-name">${escapeHtml(node.label)}</div>
+      <div class="pa-tree-code">${node.code}</div>
+    </div>
+    <div class="pa-tree-meta">${meta}</div>
+  </div>`;
+  if (isParent) {
+    html += `<div id="pach-${node.id}" role="group"${node.expanded?'':' style="display:none"'}>`;
+    html += node.children.map(c => _paRenderTreeNode(c, depth + 1)).join('');
+    html += `</div>`;
+  }
+  return html;
+}
+
+function paToggleTree(id) {
+  function find(nodes) {
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      if (n.children) { const f = find(n.children); if (f) return f; }
+    }
+  }
+  const allNodes = Object.values(PA_USER_PERM_TREE).flat();
+  const node = find(allNodes);
+  if (!node) return;
+  node.expanded = !node.expanded;
+  const ch = document.getElementById('pach-' + id);
+  const btn = document.getElementById('paexp-' + id);
+  if (ch) ch.style.display = node.expanded ? '' : 'none';
+  if (btn) btn.innerHTML = _paChevron(node.expanded);
+}
+
+function paOpenUserAccess(personId) {
+  _paState.userAccessId = personId;
+  _paState.pendingChanges = [
+    { name:'View Promotion Packs', code:'governance.packs.view', action:'grant', scope:'Own' },
+    { name:'Promote Sandboxes',    code:'governance.sandbox.promote', action:'deny', scope:'Own' },
+  ];
+  renderPeople();
+  paShowChangesBar(true);
+}
+
+function paCloseUserAccess() {
+  _paState.userAccessId = null;
+  _paState.pendingChanges = [];
+  paShowChangesBar(false);
+  renderPeople();
+}
+
+function paShowChangesBar(visible) {
+  const bar = document.getElementById('paChangesBar');
+  if (bar) bar.classList.toggle('visible', visible);
+}
+
+function paOpenApplyChanges() {
+  _paState.applyChangesOpen = true;
+  renderPeople();
+}
+
+function paCloseApplyChanges() {
+  _paState.applyChangesOpen = false;
+  renderPeople();
+}
+
+function paApplyChanges() {
+  const btn = document.getElementById('paApplyBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Applying…'; }
+  setTimeout(() => {
+    _paState.applyChangesOpen = false;
+    _paState.pendingChanges = [];
+    _paState.userAccessId = null;
+    paShowChangesBar(false);
+    renderPeople();
+    toast('Permissions updated', 'success');
+  }, 1200);
+}
+
+function renderUserAccessView(personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId);
+  if (!p) return '';
+  const memberRoles = (PA_MEMBER_ROLES[p.id] || []).map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
+  const tab = _paState.userAccessTab || 'governance';
+  const treeNodes = PA_USER_PERM_TREE[tab] || [];
+  const pending = _paState.pendingChanges || [];
+
+  const applyModal = _paState.applyChangesOpen ? `
+    <div class="rc-overlay open" onclick="if(event.target===this)paCloseApplyChanges()">
+      <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r16);width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line)">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1)">Apply permission changes</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:3px">Review changes before saving. This cannot be undone.</div>
+          </div>
+          <button class="pm-drawer-close" onclick="paCloseApplyChanges()" aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <div style="padding:20px 24px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:12px">${pending.length} pending changes — ${escapeHtml(p.name)}</div>
+          ${pending.map(ch => `
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)">
+              <div style="width:20px;height:20px;border-radius:50%;background:${ch.action==='grant'?'var(--green-10)':'var(--red-12)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                ${ch.action==='grant'
+                  ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+                  : '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>'}
+              </div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600;color:var(--t1)">${escapeHtml(ch.name)}</div>
+                <div style="font-size:11px;color:var(--t3);font-family:monospace">${ch.code}</div>
+              </div>
+              <span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:10px;background:${ch.action==='grant'?'var(--green-10)':'var(--red-12)'};color:${ch.action==='grant'?'var(--green)':'var(--red)'}">${ch.action==='grant'?'Grant':'Deny'}</span>
+              <span style="font-size:12px;color:var(--t3)">${ch.scope}</span>
+            </div>`).join('')}
+        </div>
+        <div style="padding:14px 24px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-ghost btn-sm" onclick="paCloseApplyChanges()">Cancel</button>
+          <button class="btn btn-primary btn-sm" id="paApplyBtn" onclick="paApplyChanges()">Apply ${pending.length} change${pending.length!==1?'s':''}</button>
+        </div>
+      </div>
+    </div>` : '';
+
+  return `
+    <div class="ph">
+      <div class="ph-top">
+        <div class="ph-text" style="display:flex;align-items:center;gap:10px">
+          <button class="btn btn-ghost btn-sm" onclick="paCloseUserAccess()" aria-label="Back" style="padding:0 8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div>
+            <div class="ph-h1">Access — ${escapeHtml(p.name)}</div>
+            <div class="ph-sub">Reviewing effective permissions and role assignments</div>
+          </div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-secondary btn-sm" onclick="paOpenApplyChanges()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Apply Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pa-access-layout">
+      <!-- Rail -->
+      <div class="pa-access-rail">
+        <!-- Profile card -->
+        <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:16px">
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+            <div class="pm-drawer-avatar" style="background:${p.color}">${p.initials}</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--t1)">${escapeHtml(p.name)}</div>
+              <div style="font-size:12px;color:var(--t3)">${escapeHtml(p.email)}</div>
+              <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">
+                <span class="pa-tab-count" style="background:var(--green-10);color:var(--green);border-radius:10px;padding:2px 8px">Active</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Roles</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
+            ${memberRoles.length ? memberRoles.map(r=>`<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;color:${r.color};background:${r.color}18;border:1px solid ${r.color}30">${escapeHtml(r.label)}</span>`).join('') : '<span style="font-size:12px;color:var(--t3)">No roles</span>'}
+          </div>
+          <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Tenant type</div>
+          <div style="font-size:13px;font-weight:500;color:var(--t1)">${memberRoles.some(r=>r.id==='workspace-admin')?'Owner':'Admin'}</div>
+        </div>
+
+        <!-- Effective access card (gradient top bar — appears ONCE per view) -->
+        <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);overflow:hidden">
+          <div class="pa-eff-top"></div>
+          <div style="padding:14px 16px">
+            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:12px">Effective access</div>
+            <div style="display:flex">
+              <div class="pa-eff-stat"><div class="pa-eff-num">24</div><div class="pa-eff-lbl">Granted</div></div>
+              <div class="pa-eff-stat"><div class="pa-eff-num" style="color:var(--red)">2</div><div class="pa-eff-lbl">Denied</div></div>
+              <div class="pa-eff-stat"><div class="pa-eff-num" style="color:var(--amber)">2</div><div class="pa-eff-lbl">Pending</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:14px 16px">
+          <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Permission states</div>
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:12px;color:var(--t2)">
+            <div style="display:flex;align-items:center;gap:8px">${_paCbHTML('g-direct')}<span>Granted — direct</span></div>
+            <div style="display:flex;align-items:center;gap:8px">${_paCbHTML('g-inh')}<span>Granted — inherited</span></div>
+            <div style="display:flex;align-items:center;gap:8px">${_paCbHTML('g-role')}<span>Granted — from role</span></div>
+            <div style="display:flex;align-items:center;gap:8px">${_paCbHTML('g-denied')}<span>Denied — explicit</span></div>
+            <div style="display:flex;align-items:center;gap:8px">${_paCbHTML('g-part')}<span>Partial (mixed children)</span></div>
+            <div style="display:flex;align-items:center;gap:8px">${_paCbHTML('g-padd')}<span>Pending — add</span></div>
+            <div style="display:flex;align-items:center;gap:8px">${_paCbHTML('g-pdeny')}<span>Pending — deny</span></div>
+            <div style="display:flex;align-items:center;gap:8px">${_paCbHTML('')}<span>Not granted</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main: permission tree -->
+      <div class="pa-access-main">
+        <div class="pa-tabs" style="margin-bottom:16px">
+          ${['governance','datastudio','admin','integrations'].map(t => `
+            <button class="pa-tab ${tab===t?'active':''}" onclick="_paState.userAccessTab='${t}';renderPeople()">${t==='datastudio'?'Data Studio':t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);overflow:hidden">
+          <div style="padding:10px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center">
+            <div style="position:relative;flex:1;max-width:240px">
+              <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3)" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input style="width:100%;height:34px;padding:0 10px 0 32px;border:1px solid var(--line);border-radius:var(--r8);background:var(--bg2);color:var(--t1);font-family:inherit;font-size:13px;outline:none" placeholder="Filter permissions…" aria-label="Filter permissions">
+            </div>
+            <select style="height:34px;padding:0 10px;border:1px solid var(--line);border-radius:var(--r8);background:var(--bg2);color:var(--t1);font-family:inherit;font-size:13px;outline:none;cursor:pointer" aria-label="Filter by state">
+              <option>All states</option><option>Granted</option><option>Denied</option><option>Pending</option>
+            </select>
+          </div>
+          <div role="tree" aria-label="${tab.charAt(0).toUpperCase()+tab.slice(1)} permissions">
+            ${tab==='governance' ? treeNodes.map(n=>_paRenderTreeNode(n,0)).join('') : '<div style="padding:40px 24px;text-align:center;color:var(--t3);font-size:13px">No permissions in this studio.</div>'}
+          </div>
+        </div>
+      </div>
+    </div>
+    ${applyModal}
+  `;
+}
 
 function renderPeople(subTab) {
   if (subTab) _paState.tab = subTab;
+
+  // V2: user access view
+  if (_paState.userAccessId) {
+    $('content').innerHTML = renderUserAccessView(_paState.userAccessId);
+    paShowChangesBar((_paState.pendingChanges||[]).length > 0);
+    return;
+  }
+
   const activeTab = _paState.tab;
 
   const activeCount = MOCK_PEOPLE.filter(p => p.status === 'active').length;
@@ -11303,6 +11641,9 @@ function renderPeopleMembers() {
             </div>
           </div>
           <div class="pa-role-card-actions" onclick="event.stopPropagation()">
+            <button class="pa-role-action-btn" title="View access" onclick="paOpenUserAccess('${p.id}')">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4v4.5C2 11.8 4.7 14.6 8 15.5c3.3-.9 6-3.7 6-7V4L8 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+            </button>
             <button class="pa-role-action-btn" title="View details" onclick="paOpenDrawer('${p.id}')">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="8" rx="6.5" ry="4.5" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>
             </button>
@@ -11331,43 +11672,27 @@ function renderPeopleRolesList() {
     const studioTags = _paRoleStudioTags(r.id);
 
     return `
-      <div class="pa-role-card" onclick="paOpenRoleDetail('${r.id}')">
-        <div class="pa-role-card-icon" style="background:${r.color}20">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="color:${r.color}">
-            <path d="M8 1.5L2 4v4.5C2 11.8 4.7 14.6 8 15.5c3.3-.9 6-3.7 6-7V4L8 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="${r.color}25"/>
-          </svg>
-        </div>
-        <div class="pa-role-card-body">
-          <div class="pa-role-card-row1">
-            <span class="pa-role-card-name">${escapeHtml(r.label)}</span>
-            <span class="pa-role-type-badge ${r.system ? 'pa-role-type-badge--system' : 'pa-role-type-badge--custom'}">${r.system ? 'System' : 'Custom'}</span>
+      <div class="pa-role-grid-card" onclick="paOpenRoleDetail('${r.id}')">
+        <div class="pa-role-grid-hdr" style="background:${r.color}"></div>
+        <div class="pa-role-grid-body">
+          <div class="pa-role-grid-name">
+            ${escapeHtml(r.label)}
+            <span class="pa-role-type-badge ${r.system ? 'pa-role-type-badge--system' : 'pa-role-type-badge--custom'}" style="font-size:11px">${r.system ? 'System' : 'Custom'}</span>
           </div>
-          <div class="pa-role-card-desc">${escapeHtml(r.desc)}</div>
-          <div class="pa-role-card-meta">
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="11.5" cy="5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M14 13c0-2-1.3-3.2-2.5-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            <span>${members.length} ${members.length===1?'member':'members'}</span>
-            <span class="pa-role-meta-sep">·</span>
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4v4.5C2 11.8 4.7 14.6 8 15.5c3.3-.9 6-3.7 6-7V4L8 1.5z" stroke="currentColor" stroke-width="1.2"/></svg>
-            <span>${permCount} permissions</span>
+          <div class="pa-role-grid-desc">${escapeHtml(r.desc)}</div>
+          <div class="pa-role-grid-foot">
+            <span style="font-size:12px;color:var(--t3);font-weight:500">${members.length} member${members.length!==1?'s':''}</span>
+            <div style="display:flex;gap:5px" onclick="event.stopPropagation()">
+              ${!r.system ? `<button class="btn btn-ghost btn-sm" onclick="paOpenRoleEdit('${r.id}')">Edit</button>` : ''}
+              ${!r.system ? `<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="paOpenRoleDelete('${r.id}')">Delete</button>` : ''}
+              ${r.system ? `<button class="btn btn-ghost btn-sm" onclick="paOpenRoleDetail('${r.id}')">View</button>` : ''}
+            </div>
           </div>
-          ${studioTags.length > 0 ? `<div class="pa-role-card-tags">${studioTags.map(s => `<span class="pa-role-tag" style="color:${s.color};background:${s.color}18;border-color:${s.color}35">${escapeHtml(s.label)}</span>`).join('')}</div>` : ''}
-        </div>
-        <div class="pa-role-card-actions" onclick="event.stopPropagation()">
-          <button class="pa-role-action-btn" title="View details" onclick="paOpenRoleDetail('${r.id}')">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="8" rx="6.5" ry="4.5" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>
-          </button>
-          ${!r.system ? `
-          <button class="pa-role-action-btn" title="Edit role" onclick="paOpenRoleEdit('${r.id}')">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5a1.5 1.5 0 012.1 2.1L5.5 12.7l-3 .8.8-3 8.2-8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-          </button>
-          <button class="pa-role-action-btn pa-role-action-btn--danger" title="Delete role" onclick="paOpenRoleDelete('${r.id}')">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6.5 7v5M9.5 7v5M3 4l1 9.5h8L13 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>` : ''}
         </div>
       </div>`;
   };
 
-  return `<div class="pa-roles-list">${PA_ROLES.map(renderRole).join('')}</div>`;
+  return `<div class="pa-roles-grid">${PA_ROLES.map(renderRole).join('')}</div>`;
 }
 
 function renderMemberDrawer(personId) {
@@ -19005,5 +19330,20 @@ window.NOTIF_DATA = [
 ];
 </script>
 <script src="shared/notif-panel.js"></script>
+
+<!-- ── Pending Changes Bar (People & Access) ── -->
+<div class="pa-changes-bar" id="paChangesBar" role="status" aria-live="polite">
+  <div>
+    <div style="font-size:13px;font-weight:600;color:var(--t1)" id="paChangesLabel">2 unsaved changes</div>
+    <div style="font-size:12px;color:var(--t3)" id="paChangesSub">Reviewing permissions</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-ghost btn-sm" onclick="_paState.pendingChanges=[];paShowChangesBar(false);toast('Changes discarded','info')">Discard</button>
+    <button class="btn btn-primary btn-sm" onclick="paOpenApplyChanges()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      Apply changes
+    </button>
+  </div>
+</div>
 </body>
 </html>
