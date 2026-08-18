@@ -11714,12 +11714,12 @@ function renderPeople(subTab) {
         </div>
         <div class="ph-actions">
           ${activeTab === 'roles'
-            ? `<button class="btn btn-primary btn-sm" onclick="paOpenRoleCreate()">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="margin-right:4px"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            ? `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenRoleCreate()">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                 New role
                </button>`
-            : `<button class="btn btn-primary btn-sm" onclick="paOpenInvite()">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="margin-right:4px"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            : `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenInvite()">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                 Invite member
                </button>`}
         </div>
@@ -11910,7 +11910,7 @@ function renderPeopleRolesList() {
             </div>
             <div class="pa-role-card2-actions" onclick="event.stopPropagation()">
               ${!r.system ? _paBtnHTML('Edit','tertiary','sm',`paOpenRoleEdit('${r.id}')`) : ''}
-              ${!r.system ? _paBtnHTML('Delete','tertiary','sm',`paOpenRoleDelete('${r.id}')`,`style="color:var(--red)"`) : ''}
+              ${!r.system ? _paBtnHTML('Delete','tertiary','sm',`paOpenRoleDelete('${r.id}')`,`style="color:var(--color-text-error)"`) : ''}
               ${r.system  ? _paBtnHTML('View','secondary','sm',`paOpenRoleDetail('${r.id}')`) : ''}
             </div>
           </div>
@@ -12133,8 +12133,8 @@ function renderInviteModal() {
         </div>
       </div>
       <div class="pm-invite-foot">
-        <button class="btn btn-ghost btn-sm" onclick="paCloseInvite()">Cancel</button>
-        <button class="btn btn-primary btn-sm" onclick="paSubmitInvite()">Send invite</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseInvite()">Cancel</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitInvite()">Send invite</button>
       </div>
     </div>`;
 }
@@ -12369,8 +12369,8 @@ function renderRoleDetail(roleId) {
 
     ${!r.system ? `
     <div style="padding:16px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px">
-      <button class="btn btn-ghost btn-sm" style="color:var(--error);border-color:var(--error)30" onclick="paDeleteRole('${roleId}')">Delete role</button>
-      <button class="btn btn-main btn-sm" onclick="paSaveRolePerms('${roleId}')">Save changes</button>
+      <button class="ds-btn ds-btn-sm ds-btn--tertiary" style="color:var(--color-text-error)" onclick="paDeleteRole('${roleId}')">Delete role</button>
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSaveRolePerms('${roleId}')">Save changes</button>
     </div>` : ''}`;
 }
 
@@ -12603,8 +12603,8 @@ function renderRoleCreateModal() {
         <span class="rc-changes-none">No changes yet</span>
       </div>
       <div class="rc-foot">
-        <button class="btn btn-ghost btn-sm" onclick="paCloseRoleCreate()">Cancel</button>
-        <button class="btn btn-main btn-sm" onclick="paSubmitRoleCreate()">Create role</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseRoleCreate()">Cancel</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitRoleCreate()">Create role</button>
       </div>
     </div>`;
 }
@@ -12651,8 +12651,8 @@ function renderRoleEditModal() {
         <span class="rc-changes-none">No changes yet</span>
       </div>
       <div class="rc-foot">
-        <button class="btn btn-ghost btn-sm" onclick="paCloseRoleEdit()">Cancel</button>
-        <button class="btn btn-main btn-sm" onclick="paSubmitRoleEdit()">Save changes</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseRoleEdit()">Cancel</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitRoleEdit()">Save changes</button>
       </div>
     </div>`;
 }
@@ -12675,8 +12675,8 @@ function renderRoleDeleteModal() {
         This will permanently remove the role.${memberCount > 0 ? ` <strong>${memberCount} ${memberCount===1?'member':'members'}</strong> will lose the permissions it grants.` : ''} This action cannot be undone.
       </div>
       <div class="pa-delete-modal-foot">
-        <button class="btn btn-ghost btn-sm" onclick="paCloseRoleDelete()">Cancel</button>
-        <button class="btn btn-sm" style="background:#ef4444;color:#fff;border-color:#ef4444" onclick="paConfirmRoleDelete()">Delete role</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseRoleDelete()">Cancel</button>
+        <button class="ds-btn ds-btn-sm ds-btn--warning" onclick="paConfirmRoleDelete()">Delete role</button>
       </div>
     </div>`;
 }
@@ -12830,8 +12830,8 @@ function renderStudioAccessModal() {
       ${studioBarHtml}
       <div class="pt-rows">${rowsHtml}</div>
       <div class="rc-foot">
-        <button class="btn btn-ghost btn-sm" onclick="paCloseStudioAccess()">Cancel</button>
-        <button class="btn btn-main btn-sm" onclick="paSaveStudioAccess()">Save changes</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseStudioAccess()">Cancel</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSaveStudioAccess()">Save changes</button>
       </div>
     </div>`;
 }
