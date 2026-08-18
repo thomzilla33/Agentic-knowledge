@@ -7540,28 +7540,17 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .pa-toggle::after{
   content:''; position:absolute; top:2px; left:2px;
   width:14px; height:14px; border-radius:50%;
-  background:#fff; transition:left .18s, background .18s;
+  background:#fff; transition:left .18s;
   box-shadow:0 1px 3px rgba(0,0,0,.30);
 }
-/* ON */
-.pa-toggle.g-direct{background:var(--pri)}
-.pa-toggle.g-direct::after{left:16px}
-.pa-toggle.g-role{background:var(--badge-success);cursor:not-allowed}
-.pa-toggle.g-role::after{left:16px}
-.pa-toggle.g-inh{background:var(--pri);opacity:.55;cursor:not-allowed}
-.pa-toggle.g-inh::after{left:16px}
-/* DENIED — off-track, red thumb */
-.pa-toggle.g-denied{background:var(--red-12);border:1.5px solid var(--red)}
-.pa-toggle.g-denied::after{top:1px;left:1px;background:var(--red)}
-/* PARTIAL — amber, thumb centred */
-.pa-toggle.g-part{background:transparent;border:1.5px solid var(--amber,#F59E0B)}
-.pa-toggle.g-part::after{top:1px;left:6px;background:var(--amber,#F59E0B)}
-/* PENDING GRANT — dashed, thumb right */
-.pa-toggle.g-padd{background:transparent;border:1.5px dashed var(--pri)}
-.pa-toggle.g-padd::after{top:1px;left:15px;background:var(--pri);opacity:.7}
-/* PENDING DENY — dashed, thumb left */
-.pa-toggle.g-pdeny{background:transparent;border:1.5px dashed var(--red);opacity:.7}
-.pa-toggle.g-pdeny::after{top:1px;left:1px;background:var(--red);opacity:.7}
+/* ON — direct grant */
+.pa-toggle.on{background:var(--pri)}
+.pa-toggle.on::after{left:16px}
+/* ON — locked (role / inherited): same pill, non-interactive */
+.pa-toggle.on-locked{background:var(--pri);opacity:.55;cursor:not-allowed}
+.pa-toggle.on-locked::after{left:16px}
+/* OFF — non-interactive cursor for locked-off */
+.pa-toggle.off-locked{cursor:not-allowed}
 
 /* ── Pending changes sticky bar ── */
 .pa-changes-bar { position:fixed; bottom:0; left:var(--sidebar-w,230px); right:0; z-index:120; height:64px; background:var(--bg2); border-top:2px solid var(--pri); display:flex; align-items:center; justify-content:space-between; padding:0 32px; box-shadow:0 -4px 20px rgba(0,0,0,.15); transform:translateY(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); }
@@ -11405,35 +11394,34 @@ let _paState = {
   applyChangesOpen: false,
 };
 
-// ── Permission tree fixture (David Cardenas / governance tab) ──────────────
+// ── Permission tree fixture (governance tab) — binary granted / not-granted ──
 const PA_USER_PERM_TREE = {
   governance: [
     { id:'gov-drives', label:'Drives', code:'governance.drive', expanded:true,
       state:'g-role', role:'Manager', scope:'Tenant', locked:true,
       children:[
-        { id:'gov-drives-view',   label:'View Drives',    code:'governance.drive.view',          state:'g-inh', via:'Drives', scope:'Tenant', locked:true },
-        { id:'gov-drives-up',     label:'Upload files',   code:'governance.drive.upload',        state:'g-inh', via:'Drives', scope:'Tenant', locked:true },
-        { id:'gov-drives-folder', label:'Create folders', code:'governance.drive.folder.create', state:'g-inh', via:'Drives', scope:'Tenant', locked:true },
+        { id:'gov-drives-view',   label:'View Drives',    code:'governance.drive.view',          state:'g-inh', scope:'Tenant', locked:true },
+        { id:'gov-drives-up',     label:'Upload files',   code:'governance.drive.upload',        state:'g-inh', scope:'Tenant', locked:true },
+        { id:'gov-drives-folder', label:'Create folders', code:'governance.drive.folder.create', state:'g-inh', scope:'Tenant', locked:true },
       ]},
     { id:'gov-sandbox', label:'Sandboxes', code:'governance.sandbox', expanded:true,
-      state:'g-part', scope:'Own', partialCount:'4 of 6',
+      state:'g-role', role:'Manager', scope:'Own', locked:true,
       children:[
-        { id:'gov-sb-view',    label:'View Sandboxes',    code:'governance.sandbox.view',    state:'g-role',  role:'Manager', scope:'Own', locked:true },
-        { id:'gov-sb-det',     label:'Sandbox details',   code:'governance.sandbox.details', state:'g-inh',   via:'Sandboxes', scope:'Own' },
-        { id:'gov-sb-claims',  label:'View claims',       code:'governance.sandbox.claims',  state:'g-inh',   via:'Sandboxes', scope:'Own' },
-        { id:'gov-sb-bundles', label:'Manage bundles',    code:'governance.sandbox.bundles', state:'g-inh',   via:'Sandboxes', scope:'Own' },
-        { id:'gov-sb-sources', label:'Connect sources',   code:'governance.sandbox.sources', state:'g-denied' },
-        { id:'gov-sb-promo',   label:'Promote sandboxes', code:'governance.sandbox.promote', state:'g-pdeny' },
+        { id:'gov-sb-view',    label:'View Sandboxes',    code:'governance.sandbox.view',    state:'g-inh', scope:'Own', locked:true },
+        { id:'gov-sb-det',     label:'Sandbox details',   code:'governance.sandbox.details', state:'g-inh', scope:'Own', locked:true },
+        { id:'gov-sb-claims',  label:'View claims',       code:'governance.sandbox.claims',  state:'g-inh', scope:'Own', locked:true },
+        { id:'gov-sb-bundles', label:'Manage bundles',    code:'governance.sandbox.bundles', state:'g-direct', scope:'Own' },
+        { id:'gov-sb-sources', label:'Connect sources',   code:'governance.sandbox.sources', state:'', scope:'Own' },
+        { id:'gov-sb-promo',   label:'Promote sandboxes', code:'governance.sandbox.promote', state:'', scope:'Own' },
       ]},
     { id:'gov-truth', label:'Truth Plane', code:'governance.truthplane', expanded:false, state:'',
       children:[
         { id:'gov-truth-view',  label:'View truth plane', code:'governance.truthplane.view',  state:'' },
         { id:'gov-truth-facts', label:'Manage facts',     code:'governance.truthplane.facts', state:'' },
       ]},
-    { id:'gov-packs', label:'Promotion Packs', code:'governance.packs', expanded:false,
-      state:'g-part', partialCount:'1 pending',
+    { id:'gov-packs', label:'Promotion Packs', code:'governance.packs', expanded:false, state:'',
       children:[
-        { id:'gov-packs-view',   label:'View packs',   code:'governance.packs.view',   state:'g-padd' },
+        { id:'gov-packs-view',   label:'View packs',   code:'governance.packs.view',   state:'g-direct' },
         { id:'gov-packs-create', label:'Create packs', code:'governance.packs.create', state:'' },
       ]},
   ]
@@ -11459,18 +11447,13 @@ function _paBtnHTML(label, variant, size, onclick, extraAttr) {
   return `<button class="ds-btn ds-btn-${size||'sm'} ds-btn--${variant||'secondary'}" onclick="${onclick}" ${extraAttr||''}>${label}</button>`;
 }
 
-function _paCbHTML(state) {
-  const map = {
-    'g-direct': `<div class="pa-toggle g-direct" title="Granted directly"    role="switch" aria-checked="true"></div>`,
-    'g-role':   `<div class="pa-toggle g-role"   title="Granted via role"    role="switch" aria-checked="true"></div>`,
-    'g-inh':    `<div class="pa-toggle g-inh"    title="Inherited"           role="switch" aria-checked="true"></div>`,
-    'g-denied': `<div class="pa-toggle g-denied" title="Denied"              role="switch" aria-checked="false"></div>`,
-    'g-part':   `<div class="pa-toggle g-part"   title="Partial access"      role="switch" aria-checked="mixed"></div>`,
-    'g-padd':   `<div class="pa-toggle g-padd"   title="Pending grant"       role="switch" aria-checked="true"></div>`,
-    'g-pdeny':  `<div class="pa-toggle g-pdeny"  title="Pending deny"        role="switch" aria-checked="false"></div>`,
-    '':         `<div class="pa-toggle"           title="Not granted"         role="switch" aria-checked="false"></div>`,
-  };
-  return map[state] || map[''];
+function _paCbHTML(state, onclick) {
+  const granted  = state === 'g-direct' || state === 'g-role' || state === 'g-inh';
+  const locked   = state === 'g-role'   || state === 'g-inh';
+  const cls      = locked ? (granted ? 'on-locked' : 'off-locked') : (granted ? 'on' : '');
+  const label    = granted ? 'Granted' : 'Not granted';
+  const click    = (!locked && onclick) ? ` onclick="${onclick}"` : '';
+  return `<div class="pa-toggle ${cls}"${click} role="switch" aria-checked="${granted}" title="${label}"></div>`;
 }
 
 function _paChevron(expanded) {
@@ -11489,9 +11472,10 @@ function _paRenderTreeNode(node, depth) {
   else if (node.scope && !node.locked && node.state && node.state!=='g-denied' && node.state!=='g-pdeny' && node.state!=='g-padd' && node.state!=='')
     meta += `<select class="pa-tree-scope-sel" aria-label="Scope" style="font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-family:inherit;outline:none;cursor:pointer"><option${node.scope==='Own'?' selected':''}>Own</option><option${node.scope==='Tenant'?' selected':''}>Tenant</option></select>`;
 
+  const toggleClick = node.locked ? null : `paToggleUserPerm('${node.id}')`;
   let html = `<div class="pa-tree-row" role="treeitem" style="padding-left:${16+indent}px" id="parow-${node.id}">
     ${isParent ? `<button class="pa-tree-expand" onclick="paToggleTree('${node.id}')" id="paexp-${node.id}" aria-label="Expand ${escapeHtml(node.label)}">${_paChevron(node.expanded)}</button>` : '<span style="width:20px;flex-shrink:0"></span>'}
-    ${_paCbHTML(node.state)}
+    ${_paCbHTML(node.state, toggleClick)}
     <div class="pa-tree-label">
       <div class="pa-tree-name">${escapeHtml(node.label)}</div>
       <div class="pa-tree-code">${node.code}</div>
@@ -11521,6 +11505,52 @@ function paToggleTree(id) {
   const btn = document.getElementById('paexp-' + id);
   if (ch) ch.style.display = node.expanded ? '' : 'none';
   if (btn) btn.innerHTML = _paChevron(node.expanded);
+}
+
+function _paFindNode(id) {
+  function find(nodes) {
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      if (n.children) { const f = find(n.children); if (f) return f; }
+    }
+    return null;
+  }
+  for (const nodes of Object.values(PA_USER_PERM_TREE)) {
+    const n = find(nodes);
+    if (n) return n;
+  }
+  return null;
+}
+
+function paToggleUserPerm(nodeId) {
+  const node = _paFindNode(nodeId);
+  if (!node || node.locked) return;
+
+  const wasGranted = node.state === 'g-direct';
+  node.state = wasGranted ? '' : 'g-direct';
+
+  // Track as unsaved change
+  _paState.pendingChanges = (_paState.pendingChanges || []).filter(c => c.nodeId !== nodeId);
+  _paState.pendingChanges.push({ nodeId, name:node.label, code:node.code, action: wasGranted ? 'revoke' : 'grant', scope:node.scope||'Own' });
+
+  // Patch only the toggle in the DOM — no full re-render, no scroll reset
+  const row = document.getElementById('parow-' + nodeId);
+  if (row) {
+    const t = row.querySelector('.pa-toggle');
+    if (t) {
+      t.className = 'pa-toggle' + (node.state === 'g-direct' ? ' on' : '');
+      t.setAttribute('aria-checked', node.state === 'g-direct' ? 'true' : 'false');
+      t.title = node.state === 'g-direct' ? 'Granted' : 'Not granted';
+    }
+  }
+
+  // Update changes bar count label without re-rendering the whole view
+  const bar = document.getElementById('paChangesBar');
+  if (bar) {
+    bar.classList.add('visible');
+    const label = document.getElementById('paChangesLabel');
+    if (label) label.textContent = _paState.pendingChanges.length + ' unsaved change' + (_paState.pendingChanges.length !== 1 ? 's' : '');
+  }
 }
 
 function paOpenUserAccess(personId) {
@@ -11677,23 +11707,17 @@ function renderUserAccessView(personId) {
             <div style="font-size:12px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Effective access</div>
             <div style="display:flex;gap:4px">
               <div class="pa-eff-stat"><div class="pa-eff-num">24</div><div class="pa-eff-lbl">Granted</div></div>
-              <div class="pa-eff-stat"><div class="pa-eff-num" style="color:var(--badge-error)">2</div><div class="pa-eff-lbl">Denied</div></div>
-              <div class="pa-eff-stat"><div class="pa-eff-num" style="color:var(--badge-alert)">2</div><div class="pa-eff-lbl">Pending</div></div>
+              <div class="pa-eff-stat"><div class="pa-eff-num" style="color:var(--color-text-disabled)">8</div><div class="pa-eff-lbl">Not granted</div></div>
             </div>
           </div>
         </div>
 
-        <!-- Legend — compact 2-col grid -->
+        <!-- Legend — two states -->
         <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:14px 16px">
           <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Permission states</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 4px;font-size:12px;color:var(--color-text-subtitle)">
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-direct')}<span>Direct</span></div>
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-inh')}<span>Inherited</span></div>
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-role')}<span>From role</span></div>
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-denied')}<span>Denied</span></div>
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-part')}<span>Partial</span></div>
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-padd')}<span>Pending +</span></div>
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-pdeny')}<span>Pending −</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--color-text-subtitle)">
+            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-direct')}<span>Granted</span></div>
+            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-inh')}<span>Granted via role (locked)</span></div>
             <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('')}<span>Not granted</span></div>
           </div>
         </div>
