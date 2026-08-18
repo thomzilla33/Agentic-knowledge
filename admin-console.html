@@ -9564,7 +9564,7 @@ function detailInstances(integration) {
             </div>
             <div class="inst-empty-t">No instances of ${escapeHtml(integration.name)} yet</div>
             <div class="inst-empty-p">An instance is one connected account (e.g. <i>${escapeHtml(integration.name)} — Production</i>, <i>${escapeHtml(integration.name)} — Sandbox</i>). Each one has its own credentials, capabilities and access list.</div>
-            <button class="btn btn-primary btn-sm" onclick="openConnect('${integration.slug}')">Connect ${escapeHtml(integration.name)} →</button>
+            <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="openConnect('${integration.slug}')">Connect ${escapeHtml(integration.name)} →</button>
           </div>
         </div>
       </section>
@@ -9761,8 +9761,8 @@ function renderRequestForm() {
         <p class="req-success-sub">Ticket <strong>REQ-${String(REQUESTS.length+1).padStart(3,'0')}</strong> · ${escapeHtml(s.integrationName || 'New integration')} · ETA review in 24h</p>
         <p class="req-success-body">The AIMS managed services team will review your request and reach out with a scope and quote within one business day. You can track progress in the Requests inbox.</p>
         <div class="req-success-actions">
-          <a class="btn btn-primary" href="#/requests">Go to Requests inbox →</a>
-          <a class="btn btn-ghost btn-sm" href="#/integrations" onclick="requestFormState.step=0">Back to Connections</a>
+          <a class="ds-btn ds-btn-md ds-btn--primary" href="#/requests">Go to Requests inbox →</a>
+          <a class="ds-btn ds-btn-sm ds-btn--secondary" href="#/integrations" onclick="requestFormState.step=0">Back to Connections</a>
         </div>
       </div>
     `;
@@ -9905,8 +9905,8 @@ function renderRequestForm() {
         </div>
 
         <div class="req-form-footer">
-          <a class="btn btn-ghost btn-sm" href="#/integrations">Cancel</a>
-          <button class="btn btn-primary" onclick="submitRequest()">Submit request →</button>
+          <a class="ds-btn ds-btn-sm ds-btn--secondary" href="#/integrations">Cancel</a>
+          <button class="ds-btn ds-btn-md ds-btn--primary" onclick="submitRequest()">Submit request →</button>
         </div>
       </div>
     </div>
@@ -9965,8 +9965,8 @@ function ensureRequestModal() {
         <div class="req-modal-body" id="reqModalBody"></div>
         <footer class="req-modal-foot">
           <span class="req-modal-foot-hint">You're asking someone to build this for free — be specific to help us prioritize.</span>
-          <button class="btn btn-ghost btn-sm" type="button" onclick="closeRequestModal()">Cancel</button>
-          <button class="btn btn-primary btn-sm" type="button" onclick="submitRequestModal()">Submit request →</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" type="button" onclick="closeRequestModal()">Cancel</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" type="button" onclick="submitRequestModal()">Submit request →</button>
         </footer>
       </div>
     </div>
@@ -13776,7 +13776,7 @@ function renderHome() {
           }).join('')}
           ${connected.length>5 ? `<div class="active-more">+${connected.length-5} more</div>` : ''}
         </div>
-        <button class="btn btn-ghost btn-sm active-strip-cta" onclick="setHomeTab('integrated')">View all</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary active-strip-cta" onclick="setHomeTab('integrated')">View all</button>
       </div>
     ` : ''}
 
@@ -13788,8 +13788,8 @@ function renderHome() {
             <h2 class="featured-title">Turn Snowflake into a Knowledge source for Governance</h2>
             <p class="featured-desc">Use your data warehouse tables as searchable knowledge for agents, or invoke Snowflake queries as tools from Agentic. SOC 2 compliant, role-based access, fully auditable.</p>
             <div class="featured-actions">
-              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();navigate('#/integrations/${featured.slug}')">Explore ${escapeHtml(featured.name)} →</button>
-              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toast('Already connected ✓','success')">View capabilities</button>
+              <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="event.stopPropagation();navigate('#/integrations/${featured.slug}')">Explore ${escapeHtml(featured.name)} →</button>
+              <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="event.stopPropagation();toast('Already connected ✓','success')">View capabilities</button>
             </div>
           </div>
           <div class="featured-visual">${logo(featured, 'xl')}</div>
@@ -13823,7 +13823,7 @@ function renderHome() {
           <div class="build-promo-title">Can't find what you need? Build your own.</div>
           <div class="build-promo-desc">Connect internal APIs with the no-code Webhook builder, import an OpenAPI spec, or write with the TypeScript/Python SDK.</div>
         </div>
-        <button class="btn btn-ghost btn-sm">Get started →</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary">Get started →</button>
       </div>
 
       <div class="build-promo" style="background:linear-gradient(135deg, rgba(253,199,0,0.05) 0%, var(--cyan-05) 100%);border-color:rgba(253,199,0,0.30)" onclick="openRequestModal()">
@@ -13832,7 +13832,7 @@ function renderHome() {
           <div class="build-promo-title">Need something custom? Request it from the AIMS team.</div>
           <div class="build-promo-desc">Submit a structured request with timeline, scope and compliance flags. The managed services team responds within one business day with a quote.</div>
         </div>
-        <button class="btn btn-ghost btn-sm">Request →</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary">Request →</button>
       </div>
     ` : ''}
 
@@ -13876,9 +13876,9 @@ function renderHome() {
           <div class="empty-with-request-h">${state.search ? `No integrations match "${escapeHtml(state.search)}"` : 'No integrations match these filters'}</div>
           <div class="empty-with-request-p">${state.search ? `Can't find ${escapeHtml(state.search)}? You can request it from the AIMS managed services team — they will scope it, quote it, and ship it.` : `Try widening your search or <a href="#" onclick="clearFilters();return false;" style="color:var(--pri)">clear all filters</a> to see everything.`}</div>
           <div class="empty-with-request-actions">
-            <a class="btn btn-primary" href="javascript:void(0)" onclick="openRequestModal(state.search || '')">Request ${state.search ? escapeHtml(state.search) : 'an integration'} →</a>
-            ${state.search ? `<button class="btn btn-ghost btn-sm" onclick="clearFilters()">Clear filters</button>` : ''}
-            <a class="btn btn-ghost btn-sm" href="#/build">Or build it yourself →</a>
+            <a class="ds-btn ds-btn-md ds-btn--primary" href="javascript:void(0)" onclick="openRequestModal(state.search || '')">Request ${state.search ? escapeHtml(state.search) : 'an integration'} →</a>
+            ${state.search ? `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="clearFilters()">Clear filters</button>` : ''}
+            <a class="ds-btn ds-btn-sm ds-btn--secondary" href="#/build">Or build it yourself →</a>
           </div>
         </div>
       ` : `<div class="mkt-grid">${filtered.map(mktCardHTML).join('')}</div>`}
@@ -14054,8 +14054,8 @@ function homeTabStripHTML(connectedCount, currentTab) {
         <span class="home-tab-count">${INTEGRATIONS.length}</span>
       </button>
       <span style="flex:1"></span>
-      <a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="openRequestModal()" style="text-decoration:none">+ Request integration</a>
-      <a class="btn btn-primary btn-outline btn-sm" href="#/build" style="text-decoration:none">+ Build your own</a>
+      <a class="ds-btn ds-btn-sm ds-btn--primary" href="javascript:void(0)" onclick="openRequestModal()" style="text-decoration:none">+ Request integration</a>
+      <a class="ds-btn ds-btn-sm ds-btn--secondary" href="#/build" style="text-decoration:none">+ Build your own</a>
     </div>
   `;
 }
@@ -15348,8 +15348,8 @@ function openImpactModal(slug, onConfirm) {
   $('impactModalBody').innerHTML = body;
 
   $('impactModalFooter').innerHTML = `
-    <button class="btn btn-ghost btn-sm" onclick="closeImpactModal()">Cancel</button>
-    <button class="btn btn-danger btn-sm" onclick="confirmImpactModal()">${imp.total === 0 ? 'Disconnect' : 'Disconnect anyway'}</button>
+    <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="closeImpactModal()">Cancel</button>
+    <button class="ds-btn ds-btn-sm ds-btn--warning" onclick="confirmImpactModal()">${imp.total === 0 ? 'Disconnect' : 'Disconnect anyway'}</button>
   `;
 
   $('impactModalOverlay').classList.add('is-open');
@@ -15608,7 +15608,7 @@ function gateBannerHTML(i) {
         <div class="gate-banner-desc">${escapeHtml(copy.body)}</div>
       </div>
       <div class="gate-banner-actions">
-        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();handleGateAction('${i.slug}','${status}')">${escapeHtml(copy.cta)} →</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="event.stopPropagation();handleGateAction('${i.slug}','${status}')">${escapeHtml(copy.cta)} →</button>
       </div>
     </div>
   `;
@@ -15678,10 +15678,10 @@ function paintDetail(i) {
             Ask AI
           </button>
           ${i.connected ? `
-            <button class="btn btn-ghost btn-sm" onclick="toast('Credentials rotation simulated')">Rotate credentials</button>
-            <button class="btn btn-danger btn-sm" onclick="disconnect('${i.slug}')">Disconnect</button>
+            <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Credentials rotation simulated')">Rotate credentials</button>
+            <button class="ds-btn ds-btn-sm ds-btn--warning" onclick="disconnect('${i.slug}')">Disconnect</button>
           ` : `
-            <button class="btn btn-primary" onclick="openConnect('${i.slug}')">Connect ${escapeHtml(i.name)}</button>
+            <button class="ds-btn ds-btn-md ds-btn--primary" onclick="openConnect('${i.slug}')">Connect ${escapeHtml(i.name)}</button>
           `}
         </div>
       </div>
@@ -15753,8 +15753,8 @@ function renderInstanceDetail(slug, instId) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2.5c.5 0 1 .4 1.1.9l1.1 4.9c.1.3.3.5.6.6l4.9 1.1c.5.1.9.6.9 1.1s-.4 1-.9 1.1l-4.9 1.1c-.3.1-.5.3-.6.6l-1.1 4.9c-.1.5-.6.9-1.1.9s-1-.4-1.1-.9l-1.1-4.9c-.1-.3-.3-.5-.6-.6l-4.9-1.1c-.5-.1-.9-.6-.9-1.1s.4-1 .9-1.1l4.9-1.1c.3-.1.5-.3.6-.6l1.1-4.9c.1-.5.6-.9 1.1-.9z" fill="currentColor"/></svg>
             Ask AI
           </button>
-          <button class="btn btn-ghost btn-sm" onclick="setInstanceTab('${i.slug}','${inst.id}','auth')">Rotate credentials</button>
-          <button class="btn btn-danger btn-sm" onclick="if(confirm('Disconnect this instance?'))toast('${escapeHtml(inst.name)} disconnected','success')">Disconnect</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="setInstanceTab('${i.slug}','${inst.id}','auth')">Rotate credentials</button>
+          <button class="ds-btn ds-btn-sm ds-btn--warning" onclick="if(confirm('Disconnect this instance?'))toast('${escapeHtml(inst.name)} disconnected','success')">Disconnect</button>
         </div>
       </div>
     </div>
@@ -15827,7 +15827,7 @@ function instanceBasicHTML(i, inst) {
             <div class="ov-widget-body">
               <div class="lock-overlay-h" style="color:var(--amber)">⚠ Action needed</div>
               <div class="lock-overlay-p">${escapeHtml(inst.note)}</div>
-              <button class="btn btn-primary btn-sm" onclick="openHelix('${i.slug}','${inst.id}')">Open in Helix Data Studio →</button>
+              <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="openHelix('${i.slug}','${inst.id}')">Open in Helix Data Studio →</button>
             </div>
           </section>
         ` : ''}
@@ -15838,10 +15838,10 @@ function instanceBasicHTML(i, inst) {
             <h3 class="ov-widget-title">Quick actions</h3>
           </header>
           <div class="ov-widget-body" style="display:flex; flex-direction:column; gap:8px">
-            <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="setInstanceTab('${i.slug}','${inst.id}','capabilities')">Manage capabilities →</button>
-            <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="setInstanceTab('${i.slug}','${inst.id}','auth')">Rotate credentials →</button>
-            <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="setInstanceTab('${i.slug}','${inst.id}','logs')">View execution logs →</button>
-            <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="setInstanceTab('${i.slug}','${inst.id}','audit')">View audit log →</button>
+            <button class="ds-btn ds-btn-sm ds-btn--secondary" style="justify-content:flex-start" onclick="setInstanceTab('${i.slug}','${inst.id}','capabilities')">Manage capabilities →</button>
+            <button class="ds-btn ds-btn-sm ds-btn--secondary" style="justify-content:flex-start" onclick="setInstanceTab('${i.slug}','${inst.id}','auth')">Rotate credentials →</button>
+            <button class="ds-btn ds-btn-sm ds-btn--secondary" style="justify-content:flex-start" onclick="setInstanceTab('${i.slug}','${inst.id}','logs')">View execution logs →</button>
+            <button class="ds-btn ds-btn-sm ds-btn--secondary" style="justify-content:flex-start" onclick="setInstanceTab('${i.slug}','${inst.id}','audit')">View audit log →</button>
           </div>
         </section>
       </aside>
@@ -16254,7 +16254,7 @@ function instanceAccessHTML(i, inst) {
         </div>
 
         <div class="who-actions">
-          <button class="btn btn-primary btn-sm" type="button" onclick="openWhoPicker('${i.slug}','${inst.id}', event)">
+          <button class="ds-btn ds-btn-sm ds-btn--primary" type="button" onclick="openWhoPicker('${i.slug}','${inst.id}', event)">
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="margin-right:5px;vertical-align:-1px"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
             Add people or groups
           </button>
@@ -16744,7 +16744,7 @@ function detailOverview(i) {
             <div class="ov-widget-body">
               <div class="lock-overlay-h">Before you connect</div>
               <div class="lock-overlay-p">This integration will request the scopes shown above. Capabilities, Permissions and Audit unlock once connected.</div>
-              <button class="btn btn-primary btn-sm" onclick="openConnect('${i.slug}')">Connect ${escapeHtml(i.name)}</button>
+              <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="openConnect('${i.slug}')">Connect ${escapeHtml(i.name)}</button>
             </div>
           </section>
         ` : ''}
@@ -17004,8 +17004,8 @@ function detailPermissions(i) {
 
     <div class="save-bar">
       <span class="save-bar-text">● Changes pending</span>
-      <button class="btn btn-ghost btn-sm" onclick="toast('Changes discarded')">Discard</button>
-      <button class="btn btn-primary btn-sm" onclick="toast('Permissions saved','success')">Save changes</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Changes discarded')">Discard</button>
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="toast('Permissions saved','success')">Save changes</button>
     </div>
   `;
 }
@@ -17123,7 +17123,7 @@ function lockOverlay(i, title) {
     <div class="lock-overlay">
       <div class="lock-overlay-h"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="7" width="10" height="7" rx="1.2"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>${escapeHtml(title)}</div>
       <div class="lock-overlay-p">Connect this integration to manage capabilities, permissions and audit events.</div>
-      <button class="btn btn-primary btn-sm" onclick="openConnect('${i.slug}')">Connect ${escapeHtml(i.name)}</button>
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="openConnect('${i.slug}')">Connect ${escapeHtml(i.name)}</button>
     </div>
   `;
 }
@@ -17403,7 +17403,7 @@ function paintDrawer() {
       })()}
     `;
     const canContinue = s.instanceName.trim() && (i.multiTenant===false || s.authMode);
-    footer = `<button class="btn btn-ghost btn-sm" onclick="closeDrawer()">Cancel</button><button class="btn btn-primary btn-sm" ${canContinue?'':'disabled style="opacity:.5;cursor:not-allowed"'} onclick="drawerNext()">Continue →</button>`;
+    footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="closeDrawer()">Cancel</button><button class="ds-btn ds-btn-sm ds-btn--primary" ${canContinue?'':'disabled'} onclick="drawerNext()">Continue →</button>`;
   }
 
   else if (s.step === 1) {
@@ -17433,7 +17433,7 @@ function paintDrawer() {
       <div class="auth-group-label">Supported by ${escapeHtml(i.name)}</div>
       ${i.authMethods.map(renderCard).join('')}
     `;
-    footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm" onclick="drawerNext()">Continue →</button>`;
+    footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-sm ds-btn--primary" onclick="drawerNext()">Continue →</button>`;
   }
 
   else if (s.step === 2) {
@@ -17453,12 +17453,12 @@ function paintDrawer() {
             <div class="field-label">Scopes that will be requested</div>
             <div class="scope-chips" style="margin-bottom:8px">${i.scopes.map(sc=>`<span class="scope-chip">${escapeHtml(sc)}</span>`).join('')}</div>
           ` : ''}
-          <button class="btn btn-primary btn-sm" onclick="simulateOAuth()">Continue to ${escapeHtml(i.name)} →</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="simulateOAuth()">Continue to ${escapeHtml(i.name)} →</button>
         `}
       `;
       footer = s.authenticated
-        ? `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm" onclick="drawerNext()">Continue →</button>`
-        : `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button>`;
+        ? `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-sm ds-btn--primary" onclick="drawerNext()">Continue →</button>`
+        : `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button>`;
     }
     else if (s.authMethod==='apikey') {
       body = `
@@ -17477,10 +17477,10 @@ function paintDrawer() {
         ${s.apiKeyValid ? `
           <div class="connected-panel"><strong>✓ Valid token</strong>Connected to AIMS Workspace · ${i.scopes?i.scopes.length:5} scopes granted</div>
         ` : `
-          <button class="btn btn-ghost btn-sm" onclick="testApiKey()">Test connection</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="testApiKey()">Test connection</button>
         `}
       `;
-      footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm ${s.apiKeyValid?'':'btn-disabled'}" ${s.apiKeyValid?'':'disabled style="opacity:.5;cursor:not-allowed"'} onclick="drawerNext()">Continue →</button>`;
+      footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-sm ds-btn--primary" ${s.apiKeyValid?'':'disabled'} onclick="drawerNext()">Continue →</button>`;
     }
     else if (s.authMethod==='service') {
       body = `
@@ -17499,7 +17499,7 @@ function paintDrawer() {
           `}
         </div>
       `;
-      footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm ${s.authenticated?'':''}" ${s.authenticated?'':'disabled style="opacity:.5;cursor:not-allowed"'} onclick="drawerNext()">Continue →</button>`;
+      footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-sm ds-btn--primary" ${s.authenticated?'':'disabled'} onclick="drawerNext()">Continue →</button>`;
     }
     else if (s.authMethod==='basic') {
       // Engineering brief §9 — Username/password → token
@@ -17521,9 +17521,9 @@ function paintDrawer() {
           <div class="field-help">Leave blank to use the provider's default endpoint</div>
         </div>
         ${s.authenticated ? `<div class="connected-panel"><strong>✓ Token obtained</strong>Refresh interval: every 24 hours</div>` : ''}
-        ${!s.authenticated ? `<button class="btn btn-ghost btn-sm" onclick="state.drawerState.authenticated=true;paintDrawer()">Exchange credentials for token</button>` : ''}
+        ${!s.authenticated ? `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="state.drawerState.authenticated=true;paintDrawer()">Exchange credentials for token</button>` : ''}
       `;
-      footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm" ${s.authenticated?'':'disabled style="opacity:.5;cursor:not-allowed"'} onclick="drawerNext()">Continue →</button>`;
+      footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-sm ds-btn--primary" ${s.authenticated?'':'disabled'} onclick="drawerNext()">Continue →</button>`;
     }
     else if (s.authMethod==='per_user') {
       // Engineering brief §9 — Per-user authentication
@@ -17544,7 +17544,7 @@ function paintDrawer() {
           <div class="field-help">Each user grants these on first use. They can revoke at any time.</div>
         </div>
       `;
-      footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm" onclick="state.drawerState.authenticated=true;drawerNext()">Continue →</button>`;
+      footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-sm ds-btn--primary" onclick="state.drawerState.authenticated=true;drawerNext()">Continue →</button>`;
     }
     else if (s.authMethod==='manual') {
       // Engineering brief §13.6 — "Design for the ugliest provider"
@@ -17579,7 +17579,7 @@ function paintDrawer() {
           <input class="input" type="password" placeholder="Client Secret"/>
         </div>
       `;
-      footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm" onclick="state.drawerState.authenticated=true;drawerNext()">Verify & continue →</button>`;
+      footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-sm ds-btn--primary" onclick="state.drawerState.authenticated=true;drawerNext()">Verify & continue →</button>`;
     }
   }
 
@@ -17605,7 +17605,7 @@ function paintDrawer() {
         `;
       }).join('')}
     `;
-    footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary btn-sm" onclick="drawerNext()">Continue →</button>`;
+    footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-sm ds-btn--primary" onclick="drawerNext()">Continue →</button>`;
   }
 
   else if (s.step === 4) {
@@ -17630,7 +17630,7 @@ function paintDrawer() {
       </div>
       <p style="font-size:12px;color:var(--t2);line-height:1.55">After connecting, you'll land on the new instance detail. Per-instance access (who and which workspaces) is configured there — and any Data Sync field mapping happens in <a href="data-studio.html#/mappings" style="color:var(--cyan);text-decoration:none">Data Studio</a>.</p>
     `;
-    footer = `<button class="btn btn-ghost btn-sm" onclick="drawerPrev()">← Back</button><button class="btn btn-primary" onclick="finalizeConnect()">Connect ${escapeHtml(i.name)} →</button>`;
+    footer = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="drawerPrev()">← Back</button><button class="ds-btn ds-btn-md ds-btn--primary" onclick="finalizeConnect()">Connect ${escapeHtml(i.name)} →</button>`;
   }
 
   else if (s.step === 5 || s.step === 6) {
@@ -17735,8 +17735,8 @@ function renderAudit() {
           <div class="ph-sub">Workspace-wide events for the last 90 days. Export to CSV or stream via webhook.</div>
         </div>
         <div class="ph-actions">
-          <button class="btn btn-ghost btn-sm" onclick="toast('Webhook export drawer opened')">Configure webhook export</button>
-          <button class="btn btn-primary btn-sm" onclick="toast('CSV exported','success')">Export CSV</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Webhook export drawer opened')">Configure webhook export</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="toast('CSV exported','success')">Export CSV</button>
         </div>
       </div>
     </div>
@@ -17797,8 +17797,8 @@ function auditTable(events, full) {
             <tr><td colspan="${full?8:6}" style="padding:8px 12px 14px">
               <div class="audit-expand">${escapeHtml(JSON.stringify({timestamp:e.tsAbs, severity:e.sev, event:e.event, actor:e.actor, resource:e.resource, studio:e.studio, ip:e.ip, details:e.details}, null, 2))}</div>
               <div style="margin-top:6px;display:flex;gap:6px">
-                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toast('Event ID copied to clipboard','success')">Copy event ID</button>
-                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toast('cURL copied to clipboard','success')">Copy as cURL</button>
+                <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="event.stopPropagation();toast('Event ID copied to clipboard','success')">Copy event ID</button>
+                <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="event.stopPropagation();toast('cURL copied to clipboard','success')">Copy as cURL</button>
               </div>
             </td></tr>
           ` : ''}
@@ -17908,7 +17908,7 @@ function renderBuildWebhook() {
           <div class="ph-sub">Connect an HTTP endpoint as a private integration available to your agents and studios.</div>
         </div>
         <div class="ph-actions">
-          <button class="btn btn-ghost btn-sm" onclick="navigate('#/build')">← Choose another method</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="navigate('#/build')">← Choose another method</button>
         </div>
       </div>
     </div>
@@ -17925,10 +17925,10 @@ function renderBuildWebhook() {
       ${webhookStepContent()}
 
       <div style="display:flex;gap:8px;justify-content:space-between;padding-top:24px;border-top:1px solid var(--line);margin-top:24px">
-        <button class="btn btn-ghost btn-sm" onclick="webhookState.step=Math.max(1,webhookState.step-1);renderBuildWebhook()" ${webhookState.step===1?'disabled style="opacity:.4;cursor:not-allowed"':''}>← Back</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="webhookState.step=Math.max(1,webhookState.step-1);renderBuildWebhook()" ${webhookState.step===1?'disabled style="opacity:.4;cursor:not-allowed"':''}>← Back</button>
         ${webhookState.step<6
-          ? `<button class="btn btn-primary btn-sm" onclick="webhookState.step++;renderBuildWebhook()">Next →</button>`
-          : `<button class="btn btn-primary" onclick="publishWebhook()">Publish to workspace</button>`}
+          ? `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="webhookState.step++;renderBuildWebhook()">Next →</button>`
+          : `<button class="ds-btn ds-btn-md ds-btn--primary" onclick="publishWebhook()">Publish to workspace</button>`}
       </div>
     </div>
   `;
@@ -17947,7 +17947,7 @@ function webhookStepContent() {
       </select>
     </div>
     <div class="field-group"><label class="field-label">Icon</label>
-      <div style="display:flex;gap:8px;align-items:center"><div class="logo logo-lg" style="background:var(--cyan)">${(s.name||'?')[0].toUpperCase()}</div><button class="btn btn-ghost btn-sm">Upload custom</button></div>
+      <div style="display:flex;gap:8px;align-items:center"><div class="logo logo-lg" style="background:var(--cyan)">${(s.name||'?')[0].toUpperCase()}</div><button class="ds-btn ds-btn-sm ds-btn--secondary">Upload custom</button></div>
     </div>
   `;
   if (s.step===2) return `
@@ -17964,7 +17964,7 @@ function webhookStepContent() {
     <h3 style="font-size:14px;font-weight:700;margin-bottom:6px">Define actions</h3>
     <p style="font-size:12px;color:var(--t2);margin-bottom:14px">Each action becomes a tool that agents can invoke.</p>
     ${s.actions.length===0 ? `<div class="empty" style="padding:24px;background:var(--bg3);border:1px dashed var(--line);border-radius:var(--r8)"><div class="empty-h">No actions yet</div><div class="empty-p">Add at least one action.</div></div>` : s.actions.map((a,idx)=>`<div class="cat-card" style="cursor:default"><strong style="color:var(--t1);font-family:'SF Mono',Menlo,monospace">${escapeHtml(a.name)}</strong><div style="font-size:11px;color:var(--t2)">${a.method} ${escapeHtml(a.url)}</div></div>`).join('')}
-    <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="addWebhookAction()">+ Add action</button>
+    <button class="ds-btn ds-btn-sm ds-btn--secondary" style="margin-top:10px" onclick="addWebhookAction()">+ Add action</button>
   `;
   if (s.step===4) return `
     <h3 style="font-size:14px;font-weight:700;margin-bottom:6px">Declare capabilities</h3>
@@ -17988,7 +17988,7 @@ Content-Type: application/json
   "customer_id": "cust_123",
   "amount": 1500
 }`)}</div>
-    <button class="btn btn-ghost btn-sm" onclick="toast('Test call returned 201 Created in 247ms','success')">Run test call</button>
+    <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Test call returned 201 Created in 247ms','success')">Run test call</button>
 
     <h3 style="font-size:14px;font-weight:700;margin:18px 0 6px">Preview card</h3>
     <div class="cat-card" style="max-width:280px;cursor:default">
@@ -18040,7 +18040,7 @@ function renderBuildOpenAPI() {
     <div class="ph"><div class="ph-top"><div class="ph-text">
       <div class="ph-h1">Import OpenAPI</div>
       <div class="ph-sub">Upload an OpenAPI spec or paste its URL. We auto-generate the integration.</div>
-    </div><div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="navigate('#/build')">← Choose another method</button></div></div></div>
+    </div><div class="ph-actions"><button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="navigate('#/build')">← Choose another method</button></div></div></div>
 
     <div class="detail-body" style="max-width:760px">
       <div class="field-group">
@@ -18083,7 +18083,7 @@ function simulateOpenAPI() {
         </div>
       `).join('')}
       <div style="margin-top:12px;color:var(--t3);font-size:12px">+ 18 more endpoints…</div>
-      <div style="margin-top:18px;display:flex;gap:8px"><button class="btn btn-primary" onclick="toast('Integration generated ✓','success');navigate('#/integrations')">Generate integration →</button></div>
+      <div style="margin-top:18px;display:flex;gap:8px"><button class="ds-btn ds-btn-md ds-btn--primary" onclick="toast('Integration generated ✓','success');navigate('#/integrations')">Generate integration →</button></div>
     `;
   }, 700);
 }
@@ -18098,13 +18098,13 @@ function renderBuildSDK() {
     <div class="ph"><div class="ph-top"><div class="ph-text">
       <div class="ph-h1">AIMS Integrations SDK</div>
       <div class="ph-sub">Build complex integrations with custom logic, multi-step orchestration and specialized auth flows.</div>
-    </div><div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="navigate('#/build')">← Choose another method</button></div></div></div>
+    </div><div class="ph-actions"><button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="navigate('#/build')">← Choose another method</button></div></div></div>
 
     <div class="detail-body" style="max-width:880px">
       <h3 style="font-size:13px;font-weight:700;margin-bottom:8px">Install</h3>
       <div style="display:flex;gap:8px;margin-bottom:18px">
-        <button class="btn btn-ghost btn-sm" onclick="toast('Copied: npm install @aims-os/integrations-sdk','success')" style="font-family:'SF Mono',Menlo,monospace">npm install @aims-os/integrations-sdk</button>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Copied: pip install aims-integrations','success')" style="font-family:'SF Mono',Menlo,monospace">pip install aims-integrations</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Copied: npm install @aims-os/integrations-sdk','success')" style="font-family:'SF Mono',Menlo,monospace">npm install @aims-os/integrations-sdk</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Copied: pip install aims-integrations','success')" style="font-family:'SF Mono',Menlo,monospace">pip install aims-integrations</button>
       </div>
 
       <h3 style="font-size:13px;font-weight:700;margin-bottom:8px">Example: TypeScript</h3>
@@ -18129,8 +18129,8 @@ function renderBuildSDK() {
 
       <h3 style="font-size:13px;font-weight:700;margin:18px 0 8px">Deploy from CLI</h3>
       <div style="display:flex;gap:8px;margin-bottom:18px">
-        <button class="btn btn-ghost btn-sm" style="font-family:'SF Mono',Menlo,monospace" onclick="toast('Token generated','success')">aims auth login</button>
-        <button class="btn btn-ghost btn-sm" style="font-family:'SF Mono',Menlo,monospace" onclick="toast('Deployed to workspace','success')">aims integrations deploy ./acme-billing</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" style="font-family:'SF Mono',Menlo,monospace" onclick="toast('Token generated','success')">aims auth login</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" style="font-family:'SF Mono',Menlo,monospace" onclick="toast('Deployed to workspace','success')">aims integrations deploy ./acme-billing</button>
       </div>
 
       <h3 style="font-size:13px;font-weight:700;margin-bottom:8px">Currently deployed from SDK</h3>
@@ -18318,7 +18318,7 @@ function renderPersonalDetail(slug) {
           <div class="detail-name">${escapeHtml(i.name)} <span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--r4);background:var(--purple-10);color:var(--purple);border:1px solid var(--purple-22);text-transform:uppercase;letter-spacing:.04em">Personal</span></div>
           <div class="detail-vendor">Visible only to you</div>
         </div>
-        <div class="detail-actions"><button class="btn btn-danger btn-sm" onclick="toast('Personal connection disconnected','success');navigate('#/personal')">Disconnect</button></div>
+        <div class="detail-actions"><button class="ds-btn ds-btn-sm ds-btn--warning" onclick="toast('Personal connection disconnected','success');navigate('#/personal')">Disconnect</button></div>
       </div>
     </div>
     <div class="tabs">
@@ -18340,7 +18340,7 @@ function renderNotFound(slug) {
     <div class="empty" style="padding:80px 24px">
       <div class="empty-h">Integration not found</div>
       <div class="empty-p">No integration matches "${escapeHtml(slug)}" in the catalog.</div>
-      <a class="btn btn-primary btn-sm" href="#/integrations">Back to catalog</a>
+      <a class="ds-btn ds-btn-sm ds-btn--primary" href="#/integrations">Back to catalog</a>
     </div>
   `;
 }
@@ -19386,7 +19386,7 @@ function openHelix(slug, instId) {
           </div>
         `).join('')}
         <div style="padding:10px 12px;border-top:1px solid var(--line)">
-          <button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="toast('Add custom field mapping')">+ Add custom field mapping</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" style="font-size:11px" onclick="toast('Add custom field mapping')">+ Add custom field mapping</button>
         </div>
       </div>
 
@@ -19395,9 +19395,9 @@ function openHelix(slug, instId) {
       </div>
     </div>
     <div class="drawer-foot">
-      <button class="btn btn-ghost btn-sm" onclick="closeHelix()">Cancel</button>
-      <a class="btn btn-ghost btn-sm" href="data-studio.html#/connections/${slug}" style="text-decoration:none">Open full mapping in Data Studio →</a>
-      <button class="btn btn-primary btn-sm" onclick="closeHelix();toast('Mapping activated · Data is now flowing into Helix','success');setTimeout(()=>{const i=findIntegration('${slug}');if(i){const inst=instancesOf('${slug}').find(x=>x.id==='${instId}');if(inst){inst.status='fully_configured';delete inst.note;route();}}},800)">Activate mapping</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="closeHelix()">Cancel</button>
+      <a class="ds-btn ds-btn-sm ds-btn--secondary" href="data-studio.html#/connections/${slug}" style="text-decoration:none">Open full mapping in Data Studio →</a>
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="closeHelix();toast('Mapping activated · Data is now flowing into Helix','success');setTimeout(()=>{const i=findIntegration('${slug}');if(i){const inst=instancesOf('${slug}').find(x=>x.id==='${instId}');if(inst){inst.status='fully_configured';delete inst.note;route();}}},800)">Activate mapping</button>
     </div>
   `;
   $('helixOverlay').classList.add('open');
