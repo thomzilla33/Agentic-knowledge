@@ -9010,6 +9010,76 @@ const PA_ROLE_PERMS = {
   'compliance-auditor':new Set(['ag.workers.view','ag.networks.view','gov.policy.view','gov.promotions.view','hx.models.view','hx.lineage.view','pl.audit.view']),
 };
 
+// Maps PA_USER_PERM_TREE node codes → PERM_TREE leaf IDs used in PA_ROLE_PERMS
+const PA_NODE_TO_PERM_IDS = {
+  // Governance tab
+  'governance.drive':               ['gov.policy.view','gov.policy.manage'],
+  'governance.drive.view':          ['gov.policy.view'],
+  'governance.drive.upload':        ['gov.policy.manage'],
+  'governance.drive.folder.create': ['gov.policy.manage'],
+  'governance.sandbox':             ['gov.promotions.view','gov.promotions.approve','gov.domains.manage','gov.resolution.manage'],
+  'governance.sandbox.view':        ['gov.promotions.view'],
+  'governance.sandbox.details':     ['gov.promotions.view'],
+  'governance.sandbox.claims':      ['gov.resolution.manage'],
+  'governance.sandbox.bundles':     ['gov.promotions.view'],
+  'governance.sandbox.sources':     ['gov.domains.manage'],
+  'governance.sandbox.promote':     ['gov.promotions.approve'],
+  'governance.truthplane':          ['gov.domains.manage','gov.resolution.manage'],
+  'governance.truthplane.view':     ['gov.domains.manage'],
+  'governance.truthplane.facts':    ['gov.resolution.manage'],
+  'governance.packs':               ['gov.promotions.view'],
+  'governance.packs.view':          ['gov.promotions.view'],
+  'governance.packs.create':        ['gov.promotions.approve'],
+  // Data Studio tab
+  'datastudio.models':              ['hx.models.view','hx.models.author'],
+  'datastudio.models.view':         ['hx.models.view'],
+  'datastudio.models.author':       ['hx.models.author'],
+  'datastudio.models.publish':      ['hx.models.author'],
+  'datastudio.models.deprecate':    ['hx.models.author'],
+  'datastudio.lineage':             ['hx.lineage.view'],
+  'datastudio.lineage.view':        ['hx.lineage.view'],
+  'datastudio.lineage.trace':       ['hx.lineage.view'],
+  'datastudio.connectors':          ['hx.connectors.manage'],
+  'datastudio.connectors.view':     ['hx.connectors.manage'],
+  'datastudio.connectors.manage':   ['hx.connectors.manage'],
+  'datastudio.connectors.test':     ['hx.connectors.manage'],
+  // Agentic tab
+  'agentic.workers':                ['ag.workers.view','ag.workers.run','ag.workers.manage'],
+  'agentic.workers.view':           ['ag.workers.view'],
+  'agentic.workers.run':            ['ag.workers.run'],
+  'agentic.workers.manage':         ['ag.workers.manage'],
+  'agentic.workers.deploy':         ['ag.workers.manage'],
+  'agentic.networks':               ['ag.networks.view','ag.networks.manage'],
+  'agentic.networks.view':          ['ag.networks.view'],
+  'agentic.networks.manage':        ['ag.networks.manage'],
+  'agentic.hitl':                   ['ag.hitl.manage'],
+  'agentic.hitl.view':              ['ag.hitl.manage'],
+  'agentic.hitl.approve':           ['ag.hitl.manage'],
+  'agentic.hitl.config':            ['ag.hitl.manage'],
+  'agentic.workflows':              ['ag.workflows.manage'],
+  'agentic.workflows.view':         ['ag.workflows.manage'],
+  'agentic.workflows.manage':       ['ag.workflows.manage'],
+  // Admin tab
+  'admin.members':                  ['pl.members.manage'],
+  'admin.members.view':             ['pl.members.manage'],
+  'admin.members.invite':           ['pl.members.manage'],
+  'admin.members.remove':           ['pl.members.manage'],
+  'admin.members.suspend':          ['pl.members.manage'],
+  'admin.roles':                    ['pl.members.manage'],
+  'admin.roles.view':               ['pl.members.manage'],
+  'admin.roles.manage':             ['pl.members.manage'],
+  'admin.integrations':             ['pl.integrations.manage'],
+  'admin.integrations.view':        ['pl.integrations.manage'],
+  'admin.integrations.manage':      ['pl.integrations.manage'],
+  'admin.integrations.auth':        ['pl.integrations.manage'],
+  'admin.audit':                    ['pl.audit.view'],
+  'admin.audit.view':               ['pl.audit.view'],
+  'admin.audit.export':             ['pl.audit.view'],
+  'admin.billing':                  ['pl.billing.view','pl.billing.manage'],
+  'admin.billing.view':             ['pl.billing.view'],
+  'admin.billing.manage':           ['pl.billing.manage'],
+};
+
 /* Seed default "Who can use it" for an instance the first time it's read.
    Always includes the connector; adds 1-2 contextual groups by category. */
 function _seedInstanceAccess(inst, integration) {
@@ -11586,6 +11656,48 @@ function paToggleTree(id) {
   if (btn) btn.innerHTML = _paChevron(node.expanded);
 }
 
+// Returns the first role object that grants at least one of permIds for userId
+function _paGetGrantingRole(permIds, userId) {
+  const roleIds = PA_MEMBER_ROLES[userId] || [];
+  for (const rid of roleIds) {
+    const rp = _paState.rolePermEdits[rid] || PA_ROLE_PERMS[rid] || new Set();
+    if (permIds.some(pid => rp.has(pid))) return PA_ROLES.find(r => r.id === rid) || null;
+  }
+  return null;
+}
+
+// Recomputes every node in PA_USER_PERM_TREE based on userId's actual role memberships
+function _paRecomputeUserTree(userId) {
+  function processNode(node, parentGrantingRole) {
+    const permIds = PA_NODE_TO_PERM_IDS[node.code] || [];
+    const grantingRole = permIds.length ? _paGetGrantingRole(permIds, userId) : null;
+
+    if (parentGrantingRole && grantingRole) {
+      // Child whose parent is also role-granted → inherited (locked)
+      node.state  = 'g-inh';
+      node.locked = true;
+      node.role   = undefined;
+    } else if (grantingRole) {
+      node.state  = 'g-role';
+      node.locked = true;
+      node.role   = grantingRole.label;
+      node.scope  = node.scope || 'Tenant';
+    } else {
+      // Not covered by any role — reset to off (preserve direct toggles applied this session)
+      if (node.state === 'g-role' || node.state === 'g-inh') {
+        node.state  = '';
+        node.locked = false;
+        node.role   = undefined;
+      }
+    }
+
+    if (node.children) {
+      node.children.forEach(child => processNode(child, grantingRole));
+    }
+  }
+  Object.values(PA_USER_PERM_TREE).forEach(nodes => nodes.forEach(n => processNode(n, null)));
+}
+
 function _paFindNode(id) {
   function find(nodes) {
     for (const n of nodes) {
@@ -11648,12 +11760,10 @@ function paToggleUserPerm(nodeId) {
 
 function paOpenUserAccess(personId) {
   _paState.userAccessId = personId;
-  _paState.pendingChanges = [
-    { name:'View Promotion Packs', code:'governance.packs.view', action:'grant', scope:'Own' },
-    { name:'Promote Sandboxes',    code:'governance.sandbox.promote', action:'deny', scope:'Own' },
-  ];
+  _paState.pendingChanges = [];
+  _paRecomputeUserTree(personId);
   renderPeople();
-  paShowChangesBar(true);
+  paShowChangesBar(false);
 }
 
 function paCloseUserAccess() {
@@ -12530,7 +12640,8 @@ function paSubmitRoleEdit() {
   r.label = _paState.roleEditName.trim() || r.label;
   r.desc  = _paState.roleEditDesc.trim() || r.desc;
   r.color = _paState.roleEditColor;
-  _paState.rolePermEdits[r.id] = new Set(_paState.roleEditPerms);
+  PA_ROLE_PERMS[r.id] = new Set(_paState.roleEditPerms);
+  _paState.rolePermEdits[r.id] = PA_ROLE_PERMS[r.id];
   _paState.roleEditId = null;
   renderPeople();
   toast(`Role "${r.label}" updated`, 'success');
