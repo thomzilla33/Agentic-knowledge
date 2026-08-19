@@ -5186,13 +5186,15 @@ html.theme-light .fs-cancel-btn:hover{
   border-top:1px solid var(--line);
 }
 /* ── Create Workspace slideout studio cards ── */
-.cw-studio-card { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; border:1px solid var(--color-border-neutral-default); background:var(--bg3); cursor:pointer; transition:border-color .15s,background .15s; width:100%; text-align:left; }
-.cw-studio-card:hover { border-color:var(--color-border-neutral-lighter); background:var(--hover); }
-.cw-studio-card.cw-studio-on { border-color:var(--color-border-primary-default); background:var(--pri-12); }
-.cw-studio-ico { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.cw-studio-text { flex:1; min-width:0; }
+.cw-studio-card { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border-radius:10px; border:1.5px solid var(--color-border-neutral-subtle); background:var(--surface); cursor:pointer; transition:border-color .15s,background .15s,box-shadow .15s; width:100%; text-align:left; }
+.cw-studio-card:hover { border-color:var(--color-border-neutral-default); background:var(--hover); }
+.cw-studio-card.cw-studio-on { border-color:var(--color-border-primary-default); background:var(--pri-08,rgba(99,102,241,.08)); box-shadow:0 0 0 3px var(--pri-12,rgba(99,102,241,.12)); }
+.cw-studio-ico { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.cw-studio-text { flex:1; min-width:0; padding-top:1px; }
 .cw-studio-name { font-size:13px; font-weight:600; color:var(--color-text-title); }
-.cw-studio-desc { font-size:12px; color:var(--color-text-caption); margin-top:1px; }
+.cw-studio-desc { font-size:11.5px; color:var(--color-text-caption); margin-top:2px; line-height:1.45; }
+.cw-studio-check { width:18px; height:18px; border-radius:50%; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--color-border-neutral-default); background:transparent; transition:background .12s,border-color .12s; }
+.cw-studio-on .cw-studio-check { background:var(--pri); border-color:var(--pri); }
 .cw-new-btn { display:flex; align-items:center; gap:6px; width:100%; padding:8px 12px; background:transparent; border:1px dashed var(--color-border-neutral-default); border-radius:8px; font-size:12px; font-weight:600; color:var(--pri); cursor:pointer; transition:border-color .12s,background .12s; }
 .cw-new-btn:hover { border-color:var(--pri); background:var(--pri-12); }
 .cw-new-btn:disabled { color:var(--color-text-disabled); border-color:var(--line); cursor:not-allowed; background:transparent; }
@@ -11339,17 +11341,24 @@ function _cwUpdateValid() {
 }
 
 function _cwStudioCards() {
+  const icons = {
+    agentic: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 017 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 017-7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 17v1a3 3 0 006 0v-1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 9v3m0 0l1.5-1.5M12 12l-1.5-1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    governance: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v5c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V7L12 2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    helix: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4c4-2 12 2 16 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 8c4 2 12-2 16 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 12c4-2 12 2 16 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 16c4 2 12-2 16 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 20c4-2 12 2 16 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
+  };
   return MOCK_STUDIOS.map(s => {
     const on = _cwState.studios[s.id];
-    return `<button class="cw-studio-card${on ? ' cw-studio-on' : ''}" onclick="cwToggleStudio('${s.id}')" type="button">
-      <div class="cw-studio-ico" style="background:${s.bg};border:1px solid ${s.border}">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="${s.color}" stroke-width="1.8"/></svg>
+    return `<button class="cw-studio-card${on ? ' cw-studio-on' : ''}" onclick="cwToggleStudio('${s.id}')" type="button" aria-pressed="${on}">
+      <div class="cw-studio-ico" style="background:${s.bg};border:1px solid ${s.border};color:${s.color}">
+        ${icons[s.id] || ''}
       </div>
       <div class="cw-studio-text">
         <div class="cw-studio-name">${s.name}</div>
-        <div class="cw-studio-desc">${s.features.length} features available</div>
+        <div class="cw-studio-desc">${s.desc}</div>
       </div>
-      ${on ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M5 13l4 4L19 7" stroke="var(--pri)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<div style="width:16px"></div>`}
+      <div class="cw-studio-check">
+        ${on ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+      </div>
     </button>`;
   }).join('');
 }
@@ -11374,7 +11383,7 @@ function _cwRender() {
       </div>
       <div class="pa-slideout-body">
         <div class="pa-slideout-section">
-          <div class="pa-slideout-section-h">Basics</div>
+          <div class="pa-slideout-section-h">Workspace info</div>
           <div class="pa-field">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
               <label class="pa-label" style="margin-bottom:0">Workspace name <span style="color:var(--red)">*</span></label>
