@@ -7894,7 +7894,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
     <div class="tb-context-wrap">
-      <button class="tb-context" type="button" onclick="event.stopPropagation();toggleStudioSwitcher()" aria-haspopup="menu" aria-expanded="false" id="tbContextBtn">
+      <button class="tb-context" type="button" onclick="event.stopPropagation();renderWorkspaceSwitcherItems();toggleStudioSwitcher()" aria-haspopup="menu" aria-expanded="false" id="tbContextBtn">
         <div class="tb-context-logo" style="background:var(--grad-app)">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="1.6" fill="#fff"/>
@@ -7905,7 +7905,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
             <path d="M4 4L7 7M12 4L9 7M4 12L7 9M12 12L9 9" stroke="#fff" stroke-width="1.1" stroke-linecap="round"/>
           </svg>
         </div>
-        <span class="tb-context-name">Agentic Studio</span>
+        <span class="tb-context-name" id="tbContextName">All Workspaces</span>
         <svg class="tb-context-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="studio-switcher" id="studioSwitcher" role="menu" aria-hidden="true">
@@ -11186,6 +11186,56 @@ function renderWidgetsLibrary() {
       </div>
     </div>
   `;
+}
+
+/* ── Workspaces ─────────────────────────────────────────── */
+const AC_WORKSPACES = [
+  { id:'all',         name:'All Workspaces',    desc:'Tenant-wide view',   color:'#6366f1', studios:null },
+  { id:'latam',       name:'LATAM Operations',  desc:'14 members',         color:'#06B6D4', studios:['governance','agentic','data'] },
+  { id:'product',     name:'Product Team',      desc:'8 members',          color:'#10B981', studios:['agentic','data'] },
+  { id:'americas',    name:'Contoso Americas',  desc:'22 members',         color:'#F59E0B', studios:['governance','data'] },
+  { id:'engineering', name:'Engineering',       desc:'11 members',         color:'#8B5CF6', studios:['agentic'] },
+  { id:'compliance',  name:'Risk & Compliance', desc:'5 members',          color:'#EF4444', studios:['governance'] },
+];
+
+let _acWorkspace = 'all'; // active workspace id
+
+function acSetWorkspace(id) {
+  _acWorkspace = id;
+  const ws = AC_WORKSPACES.find(w => w.id === id) || AC_WORKSPACES[0];
+  const nameEl = document.getElementById('tbContextName');
+  if (nameEl) nameEl.textContent = ws.name;
+  const sw = document.getElementById('studioSwitcher');
+  if (sw) { sw.classList.remove('open'); sw.setAttribute('aria-hidden','true'); }
+  const btn = document.getElementById('tbContextBtn');
+  if (btn) btn.setAttribute('aria-expanded','false');
+  renderWorkspaceSwitcherItems();
+  // Re-render current section if affected
+  const hash = window.location.hash.replace(/^#\/?/,'') || 'home';
+  if (hash === 'home' || hash === '') renderAdminHome();
+}
+
+function renderWorkspaceSwitcherItems() {
+  const sw = document.getElementById('studioSwitcher');
+  if (!sw) return;
+  sw.innerHTML = '<div class="studio-switcher-h">Switch workspace</div>' +
+    AC_WORKSPACES.map(ws => `
+      <button class="studio-switcher-item${ws.id === _acWorkspace ? ' active' : ''}"
+        onclick="acSetWorkspace('${ws.id}')" type="button">
+        <div class="studio-switcher-ico" style="background:${ws.color}22;color:${ws.color};border:1px solid ${ws.color}44">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            ${ws.id === 'all'
+              ? '<rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/>'
+              : '<path d="M8 2a6 6 0 100 12A6 6 0 008 2z"/><path d="M8 2c-1.5 2-2.5 3.8-2.5 6s1 4 2.5 6"/><path d="M8 2c1.5 2 2.5 3.8 2.5 6S9.5 16 8 14"/><path d="M2 8h12"/>'}
+          </svg>
+        </div>
+        <div class="studio-switcher-text">
+          <div class="studio-switcher-name">${ws.name}</div>
+          <div class="studio-switcher-desc">${ws.desc}${ws.studios ? ' · ' + ws.studios.join(', ') : ''}</div>
+        </div>
+        ${ws.id === _acWorkspace ? '<span class="studio-switcher-current">Current</span>' : ''}
+      </button>`).join('') +
+    '<div class="studio-switcher-foot">AIMS OS · Admin Console</div>';
 }
 
 /* ── Admin Console Home ─────────────────────────────────── */
