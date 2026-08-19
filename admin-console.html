@@ -7665,7 +7665,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .ids-badge-required { background:rgba(100,116,139,.15); color:var(--t3); }
 .ids-badge-active { background:var(--green-10); color:var(--green); }
 /* Toggle */
-.ids-toggle { position:relative; width:36px; height:20px; flex-shrink:0; }
+.ids-toggle { position:relative; display:inline-block; width:36px; height:20px; flex-shrink:0; }
 .ids-toggle input { opacity:0; width:0; height:0; position:absolute; }
 .ids-toggle-track { position:absolute; inset:0; border-radius:20px; background:var(--bg3); border:1px solid var(--line); cursor:pointer; transition:background .2s,border-color .2s; }
 .ids-toggle input:checked ~ .ids-toggle-track { background:var(--pri); border-color:var(--pri); }
@@ -7744,6 +7744,35 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .ste-tag-included { background:var(--green-10); color:var(--green); }
 .ste-tag-addon    { background:rgba(249,115,22,.1);  color:#f97316; }
 .ste-tag-beta     { background:var(--indigo-15); color:var(--indigo); }
+
+/* Workspace × Studio matrix */
+.ste-matrix-wrap { margin-bottom:36px; }
+.ste-matrix-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--t3); margin-bottom:14px; }
+.ste-matrix-table { width:100%; border-collapse:separate; border-spacing:0; border:1px solid var(--line); border-radius:var(--r12); overflow:hidden; }
+.ste-matrix-th { padding:12px 16px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:var(--t3); background:var(--bg2); text-align:center; border-bottom:1px solid var(--line); }
+.ste-matrix-th.ws-col { text-align:left; min-width:180px; }
+.ste-matrix-th.studio-col { min-width:140px; }
+.ste-matrix-td { padding:12px 16px; border-bottom:1px solid var(--line); vertical-align:middle; }
+.ste-matrix-td.ws-name-cell { }
+.ste-matrix-td.toggle-cell { text-align:center; }
+.ste-matrix-tr:last-child .ste-matrix-td { border-bottom:none; }
+.ste-matrix-tr:hover .ste-matrix-td { background:var(--hover); }
+.ste-matrix-ws-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; flex-shrink:0; }
+.ste-matrix-ws-info { display:flex; align-items:center; }
+.ste-matrix-ws-label { font-size:13px; font-weight:600; color:var(--t1); }
+.ste-matrix-ws-sub { font-size:11px; color:var(--t3); margin-top:1px; }
+.ste-matrix-studio-hd { display:flex; flex-direction:column; align-items:center; gap:5px; }
+.ste-matrix-studio-dot { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin:0 auto 2px; }
+/* Workspace-scoped view */
+.ste-ws-banner { display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:var(--r12); margin-bottom:28px; border:1px solid var(--line); background:var(--bg2); }
+.ste-ws-banner-dot { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ste-ws-banner-meta { flex:1; }
+.ste-ws-banner-name { font-size:15px; font-weight:700; color:var(--t1); }
+.ste-ws-banner-sub { font-size:12px; color:var(--t3); margin-top:2px; }
+.ste-ws-back { font-size:12px; color:var(--pri); cursor:pointer; background:none; border:none; padding:0; }
+.ste-ws-back:hover { text-decoration:underline; }
+.ste-ws-studio-enabled { font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; background:var(--green-10); color:var(--green); border:1px solid var(--green-25); }
+.ste-ws-studio-disabled { font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; background:var(--hover); color:var(--t3); border:1px solid var(--line); }
 
 /* ====================== ROLE DETAIL & CREATE ====================== */
 /* Permission tree */
@@ -11201,9 +11230,9 @@ function renderWidgetsLibrary() {
 /* ── Workspaces ─────────────────────────────────────────── */
 const AC_WORKSPACES = [
   { id:'all',         name:'All Workspaces',    desc:'Tenant-wide view',   color:'#6366f1', studios:null },
-  { id:'latam',       name:'LATAM Operations',  desc:'14 members',         color:'#06B6D4', studios:['governance','agentic','data'] },
-  { id:'product',     name:'Product Team',      desc:'8 members',          color:'#10B981', studios:['agentic','data'] },
-  { id:'americas',    name:'Contoso Americas',  desc:'22 members',         color:'#F59E0B', studios:['governance','data'] },
+  { id:'latam',       name:'LATAM Operations',  desc:'14 members',         color:'#06B6D4', studios:['governance','agentic','helix'] },
+  { id:'product',     name:'Product Team',      desc:'8 members',          color:'#10B981', studios:['agentic','helix'] },
+  { id:'americas',    name:'Contoso Americas',  desc:'22 members',         color:'#F59E0B', studios:['governance','helix'] },
   { id:'engineering', name:'Engineering',       desc:'11 members',         color:'#8B5CF6', studios:['agentic'] },
   { id:'compliance',  name:'Risk & Compliance', desc:'5 members',          color:'#EF4444', studios:['governance'] },
 ];
@@ -11223,6 +11252,7 @@ function acSetWorkspace(id) {
   // Re-render current section if affected
   const hash = window.location.hash.replace(/^#\/?/,'') || 'home';
   if (hash === 'home' || hash === '') renderAdminHome();
+  else if (hash === 'studios') renderStudiosEntitlements();
 }
 
 function renderWorkspaceSwitcherItems() {
@@ -13975,6 +14005,80 @@ function steToggleExpand(id) {
   renderStudiosEntitlements();
 }
 
+/* Workspace × Studio activation state — derived from AC_WORKSPACES */
+const _steWsStudios = (() => {
+  const state = {};
+  AC_WORKSPACES.filter(w => w.id !== 'all').forEach(ws => {
+    state[ws.id] = {};
+    MOCK_STUDIOS.forEach(s => {
+      state[ws.id][s.id] = ws.studios ? ws.studios.includes(s.id) : true;
+    });
+  });
+  return state;
+})();
+
+function steToggleWsStudio(wsId, studioId) {
+  _steWsStudios[wsId][studioId] = !_steWsStudios[wsId][studioId];
+  renderStudiosEntitlements();
+}
+
+function _renderWorkspaceMatrix() {
+  const studios = MOCK_STUDIOS;
+  const workspaces = AC_WORKSPACES.filter(w => w.id !== 'all');
+  const studioColors = { agentic:'#06B6D4', governance:'#10B981', helix:'#8B5CF6' };
+
+  const headerCols = studios.map(s => `
+    <th class="ste-matrix-th studio-col">
+      <div class="ste-matrix-studio-hd">
+        <div class="ste-matrix-studio-dot" style="background:${studioColors[s.id]}22;border:1px solid ${studioColors[s.id]}44">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="${studioColors[s.id]}" stroke-width="1.8"/></svg>
+        </div>
+        <span style="color:var(--t2)">${s.name.replace(' Studio','').replace(' Data','')}</span>
+      </div>
+    </th>`).join('');
+
+  const rows = workspaces.map(ws => {
+    const cells = studios.map(s => {
+      const on = _steWsStudios[ws.id][s.id];
+      return `<td class="ste-matrix-td toggle-cell">
+        <div style="display:flex;justify-content:center;align-items:center">
+          <label class="ids-toggle">
+            <input type="checkbox" ${on ? 'checked' : ''} onchange="steToggleWsStudio('${ws.id}','${s.id}')">
+            <span class="ids-toggle-track"></span>
+            <span class="ids-toggle-thumb"></span>
+          </label>
+        </div>
+      </td>`;
+    }).join('');
+
+    return `<tr class="ste-matrix-tr">
+      <td class="ste-matrix-td ws-name-cell">
+        <div class="ste-matrix-ws-info">
+          <span class="ste-matrix-ws-dot" style="background:${ws.color}"></span>
+          <div>
+            <div class="ste-matrix-ws-label">${ws.name}</div>
+            <div class="ste-matrix-ws-sub">${ws.desc}</div>
+          </div>
+        </div>
+      </td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  return `<div class="ste-matrix-wrap">
+    <div class="ste-matrix-title">Studio access by workspace</div>
+    <table class="ste-matrix-table">
+      <thead>
+        <tr>
+          <th class="ste-matrix-th ws-col">Workspace</th>
+          ${headerCols}
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
 function renderStudiosEntitlements() {
   const st = _steState;
 
@@ -14042,6 +14146,82 @@ function renderStudiosEntitlements() {
     </div>`;
   };
 
+  if (_acWorkspace !== 'all') {
+    /* ── Workspace-scoped view ── */
+    const ws = AC_WORKSPACES.find(w => w.id === _acWorkspace);
+    const wsStudios = MOCK_STUDIOS.filter(s => _steWsStudios[_acWorkspace][s.id]);
+    const wsStudiosOff = MOCK_STUDIOS.filter(s => !_steWsStudios[_acWorkspace][s.id]);
+
+    $('content').innerHTML = `
+<div class="ste-wrap">
+  <!-- BACK / WORKSPACE BANNER -->
+  <div class="ste-ws-banner">
+    <div class="ste-ws-banner-dot" style="background:${ws.color}22;border:1px solid ${ws.color}44">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${ws.color}" stroke-width="1.8" stroke-linecap="round">
+        <path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
+        <path d="M12 2c-2.5 3.3-4 6.5-4 10s1.5 6.7 4 10"/>
+        <path d="M12 2c2.5 3.3 4 6.5 4 10s-1.5 6.7-4 10"/>
+        <path d="M2 12h20"/>
+      </svg>
+    </div>
+    <div class="ste-ws-banner-meta">
+      <div class="ste-ws-banner-name">${ws.name}</div>
+      <div class="ste-ws-banner-sub">${ws.desc} · ${wsStudios.length} studio${wsStudios.length !== 1 ? 's' : ''} active</div>
+    </div>
+    <button class="ste-ws-back" onclick="acSetWorkspace('all');renderStudiosEntitlements()">← All workspaces</button>
+  </div>
+
+  <!-- ACTIVE STUDIOS -->
+  <div class="ms-section-title" style="margin-bottom:16px;">Active studios in this workspace</div>
+  <div class="ste-studio-grid" style="margin-bottom:32px;">
+    ${wsStudios.length ? wsStudios.map(s => `
+    <div class="ste-studio-card">
+      <div class="ste-studio-head">
+        <div class="ste-studio-ico" style="background:${s.bg};border:1px solid ${s.border};">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="${s.color}" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="${s.color}" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ste-studio-meta">
+          <div class="ste-studio-name">${s.name}</div>
+          <div class="ste-studio-desc">${s.desc}</div>
+        </div>
+        <span class="ste-ws-studio-enabled">● Enabled for ${ws.name}</span>
+        <label class="ids-toggle" style="margin-left:16px;">
+          <input type="checkbox" checked onchange="steToggleWsStudio('${_acWorkspace}','${s.id}')">
+          <span class="ids-toggle-track"></span>
+          <span class="ids-toggle-thumb"></span>
+        </label>
+      </div>
+    </div>`).join('') : '<div style="color:var(--t3);font-size:13px;padding:16px 0;">No studios active in this workspace.</div>'}
+  </div>
+
+  ${wsStudiosOff.length ? `
+  <!-- DISABLED STUDIOS -->
+  <div class="ms-section-title" style="margin-bottom:16px;color:var(--t3);">Not enabled in this workspace</div>
+  <div class="ste-studio-grid">
+    ${wsStudiosOff.map(s => `
+    <div class="ste-studio-card" style="opacity:.6;">
+      <div class="ste-studio-head">
+        <div class="ste-studio-ico" style="background:var(--bg3);border:1px solid var(--line);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="var(--t3)" stroke-width="1.8"/></svg>
+        </div>
+        <div class="ste-studio-meta">
+          <div class="ste-studio-name" style="color:var(--t2)">${s.name}</div>
+          <div class="ste-studio-desc">${s.desc}</div>
+        </div>
+        <span class="ste-ws-studio-disabled">○ Disabled</span>
+        <label class="ids-toggle" style="margin-left:16px;">
+          <input type="checkbox" onchange="steToggleWsStudio('${_acWorkspace}','${s.id}')">
+          <span class="ids-toggle-track"></span>
+          <span class="ids-toggle-thumb"></span>
+        </label>
+      </div>
+    </div>`).join('')}
+  </div>` : ''}
+</div>`;
+    return;
+  }
+
+  /* ── All Workspaces view (Super Admin) ── */
   $('content').innerHTML = `
 <div class="ste-wrap">
 
@@ -14061,8 +14241,11 @@ function renderStudiosEntitlements() {
     <button class="ste-renew-btn" onclick="toast('Contact your account manager to manage your license','info')">Manage license</button>
   </div>
 
+  <!-- WORKSPACE × STUDIO MATRIX -->
+  ${_renderWorkspaceMatrix()}
+
   <!-- STUDIO CARDS -->
-  <div class="ms-section-title" style="margin-bottom:16px;">Studios</div>
+  <div class="ms-section-title" style="margin-bottom:16px;">Tenant studio configuration</div>
   <div class="ste-studio-grid">
     ${MOCK_STUDIOS.map(studioCard).join('')}
   </div>
