@@ -8135,7 +8135,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
             <span class="ssb-item-label">Studios & Entitlements</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="billing">
+          <button class="ssb-item" data-route="billing" onclick="navigate('#/billing')">
             <span class="ssb-item-label">Billing & Subscription</span>
           </button>
         </div>
@@ -8144,12 +8144,12 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
         <div class="ssb-group">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
 
-          <button class="ssb-item disabled" data-route="governance-defaults">
+          <button class="ssb-item" data-route="governance-defaults" onclick="navigate('#/governance-defaults')">
             <span class="ssb-item-label">Governance Defaults</span>
             <span class="ssb-item-badge ssb-item-badge--green">2</span>
           </button>
 
-          <button class="ssb-item disabled" data-route="data-privacy">
+          <button class="ssb-item" data-route="data-privacy" onclick="navigate('#/data-privacy')">
             <span class="ssb-item-label">Data & Privacy</span>
           </button>
 
@@ -8158,7 +8158,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
             <span class="ssb-item-alert" title="1 integration failing"></span>
           </button>
 
-          <button class="ssb-item disabled" data-route="notifications">
+          <button class="ssb-item" data-route="notifications" onclick="navigate('#/notifications')">
             <span class="ssb-item-label">Notifications</span>
             <span class="ssb-item-badge">4</span>
           </button>
@@ -14028,7 +14028,11 @@ function route() {
     'people':'people',
     'organization':'organization',
     'identity':'identity',
-    'studios':'studios'
+    'studios':'studios',
+    'billing':'billing',
+    'governance-defaults':'governance-defaults',
+    'data-privacy':'data-privacy',
+    'notifications':'notifications'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
