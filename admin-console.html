@@ -8046,6 +8046,55 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .rd-danger-btn { background:none; border:1px solid rgba(239,68,68,.4); border-radius:var(--r8); padding:7px 14px; font-size:12px; font-weight:600; color:var(--red); cursor:pointer; transition:background .15s; }
 .rd-danger-btn:hover { background:var(--red-12); }
 
+/* ── Workspace Deletion Wizard ───────────────────────────────────────────── */
+.wd-overlay { position:fixed; inset:0; background:rgba(0,0,0,.72); backdrop-filter:blur(8px); z-index:600; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .22s; }
+.wd-overlay.open { opacity:1; pointer-events:all; }
+.wd-modal { width:600px; max-width:95vw; max-height:90vh; background:var(--surface); border-radius:16px; border:1px solid rgba(239,68,68,.3); box-shadow:0 32px 80px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; }
+.wd-progress { display:flex; align-items:center; padding:18px 24px 0; gap:0; flex-shrink:0; }
+.wd-step-dot { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:all .2s; }
+.wd-step-dot.done { background:rgba(239,68,68,.8); color:#fff; }
+.wd-step-dot.active { background:var(--surface); color:var(--red); border:2px solid var(--red); }
+.wd-step-dot.future { background:var(--bg3); color:var(--t3); }
+.wd-step-line { flex:1; height:1px; background:var(--line); margin:0 4px; }
+.wd-step-labels { display:flex; padding:6px 24px 0; }
+.wd-step-lbl { flex:1; font-size:10.5px; color:var(--t3); text-align:center; }
+.wd-step-lbl.active { color:var(--red); font-weight:600; }
+.wd-body { padding:24px; overflow-y:auto; flex:1; }
+.wd-warn-banner { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:10px; padding:12px 14px; display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; }
+.wd-warn-icon { color:var(--red); flex-shrink:0; margin-top:1px; }
+.wd-warn-text { font-size:12.5px; color:var(--red); line-height:1.5; font-weight:500; }
+.wd-impact-title { font-size:12px; font-weight:600; color:var(--t2); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+.wd-impact-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
+.wd-impact-tile { background:var(--bg2); border:1px solid var(--line); border-radius:9px; padding:12px 14px; }
+.wd-impact-val { font-size:22px; font-weight:700; color:var(--t1); line-height:1; }
+.wd-impact-label { font-size:11px; color:var(--t3); margin-top:4px; }
+.wd-impact-sublabel { font-size:10.5px; color:rgba(239,68,68,.7); margin-top:2px; }
+.wd-section-h { font-size:12px; font-weight:600; color:var(--t2); margin-bottom:10px; }
+.wd-check-item { display:flex; align-items:flex-start; gap:10px; padding:11px 12px; border:1px solid var(--line); border-radius:8px; cursor:pointer; margin-bottom:8px; transition:border-color .15s; user-select:none; }
+.wd-check-item.checked { border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.04); }
+.wd-check-box { width:18px; height:18px; border-radius:4px; border:1.5px solid var(--line); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; transition:all .15s; }
+.wd-check-item.checked .wd-check-box { background:var(--red); border-color:var(--red); color:#fff; }
+.wd-check-label { font-size:12.5px; color:var(--t1); font-weight:500; }
+.wd-check-sub { font-size:11px; color:var(--t3); margin-top:2px; }
+.wd-schedule-box { background:var(--bg2); border:1px solid rgba(239,68,68,.2); border-radius:10px; padding:14px 16px; margin-bottom:16px; }
+.wd-schedule-row { display:flex; align-items:center; justify-content:space-between; }
+.wd-schedule-label { font-size:13px; font-weight:600; color:var(--t1); }
+.wd-schedule-date { font-size:13px; font-weight:700; color:var(--red); }
+.wd-schedule-sub { font-size:11.5px; color:var(--t3); margin-top:5px; line-height:1.5; }
+.wd-grace-note { font-size:11.5px; color:var(--t3); background:var(--bg3); border-radius:8px; padding:10px 12px; margin-bottom:16px; line-height:1.6; }
+.wd-confirm-label { font-size:12.5px; color:var(--t2); margin-bottom:6px; }
+.wd-confirm-input { width:100%; background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:13px; color:var(--t1); box-sizing:border-box; outline:none; font-family:'SF Mono',ui-monospace,monospace; transition:border-color .15s; }
+.wd-confirm-input:focus { border-color:rgba(239,68,68,.5); }
+.wd-confirm-input.match { border-color:var(--red); }
+.wd-footer { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-top:1px solid var(--line); flex-shrink:0; }
+.wd-back-btn { padding:9px 16px; background:transparent; border:1px solid var(--line); border-radius:8px; font-size:13px; color:var(--t2); cursor:pointer; }
+.wd-back-btn:hover { background:var(--bg2); }
+.wd-next-btn { padding:9px 20px; background:var(--bg3); border:1px solid var(--line); border-radius:8px; font-size:13px; font-weight:600; color:var(--t2); cursor:pointer; transition:all .15s; }
+.wd-next-btn.enabled { background:var(--red); border-color:var(--red); color:#fff; }
+.wd-next-btn.enabled:hover { opacity:.88; }
+.wd-cancel-link { font-size:12px; color:var(--t3); cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.wd-cancel-link:hover { color:var(--t1); }
+
 /* ── Org Logo Upload Modal ──────────────────────────────────────────────── */
 .olm-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
 .olm-overlay.open { opacity:1; pointer-events:all; }
@@ -15406,6 +15455,180 @@ const MOCK_ORG = {
   memberCount: 13,
 };
 
+/* ── Workspace Deletion Wizard ───────────────────────────────────────────── */
+const _wdWiz = {
+  open: false, step: 1,
+  checks: { exported: false, notified: false, integrations: false },
+  confirmText: '',
+  deleteDate: 'September 3, 2026',
+};
+
+function _ensureWdModal() {
+  if (document.getElementById('wdOverlay')) return;
+  const ov = document.createElement('div');
+  ov.id = 'wdOverlay'; ov.className = 'wd-overlay';
+  const m = document.createElement('div');
+  m.id = 'wdModal'; m.className = 'wd-modal';
+  ov.appendChild(m);
+  document.body.appendChild(ov);
+}
+
+function openWorkspaceDeletion() {
+  _ensureWdModal();
+  _wdWiz.open = true; _wdWiz.step = 1;
+  _wdWiz.checks = { exported: false, notified: false, integrations: false };
+  _wdWiz.confirmText = '';
+  _wdRender();
+  requestAnimationFrame(() => document.getElementById('wdOverlay').classList.add('open'));
+}
+
+function closeWorkspaceDeletion() {
+  _wdWiz.open = false;
+  document.getElementById('wdOverlay')?.classList.remove('open');
+}
+
+function _wdGoStep(n) { _wdWiz.step = n; _wdRender(); }
+function _wdToggleCheck(key) { _wdWiz.checks[key] = !_wdWiz.checks[key]; _wdRender(); }
+
+function _wdExecute() {
+  closeWorkspaceDeletion();
+  toast('Workspace deletion scheduled for September 3, 2026. A confirmation email has been sent.', 'info');
+}
+
+function _wdRender() {
+  const m = document.getElementById('wdModal');
+  if (!m) return;
+  const s = _wdWiz;
+  const o = MOCK_ORG;
+  const steps = ['Impact', 'Checklist', 'Confirm'];
+
+  const dots = steps.map((label, i) => {
+    const n = i + 1;
+    const cls = s.step > n ? 'done' : s.step === n ? 'active' : 'future';
+    return `<div class="wd-step-dot ${cls}">${s.step > n ? '✓' : n}</div>${n < steps.length ? '<div class="wd-step-line"></div>' : ''}`;
+  }).join('');
+
+  const labels = steps.map((label, i) => {
+    const n = i + 1;
+    return `<div class="wd-step-lbl ${s.step === n ? 'active' : ''}">${label}</div>`;
+  }).join('');
+
+  let body = '';
+  let footer = '';
+
+  if (s.step === 1) {
+    body = `
+      <div style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:4px">Delete ${escapeHtml(o.name)} workspace</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:16px">Review what will be permanently removed before continuing</div>
+      <div class="wd-warn-banner">
+        <div class="wd-warn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        <div class="wd-warn-text">This action is permanent and cannot be undone. All data will be deleted after the grace period.</div>
+      </div>
+      <div class="wd-impact-title">What gets permanently deleted</div>
+      <div class="wd-impact-grid">
+        <div class="wd-impact-tile">
+          <div class="wd-impact-val">${o.memberCount}</div>
+          <div class="wd-impact-label">Members</div>
+          <div class="wd-impact-sublabel">All access revoked immediately</div>
+        </div>
+        <div class="wd-impact-tile">
+          <div class="wd-impact-val">12</div>
+          <div class="wd-impact-label">AI Workers &amp; Networks</div>
+          <div class="wd-impact-sublabel">All configurations deleted</div>
+        </div>
+        <div class="wd-impact-tile">
+          <div class="wd-impact-val">8</div>
+          <div class="wd-impact-label">Data Models</div>
+          <div class="wd-impact-sublabel">All governed data purged</div>
+        </div>
+        <div class="wd-impact-tile">
+          <div class="wd-impact-val">90d</div>
+          <div class="wd-impact-label">Audit History</div>
+          <div class="wd-impact-sublabel">Logs permanently deleted</div>
+        </div>
+        <div class="wd-impact-tile">
+          <div class="wd-impact-val">6</div>
+          <div class="wd-impact-label">API Keys &amp; Integrations</div>
+          <div class="wd-impact-sublabel">All tokens revoked</div>
+        </div>
+        <div class="wd-impact-tile">
+          <div class="wd-impact-val">2</div>
+          <div class="wd-impact-label">Verified Domains</div>
+          <div class="wd-impact-sublabel">Domain bindings removed</div>
+        </div>
+      </div>
+    `;
+    footer = `
+      <span class="wd-cancel-link" onclick="closeWorkspaceDeletion()">Cancel</span>
+      <div style="display:flex;gap:8px">
+        <button class="wd-next-btn enabled" onclick="_wdGoStep(2)">Continue →</button>
+      </div>
+    `;
+  }
+
+  else if (s.step === 2) {
+    const allChecked = Object.values(s.checks).every(Boolean);
+    const checkItem = (key, label, sub) => `
+      <div class="wd-check-item ${s.checks[key]?'checked':''}" onclick="_wdToggleCheck('${key}')">
+        <div class="wd-check-box">${s.checks[key]?'<svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+        <div>
+          <div class="wd-check-label">${label}</div>
+          <div class="wd-check-sub">${sub}</div>
+        </div>
+      </div>
+    `;
+    body = `
+      <div style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:4px">Before you delete</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:18px">Confirm you've completed these steps to avoid losing critical data</div>
+      ${checkItem('exported', 'I have exported workspace data', 'Use "Request export" in the Danger Zone or confirm data is not needed')}
+      ${checkItem('notified', `I have notified all ${o.memberCount} members`, 'Members will lose access on the deletion date — give them time to save their work')}
+      ${checkItem('integrations', 'All integrations have been updated', 'Revoke or migrate API keys and webhook endpoints to prevent broken pipelines')}
+    `;
+    footer = `
+      <button class="wd-back-btn" onclick="_wdGoStep(1)">← Back</button>
+      <div style="display:flex;gap:8px">
+        <span class="wd-cancel-link" onclick="closeWorkspaceDeletion()">Cancel</span>
+        <button class="wd-next-btn ${allChecked?'enabled':''}" onclick="${allChecked?'_wdGoStep(3)':''}">Continue →</button>
+      </div>
+    `;
+  }
+
+  else if (s.step === 3) {
+    const nameMatch = s.confirmText === o.name;
+    body = `
+      <div style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:4px">Schedule deletion</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:18px">One last step — confirm the workspace name to proceed</div>
+      <div class="wd-schedule-box">
+        <div class="wd-schedule-row">
+          <div class="wd-schedule-label">Scheduled deletion date</div>
+          <div class="wd-schedule-date">${s.deleteDate}</div>
+        </div>
+        <div class="wd-schedule-sub">Your workspace will remain accessible until this date. You can cancel anytime before then.</div>
+      </div>
+      <div class="wd-grace-note">
+        ⏱ <strong style="color:var(--t1)">14-day grace period</strong> — You can cancel deletion at any time before September 3. After that date, all data is permanently destroyed and cannot be recovered. Anthropic does not retain backups after deletion.
+      </div>
+      <div class="wd-confirm-label">Type <strong style="color:var(--t1);font-family:monospace">${escapeHtml(o.name)}</strong> to confirm</div>
+      <input class="wd-confirm-input ${nameMatch?'match':''}" type="text" placeholder="${escapeHtml(o.name)}" value="${escapeHtml(s.confirmText)}" oninput="_wdWiz.confirmText=this.value;_wdRender();setTimeout(()=>{const i=document.querySelector('.wd-confirm-input');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},0)"/>
+      ${nameMatch ? '<div style="font-size:11px;color:var(--red);margin-top:6px">✓ Workspace name confirmed — deletion will be scheduled</div>' : ''}
+    `;
+    footer = `
+      <button class="wd-back-btn" onclick="_wdGoStep(2)">← Back</button>
+      <div style="display:flex;gap:8px">
+        <span class="wd-cancel-link" onclick="closeWorkspaceDeletion()">Cancel</span>
+        <button class="wd-next-btn ${nameMatch?'enabled':''}" onclick="${nameMatch?'_wdExecute()':''}">Schedule deletion</button>
+      </div>
+    `;
+  }
+
+  m.innerHTML = `
+    <div class="wd-progress">${dots}</div>
+    <div class="wd-step-labels">${labels}</div>
+    <div class="wd-body">${body}</div>
+    <div class="wd-footer">${footer}</div>
+  `;
+}
+
 /* ── Org Logo Upload ──────────────────────────────────────────────────────── */
 const _olmState = { open: false, dataUrl: null };
 
@@ -15822,7 +16045,7 @@ function renderOrganization() {
           <div class="org-danger-label">Delete this workspace</div>
           <div class="org-danger-desc">Permanently removes all data. This action cannot be undone.</div>
         </div>
-        <button class="org-danger-btn" onclick="toast('Contact support to delete your workspace','info')">Delete workspace</button>
+        <button class="org-danger-btn" onclick="openWorkspaceDeletion()">Delete workspace</button>
       </div>
     </div>
   </div>
