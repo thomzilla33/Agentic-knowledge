@@ -7647,6 +7647,8 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 /* MFA shield in member rows */
 .pa-mfa-icon { color:var(--badge-success); opacity:.85; }
 .pa-mfa-off  { color:var(--color-text-disabled); }
+/* Group detail drawer — color swatch button */
+.gd-color-btn:hover { filter:brightness(1.15); box-shadow:0 0 0 2px var(--pri) !important; }
 /* Group detail drawer — inline name edit */
 .gd-name-input { background:var(--bg3); border:1.5px solid var(--pri); border-radius:6px; padding:4px 8px; font-size:15px; font-weight:700; color:var(--color-text-title); outline:none; min-width:0; flex:1; font-family:inherit; }
 .gd-name-action { background:none; border:none; cursor:pointer; width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .12s,color .12s; }
@@ -13561,6 +13563,7 @@ let _paState = {
   groupDetailId: null,
   groupEditNameId: null,
   groupEditNameValue: '',
+  groupEditColorId: null,
   groupCreateOpen: false,
   groupCreateName: '',
   groupCreateDesc: '',
@@ -15573,11 +15576,16 @@ function renderGroupDetail(groupId) {
   const members = g.memberIds.map(id => MOCK_PEOPLE.find(p=>p.id===id)).filter(Boolean);
   const allStudios = ['agentic','helix','governance','data'];
   const editingName = _paState.groupEditNameId === groupId;
+  const editingColor = _paState.groupEditColorId === groupId;
+  const GD_COLORS = ['#10b981','#06B6D4','#8b5cf6','#f97316','#ef4444','#84cc16','#0ea5e9','#6366f1','#ec4899','#f59e0b'];
   return `
   <div class="drawer-header">
     <div style="flex:1;min-width:0">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="width:12px;height:12px;border-radius:3px;background:${g.color};display:inline-block;flex-shrink:0"></span>
+        <button class="gd-color-btn" onclick="event.stopPropagation();_paState.groupEditColorId=_paState.groupEditColorId==='${groupId}'?null:'${groupId}';_paRerender()"
+          style="width:20px;height:20px;border-radius:5px;background:${g.color};border:2px solid ${editingColor?'#fff':'transparent'};box-shadow:${editingColor?'0 0 0 2px var(--pri)':'none'};cursor:pointer;flex-shrink:0;transition:all .15s;padding:0"
+          title="Change color">
+        </button>
         ${editingName ? `
           <input id="gdNameInput" class="gd-name-input" value="${escapeHtml(_paState.groupEditNameValue)}"
             oninput="_paState.groupEditNameValue=this.value"
@@ -15596,7 +15604,19 @@ function renderGroupDetail(groupId) {
           </button>
         `}
       </div>
-      <div class="drawer-subtitle">${escapeHtml(g.desc)}</div>
+      ${editingColor ? `
+      <div style="display:flex;align-items:center;gap:6px;margin-top:10px;padding:10px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--color-border-neutral-subtle)">
+        <span style="font-size:11px;font-weight:600;color:var(--color-text-caption);letter-spacing:.04em;text-transform:uppercase;margin-right:4px">Color</span>
+        ${GD_COLORS.map(c => `
+          <button onclick="paSetGroupColor('${groupId}','${c}')"
+            style="width:22px;height:22px;border-radius:5px;background:${c};border:2px solid ${g.color===c?'#fff':'transparent'};box-shadow:${g.color===c?'0 0 0 2px var(--pri)':'none'};cursor:pointer;padding:0;flex-shrink:0;transition:all .12s"
+            title="${c}">
+          </button>`).join('')}
+        <button onclick="_paState.groupEditColorId=null;_paRerender()"
+          style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--color-text-caption);font-size:11px;padding:2px 6px;border-radius:4px"
+          onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">Done</button>
+      </div>` : `
+      <div class="drawer-subtitle">${escapeHtml(g.desc)}</div>`}
     </div>
     <button class="drawer-close" onclick="paCloseGroupDetail()">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -15850,6 +15870,11 @@ function paSaveGroupName(groupId) {
 function paCancelGroupNameEdit() {
   _paState.groupEditNameId = null;
   _paState.groupEditNameValue = '';
+  _paRerender();
+}
+function paSetGroupColor(groupId, color) {
+  const g = PA_GROUPS.find(x=>x.id===groupId);
+  if (g) g.color = color;
   _paRerender();
 }
 function paOpenRolePicker(personId) {
