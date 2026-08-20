@@ -14553,6 +14553,14 @@ function renderMemberDrawer(personId) {
   // --- profile meta ---
   const mfaOn = !!PA_MFA[p.id];
   const memberGroups = PA_GROUPS.filter(g => g.memberIds.includes(p.id));
+  const effectivePermSet = new Set(memberRoles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]));
+  const STUDIO_PREFIXES = [
+    { id:'agentic',    name:'Agentic Studio',    color:'#06B6D4', prefix:'ag.' },
+    { id:'governance', name:'Governance Studio', color:'#10b981', prefix:'gov.' },
+    { id:'helix',      name:'Helix Data Studio', color:'#8b5cf6', prefix:'hx.' },
+    { id:'platform',   name:'Platform',          color:'#64748b', prefix:'pl.' },
+  ];
+  const studioAccessList = STUDIO_PREFIXES.filter(s => [...effectivePermSet].some(pid => pid.startsWith(s.prefix)));
 
   let overviewContent = '<div class="pa-slideout-body" style="display:contents">';
 
@@ -14598,6 +14606,20 @@ function renderMemberDrawer(personId) {
           <div class="pm-profile-val">${escapeHtml(p.joinDate||'—')}</div>
         </div>
       </div>
+      <div style="display:flex;gap:0;margin-top:12px;padding-top:12px;border-top:1px solid var(--color-border-neutral-subtle);border-radius:8px;overflow:hidden;border:1px solid var(--color-border-neutral-subtle)">
+        <div style="flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--color-border-neutral-subtle)">
+          <div style="font-size:18px;font-weight:700;color:var(--color-text-title);line-height:1">${effectivePermSet.size}</div>
+          <div style="font-size:10.5px;color:var(--color-text-caption);margin-top:2px;text-transform:uppercase;letter-spacing:.04em">Permissions</div>
+        </div>
+        <div style="flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--color-border-neutral-subtle)">
+          <div style="font-size:18px;font-weight:700;color:var(--color-text-title);line-height:1">${studioAccessList.length}</div>
+          <div style="font-size:10.5px;color:var(--color-text-caption);margin-top:2px;text-transform:uppercase;letter-spacing:.04em">Studios</div>
+        </div>
+        <div style="flex:1;text-align:center;padding:8px 4px">
+          <div style="font-size:18px;font-weight:700;color:var(--color-text-title);line-height:1">${memberGroups.length}</div>
+          <div style="font-size:10.5px;color:var(--color-text-caption);margin-top:2px;text-transform:uppercase;letter-spacing:.04em">Groups</div>
+        </div>
+      </div>
     </div>`;
 
   // assigned roles
@@ -14606,15 +14628,19 @@ function renderMemberDrawer(personId) {
       <div class="pa-slideout-section-h">Assigned roles</div>
       ${memberRoles.length === 0
         ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:10px 0">${p.status==='invited'?'Roles will apply once the invitation is accepted.':'No platform roles assigned. Use individual permission grants or assign a role below.'}</div>`
-        : memberRoles.map(r => `
-          <div class="pa-role-row2">
-            <div style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0"></div>
-            <div class="pa-role-row2-info">
-              <div class="pa-role-row2-name">${escapeHtml(r.label)}${r.system?` <span style="font-size:10px;color:var(--color-text-caption);font-weight:500">· System</span>`:''}</div>
+        : memberRoles.map(r => {
+          const rPermCount = (PA_ROLE_PERMS[r.id] || new Set()).size;
+          return `<div class="pa-role-row2">
+            <div style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0;margin-top:2px"></div>
+            <div class="pa-role-row2-info" style="flex:1;min-width:0">
+              <div class="pa-role-row2-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                ${escapeHtml(r.label)}${r.system?` <span style="font-size:10px;color:var(--color-text-caption);font-weight:500">· System</span>`:''}
+                <span style="font-size:10px;color:var(--color-text-caption);background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-weight:500;white-space:nowrap">${rPermCount} perms</span>
+              </div>
               <div class="pa-role-row2-desc">${escapeHtml(r.desc)}</div>
             </div>
             ${p.id !== 'tg' ? `<button class="pa-remove-btn" onclick="paRemoveRole('${p.id}','${r.id}')">Remove</button>` : ''}
-          </div>`).join('')
+          </div>`;}).join('')
       }
       ${p.id !== 'tg' && p.status !== 'invited' ? `<button class="pa-add-role-btn" onclick="paOpenRolePicker('${p.id}')">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -14629,23 +14655,18 @@ function renderMemberDrawer(personId) {
         Studio access
         <button class="ds-btn ds-btn-sm ds-btn--tertiary" onclick="paOpenStudioAccess('${p.id}')">Manage…</button>
       </div>
-      ${(() => {
-        const STUDIOS_META = [
-          { id:'agentic',    name:'Agentic Studio',      color:'#06B6D4', prefix:'ag.' },
-          { id:'governance', name:'Governance Studio',   color:'#10b981', prefix:'gov.' },
-          { id:'helix',      name:'Helix Data Studio',   color:'#8b5cf6', prefix:'hx.' },
-          { id:'platform',   name:'Platform',            color:'#64748b', prefix:'pl.' },
-        ];
-        const allPerms = new Set(memberRoles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]));
-        const accessList = STUDIOS_META.filter(s => [...allPerms].some(pid => pid.startsWith(s.prefix)));
-        if (accessList.length === 0) return `<div style="font-size:12.5px;color:var(--color-text-caption);padding:6px 0">No studio access — assign a role or manage access directly.</div>`;
-        return accessList.map(s => `
-          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">
-            <div style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
-            <span style="font-size:12.5px;color:var(--color-text-title);flex:1">${escapeHtml(s.name)}</span>
-            <span style="font-size:11px;color:var(--badge-success);font-weight:500">Active</span>
-          </div>`).join('');
-      })()}
+      ${studioAccessList.length === 0
+        ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:6px 0">No studio access — assign a role or manage access directly.</div>`
+        : studioAccessList.map(function(s) {
+            const sPermCount = [...effectivePermSet].filter(function(pid){ return pid.startsWith(s.prefix); }).length;
+            return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
+              + '<div style="width:8px;height:8px;border-radius:50%;background:' + s.color + ';flex-shrink:0"></div>'
+              + '<span style="font-size:12.5px;color:var(--color-text-title);flex:1">' + escapeHtml(s.name) + '</span>'
+              + '<span style="font-size:11px;color:var(--color-text-caption);margin-right:8px">' + sPermCount + ' perms</span>'
+              + '<span style="font-size:11px;color:var(--badge-success);font-weight:600">Active</span>'
+              + '</div>';
+          }).join('')
+      }
     </div>`;
 
   // groups membership
