@@ -7621,7 +7621,33 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .pa-add-role-btn { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:9px 12px; background:transparent; border:1px dashed var(--color-border-neutral-default); border-radius:8px; font-size:12px; font-weight:500; color:var(--color-text-caption); cursor:pointer; transition:border-color .12s,color .12s; margin-top:6px; }
 .pa-add-role-btn:hover { border-color:var(--pri); color:var(--pri); }
 
-/* ── DS Modal Dialog ── */
+/* ── Groups tab ── */
+.pa-groups-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
+.pa-group-card { background:var(--bg2); border:1px solid var(--color-border-neutral-default); border-radius:12px; overflow:hidden; cursor:pointer; transition:border-color .15s,box-shadow .15s; }
+.pa-group-card:hover { border-color:var(--color-border-primary-default); box-shadow:0 4px 20px rgba(43,127,255,0.10); }
+.pa-group-card-hdr { height:4px; }
+.pa-group-card-body { padding:16px 18px 14px; }
+.pa-group-card-name { font-size:14px; font-weight:700; color:var(--color-text-title); margin-bottom:5px; }
+.pa-group-card-desc { font-size:12px; color:var(--color-text-caption); line-height:1.5; margin-bottom:12px; min-height:34px; }
+.pa-group-card-foot { display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid var(--color-border-neutral-subtle); }
+.pa-group-studios { display:flex; gap:4px; flex-wrap:wrap; }
+.pa-group-studio-pip { font-size:10px; font-weight:600; letter-spacing:.02em; padding:2px 7px; border-radius:4px; background:rgba(43,127,255,0.08); color:var(--pri); border:1px solid rgba(43,127,255,0.18); }
+
+/* Role picker modal */
+.rp-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+.rp-card { border:2px solid var(--color-border-neutral-default); border-radius:10px; padding:14px 16px; cursor:pointer; transition:border-color .15s,background .15s; background:var(--bg3); }
+.rp-card:hover { border-color:var(--color-border-primary-default); background:rgba(43,127,255,0.04); }
+.rp-card.selected { border-color:var(--pri); background:var(--pri-06); }
+.rp-card-dot { width:10px; height:10px; border-radius:50%; margin-bottom:8px; }
+.rp-card-name { font-size:13px; font-weight:700; color:var(--color-text-title); margin-bottom:4px; }
+.rp-card-desc { font-size:11px; color:var(--color-text-caption); line-height:1.45; }
+.rp-card-type { font-size:10px; font-weight:600; color:var(--color-text-caption); margin-top:6px; }
+
+/* MFA shield in member rows */
+.pa-mfa-icon { color:var(--badge-success); opacity:.85; }
+.pa-mfa-off  { color:var(--color-text-disabled); }
+
+/* DS Modal Dialog ── */
 .pa-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); z-index:400; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
 .pa-modal-overlay.open { opacity:1; pointer-events:all; }
 .pa-modal { background:var(--bg2); border:1px solid var(--color-border-neutral-lighter); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.5); width:440px; max-width:calc(100vw - 32px); }
@@ -9405,6 +9431,22 @@ const PA_MEMBER_ROLES = {
   ok: ['compliance-auditor'],
   lt: ['viewer', 'agent-builder'],
 };
+
+// MFA status per member (true = enrolled)
+const PA_MFA = { tg:true, mg:true, es:true, sb:true, dp:true, np:false, mc:true, sc:false, ap:false, jh:true, ps:false, ok:false, lt:true };
+
+// Cross-studio groups / teams
+const PA_GROUPS = [
+  { id:'engineering',  name:'Engineering',          color:'#10b981', desc:'Platform and product engineers building integrations and workflows.',    memberIds:['es','mc','jh'],      studios:['agentic','helix','governance'] },
+  { id:'ai-ops',       name:'AI Ops',               color:'#06B6D4', desc:'Responsible for deploying and monitoring AI workers in production.',      memberIds:['sb','dp','jh','lt'],  studios:['agentic'] },
+  { id:'data-team',    name:'Data Team',             color:'#8b5cf6', desc:'Data engineers and stewards managing model governance and lineage.',     memberIds:['mg','np'],           studios:['helix','governance'] },
+  { id:'leadership',   name:'Leadership',            color:'#f97316', desc:'Executives and directors with read access across all studios.',           memberIds:['tg','mg','es','ap'],  studios:['agentic','governance','helix'] },
+  { id:'compliance',   name:'Compliance & Audit',   color:'#0ea5e9', desc:'Read-only access to audit logs and governance events.',                   memberIds:['ok','ps'],           studios:['governance'] },
+  { id:'external',     name:'External Consultants', color:'#84cc16', desc:'Limited scoped access for contracted third-party consultants.',            memberIds:['ok'],               studios:[] },
+];
+
+// Group member edits (runtime, for add/remove in drawer)
+const _paGroupEdits = {};
 
 // Hierarchical permission tree: Studio → Feature → Individual permission
 const PERM_TREE = [
@@ -13494,6 +13536,18 @@ let _paState = {
   userAccessTab: 'governance',
   pendingChanges: [],
   applyChangesOpen: false,
+  // Groups tab
+  groupDetailId: null,
+  groupCreateOpen: false,
+  groupCreateName: '',
+  groupCreateDesc: '',
+  groupCreateColor: '#06B6D4',
+  groupCreateMembers: new Set(),
+  groupCreateStudios: new Set(),
+  // Role picker
+  rolePickerOpen: false,
+  rolePickerPersonId: null,
+  rolePickerSelected: null,
 };
 
 // ── Permission tree fixture (governance tab) — binary granted / not-granted ──
@@ -14079,6 +14133,11 @@ function renderPeople(subTab) {
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                 New role
                </button>`
+            : activeTab === 'groups'
+            ? `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenGroupCreate()">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                New group
+               </button>`
             : `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenInvite()">
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                 Invite member
@@ -14095,9 +14154,12 @@ function renderPeople(subTab) {
         <button class="pa-tab ${activeTab==='roles'?'active':''}" onclick="renderPeople('roles')">
           Roles &amp; Permissions <span class="pa-tab-count">${PA_ROLES.length}</span>
         </button>
+        <button class="pa-tab ${activeTab==='groups'?'active':''}" onclick="renderPeople('groups')">
+          Groups <span class="pa-tab-count">${PA_GROUPS.length}</span>
+        </button>
       </div>
 
-      ${activeTab === 'members' ? renderPeopleMembers() : renderPeopleRolesList()}
+      ${activeTab === 'members' ? renderPeopleMembers() : activeTab === 'roles' ? renderPeopleRolesList() : renderPeopleGroups()}
     </div>
 
     <!-- Member / Role detail drawer -->
@@ -14129,6 +14191,22 @@ function renderPeople(subTab) {
     <!-- Studio access modal -->
     <div class="rc-overlay ${_paState.studioAccessOpen ? 'open' : ''}" onclick="if(event.target===this)paCloseStudioAccess()">
       ${_paState.studioAccessOpen ? renderStudioAccessModal() : ''}
+    </div>
+
+    <!-- Group detail drawer -->
+    <div class="drawer-overlay ${_paState.groupDetailId ? 'open' : ''}" onclick="paCloseGroupDetail()"></div>
+    <div class="drawer ${_paState.groupDetailId ? 'open' : ''}" id="paGroupDrawer">
+      ${_paState.groupDetailId ? renderGroupDetail(_paState.groupDetailId) : ''}
+    </div>
+
+    <!-- Group create modal -->
+    <div class="rc-overlay ${_paState.groupCreateOpen ? 'open' : ''}" onclick="if(event.target===this)paCloseGroupCreate()">
+      ${_paState.groupCreateOpen ? renderGroupCreateModal() : ''}
+    </div>
+
+    <!-- Role picker modal -->
+    <div class="rc-overlay ${_paState.rolePickerOpen ? 'open' : ''}" onclick="if(event.target===this)paCloseRolePicker()">
+      ${_paState.rolePickerOpen ? renderRolePickerModal() : ''}
     </div>
   `;
   if (_paState.roleCreateOpen || _paState.roleEditId) _ptSetIndeterminate();
@@ -14236,6 +14314,7 @@ function renderPeopleMembers() {
             <th style="width:280px">Member</th>
             <th>Roles</th>
             <th style="width:130px">Status</th>
+            <th style="width:60px;text-align:center">MFA</th>
             <th style="width:130px">Last active</th>
             <th style="width:80px"></th>
           </tr>
@@ -14266,6 +14345,11 @@ function renderPeopleMembers() {
                   ${_paBadgeHTML(statusBadge(p.status))}
                   ${statusLabel(p.status)}
                 </div>
+              </td>
+              <td style="text-align:center">
+                ${PA_MFA[p.id]
+                  ? `<span class="pa-mfa-icon" title="MFA enabled"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M6.5 11l1.5 1.5L10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`
+                  : `<span class="pa-mfa-off" title="MFA not enabled"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>`}
               </td>
               <td class="pa-member-last">${escapeHtml(p.lastActive)}</td>
               <td onclick="event.stopPropagation()">
@@ -14401,7 +14485,7 @@ function renderMemberDrawer(personId) {
             ${p.id !== 'tg' ? `<button class="pa-remove-btn" onclick="paRemoveRole('${p.id}','${r.id}')">Remove</button>` : ''}
           </div>`).join('')
       }
-      ${p.id !== 'tg' ? `<button class="pa-add-role-btn" onclick="toast('Role picker coming soon','info')">
+      ${p.id !== 'tg' ? `<button class="pa-add-role-btn" onclick="paOpenRolePicker('${p.id}')">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Assign a role…
       </button>` : ''}
@@ -15431,6 +15515,224 @@ function paSubmitRoleCreate() {
   _paState.roleDetailTab = 'permissions';
   toast(`"${name}" role created`, 'success');
   _paRerender();
+}
+
+/* ---- Groups tab ---- */
+function renderPeopleGroups() {
+  return `
+  <div class="pa-groups-grid">
+    ${PA_GROUPS.map(g => {
+      const members = g.memberIds.map(id => MOCK_PEOPLE.find(p=>p.id===id)).filter(Boolean);
+      const avatars = members.slice(0,4).map(m=>_paAvHTML(m.id,m.name,m.initials,'ds-av-sm')).join('');
+      const extra = members.length > 4 ? `<span style="font-size:11px;color:var(--color-text-caption);margin-left:4px">+${members.length-4}</span>` : '';
+      return `
+      <div class="pa-group-card" onclick="paOpenGroupDetail('${g.id}')">
+        <div class="pa-group-card-hdr" style="background:${g.color}"></div>
+        <div class="pa-group-card-body">
+          <div class="pa-group-card-name">${escapeHtml(g.name)}</div>
+          <div class="pa-group-card-desc">${escapeHtml(g.desc)}</div>
+          <div class="pa-group-card-foot">
+            <div class="pa-group-studios">
+              ${g.studios.length ? g.studios.map(s=>`<span class="pa-group-studio-pip">${s}</span>`).join('') : `<span style="font-size:11px;color:var(--color-text-disabled)">No studios</span>`}
+            </div>
+            <div style="display:flex;align-items:center;gap:2px">${avatars}${extra}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderGroupDetail(groupId) {
+  const g = PA_GROUPS.find(x=>x.id===groupId);
+  if (!g) return '';
+  const members = g.memberIds.map(id => MOCK_PEOPLE.find(p=>p.id===id)).filter(Boolean);
+  const allStudios = ['agentic','helix','governance','data'];
+  return `
+  <div class="drawer-header">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:12px;height:12px;border-radius:3px;background:${g.color};display:inline-block;flex-shrink:0"></span>
+        <span class="drawer-title">${escapeHtml(g.name)}</span>
+      </div>
+      <div class="drawer-subtitle">${escapeHtml(g.desc)}</div>
+    </div>
+    <button class="drawer-close" onclick="paCloseGroupDetail()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="drawer-section-label" style="margin-top:20px">Studio access</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    ${allStudios.map(s => {
+      const active = g.studios.includes(s);
+      return `<div style="padding:6px 14px;border-radius:8px;border:1px solid ${active?'var(--pri)':'var(--color-border-neutral-subtle)'};background:${active?'rgba(43,127,255,0.06)':'transparent'};font-size:12px;font-weight:600;color:${active?'var(--pri)':'var(--color-text-caption)'}">${s}</div>`;
+    }).join('')}
+  </div>
+
+  <div class="drawer-section-label" style="margin-top:24px">Members (${members.length})</div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+    ${members.length ? members.map(m => {
+      const mfa = PA_MFA[m.id];
+      const roles = (PA_MEMBER_ROLES[m.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean);
+      return `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;background:var(--bg3)">
+        ${_paAvHTML(m.id,m.name,m.initials,'ds-av-md')}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(m.name)}</div>
+          <div style="font-size:11px;color:var(--color-text-caption)">${roles.map(r=>r.label).join(', ')||'No roles'}</div>
+        </div>
+        <span title="MFA ${mfa?'enabled':'disabled'}" style="color:${mfa?'var(--badge-success)':'var(--color-text-disabled)'}">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>${mfa?'<path d="M6.5 11l1.5 1.5L10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>':''}</svg>
+        </span>
+        <button class="pa-row-btn pa-row-btn--danger" title="Remove from group" onclick="paRemoveFromGroup('${groupId}','${m.id}')">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>`;
+    }).join('') : `<div style="font-size:13px;color:var(--color-text-disabled);padding:12px 0">No members yet.</div>`}
+  </div>
+
+  <div style="margin-top:24px;display:flex;gap:8px">
+    <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="toast('Member assignment coming in V1.2','info')">Add members</button>
+    ${g.id !== 'leadership' ? `<button class="ds-btn ds-btn-sm ds-btn--danger-ghost" onclick="paDeleteGroup('${groupId}')">Delete group</button>` : ''}
+  </div>`;
+}
+
+function renderGroupCreateModal() {
+  const s = _paState;
+  const allStudios = ['agentic','helix','governance','data'];
+  const COLORS = ['#10b981','#06B6D4','#8b5cf6','#f97316','#ef4444','#84cc16','#0ea5e9','#6366f1'];
+  return `
+  <div class="rc-modal" style="width:540px" onclick="event.stopPropagation()">
+    <div class="rc-modal-header">
+      <span class="rc-modal-title">Create group</span>
+      <button class="rc-modal-close" onclick="paCloseGroupCreate()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="rc-modal-body">
+      <label class="rc-label">Group name</label>
+      <input class="rc-input" placeholder="e.g. Platform Engineering" value="${escapeHtml(s.groupCreateName)}"
+        oninput="_paState.groupCreateName=this.value">
+
+      <label class="rc-label" style="margin-top:14px">Description</label>
+      <textarea class="rc-input" rows="2" placeholder="Brief description of this group's purpose..."
+        oninput="_paState.groupCreateDesc=this.value">${escapeHtml(s.groupCreateDesc)}</textarea>
+
+      <label class="rc-label" style="margin-top:14px">Color</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        ${COLORS.map(c=>`<div onclick="_paState.groupCreateColor='${c}';_paRerender()" style="width:26px;height:26px;border-radius:6px;background:${c};cursor:pointer;border:2px solid ${s.groupCreateColor===c?'#fff':'transparent'};box-shadow:${s.groupCreateColor===c?'0 0 0 2px var(--pri)':'none'}"></div>`).join('')}
+      </div>
+
+      <label class="rc-label" style="margin-top:14px">Studio access</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        ${allStudios.map(st=>{
+          const on = s.groupCreateStudios.has(st);
+          return `<div onclick="if(_paState.groupCreateStudios.has('${st}'))_paState.groupCreateStudios.delete('${st}');else _paState.groupCreateStudios.add('${st}');_paRerender()" style="padding:6px 14px;border-radius:8px;border:1px solid ${on?'var(--pri)':'var(--color-border-neutral-subtle)'};background:${on?'rgba(43,127,255,0.06)':'transparent'};font-size:12px;font-weight:600;color:${on?'var(--pri)':'var(--color-text-caption)'};cursor:pointer">${st}</div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="rc-modal-footer">
+      <button class="ds-btn ds-btn-sm ds-btn--ghost" onclick="paCloseGroupCreate()">Cancel</button>
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitGroupCreate()">Create group</button>
+    </div>
+  </div>`;
+}
+
+function renderRolePickerModal() {
+  const s = _paState;
+  const p = MOCK_PEOPLE.find(x=>x.id===s.rolePickerPersonId);
+  const currentRoles = PA_MEMBER_ROLES[s.rolePickerPersonId]||[];
+  return `
+  <div class="rc-modal" style="width:580px" onclick="event.stopPropagation()">
+    <div class="rc-modal-header">
+      <span class="rc-modal-title">Assign role${p?` — ${escapeHtml(p.name)}`:''}</span>
+      <button class="rc-modal-close" onclick="paCloseRolePicker()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="rc-modal-body">
+      <div style="font-size:12px;color:var(--color-text-caption);margin-bottom:14px">Select a role to assign. Roles define what this member can see and do across studios.</div>
+      <div class="rp-grid">
+        ${PA_ROLES.map(r => {
+          const selected = s.rolePickerSelected !== null ? s.rolePickerSelected === r.id : currentRoles.includes(r.id);
+          return `
+          <div class="rp-card ${selected?'selected':''}" onclick="_paState.rolePickerSelected='${r.id}';_paRerender()">
+            <div class="rp-card-dot" style="background:${r.color}"></div>
+            <div class="rp-card-name">${escapeHtml(r.label)}</div>
+            <div class="rp-card-desc">${escapeHtml(r.desc||'')}</div>
+            <div class="rp-card-type">${r.system?'System role':'Custom role'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="rc-modal-footer">
+      <button class="ds-btn ds-btn-sm ds-btn--ghost" onclick="paCloseRolePicker()">Cancel</button>
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paAssignRole()">Assign role</button>
+    </div>
+  </div>`;
+}
+
+/* ---- Groups & Role-picker plumbing ---- */
+function paOpenGroupDetail(groupId) { _paState.groupDetailId = groupId; _paRerender(); }
+function paCloseGroupDetail() { _paState.groupDetailId = null; _paRerender(); }
+function paOpenGroupCreate() {
+  _paState.groupCreateOpen = true;
+  _paState.groupCreateName = '';
+  _paState.groupCreateDesc = '';
+  _paState.groupCreateColor = '#06B6D4';
+  _paState.groupCreateMembers = new Set();
+  _paState.groupCreateStudios = new Set();
+  _paRerender();
+}
+function paCloseGroupCreate() { _paState.groupCreateOpen = false; _paRerender(); }
+function paSubmitGroupCreate() {
+  const name = _paState.groupCreateName.trim();
+  if (!name) { toast('Group name is required', 'error'); return; }
+  const newId = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  PA_GROUPS.push({ id:newId, name, color:_paState.groupCreateColor, desc:_paState.groupCreateDesc||'No description', memberIds:[], studios:Array.from(_paState.groupCreateStudios) });
+  _paState.groupCreateOpen = false;
+  _paState.groupDetailId = newId;
+  toast(`"${name}" group created`, 'success');
+  _paRerender();
+}
+function paRemoveFromGroup(groupId, personId) {
+  const g = PA_GROUPS.find(x=>x.id===groupId);
+  if (g) g.memberIds = g.memberIds.filter(id=>id!==personId);
+  toast('Member removed from group', 'success');
+  _paRerender();
+}
+function paDeleteGroup(groupId) {
+  const idx = PA_GROUPS.findIndex(x=>x.id===groupId);
+  if (idx !== -1) {
+    const name = PA_GROUPS[idx].name;
+    PA_GROUPS.splice(idx, 1);
+    _paState.groupDetailId = null;
+    toast(`"${name}" group deleted`, 'success');
+    _paRerender();
+  }
+}
+function paOpenRolePicker(personId) {
+  _paState.rolePickerOpen = true;
+  _paState.rolePickerPersonId = personId;
+  _paState.rolePickerSelected = null;
+  _paRerender();
+}
+function paCloseRolePicker() {
+  _paState.rolePickerOpen = false;
+  _paState.rolePickerPersonId = null;
+  _paState.rolePickerSelected = null;
+  _paRerender();
+}
+function paAssignRole() {
+  const personId = _paState.rolePickerPersonId;
+  const roleId = _paState.rolePickerSelected;
+  if (!roleId) { toast('Please select a role', 'error'); return; }
+  if (!PA_MEMBER_ROLES[personId]) PA_MEMBER_ROLES[personId] = [];
+  if (!PA_MEMBER_ROLES[personId].includes(roleId)) PA_MEMBER_ROLES[personId] = [roleId, ...PA_MEMBER_ROLES[personId]];
+  const role = PA_ROLES.find(r=>r.id===roleId);
+  paCloseRolePicker();
+  toast(`Role "${role?.label||roleId}" assigned`, 'success');
 }
 
 /* ====================== PEOPLE & ACCESS end ====================== */
