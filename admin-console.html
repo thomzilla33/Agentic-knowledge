@@ -14493,36 +14493,61 @@ function renderMemberDrawer(personId) {
 
   const activityEvents = {
     tg: [
-      { event:'Logged in', time:'Just now', detail:'' },
-      { event:'Invited Priya Subramaniam', time:'Aug 10, 2026', detail:'Role: Compliance Officer' },
-      { event:'Updated workspace billing plan', time:'Jul 28, 2026', detail:'' },
+      { type:'login',   event:'Logged in',                              time:'Just now',    studio:'',                  detail:'' },
+      { type:'admin',   event:'Invited Priya Subramaniam',              time:'Aug 10, 2026',studio:'',                  detail:'Role: Compliance Officer' },
+      { type:'admin',   event:'Updated workspace billing plan',         time:'Jul 28, 2026',studio:'Platform',          detail:'Upgraded to Enterprise' },
+      { type:'role',    event:'Assigned "Workspace Admin" to Diana P.', time:'Jul 20, 2026',studio:'',                  detail:'' },
+      { type:'view',    event:'Viewed audit log',                       time:'Jul 15, 2026',studio:'Platform',          detail:'' },
     ],
     mg: [
-      { event:'Logged in', time:'2h ago', detail:'' },
-      { event:'Edited governance policy', time:'Aug 11, 2026', detail:'Governance Studio' },
-      { event:'Published model "Customer Churn v3"', time:'Aug 5, 2026', detail:'Helix Studio' },
+      { type:'login',   event:'Logged in',                              time:'2h ago',      studio:'',                  detail:'' },
+      { type:'edit',    event:'Edited governance policy',               time:'Aug 11, 2026',studio:'Governance Studio', detail:'AI Use Policy v2' },
+      { type:'publish', event:'Published model "Customer Churn v3"',    time:'Aug 5, 2026', studio:'Helix Studio',      detail:'' },
+      { type:'create',  event:'Created domain "Customer Analytics"',    time:'Aug 1, 2026', studio:'Governance Studio', detail:'' },
+      { type:'view',    event:'Viewed lineage report',                  time:'Jul 28, 2026',studio:'Helix Studio',      detail:'Customer 360 pipeline' },
+      { type:'login',   event:'Logged in',                              time:'Jul 25, 2026',studio:'',                  detail:'' },
     ],
     sc: [
-      { event:'Logged in', time:'3 days ago', detail:'' },
-      { event:'Account suspended', time:'Aug 9, 2026', detail:'Pending access review' },
-      { event:'Accessed Customer Success agent', time:'Aug 8, 2026', detail:'Agentic Studio' },
+      { type:'suspend', event:'Account suspended',                      time:'Aug 9, 2026', studio:'',                  detail:'Pending access review' },
+      { type:'login',   event:'Last login before suspension',           time:'Aug 8, 2026', studio:'',                  detail:'' },
+      { type:'view',    event:'Accessed "Customer Success" agent',      time:'Aug 8, 2026', studio:'Agentic Studio',    detail:'' },
+      { type:'login',   event:'Logged in',                              time:'Aug 7, 2026', studio:'',                  detail:'' },
     ],
     ok: [
-      { event:'Logged in', time:'1 week ago', detail:'' },
-      { event:'Viewed audit log (read-only)', time:'Jul 28, 2026', detail:'' },
-      { event:'Added as External Consultant', time:'Jul 20, 2026', detail:'Individual grants only' },
+      { type:'login',   event:'Logged in',                              time:'1 week ago',  studio:'',                  detail:'' },
+      { type:'view',    event:'Viewed audit log (read-only)',           time:'Jul 28, 2026',studio:'Platform',          detail:'' },
+      { type:'admin',   event:'Added as External Consultant',          time:'Jul 20, 2026',studio:'',                  detail:'Individual grants only' },
     ],
     ps: [
-      { event:'Invitation sent', time:'Aug 10, 2026', detail:'Email: priya.subramaniam@contoso.com' },
+      { type:'invite',  event:'Invitation sent',                        time:'Aug 10, 2026',studio:'',                  detail:'Email: priya.subramaniam@contoso.com' },
     ],
     jh: [
-      { event:'Logged in', time:'Yesterday', detail:'' },
-      { event:'Deployed "Invoice Processor" worker', time:'Aug 8, 2026', detail:'Agentic Studio' },
-      { event:'Delete permissions restricted by admin', time:'Jul 30, 2026', detail:'Workers, Networks, Workflows' },
+      { type:'login',   event:'Logged in',                              time:'Yesterday',   studio:'',                  detail:'' },
+      { type:'deploy',  event:'Deployed "Invoice Processor" worker',    time:'Aug 8, 2026', studio:'Agentic Studio',    detail:'' },
+      { type:'create',  event:'Created network "AP Processing"',        time:'Aug 3, 2026', studio:'Agentic Studio',    detail:'' },
+      { type:'admin',   event:'Delete permissions restricted by admin', time:'Jul 30, 2026',studio:'',                  detail:'Workers, Networks, Workflows' },
+    ],
+    es: [
+      { type:'login',   event:'Logged in',                              time:'1h ago',      studio:'',                  detail:'' },
+      { type:'edit',    event:'Updated data connector "Salesforce CRM"',time:'Aug 12, 2026',studio:'Helix Studio',      detail:'' },
+      { type:'publish', event:'Published model "Revenue Forecast v4"',  time:'Aug 6, 2026', studio:'Helix Studio',      detail:'' },
+      { type:'view',    event:'Viewed governance dashboard',            time:'Jul 30, 2026',studio:'Governance Studio', detail:'' },
+    ],
+    sb: [
+      { type:'login',   event:'Logged in',                              time:'Yesterday',   studio:'',                  detail:'' },
+      { type:'deploy',  event:'Deployed "Email Responder" worker',      time:'Aug 9, 2026', studio:'Agentic Studio',    detail:'' },
+      { type:'create',  event:'Built agent network "Support Triage"',   time:'Aug 4, 2026', studio:'Agentic Studio',    detail:'' },
+      { type:'login',   event:'Logged in',                              time:'Aug 2, 2026', studio:'',                  detail:'' },
+    ],
+    np: [
+      { type:'login',   event:'Logged in',                              time:'4h ago',      studio:'',                  detail:'' },
+      { type:'edit',    event:'Approved promotion packet',              time:'Aug 10, 2026',studio:'Governance Studio', detail:'Customer 360 v2' },
+      { type:'create',  event:'Defined resolution rule "PII Redact"',   time:'Aug 5, 2026', studio:'Governance Studio', detail:'' },
+      { type:'view',    event:'Viewed model lineage',                   time:'Jul 29, 2026',studio:'Helix Studio',      detail:'Revenue Forecast pipeline' },
     ],
   }[p.id] || [
-    { event:'Logged in', time:p.lastActive, detail:'' },
-    { event:'Joined workspace', time:p.joinDate, detail:'' },
+    { type:'login', event:'Logged in',      time:p.lastActive||'—', studio:'', detail:'' },
+    { type:'admin', event:'Joined workspace',time:p.joinDate||'—',  studio:'', detail:'' },
   ];
 
   // --- profile meta ---
@@ -14743,20 +14768,49 @@ function renderMemberDrawer(personId) {
       }
     </div>`;
 
+  const ACTIVITY_ICONS = {
+    login:   { color:'#2b7fff', bg:'rgba(43,127,255,.12)', path:'<path d="M7 10a3 3 0 100-6 3 3 0 000 6zm-4 4a4 4 0 017.45-2M15 4l1.5 1.5-4 4-2-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    edit:    { color:'#8b5cf6', bg:'rgba(139,92,246,.12)', path:'<path d="M11 3l2 2-7 7H4v-2L11 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    publish: { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<path d="M8 12V4M5 7l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>' },
+    create:  { color:'#06B6D4', bg:'rgba(6,182,212,.12)',  path:'<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' },
+    view:    { color:'#64748b', bg:'rgba(100,116,139,.1)', path:'<path d="M8 5c-2.8 0-5 3-5 3s2.2 3 5 3 5-3 5-3-2.2-3-5-3zm0 5a2 2 0 110-4 2 2 0 010 4z" fill="currentColor"/>' },
+    admin:   { color:'#f59e0b', bg:'rgba(245,158,11,.12)', path:'<path d="M8 2l1.4 2.9 3.3.5-2.4 2.3.6 3.2L8 9.4l-2.9 1.5.6-3.2L3.3 5.4l3.3-.5L8 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>' },
+    role:    { color:'#2b7fff', bg:'rgba(43,127,255,.12)', path:'<path d="M9.5 5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM3.5 14a3.5 3.5 0 017 0M13.5 6l1 1-3 3-2-2 1-1 1 1 2-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    suspend: { color:'#ef4444', bg:'rgba(239,68,68,.1)',   path:'<circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
+    invite:  { color:'#f59e0b', bg:'rgba(245,158,11,.12)', path:'<rect x="2" y="5" width="12" height="9" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M2 6l6 4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
+    deploy:  { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<rect x="2" y="10" width="12" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M8 2v8M5.5 4.5l2.5-2.5 2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+  };
+  const STUDIO_COLORS = { 'Agentic Studio':'#06B6D4','Governance Studio':'#10b981','Helix Studio':'#8b5cf6','Platform':'#64748b' };
+
+  const activityRows = activityEvents.map(function(e, i) {
+    const ic = ACTIVITY_ICONS[e.type] || ACTIVITY_ICONS.view;
+    const isLast = i === activityEvents.length - 1;
+    const sc = e.studio ? STUDIO_COLORS[e.studio] : null;
+    const studioTag = sc
+      ? '<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:500;color:' + sc + ';background:' + sc + '1a;border:1px solid ' + sc + '33;border-radius:4px;padding:1px 6px;white-space:nowrap;flex-shrink:0;margin-left:4px"><span style="width:5px;height:5px;border-radius:50%;background:' + sc + ';display:inline-block;flex-shrink:0"></span>' + escapeHtml(e.studio) + '</span>'
+      : '';
+    const detailSpan = e.detail ? '<span style="color:var(--color-text-caption);margin-left:2px">· ' + escapeHtml(e.detail) + '</span>' : '';
+    const connector = isLast ? '' : '<div style="width:1px;flex:1;min-height:12px;background:var(--color-border-neutral-subtle);margin:2px auto 0"></div>';
+    return '<div style="display:flex;gap:10px;align-items:flex-start">'
+      + '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">'
+      + '<div style="width:24px;height:24px;border-radius:50%;background:' + ic.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+      + '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:' + ic.color + '">' + ic.path + '</svg>'
+      + '</div>'
+      + connector
+      + '</div>'
+      + '<div style="flex:1;min-width:0;padding-bottom:' + (isLast ? '4' : '14') + 'px">'
+      + '<div style="font-size:12.5px;color:var(--color-text-title);line-height:1.4;display:flex;align-items:center;flex-wrap:wrap;gap:3px">' + escapeHtml(e.event) + studioTag + '</div>'
+      + (e.detail ? '<div style="font-size:12px;color:var(--color-text-caption);margin-top:1px">' + escapeHtml(e.detail) + '</div>' : '')
+      + '<div style="font-size:11.5px;color:var(--color-text-caption);margin-top:2px">' + escapeHtml(e.time) + '</div>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+
   const activityContent = `
     <div class="pa-slideout-section">
       <div class="pa-slideout-section-h">Recent activity</div>
-      <div>
-        ${activityEvents.map(e => `
-          <div class="pm-activity-row">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--color-text-caption);flex-shrink:0;margin-top:4px"></div>
-            <div>
-              <div class="pm-activity-event">${escapeHtml(e.event)}${e.detail ? ` <span style="color:var(--color-text-caption)">· ${escapeHtml(e.detail)}</span>` : ''}</div>
-              <div class="pm-activity-time">${escapeHtml(e.time)}</div>
-            </div>
-          </div>`).join('')}
-      </div>
-      <div style="margin-top:12px">
+      <div style="margin-top:4px">${activityRows}</div>
+      <div style="margin-top:14px">
         <a href="#/audit" style="font-size:12px;color:var(--pri);text-decoration:none" onclick="paCloseDrawer();navigate('#/audit')">View full audit log →</a>
       </div>
     </div>`;
