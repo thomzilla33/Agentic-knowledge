@@ -6408,6 +6408,64 @@ html.theme-light .audit-ev{background:var(--canvas); border-color:var(--line); c
 html.theme-light .audit-filters{background:var(--canvas); border-color:var(--line)}
 html.theme-light .audit-filter-input{background:#FFFFFF; border-color:var(--line); color:var(--t1)}
 
+/* ====================== TENANT DIRECTORY ====================== */
+.td-page{padding:28px 32px 60px;max-width:1200px;}
+.td-stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.td-stat{background:var(--canvas);border:1px solid var(--line);border-radius:12px;padding:14px 18px;}
+.td-stat-val{font-size:26px;font-weight:700;color:var(--t1);line-height:1;}
+.td-stat-label{font-size:11px;color:var(--t3);margin-top:4px;}
+.td-stat-sub{font-size:11px;color:var(--pri);margin-top:2px;}
+.td-filters{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.td-search{flex:1;min-width:200px;max-width:320px;display:flex;align-items:center;gap:6px;background:var(--canvas);border:1px solid var(--line);border-radius:8px;padding:7px 10px;}
+.td-search input{background:none;border:none;outline:none;font-size:13px;color:var(--t1);width:100%;font-family:inherit;}
+.td-search input::placeholder{color:var(--t3);}
+.td-filter-select{font-size:12px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--canvas);color:var(--t1);cursor:pointer;font-family:inherit;outline:none;}
+.td-table-wrap{background:var(--canvas);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.td-table{width:100%;border-collapse:collapse;}
+.td-table th{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;padding:10px 16px;text-align:left;border-bottom:1px solid var(--line);background:var(--bg);}
+.td-table td{padding:13px 16px;font-size:13px;color:var(--t1);border-bottom:1px solid var(--line);vertical-align:middle;}
+.td-table tbody tr:last-child td{border-bottom:none;}
+.td-table tbody tr:hover{background:var(--hover);cursor:pointer;}
+.td-tenant-name{font-weight:600;color:var(--t1);}
+.td-tenant-domain{font-size:11px;color:var(--t3);margin-top:2px;}
+.td-health-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;flex-shrink:0;}
+.td-health-dot--healthy{background:#22c55e;}
+.td-health-dot--trial{background:#f59e0b;}
+.td-health-dot--suspended{background:#ef4444;}
+.td-plan-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.03em;text-transform:uppercase;}
+.td-plan-pill--enterprise{background:rgba(43,127,255,.12);color:var(--pri);}
+.td-plan-pill--team{background:rgba(99,102,241,.12);color:#6366f1;}
+.td-plan-pill--starter{background:rgba(100,116,139,.12);color:#64748b;}
+.td-studio-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;background:rgba(43,127,255,.08);color:var(--pri);border:1px solid rgba(43,127,255,.2);}
+.td-studio-chip--off{background:var(--bg);color:var(--t3);border-color:var(--line);}
+/* Drawer tabs */
+.td-drawer-tabs{display:flex;gap:2px;padding:12px 20px 0;border-bottom:1px solid var(--line);margin-bottom:0;}
+.td-drawer-tab{font-size:12px;font-weight:500;padding:7px 12px;border-radius:6px 6px 0 0;border:none;background:none;color:var(--t3);cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.td-drawer-tab.active{color:var(--pri);border-bottom-color:var(--pri);font-weight:600;}
+.td-drawer-body{padding:18px 20px;overflow-y:auto;flex:1;}
+.td-section{margin-bottom:22px;}
+.td-section-title{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;}
+.td-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);}
+.td-row:last-child{border-bottom:none;}
+.td-row-key{font-size:12px;color:var(--t3);}
+.td-row-val{font-size:12px;font-weight:500;color:var(--t1);text-align:right;}
+.td-row-val--green{color:#22c55e;}
+.td-row-val--red{color:#ef4444;}
+.td-row-val--amber{color:#f59e0b;}
+.td-feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.td-feat-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--line);}
+.td-feat-label{font-size:12px;color:var(--t1);}
+.td-feat-check{font-size:12px;font-weight:700;}
+.td-feat-check--on{color:#22c55e;}
+.td-feat-check--off{color:var(--t3);}
+.td-admin-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:4px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--line);color:var(--t2);margin:3px 3px 3px 0;}
+.td-empty{padding:48px;text-align:center;color:var(--t3);font-size:13px;}
+html.theme-light .td-stat{background:#FFFFFF;border-color:var(--line);}
+html.theme-light .td-table-wrap{background:#FFFFFF;border-color:var(--line);}
+html.theme-light .td-table th{background:#F8FAFC;}
+html.theme-light .td-filter-select{background:#FFFFFF;}
+html.theme-light .td-search{background:#FFFFFF;}
+
 /* Drawer (generic) */
 html.theme-light .drawer{
   background:linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%);
@@ -8872,6 +8930,14 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
           </button>
         </div>
 
+        <!-- SUPER ADMIN -->
+        <div class="ssb-group" id="ssbSuperAdmin">
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Super Admin</span></div>
+          <button class="ssb-item" data-route="tenants" onclick="navigate('#/tenants')">
+            <span class="ssb-item-label">Tenant Directory</span>
+          </button>
+        </div>
+
       </div>
 
       </aside>
@@ -10279,6 +10345,89 @@ const INTEGRATIONS = [
     approvers:[]
   }
 ];
+
+/* ====================== TENANT DIRECTORY DATA ====================== */
+const MOCK_TENANTS = [
+  {
+    id: 'tenant-contoso', name: 'Contoso Ltd', domain: 'contoso.com', plan: 'enterprise',
+    status: 'active', users: 84, activeUsers: 71, createdAt: '2024-03-12',
+    admins: ['thomas.gonzalez@aimsos.ai', 'ana.ruiz@contoso.com'],
+    studios: { agentic: true, governance: true, workforce: true, data: true },
+    governance: { sandboxMode: 'scoped', truthPlane: 'enabled', humanInLoop: true, auditRetention: 90 },
+    billing: { mrr: 8400, seats: 100, seatsUsed: 84, renewalDate: '2027-03-12' },
+    features: { sso: true, mfa: true, apiAccess: true, customRoles: true, advancedAudit: true },
+    lastActivity: '2 min ago', health: 'healthy'
+  },
+  {
+    id: 'tenant-northwind', name: 'Northwind Traders', domain: 'northwind.io', plan: 'team',
+    status: 'active', users: 23, activeUsers: 20, createdAt: '2024-08-01',
+    admins: ['carlos.diaz@northwind.io'],
+    studios: { agentic: true, governance: false, workforce: true, data: false },
+    governance: { sandboxMode: 'open', truthPlane: 'disabled', humanInLoop: false, auditRetention: 30 },
+    billing: { mrr: 1150, seats: 25, seatsUsed: 23, renewalDate: '2026-08-01' },
+    features: { sso: false, mfa: true, apiAccess: false, customRoles: false, advancedAudit: false },
+    lastActivity: '1 hour ago', health: 'healthy'
+  },
+  {
+    id: 'tenant-fabrikam', name: 'Fabrikam Inc', domain: 'fabrikam.com', plan: 'enterprise',
+    status: 'active', users: 210, activeUsers: 188, createdAt: '2023-11-20',
+    admins: ['john.doe@fabrikam.com', 'sara.lee@fabrikam.com', 'mike.wang@fabrikam.com'],
+    studios: { agentic: true, governance: true, workforce: true, data: true },
+    governance: { sandboxMode: 'strict', truthPlane: 'enabled', humanInLoop: true, auditRetention: 365 },
+    billing: { mrr: 21000, seats: 250, seatsUsed: 210, renewalDate: '2026-11-20' },
+    features: { sso: true, mfa: true, apiAccess: true, customRoles: true, advancedAudit: true },
+    lastActivity: '5 min ago', health: 'healthy'
+  },
+  {
+    id: 'tenant-adatum', name: 'Adatum Corporation', domain: 'adatum.net', plan: 'starter',
+    status: 'trial', users: 8, activeUsers: 6, createdAt: '2026-07-30',
+    admins: ['admin@adatum.net'],
+    studios: { agentic: true, governance: false, workforce: false, data: false },
+    governance: { sandboxMode: 'open', truthPlane: 'disabled', humanInLoop: false, auditRetention: 7 },
+    billing: { mrr: 0, seats: 10, seatsUsed: 8, renewalDate: '2026-08-30' },
+    features: { sso: false, mfa: false, apiAccess: false, customRoles: false, advancedAudit: false },
+    lastActivity: '3 hours ago', health: 'trial'
+  },
+  {
+    id: 'tenant-tailspin', name: 'Tailspin Toys', domain: 'tailspintoys.com', plan: 'team',
+    status: 'suspended', users: 15, activeUsers: 0, createdAt: '2024-05-18',
+    admins: ['billing@tailspintoys.com'],
+    studios: { agentic: false, governance: false, workforce: false, data: false },
+    governance: { sandboxMode: 'open', truthPlane: 'disabled', humanInLoop: false, auditRetention: 30 },
+    billing: { mrr: 0, seats: 20, seatsUsed: 15, renewalDate: '2026-05-18' },
+    features: { sso: false, mfa: false, apiAccess: false, customRoles: false, advancedAudit: false },
+    lastActivity: '18 days ago', health: 'suspended'
+  },
+  {
+    id: 'tenant-alpine', name: 'Alpine Ski House', domain: 'alpineski.co', plan: 'enterprise',
+    status: 'active', users: 56, activeUsers: 49, createdAt: '2025-01-15',
+    admins: ['ops@alpineski.co', 'diana.frost@alpineski.co'],
+    studios: { agentic: true, governance: true, workforce: false, data: true },
+    governance: { sandboxMode: 'scoped', truthPlane: 'enabled', humanInLoop: true, auditRetention: 180 },
+    billing: { mrr: 5600, seats: 60, seatsUsed: 56, renewalDate: '2027-01-15' },
+    features: { sso: true, mfa: true, apiAccess: true, customRoles: true, advancedAudit: false },
+    lastActivity: '30 min ago', health: 'healthy'
+  },
+  {
+    id: 'tenant-woodgrove', name: 'Woodgrove Bank', domain: 'woodgrovebank.com', plan: 'enterprise',
+    status: 'active', users: 342, activeUsers: 310, createdAt: '2023-06-01',
+    admins: ['it-admin@woodgrovebank.com', 'security@woodgrovebank.com'],
+    studios: { agentic: true, governance: true, workforce: true, data: true },
+    governance: { sandboxMode: 'strict', truthPlane: 'enabled', humanInLoop: true, auditRetention: 730 },
+    billing: { mrr: 34200, seats: 400, seatsUsed: 342, renewalDate: '2026-06-01' },
+    features: { sso: true, mfa: true, apiAccess: true, customRoles: true, advancedAudit: true },
+    lastActivity: '1 min ago', health: 'healthy'
+  }
+];
+
+let _tdState = {
+  search: '',
+  filterPlan: 'all',
+  filterStatus: 'all',
+  filterStudio: 'all',
+  drawerTenantId: null,
+  drawerTab: 'overview'
+};
 
 const AUDIT_EVENTS = [
   { ts:'2 min ago', tsAbs:'2026-05-19 14:18:22 UTC', sev:'info', event:'integration.used_by_agent', actor:'Agent: Sales Triage Bot', actorType:'agent', resource:'slack', studio:'agentic', ip:'10.0.4.12', details:{action:'send_message', channel:'#sales-leads', message_length:124} },
@@ -18646,6 +18795,8 @@ function route() {
     renderDataPrivacy();
   } else if (parts[0]==='notifications') {
     renderNotifications();
+  } else if (parts[0]==='tenants') {
+    renderTenantDirectory(parts[1] || null);
   } else {
     renderHome();
   }
@@ -22163,6 +22314,7 @@ function closeDrawer() {
   state.drawerOpen = false;
   $('drawerOverlay').classList.remove('open');
   $('drawer').classList.remove('open');
+  if (typeof _tdState !== 'undefined') _tdState.drawerTenantId = null;
 }
 
 
@@ -25048,5 +25200,304 @@ window.NOTIF_DATA = [
     </button>
   </div>
 </div>
+
+<script>
+/* ====================== TENANT DIRECTORY ====================== */
+
+function _tdFilteredTenants() {
+  const q = _tdState.search.toLowerCase();
+  return MOCK_TENANTS.filter(t => {
+    if (q && !t.name.toLowerCase().includes(q) && !t.domain.toLowerCase().includes(q)) return false;
+    if (_tdState.filterPlan !== 'all' && t.plan !== _tdState.filterPlan) return false;
+    if (_tdState.filterStatus !== 'all' && t.status !== _tdState.filterStatus) return false;
+    if (_tdState.filterStudio !== 'all' && !t.studios[_tdState.filterStudio]) return false;
+    return true;
+  });
+}
+
+function _tdHealthLabel(h) {
+  return { healthy: 'Active', trial: 'Trial', suspended: 'Suspended' }[h] || h;
+}
+
+function _tdStudioChips(studios) {
+  const map = { agentic: 'Agentic', governance: 'Governance', workforce: 'Workforce', data: 'Data' };
+  return Object.entries(map).map(([k, label]) =>
+    `<span class="td-studio-chip${studios[k] ? '' : ' td-studio-chip--off'}">${label}</span>`
+  ).join('');
+}
+
+function _tdPlanPill(plan) {
+  return `<span class="td-plan-pill td-plan-pill--${plan}">${plan}</span>`;
+}
+
+function renderTenantDirectory(tenantId) {
+  setActiveNav('tenants');
+  if (tenantId) {
+    const t = MOCK_TENANTS.find(x => x.id === tenantId);
+    if (t) { _tdState.drawerTenantId = tenantId; }
+  }
+
+  const all = MOCK_TENANTS;
+  const active = all.filter(t => t.status === 'active').length;
+  const trial  = all.filter(t => t.status === 'trial').length;
+  const susp   = all.filter(t => t.status === 'suspended').length;
+  const totalMrr = all.reduce((s, t) => s + t.billing.mrr, 0);
+  const filtered = _tdFilteredTenants();
+
+  const statsStrip = `
+    <div class="td-stats-strip">
+      <div class="td-stat">
+        <div class="td-stat-val">${all.length}</div>
+        <div class="td-stat-label">Total tenants</div>
+        <div class="td-stat-sub">${active} active · ${trial} trial · ${susp} suspended</div>
+      </div>
+      <div class="td-stat">
+        <div class="td-stat-val">${all.reduce((s,t)=>s+t.users,0).toLocaleString()}</div>
+        <div class="td-stat-label">Total users</div>
+        <div class="td-stat-sub">${all.reduce((s,t)=>s+t.activeUsers,0).toLocaleString()} active this month</div>
+      </div>
+      <div class="td-stat">
+        <div class="td-stat-val">$${(totalMrr/1000).toFixed(1)}k</div>
+        <div class="td-stat-label">Monthly recurring revenue</div>
+        <div class="td-stat-sub">${all.filter(t=>t.plan==='enterprise').length} enterprise accounts</div>
+      </div>
+      <div class="td-stat">
+        <div class="td-stat-val">${all.reduce((s,t)=>s+t.billing.seatsUsed,0)}<span style="font-size:14px;font-weight:400;color:var(--t3)"> / ${all.reduce((s,t)=>s+t.billing.seats,0)}</span></div>
+        <div class="td-stat-label">Seats used / provisioned</div>
+        <div class="td-stat-sub">${Math.round(all.reduce((s,t)=>s+t.billing.seatsUsed,0)/all.reduce((s,t)=>s+t.billing.seats,0)*100)}% utilization</div>
+      </div>
+    </div>`;
+
+  const filtersBar = `
+    <div class="td-filters">
+      <div class="td-search">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input placeholder="Search tenants…" value="${escapeHtml(_tdState.search)}" oninput="_tdState.search=this.value;renderTenantDirectory()" />
+      </div>
+      <select class="td-filter-select" onchange="_tdState.filterPlan=this.value;renderTenantDirectory()">
+        <option value="all"${_tdState.filterPlan==='all'?' selected':''}>All plans</option>
+        <option value="enterprise"${_tdState.filterPlan==='enterprise'?' selected':''}>Enterprise</option>
+        <option value="team"${_tdState.filterPlan==='team'?' selected':''}>Team</option>
+        <option value="starter"${_tdState.filterPlan==='starter'?' selected':''}>Starter</option>
+      </select>
+      <select class="td-filter-select" onchange="_tdState.filterStatus=this.value;renderTenantDirectory()">
+        <option value="all"${_tdState.filterStatus==='all'?' selected':''}>All statuses</option>
+        <option value="active"${_tdState.filterStatus==='active'?' selected':''}>Active</option>
+        <option value="trial"${_tdState.filterStatus==='trial'?' selected':''}>Trial</option>
+        <option value="suspended"${_tdState.filterStatus==='suspended'?' selected':''}>Suspended</option>
+      </select>
+      <select class="td-filter-select" onchange="_tdState.filterStudio=this.value;renderTenantDirectory()">
+        <option value="all"${_tdState.filterStudio==='all'?' selected':''}>All studios</option>
+        <option value="agentic"${_tdState.filterStudio==='agentic'?' selected':''}>Agentic</option>
+        <option value="governance"${_tdState.filterStudio==='governance'?' selected':''}>Governance</option>
+        <option value="workforce"${_tdState.filterStudio==='workforce'?' selected':''}>Workforce</option>
+        <option value="data"${_tdState.filterStudio==='data'?' selected':''}>Data</option>
+      </select>
+      <span style="font-size:12px;color:var(--t3);margin-left:auto">${filtered.length} tenant${filtered.length!==1?'s':''}</span>
+    </div>`;
+
+  const tableRows = filtered.length === 0
+    ? `<tr><td colspan="7" class="td-empty">No tenants match your filters.</td></tr>`
+    : filtered.map(t => `
+    <tr onclick="tdOpenDrawer('${t.id}')">
+      <td>
+        <div class="td-tenant-name">${escapeHtml(t.name)}</div>
+        <div class="td-tenant-domain">${escapeHtml(t.domain)}</div>
+      </td>
+      <td>${_tdPlanPill(t.plan)}</td>
+      <td>
+        <span style="display:inline-flex;align-items:center">
+          <span class="td-health-dot td-health-dot--${t.health}"></span>
+          ${_tdHealthLabel(t.health)}
+        </span>
+      </td>
+      <td>${_tdStudioChips(t.studios)}</td>
+      <td style="font-variant-numeric:tabular-nums">${t.users}<span style="color:var(--t3)"> / ${t.billing.seats}</span></td>
+      <td style="font-size:12px;color:var(--t2)">${t.billing.mrr > 0 ? '$'+t.billing.mrr.toLocaleString()+'/mo' : '—'}</td>
+      <td style="font-size:11px;color:var(--t3)">${t.lastActivity}</td>
+    </tr>`).join('');
+
+  const table = `
+    <div class="td-table-wrap">
+      <table class="td-table">
+        <thead>
+          <tr>
+            <th>Tenant</th>
+            <th>Plan</th>
+            <th>Status</th>
+            <th>Studios</th>
+            <th>Users / Seats</th>
+            <th>MRR</th>
+            <th>Last activity</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>`;
+
+  $('content').innerHTML = `
+    <div class="td-page">
+      <div class="ns-header" style="margin-bottom:22px">
+        <div>
+          <div class="ns-header-title">Tenant Directory</div>
+          <div class="ns-header-sub">All tenants on the AIMS-OS platform — click any row to inspect its configuration.</div>
+        </div>
+      </div>
+      ${statsStrip}
+      ${filtersBar}
+      ${table}
+    </div>`;
+
+  // Re-focus search input after re-render
+  if (_tdState.search) {
+    const inp = document.querySelector('.td-search input');
+    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
+
+  // Open drawer if tenantId was passed
+  if (_tdState.drawerTenantId) {
+    setTimeout(() => tdOpenDrawer(_tdState.drawerTenantId), 0);
+  }
+}
+
+function tdOpenDrawer(tenantId) {
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t) return;
+  _tdState.drawerTenantId = tenantId;
+  if (!_tdState.drawerTab) _tdState.drawerTab = 'overview';
+
+  const tabs = ['overview', 'studios', 'governance', 'features', 'billing', 'admins'];
+  const tabLabels = { overview:'Overview', studios:'Studios', governance:'Governance', features:'Features & Flags', billing:'Billing', admins:'Admins' };
+
+  const tabBar = `<div class="td-drawer-tabs">
+    ${tabs.map(tab => `<button class="td-drawer-tab${_tdState.drawerTab===tab?' active':''}" onclick="_tdState.drawerTab='${tab}';tdOpenDrawer('${tenantId}')">${tabLabels[tab]}</button>`).join('')}
+  </div>`;
+
+  let tabBody = '';
+  if (_tdState.drawerTab === 'overview') {
+    const utilPct = Math.round(t.billing.seatsUsed / t.billing.seats * 100);
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Tenant info</div>
+        <div class="td-row"><span class="td-row-key">Name</span><span class="td-row-val">${escapeHtml(t.name)}</span></div>
+        <div class="td-row"><span class="td-row-key">Domain</span><span class="td-row-val">${escapeHtml(t.domain)}</span></div>
+        <div class="td-row"><span class="td-row-key">Plan</span><span class="td-row-val">${_tdPlanPill(t.plan)}</span></div>
+        <div class="td-row"><span class="td-row-key">Status</span><span class="td-row-val ${t.health==='healthy'?'td-row-val--green':t.health==='suspended'?'td-row-val--red':'td-row-val--amber'}">${_tdHealthLabel(t.health)}</span></div>
+        <div class="td-row"><span class="td-row-key">Created</span><span class="td-row-val">${t.createdAt}</span></div>
+        <div class="td-row"><span class="td-row-key">Last activity</span><span class="td-row-val">${t.lastActivity}</span></div>
+      </div>
+      <div class="td-section">
+        <div class="td-section-title">Usage</div>
+        <div class="td-row"><span class="td-row-key">Total users</span><span class="td-row-val">${t.users}</span></div>
+        <div class="td-row"><span class="td-row-key">Active users</span><span class="td-row-val td-row-val--green">${t.activeUsers}</span></div>
+        <div class="td-row"><span class="td-row-key">Seats provisioned</span><span class="td-row-val">${t.billing.seats}</span></div>
+        <div class="td-row"><span class="td-row-key">Seat utilization</span>
+          <span class="td-row-val ${utilPct>90?'td-row-val--amber':''}">${utilPct}%
+            <span style="display:inline-block;width:60px;height:5px;background:var(--line);border-radius:3px;margin-left:6px;vertical-align:middle;overflow:hidden"><span style="display:block;height:100%;width:${utilPct}%;background:${utilPct>90?'#f59e0b':utilPct>70?'var(--pri)':'#22c55e'};border-radius:3px"></span></span>
+          </span>
+        </div>
+      </div>`;
+  } else if (_tdState.drawerTab === 'studios') {
+    const studioMap = [
+      { id:'agentic', label:'Agentic Studio', desc:'AI agent orchestration and workflow automation' },
+      { id:'governance', label:'Governance Studio', desc:'Policy enforcement and compliance management' },
+      { id:'workforce', label:'Workforce Studio', desc:'Human-in-the-loop task routing' },
+      { id:'data', label:'Data Studio', desc:'Data modeling, ingestion, and governed access' },
+    ];
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Studio entitlements</div>
+        ${studioMap.map(s => {
+          const enabled = t.studios[s.id];
+          return `<div class="td-row" style="align-items:flex-start;padding:10px 0">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--t1)">${s.label}</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">${s.desc}</div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:${enabled?'#22c55e':'var(--t3)'}">
+              ${enabled ? '✓ Enabled' : '✗ Disabled'}
+            </span>
+          </div>`;
+        }).join('')}
+      </div>`;
+  } else if (_tdState.drawerTab === 'governance') {
+    const sandboxLabels = { open:'Open (no restrictions)', scoped:'Scoped (per studio)', strict:'Strict (approval required)' };
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Governance configuration</div>
+        <div class="td-row"><span class="td-row-key">Sandbox mode</span><span class="td-row-val">${sandboxLabels[t.governance.sandboxMode] || t.governance.sandboxMode}</span></div>
+        <div class="td-row"><span class="td-row-key">Truth plane</span>
+          <span class="td-row-val ${t.governance.truthPlane==='enabled'?'td-row-val--green':'td-row-val--red'}">${t.governance.truthPlane==='enabled'?'Enabled':'Disabled'}</span>
+        </div>
+        <div class="td-row"><span class="td-row-key">Human in the loop</span>
+          <span class="td-row-val ${t.governance.humanInLoop?'td-row-val--green':'td-row-val--red'}">${t.governance.humanInLoop?'Required':'Not required'}</span>
+        </div>
+        <div class="td-row"><span class="td-row-key">Audit log retention</span><span class="td-row-val">${t.governance.auditRetention} days</span></div>
+      </div>`;
+  } else if (_tdState.drawerTab === 'features') {
+    const featureMap = [
+      { id:'sso', label:'Single Sign-On (SSO)' },
+      { id:'mfa', label:'Multi-Factor Authentication' },
+      { id:'apiAccess', label:'API Access' },
+      { id:'customRoles', label:'Custom Roles' },
+      { id:'advancedAudit', label:'Advanced Audit' },
+    ];
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Feature flags</div>
+        <div class="td-feat-grid">
+          ${featureMap.map(f => `
+            <div class="td-feat-item">
+              <span class="td-feat-check ${t.features[f.id]?'td-feat-check--on':'td-feat-check--off'}">${t.features[f.id]?'✓':'✗'}</span>
+              <span class="td-feat-label">${f.label}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  } else if (_tdState.drawerTab === 'billing') {
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Billing details</div>
+        <div class="td-row"><span class="td-row-key">Plan</span><span class="td-row-val">${_tdPlanPill(t.plan)}</span></div>
+        <div class="td-row"><span class="td-row-key">Monthly revenue</span><span class="td-row-val">${t.billing.mrr > 0 ? '$' + t.billing.mrr.toLocaleString() + '/mo' : 'Trial — $0'}</span></div>
+        <div class="td-row"><span class="td-row-key">Seats provisioned</span><span class="td-row-val">${t.billing.seats}</span></div>
+        <div class="td-row"><span class="td-row-key">Seats used</span><span class="td-row-val">${t.billing.seatsUsed}</span></div>
+        <div class="td-row"><span class="td-row-key">Renewal date</span><span class="td-row-val">${t.billing.renewalDate}</span></div>
+      </div>`;
+  } else if (_tdState.drawerTab === 'admins') {
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Tenant admins</div>
+        <div style="margin-top:4px">
+          ${t.admins.map(a => `<span class="td-admin-tag">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            ${escapeHtml(a)}
+          </span>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // Render into drawer
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  const drawerEl = document.getElementById('drawer');
+  if (!drawerEl) return;
+
+  drawerOverlay.classList.add('open');
+  drawerEl.classList.add('open');
+  drawerEl.innerHTML = `
+    <div class="drawer-header" style="padding:16px 20px 0">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--t1)">${escapeHtml(t.name)}</div>
+          <div style="font-size:12px;color:var(--t3);margin-top:2px">${escapeHtml(t.domain)} · ${_tdPlanPill(t.plan)}</div>
+        </div>
+        <button class="drawer-close" onclick="closeDrawer()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
+        </button>
+      </div>
+      ${tabBar}
+    </div>
+    <div class="td-drawer-body">${tabBody}</div>`;
+}
+</script>
 </body>
 </html>
