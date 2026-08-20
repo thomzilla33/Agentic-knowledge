@@ -9482,6 +9482,57 @@ const PA_MEMBER_ROLES = {
 // MFA status per member (true = enrolled)
 const PA_MFA = { tg:true, mg:true, es:true, sb:true, dp:true, np:false, mc:true, sc:false, ap:false, jh:true, ps:false, ok:false, lt:true };
 
+const PA_NOTIF = {
+  tg: { email:true,  inapp:true, slack:'#platform-alerts', webhook:null,
+        cats:{ governance:true,  agentic:true,  platform:true,  security:true  },
+        feed:[
+          { type:'security',   msg:'New login from San Francisco, CA',             time:'Just now',    read:true  },
+          { type:'platform',   msg:'Billing plan upgraded to Enterprise',           time:'Aug 10, 2026',read:true  },
+          { type:'governance', msg:'Priya Subramaniam accepted workspace invite',   time:'Aug 10, 2026',read:true  },
+          { type:'security',   msg:'MFA reset requested for Sarah Chen',            time:'Aug 9, 2026', read:true  },
+        ]},
+  mg: { email:true,  inapp:true, slack:null,               webhook:null,
+        cats:{ governance:true,  agentic:false, platform:false, security:true  },
+        feed:[
+          { type:'governance', msg:'Promotion packet "Customer 360 v2" awaiting your approval', time:'Aug 10, 2026',read:false },
+          { type:'governance', msg:'AI Use Policy v2 published by Thom González',               time:'Aug 11, 2026',read:true  },
+          { type:'security',   msg:'New login from Mexico City, MX',                            time:'Aug 11, 2026',read:true  },
+          { type:'governance', msg:'Resolution request #47 assigned to you',                    time:'Aug 5, 2026', read:true  },
+        ]},
+  jh: { email:true,  inapp:true, slack:'#eng-agents',      webhook:'https://hooks.contoso.com/aims',
+        cats:{ governance:false, agentic:true,  platform:false, security:true  },
+        feed:[
+          { type:'agentic',    msg:'"Invoice Processor" worker completed 1,248 runs',  time:'Yesterday',   read:false },
+          { type:'agentic',    msg:'"AP Processing" network flagged 3 errors',         time:'Aug 8, 2026', read:true  },
+          { type:'security',   msg:'Delete permissions restricted by admin',           time:'Jul 30, 2026',read:true  },
+        ]},
+  es: { email:true,  inapp:true, slack:null,               webhook:null,
+        cats:{ governance:true,  agentic:false, platform:true,  security:true  },
+        feed:[
+          { type:'governance', msg:'Data connector "Salesforce CRM" sync completed',   time:'Aug 12, 2026',read:false },
+          { type:'platform',   msg:'Billing statement for July is ready',              time:'Aug 1, 2026', read:true  },
+          { type:'security',   msg:'New login from Austin, TX',                        time:'1h ago',      read:true  },
+        ]},
+  np: { email:false, inapp:true, slack:null,               webhook:null,
+        cats:{ governance:true,  agentic:false, platform:false, security:false },
+        feed:[
+          { type:'governance', msg:'Promotion packet approved by Thom González',       time:'Aug 10, 2026',read:false },
+          { type:'governance', msg:'Resolution rule "PII Redact" is now active',       time:'Aug 5, 2026', read:true  },
+        ]},
+  sc: { email:false, inapp:false,slack:null,               webhook:null,
+        cats:{ governance:false, agentic:false, platform:false, security:true  },
+        feed:[
+          { type:'security',   msg:'Account suspended — pending access review',        time:'Aug 9, 2026', read:true  },
+        ]},
+  sb: { email:true,  inapp:true, slack:'#agentic-ops',     webhook:null,
+        cats:{ governance:false, agentic:true,  platform:false, security:true  },
+        feed:[
+          { type:'agentic',    msg:'"Email Responder" completed 892 sessions today',   time:'Yesterday',   read:false },
+          { type:'agentic',    msg:'"Support Triage" network deployed successfully',   time:'Aug 9, 2026', read:true  },
+          { type:'security',   msg:'New login from Chicago, IL',                       time:'Yesterday',   read:true  },
+        ]},
+};
+
 // Cross-studio groups / teams
 const PA_GROUPS = [
   { id:'engineering',  name:'Engineering',          color:'#10b981', desc:'Platform and product engineers building integrations and workflows.',    memberIds:['es','mc','jh'],      studios:['agentic','helix','governance'] },
@@ -14836,6 +14887,97 @@ function renderMemberDrawer(personId) {
       </div>
     </div>`;
 
+  // --- notifications tab ---
+  const nd = PA_NOTIF[p.id] || { email:false, inapp:true, slack:null, webhook:null, cats:{}, feed:[] };
+  const NOTIF_CAT_META = {
+    governance: { label:'Governance', desc:'Policy updates, approvals, resolution requests', color:'#10b981', icon:'<path d="M8 2l5 3v4c0 3-2.5 5-5 6C5.5 14 3 12 3 9V5l5-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>' },
+    agentic:    { label:'Agentic',    desc:'Worker completions, errors, HITL requests',      color:'#06B6D4', icon:'<circle cx="8" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 14c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M12.5 4.5l1-1M3.5 4.5l-1-1M14.5 8h1M.5 8h1" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>' },
+    platform:   { label:'Platform',   desc:'Billing, member changes, workspace updates',    color:'#64748b', icon:'<rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 15h6M8 13v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
+    security:   { label:'Security',   desc:'Login alerts, MFA events, access changes',      color:'#f59e0b', icon:'<path d="M8 2l5 3v4c0 3-2.5 5-5 6C5.5 14 3 12 3 9V5l5-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+  };
+  const NOTIF_FEED_ICONS = {
+    governance: { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<path d="M8 2l5 3v4c0 3-2.5 5-5 6C5.5 14 3 12 3 9V5l5-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>' },
+    agentic:    { color:'#06B6D4', bg:'rgba(6,182,212,.12)',  path:'<circle cx="8" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 14c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
+    platform:   { color:'#64748b', bg:'rgba(100,116,139,.1)', path:'<rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 15h6M8 13v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
+    security:   { color:'#f59e0b', bg:'rgba(245,158,11,.12)', path:'<path d="M8 2l5 3v4c0 3-2.5 5-5 6C5.5 14 3 12 3 9V5l5-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+  };
+
+  // channels section
+  const channelRows = [
+    { key:'email',  label:'Email',     detail: nd.email  ? escapeHtml(p.email||'—') : 'Disabled',   on: nd.email,  icon:'<path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { key:'inapp',  label:'In-app',    detail: nd.inapp  ? 'Always on'              : 'Disabled',    on: nd.inapp,  icon:'<rect x="2" y="2" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 15h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
+    { key:'slack',  label:'Slack',     detail: nd.slack  ? escapeHtml(nd.slack)      : 'Not connected',on:!!nd.slack,icon:'<path d="M6 2a2 2 0 00-2 2v4a2 2 0 104 0V4a2 2 0 00-2-2zM10 8a2 2 0 00-2 2v4a2 2 0 104 0v-4a2 2 0 00-2-2zM2 6a2 2 0 002 2h4a2 2 0 000-4H4a2 2 0 00-2 2zM8 10a2 2 0 002 2h4a2 2 0 000-4h-4a2 2 0 00-2 2z" stroke="currentColor" stroke-width="1.2"/>' },
+    { key:'webhook',label:'Webhook',   detail: nd.webhook ? escapeHtml(nd.webhook.replace('https://','')):'Not configured',on:!!nd.webhook,icon:'<path d="M12 5a3 3 0 100 6H9M4 11a3 3 0 100-6h3M7 8h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
+  ].map(function(ch) {
+    const onOff = ch.on
+      ? '<span style="font-size:11px;font-weight:600;color:var(--badge-success)">On</span>'
+      : '<span style="font-size:11px;color:var(--color-text-caption)">Off</span>';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
+      + '<div style="width:26px;height:26px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+      + '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="color:var(--color-text-subtitle)">' + ch.icon + '</svg>'
+      + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:12.5px;font-weight:500;color:var(--color-text-title)">' + ch.label + '</div>'
+      + '<div style="font-size:11.5px;color:var(--color-text-caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">' + ch.detail + '</div>'
+      + '</div>'
+      + onOff
+      + '</div>';
+  }).join('');
+
+  // categories section
+  const catRows = Object.entries(NOTIF_CAT_META).map(function(entry) {
+    const key = entry[0], meta = entry[1];
+    const on = !!(nd.cats && nd.cats[key]);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
+      + '<div style="width:26px;height:26px;border-radius:6px;background:' + meta.color + '1a;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+      + '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="color:' + meta.color + '">' + meta.icon + '</svg>'
+      + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:12.5px;font-weight:500;color:var(--color-text-title)">' + meta.label + '</div>'
+      + '<div style="font-size:11.5px;color:var(--color-text-caption);line-height:1.3">' + meta.desc + '</div>'
+      + '</div>'
+      + (on
+        ? '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--badge-success);flex-shrink:0"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--color-text-caption);flex-shrink:0"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>')
+      + '</div>';
+  }).join('');
+
+  // recent feed
+  const feedRows = nd.feed.length === 0
+    ? '<div style="font-size:12.5px;color:var(--color-text-caption);padding:8px 0">No recent notifications.</div>'
+    : nd.feed.map(function(n) {
+        const fi = NOTIF_FEED_ICONS[n.type] || NOTIF_FEED_ICONS.platform;
+        return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
+          + '<div style="width:26px;height:26px;border-radius:50%;background:' + fi.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">'
+          + '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="color:' + fi.color + '">' + fi.path + '</svg>'
+          + '</div>'
+          + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:12.5px;color:var(--color-text-title);line-height:1.35' + (n.read ? '' : ';font-weight:600') + '">' + escapeHtml(n.msg) + (n.read ? '' : ' <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pri);vertical-align:middle;margin-left:3px"></span>') + '</div>'
+          + '<div style="font-size:11.5px;color:var(--color-text-caption);margin-top:2px">' + escapeHtml(n.time) + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+
+  const notifContent = `
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h">Notification channels</div>
+      ${channelRows}
+    </div>
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h">Subscribed categories</div>
+      ${catRows}
+    </div>
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h" style="display:flex;justify-content:space-between;align-items:center">
+        Recent notifications
+        ${nd.feed.filter(function(n){return !n.read;}).length > 0 ? '<span style="font-size:11px;color:var(--pri);font-weight:600">' + nd.feed.filter(function(n){return !n.read;}).length + ' unread</span>' : ''}
+      </div>
+      ${feedRows}
+      <div style="margin-top:12px">
+        <a href="#/notifications" style="font-size:12px;color:var(--pri);text-decoration:none" onclick="paCloseDrawer();navigate('#/notifications')">Manage notification settings →</a>
+      </div>
+    </div>`;
+
   const statusBadgeV = p.status==='active'?'success':p.status==='invited'?'alert':'error';
   const statusLabelV = p.status==='active'?'Active':p.status==='invited'?'Invited':'Suspended';
 
@@ -14859,9 +15001,10 @@ function renderMemberDrawer(personId) {
       <button class="pa-slideout-tab ${tab==='overview'?'active':''}" onclick="paSetDrawerTab('overview')">Overview</button>
       <button class="pa-slideout-tab ${tab==='permissions'?'active':''}" onclick="paSetDrawerTab('permissions')">Permissions</button>
       <button class="pa-slideout-tab ${tab==='activity'?'active':''}" onclick="paSetDrawerTab('activity')">Activity</button>
+      <button class="pa-slideout-tab ${tab==='notifications'?'active':''}" onclick="paSetDrawerTab('notifications')">Notifications</button>
     </div>
     <div class="pa-slideout-body">
-      ${tab === 'overview' ? overviewContent : tab === 'permissions' ? permContent : activityContent}
+      ${tab === 'overview' ? overviewContent : tab === 'permissions' ? permContent : tab === 'activity' ? activityContent : notifContent}
     </div>
     <div class="pa-slideout-foot">
       <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseDrawer()">Close</button>
