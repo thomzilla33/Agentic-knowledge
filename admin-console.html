@@ -7647,6 +7647,15 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 /* MFA shield in member rows */
 .pa-mfa-icon { color:var(--badge-success); opacity:.85; }
 .pa-mfa-off  { color:var(--color-text-disabled); }
+/* Group detail drawer — inline name edit */
+.gd-name-input { background:var(--bg3); border:1.5px solid var(--pri); border-radius:6px; padding:4px 8px; font-size:15px; font-weight:700; color:var(--color-text-title); outline:none; min-width:0; flex:1; font-family:inherit; }
+.gd-name-action { background:none; border:none; cursor:pointer; width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .12s,color .12s; }
+.gd-name-edit { color:var(--color-text-caption); }
+.gd-name-edit:hover { background:var(--bg3); color:var(--color-text-title); }
+.gd-name-save { color:var(--badge-success); }
+.gd-name-save:hover { background:rgba(16,185,129,0.1); }
+.gd-name-cancel { color:var(--color-text-caption); }
+.gd-name-cancel:hover { background:var(--bg3); color:var(--color-text-title); }
 
 /* DS Modal Dialog ── */
 .pa-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); z-index:400; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
@@ -13550,6 +13559,8 @@ let _paState = {
   applyChangesOpen: false,
   // Groups tab
   groupDetailId: null,
+  groupEditNameId: null,
+  groupEditNameValue: '',
   groupCreateOpen: false,
   groupCreateName: '',
   groupCreateDesc: '',
@@ -15561,12 +15572,29 @@ function renderGroupDetail(groupId) {
   if (!g) return '';
   const members = g.memberIds.map(id => MOCK_PEOPLE.find(p=>p.id===id)).filter(Boolean);
   const allStudios = ['agentic','helix','governance','data'];
+  const editingName = _paState.groupEditNameId === groupId;
   return `
   <div class="drawer-header">
-    <div>
+    <div style="flex:1;min-width:0">
       <div style="display:flex;align-items:center;gap:10px">
         <span style="width:12px;height:12px;border-radius:3px;background:${g.color};display:inline-block;flex-shrink:0"></span>
-        <span class="drawer-title">${escapeHtml(g.name)}</span>
+        ${editingName ? `
+          <input id="gdNameInput" class="gd-name-input" value="${escapeHtml(_paState.groupEditNameValue)}"
+            oninput="_paState.groupEditNameValue=this.value"
+            onkeydown="if(event.key==='Enter')paSaveGroupName('${groupId}');if(event.key==='Escape')paCancelGroupNameEdit()"
+            autofocus>
+          <button class="gd-name-action gd-name-save" onclick="paSaveGroupName('${groupId}')" title="Save">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="gd-name-action gd-name-cancel" onclick="paCancelGroupNameEdit()" title="Cancel">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        ` : `
+          <span class="drawer-title">${escapeHtml(g.name)}</span>
+          <button class="gd-name-action gd-name-edit" onclick="paStartGroupNameEdit('${groupId}')" title="Rename group">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          </button>
+        `}
       </div>
       <div class="drawer-subtitle">${escapeHtml(g.desc)}</div>
     </div>
@@ -15575,11 +15603,16 @@ function renderGroupDetail(groupId) {
     </button>
   </div>
 
-  <div class="drawer-section-label" style="margin-top:20px">Studio access</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px">
+    <div class="drawer-section-label" style="margin:0">Studio access</div>
+    <span style="font-size:11px;color:var(--color-text-caption)">Click to toggle</span>
+  </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
     ${allStudios.map(s => {
       const active = g.studios.includes(s);
-      return `<div style="padding:6px 14px;border-radius:8px;border:1px solid ${active?'var(--pri)':'var(--color-border-neutral-subtle)'};background:${active?'rgba(43,127,255,0.06)':'transparent'};font-size:12px;font-weight:600;color:${active?'var(--pri)':'var(--color-text-caption)'}">${s}</div>`;
+      return `<div onclick="paToggleGroupStudio('${groupId}','${s}')" style="padding:6px 14px;border-radius:8px;border:1px solid ${active?'var(--pri)':'var(--color-border-neutral-subtle)'};background:${active?'rgba(43,127,255,0.06)':'transparent'};font-size:12px;font-weight:600;color:${active?'var(--pri)':'var(--color-text-caption)'};cursor:pointer;user-select:none;transition:all .15s">
+        ${active?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="margin-right:4px;vertical-align:-1px"><path d="M1.5 5l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}${s}
+      </div>`;
     }).join('')}
   </div>
 
@@ -15786,6 +15819,38 @@ function paDeleteGroup(groupId) {
     toast(`"${name}" group deleted`, 'success');
     _paRerender();
   }
+}
+function paToggleGroupStudio(groupId, studio) {
+  const g = PA_GROUPS.find(x=>x.id===groupId);
+  if (!g) return;
+  const i = g.studios.indexOf(studio);
+  if (i === -1) g.studios.push(studio);
+  else g.studios.splice(i, 1);
+  toast(`${studio} access ${i===-1?'granted':'removed'}`, 'success');
+  _paRerender();
+}
+function paStartGroupNameEdit(groupId) {
+  const g = PA_GROUPS.find(x=>x.id===groupId);
+  if (!g) return;
+  _paState.groupEditNameId = groupId;
+  _paState.groupEditNameValue = g.name;
+  _paRerender();
+  setTimeout(() => { const el = document.getElementById('gdNameInput'); if (el) { el.focus(); el.select(); } }, 50);
+}
+function paSaveGroupName(groupId) {
+  const g = PA_GROUPS.find(x=>x.id===groupId);
+  const val = (_paState.groupEditNameValue||'').trim();
+  if (!val) { toast('Name cannot be empty', 'error'); return; }
+  if (g) g.name = val;
+  _paState.groupEditNameId = null;
+  _paState.groupEditNameValue = '';
+  toast('Group renamed', 'success');
+  _paRerender();
+}
+function paCancelGroupNameEdit() {
+  _paState.groupEditNameId = null;
+  _paState.groupEditNameValue = '';
+  _paRerender();
 }
 function paOpenRolePicker(personId) {
   _paState.rolePickerOpen = true;
