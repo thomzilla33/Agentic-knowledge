@@ -13639,6 +13639,7 @@ let _paState = {
   applyChangesOpen: false,
   // Groups tab
   groupDetailId: null,
+  groupDetailTab: 'members',
   groupEditNameId: null,
   groupEditNameValue: '',
   groupEditColorId: null,
@@ -15386,20 +15387,86 @@ function renderRoleDetail(roleId) {
         '</div>';
     }).join('') + '</div>';
 
-  const membersTab = `
-    <div style="padding:0 20px 20px">
-      ${members.length === 0 ? `
-        <div style="text-align:center;padding:32px 0;color:var(--t3);font-size:13px">No members assigned to this role.</div>
-      ` : members.map(m => `
-        <div class="rd-member-row">
-          <div class="pm-avatar" style="width:32px;height:32px;font-size:12px;background:${m.color}">${escapeHtml(m.initials)}</div>
-          <div class="rd-member-info">
-            <div class="rd-member-name">${escapeHtml(m.name)}</div>
-            <div class="rd-member-email">${escapeHtml(m.email)}</div>
-          </div>
-          ${!r.system ? `<button class="rd-remove-btn" onclick="paRoleRemoveMember('${roleId}','${m.id}',event)">Remove</button>` : ''}
-        </div>`).join('')}
-    </div>`;
+  const membersTab = (function() {
+    if (members.length === 0) return '<div style="padding:32px 20px;text-align:center;color:var(--color-text-caption);font-size:13px">No members assigned to this role.</div>';
+    return '<div style="padding:0 20px 20px">' + members.map(function(m) {
+      const statusColor = m.status==='active'?'var(--badge-success)':m.status==='invited'?'#f59e0b':'#ef4444';
+      const statusLabel = m.status==='active'?'Active':m.status==='invited'?'Invited':'Suspended';
+      const mRoles = (PA_MEMBER_ROLES[m.id]||[]).map(function(rid){return PA_ROLES.find(function(r2){return r2.id===rid;});}).filter(Boolean).filter(function(r2){return r2.id!==roleId;});
+      const otherRoles = mRoles.length ? ' · ' + mRoles.map(function(r2){return escapeHtml(r2.label);}).join(', ') : '';
+      return '<div class="rd-member-row" style="cursor:pointer" onclick="paCloseRoleDetail();paOpenDrawer(\'' + m.id + '\')" title="View profile">'
+        + _paAvHTML(m.id, m.name, m.initials, 'ds-av-sm')
+        + '<div class="rd-member-info" style="flex:1;min-width:0">'
+        + '<div class="rd-member-name" style="display:flex;align-items:center;gap:6px">' + escapeHtml(m.name)
+        + '<span style="font-size:10px;font-weight:600;color:' + statusColor + '">' + statusLabel + '</span>'
+        + '</div>'
+        + '<div class="rd-member-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(m.email) + otherRoles + '</div>'
+        + '</div>'
+        + '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+        + '<span style="font-size:11px;color:var(--color-text-caption)">' + escapeHtml(m.lastActive||'—') + '</span>'
+        + (!r.system ? '<button class="rd-remove-btn" onclick="event.stopPropagation();paRoleRemoveMember(\'' + roleId + '\',\'' + m.id + '\',event)">Remove</button>' : '')
+        + '</div>'
+        + '</div>';
+    }).join('') + '</div>';
+  })();
+
+  const ROLE_ACTIVITY = {
+    'workspace-admin': [
+      { type:'role',    msg:'Edgardo Sierra assigned to this role',        time:'Aug 12, 2026' },
+      { type:'edit',    msg:'Permission "Manage escalations" enabled',     time:'Aug 3, 2026'  },
+      { type:'create',  msg:'Role created by system',                      time:'Jan 12, 2025' },
+    ],
+    'developer': [
+      { type:'role',    msg:'Lucía Torres assigned to this role',          time:'Aug 10, 2026' },
+      { type:'edit',    msg:'Permissions updated by Thom González',        time:'Jul 28, 2026' },
+      { type:'role',    msg:'Diana Pacheco removed from this role',        time:'Jul 15, 2026' },
+    ],
+    'data-steward': [
+      { type:'role',    msg:'Nicolás Paredes assigned to this role',       time:'Aug 5, 2026'  },
+      { type:'edit',    msg:'"Create & edit lineage" permission enabled',  time:'Jul 20, 2026' },
+      { type:'create',  msg:'Role created by María González',              time:'Mar 1, 2026'  },
+    ],
+    'agent-builder': [
+      { type:'role',    msg:'Lucía Torres assigned to this role',          time:'Aug 9, 2026'  },
+      { type:'edit',    msg:'"Deploy workers" permission added',           time:'Aug 1, 2026'  },
+      { type:'role',    msg:'Sebastián Blanco assigned to this role',      time:'Jul 18, 2026' },
+      { type:'create',  msg:'Role created by Thom González',               time:'Jun 3, 2026'  },
+    ],
+    'compliance-auditor': [
+      { type:'view',    msg:'Olga Kowalski accessed audit log',            time:'Jul 28, 2026' },
+      { type:'create',  msg:'Role created by María González',              time:'Apr 15, 2026' },
+    ],
+    'viewer': [
+      { type:'role',    msg:'Sarah Chen assigned to this role',            time:'Aug 9, 2026'  },
+      { type:'role',    msg:'Álvaro Puente assigned to this role',         time:'Jul 22, 2026' },
+      { type:'create',  msg:'Role created by system',                      time:'Jan 12, 2025' },
+    ],
+  };
+  const roleActivityEvents = ROLE_ACTIVITY[roleId] || [
+    { type:'create', msg:'Role created', time:'—' },
+  ];
+  const ROLE_ACT_ICONS = {
+    role:   { color:'#2b7fff', bg:'rgba(43,127,255,.12)', path:'<path d="M9.5 5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM3.5 14a3.5 3.5 0 017 0M13.5 6l1 1-3 3-2-2 1-1 1 1 2-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    edit:   { color:'#8b5cf6', bg:'rgba(139,92,246,.12)', path:'<path d="M11 3l2 2-7 7H4v-2L11 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    create: { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' },
+    view:   { color:'#64748b', bg:'rgba(100,116,139,.1)', path:'<path d="M8 5c-2.8 0-5 3-5 3s2.2 3 5 3 5-3 5-3-2.2-3-5-3zm0 5a2 2 0 110-4 2 2 0 010 4z" fill="currentColor"/>' },
+  };
+  const activityTabHtml = '<div style="padding:16px 20px 20px;display:flex;flex-direction:column;gap:0">'
+    + roleActivityEvents.map(function(e, i) {
+        const ic = ROLE_ACT_ICONS[e.type] || ROLE_ACT_ICONS.view;
+        const isLast = i === roleActivityEvents.length - 1;
+        const connector = isLast ? '' : '<div style="width:1px;flex:1;min-height:10px;background:var(--color-border-neutral-subtle);margin:2px auto 0"></div>';
+        return '<div style="display:flex;gap:10px;align-items:flex-start">'
+          + '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">'
+          + '<div style="width:24px;height:24px;border-radius:50%;background:' + ic.bg + ';display:flex;align-items:center;justify-content:center">'
+          + '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="color:' + ic.color + '">' + ic.path + '</svg>'
+          + '</div>' + connector + '</div>'
+          + '<div style="flex:1;min-width:0;padding-bottom:' + (isLast ? '0' : '12') + 'px">'
+          + '<div style="font-size:12.5px;color:var(--color-text-title);line-height:1.35">' + escapeHtml(e.msg) + '</div>'
+          + '<div style="font-size:11.5px;color:var(--color-text-caption);margin-top:2px">' + escapeHtml(e.time) + '</div>'
+          + '</div></div>';
+      }).join('')
+    + '</div>';
 
   return `
     <div class="pm-drawer-head">
@@ -15420,10 +15487,11 @@ function renderRoleDetail(roleId) {
     <div class="rd-tabs">
       <button class="rd-tab ${tab==='permissions'?'active':''}" onclick="paSetRoleDetailTab('permissions')">Permissions</button>
       <button class="rd-tab ${tab==='members'?'active':''}" onclick="paSetRoleDetailTab('members')">Members (${members.length})</button>
+      <button class="rd-tab ${tab==='activity'?'active':''}" onclick="paSetRoleDetailTab('activity')">Activity</button>
     </div>
 
     <div style="overflow-y:auto;flex:1">
-      ${tab === 'permissions' ? permTab : membersTab}
+      ${tab === 'permissions' ? permTab : tab === 'members' ? membersTab : activityTabHtml}
     </div>
 
     ${!r.system ? `
@@ -16088,6 +16156,7 @@ function renderPeopleGroups() {
 function renderGroupDetail(groupId) {
   const g = PA_GROUPS.find(x=>x.id===groupId);
   if (!g) return '';
+  const tab = _paState.groupDetailTab || 'members';
   const members = g.memberIds.map(id => MOCK_PEOPLE.find(p=>p.id===id)).filter(Boolean);
   const allStudios = ['agentic','helix','governance','data'];
   const editingName = _paState.groupEditNameId === groupId;
@@ -16138,111 +16207,160 @@ function renderGroupDetail(groupId) {
     </button>
   </div>
 
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px">
-    <div class="drawer-section-label" style="margin:0">Studio access</div>
-    <span style="font-size:11px;color:var(--color-text-caption)">Click to toggle</span>
-  </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-    ${allStudios.map(s => {
-      const active = g.studios.includes(s);
-      return `<div onclick="paToggleGroupStudio('${groupId}','${s}')" style="padding:6px 14px;border-radius:8px;border:1px solid ${active?'var(--pri)':'var(--color-border-neutral-subtle)'};background:${active?'rgba(43,127,255,0.06)':'transparent'};font-size:12px;font-weight:600;color:${active?'var(--pri)':'var(--color-text-caption)'};cursor:pointer;user-select:none;transition:all .15s">
-        ${active?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="margin-right:4px;vertical-align:-1px"><path d="M1.5 5l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}${s}
-      </div>`;
-    }).join('')}
+  <div class="rd-tabs" style="margin-top:16px">
+    <button class="rd-tab ${tab==='members'?'active':''}" onclick="paSetGroupDetailTab('members')">Members (${members.length})</button>
+    <button class="rd-tab ${tab==='settings'?'active':''}" onclick="paSetGroupDetailTab('settings')">Settings</button>
+    <button class="rd-tab ${tab==='activity'?'active':''}" onclick="paSetGroupDetailTab('activity')">Activity</button>
   </div>
 
-  <div class="drawer-section-label" style="margin-top:24px">Members (${members.length})</div>
-  <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-    ${members.length ? members.map(m => {
-      const mfa = PA_MFA[m.id];
-      const roles = (PA_MEMBER_ROLES[m.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean);
-      return `
-      <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;background:var(--bg3)">
-        ${_paAvHTML(m.id,m.name,m.initials,'ds-av-md')}
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(m.name)}</div>
-          <div style="font-size:11px;color:var(--color-text-caption)">${roles.map(r=>r.label).join(', ')||'No roles'}</div>
-        </div>
-        <span title="MFA ${mfa?'enabled':'disabled'}" style="color:${mfa?'var(--badge-success)':'var(--color-text-disabled)'}">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>${mfa?'<path d="M6.5 11l1.5 1.5L10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>':''}</svg>
-        </span>
-        <button class="pa-row-btn pa-row-btn--danger" title="Remove from group" onclick="paRemoveFromGroup('${groupId}','${m.id}')">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </button>
-      </div>`;
-    }).join('') : `<div style="font-size:13px;color:var(--color-text-disabled);padding:12px 0">No members yet.</div>`}
-  </div>
-
-  ${_paState.groupAddMembersOpen ? (() => {
-    const q = (_paState.groupAddMembersSearch||'').toLowerCase();
-    const available = MOCK_PEOPLE.filter(p =>
-      p.status !== 'suspended' &&
-      !g.memberIds.includes(p.id) &&
-      (!q || p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q))
-    );
-    const sel = _paState.groupAddMembersSelected;
-    return `
-    <div style="margin-top:20px;border:1px solid var(--pri);border-radius:12px;overflow:hidden">
-      <div style="padding:12px 14px 0;background:rgba(43,127,255,0.04)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <span style="font-size:12px;font-weight:700;color:var(--color-text-title)">Add members${sel.size?` · <span style="color:var(--pri)">${sel.size} selected</span>`:''}` +
-          `</span>
-          <button onclick="paCloseGroupAddMembers()" style="background:none;border:none;cursor:pointer;color:var(--color-text-caption);font-size:11px;padding:2px 6px;border-radius:4px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">Cancel</button>
-        </div>
-        <div style="position:relative">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--color-text-caption)"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          <input class="rc-input" style="padding-left:28px;padding-top:7px;padding-bottom:7px;border-radius:8px;margin-bottom:10px"
-            placeholder="Search workspace members…"
-            value="${escapeHtml(_paState.groupAddMembersSearch||'')}"
-            oninput="_paState.groupAddMembersSearch=this.value;_paRerender()">
-        </div>
-      </div>
-      <div style="max-height:200px;overflow-y:auto;background:rgba(43,127,255,0.02)">
-        ${available.length === 0
-          ? `<div style="padding:16px 14px;font-size:12px;color:var(--color-text-disabled)">${q?'No members match your search.':'All workspace members are already in this group.'}</div>`
-          : available.map(p => {
-              const checked = sel.has(p.id);
-              const roles = (PA_MEMBER_ROLES[p.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean);
-              return `
-              <div onclick="_paState.groupAddMembersSelected.has('${p.id}')?_paState.groupAddMembersSelected.delete('${p.id}'):_paState.groupAddMembersSelected.add('${p.id}');_paRerender()"
-                style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--color-border-neutral-subtle);background:${checked?'rgba(43,127,255,0.06)':'transparent'};transition:background .1s">
-                ${_paAvHTML(p.id,p.name,p.initials,'ds-av-sm')}
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(p.name)}</div>
-                  <div style="font-size:11px;color:var(--color-text-caption)">${roles.map(r=>r.label).join(', ')||'No roles'}</div>
-                </div>
-                <div style="width:18px;height:18px;border-radius:5px;border:1.5px solid ${checked?'var(--pri)':'var(--color-border-neutral-default)'};background:${checked?'var(--pri)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s">
-                  ${checked?'<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
-                </div>
-              </div>`;
-            }).join('')
-        }
-      </div>
-      <div style="padding:10px 14px;background:rgba(43,127,255,0.04);border-top:1px solid var(--color-border-neutral-subtle);display:flex;justify-content:flex-end">
-        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitGroupAddMembers('${groupId}')"
-          ${sel.size===0?'disabled style="opacity:.5;cursor:not-allowed"':''}>
-          Add ${sel.size||''}${sel.size===1?' member':sel.size>1?' members':' members'}
-        </button>
-      </div>
-    </div>`;
-  })() : `
-  <div style="margin-top:24px;display:flex;flex-direction:column;gap:0">
-    <div style="display:flex;gap:8px">
-      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenGroupAddMembers()">Add members</button>
-      ${g.id !== 'leadership' ? `<button class="ds-btn ds-btn-sm ds-btn--danger-ghost" onclick="paDeleteGroup('${groupId}')">Delete group</button>` : ''}
+  ${tab === 'members' ? `
+  <div style="padding:16px 0 0">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${members.length ? members.map(m => {
+        const mfa = PA_MFA[m.id];
+        const statusColor = m.status==='active'?'var(--badge-success)':m.status==='invited'?'#f59e0b':'#ef4444';
+        const statusLabel = m.status==='active'?'Active':m.status==='invited'?'Invited':'Suspended';
+        const roles = (PA_MEMBER_ROLES[m.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean);
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--bg3);cursor:pointer" onclick="paCloseGroupDetail();paOpenDrawer('${m.id}')" title="View profile">
+          ${_paAvHTML(m.id,m.name,m.initials,'ds-av-sm')}
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(m.name)}</span>
+              <span style="font-size:10px;font-weight:600;color:${statusColor}">${statusLabel}</span>
+            </div>
+            <div style="font-size:11px;color:var(--color-text-caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${roles.map(r=>r.label).join(', ')||'No roles'}</div>
+          </div>
+          <span title="MFA ${mfa?'enabled':'disabled'}" style="color:${mfa?'var(--badge-success)':'var(--color-text-disabled)'};flex-shrink:0">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>${mfa?'<path d="M6.5 11l1.5 1.5L10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>':''}</svg>
+          </span>
+          <button class="pa-row-btn pa-row-btn--danger" title="Remove from group" onclick="event.stopPropagation();paRemoveFromGroup('${groupId}','${m.id}')">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>`;
+      }).join('') : `<div style="font-size:13px;color:var(--color-text-disabled);padding:12px 0">No members yet.</div>`}
     </div>
-    ${_paState.groupDeleteConfirmId === groupId ? `
-    <div style="margin-top:12px;background:rgba(239,68,68,0.07);border:1.5px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--color-text-title);margin-bottom:2px">Delete "${escapeHtml(g.name)}"?</div>
-        <div style="font-size:12px;color:var(--color-text-subtitle)">Members won't be removed from the workspace, but this group will be gone permanently.</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="ds-btn ds-btn-sm ds-btn--danger" onclick="paConfirmDeleteGroup('${groupId}')">Delete group</button>
-        <button class="ds-btn ds-btn-sm ds-btn--ghost" onclick="paCancelDeleteGroup()">Cancel</button>
-      </div>
-    </div>` : ''}
-  </div>`}
+  </div>` : tab === 'settings' ? `
+  <div style="padding:16px 0 0">
+    <div class="drawer-section-label" style="margin:0 0 8px">Studio access <span style="font-size:10.5px;font-weight:400;color:var(--color-text-caption);margin-left:4px">Click to toggle</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+      ${allStudios.map(s => {
+        const SCOL = {agentic:'#06B6D4',helix:'#8b5cf6',governance:'#10b981',data:'#64748b'};
+        const active = g.studios.includes(s);
+        const sc = SCOL[s]||'#64748b';
+        return `<div onclick="paToggleGroupStudio('${groupId}','${s}')" style="padding:6px 12px;border-radius:8px;border:1px solid ${active?sc:'var(--color-border-neutral-subtle)'};background:${active?sc+'1a':'transparent'};font-size:12px;font-weight:600;color:${active?sc:'var(--color-text-caption)'};cursor:pointer;user-select:none;transition:all .15s;display:flex;align-items:center;gap:5px">
+          ${active?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:'<div style="width:8px;height:8px;border-radius:50%;background:'+sc+'66"></div>'}${s}
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="drawer-section-label" style="margin:0 0 8px">Danger zone</div>
+    <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px">
+      <div style="font-size:12.5px;color:var(--color-text-subtitle);margin-bottom:10px">Deleting this group removes it permanently. Members are not removed from the workspace.</div>
+      ${g.id !== 'leadership' ? `<button class="ds-btn ds-btn-sm ds-btn--danger-ghost" onclick="paDeleteGroup('${groupId}')">Delete group</button>` : '<span style="font-size:12px;color:var(--color-text-caption)">Protected — cannot be deleted.</span>'}
+      ${_paState.groupDeleteConfirmId === groupId ? `
+      <div style="margin-top:12px;border-top:1px solid rgba(239,68,68,.2);padding-top:12px">
+        <div style="font-size:12.5px;font-weight:600;color:#ef4444;margin-bottom:8px">Are you sure? This cannot be undone.</div>
+        <div style="display:flex;gap:8px">
+          <button class="ds-btn ds-btn-sm ds-btn--danger" onclick="paConfirmDeleteGroup('${groupId}')">Delete</button>
+          <button class="ds-btn ds-btn-sm ds-btn--ghost" onclick="paCancelDeleteGroup()">Cancel</button>
+        </div>
+      </div>` : ''}
+    </div>
+  </div>` : (() => {
+    const GROUP_ACTIVITY = {
+      'engineering': [
+        { type:'role',   msg:'Jordan Huerta added to this group',          time:'Aug 9, 2026'  },
+        { type:'edit',   msg:'Studio access updated — removed "data"',     time:'Aug 3, 2026'  },
+        { type:'role',   msg:'Marcus Chen added to this group',            time:'Jul 18, 2026' },
+        { type:'create', msg:'Group created by Thom González',             time:'Mar 1, 2025'  },
+      ],
+      'ai-ops': [
+        { type:'role',   msg:'Lucía Torres added to this group',           time:'Aug 10, 2026' },
+        { type:'edit',   msg:'Studio access updated — added "helix"',      time:'Aug 5, 2026'  },
+        { type:'create', msg:'Group created by Edgardo Sierra',            time:'Jun 15, 2025' },
+      ],
+      'data-team': [
+        { type:'role',   msg:'Nicolás Paredes added to this group',        time:'Aug 5, 2026'  },
+        { type:'create', msg:'Group created by María González',            time:'Apr 1, 2026'  },
+      ],
+      'leadership': [
+        { type:'role',   msg:'Edgardo Sierra added to this group',         time:'Aug 12, 2026' },
+        { type:'role',   msg:'Álvaro Puente removed from this group',      time:'Jul 30, 2026' },
+        { type:'create', msg:'Group created by Thom González',             time:'Jan 12, 2025' },
+      ],
+      'compliance-audit': [
+        { type:'role',   msg:'Priya Subramaniam added to this group',      time:'Aug 10, 2026' },
+        { type:'create', msg:'Group created by María González',            time:'May 1, 2026'  },
+      ],
+      'external': [
+        { type:'role',   msg:'Olga Kowalski granted access',               time:'Jul 20, 2026' },
+        { type:'create', msg:'Group created by Thom González',             time:'Jul 20, 2026' },
+      ],
+    };
+    const GAI = {
+      role:   { color:'#2b7fff', bg:'rgba(43,127,255,.12)', path:'<path d="M9.5 5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM3.5 14a3.5 3.5 0 017 0M13.5 6l1 1-3 3-2-2 1-1 1 1 2-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+      edit:   { color:'#8b5cf6', bg:'rgba(139,92,246,.12)', path:'<path d="M11 3l2 2-7 7H4v-2L11 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+      create: { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' },
+    };
+    const events = GROUP_ACTIVITY[groupId] || [{ type:'create', msg:'Group created', time:'—' }];
+    return '<div style="padding:16px 0 0">'
+      + events.map(function(e, i) {
+          const ic = GAI[e.type] || GAI.edit;
+          const isLast = i === events.length - 1;
+          return '<div style="display:flex;gap:10px;align-items:flex-start">'
+            + '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">'
+            + '<div style="width:24px;height:24px;border-radius:50%;background:' + ic.bg + ';display:flex;align-items:center;justify-content:center">'
+            + '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="color:' + ic.color + '">' + ic.path + '</svg>'
+            + '</div>'
+            + (isLast ? '' : '<div style="width:1px;flex:1;min-height:10px;background:var(--color-border-neutral-subtle);margin:2px auto 0"></div>')
+            + '</div>'
+            + '<div style="flex:1;min-width:0;padding-bottom:' + (isLast ? '0' : '12') + 'px">'
+            + '<div style="font-size:12.5px;color:var(--color-text-title);line-height:1.35">' + escapeHtml(e.msg) + '</div>'
+            + '<div style="font-size:11.5px;color:var(--color-text-caption);margin-top:2px">' + escapeHtml(e.time) + '</div>'
+            + '</div></div>';
+        }).join('')
+      + '</div>';
+  })()}
+
+  ${tab === 'members' ? `
+  <div style="margin-top:16px">
+    ${_paState.groupAddMembersOpen ? (() => {
+      const q = (_paState.groupAddMembersSearch||'').toLowerCase();
+      const available = MOCK_PEOPLE.filter(p =>
+        p.status !== 'suspended' &&
+        !g.memberIds.includes(p.id) &&
+        (!q || p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q))
+      );
+      const sel = _paState.groupAddMembersSelected;
+      return `<div style="border:1px solid var(--pri);border-radius:12px;overflow:hidden">
+        <div style="padding:12px 14px 0;background:rgba(43,127,255,0.04)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <span style="font-size:12px;font-weight:700;color:var(--color-text-title)">Add members${sel.size?' · <span style="color:var(--pri)">' + sel.size + ' selected</span>':''}</span>
+            <button onclick="paCloseGroupAddMembers()" style="background:none;border:none;cursor:pointer;color:var(--color-text-caption);font-size:11px;padding:2px 6px;border-radius:4px">Cancel</button>
+          </div>
+          <div style="position:relative">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--color-text-caption)"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <input class="rc-input" style="padding-left:28px;padding-top:7px;padding-bottom:7px;border-radius:8px;margin-bottom:10px" placeholder="Search workspace members…" value="${escapeHtml(_paState.groupAddMembersSearch||'')}" oninput="_paState.groupAddMembersSearch=this.value;_paRerender()">
+          </div>
+        </div>
+        <div style="max-height:200px;overflow-y:auto">
+          ${available.length === 0
+            ? `<div style="padding:16px 14px;font-size:12px;color:var(--color-text-disabled)">${q?'No members match.':'All members already in group.'}</div>`
+            : available.map(p => {
+                const checked = sel.has(p.id);
+                const roles = (PA_MEMBER_ROLES[p.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean);
+                return `<div onclick="_paState.groupAddMembersSelected.has('${p.id}')?_paState.groupAddMembersSelected.delete('${p.id}'):_paState.groupAddMembersSelected.add('${p.id}');_paRerender()" style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--color-border-neutral-subtle);background:${checked?'rgba(43,127,255,0.06)':'transparent'}">
+                  ${_paAvHTML(p.id,p.name,p.initials,'ds-av-sm')}
+                  <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(p.name)}</div><div style="font-size:11px;color:var(--color-text-caption)">${roles.map(r=>r.label).join(', ')||'No roles'}</div></div>
+                  <div style="width:18px;height:18px;border-radius:5px;border:1.5px solid ${checked?'var(--pri)':'var(--color-border-neutral-default)'};background:${checked?'var(--pri)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">${checked?'<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+                </div>`;
+              }).join('')}
+        </div>
+        <div style="padding:10px 14px;background:rgba(43,127,255,0.04);border-top:1px solid var(--color-border-neutral-subtle);display:flex;justify-content:flex-end">
+          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitGroupAddMembers('${groupId}')" ${sel.size===0?'disabled style="opacity:.5;cursor:not-allowed"':''}>Add ${sel.size||''} ${sel.size===1?'member':'members'}</button>
+        </div>
+      </div>`;
+    })() : `<button class="pa-add-role-btn" onclick="paOpenGroupAddMembers()"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Add members…</button>`}
+  </div>` : ''}
   `;
 }
 
@@ -16383,8 +16501,9 @@ function renderRolePickerModal() {
 }
 
 /* ---- Groups & Role-picker plumbing ---- */
-function paOpenGroupDetail(groupId) { _paState.groupDetailId = groupId; _paRerender(); }
+function paOpenGroupDetail(groupId) { _paState.groupDetailId = groupId; _paState.groupDetailTab = 'members'; _paRerender(); }
 function paCloseGroupDetail() { _paState.groupDetailId = null; _paState.groupDeleteConfirmId = null; _paRerender(); }
+function paSetGroupDetailTab(tab) { _paState.groupDetailTab = tab; const d = document.getElementById('paGroupDrawer'); if (d) d.innerHTML = renderGroupDetail(_paState.groupDetailId); }
 function paOpenGroupCreate() {
   _paState.groupCreateOpen = true;
   _paState.groupCreateName = '';
