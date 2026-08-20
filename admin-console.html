@@ -13567,6 +13567,7 @@ let _paState = {
   groupAddMembersOpen: false,
   groupAddMembersSearch: '',
   groupAddMembersSelected: new Set(),
+  groupDeleteConfirmId: null,
   groupCreateOpen: false,
   groupCreateName: '',
   groupCreateDesc: '',
@@ -15714,9 +15715,22 @@ function renderGroupDetail(groupId) {
       </div>
     </div>`;
   })() : `
-  <div style="margin-top:24px;display:flex;gap:8px">
-    <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenGroupAddMembers()">Add members</button>
-    ${g.id !== 'leadership' ? `<button class="ds-btn ds-btn-sm ds-btn--danger-ghost" onclick="paDeleteGroup('${groupId}')">Delete group</button>` : ''}
+  <div style="margin-top:24px;display:flex;flex-direction:column;gap:0">
+    <div style="display:flex;gap:8px">
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenGroupAddMembers()">Add members</button>
+      ${g.id !== 'leadership' ? `<button class="ds-btn ds-btn-sm ds-btn--danger-ghost" onclick="paDeleteGroup('${groupId}')">Delete group</button>` : ''}
+    </div>
+    ${_paState.groupDeleteConfirmId === groupId ? `
+    <div style="margin-top:12px;background:rgba(239,68,68,0.07);border:1.5px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--color-text-title);margin-bottom:2px">Delete "${escapeHtml(g.name)}"?</div>
+        <div style="font-size:12px;color:var(--color-text-subtitle)">Members won't be removed from the workspace, but this group will be gone permanently.</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="ds-btn ds-btn-sm ds-btn--danger" onclick="paConfirmDeleteGroup('${groupId}')">Delete group</button>
+        <button class="ds-btn ds-btn-sm ds-btn--ghost" onclick="paCancelDeleteGroup()">Cancel</button>
+      </div>
+    </div>` : ''}
   </div>`}
   `;
 }
@@ -15859,7 +15873,7 @@ function renderRolePickerModal() {
 
 /* ---- Groups & Role-picker plumbing ---- */
 function paOpenGroupDetail(groupId) { _paState.groupDetailId = groupId; _paRerender(); }
-function paCloseGroupDetail() { _paState.groupDetailId = null; _paRerender(); }
+function paCloseGroupDetail() { _paState.groupDetailId = null; _paState.groupDeleteConfirmId = null; _paRerender(); }
 function paOpenGroupCreate() {
   _paState.groupCreateOpen = true;
   _paState.groupCreateName = '';
@@ -15888,14 +15902,23 @@ function paRemoveFromGroup(groupId, personId) {
   _paRerender();
 }
 function paDeleteGroup(groupId) {
+  _paState.groupDeleteConfirmId = groupId;
+  _paRerender();
+}
+function paConfirmDeleteGroup(groupId) {
   const idx = PA_GROUPS.findIndex(x=>x.id===groupId);
   if (idx !== -1) {
     const name = PA_GROUPS[idx].name;
     PA_GROUPS.splice(idx, 1);
     _paState.groupDetailId = null;
+    _paState.groupDeleteConfirmId = null;
     toast(`"${name}" group deleted`, 'success');
     _paRerender();
   }
+}
+function paCancelDeleteGroup() {
+  _paState.groupDeleteConfirmId = null;
+  _paRerender();
 }
 function paToggleGroupStudio(groupId, studio) {
   const g = PA_GROUPS.find(x=>x.id===groupId);
