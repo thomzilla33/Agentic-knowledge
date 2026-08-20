@@ -888,15 +888,47 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
 }
 /* Stats strip */
 .ac-stats-strip{display:flex; gap:12px; flex-shrink:0; margin-bottom:4px;}
-.ac-stat-card{flex:1; background:var(--bg2); border:1px solid var(--line); border-radius:10px; padding:12px 16px; display:flex; flex-direction:column; gap:2px;}
-.ac-stat-value{font-size:22px; font-weight:700; color:var(--t1); line-height:1;}
-.ac-stat-label{font-size:11px; color:var(--t3); margin-top:4px;}
+.ac-stat-card{
+  flex:1; background:var(--bg2); border:1px solid var(--line); border-radius:10px;
+  padding:12px 16px; display:flex; flex-direction:column; gap:0;
+  position:relative; overflow:hidden;
+}
+.ac-stat-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--ac-stat-accent, var(--line));
+  border-radius:10px 10px 0 0;
+}
+.ac-stat-icon{
+  width:20px; height:20px; margin-bottom:6px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--ac-stat-accent, var(--t3)); opacity:.75;
+}
+.ac-stat-icon svg{width:16px; height:16px}
+.ac-stat-value{font-size:24px; font-weight:700; color:var(--t1); line-height:1; letter-spacing:-.02em;}
+.ac-stat-label{font-size:11px; color:var(--t3); margin-top:5px; font-weight:500;}
+
 /* Section card icon */
-.ac-card-icon{width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-bottom:6px;}
+.ac-card-icon{width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-bottom:8px;}
+.ac-card-icon svg{width:16px; height:16px}
+/* Card hover arrow */
+.ac-card-arrow{
+  margin-left:auto; opacity:0; transition:opacity .15s, transform .15s;
+  color:var(--t3); font-size:14px; line-height:1; flex-shrink:0;
+}
+.ac-section-card--active:hover .ac-card-arrow{opacity:1; transform:translateX(2px);}
+
 /* Alert severity variants */
+.ac-alert-row--real{
+  border-left:3px solid var(--line);
+  padding-left:11px;
+}
+.ac-alert-row--real:has(.ac-alert-dot--warn){border-left-color:#F97316;}
+.ac-alert-row--real:has(.ac-alert-dot--info){border-left-color:var(--pri);}
+.ac-alert-row--real:has(.ac-alert-dot--ok){border-left-color:var(--green);}
 .ac-alert-dot--info{background:var(--pri);}
 .ac-alert-dot--warn{background:#F97316;}
 .ac-alert-dot--ok{background:var(--green);}
+
 @media(max-width:900px){
   .ac-cmd-body{flex-direction:column;}
   .ac-cmd-left{width:100%;}
@@ -5274,6 +5306,22 @@ html.theme-light .fs-cancel-btn:hover{
 /* Digest row */
 .ns-pref-row { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); gap:16px; }
 .ns-pref-row:last-child { border-bottom:none; }
+/* Promotion request rows */
+.gd-req-row{display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--color-border-neutral-subtle);}
+.gd-req-row:last-child{border-bottom:none;}
+.gd-req-row.gd-req--reviewed{opacity:.45;pointer-events:none;}
+.gd-req-body{flex:1;min-width:0;}
+.gd-req-domain{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-caption);margin-bottom:3px;}
+.gd-req-title{font-size:13px;font-weight:600;color:var(--color-text-title);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gd-req-meta{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px;color:var(--color-text-caption);}
+.gd-req-av{width:18px;height:18px;border-radius:50%;background:var(--pri-12);color:var(--pri);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.gd-req-dot{color:var(--color-border-neutral-subtle);}
+.gd-req-ev{font-style:italic;}
+.gd-req-actions{display:flex;gap:6px;flex-shrink:0;}
+.gd-req-verdict{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;}
+.gd-req-verdict--approved{background:rgba(16,185,129,.12);color:#10B981;}
+.gd-req-verdict--rejected{background:rgba(239,68,68,.1);color:#F87171;}
+.gd-section-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:#F97316;color:#fff;font-size:10px;font-weight:700;padding:0 4px;margin-left:6px;vertical-align:middle;}
 .ns-pref-label { font-size:13px; font-weight:500; color:var(--color-text-title); }
 .ns-pref-hint { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
 .ns-select { height:32px; padding:0 28px 0 10px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:7px; font-size:12px; color:var(--color-text-title); outline:none; appearance:none; -webkit-appearance:none; cursor:pointer; box-sizing:border-box; background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 9px center; }
@@ -7675,6 +7723,73 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 /* MFA shield in member rows */
 .pa-mfa-icon { color:var(--badge-success); opacity:.85; }
 .pa-mfa-off  { color:var(--color-text-disabled); }
+/* Invite wizard — step indicator */
+.pm-invite-stepper{display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(--color-border-neutral-subtle);gap:0;}
+.pm-invite-step-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--color-text-disabled);}
+.pm-invite-step-item.active{color:var(--pri);font-weight:600;}
+.pm-invite-step-item.done{color:var(--badge-success);}
+.pm-invite-step-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.pm-invite-step-item.active .pm-invite-step-dot{background:var(--pri);border-color:var(--pri);color:#fff;}
+.pm-invite-step-item.done .pm-invite-step-dot{background:var(--badge-success);border-color:var(--badge-success);color:#fff;}
+.pm-invite-step-sep{flex:1;height:1px;background:var(--color-border-neutral-subtle);margin:0 8px;}
+/* Invite wizard — access mode cards */
+.iw-access-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.iw-access-card{border:1.5px solid var(--color-border-neutral-subtle);border-radius:10px;padding:11px 12px;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:border-color .15s,background .15s;text-align:left;background:none;font-family:inherit;}
+.iw-access-card:hover{border-color:var(--pri);background:rgba(99,102,241,.04);}
+.iw-access-card.selected{border-color:var(--pri);background:rgba(99,102,241,.08);}
+.iw-access-card-icon{width:28px;height:28px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--t3);margin-bottom:2px;}
+.iw-access-card.selected .iw-access-card-icon{background:rgba(99,102,241,.15);color:var(--pri);}
+.iw-access-card-label{font-size:12px;font-weight:600;color:var(--color-text-title);}
+.iw-access-card-desc{font-size:11px;color:var(--color-text-caption);line-height:1.4;}
+/* Invite wizard — scratch permission panel */
+.iw-perm-panel{display:flex;border:1px solid var(--color-border-neutral-subtle);border-radius:10px;overflow:hidden;height:240px;margin-top:4px;}
+.iw-perm-cats{width:132px;border-right:1px solid var(--color-border-neutral-subtle);background:var(--bg3);overflow-y:auto;flex-shrink:0;}
+.iw-perm-cat-btn{display:flex;align-items:center;gap:7px;width:100%;padding:9px 10px;font-size:11px;font-weight:500;color:var(--color-text-body);background:none;border:none;cursor:pointer;text-align:left;border-bottom:1px solid var(--color-border-neutral-subtle);font-family:inherit;transition:background .12s,color .12s;}
+.iw-perm-cat-btn:last-child{border-bottom:none;}
+.iw-perm-cat-btn:hover{background:var(--bg2);color:var(--color-text-title);}
+.iw-perm-cat-btn.active{background:var(--bg1);color:var(--pri);font-weight:600;}
+.iw-perm-cat-dot{width:6px;height:6px;border-radius:50%;background:var(--color-border-neutral-subtle);flex-shrink:0;transition:background .12s;}
+.iw-perm-cat-btn.active .iw-perm-cat-dot{background:var(--pri);}
+.iw-perm-list{flex:1;overflow-y:auto;}
+.iw-perm-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--color-border-neutral-subtle);}
+.iw-perm-row:last-child{border-bottom:none;}
+.iw-perm-body{flex:1;min-width:0;}
+.iw-perm-label{font-size:12px;font-weight:500;color:var(--color-text-title);}
+.iw-perm-desc{font-size:11px;color:var(--color-text-caption);margin-top:1px;line-height:1.3;}
+.iw-toggle-btn{position:relative;width:34px;height:18px;flex-shrink:0;cursor:pointer;background:none;border:none;padding:0;}
+.iw-toggle-track{position:absolute;inset:0;border-radius:9px;background:var(--color-border-neutral-subtle);transition:background .15s;}
+.iw-toggle-btn.on .iw-toggle-track{background:var(--pri);}
+.iw-toggle-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.25);pointer-events:none;}
+.iw-toggle-btn.on .iw-toggle-thumb{transform:translateX(16px);}
+/* Invite wizard — review step */
+.iw-review-section{background:var(--bg3);border-radius:10px;padding:13px 14px;margin-bottom:10px;}
+.iw-review-section:last-child{margin-bottom:0;}
+.iw-review-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-caption);margin-bottom:8px;}
+.iw-review-email-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-title);margin-bottom:5px;}
+.iw-review-email-row:last-child{margin-bottom:0;}
+.iw-review-av{width:22px;height:22px;border-radius:50%;background:rgba(99,102,241,.12);color:var(--pri);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.iw-review-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;}
+.iw-review-row:last-child{margin-bottom:0;}
+.iw-review-key{color:var(--color-text-caption);}
+.iw-review-val{color:var(--color-text-title);font-weight:500;}
+.iw-perm-count-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(99,102,241,.12);color:var(--pri);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;}
+/* Pending invitations callout */
+.pa-invite-callout{margin:0 0 16px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px;overflow:hidden;}
+.pa-invite-callout-head{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(245,158,11,.12);}
+.pa-invite-callout-icon{width:18px;height:18px;flex-shrink:0;color:#f59e0b;display:flex;align-items:center;justify-content:center;}
+.pa-invite-callout-title{font-size:12px;font-weight:600;color:#f59e0b;flex:1;}
+.pa-invite-callout-link{font-size:11px;color:var(--pri);cursor:pointer;background:none;border:none;padding:0;font-family:inherit;}
+.pa-invite-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(245,158,11,.08);}
+.pa-invite-row:last-child{border-bottom:none;}
+.pa-invite-av{width:28px;height:28px;border-radius:50%;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:0;}
+.pa-invite-body{flex:1;min-width:0;}
+.pa-invite-name{font-size:13px;font-weight:600;color:var(--color-text-title);}
+.pa-invite-meta{font-size:11px;color:var(--color-text-caption);margin-top:1px;}
+.pa-invite-actions{display:flex;gap:6px;flex-shrink:0;}
+.pa-invite-btn{font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:1px solid var(--color-border-neutral-subtle);background:var(--color-surface-raised);color:var(--color-text-body);cursor:pointer;font-family:inherit;transition:background .12s;}
+.pa-invite-btn:hover{background:var(--bg3);}
+.pa-invite-btn--danger{color:#f87171;border-color:rgba(239,68,68,.2);}
+.pa-invite-btn--danger:hover{background:rgba(239,68,68,.06);}
 /* Group detail drawer — color swatch button */
 .gd-color-btn:hover { filter:brightness(1.15); box-shadow:0 0 0 2px var(--pri) !important; }
 /* Group detail drawer — inline name edit */
@@ -9479,6 +9594,39 @@ const MOCK_PEOPLE = [
   { id:'ps',  name:'Priya Subramaniam', initials:'PS', role:'Compliance Officer',    color:'#0ea5e9',  email:'priya.subramaniam@contoso.com', status:'invited',   lastActive:'Never',        joinDate:'Aug 10, 2026',  invitedDate:'Aug 10, 2026' },
   { id:'ok',  name:'Omar Khalil',       initials:'OK', role:'External Consultant',   color:'#84cc16',  email:'omar.khalil@consulting.io',     status:'active',    lastActive:'1 week ago',   joinDate:'Jul 20, 2026' },
   { id:'lt',  name:'Layla Torres',      initials:'LT', role:'Ops Lead',              color:'#f97316',  email:'layla.torres@contoso.com',      status:'active',    lastActive:'Today',        joinDate:'Aug 1, 2026' },
+];
+
+/* Invite wizard — permission categories per studio */
+const INVITE_PERM_CATS = [
+  { id:'agentic', label:'Agentic Studio', perms:[
+    { id:'ag-workers-view',    label:'View workers',          desc:'See all AI worker configurations in this workspace' },
+    { id:'ag-workers-create',  label:'Create workers',        desc:'Build new AI worker definitions' },
+    { id:'ag-workers-execute', label:'Execute workers',       desc:'Trigger worker runs manually or via schedule' },
+    { id:'ag-workers-edit',    label:'Edit workers',          desc:'Modify existing worker configurations' },
+    { id:'ag-networks-view',   label:'View agentic networks', desc:'Access network topology and routing rules' },
+    { id:'ag-networks-manage', label:'Manage networks',       desc:'Create and configure agentic networks' },
+  ]},
+  { id:'data', label:'Data Studio', perms:[
+    { id:'ds-models-view',    label:'View data models',   desc:'Browse entity and relationship definitions' },
+    { id:'ds-models-author',  label:'Author data models', desc:'Create and edit model definitions' },
+    { id:'ds-models-publish', label:'Publish models',     desc:'Promote models from Draft to Published state' },
+    { id:'ds-sources-view',   label:'View data sources',  desc:'See all connected data integrations' },
+    { id:'ds-sources-manage', label:'Manage data sources',desc:'Connect, configure, and remove data sources' },
+    { id:'ds-pipelines-run',  label:'Run pipelines',      desc:'Trigger ingestion and transformation jobs manually' },
+  ]},
+  { id:'governance', label:'Governance Studio', perms:[
+    { id:'gs-policies-view',    label:'View policies',          desc:'Access governance rules and policy definitions' },
+    { id:'gs-policies-manage',  label:'Manage policies',        desc:'Create and edit governance policies' },
+    { id:'gs-requests-view',    label:'View promotion requests',desc:'See the sandbox → truth promotion queue' },
+    { id:'gs-requests-approve', label:'Approve promotions',     desc:'Approve or reject promotion packets' },
+    { id:'gs-sandbox-access',   label:'Sandbox access',         desc:'Work in the Sandbox plane and submit promotions' },
+  ]},
+  { id:'helix', label:'Helix Studio', perms:[
+    { id:'hx-ingestion-view',      label:'View ingestion jobs',  desc:'Monitor data ingestion status and history' },
+    { id:'hx-ingestion-manage',    label:'Manage ingestion',     desc:'Configure sources, schedules, and field mappings' },
+    { id:'hx-monitoring-view',     label:'View monitoring',      desc:'Access pipeline health and alert dashboards' },
+    { id:'hx-monitoring-configure',label:'Configure monitoring', desc:'Set alert thresholds and notification rules' },
+  ]},
 ];
 
 /* Platform-level roles — separate from studio-scoped STUDIO_ROLES */
@@ -13237,8 +13385,55 @@ function renderBilling() {
 </div>`;
 }
 
+const _gdRequests = [
+  { id:'pp-001', title:'Customer churn prediction v2.1 → Truth', domain:'Customer Intelligence', by:'María González', av:'MG', date:'2 days ago', evidence:'Accuracy report attached', verdict:null },
+  { id:'pp-002', title:'Contract risk classifier v1.4 → Truth',   domain:'Legal & Compliance',      by:'David Park',     av:'DP', date:'4 days ago', evidence:'Evaluation matrix attached', verdict:null },
+];
+
+function gdApprove(id) {
+  const r = _gdRequests.find(x=>x.id===id); if(!r) return;
+  r.verdict = 'approved';
+  renderGovernanceDefaults();
+}
+function gdReject(id) {
+  const r = _gdRequests.find(x=>x.id===id); if(!r) return;
+  r.verdict = 'rejected';
+  renderGovernanceDefaults();
+}
+
 function renderGovernanceDefaults() {
   const ag = _gd.actionGating;
+  const pending = _gdRequests.filter(r=>!r.verdict).length;
+
+  function reqHtml(r) {
+    if (r.verdict) {
+      return `<div class="gd-req-row gd-req--reviewed">
+        <div class="gd-req-body">
+          <div class="gd-req-domain">${r.domain}</div>
+          <div class="gd-req-title">${r.title}</div>
+        </div>
+        <span class="gd-req-verdict gd-req-verdict--${r.verdict}">${r.verdict === 'approved' ? '✓ Approved' : '✕ Rejected'}</span>
+      </div>`;
+    }
+    return `<div class="gd-req-row" id="req-${r.id}">
+      <div class="gd-req-body">
+        <div class="gd-req-domain">${r.domain}</div>
+        <div class="gd-req-title">${r.title}</div>
+        <div class="gd-req-meta">
+          <span class="gd-req-av">${r.av}</span>
+          <span>${r.by}</span>
+          <span class="gd-req-dot">·</span>
+          <span>${r.date}</span>
+          <span class="gd-req-dot">·</span>
+          <span class="gd-req-ev">📎 ${r.evidence}</span>
+        </div>
+      </div>
+      <div class="gd-req-actions">
+        <button class="btn btn-ghost btn-sm" onclick="gdReject('${r.id}')">Reject</button>
+        <button class="btn btn-primary btn-sm" onclick="gdApprove('${r.id}')">Approve</button>
+      </div>
+    </div>`;
+  }
 
   const gatingItems = [
     { id:'externalMessaging', label:'External messaging',   sub:'Emails, Slack messages, and webhooks sent to outside parties' },
@@ -13255,6 +13450,21 @@ function renderGovernanceDefaults() {
           <div class="ns-page-sub">Tenant-wide defaults for the Sandbox / Truth plane model. Workspace overrides take precedence where set.</div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="gdSave()">Save changes</button>
+      </div>
+
+      <!-- Promotion Requests -->
+      <div class="ns-section">
+        <div class="ns-section-head" style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="ns-section-title">
+              Promotion Requests
+              ${pending > 0 ? `<span class="gd-section-badge">${pending}</span>` : ''}
+            </div>
+            <div class="ns-section-desc">Sandbox → Truth promotion packets awaiting your approval.</div>
+          </div>
+          <a style="font-size:12px;color:var(--pri);cursor:pointer" onclick="location.hash='#/requests'">View all →</a>
+        </div>
+        ${_gdRequests.map(r => reqHtml(r)).join('')}
       </div>
 
       <!-- Plane Defaults -->
@@ -13519,6 +13729,7 @@ function renderAdminHome() {
         <div class="ac-card-footer">
           <span class="ac-card-badge ac-card-badge--active">● Active</span>
           ${item.alert ? `<span class="ac-card-alert-badge">⚠ ${item.alert}</span>` : ''}
+          <span class="ac-card-arrow">›</span>
         </div>
       </div>`;
     }
@@ -13541,19 +13752,23 @@ function renderAdminHome() {
 
       <!-- Stats strip -->
       <div class="ac-stats-strip">
-        <div class="ac-stat-card">
+        <div class="ac-stat-card" style="--ac-stat-accent:#6366f1">
+          <div class="ac-stat-icon"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 5a5 5 0 0110 0H3z"/></svg></div>
           <div class="ac-stat-value">${totalUsers}</div>
           <div class="ac-stat-label">Total members</div>
         </div>
-        <div class="ac-stat-card">
+        <div class="ac-stat-card" style="--ac-stat-accent:#0ea5e9">
+          <div class="ac-stat-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M2 8l6-5 6 5"/><path d="M6 14v-4h4v4"/></svg></div>
           <div class="ac-stat-value">${totalWorkspaces}</div>
           <div class="ac-stat-label">Workspaces</div>
         </div>
-        <div class="ac-stat-card">
+        <div class="ac-stat-card" style="--ac-stat-accent:#10b981">
+          <div class="ac-stat-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l6-3 6 3-6 3-6-3z"/><path d="M2 8l6 3 6-3"/><path d="M2 11l6 3 6-3"/></svg></div>
           <div class="ac-stat-value">${totalStudios}</div>
           <div class="ac-stat-label">Active studios</div>
         </div>
-        <div class="ac-stat-card">
+        <div class="ac-stat-card" style="--ac-stat-accent:#f59e0b">
+          <div class="ac-stat-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.1 3.1l1.4 1.4M11.5 11.5l1.4 1.4M11.5 3.1l-1.4 1.4M3.1 11.5L4.5 10"/></svg></div>
           <div class="ac-stat-value">${totalIntegrations}</div>
           <div class="ac-stat-label">Integrations</div>
         </div>
@@ -14423,7 +14638,32 @@ function renderPeopleMembers() {
   const statusBadge = (s) => s==='active'?'success':s==='invited'?'alert':'error';
   const statusLabel = (s) => s==='active'?'Active':s==='invited'?'Invited':'Suspended';
 
+  const pendingInvites = MOCK_PEOPLE.filter(p => p.status === 'invited');
+  function inviteRowHtml(p) {
+    return `<div class="pa-invite-row">
+      <div class="pa-invite-av">${escapeHtml(p.initials)}</div>
+      <div class="pa-invite-body">
+        <div class="pa-invite-name">${escapeHtml(p.name)}</div>
+        <div class="pa-invite-meta">${escapeHtml(p.email)} · Invited ${escapeHtml(p.invitedDate||p.joinDate||'')}</div>
+      </div>
+      <div class="pa-invite-actions">
+        <button class="pa-invite-btn" onclick="paResendInvite('${p.id}')">Resend</button>
+        <button class="pa-invite-btn pa-invite-btn--danger" onclick="paRemoveMember('${p.id}')">Revoke</button>
+      </div>
+    </div>`;
+  }
+  const inviteCalloutHtml = pendingInvites.length > 0 ? `
+    <div class="pa-invite-callout">
+      <div class="pa-invite-callout-head">
+        <span class="pa-invite-callout-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4h12v9H2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 4l6 5 6-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="pa-invite-callout-title">${pendingInvites.length} invitation${pendingInvites.length!==1?'s':''} pending acceptance</span>
+        <button class="pa-invite-callout-link" onclick="_paState.memberStatus='invited';_paRerender()">View all →</button>
+      </div>
+      ${pendingInvites.map(inviteRowHtml).join('')}
+    </div>` : '';
+
   return `
+    ${inviteCalloutHtml}
     <div class="pa-filters">
       <div class="pa-search-wrap">
         <svg class="pa-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
@@ -15066,52 +15306,230 @@ function renderInviteStudios() {
   }).join('');
 }
 function renderInviteModal() {
+  const step = _paState.inviteStep || 1;
   const count = _paState.inviteEmails.length;
+  function sc(n) { return step > n ? 'done' : step === n ? 'active' : ''; }
+  const stepper = `
+    <div class="pm-invite-stepper">
+      <div class="pm-invite-step-item ${sc(1)}">
+        <div class="pm-invite-step-dot">${step > 1 ? '✓' : '1'}</div>
+        <span>Email</span>
+      </div>
+      <div class="pm-invite-step-sep"></div>
+      <div class="pm-invite-step-item ${sc(2)}">
+        <div class="pm-invite-step-dot">${step > 2 ? '✓' : '2'}</div>
+        <span>Access</span>
+      </div>
+      <div class="pm-invite-step-sep"></div>
+      <div class="pm-invite-step-item ${sc(3)}">
+        <div class="pm-invite-step-dot">3</div>
+        <span>Review</span>
+      </div>
+    </div>`;
+  const mode = _paState.inviteAccessMode || 'role-defaults';
+  const modalW = (step === 2 && mode === 'scratch') ? '640px' : step === 2 ? '560px' : '460px';
+  let body, foot;
+  if (step === 1) {
+    body = renderInviteStep1();
+    foot = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseInvite()">Cancel</button>
+            <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="iwNextStep()">Next →</button>`;
+  } else if (step === 2) {
+    body = renderInviteStep2();
+    foot = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="iwBackStep()">← Back</button>
+            <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="iwNextStep()">Next →</button>`;
+  } else {
+    body = renderInviteStep3();
+    foot = `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="iwBackStep()">← Back</button>
+            <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitInvite()">
+              Send invite${count > 1 ? ` (${count})` : ''}
+            </button>`;
+  }
   return `
-    <div class="pm-invite-modal">
+    <div class="pm-invite-modal" style="width:${modalW};max-width:calc(100vw - 32px)">
       <div class="pm-invite-head">
         <div class="pm-invite-title">Invite member${count > 1 ? ` (${count})` : ''}</div>
         <button class="drawer-close" onclick="paCloseInvite()" aria-label="Close">✕</button>
       </div>
-      <div class="pm-invite-body" style="display:flex;flex-direction:column;gap:16px">
-        <div class="field-group" style="margin-bottom:0">
-          <label class="field-label">Email address</label>
-          <div class="invite-email-field" onclick="document.getElementById('inviteEmailInput').focus()">
-            <span id="inviteChipArea">${renderInviteChips()}</span>
-            <input class="invite-email-input" type="text" inputmode="email" id="inviteEmailInput" placeholder="${count===0?'name@company.com':'Add another…'}"
-              oninput="paInviteInput(this.value)"
-              onkeydown="paInviteKeydown(event)"
-              onpaste="paInvitePaste(event)"
-              onblur="paInviteBlur(this.value)"
-              autocomplete="off" autofocus/>
-          </div>
-          <div class="field-help">Press Enter or comma after each address. Paste a comma-separated list to add multiple at once.</div>
-        </div>
-        <div class="field-group" style="margin-bottom:0">
-          <label class="field-label">Assign role</label>
-          <select class="input" id="inviteRoleInput">
-            <option value="">No role (access via individual grants)</option>
-            ${PA_ROLES.map(r => `<option value="${r.id}">${escapeHtml(r.label)}</option>`).join('')}
-          </select>
-          <div class="field-help">Roles determine what the invited user can access across studios.</div>
-        </div>
-        <div class="field-group" style="margin-bottom:0">
-          <label class="field-label">Studio access</label>
-          <div class="invite-studio-grid" id="inviteStudioArea">${renderInviteStudios()}</div>
-          <div class="field-help">Studios the user will be able to access after accepting the invite.</div>
-        </div>
-        <div class="field-group" style="margin-bottom:0">
-          <label class="field-label">Personal message <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
-          <textarea class="input" id="inviteMessageInput" rows="2" placeholder="Add a note to the invite email…" style="resize:none"></textarea>
-        </div>
+      ${stepper}
+      <div class="pm-invite-body" style="display:flex;flex-direction:column;gap:14px">
+        ${body}
       </div>
-      <div class="pm-invite-foot">
-        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseInvite()">Cancel</button>
-        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitInvite()">
-          Send invite${count > 1 ? ` (${count})` : ''}
-        </button>
-      </div>
+      <div class="pm-invite-foot">${foot}</div>
     </div>`;
+}
+
+function renderInviteStep1() {
+  const count = _paState.inviteEmails.length;
+  const msg = _paState.inviteMessage || '';
+  return `
+    <div class="field-group" style="margin-bottom:0">
+      <label class="field-label">Email address</label>
+      <div class="invite-email-field" onclick="document.getElementById('inviteEmailInput').focus()">
+        <span id="inviteChipArea">${renderInviteChips()}</span>
+        <input class="invite-email-input" type="text" inputmode="email" id="inviteEmailInput"
+          placeholder="${count===0?'name@company.com':'Add another…'}"
+          oninput="paInviteInput(this.value)" onkeydown="paInviteKeydown(event)"
+          onpaste="paInvitePaste(event)" onblur="paInviteBlur(this.value)"
+          autocomplete="off" autofocus/>
+      </div>
+      <div class="field-help">Press Enter or comma after each address. Paste a comma-separated list to add multiple at once.</div>
+    </div>
+    <div class="field-group" style="margin-bottom:0">
+      <label class="field-label">Personal message <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
+      <textarea class="input" id="inviteMessageInput" rows="2" placeholder="Add a note to the invite email…" style="resize:none">${escapeHtml(msg)}</textarea>
+    </div>`;
+}
+
+function renderInviteStep2() {
+  const mode = _paState.inviteAccessMode || 'role-defaults';
+  const roleId = _paState.inviteRole || '';
+  const cat = _paState.invitePermCategory || 'agentic';
+  const perms = _paState.invitePerms || {};
+  const ACCESS_MODES = [
+    { id:'role-defaults', label:'Use role defaults', desc:'Permissions automatically follow the assigned role',
+      icon:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4v4.5C2 11.8 4.7 14.6 8 15.5c3.3-.9 6-3.7 6-7V4L8 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>` },
+    { id:'custom-set', label:'Custom permission set', desc:'Apply a saved named permission set',
+      icon:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M9 11.5h5M11.5 9v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>` },
+    { id:'template', label:'Copy from template', desc:"Start with another user's permission profile",
+      icon:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 7h9M2 11h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>` },
+    { id:'scratch', label:'Start from scratch', desc:'Choose every permission individually per studio',
+      icon:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.5 2.5l3 3-8 8H2.5v-3l8-8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8.5 4.5l3 3" stroke="currentColor" stroke-width="1.3"/></svg>` },
+  ];
+  const permPanel = mode === 'scratch' ? `
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Studio permissions</div>
+      <div class="iw-perm-panel">
+        <div class="iw-perm-cats">
+          ${INVITE_PERM_CATS.map(c => `
+            <button class="iw-perm-cat-btn ${c.id===cat?'active':''}" data-cat="${c.id}" onclick="iwSetPermCat('${c.id}')">
+              <span class="iw-perm-cat-dot"></span>
+              ${escapeHtml(c.label)}
+            </button>`).join('')}
+        </div>
+        <div class="iw-perm-list" id="iwPermList">
+          ${renderIwPermList(cat)}
+        </div>
+      </div>
+    </div>` : '';
+  return `
+    <div class="field-group" style="margin-bottom:0">
+      <label class="field-label">Assign role</label>
+      <select class="input" id="iwRoleInput" onchange="_paState.inviteRole=this.value">
+        <option value="" ${!roleId?'selected':''}>No role (access via individual grants)</option>
+        ${PA_ROLES.map(r => `<option value="${r.id}" ${roleId===r.id?'selected':''}>${escapeHtml(r.label)}</option>`).join('')}
+      </select>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">How to set up access</div>
+      <div class="iw-access-cards">
+        ${ACCESS_MODES.map(m => `
+          <button class="iw-access-card ${mode===m.id?'selected':''}" data-mode="${m.id}" onclick="iwSetAccessMode('${m.id}')">
+            <div class="iw-access-card-icon">${m.icon}</div>
+            <div class="iw-access-card-label">${m.label}</div>
+            <div class="iw-access-card-desc">${m.desc}</div>
+          </button>`).join('')}
+      </div>
+    </div>
+    ${permPanel}`;
+}
+
+function renderIwPermList(catId) {
+  const cat = INVITE_PERM_CATS.find(c => c.id === catId);
+  if (!cat) return '';
+  const perms = _paState.invitePerms || {};
+  return cat.perms.map(p => `
+    <div class="iw-perm-row">
+      <div class="iw-perm-body">
+        <div class="iw-perm-label">${escapeHtml(p.label)}</div>
+        <div class="iw-perm-desc">${escapeHtml(p.desc)}</div>
+      </div>
+      <button class="iw-toggle-btn ${perms[p.id]?'on':''}" data-perm="${p.id}" onclick="iwTogglePerm('${p.id}')">
+        <span class="iw-toggle-track"></span>
+        <span class="iw-toggle-thumb"></span>
+      </button>
+    </div>`).join('');
+}
+
+function renderInviteStep3() {
+  const emails = _paState.inviteEmails;
+  const roleId = _paState.inviteRole || '';
+  const role = PA_ROLES.find(r => r.id === roleId);
+  const mode = _paState.inviteAccessMode || 'role-defaults';
+  const modeLabels = {'role-defaults':'Role defaults','custom-set':'Custom permission set','template':'Copied from template','scratch':'Custom (from scratch)'};
+  const perms = _paState.invitePerms || {};
+  const permCount = Object.values(perms).filter(Boolean).length;
+  const msg = _paState.inviteMessage;
+  return `
+    <div class="iw-review-section">
+      <div class="iw-review-label">Inviting${emails.length > 1 ? ` (${emails.length})` : ''}</div>
+      ${emails.map(em => `<div class="iw-review-email-row">
+        <div class="iw-review-av">${em.slice(0,2).toUpperCase()}</div>
+        <span>${escapeHtml(em)}</span>
+      </div>`).join('')}
+    </div>
+    <div class="iw-review-section">
+      <div class="iw-review-label">Access</div>
+      <div class="iw-review-row">
+        <span class="iw-review-key">Role</span>
+        <span class="iw-review-val">${escapeHtml(role ? role.label : 'No role assigned')}</span>
+      </div>
+      <div class="iw-review-row">
+        <span class="iw-review-key">Access method</span>
+        <span class="iw-review-val">${modeLabels[mode]||mode}</span>
+      </div>
+      ${mode === 'scratch' ? `<div class="iw-review-row">
+        <span class="iw-review-key">Permissions</span>
+        <span class="iw-perm-count-pill">${permCount} granted</span>
+      </div>` : ''}
+    </div>
+    ${msg ? `<div class="iw-review-section">
+      <div class="iw-review-label">Personal message</div>
+      <div style="font-size:12px;color:var(--color-text-body);line-height:1.5">${escapeHtml(msg)}</div>
+    </div>` : ''}`;
+}
+
+function iwNextStep() {
+  const step = _paState.inviteStep || 1;
+  if (step === 1) {
+    const inp = document.getElementById('inviteEmailInput');
+    if (inp && inp.value.trim()) { _paState.inviteEmailDraft = inp.value.trim(); paInviteCommitEmail(); }
+    if (_paState.inviteEmails.length === 0) { toast('Enter at least one email address', 'error'); return; }
+    const msgEl = document.getElementById('inviteMessageInput');
+    if (msgEl) _paState.inviteMessage = msgEl.value;
+    _paState.inviteStep = 2;
+  } else if (step === 2) {
+    const roleEl = document.getElementById('iwRoleInput');
+    if (roleEl) _paState.inviteRole = roleEl.value;
+    _paState.inviteStep = 3;
+  }
+  const overlay = document.querySelector('.pm-invite-overlay');
+  if (overlay) overlay.innerHTML = renderInviteModal();
+}
+
+function iwBackStep() {
+  _paState.inviteStep = Math.max(1, (_paState.inviteStep || 1) - 1);
+  const overlay = document.querySelector('.pm-invite-overlay');
+  if (overlay) overlay.innerHTML = renderInviteModal();
+}
+
+function iwSetAccessMode(mode) {
+  _paState.inviteAccessMode = mode;
+  const overlay = document.querySelector('.pm-invite-overlay');
+  if (overlay) overlay.innerHTML = renderInviteModal();
+}
+
+function iwSetPermCat(catId) {
+  _paState.invitePermCategory = catId;
+  const list = document.getElementById('iwPermList');
+  if (list) list.innerHTML = renderIwPermList(catId);
+  document.querySelectorAll('.iw-perm-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === catId));
+}
+
+function iwTogglePerm(permId) {
+  if (!_paState.invitePerms) _paState.invitePerms = {};
+  _paState.invitePerms[permId] = !_paState.invitePerms[permId];
+  const btn = document.querySelector(`[data-perm="${permId}"]`);
+  if (btn) btn.classList.toggle('on', !!_paState.invitePerms[permId]);
 }
 
 function _paRerender() {
@@ -15144,8 +15562,14 @@ function paSetDrawerTab(tab) {
 }
 function paOpenInvite() {
   _paState.inviteOpen = true;
+  _paState.inviteStep = 1;
   _paState.inviteEmails = [];
   _paState.inviteEmailDraft = '';
+  _paState.inviteMessage = '';
+  _paState.inviteRole = '';
+  _paState.inviteAccessMode = 'role-defaults';
+  _paState.invitePermCategory = 'agentic';
+  _paState.invitePerms = {};
   _paState.inviteStudios = new Set(['agentic','helix','governance','data']);
   renderPeople();
 }
@@ -15231,8 +15655,7 @@ function paSubmitInvite() {
   const emails = _paState.inviteEmails.slice();
   if (emails.length === 0) { toast('Enter at least one email address', 'error'); return; }
 
-  const roleInput = document.getElementById('inviteRoleInput');
-  const roleId = roleInput ? roleInput.value : '';
+  const roleId = _paState.inviteRole || '';
   const role = PA_ROLES.find(r => r.id === roleId);
 
   const COLORS = ['#10b981','#06B6D4','#8b5cf6','#f97316','#ef4444','#84cc16','#0ea5e9','#6366f1'];
