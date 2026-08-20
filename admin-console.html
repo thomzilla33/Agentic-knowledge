@@ -8046,6 +8046,46 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .rd-danger-btn { background:none; border:1px solid rgba(239,68,68,.4); border-radius:var(--r8); padding:7px 14px; font-size:12px; font-weight:600; color:var(--red); cursor:pointer; transition:background .15s; }
 .rd-danger-btn:hover { background:var(--red-12); }
 
+/* ── Audit Event Detail Drawer ──────────────────────────────────────────── */
+.ad-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(3px); z-index:400; opacity:0; pointer-events:none; transition:opacity .2s; }
+.ad-overlay.open { opacity:1; pointer-events:all; }
+.ad-drawer { position:fixed; top:0; right:0; bottom:0; width:420px; background:var(--surface); border-left:1px solid var(--line); z-index:401; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); box-shadow:-24px 0 60px rgba(0,0,0,.3); }
+html.theme-light .ad-drawer { background:#fff; }
+.ad-drawer.open { transform:translateX(0); }
+.ad-head { padding:18px 20px 14px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.ad-head-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+.ad-sev-badge { display:inline-flex; align-items:center; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; flex-shrink:0; margin-top:2px; }
+.ad-sev-badge.info { background:rgba(99,102,241,.12); color:var(--pri); }
+.ad-sev-badge.warn { background:rgba(245,158,11,.12); color:#F59E0B; }
+.ad-sev-badge.crit { background:rgba(239,68,68,.10); color:var(--red); }
+.ad-event-name { font-size:13px; font-weight:700; color:var(--t1); font-family:'SF Mono',Menlo,Consolas,monospace; flex:1; word-break:break-all; line-height:1.4; }
+.ad-ts { font-size:11px; color:var(--t3); margin-top:2px; }
+.ad-close { width:28px; height:28px; border-radius:8px; border:none; background:none; color:var(--t3); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .12s,color .12s; }
+.ad-close:hover { background:var(--hover); color:var(--t1); }
+.ad-body { flex:1; overflow-y:auto; }
+.ad-body::-webkit-scrollbar { width:4px; }
+.ad-body::-webkit-scrollbar-thumb { background:var(--line); border-radius:2px; }
+.ad-section { padding:14px 20px; border-bottom:1px solid var(--line); }
+.ad-section:last-child { border-bottom:none; }
+.ad-section-h { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin:0 0 10px; }
+.ad-kv-row { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:12px; }
+html.theme-light .ad-kv-row { border-bottom-color:var(--line); }
+.ad-kv-row:last-child { border-bottom:none; }
+.ad-kv-key { color:var(--t3); flex-shrink:0; width:120px; padding-top:1px; }
+.ad-kv-val { color:var(--t1); font-weight:500; flex:1; min-width:0; word-break:break-all; }
+.ad-kv-val code { font-family:'SF Mono',Menlo,Consolas,monospace; font-size:11px; color:var(--t2); background:var(--bg2); padding:1px 5px; border-radius:4px; }
+.ad-kv-val.mono { font-family:'SF Mono',Menlo,Consolas,monospace; font-size:11px; color:var(--t2); }
+.ad-diff { display:flex; flex-direction:column; gap:4px; }
+.ad-diff-before { font-size:11px; color:var(--red); background:rgba(239,68,68,.07); border-radius:5px; padding:4px 8px; font-family:'SF Mono',Menlo,Consolas,monospace; }
+.ad-diff-after  { font-size:11px; color:#10B981; background:rgba(16,185,129,.07); border-radius:5px; padding:4px 8px; font-family:'SF Mono',Menlo,Consolas,monospace; }
+.ad-related-row { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; transition:background .12s; border-radius:6px; }
+html.theme-light .ad-related-row { border-bottom-color:var(--line); }
+.ad-related-row:last-child { border-bottom:none; }
+.ad-related-row:hover { background:var(--hover); }
+.ad-related-ts { font-size:11px; color:var(--t3); width:80px; flex-shrink:0; }
+.ad-related-ev { font-size:11px; color:var(--t2); font-family:'SF Mono',Menlo,Consolas,monospace; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ad-foot { padding:14px 20px; border-top:1px solid var(--line); flex-shrink:0; display:flex; gap:8px; }
+
 /* ── Offboarding Wizard ─────────────────────────────────────────────────── */
 .ob-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); backdrop-filter:blur(6px); z-index:600; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
 .ob-overlay.open { opacity:1; pointer-events:all; }
@@ -20175,7 +20215,223 @@ function auditTable(events, full) {
 }
 
 function toggleAuditSev(sev) { auditFilters.severity.has(sev) ? auditFilters.severity.delete(sev) : auditFilters.severity.add(sev); renderAudit() }
-function toggleAuditExpand(idx) { auditFilters.expanded = auditFilters.expanded===idx ? null : idx; renderAudit() }
+function toggleAuditExpand(idx) { openAuditDetail(idx); }
+
+/* ── Audit Detail Drawer ────────────────────────────────────────────────── */
+const _adState = { open:false, idx:null };
+
+function _ensureAdDrawer() {
+  if (document.getElementById('adOverlay')) return;
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="ad-overlay" id="adOverlay" onclick="closeAuditDetail()"></div>
+    <aside class="ad-drawer" id="adDrawer" role="dialog" aria-label="Event detail"></aside>
+  `;
+  while (div.firstChild) document.body.appendChild(div.firstChild);
+}
+
+function openAuditDetail(idx) {
+  _ensureAdDrawer();
+  _adState.open = true;
+  _adState.idx  = idx;
+  _paintAdDrawer();
+  requestAnimationFrame(() => {
+    document.getElementById('adOverlay')?.classList.add('open');
+    document.getElementById('adDrawer')?.classList.add('open');
+  });
+}
+
+function closeAuditDetail() {
+  _adState.open = false;
+  document.getElementById('adOverlay')?.classList.remove('open');
+  document.getElementById('adDrawer')?.classList.remove('open');
+}
+
+function _adEventId(e) {
+  return 'evt_' + (e.tsAbs || '').replace(/[^0-9]/g,'').slice(0,14);
+}
+
+function _adFormatDetails(e) {
+  const d = e.details || {};
+  const rows = [];
+
+  const ev = e.event || '';
+
+  if (ev.includes('used_by_agent')) {
+    if (d.action)          rows.push(['Action', `<code>${escapeHtml(d.action)}</code>`]);
+    if (d.channel)         rows.push(['Channel', escapeHtml(d.channel)]);
+    if (d.project)         rows.push(['Project', escapeHtml(d.project)]);
+    if (d.issue_key)       rows.push(['Issue', `<code>${escapeHtml(d.issue_key)}</code>`]);
+    if (d.repo)            rows.push(['Repository', `<code>${escapeHtml(d.repo)}</code>`]);
+    if (d.rows_returned != null) rows.push(['Rows returned', escapeHtml(String(d.rows_returned))]);
+    if (d.message_length != null) rows.push(['Message length', escapeHtml(String(d.message_length)) + ' chars']);
+  } else if (ev.includes('health_degraded') || ev.includes('health_failed')) {
+    if (d.reason)          rows.push(['Reason', `<span style="color:${ev.includes('failed')?'var(--red)':'#F59E0B'}">${escapeHtml(d.reason)}</span>`]);
+    if (d.errors_last_hour != null) rows.push(['Errors (last hour)', String(d.errors_last_hour)]);
+  } else if (ev.includes('permissions_changed')) {
+    if (d.change) {
+      rows.push(['Change', escapeHtml(d.change)]);
+    } else if (d.before || d.after) {
+      const before = JSON.stringify(d.before || {}, null, 2);
+      const after  = JSON.stringify(d.after  || {}, null, 2);
+      rows.push(['Changes', `<div class="ad-diff"><div class="ad-diff-before">− ${escapeHtml(before)}</div><div class="ad-diff-after">+ ${escapeHtml(after)}</div></div>`]);
+    }
+  } else if (ev.includes('sso.login')) {
+    if (d.provider)  rows.push(['Provider', escapeHtml(d.provider)]);
+    if (d.mfa != null) rows.push(['MFA', d.mfa ? '<span style="color:#10B981;font-weight:600">✓ Verified</span>' : '<span style="color:var(--red)">Not used</span>']);
+  } else if (ev.includes('connected')) {
+    if (d.auth_method) rows.push(['Auth method', `<code>${escapeHtml(d.auth_method)}</code>`]);
+    if (d.scopes_granted != null) rows.push(['Scopes granted', String(d.scopes_granted)]);
+  } else if (ev.includes('credentials_rotated')) {
+    rows.push(['Status', '<span style="color:#10B981;font-weight:600">Credentials rotated successfully</span>']);
+  } else if (ev.includes('private_published')) {
+    if (d.method)     rows.push(['Method', `<code>${escapeHtml(d.method)}</code>`]);
+    if (d.visibility) rows.push(['Visibility', escapeHtml(d.visibility)]);
+  } else if (ev.includes('role.assigned')) {
+    if (d.user) rows.push(['Assigned to', escapeHtml(d.user)]);
+    if (d.role) rows.push(['Role', escapeHtml(d.role)]);
+  } else if (ev.includes('settings.changed')) {
+    if (d.setting) rows.push(['Setting', `<code>${escapeHtml(d.setting)}</code>`]);
+    if (d.from != null && d.to != null) {
+      rows.push(['Change', `<div class="ad-diff"><div class="ad-diff-before">− ${escapeHtml(String(d.from))}</div><div class="ad-diff-after">+ ${escapeHtml(String(d.to))}</div></div>`]);
+    }
+  }
+
+  if (rows.length === 0) {
+    const raw = JSON.stringify(d, null, 2);
+    if (raw && raw !== '{}') rows.push(['Raw', `<span class="ad-kv-val mono">${escapeHtml(raw)}</span>`]);
+    else rows.push(['Details', '<span style="color:var(--t3)">No additional context</span>']);
+  }
+  return rows;
+}
+
+function _paintAdDrawer() {
+  const drawer = document.getElementById('adDrawer');
+  if (!drawer) return;
+  const filtered = (() => {
+    let ev = AUDIT_EVENTS;
+    if (auditFilters.severity.size > 0) ev = ev.filter(e => auditFilters.severity.has(e.sev));
+    if (auditFilters.search) {
+      const q = auditFilters.search.toLowerCase();
+      ev = ev.filter(e => (e.event||'').toLowerCase().includes(q) || (e.actor||'').toLowerCase().includes(q) || (e.resource||'').toLowerCase().includes(q));
+    }
+    return ev;
+  })();
+  const e = filtered[_adState.idx];
+  if (!e) return;
+  const eventId = _adEventId(e);
+  const sevCls  = e.sev === 'crit' ? 'crit' : e.sev === 'warn' ? 'warn' : 'info';
+  const sevLabel = e.sev === 'crit' ? 'Critical' : e.sev === 'warn' ? 'Warning' : 'Info';
+
+  const actorAvatar = e.actorType === 'agent'
+    ? `<div style="width:32px;height:32px;border-radius:8px;background:var(--purple-10);border:1px solid var(--purple-30);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--purple)"><rect x="3" y="5" width="10" height="7" rx="1.4" stroke="currentColor" stroke-width="1.4"/><circle cx="6" cy="8.5" r=".8" fill="currentColor"/><circle cx="10" cy="8.5" r=".8" fill="currentColor"/><path d="M8 2v3M5.5 12v2M10.5 12v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>`
+    : e.actorType === 'system'
+    ? `<div style="width:32px;height:32px;border-radius:8px;background:var(--bg2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--t3)"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M8 1.5v2.2M8 12.3v2.2M14.5 8h-2.2M3.7 8H1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>`
+    : `<div style="width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">${(e.actor[0]||'').toUpperCase()}</div>`;
+
+  const detailRows = _adFormatDetails(e);
+
+  // Related events: same resource OR same actor, excluding this one
+  const related = AUDIT_EVENTS
+    .filter((r, i) => r !== e && (r.resource === e.resource || (r.actor === e.actor && e.actorType !== 'system')))
+    .slice(0, 4);
+
+  drawer.innerHTML = `
+    <div class="ad-head">
+      <div class="ad-head-row">
+        <div style="flex:1;min-width:0">
+          <span class="ad-sev-badge ${sevCls}">${sevLabel}</span>
+          <div class="ad-event-name" style="margin-top:8px">${escapeHtml(e.event)}</div>
+          <div class="ad-ts">${escapeHtml(e.tsAbs)} · ${escapeHtml(e.ts)}</div>
+        </div>
+        <button class="ad-close" onclick="closeAuditDetail()" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div style="font-size:11px;color:var(--t3);font-family:'SF Mono',Menlo,Consolas,monospace">ID: ${escapeHtml(eventId)}</div>
+    </div>
+
+    <div class="ad-body">
+      <div class="ad-section">
+        <div class="ad-section-h">Actor</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          ${actorAvatar}
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--t1)">${escapeHtml(e.actor)}</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:1px;text-transform:capitalize">${escapeHtml(e.actorType)}</div>
+          </div>
+        </div>
+        <div class="ad-kv-row">
+          <div class="ad-kv-key">IP address</div>
+          <div class="ad-kv-val mono">${e.ip ? escapeHtml(e.ip) : '<span style="color:var(--t3)">—</span>'}</div>
+        </div>
+        ${e.actorType === 'user' ? `
+        <div class="ad-kv-row">
+          <div class="ad-kv-key">Session origin</div>
+          <div class="ad-kv-val mono">Browser · SSO</div>
+        </div>` : ''}
+      </div>
+
+      <div class="ad-section">
+        <div class="ad-section-h">Context</div>
+        <div class="ad-kv-row">
+          <div class="ad-kv-key">Resource</div>
+          <div class="ad-kv-val">${e.resource
+            ? `<a href="#/integrations/${e.resource}" style="color:var(--pri);text-decoration:none" onclick="closeAuditDetail()">${escapeHtml(e.resource)}</a>`
+            : '<span style="color:var(--t3)">—</span>'}</div>
+        </div>
+        <div class="ad-kv-row">
+          <div class="ad-kv-key">Studio</div>
+          <div class="ad-kv-val">${e.studio ? escapeHtml(STUDIO_META[e.studio]?.label || e.studio) : '<span style="color:var(--t3)">—</span>'}</div>
+        </div>
+        <div class="ad-kv-row">
+          <div class="ad-kv-key">Severity</div>
+          <div class="ad-kv-val"><span class="ad-sev-badge ${sevCls}" style="font-size:9px;padding:2px 7px">${sevLabel}</span></div>
+        </div>
+      </div>
+
+      <div class="ad-section">
+        <div class="ad-section-h">Event details</div>
+        ${detailRows.map(([k, v]) => `
+          <div class="ad-kv-row">
+            <div class="ad-kv-key">${escapeHtml(k)}</div>
+            <div class="ad-kv-val">${v}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      ${related.length > 0 ? `
+      <div class="ad-section">
+        <div class="ad-section-h">Related events</div>
+        ${related.map((r, i) => {
+          const ri = AUDIT_EVENTS.indexOf(r);
+          return `
+            <div class="ad-related-row" onclick="openAuditDetail(${ri})">
+              <span class="ad-related-ts">${escapeHtml(r.ts)}</span>
+              <span class="ad-sev-badge ${r.sev === 'crit' ? 'crit' : r.sev === 'warn' ? 'warn' : 'info'}" style="font-size:9px;padding:1px 6px">${r.sev.toUpperCase()}</span>
+              <span class="ad-related-ev">${escapeHtml(r.event)}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>` : ''}
+    </div>
+
+    <div class="ad-foot">
+      <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard?.writeText('${escapeHtml(eventId)}').then(()=>toast('Event ID copied','success'))">Copy event ID</button>
+      <button class="btn btn-ghost btn-sm" onclick="toast('cURL copied to clipboard','success')">Copy as cURL</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeAuditDetail();auditFilters.search='${escapeHtml(e.resource||e.actor)}';renderAudit()">Filter by ${escapeHtml(e.resource || e.actor.split(':')[0] || 'actor')}</button>
+    </div>
+  `;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && _adState.open) closeAuditDetail();
+});
 
 /* ====================== BUILD YOUR OWN ====================== */
 
