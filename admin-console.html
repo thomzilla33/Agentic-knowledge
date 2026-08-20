@@ -8046,6 +8046,77 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .rd-danger-btn { background:none; border:1px solid rgba(239,68,68,.4); border-radius:var(--r8); padding:7px 14px; font-size:12px; font-weight:600; color:var(--red); cursor:pointer; transition:background .15s; }
 .rd-danger-btn:hover { background:var(--red-12); }
 
+/* ── Webhook Export Drawer ───────────────────────────────────────────────── */
+.wh-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(3px); z-index:400; opacity:0; pointer-events:none; transition:opacity .2s; }
+.wh-overlay.open { opacity:1; pointer-events:all; }
+.wh-drawer { position:fixed; top:0; right:0; bottom:0; width:460px; background:var(--surface); border-left:1px solid var(--line); z-index:401; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); box-shadow:-24px 0 60px rgba(0,0,0,.3); }
+.wh-drawer.open { transform:translateX(0); }
+.wh-head { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.wh-title { font-size:14px; font-weight:600; color:var(--t1); }
+.wh-close { width:28px; height:28px; border-radius:6px; background:transparent; border:none; color:var(--t3); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .12s; }
+.wh-close:hover { background:var(--bg2); color:var(--t1); }
+.wh-tabs { display:flex; border-bottom:1px solid var(--line); flex-shrink:0; }
+.wh-tab { flex:1; text-align:center; padding:10px 0; font-size:12px; font-weight:500; color:var(--t3); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .12s; }
+.wh-tab.active { color:var(--pri); border-bottom-color:var(--pri); }
+.wh-body { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:18px; }
+.wh-status-bar { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--bg2); border:1px solid var(--line); border-radius:10px; }
+.wh-status-label { font-size:12.5px; font-weight:500; color:var(--t1); }
+.wh-status-sub { font-size:11px; color:var(--t3); margin-top:2px; }
+.wh-toggle { position:relative; width:38px; height:22px; cursor:pointer; }
+.wh-toggle input { opacity:0; width:0; height:0; }
+.wh-toggle-track { position:absolute; inset:0; background:var(--line); border-radius:11px; transition:background .2s; }
+.wh-toggle input:checked ~ .wh-toggle-track { background:var(--pri); }
+.wh-toggle-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; background:#fff; border-radius:50%; transition:transform .2s; }
+.wh-toggle input:checked ~ .wh-toggle-track + .wh-toggle-thumb,
+.wh-toggle input:checked ~ * + .wh-toggle-thumb { transform:translateX(16px); }
+.wh-section-h { font-size:11px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+.wh-field { margin-bottom:12px; }
+.wh-field label { display:block; font-size:11.5px; color:var(--t2); margin-bottom:5px; font-weight:500; }
+.wh-input { width:100%; background:var(--bg2); border:1px solid var(--line); border-radius:7px; padding:8px 10px; font-size:12.5px; color:var(--t1); box-sizing:border-box; outline:none; transition:border-color .15s; }
+.wh-input:focus { border-color:var(--pri); }
+.wh-input-row { display:flex; gap:8px; align-items:flex-start; }
+.wh-input-row .wh-input { flex:1; }
+.wh-test-btn { flex-shrink:0; padding:8px 12px; background:var(--bg2); border:1px solid var(--line); border-radius:7px; font-size:12px; color:var(--t2); cursor:pointer; white-space:nowrap; transition:background .12s,color .12s; height:36px; }
+.wh-test-btn:hover { background:rgba(99,102,241,.1); color:var(--pri); border-color:var(--pri); }
+.wh-test-badge.ok { font-size:11px; color:#10B981; background:rgba(16,185,129,.1); border-radius:5px; padding:3px 8px; }
+.wh-test-badge.err { font-size:11px; color:var(--red); background:rgba(239,68,68,.08); border-radius:5px; padding:3px 8px; }
+.wh-auth-cards { display:flex; gap:8px; }
+.wh-auth-card { flex:1; padding:9px 10px; background:var(--bg2); border:1px solid var(--line); border-radius:8px; cursor:pointer; transition:border-color .15s; }
+.wh-auth-card.selected { border-color:var(--pri); background:rgba(99,102,241,.06); }
+.wh-auth-card-h { font-size:12px; font-weight:600; color:var(--t1); }
+.wh-auth-card-sub { font-size:10.5px; color:var(--t3); margin-top:2px; }
+.wh-checks { display:flex; flex-wrap:wrap; gap:6px; }
+.wh-check { display:flex; align-items:center; gap:6px; padding:5px 9px; background:var(--bg2); border:1px solid var(--line); border-radius:6px; cursor:pointer; user-select:none; transition:border-color .12s; font-size:12px; color:var(--t2); }
+.wh-check.on { border-color:var(--pri); color:var(--t1); background:rgba(99,102,241,.06); }
+.wh-check-dot { width:10px; height:10px; border-radius:3px; border:1.5px solid var(--line); flex-shrink:0; transition:background .12s,border-color .12s; }
+.wh-check.on .wh-check-dot { background:var(--pri); border-color:var(--pri); }
+.wh-format-row { display:flex; gap:8px; }
+.wh-format-opt { flex:1; padding:8px; text-align:center; border:1px solid var(--line); border-radius:7px; cursor:pointer; font-size:12px; color:var(--t2); background:var(--bg2); transition:all .12s; }
+.wh-format-opt.sel { border-color:var(--pri); color:var(--pri); background:rgba(99,102,241,.07); font-weight:600; }
+.wh-format-desc { font-size:10.5px; color:var(--t3); margin-top:3px; }
+.wh-toggle-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.wh-toggle-row-label { font-size:12.5px; color:var(--t1); }
+.wh-toggle-row-sub { font-size:11px; color:var(--t3); margin-top:1px; }
+.wh-mini-toggle { position:relative; width:32px; height:18px; cursor:pointer; flex-shrink:0; }
+.wh-mini-toggle input { opacity:0; width:0; height:0; }
+.wh-mini-track { position:absolute; inset:0; background:var(--line); border-radius:9px; transition:background .2s; }
+.wh-mini-toggle input:checked ~ .wh-mini-track { background:var(--pri); }
+.wh-mini-thumb { position:absolute; top:2px; left:2px; width:14px; height:14px; background:#fff; border-radius:50%; transition:transform .2s; pointer-events:none; }
+.wh-mini-toggle input:checked ~ .wh-mini-track ~ .wh-mini-thumb { transform:translateX(14px); }
+.wh-footer { padding:14px 20px; border-top:1px solid var(--line); display:flex; gap:8px; flex-shrink:0; }
+.wh-save-btn { flex:1; padding:9px; background:var(--pri); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:opacity .15s; }
+.wh-save-btn:hover { opacity:.88; }
+.wh-cancel-btn { padding:9px 16px; background:transparent; border:1px solid var(--line); border-radius:8px; font-size:13px; color:var(--t2); cursor:pointer; transition:background .12s; }
+.wh-cancel-btn:hover { background:var(--bg2); }
+/* delivery log */
+.wh-log-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:12px; }
+.wh-log-status { width:36px; text-align:center; font-size:11px; font-weight:700; padding:2px 5px; border-radius:4px; flex-shrink:0; }
+.wh-log-status.ok { background:rgba(16,185,129,.12); color:#10B981; }
+.wh-log-status.fail { background:rgba(239,68,68,.1); color:var(--red); }
+.wh-log-event { flex:1; color:var(--t1); font-size:11.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wh-log-ts { color:var(--t3); font-size:11px; white-space:nowrap; }
+.wh-log-lat { color:var(--t3); font-size:10.5px; white-space:nowrap; }
+
 /* ── Audit Event Detail Drawer ──────────────────────────────────────────── */
 .ad-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(3px); z-index:400; opacity:0; pointer-events:none; transition:opacity .2s; }
 .ad-overlay.open { opacity:1; pointer-events:all; }
@@ -20141,7 +20212,7 @@ function renderAudit() {
           <div class="ph-sub">Workspace-wide events for the last 90 days. Export to CSV or stream via webhook.</div>
         </div>
         <div class="ph-actions">
-          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Webhook export drawer opened')">Configure webhook export</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="openWebhookExport()">Configure webhook export</button>
           <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="toast('CSV exported','success')">Export CSV</button>
         </div>
       </div>
@@ -20245,6 +20316,267 @@ function closeAuditDetail() {
   _adState.open = false;
   document.getElementById('adOverlay')?.classList.remove('open');
   document.getElementById('adDrawer')?.classList.remove('open');
+}
+
+/* ── Webhook Export Drawer ──────────────────────────────────────────────── */
+const _whState = {
+  open: false, tab: 'config',
+  enabled: true,
+  url: 'https://hooks.acme-corp.com/aims-audit',
+  auth: 'hmac',
+  secret: 'whs_9f3k2mXp8qLrN4vZ',
+  severities: new Set(['warn','crit']),
+  eventTypes: new Set(['permissions','settings','sso','governance']),
+  format: 'ndjson',
+  batchWindow: 5,
+  retryOnFail: true,
+  testResult: null,
+};
+
+const _WH_DELIVERY_LOG = [
+  { ts:'2 min ago', event:'role.assigned', status:200, latency:'142ms' },
+  { ts:'2 min ago', event:'permissions.changed', status:200, latency:'98ms' },
+  { ts:'18 min ago', event:'sso.login_success', status:200, latency:'210ms' },
+  { ts:'1 hr ago', event:'governance.policy_updated', status:200, latency:'185ms' },
+  { ts:'1 hr ago', event:'settings.changed', status:500, latency:'—' },
+  { ts:'2 hrs ago', event:'role.revoked', status:200, latency:'121ms' },
+  { ts:'3 hrs ago', event:'permissions.changed', status:200, latency:'93ms' },
+  { ts:'5 hrs ago', event:'sso.mfa_bypassed', status:200, latency:'167ms' },
+  { ts:'6 hrs ago', event:'governance.approval_rejected', status:200, latency:'144ms' },
+  { ts:'1 day ago', event:'settings.changed', status:200, latency:'102ms' },
+];
+
+function _ensureWhDrawer() {
+  if (document.getElementById('whOverlay')) return;
+  const ov = document.createElement('div');
+  ov.id = 'whOverlay'; ov.className = 'wh-overlay';
+  ov.onclick = closeWebhookExport;
+  const dr = document.createElement('div');
+  dr.id = 'whDrawer'; dr.className = 'wh-drawer';
+  document.body.appendChild(ov);
+  document.body.appendChild(dr);
+  document.addEventListener('keydown', e => { if (e.key==='Escape' && _whState.open) closeWebhookExport(); });
+}
+
+function openWebhookExport() {
+  _ensureWhDrawer();
+  _whState.open = true;
+  _whState.tab = 'config';
+  _paintWhDrawer();
+  requestAnimationFrame(() => {
+    document.getElementById('whOverlay').classList.add('open');
+    document.getElementById('whDrawer').classList.add('open');
+  });
+}
+
+function closeWebhookExport() {
+  _whState.open = false;
+  document.getElementById('whOverlay')?.classList.remove('open');
+  document.getElementById('whDrawer')?.classList.remove('open');
+}
+
+function _whSetAuth(a) { _whState.auth = a; _paintWhDrawer(); }
+function _whToggleSev(s) { _whState.severities.has(s) ? _whState.severities.delete(s) : _whState.severities.add(s); _paintWhDrawer(); }
+function _whToggleType(t) { _whState.eventTypes.has(t) ? _whState.eventTypes.delete(t) : _whState.eventTypes.add(t); _paintWhDrawer(); }
+function _whSetFormat(f) { _whState.format = f; _paintWhDrawer(); }
+function _whTestConnection() {
+  _whState.testResult = null;
+  _paintWhDrawer();
+  setTimeout(() => {
+    _whState.testResult = _whState.url.startsWith('https://') ? 'ok' : 'err';
+    _paintWhDrawer();
+  }, 1400);
+}
+function _whSave() {
+  closeWebhookExport();
+  toast('Webhook export settings saved', 'success');
+}
+
+function _paintWhDrawer() {
+  const s = _whState;
+  const dr = document.getElementById('whDrawer');
+  if (!dr) return;
+
+  const sevOpts = [
+    { v:'info', label:'Info' },
+    { v:'warn', label:'Warning' },
+    { v:'crit', label:'Critical' },
+  ];
+  const typeOpts = [
+    { v:'permissions', label:'Permissions' },
+    { v:'settings', label:'Settings' },
+    { v:'sso', label:'Identity & SSO' },
+    { v:'governance', label:'Governance' },
+    { v:'health', label:'Health' },
+    { v:'api', label:'API' },
+  ];
+
+  const configTab = `
+    <div class="wh-body">
+      <!-- Status -->
+      <div class="wh-status-bar">
+        <div>
+          <div class="wh-status-label">${s.enabled ? 'Stream active' : 'Stream paused'}</div>
+          <div class="wh-status-sub">${s.enabled ? 'Events are being delivered to your endpoint' : 'No events are being sent'}</div>
+        </div>
+        <label class="wh-toggle">
+          <input type="checkbox" ${s.enabled ? 'checked' : ''} onchange="_whState.enabled=this.checked;_paintWhDrawer()"/>
+          <div class="wh-toggle-track"></div>
+          <div class="wh-toggle-thumb"></div>
+        </label>
+      </div>
+
+      <!-- Endpoint -->
+      <div>
+        <div class="wh-section-h">Endpoint</div>
+        <div class="wh-field">
+          <label>URL</label>
+          <div class="wh-input-row">
+            <input class="wh-input" placeholder="https://your-endpoint/hook" value="${escapeHtml(s.url)}" oninput="_whState.url=this.value" style="font-size:11.5px;font-family:monospace"/>
+            <button class="wh-test-btn" onclick="_whTestConnection()">
+              ${s.testResult === null ? 'Test' : s.testResult === 'ok' ? '✓ 200 OK' : '✗ Failed'}
+            </button>
+          </div>
+          ${s.testResult === 'ok' ? '<div class="wh-test-badge ok" style="margin-top:6px">Connection successful — received 200 OK</div>' : ''}
+          ${s.testResult === 'err' ? '<div class="wh-test-badge err" style="margin-top:6px">Connection failed — URL must use HTTPS</div>' : ''}
+        </div>
+      </div>
+
+      <!-- Auth -->
+      <div>
+        <div class="wh-section-h">Authentication</div>
+        <div class="wh-auth-cards">
+          ${[
+            { v:'hmac', h:'HMAC-SHA256', sub:'Signed payloads' },
+            { v:'bearer', h:'Bearer token', sub:'Authorization header' },
+            { v:'none', h:'None', sub:'No auth' },
+          ].map(a => `
+            <div class="wh-auth-card ${s.auth===a.v?'selected':''}" onclick="_whSetAuth('${a.v}')">
+              <div class="wh-auth-card-h">${a.h}</div>
+              <div class="wh-auth-card-sub">${a.sub}</div>
+            </div>
+          `).join('')}
+        </div>
+        ${s.auth !== 'none' ? `
+          <div class="wh-field" style="margin-top:10px">
+            <label>${s.auth==='hmac' ? 'Signing secret' : 'Bearer token'}</label>
+            <input class="wh-input" type="password" value="${escapeHtml(s.secret)}" placeholder="${s.auth==='hmac'?'whs_…':'eyJhbGci…'}" oninput="_whState.secret=this.value" style="font-family:monospace;font-size:11.5px"/>
+            <div style="font-size:10.5px;color:var(--t3);margin-top:4px">${s.auth==='hmac' ? 'Added as X-AIMS-Signature header on every request' : 'Added as Authorization: Bearer header'}</div>
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- Event filters -->
+      <div>
+        <div class="wh-section-h">Event filters</div>
+        <div class="wh-field">
+          <label>Severity</label>
+          <div class="wh-checks">
+            ${sevOpts.map(o => `
+              <div class="wh-check ${s.severities.has(o.v)?'on':''}" onclick="_whToggleSev('${o.v}')">
+                <div class="wh-check-dot"></div>${o.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="wh-field">
+          <label>Event categories</label>
+          <div class="wh-checks">
+            ${typeOpts.map(o => `
+              <div class="wh-check ${s.eventTypes.has(o.v)?'on':''}" onclick="_whToggleType('${o.v}')">
+                <div class="wh-check-dot"></div>${o.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Payload format -->
+      <div>
+        <div class="wh-section-h">Payload format</div>
+        <div class="wh-format-row">
+          ${[
+            { v:'json', h:'JSON', sub:'One object per request' },
+            { v:'ndjson', h:'NDJSON', sub:'Newline-delimited, batched' },
+          ].map(f => `
+            <div class="wh-format-opt ${s.format===f.v?'sel':''}" onclick="_whSetFormat('${f.v}')">
+              <div>${f.h}</div>
+              <div class="wh-format-desc">${f.sub}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Delivery settings -->
+      <div>
+        <div class="wh-section-h">Delivery</div>
+        <div class="wh-toggle-row">
+          <div>
+            <div class="wh-toggle-row-label">Retry on failure</div>
+            <div class="wh-toggle-row-sub">Up to 3 attempts with exponential backoff</div>
+          </div>
+          <label class="wh-mini-toggle">
+            <input type="checkbox" ${s.retryOnFail?'checked':''} onchange="_whState.retryOnFail=this.checked"/>
+            <div class="wh-mini-track"></div>
+            <div class="wh-mini-thumb"></div>
+          </label>
+        </div>
+        <div class="wh-toggle-row" style="border:none">
+          <div>
+            <div class="wh-toggle-row-label">Batch window</div>
+            <div class="wh-toggle-row-sub">${s.batchWindow===0?'Real-time delivery':'Events grouped every '+s.batchWindow+'s'}</div>
+          </div>
+          <select class="wh-input" style="width:auto;padding:5px 8px;font-size:12px" onchange="_whState.batchWindow=+this.value;_paintWhDrawer()">
+            <option value="0" ${s.batchWindow===0?'selected':''}>Real-time</option>
+            <option value="5" ${s.batchWindow===5?'selected':''}>5 seconds</option>
+            <option value="15" ${s.batchWindow===15?'selected':''}>15 seconds</option>
+            <option value="60" ${s.batchWindow===60?'selected':''}>1 minute</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="wh-footer">
+      <button class="wh-cancel-btn" onclick="closeWebhookExport()">Cancel</button>
+      <button class="wh-save-btn" onclick="_whSave()">Save configuration</button>
+    </div>
+  `;
+
+  const logTab = `
+    <div class="wh-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+        <div class="wh-section-h" style="margin:0">Last 10 deliveries</div>
+        <span style="font-size:11px;color:var(--t3)">Auto-refreshes every 30s</span>
+      </div>
+      ${_WH_DELIVERY_LOG.map(r => `
+        <div class="wh-log-row">
+          <span class="wh-log-status ${r.status===200?'ok':'fail'}">${r.status}</span>
+          <span class="wh-log-event">${r.event}</span>
+          <span class="wh-log-lat">${r.latency}</span>
+          <span class="wh-log-ts">${r.ts}</span>
+        </div>
+      `).join('')}
+      <div style="font-size:11px;color:var(--t3);text-align:center;padding:8px 0">
+        ${_WH_DELIVERY_LOG.filter(r=>r.status!==200).length} failed · ${_WH_DELIVERY_LOG.filter(r=>r.status===200).length} successful in the last 24 hours
+      </div>
+    </div>
+  `;
+
+  dr.innerHTML = `
+    <div class="wh-head">
+      <div>
+        <div class="wh-title">Webhook export</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">Stream audit events to an external endpoint</div>
+      </div>
+      <button class="wh-close" onclick="closeWebhookExport()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="wh-tabs">
+      <div class="wh-tab ${s.tab==='config'?'active':''}" onclick="_whState.tab='config';_paintWhDrawer()">Configuration</div>
+      <div class="wh-tab ${s.tab==='log'?'active':''}" onclick="_whState.tab='log';_paintWhDrawer()">Delivery log</div>
+    </div>
+    ${s.tab === 'config' ? configTab : logTab}
+  `;
 }
 
 function _adEventId(e) {
