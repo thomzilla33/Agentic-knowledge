@@ -8046,6 +8046,78 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .rd-danger-btn { background:none; border:1px solid rgba(239,68,68,.4); border-radius:var(--r8); padding:7px 14px; font-size:12px; font-weight:600; color:var(--red); cursor:pointer; transition:background .15s; }
 .rd-danger-btn:hover { background:var(--red-12); }
 
+/* ── Org Logo Upload Modal ──────────────────────────────────────────────── */
+.olm-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+.olm-overlay.open { opacity:1; pointer-events:all; }
+.olm-modal { background:var(--surface); border-radius:16px; width:520px; max-width:95vw; border:1px solid var(--line); box-shadow:0 24px 60px rgba(0,0,0,.5); overflow:hidden; }
+.olm-head { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--line); }
+.olm-title { font-size:14px; font-weight:600; color:var(--t1); }
+.olm-close { width:28px; height:28px; border-radius:6px; background:transparent; border:none; color:var(--t3); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.olm-close:hover { background:var(--bg2); color:var(--t1); }
+.olm-body { padding:20px; display:flex; gap:20px; align-items:flex-start; }
+.olm-current-logo { width:88px; height:88px; border-radius:14px; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:800; color:#fff; overflow:hidden; flex-shrink:0; }
+.olm-current-logo img { width:100%; height:100%; object-fit:cover; }
+.olm-current-label { font-size:11px; color:var(--t3); text-align:center; margin-top:6px; }
+.olm-dropzone-wrap { flex:1; }
+.olm-dropzone { border:2px dashed var(--line); border-radius:10px; padding:22px 16px; text-align:center; cursor:pointer; transition:border-color .15s,background .15s; background:var(--bg2); position:relative; min-height:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+.olm-dropzone:hover, .olm-dropzone.drag-over { border-color:var(--pri); background:rgba(99,102,241,.05); }
+.olm-dropzone.has-file { border-color:var(--pri); background:rgba(99,102,241,.04); }
+.olm-dropzone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.olm-drop-icon { width:36px; height:36px; border-radius:8px; background:var(--bg3); display:flex; align-items:center; justify-content:center; color:var(--t3); }
+.olm-drop-label { font-size:13px; color:var(--t1); font-weight:500; }
+.olm-drop-sub { font-size:11px; color:var(--t3); }
+.olm-preview-img { max-width:100%; max-height:88px; border-radius:8px; object-fit:contain; }
+.olm-guidelines { margin-top:10px; font-size:11px; color:var(--t3); line-height:1.6; }
+.olm-footer { display:flex; gap:8px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--line); }
+.olm-cancel-btn { padding:8px 16px; background:transparent; border:1px solid var(--line); border-radius:8px; font-size:13px; color:var(--t2); cursor:pointer; }
+.olm-save-btn { padding:8px 18px; background:var(--pri); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; opacity:.4; pointer-events:none; }
+.olm-save-btn.ready { opacity:1; pointer-events:auto; }
+.olm-save-btn.ready:hover { opacity:.88; }
+
+/* ── Domain Verification ─────────────────────────────────────────────────── */
+.dv-add-btn { padding:7px 14px; background:var(--bg3); border:1px solid var(--line); border-radius:8px; font-size:12px; font-weight:600; color:var(--t2); cursor:pointer; transition:border-color .15s,color .15s; float:right; }
+.dv-add-btn:hover { border-color:var(--pri); color:var(--pri); }
+.dv-row { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+.dv-row:last-child { border-bottom:none; }
+.dv-domain-name { font-size:13px; color:var(--t1); font-weight:500; font-family:'SF Mono',ui-monospace,monospace; flex:1; min-width:0; }
+.dv-badge { font-size:11px; font-weight:600; padding:2px 8px; border-radius:5px; flex-shrink:0; }
+.dv-badge.verified { background:rgba(16,185,129,.1); color:#10B981; }
+.dv-badge.pending { background:rgba(245,158,11,.12); color:#F59E0B; }
+.dv-badge.failed { background:rgba(239,68,68,.1); color:var(--red); }
+.dv-members { font-size:11px; color:var(--t3); flex-shrink:0; }
+.dv-action-btn { padding:4px 10px; border:1px solid var(--line); border-radius:6px; font-size:11.5px; color:var(--t2); background:transparent; cursor:pointer; flex-shrink:0; transition:all .12s; white-space:nowrap; }
+.dv-action-btn:hover { border-color:var(--pri); color:var(--pri); }
+.dv-remove-btn { padding:4px 10px; border:1px solid rgba(239,68,68,.2); border-radius:6px; font-size:11.5px; color:var(--red); background:transparent; cursor:pointer; flex-shrink:0; white-space:nowrap; }
+.dv-remove-btn:hover { background:rgba(239,68,68,.06); }
+.dv-txt-block { background:var(--bg3); border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin:4px 0 6px; }
+.dv-txt-label { font-size:11px; color:var(--t3); margin-bottom:6px; }
+.dv-txt-row { display:flex; gap:8px; align-items:center; }
+.dv-txt-code { font-family:'SF Mono',ui-monospace,monospace; font-size:11px; color:#10B981; background:var(--bg2); border:1px solid var(--line); border-radius:5px; padding:6px 10px; flex:1; word-break:break-all; }
+.dv-txt-copy { padding:4px 10px; border:1px solid var(--line); border-radius:6px; font-size:11px; color:var(--t2); background:transparent; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+.dv-txt-copy:hover { border-color:var(--pri); color:var(--pri); }
+.dv-verify-now-btn { padding:4px 10px; border:1px solid var(--pri); border-radius:6px; font-size:11.5px; color:var(--pri); background:rgba(99,102,241,.06); cursor:pointer; flex-shrink:0; white-space:nowrap; }
+.dv-empty { text-align:center; padding:24px 0; color:var(--t3); font-size:13px; }
+/* Add domain modal */
+.dvm-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+.dvm-overlay.open { opacity:1; pointer-events:all; }
+.dvm-modal { background:var(--surface); border-radius:14px; width:440px; max-width:95vw; border:1px solid var(--line); box-shadow:0 24px 60px rgba(0,0,0,.5); overflow:hidden; }
+.dvm-head { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--line); }
+.dvm-title { font-size:14px; font-weight:600; color:var(--t1); }
+.dvm-close { width:28px; height:28px; border-radius:6px; background:transparent; border:none; color:var(--t3); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.dvm-close:hover { background:var(--bg2); }
+.dvm-body { padding:20px; }
+.dvm-step-hint { font-size:11.5px; color:var(--t3); margin-bottom:14px; line-height:1.5; }
+.dvm-input { width:100%; background:var(--bg2); border:1px solid var(--line); border-radius:7px; padding:9px 12px; font-size:13px; color:var(--t1); box-sizing:border-box; outline:none; font-family:'SF Mono',ui-monospace,monospace; }
+.dvm-input:focus { border-color:var(--pri); }
+.dvm-record-block { background:var(--bg3); border:1px solid var(--line); border-radius:9px; padding:14px; margin-top:4px; }
+.dvm-record-row { display:flex; justify-content:space-between; font-size:12px; color:var(--t2); padding:3px 0; }
+.dvm-record-val { font-family:'SF Mono',ui-monospace,monospace; font-size:11.5px; color:var(--t1); word-break:break-all; }
+.dvm-note { font-size:11px; color:var(--t3); margin-top:10px; line-height:1.5; }
+.dvm-footer { display:flex; gap:8px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--line); }
+.dvm-cancel-btn { padding:8px 16px; background:transparent; border:1px solid var(--line); border-radius:8px; font-size:13px; color:var(--t2); cursor:pointer; }
+.dvm-next-btn { padding:8px 18px; background:var(--pri); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
+.dvm-next-btn:disabled { opacity:.4; cursor:not-allowed; }
+
 /* ── Webhook Export Drawer ───────────────────────────────────────────────── */
 .wh-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(3px); z-index:400; opacity:0; pointer-events:none; transition:opacity .2s; }
 .wh-overlay.open { opacity:1; pointer-events:all; }
@@ -15334,6 +15406,256 @@ const MOCK_ORG = {
   memberCount: 13,
 };
 
+/* ── Org Logo Upload ──────────────────────────────────────────────────────── */
+const _olmState = { open: false, dataUrl: null };
+
+function _ensureOlmModal() {
+  if (document.getElementById('olmOverlay')) return;
+  const ov = document.createElement('div');
+  ov.id = 'olmOverlay'; ov.className = 'olm-overlay';
+  ov.onclick = e => { if (e.target === ov) closeLogoUpload(); };
+  const wrap = document.createElement('div');
+  wrap.id = 'olmModal'; wrap.className = 'olm-modal';
+  ov.appendChild(wrap);
+  document.body.appendChild(ov);
+}
+
+function openLogoUpload() {
+  _ensureOlmModal();
+  _olmState.open = true;
+  _olmState.dataUrl = null;
+  _paintOlmModal();
+  requestAnimationFrame(() => document.getElementById('olmOverlay').classList.add('open'));
+}
+
+function closeLogoUpload() {
+  _olmState.open = false;
+  document.getElementById('olmOverlay')?.classList.remove('open');
+}
+
+function _olmFileSelected(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { _olmState.dataUrl = e.target.result; _paintOlmModal(); };
+  reader.readAsDataURL(file);
+}
+
+function _olmSave() {
+  if (!_olmState.dataUrl) return;
+  const orgLogo = document.querySelector('.org-logo');
+  if (orgLogo) {
+    orgLogo.innerHTML = `<img src="${_olmState.dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:14px"/>`;
+    orgLogo.style.background = 'transparent';
+  }
+  closeLogoUpload();
+  toast('Workspace logo updated', 'success');
+}
+
+function _paintOlmModal() {
+  const m = document.getElementById('olmModal');
+  if (!m) return;
+  const hasFile = !!_olmState.dataUrl;
+  m.innerHTML = `
+    <div class="olm-head">
+      <div class="olm-title">Upload workspace logo</div>
+      <button class="olm-close" onclick="closeLogoUpload()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="olm-body">
+      <div>
+        <div class="olm-current-logo">
+          ${hasFile ? `<img src="${_olmState.dataUrl}" style="width:100%;height:100%;object-fit:cover"/>` : 'CO'}
+        </div>
+        <div class="olm-current-label">Preview</div>
+      </div>
+      <div class="olm-dropzone-wrap">
+        <div class="olm-dropzone ${hasFile ? 'has-file' : ''}">
+          <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onchange="_olmFileSelected(this)"/>
+          ${hasFile ? `
+            <img class="olm-preview-img" src="${_olmState.dataUrl}"/>
+            <div style="font-size:12px;color:var(--pri);font-weight:500;margin-top:6px">Click to change</div>
+          ` : `
+            <div class="olm-drop-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="olm-drop-label">Click or drag to upload</div>
+            <div class="olm-drop-sub">PNG, JPG, SVG, WebP</div>
+          `}
+        </div>
+        <div class="olm-guidelines">Recommended: 256×256px or larger · Square format · Max 2 MB</div>
+      </div>
+    </div>
+    <div class="olm-footer">
+      <button class="olm-cancel-btn" onclick="closeLogoUpload()">Cancel</button>
+      <button class="olm-save-btn ${hasFile ? 'ready' : ''}" onclick="_olmSave()">Save logo</button>
+    </div>
+  `;
+}
+
+/* ── Domain Verification ─────────────────────────────────────────────────── */
+let _dvState = {
+  domains: [
+    { id:'dv1', domain:'acme-corp.com', status:'verified', added:'Nov 3, 2025', members:47 },
+    { id:'dv2', domain:'acme-eu.com',  status:'pending',  added:'Aug 18, 2026', members:0, txtRecord:'aims-verify=9f3k2mXp8qLrN4vZ4gK8' },
+  ],
+  expanded: null,
+  verifying: null,
+  addOpen: false, addStep: 1, addInput: '', addTxt: '',
+};
+
+function _ensureDvmModal() {
+  if (document.getElementById('dvmOverlay')) return;
+  const ov = document.createElement('div');
+  ov.id = 'dvmOverlay'; ov.className = 'dvm-overlay';
+  ov.onclick = e => { if (e.target === ov) closeAddDomain(); };
+  const m = document.createElement('div');
+  m.id = 'dvmModal'; m.className = 'dvm-modal';
+  ov.appendChild(m);
+  document.body.appendChild(ov);
+}
+
+function openAddDomain() {
+  _ensureDvmModal();
+  _dvState.addOpen = true; _dvState.addStep = 1; _dvState.addInput = '';
+  _paintDvmModal();
+  requestAnimationFrame(() => document.getElementById('dvmOverlay').classList.add('open'));
+}
+
+function closeAddDomain() {
+  _dvState.addOpen = false;
+  document.getElementById('dvmOverlay')?.classList.remove('open');
+}
+
+function _dvStep2() {
+  const d = _dvState.addInput.trim().replace(/^https?:\/\//,'').replace(/\/.*/,'');
+  if (!d) return;
+  _dvState.addInput = d;
+  _dvState.addTxt = 'aims-verify=' + Math.random().toString(36).slice(2,18);
+  _dvState.addStep = 2;
+  _paintDvmModal();
+}
+
+function _dvConfirmAdd() {
+  const newDomain = {
+    id: 'dv' + Date.now(),
+    domain: _dvState.addInput,
+    status: 'pending',
+    added: 'Aug 20, 2026',
+    members: 0,
+    txtRecord: _dvState.addTxt,
+  };
+  _dvState.domains = [..._dvState.domains, newDomain];
+  closeAddDomain();
+  renderOrganization();
+  toast('Domain added — verify ownership by adding the TXT record', 'info');
+}
+
+function _dvRemove(id) {
+  _dvState.domains = _dvState.domains.filter(d => d.id !== id);
+  renderOrganization();
+}
+
+function _dvToggleExpand(id) {
+  _dvState.expanded = _dvState.expanded === id ? null : id;
+  renderOrganization();
+}
+
+function _dvVerify(id) {
+  _dvState.verifying = id;
+  renderOrganization();
+  setTimeout(() => {
+    _dvState.domains = _dvState.domains.map(d =>
+      d.id === id ? { ...d, status:'verified', members:0 } : d
+    );
+    _dvState.verifying = null;
+    _dvState.expanded = null;
+    renderOrganization();
+    toast('Domain verified — members with this domain can now auto-join', 'success');
+  }, 2200);
+}
+
+function _paintDvmModal() {
+  const m = document.getElementById('dvmModal');
+  if (!m) return;
+  const s = _dvState;
+  if (s.addStep === 1) {
+    m.innerHTML = `
+      <div class="dvm-head">
+        <div class="dvm-title">Add verified domain</div>
+        <button class="dvm-close" onclick="closeAddDomain()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="dvm-body">
+        <div class="dvm-step-hint">Enter the domain you want to verify. Members with email addresses on this domain will be able to join your workspace automatically.</div>
+        <input class="dvm-input" type="text" placeholder="acme-corp.com" value="${escapeHtml(s.addInput)}" oninput="_dvState.addInput=this.value" autofocus/>
+      </div>
+      <div class="dvm-footer">
+        <button class="dvm-cancel-btn" onclick="closeAddDomain()">Cancel</button>
+        <button class="dvm-next-btn" onclick="_dvStep2()" ${!s.addInput.trim()?'disabled':''}>Continue →</button>
+      </div>
+    `;
+  } else {
+    m.innerHTML = `
+      <div class="dvm-head">
+        <div class="dvm-title">Add DNS TXT record</div>
+        <button class="dvm-close" onclick="closeAddDomain()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="dvm-body">
+        <div class="dvm-step-hint">Add this TXT record to your DNS settings for <strong style="color:var(--t1)">${escapeHtml(s.addInput)}</strong>. It can take up to 48 hours to propagate.</div>
+        <div class="dvm-record-block">
+          <div class="dvm-record-row"><span>Type</span><span class="dvm-record-val">TXT</span></div>
+          <div class="dvm-record-row"><span>Host</span><span class="dvm-record-val">@</span></div>
+          <div class="dvm-record-row" style="align-items:flex-start"><span>Value</span><span class="dvm-record-val" style="margin-left:8px">${escapeHtml(s.addTxt)}</span></div>
+          <div class="dvm-record-row"><span>TTL</span><span class="dvm-record-val">Auto</span></div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:6px">
+          <button class="dv-txt-copy" onclick="navigator.clipboard.writeText('${escapeHtml(s.addTxt)}');toast('TXT record copied','success')">Copy value</button>
+        </div>
+        <div class="dvm-note">Once you've added the record, click "I've added the record" to save and start verification. You can verify anytime from the domain list.</div>
+      </div>
+      <div class="dvm-footer">
+        <button class="dvm-cancel-btn" onclick="closeAddDomain()">Cancel</button>
+        <button class="dvm-next-btn" onclick="_dvConfirmAdd()">I've added the record</button>
+      </div>
+    `;
+  }
+}
+
+function _dvRenderSection() {
+  const s = _dvState;
+  if (!s.domains.length) {
+    return `<div class="dv-empty">No domains added yet. Add a domain to enable auto-join for your team.</div>`;
+  }
+  return s.domains.map(d => {
+    const isVerifying = s.verifying === d.id;
+    const isExpanded = s.expanded === d.id;
+    return `
+      <div>
+        <div class="dv-row">
+          <div class="dv-domain-name">${escapeHtml(d.domain)}</div>
+          <span class="dv-badge ${d.status}">${d.status === 'verified' ? '✓ Verified' : isVerifying ? '⟳ Verifying…' : '⏳ Pending'}</span>
+          ${d.status === 'verified' ? `<span class="dv-members">${d.members} member${d.members!==1?'s':''}</span>` : ''}
+          ${d.status === 'pending' && !isVerifying ? `
+            <button class="dv-action-btn" onclick="_dvToggleExpand('${d.id}')">${isExpanded ? 'Hide record' : 'Show TXT record'}</button>
+            <button class="dv-verify-now-btn" onclick="_dvVerify('${d.id}')">Verify now</button>
+          ` : ''}
+          <button class="dv-remove-btn" onclick="_dvRemove('${d.id}')">Remove</button>
+        </div>
+        ${isExpanded && d.status === 'pending' ? `
+          <div class="dv-txt-block">
+            <div class="dv-txt-label">Add this TXT record to your DNS provider for <strong>${escapeHtml(d.domain)}</strong></div>
+            <div class="dv-txt-row">
+              <div class="dv-txt-code">${escapeHtml(d.txtRecord)}</div>
+              <button class="dv-txt-copy" onclick="navigator.clipboard.writeText('${escapeHtml(d.txtRecord)}');toast('Copied','success')">Copy</button>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
 function renderOrganization() {
   const o = MOCK_ORG;
   $('content').innerHTML = `
@@ -15349,7 +15671,7 @@ function renderOrganization() {
           <div class="org-logo-name">${o.name}</div>
           <div class="org-logo-sub">Workspace logo · Shown to members and in emails</div>
         </div>
-        <button class="org-logo-btn" onclick="toast('Logo upload coming soon','info')">Upload logo</button>
+        <button class="org-logo-btn" onclick="openLogoUpload()">Upload logo</button>
       </div>
       <div class="ms-form-grid">
         <div class="ms-field full">
@@ -15434,6 +15756,18 @@ function renderOrganization() {
           <div class="org-meta-value">United States</div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- VERIFIED DOMAINS -->
+  <div class="ms-section">
+    <div class="ms-section-title" style="display:flex;align-items:center;justify-content:space-between">
+      <span>Verified domains</span>
+      <button class="dv-add-btn" onclick="openAddDomain()" style="float:none">+ Add domain</button>
+    </div>
+    <div class="ms-card">
+      <div style="font-size:12px;color:var(--t3);margin-bottom:12px">Members with verified domain email addresses can join your workspace automatically. DNS verification required.</div>
+      ${_dvRenderSection()}
     </div>
   </div>
 
