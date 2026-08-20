@@ -858,10 +858,22 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
   color:var(--amber); background:rgba(253,199,0,.10);
   padding:1px 6px; border-radius:4px;
 }
+/* Stats strip */
+.ac-stats-strip{display:flex; gap:12px; flex-shrink:0; margin-bottom:4px;}
+.ac-stat-card{flex:1; background:var(--bg2); border:1px solid var(--line); border-radius:10px; padding:12px 16px; display:flex; flex-direction:column; gap:2px;}
+.ac-stat-value{font-size:22px; font-weight:700; color:var(--t1); line-height:1;}
+.ac-stat-label{font-size:11px; color:var(--t3); margin-top:4px;}
+/* Section card icon */
+.ac-card-icon{width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-bottom:6px;}
+/* Alert severity variants */
+.ac-alert-dot--info{background:var(--pri);}
+.ac-alert-dot--warn{background:#F97316;}
+.ac-alert-dot--ok{background:var(--green);}
 @media(max-width:900px){
   .ac-cmd-body{flex-direction:column;}
   .ac-cmd-left{width:100%;}
   .ac-section-cards{grid-template-columns:repeat(2,1fr);}
+  .ac-stats-strip{flex-wrap:wrap;}
 }
 
 /* ── Copilot outer — fills content area ── */
@@ -12565,9 +12577,53 @@ function renderComingSoonSection(title, desc, icon) {
   `;
 }
 
+const _acIcons = {
+  'my-settings':        { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,       bg:'rgba(99,102,241,.14)', color:'var(--pri)' },
+  'people':             { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 11c1.7 0 3 1.4 3 3v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 14a3 3 0 010 0l3-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17.5" cy="7" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>`, bg:'rgba(59,130,246,.14)', color:'#60A5FA' },
+  'organization':       { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="7" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="5" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="18" height="7" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>`, bg:'rgba(16,185,129,.14)', color:'#34D399' },
+  'identity':           { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v5c0 4.8 3.5 9.3 8 10.7C16.5 20.3 20 15.8 20 11V6L12 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`, bg:'rgba(239,68,68,.12)', color:'#F87171' },
+  'studios':            { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>`, bg:'rgba(168,85,247,.14)', color:'#C084FC' },
+  'billing':            { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M2 9h20" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="13" width="4" height="2" rx="1" fill="currentColor"/></svg>`, bg:'rgba(245,158,11,.12)', color:'#FCD34D' },
+  'governance-defaults':{ svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h12M3 18h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="19" cy="16" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M17 16l1.5 1.5L21 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`, bg:'rgba(6,182,212,.12)', color:'#22D3EE' },
+  'data-privacy':       { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="12" rx="10" ry="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="1.8"/><path d="M12 2C9 6 7 9 7 12s2 6 5 10" stroke="currentColor" stroke-width="1.8"/></svg>`, bg:'rgba(16,185,129,.12)', color:'#34D399' },
+  'integrations':       { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="19" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="19" cy="19" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 12h4M14 8l2-2M14 16l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`, bg:'rgba(249,115,22,.12)', color:'#FB923C' },
+  'notifications':      { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20a2 2 0 004 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`, bg:'rgba(139,92,246,.14)', color:'#A78BFA' },
+  'audit':              { svg:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`, bg:'rgba(148,163,184,.12)', color:'#94A3B8' },
+};
+
 function renderAdminHome() {
   const el = document.getElementById('content');
   if (!el) return;
+
+  const totalUsers = AC_WORKSPACES.reduce((s, w) => s + (w.members || 0), 0) || 42;
+  const totalWorkspaces = AC_WORKSPACES.length || 2;
+  const totalIntegrations = 7;
+  const totalStudios = 3;
+
+  function cardHtml(item) {
+    const ic = _acIcons[item.id] || { svg:'', bg:'var(--bg3)', color:'var(--t3)' };
+    const icon = ic.svg ? `<div class="ac-card-icon" style="background:${ic.bg};color:${ic.color}">${ic.svg}</div>` : '';
+    if (item.state === 'active') {
+      return `<div class="ac-section-card ac-section-card--active"
+          onclick="location.hash='#/${item.route}'"
+          role="button" tabindex="0"
+          onkeydown="if(event.key==='Enter'||event.key===' ')location.hash='#/${item.route}'">
+        ${icon}
+        <div class="ac-card-name">${item.name}</div>
+        <div class="ac-card-desc">${item.desc}</div>
+        <div class="ac-card-footer">
+          <span class="ac-card-badge ac-card-badge--active">● Active</span>
+          ${item.alert ? `<span class="ac-card-alert-badge">⚠ ${item.alert}</span>` : ''}
+        </div>
+      </div>`;
+    }
+    return `<div class="ac-section-card ac-section-card--soon">
+      ${icon}
+      <div class="ac-card-name">${item.name}</div>
+      <div class="ac-card-desc">${item.desc}</div>
+      <div class="ac-card-footer"><span class="ac-card-badge ac-card-badge--soon">○ Coming soon</span></div>
+    </div>`;
+  }
 
   el.innerHTML = `
     <div class="ac-cmd-wrap">
@@ -12578,6 +12634,26 @@ function renderAdminHome() {
         <span class="ac-cmd-welcome">Welcome back, TG · Contoso Ltd</span>
       </div>
 
+      <!-- Stats strip -->
+      <div class="ac-stats-strip">
+        <div class="ac-stat-card">
+          <div class="ac-stat-value">${totalUsers}</div>
+          <div class="ac-stat-label">Total members</div>
+        </div>
+        <div class="ac-stat-card">
+          <div class="ac-stat-value">${totalWorkspaces}</div>
+          <div class="ac-stat-label">Workspaces</div>
+        </div>
+        <div class="ac-stat-card">
+          <div class="ac-stat-value">${totalStudios}</div>
+          <div class="ac-stat-label">Active studios</div>
+        </div>
+        <div class="ac-stat-card">
+          <div class="ac-stat-value">${totalIntegrations}</div>
+          <div class="ac-stat-label">Integrations</div>
+        </div>
+      </div>
+
       <!-- Two-zone body -->
       <div class="ac-cmd-body">
 
@@ -12586,7 +12662,7 @@ function renderAdminHome() {
           <h2 class="ac-home-section-label">Needs Attention</h2>
 
           <div class="ac-alert-row ac-alert-row--real">
-            <span class="ac-alert-dot"></span>
+            <span class="ac-alert-dot ac-alert-dot--warn"></span>
             <div class="ac-alert-body">
               <span class="ac-alert-section">Integrations &amp; Credentials</span>
               <span class="ac-alert-desc">1 integration is failing</span>
@@ -12594,15 +12670,26 @@ function renderAdminHome() {
             <a class="ac-alert-cta" onclick="location.hash='#/integrations'">Review →</a>
           </div>
 
-          <div class="ac-alert-row ac-alert-row--skeleton">
-            <div class="ac-skeleton ac-skeleton--wide"></div>
+          <div class="ac-alert-row ac-alert-row--real">
+            <span class="ac-alert-dot ac-alert-dot--info"></span>
+            <div class="ac-alert-body">
+              <span class="ac-alert-section">Governance Defaults</span>
+              <span class="ac-alert-desc">2 promotion requests awaiting approval</span>
+            </div>
+            <a class="ac-alert-cta" onclick="location.hash='#/governance-defaults'">Review →</a>
           </div>
-          <div class="ac-alert-row ac-alert-row--skeleton">
-            <div class="ac-skeleton ac-skeleton--medium"></div>
+
+          <div class="ac-alert-row ac-alert-row--real">
+            <span class="ac-alert-dot ac-alert-dot--info"></span>
+            <div class="ac-alert-body">
+              <span class="ac-alert-section">Notifications</span>
+              <span class="ac-alert-desc">4 unread alerts across workspaces</span>
+            </div>
+            <a class="ac-alert-cta" onclick="location.hash='#/notifications'">Review →</a>
           </div>
 
           <p class="ac-home-empty-note">
-            Items requiring action across all sections will appear here.
+            Items requiring action across all sections appear here.
           </p>
         </section>
 
@@ -12612,27 +12699,7 @@ function renderAdminHome() {
             <div class="ac-section-group">
               <h3 class="ac-section-group-label">${group.group}</h3>
               <div class="ac-section-cards">
-                ${group.items.map(item => item.state === 'active' ? `
-                  <div class="ac-section-card ac-section-card--active"
-                    onclick="location.hash='#/${item.route}'"
-                    role="button" tabindex="0"
-                    onkeydown="if(event.key==='Enter'||event.key===' ')location.hash='#/${item.route}'">
-                    <div class="ac-card-name">${item.name}</div>
-                    <div class="ac-card-desc">${item.desc}</div>
-                    <div class="ac-card-footer">
-                      <span class="ac-card-badge ac-card-badge--active">● Active</span>
-                      ${item.alert ? `<span class="ac-card-alert-badge">⚠ ${item.alert}</span>` : ''}
-                    </div>
-                  </div>
-                ` : `
-                  <div class="ac-section-card ac-section-card--soon">
-                    <div class="ac-card-name">${item.name}</div>
-                    <div class="ac-card-desc">${item.desc}</div>
-                    <div class="ac-card-footer">
-                      <span class="ac-card-badge ac-card-badge--soon">○ Coming soon</span>
-                    </div>
-                  </div>
-                `).join('')}
+                ${group.items.map(item => cardHtml(item)).join('')}
               </div>
             </div>
           `).join('')}
