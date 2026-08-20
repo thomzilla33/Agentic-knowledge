@@ -7744,6 +7744,14 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 /* ── Danger zone in member drawer ── */
 .pm-danger-zone { padding:14px; background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.2); border-radius:8px; margin-top:8px; }
 .pm-danger-zone-h { font-size:12px; font-weight:700; color:var(--red); margin-bottom:8px; }
+.pm-profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
+.pm-profile-item {}
+.pm-profile-label { font-size:11px; font-weight:600; color:var(--color-text-caption); text-transform:uppercase; letter-spacing:.04em; margin-bottom:3px; }
+.pm-profile-val { font-size:12.5px; color:var(--color-text-title); line-height:1.3; }
+.pm-copy-btn { background:none; border:none; cursor:pointer; color:var(--color-text-caption); padding:2px; border-radius:4px; display:inline-flex; align-items:center; opacity:.7; transition:opacity .12s,color .12s; flex-shrink:0; }
+.pm-copy-btn:hover { opacity:1; color:var(--pri); }
+.pm-group-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:20px; font-size:12px; color:var(--color-text-title); cursor:pointer; transition:border-color .12s,background .12s; white-space:nowrap; }
+.pm-group-chip:hover { border-color:var(--pri); background:var(--pri-06); }
 .pm-activity-row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--color-border-neutral-subtle); }
 .pm-activity-event { font-size:12.5px; color:var(--color-text-title); line-height:1.35; }
 .pm-activity-time { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
@@ -14517,17 +14525,57 @@ function renderMemberDrawer(personId) {
     { event:'Joined workspace', time:p.joinDate, detail:'' },
   ];
 
+  // --- profile meta ---
+  const mfaOn = !!PA_MFA[p.id];
+  const memberGroups = PA_GROUPS.filter(g => g.memberIds.includes(p.id));
+
   let overviewContent = '<div class="pa-slideout-body" style="display:contents">';
+
+  // status banners
   if (p.status === 'suspended') {
     overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner pm-suspend-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#ef4444" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#ef4444"/></svg><div><strong style="color:#ef4444">Account suspended</strong> — ${escapeHtml(p.suspendedReason || 'Access restricted by admin.')} This member cannot log in.</div></div></div>`;
   }
   if (p.status === 'invited') {
-    overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Invitation sent ${escapeHtml(p.invitedDate||p.joinDate)} — awaiting acceptance. <a href="#" onclick="toast('Invitation resent','success');return false" style="color:var(--pri)">Resend →</a></div></div></div>`;
+    overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Invitation sent ${escapeHtml(p.invitedDate||p.joinDate||'')} — awaiting acceptance. <a href="#" onclick="paResendInvite('${p.id}');return false" style="color:var(--pri)">Resend →</a></div></div></div>`;
   }
   if (p.id === 'ok') {
     overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#f59e0b" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#f59e0b"/></svg><div>External account — access is limited to individual permission grants only. Changes require admin approval.</div></div></div>`;
   }
 
+  // profile info card
+  overviewContent += `
+    <div class="pa-slideout-section" style="padding-bottom:12px">
+      <div class="pm-profile-grid">
+        <div class="pm-profile-item">
+          <div class="pm-profile-label">Email</div>
+          <div class="pm-profile-val" style="display:flex;align-items:center;gap:6px">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.email)}</span>
+            <button class="pm-copy-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText('${escapeHtml(p.email)}');toast('Email copied','success')" title="Copy email">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 11V3h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="pm-profile-item">
+          <div class="pm-profile-label">MFA</div>
+          <div class="pm-profile-val">
+            ${mfaOn
+              ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--badge-success);font-weight:600"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Enabled</span>`
+              : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-caption)"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M6 11l4-4M10 11L6 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Not enabled</span>`
+            }
+          </div>
+        </div>
+        <div class="pm-profile-item">
+          <div class="pm-profile-label">Last active</div>
+          <div class="pm-profile-val">${escapeHtml(p.lastActive||'—')}</div>
+        </div>
+        <div class="pm-profile-item">
+          <div class="pm-profile-label">Member since</div>
+          <div class="pm-profile-val">${escapeHtml(p.joinDate||'—')}</div>
+        </div>
+      </div>
+    </div>`;
+
+  // assigned roles
   overviewContent += `
     <div class="pa-slideout-section">
       <div class="pa-slideout-section-h">Assigned roles</div>
@@ -14543,12 +14591,14 @@ function renderMemberDrawer(personId) {
             ${p.id !== 'tg' ? `<button class="pa-remove-btn" onclick="paRemoveRole('${p.id}','${r.id}')">Remove</button>` : ''}
           </div>`).join('')
       }
-      ${p.id !== 'tg' ? `<button class="pa-add-role-btn" onclick="paOpenRolePicker('${p.id}')">
+      ${p.id !== 'tg' && p.status !== 'invited' ? `<button class="pa-add-role-btn" onclick="paOpenRolePicker('${p.id}')">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Assign a role…
       </button>` : ''}
-    </div>
+    </div>`;
 
+  // studio access
+  overviewContent += `
     <div class="pa-slideout-section">
       <div class="pa-slideout-section-h" style="display:flex;justify-content:space-between;align-items:center">
         Studio access
@@ -14571,8 +14621,31 @@ function renderMemberDrawer(personId) {
             <span style="font-size:11px;color:var(--badge-success);font-weight:500">Active</span>
           </div>`).join('');
       })()}
-    </div>
+    </div>`;
 
+  // groups membership
+  overviewContent += `
+    <div class="pa-slideout-section">
+      <div class="pa-slideout-section-h" style="display:flex;justify-content:space-between;align-items:center">
+        Groups
+        ${memberGroups.length > 0 ? `<span style="font-size:11px;color:var(--color-text-caption)">${memberGroups.length}</span>` : ''}
+      </div>
+      ${memberGroups.length === 0
+        ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:6px 0">Not a member of any group.</div>`
+        : `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${memberGroups.map(g => `
+          <span class="pm-group-chip" onclick="paCloseDrawer();paOpenGroupDetail('${g.id}')" title="Open group">
+            <span style="width:8px;height:8px;border-radius:50%;background:${g.color||'#64748b'};flex-shrink:0;display:inline-block"></span>
+            ${escapeHtml(g.name)}
+          </span>`).join('')}</div>`
+      }
+      ${p.status !== 'invited' ? `<button class="pa-add-role-btn" onclick="toast('Add to group — pick from the Groups tab','info')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Add to group…
+      </button>` : ''}
+    </div>`;
+
+  // danger zone
+  overviewContent += `
     ${p.status !== 'invited' ? `
     <div class="pa-slideout-section">
       <div class="pa-slideout-section-h">Danger zone</div>
@@ -14595,32 +14668,61 @@ function renderMemberDrawer(personId) {
              </div>`
         }
       </div>
-    </div>` : ''}
-  `;
+    </div>` : ''}`;
   overviewContent += '</div>';
 
+  const PERM_META = {
+    'ag.workers.view':       { label:'View workers',         studio:'Agentic Studio',    color:'#06B6D4' },
+    'ag.workers.run':        { label:'Run workers',          studio:'Agentic Studio',    color:'#06B6D4' },
+    'ag.workers.manage':     { label:'Manage workers',       studio:'Agentic Studio',    color:'#06B6D4' },
+    'ag.networks.view':      { label:'View networks',        studio:'Agentic Studio',    color:'#06B6D4' },
+    'ag.networks.manage':    { label:'Manage networks',      studio:'Agentic Studio',    color:'#06B6D4' },
+    'ag.workflows.manage':   { label:'Manage workflows',     studio:'Agentic Studio',    color:'#06B6D4' },
+    'ag.hitl.manage':        { label:'Manage HITL queues',   studio:'Agentic Studio',    color:'#06B6D4' },
+    'gov.policy.view':       { label:'View policies',        studio:'Governance Studio', color:'#10b981' },
+    'gov.policy.manage':     { label:'Manage policies',      studio:'Governance Studio', color:'#10b981' },
+    'gov.promotions.view':   { label:'View promotions',      studio:'Governance Studio', color:'#10b981' },
+    'gov.promotions.approve':{ label:'Approve promotions',   studio:'Governance Studio', color:'#10b981' },
+    'gov.domains.manage':    { label:'Manage domains',       studio:'Governance Studio', color:'#10b981' },
+    'gov.resolution.manage': { label:'Manage resolutions',   studio:'Governance Studio', color:'#10b981' },
+    'hx.models.view':        { label:'View models',          studio:'Helix Studio',      color:'#8b5cf6' },
+    'hx.models.author':      { label:'Author models',        studio:'Helix Studio',      color:'#8b5cf6' },
+    'hx.lineage.view':       { label:'View lineage',         studio:'Helix Studio',      color:'#8b5cf6' },
+    'hx.connectors.manage':  { label:'Manage connectors',    studio:'Helix Studio',      color:'#8b5cf6' },
+    'pl.settings.view':      { label:'View settings',        studio:'Platform',          color:'#64748b' },
+    'pl.members.manage':     { label:'Manage members',       studio:'Platform',          color:'#64748b' },
+    'pl.billing.view':       { label:'View billing',         studio:'Platform',          color:'#64748b' },
+    'pl.billing.manage':     { label:'Manage billing',       studio:'Platform',          color:'#64748b' },
+    'pl.integrations.manage':{ label:'Manage integrations',  studio:'Platform',          color:'#64748b' },
+    'pl.audit.view':         { label:'View audit logs',      studio:'Platform',          color:'#64748b' },
+  };
+  const allEffectivePerms = [...new Set(memberRoles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]))];
+  const permsByStudio = allEffectivePerms.reduce((acc, pid) => {
+    const m = PERM_META[pid]; if (!m) return acc;
+    if (!acc[m.studio]) acc[m.studio] = { color: m.color, perms: [] };
+    acc[m.studio].perms.push(m.label);
+    return acc;
+  }, {});
   const permContent = `
     <div class="pa-slideout-section">
       <div class="pa-slideout-section-h">Effective permissions</div>
       ${memberRoles.length === 0
         ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:10px 0">No roles assigned — no inherited permissions. Any access comes from individual grants.</div>`
-        : `<div style="font-size:12.5px;color:var(--color-text-subtitle);margin-bottom:12px;line-height:1.5">Permissions are inherited from <strong style="color:var(--color-text-title)">${memberRoles.map(r=>r.label).join(', ')}</strong>. The highest scope across all roles applies for each permission.</div>
-           ${[
-             { studio:'Agentic Studio', perms:['View workers', 'Run workers', 'Create workflows'] },
-             { studio:'Governance Studio', perms:['View policies', 'View promotions'] },
-             { studio:'Helix Studio', perms:['View models', 'View lineage'] },
-             { studio:'Platform', perms:['View settings'] },
-           ].filter(() => memberRoles.length > 0).map(s => `
-             <div style="margin-bottom:10px">
-               <div style="font-size:11px;font-weight:700;color:var(--color-text-caption);margin-bottom:5px">${escapeHtml(s.studio)}</div>
-               ${s.perms.map(perm => `
-                 <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">
+        : `<div style="font-size:12.5px;color:var(--color-text-subtitle);margin-bottom:14px;line-height:1.5">Inherited from <strong style="color:var(--color-text-title)">${memberRoles.map(r=>r.label).join(', ')}</strong>.</div>
+           ${Object.entries(permsByStudio).map(([studio, {color, perms}]) => `
+             <div style="margin-bottom:14px">
+               <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+                 <div style="width:7px;height:7px;border-radius:50%;background:${color}"></div>
+                 <div style="font-size:11px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em">${escapeHtml(studio)}</div>
+               </div>
+               ${perms.map(perm => `
+                 <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">
                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="color:var(--badge-success);flex-shrink:0"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                    <span style="font-size:12.5px;color:var(--color-text-title)">${escapeHtml(perm)}</span>
                    <span style="margin-left:auto;font-size:11px;color:var(--color-text-caption)">Tenant</span>
                  </div>`).join('')}
              </div>`).join('')}
-           <button class="ds-btn ds-btn-sm ds-btn--tertiary" style="margin-top:8px" onclick="toast('Full permission panel — coming soon','info')">View all permissions →</button>`
+           <div style="margin-top:4px;font-size:12px;color:var(--color-text-caption)">${allEffectivePerms.length} permissions total</div>`
       }
     </div>`;
 
