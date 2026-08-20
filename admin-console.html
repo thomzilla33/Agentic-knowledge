@@ -15407,7 +15407,7 @@ function renderInviteModal() {
       </div>
     </div>`;
   const mode = _paState.inviteAccessMode || 'role-defaults';
-  const modalW = (step === 2 && mode === 'scratch') ? '640px' : step === 2 ? '560px' : '460px';
+  const modalW = (step === 2 && (mode === 'scratch' || mode === 'custom-set' || mode === 'template')) ? '580px' : step === 2 ? '520px' : '460px';
   let body, foot;
   if (step === 1) {
     body = renderInviteStep1();
@@ -15475,6 +15475,64 @@ function renderInviteStep2() {
     { id:'scratch', label:'Start from scratch', desc:'Choose every permission individually per studio',
       icon:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.5 2.5l3 3-8 8H2.5v-3l8-8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8.5 4.5l3 3" stroke="currentColor" stroke-width="1.3"/></svg>` },
   ];
+  // custom-set: pick a saved (non-system) role as a permission set
+  const customSets = PA_ROLES.filter(r => !r.system);
+  const customSetPanel = mode === 'custom-set' ? `
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Select a permission set</div>
+      ${customSets.length === 0 ? `<div style="font-size:12px;color:var(--color-text-disabled);padding:10px 0">No custom permission sets saved yet. Create one in Roles & Permissions.</div>` : `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${customSets.map(r => {
+          const sel = _paState.inviteCustomSetId === r.id;
+          const pc = _paRolePermCount(r.id);
+          return `<div onclick="_paState.inviteCustomSetId='${r.id}';const o=document.querySelector('.pm-invite-overlay');if(o)o.innerHTML=renderInviteModal()" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1.5px solid ${sel?'var(--pri)':'var(--color-border-neutral-subtle)'};background:${sel?'rgba(43,127,255,0.06)':'var(--bg)'};cursor:pointer;transition:all .15s">
+            <span style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0"></span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;color:var(--color-text-title);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(r.label)}</div>
+              <div style="font-size:11px;color:var(--color-text-caption)">${pc} permission${pc!==1?'s':''}</div>
+            </div>
+            ${sel ? `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--pri);flex-shrink:0"><path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>` : '';
+
+  // template: copy from an existing member's access profile
+  const tSearch = (_paState.inviteTemplateSearch||'').toLowerCase();
+  const templateCandidates = MOCK_PEOPLE.filter(p =>
+    p.status === 'active' &&
+    (!tSearch || p.name.toLowerCase().includes(tSearch) || p.email.toLowerCase().includes(tSearch))
+  );
+  const tmplPerson = MOCK_PEOPLE.find(x => x.id === _paState.inviteTemplatePersonId);
+  const tmplRoles = tmplPerson ? (PA_MEMBER_ROLES[tmplPerson.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean) : [];
+  const templatePanel = mode === 'template' ? `
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Copy from a member</div>
+      <div style="position:relative;margin-bottom:8px">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--color-text-caption)"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input class="rc-input" style="padding-left:28px;padding-top:7px;padding-bottom:7px;border-radius:8px" placeholder="Search members…" value="${escapeHtml(_paState.inviteTemplateSearch||'')}" oninput="_paState.inviteTemplateSearch=this.value;const o=document.querySelector('.pm-invite-overlay');if(o)o.innerHTML=renderInviteModal()">
+      </div>
+      <div style="max-height:180px;overflow-y:auto;border:1px solid var(--color-border-neutral-subtle);border-radius:10px;overflow:hidden">
+        ${templateCandidates.length === 0
+          ? `<div style="padding:14px;font-size:12px;color:var(--color-text-disabled)">No active members match.</div>`
+          : templateCandidates.map(p => {
+              const sel = _paState.inviteTemplatePersonId === p.id;
+              const roles = (PA_MEMBER_ROLES[p.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean);
+              return `<div onclick="_paState.inviteTemplatePersonId='${p.id}';const o=document.querySelector('.pm-invite-overlay');if(o)o.innerHTML=renderInviteModal()" style="display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--color-border-neutral-subtle);background:${sel?'rgba(43,127,255,0.06)':'transparent'}">
+                ${_paAvHTML(p.id,p.name,p.initials,'ds-av-sm')}
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(p.name)}</div>
+                  <div style="font-size:11px;color:var(--color-text-caption)">${roles.map(r=>r.label).join(', ')||'No roles'}</div>
+                </div>
+                ${sel ? `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--pri);flex-shrink:0"><path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+              </div>`;
+            }).join('')}
+      </div>
+      ${tmplPerson ? `<div style="margin-top:8px;padding:8px 12px;border-radius:8px;background:rgba(43,127,255,0.06);border:1px solid rgba(43,127,255,0.2);font-size:12px;color:var(--color-text-caption)">
+        Will copy ${tmplRoles.length} role${tmplRoles.length!==1?'s':''} from <strong style="color:var(--color-text-title)">${escapeHtml(tmplPerson.name)}</strong>: ${tmplRoles.map(r=>`<span style="color:var(--pri)">${escapeHtml(r.label)}</span>`).join(', ')||'none'}
+      </div>` : ''}
+    </div>` : '';
+
   const permPanel = mode === 'scratch' ? `
     <div>
       <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Studio permissions</div>
@@ -15510,6 +15568,8 @@ function renderInviteStep2() {
           </button>`).join('')}
       </div>
     </div>
+    ${customSetPanel}
+    ${templatePanel}
     ${permPanel}`;
 }
 
@@ -15561,6 +15621,14 @@ function renderInviteStep3() {
         <span class="iw-review-key">Permissions</span>
         <span class="iw-perm-count-pill">${permCount} granted</span>
       </div>` : ''}
+      ${mode === 'custom-set' && _paState.inviteCustomSetId ? (() => {
+        const sr = PA_ROLES.find(r => r.id === _paState.inviteCustomSetId);
+        return `<div class="iw-review-row"><span class="iw-review-key">Permission set</span><span class="iw-review-val">${sr ? escapeHtml(sr.label) : _paState.inviteCustomSetId}</span></div>`;
+      })() : ''}
+      ${mode === 'template' && _paState.inviteTemplatePersonId ? (() => {
+        const tp = MOCK_PEOPLE.find(x => x.id === _paState.inviteTemplatePersonId);
+        return `<div class="iw-review-row"><span class="iw-review-key">Copied from</span><span class="iw-review-val">${tp ? escapeHtml(tp.name) : _paState.inviteTemplatePersonId}</span></div>`;
+      })() : ''}
     </div>
     ${msg ? `<div class="iw-review-section">
       <div class="iw-review-label">Personal message</div>
@@ -15651,6 +15719,9 @@ function paOpenInvite() {
   _paState.invitePermCategory = 'agentic';
   _paState.invitePerms = {};
   _paState.inviteStudios = new Set(['agentic','helix','governance','data']);
+  _paState.inviteCustomSetId = null;
+  _paState.inviteTemplatePersonId = null;
+  _paState.inviteTemplateSearch = '';
   renderPeople();
 }
 function paCloseInvite() {
@@ -15766,6 +15837,15 @@ function paSubmitInvite() {
         desc: 'Custom permissions configured at invite', memberIds: [safeId] });
       PA_ROLE_PERMS[customRoleId] = new Set(enabledPerms);
       PA_MEMBER_ROLES[safeId] = [customRoleId];
+    } else if (mode === 'custom-set' && _paState.inviteCustomSetId) {
+      const setId = _paState.inviteCustomSetId;
+      const setRole = PA_ROLES.find(r => r.id === setId);
+      PA_MEMBER_ROLES[safeId] = [setId];
+      if (setRole && setRole.memberIds) setRole.memberIds.push(safeId);
+    } else if (mode === 'template' && _paState.inviteTemplatePersonId) {
+      const templateRoles = PA_MEMBER_ROLES[_paState.inviteTemplatePersonId] || [];
+      PA_MEMBER_ROLES[safeId] = [...templateRoles];
+      templateRoles.forEach(rid => { const r = PA_ROLES.find(x => x.id === rid); if (r && r.memberIds) r.memberIds.push(safeId); });
     } else if (roleId) {
       PA_MEMBER_ROLES[safeId] = [roleId];
       if (role && role.memberIds) role.memberIds.push(safeId);
@@ -15777,8 +15857,14 @@ function paSubmitInvite() {
   _paState.inviteEmailDraft = '';
   renderPeople();
   const count = emails.length;
+  const customSetRole = mode === 'custom-set' && _paState.inviteCustomSetId
+    ? PA_ROLES.find(r => r.id === _paState.inviteCustomSetId) : null;
+  const tmplSrc = mode === 'template' && _paState.inviteTemplatePersonId
+    ? MOCK_PEOPLE.find(x => x.id === _paState.inviteTemplatePersonId) : null;
   const accessLabel = mode === 'scratch' && enabledPerms.size > 0
     ? `${enabledPerms.size} custom permission${enabledPerms.size!==1?'s':''}`
+    : mode === 'custom-set' && customSetRole ? `"${customSetRole.label}" set`
+    : mode === 'template' && tmplSrc ? `copied from ${tmplSrc.name}`
     : role ? `"${role.label}" role` : 'no role assigned';
   toast(count === 1 ? `Invite sent to ${emails[0]} · ${accessLabel}` : `Invites sent to ${count} people · ${accessLabel}`, 'success');
 }
