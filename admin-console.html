@@ -22405,6 +22405,10 @@ function renderAudit() {
     const q = auditFilters.search.toLowerCase();
     events = events.filter(e => (e.event||'').toLowerCase().includes(q) || (e.actor||'').toLowerCase().includes(q) || (e.resource||'').toLowerCase().includes(q));
   }
+  // Anchor to most recent event so prototype data stays visible regardless of today's date
+  const _auditAnchor = new Date(Math.max(...AUDIT_EVENTS.map(e=>new Date(e.tsAbs))));
+  const _drDays = auditFilters.dateRange==='7d' ? 7 : auditFilters.dateRange==='30d' ? 30 : 90;
+  events = events.filter(e => new Date(e.tsAbs) >= new Date(_auditAnchor - _drDays * 864e5));
 
   $('content').innerHTML = `
     <div class="breadcrumb">
@@ -22419,7 +22423,7 @@ function renderAudit() {
         </div>
         <div class="ph-actions">
           <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="openWebhookExport()">Configure webhook export</button>
-          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="toast('CSV exported','success')">Export CSV</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="auditExportCSV()">Export CSV</button>
         </div>
       </div>
     </div>
@@ -22428,8 +22432,8 @@ function renderAudit() {
       <div class="audit-filters">
         <div class="audit-filter">
           <span>Date range:</span>
-          <select class="audit-filter-input">
-            <option>Last 30 days</option><option>Last 7 days</option><option>Last 90 days</option><option>Custom…</option>
+          <select class="audit-filter-input" onchange="auditFilters.dateRange=this.value;renderAudit()">
+            <option value="30d"${auditFilters.dateRange==='30d'?' selected':''}>Last 30 days</option><option value="7d"${auditFilters.dateRange==='7d'?' selected':''}>Last 7 days</option><option value="90d"${auditFilters.dateRange==='90d'?' selected':''}>Last 90 days</option>
           </select>
         </div>
         <div class="audit-filter">
@@ -22493,6 +22497,23 @@ function auditTable(events, full) {
 
 function toggleAuditSev(sev) { auditFilters.severity.has(sev) ? auditFilters.severity.delete(sev) : auditFilters.severity.add(sev); renderAudit() }
 function toggleAuditExpand(idx) { openAuditDetail(idx); }
+
+function auditExportCSV() {
+  let evs = AUDIT_EVENTS;
+  if (auditFilters.severity.size > 0) evs = evs.filter(e => auditFilters.severity.has(e.sev));
+  if (auditFilters.search) { const q = auditFilters.search.toLowerCase(); evs = evs.filter(e => (e.event||'').toLowerCase().includes(q)||(e.actor||'').toLowerCase().includes(q)||(e.resource||'').toLowerCase().includes(q)); }
+  const _anchor = new Date(Math.max(...AUDIT_EVENTS.map(e=>new Date(e.tsAbs))));
+  const _days = auditFilters.dateRange==='7d'?7:auditFilters.dateRange==='30d'?30:90;
+  evs = evs.filter(e => new Date(e.tsAbs) >= new Date(_anchor - _days * 864e5));
+  const headers = ['Timestamp','Severity','Event','Actor','Resource','Studio','IP'];
+  const rows = evs.map(e => [e.tsAbs, e.sev, e.event, e.actor, e.resource||'', e.studio||'', e.ip||''].map(v => JSON.stringify(String(v))).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'audit-log.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast(`Exported ${evs.length} event${evs.length!==1?'s':''}`, 'success');
+}
 
 /* ── Audit Detail Drawer ────────────────────────────────────────────────── */
 const _adState = { open:false, idx:null };
