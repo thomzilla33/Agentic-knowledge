@@ -11886,6 +11886,268 @@ function renderNotifications() {
   `;
 }
 
+/* ── Governance Defaults state ── */
+const _gd = {
+  sandbox: {
+    draftRetention: '90',
+    connectorSources: 'all',
+    requireEvidenceOnDraft: false,
+  },
+  truth: {
+    promotionPacket: 'always',
+    conflictBlocking: true,
+    versioning: 'semantic',
+  },
+  actionGating: {
+    externalMessaging: true,
+    financialActions: true,
+    complianceOutputs: true,
+    internalReports: false,
+    logging: 'full',
+  },
+  promotion: {
+    minApprovers: '2',
+    evidenceRequired: true,
+    autoExpireDays: '30',
+  },
+  resolution: {
+    responseLimit: '72',
+    allowExternal: true,
+    externalWindow: '48',
+  },
+};
+
+function gdSave() {
+  const t = document.getElementById('gd-save-toast');
+  if (!t) return;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function renderGovernanceDefaults() {
+  const ag = _gd.actionGating;
+
+  const gatingItems = [
+    { id:'externalMessaging', label:'External messaging',   sub:'Emails, Slack messages, and webhooks sent to outside parties' },
+    { id:'financialActions',  label:'Financial actions',    sub:'Payroll, invoicing, transfers, and payment-adjacent outputs' },
+    { id:'complianceOutputs', label:'Compliance outputs',   sub:'Reports and attestations used for audits or regulatory filings' },
+    { id:'internalReports',   label:'Internal reports',     sub:'Reports shared only within this tenant' },
+  ];
+
+  $('content').innerHTML = `
+    <div class="ns-wrap">
+      <div class="ns-page-head">
+        <div>
+          <div class="ns-page-title">Governance Defaults</div>
+          <div class="ns-page-sub">Tenant-wide defaults for the Sandbox / Truth plane model. Workspace overrides take precedence where set.</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="gdSave()">Save changes</button>
+      </div>
+
+      <!-- Plane Defaults -->
+      <div class="ns-section">
+        <div class="ns-section-head">
+          <div class="ns-section-title">Plane defaults</div>
+          <div class="ns-section-desc">Configure the Sandbox and Truth planes that govern all studio activity in this tenant.</div>
+        </div>
+
+        <!-- Sandbox sub-header -->
+        <div style="padding:10px 20px 6px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--color-border-neutral-subtle);background:var(--bg2)">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-caption)">Sandbox plane</span>
+          <span style="font-size:11px;font-weight:600;color:var(--pri);background:var(--pri-12);border:1px solid var(--color-border-primary-default);border-radius:20px;padding:2px 8px">Drafts</span>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Draft retention period</div>
+            <div class="ns-pref-hint">How long Sandbox drafts are kept before auto-expiry</div>
+          </div>
+          <select class="ns-select" onchange="_gd.sandbox.draftRetention=this.value">
+            <option value="30"  ${_gd.sandbox.draftRetention==='30' ?'selected':''}>30 days</option>
+            <option value="60"  ${_gd.sandbox.draftRetention==='60' ?'selected':''}>60 days</option>
+            <option value="90"  ${_gd.sandbox.draftRetention==='90' ?'selected':''}>90 days</option>
+            <option value="180" ${_gd.sandbox.draftRetention==='180'?'selected':''}>180 days</option>
+            <option value="365" ${_gd.sandbox.draftRetention==='365'?'selected':''}>1 year</option>
+          </select>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Allowed connector sources</div>
+            <div class="ns-pref-hint">Which data sources agents can ingest into the Sandbox plane</div>
+          </div>
+          <select class="ns-select" style="width:200px" onchange="_gd.sandbox.connectorSources=this.value">
+            <option value="all"      ${_gd.sandbox.connectorSources==='all'     ?'selected':''}>All sources</option>
+            <option value="approved" ${_gd.sandbox.connectorSources==='approved'?'selected':''}>Approved sources only</option>
+            <option value="internal" ${_gd.sandbox.connectorSources==='internal'?'selected':''}>Internal sources only</option>
+          </select>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Require evidence on Sandbox drafts</div>
+            <div class="ns-pref-hint">Stewards must attach provenance evidence before a draft can be saved</div>
+          </div>
+          <label class="ids-toggle">
+            <input type="checkbox" ${_gd.sandbox.requireEvidenceOnDraft?'checked':''} onchange="_gd.sandbox.requireEvidenceOnDraft=this.checked">
+            <span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span>
+          </label>
+        </div>
+
+        <!-- Truth sub-header -->
+        <div style="padding:10px 20px 6px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--color-border-neutral-subtle);background:var(--bg2)">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-caption)">Truth plane</span>
+          <span style="font-size:11px;font-weight:600;color:#10B981;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:2px 8px">Promoted</span>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Promotion Packet requirement</div>
+            <div class="ns-pref-hint">When a Promotion Packet is required to promote Sandbox → Truth</div>
+          </div>
+          <select class="ns-select" style="width:200px" onchange="_gd.truth.promotionPacket=this.value">
+            <option value="always"  ${_gd.truth.promotionPacket==='always' ?'selected':''}>Always required</option>
+            <option value="changes" ${_gd.truth.promotionPacket==='changes'?'selected':''}>Required on material changes</option>
+            <option value="never"   ${_gd.truth.promotionPacket==='never'  ?'selected':''}>Not required (open promotion)</option>
+          </select>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Conflict blocking</div>
+            <div class="ns-pref-hint">Block promotions when an unresolved conflict exists in the target domain</div>
+          </div>
+          <label class="ids-toggle">
+            <input type="checkbox" ${_gd.truth.conflictBlocking?'checked':''} onchange="_gd.truth.conflictBlocking=this.checked">
+            <span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span>
+          </label>
+        </div>
+        <div class="ns-pref-row" style="border-bottom:none">
+          <div>
+            <div class="ns-pref-label">Versioning scheme</div>
+            <div class="ns-pref-hint">How Truth-plane model versions are numbered on each promotion</div>
+          </div>
+          <select class="ns-select" onchange="_gd.truth.versioning=this.value">
+            <option value="semantic"    ${_gd.truth.versioning==='semantic'   ?'selected':''}>Semantic (1.0.0)</option>
+            <option value="sequential"  ${_gd.truth.versioning==='sequential' ?'selected':''}>Sequential (v1, v2…)</option>
+            <option value="date"        ${_gd.truth.versioning==='date'       ?'selected':''}>Date-based (2026-08-19)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Action Gating -->
+      <div class="ns-section">
+        <div class="ns-section-head">
+          <div class="ns-section-title">Action gating defaults</div>
+          <div class="ns-section-desc">Define which action types require Truth-plane inputs before execution. Every gate decision is logged.</div>
+        </div>
+        ${gatingItems.map(item => `
+        <div class="ns-channel-row">
+          <div class="ns-channel-info">
+            <div class="ns-channel-name">${item.label}</div>
+            <div class="ns-channel-hint">${item.sub}</div>
+          </div>
+          <label class="ids-toggle">
+            <input type="checkbox" ${ag[item.id]?'checked':''} onchange="_gd.actionGating['${item.id}']=this.checked">
+            <span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span>
+          </label>
+        </div>`).join('')}
+        <div class="ns-pref-row" style="border-bottom:none">
+          <div>
+            <div class="ns-pref-label">Gate decision logging</div>
+            <div class="ns-pref-hint">What's recorded in the audit trail for each gate pass, block, or degrade</div>
+          </div>
+          <select class="ns-select" style="width:200px" onchange="_gd.actionGating.logging=this.value">
+            <option value="full"    ${ag.logging==='full'   ?'selected':''}>Full log (pass + block + degrade)</option>
+            <option value="blocked" ${ag.logging==='blocked'?'selected':''}>Blocked &amp; degraded only</option>
+            <option value="off"     ${ag.logging==='off'    ?'selected':''}>Off (not recommended)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Promotion defaults -->
+      <div class="ns-section">
+        <div class="ns-section-head">
+          <div class="ns-section-title">Promotion defaults</div>
+          <div class="ns-section-desc">Rules applied to every Promotion Packet unless a domain overrides them.</div>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Minimum approvers required</div>
+            <div class="ns-pref-hint">Number of Approver/Attestor signatures needed before a packet can be committed</div>
+          </div>
+          <select class="ns-select" onchange="_gd.promotion.minApprovers=this.value">
+            <option value="1" ${_gd.promotion.minApprovers==='1'?'selected':''}>1 approver</option>
+            <option value="2" ${_gd.promotion.minApprovers==='2'?'selected':''}>2 approvers</option>
+            <option value="3" ${_gd.promotion.minApprovers==='3'?'selected':''}>3 approvers</option>
+          </select>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Evidence attachment required</div>
+            <div class="ns-pref-hint">Every Promotion Packet must include provenance or supporting evidence</div>
+          </div>
+          <label class="ids-toggle">
+            <input type="checkbox" ${_gd.promotion.evidenceRequired?'checked':''} onchange="_gd.promotion.evidenceRequired=this.checked">
+            <span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span>
+          </label>
+        </div>
+        <div class="ns-pref-row" style="border-bottom:none">
+          <div>
+            <div class="ns-pref-label">Auto-expire draft packets after</div>
+            <div class="ns-pref-hint">Promotion Packets in Pending state are auto-closed after this window</div>
+          </div>
+          <select class="ns-select" onchange="_gd.promotion.autoExpireDays=this.value">
+            <option value="14" ${_gd.promotion.autoExpireDays==='14'?'selected':''}>14 days</option>
+            <option value="30" ${_gd.promotion.autoExpireDays==='30'?'selected':''}>30 days</option>
+            <option value="60" ${_gd.promotion.autoExpireDays==='60'?'selected':''}>60 days</option>
+            <option value="never" ${_gd.promotion.autoExpireDays==='never'?'selected':''}>Never</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Resolution Request defaults -->
+      <div class="ns-section">
+        <div class="ns-section-head">
+          <div class="ns-section-title">Resolution Request defaults</div>
+          <div class="ns-section-desc">Rules for conflict Resolution Requests — routed to any responder (internal, cross-department, or external).</div>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Response time limit</div>
+            <div class="ns-pref-hint">How long a responder has to answer before the request is escalated</div>
+          </div>
+          <select class="ns-select" onchange="_gd.resolution.responseLimit=this.value">
+            <option value="24"  ${_gd.resolution.responseLimit==='24' ?'selected':''}>24 hours</option>
+            <option value="48"  ${_gd.resolution.responseLimit==='48' ?'selected':''}>48 hours</option>
+            <option value="72"  ${_gd.resolution.responseLimit==='72' ?'selected':''}>72 hours</option>
+            <option value="168" ${_gd.resolution.responseLimit==='168'?'selected':''}>7 days</option>
+          </select>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Allow external responders</div>
+            <div class="ns-pref-hint">Stewards can invite people outside this tenant — they get answer-only, request-scoped access</div>
+          </div>
+          <label class="ids-toggle">
+            <input type="checkbox" ${_gd.resolution.allowExternal?'checked':''} onchange="_gd.resolution.allowExternal=this.checked">
+            <span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span>
+          </label>
+        </div>
+        <div class="ns-pref-row" style="border-bottom:none">
+          <div>
+            <div class="ns-pref-label">External responder access window</div>
+            <div class="ns-pref-hint">Access is automatically revoked after this window expires</div>
+          </div>
+          <select class="ns-select" onchange="_gd.resolution.externalWindow=this.value">
+            <option value="24"  ${_gd.resolution.externalWindow==='24' ?'selected':''}>24 hours</option>
+            <option value="48"  ${_gd.resolution.externalWindow==='48' ?'selected':''}>48 hours</option>
+            <option value="72"  ${_gd.resolution.externalWindow==='72' ?'selected':''}>72 hours</option>
+            <option value="168" ${_gd.resolution.externalWindow==='168'?'selected':''}>7 days</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+    <div id="gd-save-toast" class="ns-save-toast">Changes saved</div>
+  `;
+}
+
 function renderComingSoonSection(title, desc, icon) {
   $('content').innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:16px;text-align:center;padding:40px">
@@ -14789,7 +15051,7 @@ function route() {
   } else if (parts[0]==='billing') {
     renderComingSoonSection('Billing & Subscription','Plans, invoices, and payment methods.','CreditCard');
   } else if (parts[0]==='governance-defaults') {
-    renderComingSoonSection('Governance Defaults','Default policies applied across all studios.','ShieldCheck');
+    renderGovernanceDefaults();
   } else if (parts[0]==='data-privacy') {
     renderComingSoonSection('Data & Privacy','Data retention, export, and compliance settings.','Lock');
   } else if (parts[0]==='notifications') {
