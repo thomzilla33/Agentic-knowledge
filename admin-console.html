@@ -5240,6 +5240,38 @@ html.theme-light .fs-cancel-btn:hover{
 .ns-select:focus { border-color:var(--color-border-primary-default); }
 .ns-save-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); background:var(--color-bg-success-default,#0f7b55); color:#fff; font-size:13px; font-weight:600; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity .2s,transform .2s; pointer-events:none; z-index:9000; }
 .ns-save-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── Billing & Subscription ─────────────────────────────── */
+.bl-plan-card { background:var(--surface); border:1.5px solid var(--color-border-primary-default); border-radius:12px; padding:20px 24px; margin-bottom:20px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.bl-plan-name { font-size:15px; font-weight:700; color:var(--color-text-title); }
+.bl-plan-badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; background:var(--pri-12,rgba(99,102,241,.12)); color:var(--pri); border-radius:20px; padding:2px 10px; margin-left:8px; }
+.bl-plan-detail { font-size:12px; color:var(--color-text-caption); margin-top:4px; }
+.bl-plan-price { font-size:24px; font-weight:700; color:var(--color-text-title); }
+.bl-plan-period { font-size:12px; color:var(--color-text-caption); }
+.bl-plan-actions { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+.bl-usage-row { display:flex; align-items:center; gap:12px; padding:13px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.bl-usage-row:last-child { border-bottom:none; }
+.bl-usage-label { flex:1; font-size:13px; font-weight:500; color:var(--color-text-title); }
+.bl-usage-val { font-size:13px; color:var(--color-text-caption); min-width:80px; text-align:right; }
+.bl-usage-bar-wrap { width:120px; height:6px; background:var(--color-border-neutral-subtle); border-radius:99px; overflow:hidden; flex-shrink:0; }
+.bl-usage-bar { height:6px; border-radius:99px; background:var(--pri); transition:width .3s; }
+.bl-usage-bar.warn { background:#F59E0B; }
+.bl-pm-row { display:flex; align-items:center; gap:14px; padding:16px 20px; }
+.bl-pm-icon { width:42px; height:28px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:var(--color-text-caption); letter-spacing:.04em; flex-shrink:0; }
+.bl-pm-info { flex:1; }
+.bl-pm-name { font-size:13px; font-weight:600; color:var(--color-text-title); }
+.bl-pm-sub { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.bl-inv-table { width:100%; border-collapse:collapse; }
+.bl-inv-th { padding:9px 16px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--color-text-caption); background:var(--bg2); text-align:left; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.bl-inv-th:last-child { text-align:right; }
+.bl-inv-tr td { padding:12px 16px; border-bottom:1px solid var(--color-border-neutral-subtle); font-size:13px; color:var(--color-text-title); vertical-align:middle; }
+.bl-inv-tr:last-child td { border-bottom:none; }
+.bl-inv-tr:hover td { background:var(--hover); }
+.bl-inv-amount { font-weight:600; }
+.bl-inv-status { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; border-radius:20px; padding:2px 9px; }
+.bl-inv-status.paid { background:rgba(16,185,129,.12); color:#10B981; }
+.bl-inv-dl { font-size:12px; color:var(--pri); cursor:pointer; text-align:right; display:block; }
+.bl-inv-dl:hover { text-decoration:underline; }
 /* Light-mode: slideout panel */
 html.theme-light .pa-slideout { background:rgba(255,255,255,0.98); }
 /* Light-mode switcher overrides */
@@ -11924,6 +11956,153 @@ function gdSave() {
   setTimeout(() => t.classList.remove('show'), 2400);
 }
 
+/* ====================== BILLING & SUBSCRIPTION ====================== */
+
+const _bl = {
+  plan: { name:'Enterprise', seats: 42, seatsLimit: 50, cycle:'annual', nextDate:'Sep 1, 2026', amount:'$4,200', priceNote:'/month, billed annually' },
+  storage: { used: 68, limit: 100 },
+  apiCalls: { used: 182000, limit: 250000 },
+  payment: { brand:'VISA', last4:'4242', expiry:'08/28', holder:'Thomas G.' },
+  invoices: [
+    { id:'INV-2026-08', date:'Aug 1, 2026',  amount:'$4,200', status:'paid' },
+    { id:'INV-2026-07', date:'Jul 1, 2026',  amount:'$4,200', status:'paid' },
+    { id:'INV-2026-06', date:'Jun 1, 2026',  amount:'$4,200', status:'paid' },
+    { id:'INV-2026-05', date:'May 1, 2026',  amount:'$4,200', status:'paid' },
+  ],
+};
+
+function blUsageBar(used, limit) {
+  const pct = Math.round((used / limit) * 100);
+  const warn = pct >= 80;
+  return `<div class="bl-usage-bar-wrap"><div class="bl-usage-bar${warn ? ' warn' : ''}" style="width:${pct}%"></div></div>`;
+}
+
+function renderBilling() {
+  const c = $('content');
+  const b = _bl;
+  const seatsWarn = b.plan.seats / b.plan.seatsLimit >= 0.8;
+  c.innerHTML = `
+<div class="ns-wrap">
+  <div class="ns-page-head">
+    <div>
+      <div class="ns-page-title">Billing &amp; Subscription</div>
+      <div class="ns-page-sub">Plans, invoices, and payment methods for Contoso Ltd.</div>
+    </div>
+  </div>
+
+  <!-- Current plan -->
+  <div class="bl-plan-card">
+    <div>
+      <div>
+        <span class="bl-plan-name">Enterprise</span>
+        <span class="bl-plan-badge">● Active</span>
+      </div>
+      <div class="bl-plan-detail">50 seats · Unlimited studios · Priority support · SLA 99.9%</div>
+      <div class="bl-plan-detail" style="margin-top:6px">Next billing: <strong style="color:var(--color-text-title)">${b.plan.nextDate}</strong></div>
+      <div class="bl-plan-actions">
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="toast('Plan management coming soon','info')">Change plan</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;color:var(--color-text-caption)" onclick="toast('A cancellation request has been sent to your account manager','info')">Cancel subscription</button>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div class="bl-plan-price">${b.plan.amount}</div>
+      <div class="bl-plan-period">${b.plan.priceNote}</div>
+    </div>
+  </div>
+
+  <!-- Usage -->
+  <div class="ns-section" style="margin-bottom:20px">
+    <div class="ns-section-head">
+      <div class="ns-section-title">Usage this cycle</div>
+      <div class="ns-section-desc">Resets on ${b.plan.nextDate}.</div>
+    </div>
+    <div class="bl-usage-row">
+      <div class="bl-usage-label">Seats occupied</div>
+      ${blUsageBar(b.plan.seats, b.plan.seatsLimit)}
+      <div class="bl-usage-val${seatsWarn ? '" style="color:#F59E0B' : ''}">${b.plan.seats} / ${b.plan.seatsLimit}</div>
+      ${seatsWarn ? `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0" onclick="navigate('#/people')">Manage seats</button>` : ''}
+    </div>
+    <div class="bl-usage-row">
+      <div class="bl-usage-label">Storage</div>
+      ${blUsageBar(b.storage.used, b.storage.limit)}
+      <div class="bl-usage-val">${b.storage.used} GB / ${b.storage.limit} GB</div>
+    </div>
+    <div class="bl-usage-row">
+      <div class="bl-usage-label">API calls</div>
+      ${blUsageBar(b.apiCalls.used, b.apiCalls.limit)}
+      <div class="bl-usage-val">${(b.apiCalls.used/1000).toFixed(0)}k / ${(b.apiCalls.limit/1000).toFixed(0)}k</div>
+    </div>
+  </div>
+
+  <!-- Payment method -->
+  <div class="ns-section" style="margin-bottom:20px">
+    <div class="ns-section-head">
+      <div class="ns-section-title">Payment method</div>
+    </div>
+    <div class="bl-pm-row">
+      <div class="bl-pm-icon">${b.payment.brand}</div>
+      <div class="bl-pm-info">
+        <div class="bl-pm-name">•••• •••• •••• ${b.payment.last4}</div>
+        <div class="bl-pm-sub">Expires ${b.payment.expiry} · ${b.payment.holder}</div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="toast('Payment method update coming soon','info')">Update card</button>
+    </div>
+  </div>
+
+  <!-- Billing contact -->
+  <div class="ns-section" style="margin-bottom:20px">
+    <div class="ns-section-head">
+      <div class="ns-section-title">Billing contact</div>
+      <div class="ns-section-desc">Invoices and payment alerts are sent here.</div>
+    </div>
+    <div class="ns-pref-row">
+      <div>
+        <div class="ns-pref-label">Billing email</div>
+        <div class="ns-pref-hint">billing@contoso.com</div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="toast('Billing contact updated','success')">Edit</button>
+    </div>
+    <div class="ns-pref-row">
+      <div>
+        <div class="ns-pref-label">Billing address</div>
+        <div class="ns-pref-hint">One Microsoft Way, Redmond, WA 98052, USA</div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="toast('Billing address updated','success')">Edit</button>
+    </div>
+  </div>
+
+  <!-- Invoices -->
+  <div class="ns-section">
+    <div class="ns-section-head">
+      <div class="ns-section-title">Invoice history</div>
+      <div class="ns-section-desc">Last 12 months. Older invoices available on request.</div>
+    </div>
+    <table class="bl-inv-table">
+      <thead>
+        <tr>
+          <th class="bl-inv-th">Invoice</th>
+          <th class="bl-inv-th">Date</th>
+          <th class="bl-inv-th">Amount</th>
+          <th class="bl-inv-th">Status</th>
+          <th class="bl-inv-th" style="text-align:right">PDF</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${b.invoices.map(inv => `
+        <tr class="bl-inv-tr">
+          <td style="font-size:12px;color:var(--color-text-caption);font-family:monospace">${inv.id}</td>
+          <td>${inv.date}</td>
+          <td class="bl-inv-amount">${inv.amount}</td>
+          <td><span class="bl-inv-status paid">✓ Paid</span></td>
+          <td><a class="bl-inv-dl" onclick="toast('Downloading ${inv.id}.pdf','info');return false">↓ Download</a></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+
+</div>`;
+}
+
 function renderGovernanceDefaults() {
   const ag = _gd.actionGating;
 
@@ -15049,7 +15228,7 @@ function route() {
   } else if (parts[0]==='studios') {
     renderStudiosEntitlements();
   } else if (parts[0]==='billing') {
-    renderComingSoonSection('Billing & Subscription','Plans, invoices, and payment methods.','CreditCard');
+    renderBilling();
   } else if (parts[0]==='governance-defaults') {
     renderGovernanceDefaults();
   } else if (parts[0]==='data-privacy') {
