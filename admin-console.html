@@ -15737,6 +15737,9 @@ function paSubmitInvite() {
 
   const roleId = _paState.inviteRole || '';
   const role = PA_ROLES.find(r => r.id === roleId);
+  const mode = _paState.inviteAccessMode || 'role-defaults';
+  const perms = _paState.invitePerms || {};
+  const enabledPerms = new Set(Object.keys(perms).filter(k => perms[k]));
 
   const COLORS = ['#10b981','#06B6D4','#8b5cf6','#f97316','#ef4444','#84cc16','#0ea5e9','#6366f1'];
   emails.forEach((email, i) => {
@@ -15747,7 +15750,7 @@ function paSubmitInvite() {
       id: safeId,
       name: email,
       initials,
-      role: role ? role.label : '',
+      role: mode === 'scratch' && enabledPerms.size > 0 ? 'Custom' : (role ? role.label : ''),
       color: COLORS[(MOCK_PEOPLE.length + i) % COLORS.length],
       email,
       status: 'invited',
@@ -15755,7 +15758,15 @@ function paSubmitInvite() {
       invitedDate: 'Aug 20, 2026',
     };
     MOCK_PEOPLE.push(newPerson);
-    if (roleId) {
+
+    if (mode === 'scratch' && enabledPerms.size > 0) {
+      // Create a synthetic custom role to carry the scratch permissions
+      const customRoleId = 'custom_' + safeId;
+      PA_ROLES.push({ id: customRoleId, label: 'Custom', system: false, color: '#64748b',
+        desc: 'Custom permissions configured at invite', memberIds: [safeId] });
+      PA_ROLE_PERMS[customRoleId] = new Set(enabledPerms);
+      PA_MEMBER_ROLES[safeId] = [customRoleId];
+    } else if (roleId) {
       PA_MEMBER_ROLES[safeId] = [roleId];
       if (role && role.memberIds) role.memberIds.push(safeId);
     }
@@ -15766,7 +15777,10 @@ function paSubmitInvite() {
   _paState.inviteEmailDraft = '';
   renderPeople();
   const count = emails.length;
-  toast(count === 1 ? `Invite sent to ${emails[0]}` : `Invites sent to ${count} people`, 'success');
+  const accessLabel = mode === 'scratch' && enabledPerms.size > 0
+    ? `${enabledPerms.size} custom permission${enabledPerms.size!==1?'s':''}`
+    : role ? `"${role.label}" role` : 'no role assigned';
+  toast(count === 1 ? `Invite sent to ${emails[0]} · ${accessLabel}` : `Invites sent to ${count} people · ${accessLabel}`, 'success');
 }
 function paResendInvite(personId) {
   const p = MOCK_PEOPLE.find(x => x.id === personId);
