@@ -7782,6 +7782,22 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .pm-invite-title { font-size:15px; font-weight:700; color:var(--color-text-title); }
 .pm-invite-body { padding:20px; }
 .pm-invite-foot { padding:14px 20px; border-top:1px solid var(--color-border-neutral-subtle); display:flex; gap:8px; justify-content:flex-end; }
+/* invite chip email input */
+.invite-email-field { display:flex; flex-wrap:wrap; gap:5px; padding:6px 10px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); cursor:text; min-height:38px; align-items:center; transition:border-color .15s; }
+.invite-email-field:focus-within { border-color:var(--pri); }
+.invite-chip { display:inline-flex; align-items:center; gap:4px; background:rgba(43,127,255,.1); border:1px solid rgba(43,127,255,.2); border-radius:20px; padding:2px 4px 2px 9px; font-size:12px; color:var(--t1); white-space:nowrap; max-width:220px; }
+.invite-chip span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.invite-chip-x { background:none; border:none; cursor:pointer; color:var(--t2); padding:2px; line-height:1; font-size:15px; display:flex; align-items:center; border-radius:50%; transition:background .12s; flex-shrink:0; }
+.invite-chip-x:hover { background:rgba(239,68,68,.15); color:var(--badge-error); }
+.invite-email-input { border:none; outline:none; background:transparent; font-size:13px; color:var(--t1); min-width:140px; flex:1; padding:2px 0; font-family:inherit; }
+.invite-email-input::placeholder { color:var(--t3); }
+/* invite studio toggles */
+.invite-studio-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:2px; }
+.invite-studio-tog { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; border:1.5px solid var(--color-border-neutral-default); cursor:pointer; transition:border-color .12s,background .12s; user-select:none; }
+.invite-studio-tog.on { border-color:var(--pri); background:var(--pri-06); }
+.invite-studio-tog-check { width:16px; height:16px; border-radius:4px; border:1.5px solid var(--color-border-neutral-default); background:transparent; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .12s; }
+.invite-studio-tog.on .invite-studio-tog-check { border-color:var(--pri); background:var(--pri); }
+.invite-studio-tog-label { font-size:12px; font-weight:600; color:var(--t1); }
 /* pa-delete-modal kept for renderRoleDeleteModal */
 .pa-delete-modal { background:var(--bg2); border:1px solid var(--color-border-neutral-lighter); border-radius:16px; padding:28px 28px 20px; width:420px; max-width:95vw; text-align:center; position:relative; }
 .pa-delete-modal-icon { width:44px; height:44px; border-radius:50%; background:var(--red-12); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
@@ -13524,6 +13540,9 @@ let _paState = {
   memberDetailId: null,
   memberDrawerTab: 'overview',
   inviteOpen: false,
+  inviteEmails: [],
+  inviteEmailDraft: '',
+  inviteStudios: new Set(['agentic','helix','governance','data']),
   // Role detail
   roleDetailId: null,
   roleDetailTab: 'permissions',
@@ -14385,6 +14404,13 @@ function renderPeopleMembers() {
               <td class="pa-member-last">${escapeHtml(p.lastActive)}</td>
               <td onclick="event.stopPropagation()">
                 <div class="pa-row-actions">
+                  ${p.status==='invited' ? `
+                  <button class="pa-row-btn" title="Resend invite" onclick="event.stopPropagation();paResendInvite('${p.id}')">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 1010.9-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M12 1.5l1.5 3-3 .5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <button class="pa-row-btn pa-row-btn--danger" title="Revoke invite" onclick="event.stopPropagation();paRemoveMember('${p.id}')">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M6 6l4 4M10 6l-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  </button>` : `
                   <button class="pa-row-btn" title="Manage permissions" onclick="paOpenUserAccess('${p.id}')">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4v4.5C2 11.8 4.7 14.6 8 15.5c3.3-.9 6-3.7 6-7V4L8 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
                   </button>
@@ -14392,6 +14418,7 @@ function renderPeopleMembers() {
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4M8 5.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
                   </button>
                   ${p.status!=='suspended'?`<button class="pa-row-btn pa-row-btn--danger" title="Suspend member" onclick="event.stopPropagation();paSuspend('${p.id}')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M6 6l4 4M10 6l-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>`:''}
+                  `}
                 </div>
               </td>
             </tr>`;
@@ -14652,35 +14679,71 @@ function renderMemberDrawer(personId) {
   `;
 }
 
+function renderInviteChips() {
+  return _paState.inviteEmails.map(e =>
+    `<span class="invite-chip"><span>${escapeHtml(e)}</span><button class="invite-chip-x" onclick="paInviteRemove('${escapeHtml(e)}')" tabindex="-1" title="Remove">×</button></span>`
+  ).join('');
+}
+function renderInviteStudios() {
+  const studios = [
+    { id:'agentic',    label:'Agentic Studio' },
+    { id:'helix',      label:'Helix Studio' },
+    { id:'governance', label:'Governance Studio' },
+    { id:'data',       label:'Data Studio' },
+  ];
+  return studios.map(s => {
+    const on = _paState.inviteStudios.has(s.id);
+    return `<div class="invite-studio-tog ${on?'on':''}" onclick="paInviteToggleStudio('${s.id}')">
+      <div class="invite-studio-tog-check">${on?'<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+      <span class="invite-studio-tog-label">${s.label}</span>
+    </div>`;
+  }).join('');
+}
 function renderInviteModal() {
+  const count = _paState.inviteEmails.length;
   return `
     <div class="pm-invite-modal">
       <div class="pm-invite-head">
-        <div class="pm-invite-title">Invite member</div>
+        <div class="pm-invite-title">Invite member${count > 1 ? ` (${count})` : ''}</div>
         <button class="drawer-close" onclick="paCloseInvite()" aria-label="Close">✕</button>
       </div>
-      <div class="pm-invite-body">
-        <div class="field-group">
+      <div class="pm-invite-body" style="display:flex;flex-direction:column;gap:16px">
+        <div class="field-group" style="margin-bottom:0">
           <label class="field-label">Email address</label>
-          <input class="input" type="email" placeholder="name@company.com" id="inviteEmailInput" autofocus/>
-          <div class="field-help">Separate multiple addresses with commas to invite in bulk.</div>
+          <div class="invite-email-field" onclick="document.getElementById('inviteEmailInput').focus()">
+            <span id="inviteChipArea">${renderInviteChips()}</span>
+            <input class="invite-email-input" type="text" inputmode="email" id="inviteEmailInput" placeholder="${count===0?'name@company.com':'Add another…'}"
+              oninput="paInviteInput(this.value)"
+              onkeydown="paInviteKeydown(event)"
+              onpaste="paInvitePaste(event)"
+              onblur="paInviteBlur(this.value)"
+              autocomplete="off" autofocus/>
+          </div>
+          <div class="field-help">Press Enter or comma after each address. Paste a comma-separated list to add multiple at once.</div>
         </div>
-        <div class="field-group">
+        <div class="field-group" style="margin-bottom:0">
           <label class="field-label">Assign role</label>
           <select class="input" id="inviteRoleInput">
             <option value="">No role (access via individual grants)</option>
             ${PA_ROLES.map(r => `<option value="${r.id}">${escapeHtml(r.label)}</option>`).join('')}
           </select>
-          <div class="field-help">Roles determine what studios and actions the invited user can access.</div>
+          <div class="field-help">Roles determine what the invited user can access across studios.</div>
         </div>
-        <div class="field-group">
-          <label class="field-label">Personal message (optional)</label>
-          <textarea class="input" rows="2" placeholder="Add a note to the invite email…" style="resize:none"></textarea>
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Studio access</label>
+          <div class="invite-studio-grid" id="inviteStudioArea">${renderInviteStudios()}</div>
+          <div class="field-help">Studios the user will be able to access after accepting the invite.</div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Personal message <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
+          <textarea class="input" id="inviteMessageInput" rows="2" placeholder="Add a note to the invite email…" style="resize:none"></textarea>
         </div>
       </div>
       <div class="pm-invite-foot">
         <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseInvite()">Cancel</button>
-        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitInvite()">Send invite</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitInvite()">
+          Send invite${count > 1 ? ` (${count})` : ''}
+        </button>
       </div>
     </div>`;
 }
@@ -14715,20 +14778,131 @@ function paSetDrawerTab(tab) {
 }
 function paOpenInvite() {
   _paState.inviteOpen = true;
+  _paState.inviteEmails = [];
+  _paState.inviteEmailDraft = '';
+  _paState.inviteStudios = new Set(['agentic','helix','governance','data']);
   renderPeople();
 }
 function paCloseInvite() {
   _paState.inviteOpen = false;
   renderPeople();
 }
+function paInviteInput(val) {
+  if (val.endsWith(',')) {
+    _paState.inviteEmailDraft = val.slice(0, -1).trim();
+    paInviteCommitEmail();
+  } else {
+    _paState.inviteEmailDraft = val;
+  }
+}
+function paInviteKeydown(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    _paState.inviteEmailDraft = e.target.value.replace(/,$/, '').trim();
+    paInviteCommitEmail();
+  } else if (e.key === 'Backspace' && !e.target.value && _paState.inviteEmails.length > 0) {
+    _paState.inviteEmails.pop();
+    const chipArea = document.getElementById('inviteChipArea');
+    if (chipArea) chipArea.innerHTML = renderInviteChips();
+  }
+}
+function paInviteBlur(val) {
+  const clean = val.replace(/,$/, '').trim();
+  if (clean) { _paState.inviteEmailDraft = clean; paInviteCommitEmail(); }
+}
+function paInvitePaste(e) {
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text');
+  const parts = text.split(/[,;\s\n]+/).map(s => s.trim()).filter(s => s.includes('@'));
+  parts.forEach(em => { if (!_paState.inviteEmails.includes(em)) _paState.inviteEmails.push(em); });
+  _paState.inviteEmailDraft = '';
+  const chipArea = document.getElementById('inviteChipArea');
+  if (chipArea) chipArea.innerHTML = renderInviteChips();
+  const input = document.getElementById('inviteEmailInput');
+  if (input) { input.value = ''; input.placeholder = 'Add another…'; input.focus(); }
+}
+function paInviteCommitEmail() {
+  const draft = _paState.inviteEmailDraft.trim();
+  if (!draft) return;
+  if (!draft.includes('@') || !draft.includes('.')) { toast('Enter a valid email address', 'error'); return; }
+  if (!_paState.inviteEmails.includes(draft)) _paState.inviteEmails.push(draft);
+  _paState.inviteEmailDraft = '';
+  const chipArea = document.getElementById('inviteChipArea');
+  if (chipArea) chipArea.innerHTML = renderInviteChips();
+  const input = document.getElementById('inviteEmailInput');
+  if (input) { input.value = ''; input.placeholder = 'Add another…'; input.focus(); }
+  // Update button label
+  const foot = document.querySelector('.pm-invite-foot .ds-btn--primary');
+  const h = document.querySelector('.pm-invite-title');
+  const c = _paState.inviteEmails.length;
+  if (foot) foot.textContent = c > 1 ? `Send invite (${c})` : 'Send invite';
+  if (h) h.textContent = c > 1 ? `Invite member (${c})` : 'Invite member';
+}
+function paInviteRemove(email) {
+  _paState.inviteEmails = _paState.inviteEmails.filter(e => e !== email);
+  const chipArea = document.getElementById('inviteChipArea');
+  if (chipArea) chipArea.innerHTML = renderInviteChips();
+  const c = _paState.inviteEmails.length;
+  const foot = document.querySelector('.pm-invite-foot .ds-btn--primary');
+  const h = document.querySelector('.pm-invite-title');
+  if (foot) foot.textContent = c > 1 ? `Send invite (${c})` : 'Send invite';
+  if (h) h.textContent = c > 1 ? `Invite member (${c})` : 'Invite member';
+}
+function paInviteToggleStudio(studio) {
+  if (_paState.inviteStudios.has(studio)) _paState.inviteStudios.delete(studio);
+  else _paState.inviteStudios.add(studio);
+  const area = document.getElementById('inviteStudioArea');
+  if (area) area.innerHTML = renderInviteStudios();
+}
 function paSubmitInvite() {
-  const email = document.getElementById('inviteEmailInput');
-  const role = document.getElementById('inviteRoleInput');
-  const addr = email ? email.value.trim() : '';
-  if (!addr) { toast('Please enter an email address', 'error'); return; }
+  // commit any remaining text in the input
+  const inputEl = document.getElementById('inviteEmailInput');
+  if (inputEl && inputEl.value.trim()) {
+    _paState.inviteEmailDraft = inputEl.value.replace(/,$/, '').trim();
+    paInviteCommitEmail();
+    // brief delay to let chip render, then re-check
+  }
+  const emails = _paState.inviteEmails.slice();
+  if (emails.length === 0) { toast('Enter at least one email address', 'error'); return; }
+
+  const roleInput = document.getElementById('inviteRoleInput');
+  const roleId = roleInput ? roleInput.value : '';
+  const role = PA_ROLES.find(r => r.id === roleId);
+
+  const COLORS = ['#10b981','#06B6D4','#8b5cf6','#f97316','#ef4444','#84cc16','#0ea5e9','#6366f1'];
+  emails.forEach((email, i) => {
+    const username = email.split('@')[0];
+    const initials = username.slice(0,2).toUpperCase();
+    const safeId = 'inv_' + username.replace(/[^a-z0-9]/gi,'') + (Date.now() % 10000) + i;
+    const newPerson = {
+      id: safeId,
+      name: email,
+      initials,
+      role: role ? role.label : '',
+      color: COLORS[(MOCK_PEOPLE.length + i) % COLORS.length],
+      email,
+      status: 'invited',
+      lastActive: 'Never',
+      invitedDate: 'Aug 20, 2026',
+    };
+    MOCK_PEOPLE.push(newPerson);
+    if (roleId) {
+      PA_MEMBER_ROLES[safeId] = [roleId];
+      if (role && role.memberIds) role.memberIds.push(safeId);
+    }
+  });
+
   _paState.inviteOpen = false;
+  _paState.inviteEmails = [];
+  _paState.inviteEmailDraft = '';
   renderPeople();
-  toast(`Invitation sent to ${addr}`, 'success');
+  const count = emails.length;
+  toast(count === 1 ? `Invite sent to ${emails[0]}` : `Invites sent to ${count} people`, 'success');
+}
+function paResendInvite(personId) {
+  const p = MOCK_PEOPLE.find(x => x.id === personId);
+  if (!p) return;
+  toast(`Invite resent to ${p.email}`, 'success');
 }
 function paSuspend(personId) {
   const p = MOCK_PEOPLE.find(x => x.id === personId); if (!p) return;
