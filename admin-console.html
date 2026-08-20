@@ -8046,6 +8046,88 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .rd-danger-btn { background:none; border:1px solid rgba(239,68,68,.4); border-radius:var(--r8); padding:7px 14px; font-size:12px; font-weight:600; color:var(--red); cursor:pointer; transition:background .15s; }
 .rd-danger-btn:hover { background:var(--red-12); }
 
+/* ── Offboarding Wizard ─────────────────────────────────────────────────── */
+.ob-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); backdrop-filter:blur(6px); z-index:600; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+.ob-overlay.open { opacity:1; pointer-events:all; }
+.ob-modal { width:640px; max-width:95vw; max-height:90vh; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:0 32px 80px rgba(0,0,0,.5); display:flex; flex-direction:column; overflow:hidden; }
+html.theme-light .ob-modal { background:var(--bg1); border-color:var(--line); box-shadow:0 20px 60px rgba(0,0,0,.15); }
+/* Progress bar */
+.ob-progress { display:flex; align-items:center; padding:20px 24px 0; gap:0; flex-shrink:0; }
+.ob-step-dot { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:background .2s,color .2s,border-color .2s; }
+.ob-step-dot.done { background:var(--pri); color:#fff; border:2px solid var(--pri); }
+.ob-step-dot.active { background:var(--surface); color:var(--pri); border:2px solid var(--pri); }
+html.theme-light .ob-step-dot.active { background:var(--bg1); }
+.ob-step-dot.pending { background:transparent; color:var(--t3); border:2px solid var(--line); }
+.ob-step-line { flex:1; height:2px; background:var(--line); margin:0 4px; transition:background .25s; }
+.ob-step-line.done { background:var(--pri); }
+.ob-step-label { font-size:10px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-top:4px; text-align:center; }
+.ob-step-wrap { display:flex; flex-direction:column; align-items:center; }
+/* Header */
+.ob-head { padding:16px 24px 14px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.ob-head-title { font-size:16px; font-weight:700; color:var(--t1); margin:0 0 2px; }
+.ob-head-sub { font-size:12px; color:var(--t3); margin:0; }
+/* Body */
+.ob-body { flex:1; overflow-y:auto; padding:20px 24px; }
+.ob-body::-webkit-scrollbar { width:4px; }
+.ob-body::-webkit-scrollbar-thumb { background:var(--line); border-radius:2px; }
+/* User banner */
+.ob-user-banner { display:flex; align-items:center; gap:12px; background:var(--bg2); border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin-bottom:18px; }
+.ob-user-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.ob-user-name { font-size:14px; font-weight:600; color:var(--t1); }
+.ob-user-meta { font-size:12px; color:var(--t3); margin-top:1px; }
+/* Resource grid */
+.ob-resource-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+.ob-resource-row:last-child { border-bottom:none; }
+.ob-resource-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ob-resource-label { flex:1; min-width:0; }
+.ob-resource-name { font-size:13px; font-weight:600; color:var(--t1); }
+.ob-resource-hint { font-size:11px; color:var(--t3); margin-top:1px; }
+.ob-resource-count { font-size:11px; font-weight:700; color:var(--t1); background:var(--bg2); border:1px solid var(--line); border-radius:20px; padding:2px 10px; flex-shrink:0; }
+.ob-resource-count.warn { background:rgba(239,68,68,.1); color:var(--red); border-color:rgba(239,68,68,.3); }
+/* Section heading */
+.ob-section-h { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin:18px 0 10px; }
+/* Reassign rows */
+.ob-reassign-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+html.theme-light .ob-reassign-row { border-bottom-color:var(--line); }
+.ob-reassign-row:last-child { border-bottom:none; }
+.ob-reassign-item { flex:1; min-width:0; }
+.ob-reassign-item-name { font-size:12px; font-weight:600; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ob-reassign-item-type { font-size:11px; color:var(--t3); margin-top:1px; }
+.ob-reassign-sel { flex-shrink:0; background:var(--bg2); border:1px solid var(--line); border-radius:7px; color:var(--t1); font-size:12px; padding:5px 8px; cursor:pointer; min-width:140px; }
+html.theme-light .ob-reassign-sel { background:#fff; }
+.ob-revoke-tag { font-size:11px; font-weight:600; color:var(--red); background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.25); border-radius:20px; padding:2px 10px; flex-shrink:0; }
+/* Timeline step */
+.ob-timeline-card { background:var(--bg2); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+.ob-timeline-card-h { font-size:12px; font-weight:700; color:var(--t1); margin:0 0 6px; }
+.ob-timeline-desc { font-size:12px; color:var(--t3); margin:0 0 10px; line-height:1.5; }
+.ob-date-row { display:flex; align-items:center; gap:8px; }
+.ob-date-label { font-size:12px; color:var(--t2); flex-shrink:0; }
+.ob-date-inp { background:var(--bg1); border:1px solid var(--line); border-radius:7px; color:var(--t1); font-size:12px; padding:6px 10px; flex:1; min-width:0; }
+html.theme-light .ob-date-inp { background:#fff; }
+.ob-notif-preview { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+.ob-notif-preview-h { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin:0 0 6px; }
+.ob-notif-preview-body { font-size:12px; color:var(--t2); line-height:1.5; margin:0; }
+/* Confirm step */
+.ob-confirm-summary { background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.2); border-radius:10px; padding:14px 16px; margin-bottom:16px; }
+.ob-confirm-summary-h { font-size:12px; font-weight:700; color:var(--red); margin:0 0 8px; }
+.ob-confirm-summary-row { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--t2); margin-bottom:4px; }
+.ob-confirm-summary-row:last-child { margin-bottom:0; }
+.ob-confirm-summary-row b { color:var(--t1); font-weight:600; }
+.ob-confirm-inp-wrap { margin-bottom:16px; }
+.ob-confirm-inp-label { font-size:12px; color:var(--t2); margin:0 0 6px; }
+.ob-confirm-inp-label b { color:var(--t1); }
+.ob-confirm-inp { width:100%; background:var(--bg2); border:1px solid var(--line); border-radius:8px; color:var(--t1); font-size:13px; padding:9px 12px; box-sizing:border-box; transition:border-color .15s; }
+html.theme-light .ob-confirm-inp { background:#fff; }
+.ob-confirm-inp:focus { outline:none; border-color:var(--red); }
+.ob-confirm-inp.match { border-color:#10B981; }
+/* Footer */
+.ob-foot { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-top:1px solid var(--line); flex-shrink:0; gap:8px; }
+.ob-foot-left { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--t3); }
+/* Drawer deactivate trigger */
+.cap-drawer-deactivate-btn { display:flex; align-items:center; gap:6px; margin:16px 20px 0; padding:8px 14px; background:rgba(239,68,68,.07); border:1px solid rgba(239,68,68,.25); border-radius:8px; font-size:12px; font-weight:600; color:var(--red); cursor:pointer; transition:background .15s; width:calc(100% - 40px); }
+.cap-drawer-deactivate-btn:hover { background:rgba(239,68,68,.14); }
+html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
+
 </style>
 <link rel="stylesheet" href="shared/notif-panel.css">
 </head>
@@ -11028,10 +11110,433 @@ function _paintUserDrawer() {
             <p class="cap-drawer-hint">Access granted via these groups appears in the list above as "via ${memberOf.map(g => '<b>'+escapeHtml(g.label)+'</b>').join(', ')}".</p>`;
       })()}
     </section>
+
+    ${p.status === 'active' ? `
+    <div style="padding:16px 20px 20px">
+      <button class="cap-drawer-deactivate-btn" onclick="openOffboardWizard('${p.id}'); closeUserDrawer()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2zm0 1.5a4.5 4.5 0 110 9 4.5 4.5 0 010-9zm2.47 2.03L5.53 10.47m0-5.44l4.94 4.94" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Offboard &amp; deactivate member
+      </button>
+    </div>` : ''}
   `;
 }
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && userDrawerState.open) closeUserDrawer();
+});
+
+/* ── Offboarding Wizard ──────────────────────────────────────────────────── */
+const _obWiz = { open:false, userId:null, step:1, reassign:{}, accessEnd:'2026-09-20', confirmText:'' };
+
+function _obMockResources(userId) {
+  const agentsByOwner = {
+    tg:  [{ id:'a1', name:'Sales Pipeline Automator', type:'Agentic Worker' }, { id:'a2', name:'Customer Onboarding Flow', type:'Agentic Worker' }],
+    mg:  [{ id:'a3', name:'Data Quality Monitor', type:'Agentic Worker' }, { id:'a4', name:'Model Drift Detector', type:'Agentic Worker' }],
+    es:  [{ id:'a5', name:'CI/CD Orchestrator', type:'Agentic Network' }],
+    sb:  [{ id:'a6', name:'Design Review Bot', type:'Agentic Worker' }],
+    dp:  [{ id:'a7', name:'Architecture Advisor', type:'Agentic Worker' }],
+    jh:  [{ id:'a8', name:'Sprint Planner', type:'Agentic Worker' }, { id:'a9', name:'Retrospective Summarizer', type:'Agentic Worker' }],
+    np:  [{ id:'a10', name:'Ingestion Health Monitor', type:'Agentic Worker' }],
+    lt:  [{ id:'a11', name:'Ops Incident Classifier', type:'Agentic Worker' }],
+  };
+  const stewardDomains = {
+    mg: [{ id:'d1', name:'Customer Data', backup:'np' }, { id:'d2', name:'Financial Records', backup:null }],
+    np: [{ id:'d3', name:'Ingestion Pipelines', backup:'mg' }],
+    es: [{ id:'d4', name:'Platform Security', backup:'tg' }],
+  };
+  const hitlItems = {
+    tg: [{ id:'h1', desc:'Approve: Vendor contract AI summary', queue:'Approval Queue' }],
+    mg: [{ id:'h2', desc:'Review: New model entity mapping', queue:'Governance Review' }, { id:'h3', desc:'Approve: Schema change request', queue:'Approval Queue' }],
+    es: [{ id:'h4', desc:'Confirm: API gateway rate limit change', queue:'Approval Queue' }],
+    jh: [{ id:'h5', desc:'Review: Sprint velocity model output', queue:'Content Review' }],
+  };
+  const apiKeys = {
+    tg: [{ id:'k1', name:'Production API Key', scopes:'read, write, admin' }, { id:'k2', name:'CI Integration Key', scopes:'read' }],
+    es: [{ id:'k3', name:'DevOps Automation Key', scopes:'read, write' }],
+    dp: [{ id:'k4', name:'Sandbox Access Key', scopes:'read' }],
+    mg: [{ id:'k5', name:'Data Pipeline Key', scopes:'read, write' }],
+  };
+  return {
+    agents:        agentsByOwner[userId]  || [],
+    stewardDomains: stewardDomains[userId] || [],
+    hitlItems:     hitlItems[userId]      || [],
+    apiKeys:       apiKeys[userId]        || [],
+  };
+}
+
+function _obPeopleOptions(excludeId) {
+  return MOCK_PEOPLE.filter(p => p.status === 'active' && p.id !== excludeId);
+}
+
+function openOffboardWizard(userId) {
+  const p = MOCK_PEOPLE.find(x => x.id === userId);
+  if (!p) return;
+  _obWiz.userId  = userId;
+  _obWiz.step    = 1;
+  _obWiz.reassign = {};
+  _obWiz.confirmText = '';
+  _obWiz.accessEnd = '2026-09-20';
+
+  let el = document.getElementById('obOverlay');
+  if (!el) {
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="ob-overlay" id="obOverlay"><div class="ob-modal" id="obModal"></div></div>`;
+    while (div.firstChild) document.body.appendChild(div.firstChild);
+    el = document.getElementById('obOverlay');
+  }
+  el.classList.add('open');
+  _obWiz.open = true;
+  _obRender();
+}
+
+function closeOffboardWizard() {
+  _obWiz.open = false;
+  const el = document.getElementById('obOverlay');
+  if (el) el.classList.remove('open');
+}
+
+function _obRender() {
+  const modal = document.getElementById('obModal');
+  if (!modal) return;
+  const p   = MOCK_PEOPLE.find(x => x.id === _obWiz.userId);
+  const res = _obMockResources(_obWiz.userId);
+  const steps = ['Overview','Reassign','Timeline','Confirm'];
+  const s = _obWiz.step;
+
+  const progressHtml = `
+    <div class="ob-progress">
+      ${steps.map((label, i) => {
+        const n = i + 1;
+        const cls = n < s ? 'done' : n === s ? 'active' : 'pending';
+        const lineDone = n < s;
+        const line = n < steps.length ? `<div class="ob-step-line${lineDone ? ' done' : ''}"></div>` : '';
+        return `
+          <div class="ob-step-wrap">
+            <div class="ob-step-dot ${cls}">${n < s ? '✓' : n}</div>
+            <div class="ob-step-label">${label}</div>
+          </div>
+          ${line}
+        `;
+      }).join('')}
+    </div>
+  `;
+
+  let headTitle, headSub, bodyHtml, footHtml;
+
+  if (s === 1) {
+    headTitle = 'Review owned resources';
+    headSub   = `Before deactivating ${escapeHtml(p.name)}, review everything they own that will need to be handled.`;
+    const totalIssues = res.agents.length + res.stewardDomains.length + res.hitlItems.length + res.apiKeys.length;
+    bodyHtml = `
+      <div class="ob-user-banner">
+        <div class="ob-user-avatar" style="background:${p.color}">${escapeHtml(p.initials)}</div>
+        <div>
+          <div class="ob-user-name">${escapeHtml(p.name)}</div>
+          <div class="ob-user-meta">${escapeHtml(p.role)} · Member since ${escapeHtml(p.joinDate)}</div>
+        </div>
+      </div>
+      <p class="ob-section-h">Resources that need action (${totalIssues})</p>
+      <div>
+        <div class="ob-resource-row">
+          <div class="ob-resource-icon" style="background:rgba(99,102,241,.12)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#6366f1" stroke-width="1.4"/><path d="M5 8h6M8 5v6" stroke="#6366f1" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="ob-resource-label">
+            <div class="ob-resource-name">AI Workers &amp; Networks</div>
+            <div class="ob-resource-hint">Will be reassigned to a new owner</div>
+          </div>
+          <div class="ob-resource-count${res.agents.length > 0 ? ' warn' : ''}">${res.agents.length}</div>
+        </div>
+        <div class="ob-resource-row">
+          <div class="ob-resource-icon" style="background:rgba(139,92,246,.12)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1l2 4h4l-3.3 2.4 1.3 4-4-2.8-4 2.8 1.3-4L2 5h4z" stroke="#8b5cf6" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="ob-resource-label">
+            <div class="ob-resource-name">Steward Domains</div>
+            <div class="ob-resource-hint">Backup Steward auto-inherits; domains without one need manual reassignment</div>
+          </div>
+          <div class="ob-resource-count${res.stewardDomains.length > 0 ? ' warn' : ''}">${res.stewardDomains.length}</div>
+        </div>
+        <div class="ob-resource-row">
+          <div class="ob-resource-icon" style="background:rgba(245,158,11,.12)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#F59E0B" stroke-width="1.4"/><path d="M8 4.5v4l2.5 1.5" stroke="#F59E0B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="ob-resource-label">
+            <div class="ob-resource-name">Pending HITL &amp; Approvals</div>
+            <div class="ob-resource-hint">Open queue items will be reassigned before access ends</div>
+          </div>
+          <div class="ob-resource-count${res.hitlItems.length > 0 ? ' warn' : ''}">${res.hitlItems.length}</div>
+        </div>
+        <div class="ob-resource-row">
+          <div class="ob-resource-icon" style="background:rgba(239,68,68,.10)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="8" rx="1.5" stroke="#EF4444" stroke-width="1.4"/><path d="M5 5V3.5a3 3 0 016 0V5" stroke="#EF4444" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="ob-resource-label">
+            <div class="ob-resource-name">API Keys</div>
+            <div class="ob-resource-hint">Revoked immediately upon deactivation — cannot be transferred</div>
+          </div>
+          <div class="ob-resource-count${res.apiKeys.length > 0 ? ' warn' : ''}">${res.apiKeys.length}</div>
+        </div>
+      </div>
+      ${res.stewardDomains.some(d => !d.backup) ? `
+      <div style="background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.3); border-radius:9px; padding:10px 14px; margin-top:16px; display:flex; gap:10px; align-items:flex-start">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:1px"><path d="M8 2L1.5 13.5h13L8 2z" stroke="#F59E0B" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5v3M8 11.5v.5" stroke="#F59E0B" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <p style="font-size:12px; color:var(--t2); margin:0; line-height:1.5">
+          <b style="color:var(--t1)">${res.stewardDomains.filter(d=>!d.backup).length} domain(s) have no Backup Steward.</b>
+          You'll be asked to assign an owner in the next step.
+        </p>
+      </div>` : ''}
+    `;
+    footHtml = `
+      <div class="ob-foot">
+        <div class="ob-foot-left">Step 1 of 4</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="closeOffboardWizard()">Cancel</button>
+          <button class="btn btn-primary" onclick="_obGoStep(2)">Next: Reassign resources</button>
+        </div>
+      </div>
+    `;
+
+  } else if (s === 2) {
+    headTitle = 'Reassign resources';
+    headSub   = `Choose who takes over each item. API keys will be revoked automatically.`;
+    const opts = _obPeopleOptions(_obWiz.userId);
+    const optHtml = opts.map(o => `<option value="${o.id}">${escapeHtml(o.name)} (${escapeHtml(o.role)})</option>`).join('');
+
+    const agentsSection = res.agents.length === 0 ? '' : `
+      <p class="ob-section-h">AI Workers &amp; Networks (${res.agents.length})</p>
+      ${res.agents.map(a => `
+        <div class="ob-reassign-row">
+          <div class="ob-reassign-item">
+            <div class="ob-reassign-item-name">${escapeHtml(a.name)}</div>
+            <div class="ob-reassign-item-type">${escapeHtml(a.type)}</div>
+          </div>
+          <select class="ob-reassign-sel" onchange="_obSetReassign('agent_${a.id}', this.value)">
+            <option value="">— Select new owner —</option>
+            ${optHtml}
+          </select>
+        </div>
+      `).join('')}
+    `;
+
+    const stewardSection = res.stewardDomains.length === 0 ? '' : `
+      <p class="ob-section-h">Steward Domains (${res.stewardDomains.length})</p>
+      ${res.stewardDomains.map(d => `
+        <div class="ob-reassign-row">
+          <div class="ob-reassign-item">
+            <div class="ob-reassign-item-name">${escapeHtml(d.name)}</div>
+            <div class="ob-reassign-item-type">${d.backup ? `Backup Steward: ${escapeHtml(MOCK_PEOPLE.find(x=>x.id===d.backup)?.name || d.backup)} (auto-inherits)` : '<span style="color:#F59E0B;font-weight:600">No Backup Steward — manual assignment required</span>'}</div>
+          </div>
+          <select class="ob-reassign-sel" onchange="_obSetReassign('domain_${d.id}', this.value)">
+            <option value="${d.backup || ''}">${d.backup ? escapeHtml(MOCK_PEOPLE.find(x=>x.id===d.backup)?.name || 'Auto-inherit') : '— Assign owner —'}</option>
+            ${opts.filter(o => d.backup ? o.id !== d.backup : true).map(o => `<option value="${o.id}">${escapeHtml(o.name)}</option>`).join('')}
+          </select>
+        </div>
+      `).join('')}
+    `;
+
+    const hitlSection = res.hitlItems.length === 0 ? '' : `
+      <p class="ob-section-h">Pending HITL &amp; Approvals (${res.hitlItems.length})</p>
+      ${res.hitlItems.map(h => `
+        <div class="ob-reassign-row">
+          <div class="ob-reassign-item">
+            <div class="ob-reassign-item-name">${escapeHtml(h.desc)}</div>
+            <div class="ob-reassign-item-type">${escapeHtml(h.queue)}</div>
+          </div>
+          <select class="ob-reassign-sel" onchange="_obSetReassign('hitl_${h.id}', this.value)">
+            <option value="">— Reassign to —</option>
+            ${optHtml}
+          </select>
+        </div>
+      `).join('')}
+    `;
+
+    const apiSection = res.apiKeys.length === 0 ? '' : `
+      <p class="ob-section-h">API Keys — revoked immediately</p>
+      ${res.apiKeys.map(k => `
+        <div class="ob-reassign-row">
+          <div class="ob-reassign-item">
+            <div class="ob-reassign-item-name">${escapeHtml(k.name)}</div>
+            <div class="ob-reassign-item-type">Scopes: ${escapeHtml(k.scopes)}</div>
+          </div>
+          <span class="ob-revoke-tag">Revoke on confirm</span>
+        </div>
+      `).join('')}
+    `;
+
+    bodyHtml = agentsSection + stewardSection + hitlSection + apiSection ||
+      `<p style="color:var(--t3);font-size:13px;text-align:center;padding:24px 0">No resources to reassign.</p>`;
+
+    footHtml = `
+      <div class="ob-foot">
+        <div class="ob-foot-left">Step 2 of 4</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="_obGoStep(1)">Back</button>
+          <button class="btn btn-primary" onclick="_obGoStep(3)">Next: Set timeline</button>
+        </div>
+      </div>
+    `;
+
+  } else if (s === 3) {
+    headTitle = 'Set access timeline';
+    headSub   = `Choose when access ends and preview the notification sent to ${escapeHtml(p.name)}.`;
+    bodyHtml = `
+      <p class="ob-section-h">Access end date</p>
+      <div class="ob-timeline-card">
+        <p class="ob-timeline-card-h">When does access expire?</p>
+        <p class="ob-timeline-desc">The member retains read-only access until this date, then their account is fully deactivated. Sandbox drafts enter a 30-day grace period before being purged.</p>
+        <div class="ob-date-row">
+          <span class="ob-date-label">Access ends on</span>
+          <input type="date" class="ob-date-inp" id="obAccessEndInp" value="${_obWiz.accessEnd}" onchange="_obWiz.accessEnd=this.value; _obUpdateNotifPreview()">
+        </div>
+      </div>
+
+      <p class="ob-section-h">Notification preview</p>
+      <div class="ob-notif-preview">
+        <p class="ob-notif-preview-h">Email sent to ${escapeHtml(p.email || p.id + '@aims-os')}</p>
+        <p class="ob-notif-preview-body" id="obNotifPreview">
+          Hi ${escapeHtml(p.name.split(' ')[0])}, your access to <b>Contoso AI Platform</b> is scheduled to end on
+          <b id="obNotifDate">${_obWiz.accessEnd}</b>. Your AI workers and assigned resources have been transferred
+          to new owners. Any sandbox drafts you own will be available for 30 days after your access ends.
+          If you have questions, contact your workspace administrator.
+        </p>
+      </div>
+
+      <p class="ob-section-h" style="margin-top:20px">Data lifecycle</p>
+      <div class="ob-timeline-card">
+        <p class="ob-timeline-card-h">What happens to their data?</p>
+        <p class="ob-timeline-desc" style="margin-bottom:0">
+          <b style="color:var(--t1)">Sandbox drafts</b> — 30-day grace period, then purged from Sandbox plane.<br>
+          <b style="color:var(--t1)">Truth plane contributions</b> — retained as attributed history, not deleted.<br>
+          <b style="color:var(--t1)">Audit logs</b> — permanently retained per your Data &amp; Privacy settings.<br>
+          <b style="color:var(--t1)">API keys</b> — revoked immediately upon confirmation.
+        </p>
+      </div>
+    `;
+    footHtml = `
+      <div class="ob-foot">
+        <div class="ob-foot-left">Step 3 of 4</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="_obGoStep(2)">Back</button>
+          <button class="btn btn-primary" onclick="_obGoStep(4)">Next: Confirm &amp; execute</button>
+        </div>
+      </div>
+    `;
+
+  } else if (s === 4) {
+    headTitle = 'Confirm deactivation';
+    headSub   = 'This action is irreversible. Review the summary and type the member\'s full name to confirm.';
+    const res4 = _obMockResources(_obWiz.userId);
+    const totalReassigned = res4.agents.length + res4.stewardDomains.length + res4.hitlItems.length;
+    const matched = _obWiz.confirmText.trim().toLowerCase() === p.name.toLowerCase();
+    bodyHtml = `
+      <div class="ob-confirm-summary">
+        <p class="ob-confirm-summary-h">What will happen</p>
+        <div class="ob-confirm-summary-row">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Access ends on <b>${_obWiz.accessEnd}</b>
+        </div>
+        <div class="ob-confirm-summary-row">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <b>${totalReassigned} resource${totalReassigned===1?'':'s'}</b> reassigned to new owners
+        </div>
+        <div class="ob-confirm-summary-row">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <b>${res4.apiKeys.length} API key${res4.apiKeys.length===1?'':'s'}</b> revoked immediately
+        </div>
+        <div class="ob-confirm-summary-row">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Notification email sent to <b>${escapeHtml(p.email || p.id + '@aims-os')}</b>
+        </div>
+        <div class="ob-confirm-summary-row">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sandbox drafts: <b>30-day grace period</b> then purged
+        </div>
+      </div>
+      <div class="ob-confirm-inp-wrap">
+        <p class="ob-confirm-inp-label">Type <b>${escapeHtml(p.name)}</b> to confirm</p>
+        <input
+          class="ob-confirm-inp${matched ? ' match' : ''}"
+          id="obConfirmInp"
+          type="text"
+          placeholder="${escapeHtml(p.name)}"
+          value="${escapeHtml(_obWiz.confirmText)}"
+          oninput="_obWiz.confirmText=this.value; _obToggleConfirmBtn()"
+          autocomplete="off"
+        >
+      </div>
+    `;
+    footHtml = `
+      <div class="ob-foot">
+        <div class="ob-foot-left">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1L1 12h11L6.5 1z" stroke="#F59E0B" stroke-width="1.2" stroke-linejoin="round"/><path d="M6.5 5v3M6.5 9.5v.5" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round"/></svg>
+          This cannot be undone
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="_obGoStep(3)">Back</button>
+          <button class="btn btn-primary" id="obConfirmBtn"
+            style="background:var(--red); border-color:var(--red); opacity:${matched?1:0.4}; cursor:${matched?'pointer':'not-allowed'}"
+            onclick="_obExecute()"
+            ${matched?'':' disabled'}>
+            Deactivate ${escapeHtml(p.name.split(' ')[0])}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  modal.innerHTML = `
+    ${progressHtml}
+    <div class="ob-head">
+      <h2 class="ob-head-title">${headTitle}</h2>
+      <p class="ob-head-sub">${headSub}</p>
+    </div>
+    <div class="ob-body">${bodyHtml}</div>
+    ${footHtml}
+  `;
+}
+
+function _obGoStep(n) {
+  _obWiz.step = n;
+  _obRender();
+}
+
+function _obSetReassign(key, val) {
+  _obWiz.reassign[key] = val;
+}
+
+function _obUpdateNotifPreview() {
+  const el = document.getElementById('obNotifDate');
+  if (el) el.textContent = _obWiz.accessEnd;
+}
+
+function _obToggleConfirmBtn() {
+  const p = MOCK_PEOPLE.find(x => x.id === _obWiz.userId);
+  if (!p) return;
+  const matched = _obWiz.confirmText.trim().toLowerCase() === p.name.toLowerCase();
+  const btn = document.getElementById('obConfirmBtn');
+  const inp = document.getElementById('obConfirmInp');
+  if (btn) { btn.disabled = !matched; btn.style.opacity = matched ? 1 : 0.4; btn.style.cursor = matched ? 'pointer' : 'not-allowed'; }
+  if (inp) { inp.classList.toggle('match', matched); }
+}
+
+function _obExecute() {
+  const p = MOCK_PEOPLE.find(x => x.id === _obWiz.userId);
+  if (!p) return;
+  const matched = _obWiz.confirmText.trim().toLowerCase() === p.name.toLowerCase();
+  if (!matched) return;
+  p.status = 'suspended';
+  p.suspendedReason = 'Offboarded by admin';
+  closeOffboardWizard();
+  const toast = document.createElement('div');
+  toast.className = 'ns-save-toast show';
+  toast.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="#10B981" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> ${escapeHtml(p.name)} has been deactivated. Access ends ${_obWiz.accessEnd}.`;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
+  if (typeof renderPeople === 'function') renderPeople();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && _obWiz.open) closeOffboardWizard();
 });
 
 function renderDistribution() {
@@ -13705,6 +14210,14 @@ function renderMemberDrawer(personId) {
              <div style="display:flex;gap:8px;flex-wrap:wrap">
                <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paSuspend('${p.id}')">Suspend access</button>
                <button class="ds-btn ds-btn-sm ds-btn--warning" onclick="paRemoveMember('${p.id}')">Remove from workspace</button>
+             </div>
+             <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(239,68,68,.15)">
+               <div class="pm-danger-zone-h" style="margin-bottom:8px">Offboard member</div>
+               <p style="font-size:11.5px;color:var(--color-text-caption);margin:0 0 10px;line-height:1.5">Transfer owned agents, steward domains, and HITL items before revoking access. Generates an audit record and sends a notification email.</p>
+               <button class="cap-drawer-deactivate-btn" style="width:100%;margin:0" onclick="openOffboardWizard('${p.id}'); paCloseDrawer()">
+                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2zm0 1.5a4.5 4.5 0 110 9 4.5 4.5 0 010-9zm2.47 2.03L5.53 10.47m0-5.44l4.94 4.94" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                 Offboard &amp; deactivate member…
+               </button>
              </div>`
         }
       </div>
