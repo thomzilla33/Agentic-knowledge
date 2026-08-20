@@ -22843,6 +22843,305 @@ function finalizeConnect(){
   navigate(`#/integrations/${i.slug}/instances/${instId}`);
 }
 
+/* ====================== TENANT DIRECTORY ====================== */
+
+function _tdFilteredTenants() {
+  const q = _tdState.search.toLowerCase();
+  return MOCK_TENANTS.filter(t => {
+    if (q && !t.name.toLowerCase().includes(q) && !t.domain.toLowerCase().includes(q)) return false;
+    if (_tdState.filterPlan !== 'all' && t.plan !== _tdState.filterPlan) return false;
+    if (_tdState.filterStatus !== 'all' && t.status !== _tdState.filterStatus) return false;
+    if (_tdState.filterStudio !== 'all' && !t.studios[_tdState.filterStudio]) return false;
+    return true;
+  });
+}
+
+function _tdHealthLabel(h) {
+  return { healthy: 'Active', trial: 'Trial', suspended: 'Suspended' }[h] || h;
+}
+
+function _tdStudioChips(studios) {
+  const map = { agentic: 'Agentic', governance: 'Governance', workforce: 'Workforce', data: 'Data' };
+  return Object.entries(map).map(([k, label]) =>
+    `<span class="td-studio-chip${studios[k] ? '' : ' td-studio-chip--off'}">${label}</span>`
+  ).join('');
+}
+
+function _tdPlanPill(plan) {
+  return `<span class="td-plan-pill td-plan-pill--${plan}">${plan}</span>`;
+}
+
+function renderTenantDirectory(tenantId) {
+  setActiveNav('tenants');
+  if (tenantId) {
+    const t = MOCK_TENANTS.find(x => x.id === tenantId);
+    if (t) _tdState.drawerTenantId = tenantId;
+  }
+
+  const all = MOCK_TENANTS;
+  const active = all.filter(t => t.status === 'active').length;
+  const trial  = all.filter(t => t.status === 'trial').length;
+  const susp   = all.filter(t => t.status === 'suspended').length;
+  const totalMrr = all.reduce((s, t) => s + t.billing.mrr, 0);
+  const totalUsers = all.reduce((s, t) => s + t.users, 0);
+  const activeUsers = all.reduce((s, t) => s + t.activeUsers, 0);
+  const totalSeatsUsed = all.reduce((s, t) => s + t.billing.seatsUsed, 0);
+  const totalSeats = all.reduce((s, t) => s + t.billing.seats, 0);
+  const filtered = _tdFilteredTenants();
+
+  const statsStrip = `
+    <div class="td-stats-strip">
+      <div class="td-stat">
+        <div class="td-stat-val">${all.length}</div>
+        <div class="td-stat-label">Total tenants</div>
+        <div class="td-stat-sub">${active} active · ${trial} trial · ${susp} suspended</div>
+      </div>
+      <div class="td-stat">
+        <div class="td-stat-val">${totalUsers.toLocaleString()}</div>
+        <div class="td-stat-label">Total users</div>
+        <div class="td-stat-sub">${activeUsers.toLocaleString()} active this month</div>
+      </div>
+      <div class="td-stat">
+        <div class="td-stat-val">$${(totalMrr/1000).toFixed(1)}k</div>
+        <div class="td-stat-label">Monthly recurring revenue</div>
+        <div class="td-stat-sub">${all.filter(t=>t.plan==='enterprise').length} enterprise accounts</div>
+      </div>
+      <div class="td-stat">
+        <div class="td-stat-val">${totalSeatsUsed}<span style="font-size:14px;font-weight:400;color:var(--t3)"> / ${totalSeats}</span></div>
+        <div class="td-stat-label">Seats used / provisioned</div>
+        <div class="td-stat-sub">${Math.round(totalSeatsUsed/totalSeats*100)}% utilization</div>
+      </div>
+    </div>`;
+
+  const filtersBar = `
+    <div class="td-filters">
+      <div class="td-search">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input placeholder="Search tenants…" value="${escapeHtml(_tdState.search)}" oninput="_tdState.search=this.value;renderTenantDirectory()" />
+      </div>
+      <select class="td-filter-select" onchange="_tdState.filterPlan=this.value;renderTenantDirectory()">
+        <option value="all"${_tdState.filterPlan==='all'?' selected':''}>All plans</option>
+        <option value="enterprise"${_tdState.filterPlan==='enterprise'?' selected':''}>Enterprise</option>
+        <option value="team"${_tdState.filterPlan==='team'?' selected':''}>Team</option>
+        <option value="starter"${_tdState.filterPlan==='starter'?' selected':''}>Starter</option>
+      </select>
+      <select class="td-filter-select" onchange="_tdState.filterStatus=this.value;renderTenantDirectory()">
+        <option value="all"${_tdState.filterStatus==='all'?' selected':''}>All statuses</option>
+        <option value="active"${_tdState.filterStatus==='active'?' selected':''}>Active</option>
+        <option value="trial"${_tdState.filterStatus==='trial'?' selected':''}>Trial</option>
+        <option value="suspended"${_tdState.filterStatus==='suspended'?' selected':''}>Suspended</option>
+      </select>
+      <select class="td-filter-select" onchange="_tdState.filterStudio=this.value;renderTenantDirectory()">
+        <option value="all"${_tdState.filterStudio==='all'?' selected':''}>All studios</option>
+        <option value="agentic"${_tdState.filterStudio==='agentic'?' selected':''}>Agentic</option>
+        <option value="governance"${_tdState.filterStudio==='governance'?' selected':''}>Governance</option>
+        <option value="workforce"${_tdState.filterStudio==='workforce'?' selected':''}>Workforce</option>
+        <option value="data"${_tdState.filterStudio==='data'?' selected':''}>Data</option>
+      </select>
+      <span style="font-size:12px;color:var(--t3);margin-left:auto">${filtered.length} tenant${filtered.length!==1?'s':''}</span>
+    </div>`;
+
+  const tableRows = filtered.length === 0
+    ? `<tr><td colspan="7" class="td-empty">No tenants match your filters.</td></tr>`
+    : filtered.map(t => `
+      <tr onclick="tdOpenDrawer('${t.id}')">
+        <td>
+          <div class="td-tenant-name">${escapeHtml(t.name)}</div>
+          <div class="td-tenant-domain">${escapeHtml(t.domain)}</div>
+        </td>
+        <td>${_tdPlanPill(t.plan)}</td>
+        <td>
+          <span style="display:inline-flex;align-items:center">
+            <span class="td-health-dot td-health-dot--${t.health}"></span>
+            ${_tdHealthLabel(t.health)}
+          </span>
+        </td>
+        <td>${_tdStudioChips(t.studios)}</td>
+        <td style="font-variant-numeric:tabular-nums">${t.users}<span style="color:var(--t3)"> / ${t.billing.seats}</span></td>
+        <td style="font-size:12px;color:var(--t2)">${t.billing.mrr > 0 ? '$'+t.billing.mrr.toLocaleString()+'/mo' : '—'}</td>
+        <td style="font-size:11px;color:var(--t3)">${t.lastActivity}</td>
+      </tr>`).join('');
+
+  $('content').innerHTML = `
+    <div class="td-page">
+      <div class="ns-header" style="margin-bottom:22px">
+        <div>
+          <div class="ns-header-title">Tenant Directory</div>
+          <div class="ns-header-sub">All tenants on the AIMS-OS platform — click any row to inspect its full configuration.</div>
+        </div>
+      </div>
+      ${statsStrip}
+      ${filtersBar}
+      <div class="td-table-wrap">
+        <table class="td-table">
+          <thead>
+            <tr>
+              <th>Tenant</th><th>Plan</th><th>Status</th><th>Studios</th><th>Users / Seats</th><th>MRR</th><th>Last activity</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+
+  if (_tdState.search) {
+    const inp = document.querySelector('.td-search input');
+    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
+  if (_tdState.drawerTenantId) setTimeout(() => tdOpenDrawer(_tdState.drawerTenantId), 0);
+}
+
+function tdOpenDrawer(tenantId) {
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t) return;
+  _tdState.drawerTenantId = tenantId;
+  if (!_tdState.drawerTab) _tdState.drawerTab = 'overview';
+
+  const tabs = ['overview','studios','governance','features','billing','admins'];
+  const tabLabels = { overview:'Overview', studios:'Studios', governance:'Governance', features:'Features & Flags', billing:'Billing', admins:'Admins' };
+
+  const tabBar = `<div class="td-drawer-tabs">
+    ${tabs.map(tab => `<button class="td-drawer-tab${_tdState.drawerTab===tab?' active':''}" onclick="_tdState.drawerTab='${tab}';tdOpenDrawer('${tenantId}')">${tabLabels[tab]}</button>`).join('')}
+  </div>`;
+
+  let tabBody = '';
+  if (_tdState.drawerTab === 'overview') {
+    const utilPct = Math.round(t.billing.seatsUsed / t.billing.seats * 100);
+    const barColor = utilPct > 90 ? '#f59e0b' : utilPct > 70 ? 'var(--pri)' : '#22c55e';
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Tenant info</div>
+        <div class="td-row"><span class="td-row-key">Name</span><span class="td-row-val">${escapeHtml(t.name)}</span></div>
+        <div class="td-row"><span class="td-row-key">Domain</span><span class="td-row-val">${escapeHtml(t.domain)}</span></div>
+        <div class="td-row"><span class="td-row-key">Plan</span><span class="td-row-val">${_tdPlanPill(t.plan)}</span></div>
+        <div class="td-row"><span class="td-row-key">Status</span>
+          <span class="td-row-val ${t.health==='healthy'?'td-row-val--green':t.health==='suspended'?'td-row-val--red':'td-row-val--amber'}">${_tdHealthLabel(t.health)}</span>
+        </div>
+        <div class="td-row"><span class="td-row-key">Created</span><span class="td-row-val">${t.createdAt}</span></div>
+        <div class="td-row"><span class="td-row-key">Last activity</span><span class="td-row-val">${t.lastActivity}</span></div>
+      </div>
+      <div class="td-section">
+        <div class="td-section-title">Usage</div>
+        <div class="td-row"><span class="td-row-key">Total users</span><span class="td-row-val">${t.users}</span></div>
+        <div class="td-row"><span class="td-row-key">Active users (30d)</span><span class="td-row-val td-row-val--green">${t.activeUsers}</span></div>
+        <div class="td-row"><span class="td-row-key">Seats provisioned</span><span class="td-row-val">${t.billing.seats}</span></div>
+        <div class="td-row"><span class="td-row-key">Seat utilization</span>
+          <span class="td-row-val ${utilPct>90?'td-row-val--amber':''}" style="display:flex;align-items:center;gap:8px">
+            ${utilPct}%
+            <span style="display:inline-block;width:72px;height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex-shrink:0">
+              <span style="display:block;height:100%;width:${utilPct}%;background:${barColor};border-radius:3px"></span>
+            </span>
+          </span>
+        </div>
+      </div>`;
+  } else if (_tdState.drawerTab === 'studios') {
+    const studioMap = [
+      { id:'agentic',    label:'Agentic Studio',    desc:'AI agent orchestration and workflow automation' },
+      { id:'governance', label:'Governance Studio',  desc:'Policy enforcement, Truth Plane, and compliance' },
+      { id:'workforce',  label:'Workforce Studio',   desc:'Human-in-the-loop task routing and assignments' },
+      { id:'data',       label:'Data Studio',        desc:'Data modeling, ingestion, and governed access' },
+    ];
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Studio entitlements</div>
+        ${studioMap.map(s => {
+          const on = t.studios[s.id];
+          return `<div class="td-row" style="align-items:flex-start;gap:12px;padding:12px 0">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--t1)">${s.label}</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">${s.desc}</div>
+            </div>
+            <span style="font-size:12px;font-weight:600;white-space:nowrap;color:${on?'#22c55e':'var(--t3)'}">
+              ${on ? '✓ Enabled' : '✗ Disabled'}
+            </span>
+          </div>`;
+        }).join('')}
+      </div>`;
+  } else if (_tdState.drawerTab === 'governance') {
+    const sandboxLabels = { open:'Open (no restrictions)', scoped:'Scoped (per studio)', strict:'Strict (approval required)' };
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Governance configuration</div>
+        <div class="td-row">
+          <span class="td-row-key">Sandbox mode</span>
+          <span class="td-row-val">${sandboxLabels[t.governance.sandboxMode]||t.governance.sandboxMode}</span>
+        </div>
+        <div class="td-row">
+          <span class="td-row-key">Truth Plane</span>
+          <span class="td-row-val ${t.governance.truthPlane==='enabled'?'td-row-val--green':'td-row-val--red'}">${t.governance.truthPlane==='enabled'?'Enabled':'Disabled'}</span>
+        </div>
+        <div class="td-row">
+          <span class="td-row-key">Human in the Loop</span>
+          <span class="td-row-val ${t.governance.humanInLoop?'td-row-val--green':'td-row-val--red'}">${t.governance.humanInLoop?'Required':'Not required'}</span>
+        </div>
+        <div class="td-row">
+          <span class="td-row-key">Audit log retention</span>
+          <span class="td-row-val">${t.governance.auditRetention} days</span>
+        </div>
+      </div>`;
+  } else if (_tdState.drawerTab === 'features') {
+    const featureMap = [
+      { id:'sso',           label:'Single Sign-On (SSO)' },
+      { id:'mfa',           label:'Multi-Factor Authentication' },
+      { id:'apiAccess',     label:'API Access' },
+      { id:'customRoles',   label:'Custom Roles' },
+      { id:'advancedAudit', label:'Advanced Audit' },
+    ];
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Feature flags</div>
+        <div class="td-feat-grid">
+          ${featureMap.map(f => `
+            <div class="td-feat-item">
+              <span class="td-feat-check ${t.features[f.id]?'td-feat-check--on':'td-feat-check--off'}">${t.features[f.id]?'✓':'✗'}</span>
+              <span class="td-feat-label">${f.label}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  } else if (_tdState.drawerTab === 'billing') {
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Billing details</div>
+        <div class="td-row"><span class="td-row-key">Plan</span><span class="td-row-val">${_tdPlanPill(t.plan)}</span></div>
+        <div class="td-row"><span class="td-row-key">Monthly revenue</span><span class="td-row-val">${t.billing.mrr>0?'$'+t.billing.mrr.toLocaleString()+'/mo':'Trial — $0'}</span></div>
+        <div class="td-row"><span class="td-row-key">Seats provisioned</span><span class="td-row-val">${t.billing.seats}</span></div>
+        <div class="td-row"><span class="td-row-key">Seats used</span><span class="td-row-val">${t.billing.seatsUsed}</span></div>
+        <div class="td-row"><span class="td-row-key">Renewal date</span><span class="td-row-val">${t.billing.renewalDate}</span></div>
+      </div>`;
+  } else if (_tdState.drawerTab === 'admins') {
+    tabBody = `
+      <div class="td-section">
+        <div class="td-section-title">Tenant admins (${t.admins.length})</div>
+        <div style="margin-top:6px">
+          ${t.admins.map(a => `<span class="td-admin-tag">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            ${escapeHtml(a)}
+          </span>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  const drawerEl = document.getElementById('drawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  if (!drawerEl) return;
+  drawerOverlay.classList.add('open');
+  drawerEl.classList.add('open');
+  drawerEl.innerHTML = `
+    <div class="drawer-header" style="padding:16px 20px 0">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--t1)">${escapeHtml(t.name)}</div>
+          <div style="font-size:12px;color:var(--t3);margin-top:2px">${escapeHtml(t.domain)} · ${_tdPlanPill(t.plan)}</div>
+        </div>
+        <button class="drawer-close" onclick="closeDrawer()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
+        </button>
+      </div>
+      ${tabBar}
+    </div>
+    <div class="td-drawer-body">${tabBody}</div>`;
+}
+
 /* ====================== AUDIT (full) ====================== */
 
 let auditFilters = { severity:new Set(), eventTypes:new Set(), dateRange:'30d', search:'', expanded:null };
@@ -25201,303 +25500,5 @@ window.NOTIF_DATA = [
   </div>
 </div>
 
-<script>
-/* ====================== TENANT DIRECTORY ====================== */
-
-function _tdFilteredTenants() {
-  const q = _tdState.search.toLowerCase();
-  return MOCK_TENANTS.filter(t => {
-    if (q && !t.name.toLowerCase().includes(q) && !t.domain.toLowerCase().includes(q)) return false;
-    if (_tdState.filterPlan !== 'all' && t.plan !== _tdState.filterPlan) return false;
-    if (_tdState.filterStatus !== 'all' && t.status !== _tdState.filterStatus) return false;
-    if (_tdState.filterStudio !== 'all' && !t.studios[_tdState.filterStudio]) return false;
-    return true;
-  });
-}
-
-function _tdHealthLabel(h) {
-  return { healthy: 'Active', trial: 'Trial', suspended: 'Suspended' }[h] || h;
-}
-
-function _tdStudioChips(studios) {
-  const map = { agentic: 'Agentic', governance: 'Governance', workforce: 'Workforce', data: 'Data' };
-  return Object.entries(map).map(([k, label]) =>
-    `<span class="td-studio-chip${studios[k] ? '' : ' td-studio-chip--off'}">${label}</span>`
-  ).join('');
-}
-
-function _tdPlanPill(plan) {
-  return `<span class="td-plan-pill td-plan-pill--${plan}">${plan}</span>`;
-}
-
-function renderTenantDirectory(tenantId) {
-  setActiveNav('tenants');
-  if (tenantId) {
-    const t = MOCK_TENANTS.find(x => x.id === tenantId);
-    if (t) { _tdState.drawerTenantId = tenantId; }
-  }
-
-  const all = MOCK_TENANTS;
-  const active = all.filter(t => t.status === 'active').length;
-  const trial  = all.filter(t => t.status === 'trial').length;
-  const susp   = all.filter(t => t.status === 'suspended').length;
-  const totalMrr = all.reduce((s, t) => s + t.billing.mrr, 0);
-  const filtered = _tdFilteredTenants();
-
-  const statsStrip = `
-    <div class="td-stats-strip">
-      <div class="td-stat">
-        <div class="td-stat-val">${all.length}</div>
-        <div class="td-stat-label">Total tenants</div>
-        <div class="td-stat-sub">${active} active · ${trial} trial · ${susp} suspended</div>
-      </div>
-      <div class="td-stat">
-        <div class="td-stat-val">${all.reduce((s,t)=>s+t.users,0).toLocaleString()}</div>
-        <div class="td-stat-label">Total users</div>
-        <div class="td-stat-sub">${all.reduce((s,t)=>s+t.activeUsers,0).toLocaleString()} active this month</div>
-      </div>
-      <div class="td-stat">
-        <div class="td-stat-val">$${(totalMrr/1000).toFixed(1)}k</div>
-        <div class="td-stat-label">Monthly recurring revenue</div>
-        <div class="td-stat-sub">${all.filter(t=>t.plan==='enterprise').length} enterprise accounts</div>
-      </div>
-      <div class="td-stat">
-        <div class="td-stat-val">${all.reduce((s,t)=>s+t.billing.seatsUsed,0)}<span style="font-size:14px;font-weight:400;color:var(--t3)"> / ${all.reduce((s,t)=>s+t.billing.seats,0)}</span></div>
-        <div class="td-stat-label">Seats used / provisioned</div>
-        <div class="td-stat-sub">${Math.round(all.reduce((s,t)=>s+t.billing.seatsUsed,0)/all.reduce((s,t)=>s+t.billing.seats,0)*100)}% utilization</div>
-      </div>
-    </div>`;
-
-  const filtersBar = `
-    <div class="td-filters">
-      <div class="td-search">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        <input placeholder="Search tenants…" value="${escapeHtml(_tdState.search)}" oninput="_tdState.search=this.value;renderTenantDirectory()" />
-      </div>
-      <select class="td-filter-select" onchange="_tdState.filterPlan=this.value;renderTenantDirectory()">
-        <option value="all"${_tdState.filterPlan==='all'?' selected':''}>All plans</option>
-        <option value="enterprise"${_tdState.filterPlan==='enterprise'?' selected':''}>Enterprise</option>
-        <option value="team"${_tdState.filterPlan==='team'?' selected':''}>Team</option>
-        <option value="starter"${_tdState.filterPlan==='starter'?' selected':''}>Starter</option>
-      </select>
-      <select class="td-filter-select" onchange="_tdState.filterStatus=this.value;renderTenantDirectory()">
-        <option value="all"${_tdState.filterStatus==='all'?' selected':''}>All statuses</option>
-        <option value="active"${_tdState.filterStatus==='active'?' selected':''}>Active</option>
-        <option value="trial"${_tdState.filterStatus==='trial'?' selected':''}>Trial</option>
-        <option value="suspended"${_tdState.filterStatus==='suspended'?' selected':''}>Suspended</option>
-      </select>
-      <select class="td-filter-select" onchange="_tdState.filterStudio=this.value;renderTenantDirectory()">
-        <option value="all"${_tdState.filterStudio==='all'?' selected':''}>All studios</option>
-        <option value="agentic"${_tdState.filterStudio==='agentic'?' selected':''}>Agentic</option>
-        <option value="governance"${_tdState.filterStudio==='governance'?' selected':''}>Governance</option>
-        <option value="workforce"${_tdState.filterStudio==='workforce'?' selected':''}>Workforce</option>
-        <option value="data"${_tdState.filterStudio==='data'?' selected':''}>Data</option>
-      </select>
-      <span style="font-size:12px;color:var(--t3);margin-left:auto">${filtered.length} tenant${filtered.length!==1?'s':''}</span>
-    </div>`;
-
-  const tableRows = filtered.length === 0
-    ? `<tr><td colspan="7" class="td-empty">No tenants match your filters.</td></tr>`
-    : filtered.map(t => `
-    <tr onclick="tdOpenDrawer('${t.id}')">
-      <td>
-        <div class="td-tenant-name">${escapeHtml(t.name)}</div>
-        <div class="td-tenant-domain">${escapeHtml(t.domain)}</div>
-      </td>
-      <td>${_tdPlanPill(t.plan)}</td>
-      <td>
-        <span style="display:inline-flex;align-items:center">
-          <span class="td-health-dot td-health-dot--${t.health}"></span>
-          ${_tdHealthLabel(t.health)}
-        </span>
-      </td>
-      <td>${_tdStudioChips(t.studios)}</td>
-      <td style="font-variant-numeric:tabular-nums">${t.users}<span style="color:var(--t3)"> / ${t.billing.seats}</span></td>
-      <td style="font-size:12px;color:var(--t2)">${t.billing.mrr > 0 ? '$'+t.billing.mrr.toLocaleString()+'/mo' : '—'}</td>
-      <td style="font-size:11px;color:var(--t3)">${t.lastActivity}</td>
-    </tr>`).join('');
-
-  const table = `
-    <div class="td-table-wrap">
-      <table class="td-table">
-        <thead>
-          <tr>
-            <th>Tenant</th>
-            <th>Plan</th>
-            <th>Status</th>
-            <th>Studios</th>
-            <th>Users / Seats</th>
-            <th>MRR</th>
-            <th>Last activity</th>
-          </tr>
-        </thead>
-        <tbody>${tableRows}</tbody>
-      </table>
-    </div>`;
-
-  $('content').innerHTML = `
-    <div class="td-page">
-      <div class="ns-header" style="margin-bottom:22px">
-        <div>
-          <div class="ns-header-title">Tenant Directory</div>
-          <div class="ns-header-sub">All tenants on the AIMS-OS platform — click any row to inspect its configuration.</div>
-        </div>
-      </div>
-      ${statsStrip}
-      ${filtersBar}
-      ${table}
-    </div>`;
-
-  // Re-focus search input after re-render
-  if (_tdState.search) {
-    const inp = document.querySelector('.td-search input');
-    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
-  }
-
-  // Open drawer if tenantId was passed
-  if (_tdState.drawerTenantId) {
-    setTimeout(() => tdOpenDrawer(_tdState.drawerTenantId), 0);
-  }
-}
-
-function tdOpenDrawer(tenantId) {
-  const t = MOCK_TENANTS.find(x => x.id === tenantId);
-  if (!t) return;
-  _tdState.drawerTenantId = tenantId;
-  if (!_tdState.drawerTab) _tdState.drawerTab = 'overview';
-
-  const tabs = ['overview', 'studios', 'governance', 'features', 'billing', 'admins'];
-  const tabLabels = { overview:'Overview', studios:'Studios', governance:'Governance', features:'Features & Flags', billing:'Billing', admins:'Admins' };
-
-  const tabBar = `<div class="td-drawer-tabs">
-    ${tabs.map(tab => `<button class="td-drawer-tab${_tdState.drawerTab===tab?' active':''}" onclick="_tdState.drawerTab='${tab}';tdOpenDrawer('${tenantId}')">${tabLabels[tab]}</button>`).join('')}
-  </div>`;
-
-  let tabBody = '';
-  if (_tdState.drawerTab === 'overview') {
-    const utilPct = Math.round(t.billing.seatsUsed / t.billing.seats * 100);
-    tabBody = `
-      <div class="td-section">
-        <div class="td-section-title">Tenant info</div>
-        <div class="td-row"><span class="td-row-key">Name</span><span class="td-row-val">${escapeHtml(t.name)}</span></div>
-        <div class="td-row"><span class="td-row-key">Domain</span><span class="td-row-val">${escapeHtml(t.domain)}</span></div>
-        <div class="td-row"><span class="td-row-key">Plan</span><span class="td-row-val">${_tdPlanPill(t.plan)}</span></div>
-        <div class="td-row"><span class="td-row-key">Status</span><span class="td-row-val ${t.health==='healthy'?'td-row-val--green':t.health==='suspended'?'td-row-val--red':'td-row-val--amber'}">${_tdHealthLabel(t.health)}</span></div>
-        <div class="td-row"><span class="td-row-key">Created</span><span class="td-row-val">${t.createdAt}</span></div>
-        <div class="td-row"><span class="td-row-key">Last activity</span><span class="td-row-val">${t.lastActivity}</span></div>
-      </div>
-      <div class="td-section">
-        <div class="td-section-title">Usage</div>
-        <div class="td-row"><span class="td-row-key">Total users</span><span class="td-row-val">${t.users}</span></div>
-        <div class="td-row"><span class="td-row-key">Active users</span><span class="td-row-val td-row-val--green">${t.activeUsers}</span></div>
-        <div class="td-row"><span class="td-row-key">Seats provisioned</span><span class="td-row-val">${t.billing.seats}</span></div>
-        <div class="td-row"><span class="td-row-key">Seat utilization</span>
-          <span class="td-row-val ${utilPct>90?'td-row-val--amber':''}">${utilPct}%
-            <span style="display:inline-block;width:60px;height:5px;background:var(--line);border-radius:3px;margin-left:6px;vertical-align:middle;overflow:hidden"><span style="display:block;height:100%;width:${utilPct}%;background:${utilPct>90?'#f59e0b':utilPct>70?'var(--pri)':'#22c55e'};border-radius:3px"></span></span>
-          </span>
-        </div>
-      </div>`;
-  } else if (_tdState.drawerTab === 'studios') {
-    const studioMap = [
-      { id:'agentic', label:'Agentic Studio', desc:'AI agent orchestration and workflow automation' },
-      { id:'governance', label:'Governance Studio', desc:'Policy enforcement and compliance management' },
-      { id:'workforce', label:'Workforce Studio', desc:'Human-in-the-loop task routing' },
-      { id:'data', label:'Data Studio', desc:'Data modeling, ingestion, and governed access' },
-    ];
-    tabBody = `
-      <div class="td-section">
-        <div class="td-section-title">Studio entitlements</div>
-        ${studioMap.map(s => {
-          const enabled = t.studios[s.id];
-          return `<div class="td-row" style="align-items:flex-start;padding:10px 0">
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--t1)">${s.label}</div>
-              <div style="font-size:11px;color:var(--t3);margin-top:2px">${s.desc}</div>
-            </div>
-            <span style="font-size:12px;font-weight:600;color:${enabled?'#22c55e':'var(--t3)'}">
-              ${enabled ? '✓ Enabled' : '✗ Disabled'}
-            </span>
-          </div>`;
-        }).join('')}
-      </div>`;
-  } else if (_tdState.drawerTab === 'governance') {
-    const sandboxLabels = { open:'Open (no restrictions)', scoped:'Scoped (per studio)', strict:'Strict (approval required)' };
-    tabBody = `
-      <div class="td-section">
-        <div class="td-section-title">Governance configuration</div>
-        <div class="td-row"><span class="td-row-key">Sandbox mode</span><span class="td-row-val">${sandboxLabels[t.governance.sandboxMode] || t.governance.sandboxMode}</span></div>
-        <div class="td-row"><span class="td-row-key">Truth plane</span>
-          <span class="td-row-val ${t.governance.truthPlane==='enabled'?'td-row-val--green':'td-row-val--red'}">${t.governance.truthPlane==='enabled'?'Enabled':'Disabled'}</span>
-        </div>
-        <div class="td-row"><span class="td-row-key">Human in the loop</span>
-          <span class="td-row-val ${t.governance.humanInLoop?'td-row-val--green':'td-row-val--red'}">${t.governance.humanInLoop?'Required':'Not required'}</span>
-        </div>
-        <div class="td-row"><span class="td-row-key">Audit log retention</span><span class="td-row-val">${t.governance.auditRetention} days</span></div>
-      </div>`;
-  } else if (_tdState.drawerTab === 'features') {
-    const featureMap = [
-      { id:'sso', label:'Single Sign-On (SSO)' },
-      { id:'mfa', label:'Multi-Factor Authentication' },
-      { id:'apiAccess', label:'API Access' },
-      { id:'customRoles', label:'Custom Roles' },
-      { id:'advancedAudit', label:'Advanced Audit' },
-    ];
-    tabBody = `
-      <div class="td-section">
-        <div class="td-section-title">Feature flags</div>
-        <div class="td-feat-grid">
-          ${featureMap.map(f => `
-            <div class="td-feat-item">
-              <span class="td-feat-check ${t.features[f.id]?'td-feat-check--on':'td-feat-check--off'}">${t.features[f.id]?'✓':'✗'}</span>
-              <span class="td-feat-label">${f.label}</span>
-            </div>`).join('')}
-        </div>
-      </div>`;
-  } else if (_tdState.drawerTab === 'billing') {
-    tabBody = `
-      <div class="td-section">
-        <div class="td-section-title">Billing details</div>
-        <div class="td-row"><span class="td-row-key">Plan</span><span class="td-row-val">${_tdPlanPill(t.plan)}</span></div>
-        <div class="td-row"><span class="td-row-key">Monthly revenue</span><span class="td-row-val">${t.billing.mrr > 0 ? '$' + t.billing.mrr.toLocaleString() + '/mo' : 'Trial — $0'}</span></div>
-        <div class="td-row"><span class="td-row-key">Seats provisioned</span><span class="td-row-val">${t.billing.seats}</span></div>
-        <div class="td-row"><span class="td-row-key">Seats used</span><span class="td-row-val">${t.billing.seatsUsed}</span></div>
-        <div class="td-row"><span class="td-row-key">Renewal date</span><span class="td-row-val">${t.billing.renewalDate}</span></div>
-      </div>`;
-  } else if (_tdState.drawerTab === 'admins') {
-    tabBody = `
-      <div class="td-section">
-        <div class="td-section-title">Tenant admins</div>
-        <div style="margin-top:4px">
-          ${t.admins.map(a => `<span class="td-admin-tag">
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            ${escapeHtml(a)}
-          </span>`).join('')}
-        </div>
-      </div>`;
-  }
-
-  // Render into drawer
-  const drawerOverlay = document.getElementById('drawerOverlay');
-  const drawerEl = document.getElementById('drawer');
-  if (!drawerEl) return;
-
-  drawerOverlay.classList.add('open');
-  drawerEl.classList.add('open');
-  drawerEl.innerHTML = `
-    <div class="drawer-header" style="padding:16px 20px 0">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-        <div>
-          <div style="font-size:15px;font-weight:700;color:var(--t1)">${escapeHtml(t.name)}</div>
-          <div style="font-size:12px;color:var(--t3);margin-top:2px">${escapeHtml(t.domain)} · ${_tdPlanPill(t.plan)}</div>
-        </div>
-        <button class="drawer-close" onclick="closeDrawer()">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
-        </button>
-      </div>
-      ${tabBar}
-    </div>
-    <div class="td-drawer-body">${tabBody}</div>`;
-}
-</script>
 </body>
 </html>
