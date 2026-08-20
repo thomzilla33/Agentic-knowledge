@@ -14697,31 +14697,48 @@ function renderMemberDrawer(personId) {
     'pl.audit.view':         { label:'View audit logs',      studio:'Platform',          color:'#64748b' },
   };
   const allEffectivePerms = [...new Set(memberRoles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]))];
+  const permSources = {};
+  allEffectivePerms.forEach(pid => {
+    permSources[pid] = memberRoles.filter(r => (PA_ROLE_PERMS[r.id]||new Set()).has(pid)).map(r=>r.label);
+  });
   const permsByStudio = allEffectivePerms.reduce((acc, pid) => {
     const m = PERM_META[pid]; if (!m) return acc;
     if (!acc[m.studio]) acc[m.studio] = { color: m.color, perms: [] };
-    acc[m.studio].perms.push(m.label);
+    acc[m.studio].perms.push({ pid, label: m.label });
     return acc;
   }, {});
+  const permsByStudioHTML = Object.entries(permsByStudio).map(function(entry) {
+    const studio = entry[0], color = entry[1].color, perms = entry[1].perms;
+    const permRows = perms.map(function(item) {
+      const pid = item.pid, label = item.label;
+      const src = permSources[pid] || [];
+      let srcBadge = '';
+      if (src.length === 1) {
+        srcBadge = '<span style="font-size:10px;color:var(--color-text-caption);background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:1px 5px;white-space:nowrap;flex-shrink:0">' + escapeHtml(src[0]) + '</span>';
+      } else if (src.length > 1) {
+        srcBadge = '<span style="font-size:10px;color:var(--pri);background:var(--pri-06);border:1px solid rgba(43,127,255,.2);border-radius:4px;padding:1px 5px;white-space:nowrap;flex-shrink:0">' + src.length + ' roles</span>';
+      }
+      return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
+        + '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="color:var(--badge-success);flex-shrink:0"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        + '<span style="font-size:12.5px;color:var(--color-text-title);flex:1;min-width:0">' + escapeHtml(label) + '</span>'
+        + srcBadge
+        + '<span style="font-size:11px;color:var(--color-text-caption)">Tenant</span>'
+        + '</div>';
+    }).join('');
+    return '<div style="margin-bottom:14px">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+      + '<div style="width:7px;height:7px;border-radius:50%;background:' + color + '"></div>'
+      + '<div style="font-size:11px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em">' + escapeHtml(studio) + '</div>'
+      + '<div style="font-size:11px;color:var(--color-text-caption)">· ' + perms.length + '</div>'
+      + '</div>' + permRows + '</div>';
+  }).join('');
   const permContent = `
     <div class="pa-slideout-section">
       <div class="pa-slideout-section-h">Effective permissions</div>
       ${memberRoles.length === 0
         ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:10px 0">No roles assigned — no inherited permissions. Any access comes from individual grants.</div>`
         : `<div style="font-size:12.5px;color:var(--color-text-subtitle);margin-bottom:14px;line-height:1.5">Inherited from <strong style="color:var(--color-text-title)">${memberRoles.map(r=>r.label).join(', ')}</strong>.</div>
-           ${Object.entries(permsByStudio).map(([studio, {color, perms}]) => `
-             <div style="margin-bottom:14px">
-               <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
-                 <div style="width:7px;height:7px;border-radius:50%;background:${color}"></div>
-                 <div style="font-size:11px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em">${escapeHtml(studio)}</div>
-               </div>
-               ${perms.map(perm => `
-                 <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">
-                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="color:var(--badge-success);flex-shrink:0"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                   <span style="font-size:12.5px;color:var(--color-text-title)">${escapeHtml(perm)}</span>
-                   <span style="margin-left:auto;font-size:11px;color:var(--color-text-caption)">Tenant</span>
-                 </div>`).join('')}
-             </div>`).join('')}
+           ${permsByStudioHTML}
            <div style="margin-top:4px;font-size:12px;color:var(--color-text-caption)">${allEffectivePerms.length} permissions total</div>`
       }
     </div>`;
