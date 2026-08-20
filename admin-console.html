@@ -5272,6 +5272,30 @@ html.theme-light .fs-cancel-btn:hover{
 .bl-inv-status.paid { background:rgba(16,185,129,.12); color:#10B981; }
 .bl-inv-dl { font-size:12px; color:var(--pri); cursor:pointer; text-align:right; display:block; }
 .bl-inv-dl:hover { text-decoration:underline; }
+
+/* ── Data & Privacy ─────────────────────────────── */
+.dp-retention-table { width:100%; border-collapse:collapse; }
+.dp-ret-th { padding:9px 16px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--color-text-caption); background:var(--bg2); text-align:left; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.dp-ret-tr td { padding:12px 16px; border-bottom:1px solid var(--color-border-neutral-subtle); font-size:13px; color:var(--color-text-title); vertical-align:middle; }
+.dp-ret-tr:last-child td { border-bottom:none; }
+.dp-ret-tr:hover td { background:var(--hover); }
+.dp-ret-desc { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.dp-region-row { display:flex; align-items:center; justify-content:space-between; padding:13px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.dp-region-row:last-child { border-bottom:none; }
+.dp-region-label { font-size:13px; font-weight:500; color:var(--color-text-title); }
+.dp-region-hint { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.dp-region-val { font-size:13px; font-weight:600; color:var(--color-text-title); }
+.dp-region-lock { font-size:11px; color:var(--color-text-disabled); margin-top:2px; }
+.dp-export-row { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); gap:12px; }
+.dp-export-row:last-child { border-bottom:none; }
+.dp-export-label { font-size:13px; font-weight:500; color:var(--color-text-title); }
+.dp-export-hint { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.dp-danger-row { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid rgba(239,68,68,.12); gap:12px; }
+.dp-danger-row:last-child { border-bottom:none; }
+.dp-danger-label { font-size:13px; font-weight:500; color:#EF4444; }
+.dp-danger-hint { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.dp-danger-btn { font-size:12px; font-weight:600; color:#EF4444; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:7px; padding:6px 12px; cursor:pointer; flex-shrink:0; transition:background .12s; }
+.dp-danger-btn:hover { background:rgba(239,68,68,.15); }
 /* Light-mode: slideout panel */
 html.theme-light .pa-slideout { background:rgba(255,255,255,0.98); }
 /* Light-mode switcher overrides */
@@ -11949,6 +11973,199 @@ const _gd = {
   },
 };
 
+/* ====================== DATA & PRIVACY ====================== */
+
+const _dp = {
+  retention: [
+    { label:'Audit & activity logs',   hint:'Admin actions, login events, integration changes', value:'12m' },
+    { label:'Conversation history',     hint:'Agent and workflow conversation threads',          value:'6m'  },
+    { label:'Agent outputs & artifacts',hint:'Files, reports, and structured outputs generated', value:'3m'  },
+    { label:'Model inputs (prompts)',   hint:'Prompts sent to AI models within AIMS-OS',         value:'30d' },
+    { label:'Error & debug logs',       hint:'Stack traces and diagnostic data',                 value:'14d' },
+  ],
+  privacy: {
+    usageAnalytics:  true,
+    convMetadata:    false,
+    modelImprovement:false,
+  },
+  lastExport: 'Aug 10, 2026',
+};
+
+const _dpRetOptions = [
+  { v:'7d',   l:'7 days'   },
+  { v:'14d',  l:'14 days'  },
+  { v:'30d',  l:'30 days'  },
+  { v:'3m',   l:'3 months' },
+  { v:'6m',   l:'6 months' },
+  { v:'12m',  l:'12 months'},
+  { v:'24m',  l:'24 months'},
+  { v:'forever', l:'Forever' },
+];
+
+function dpToggle(key) {
+  _dp.privacy[key] = !_dp.privacy[key];
+  const el = document.getElementById('dp-tog-' + key);
+  if (el) { el.classList.toggle('on', _dp.privacy[key]); }
+  toast('Privacy setting saved', 'success');
+}
+
+function dpRetChange(idx, val) {
+  _dp.retention[idx].value = val;
+}
+
+function dpExport() {
+  const t = document.getElementById('dp-export-toast');
+  toast('Preparing data export — you will receive an email when it\'s ready', 'info');
+  _dp.lastExport = 'Aug 19, 2026';
+  const el = document.getElementById('dp-last-export');
+  if (el) el.textContent = 'Last export: Aug 19, 2026';
+}
+
+function renderDataPrivacy() {
+  const c = $('content');
+  const r = _dp.retention;
+  const p = _dp.privacy;
+
+  function tog(key, label, hint) {
+    const on = p[key];
+    return `<div class="ns-pref-row">
+      <div>
+        <div class="ns-pref-label">${label}</div>
+        <div class="ns-pref-hint">${hint}</div>
+      </div>
+      <div class="ids-toggle ${on ? 'on' : ''}" id="dp-tog-${key}" onclick="dpToggle('${key}')" role="switch" aria-checked="${on}">
+        <div class="ids-toggle-thumb"></div>
+      </div>
+    </div>`;
+  }
+
+  function retSelect(idx, current) {
+    return `<select class="ns-select" onchange="dpRetChange(${idx},this.value)" style="width:120px">
+      ${_dpRetOptions.map(o => `<option value="${o.v}"${o.v===current?' selected':''}>${o.l}</option>`).join('')}
+    </select>`;
+  }
+
+  c.innerHTML = `
+<div class="ns-wrap">
+  <div class="ns-page-head">
+    <div>
+      <div class="ns-page-title">Data &amp; Privacy</div>
+      <div class="ns-page-sub">Retention windows, exports, and privacy controls for Contoso Ltd.</div>
+    </div>
+  </div>
+
+  <!-- Data Retention -->
+  <div class="ns-section" style="margin-bottom:20px">
+    <div class="ns-section-head">
+      <div class="ns-section-title">Data retention</div>
+      <div class="ns-section-desc">How long each data type is kept before automatic deletion. Changes apply to new data going forward.</div>
+    </div>
+    <table class="dp-retention-table">
+      <thead>
+        <tr>
+          <th class="dp-ret-th">Data type</th>
+          <th class="dp-ret-th" style="width:140px">Retention window</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${r.map((row, i) => `
+        <tr class="dp-ret-tr">
+          <td>
+            <div>${row.label}</div>
+            <div class="dp-ret-desc">${row.hint}</div>
+          </td>
+          <td>${retSelect(i, row.value)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Data Export -->
+  <div class="ns-section" style="margin-bottom:20px">
+    <div class="ns-section-head">
+      <div class="ns-section-title">Data export</div>
+      <div class="ns-section-desc">Download a full copy of your tenant's data in JSON format. Includes users, settings, audit logs, and conversation history within retention windows.</div>
+    </div>
+    <div class="dp-export-row">
+      <div>
+        <div class="dp-export-label">Export all tenant data</div>
+        <div class="dp-export-hint" id="dp-last-export">Last export: ${_dp.lastExport}</div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="dpExport()">Request export</button>
+    </div>
+    <div class="dp-export-row">
+      <div>
+        <div class="dp-export-label">Data subject request</div>
+        <div class="dp-export-hint">GDPR / CCPA — submit a request to access, correct, or delete an individual's personal data</div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="toast('Data subject request form coming soon','info')">Submit request</button>
+    </div>
+  </div>
+
+  <!-- Privacy Controls -->
+  <div class="ns-section" style="margin-bottom:20px">
+    <div class="ns-section-head">
+      <div class="ns-section-title">Privacy controls</div>
+      <div class="ns-section-desc">Control what data is shared with AIMS-OS. Changes take effect immediately.</div>
+    </div>
+    ${tog('usageAnalytics',  'Send product usage analytics', 'Aggregate feature usage, session duration, and navigation — no content')}
+    ${tog('convMetadata',    'Include conversation metadata in analytics', 'Agent IDs, token counts, and response times — no message content')}
+    ${tog('modelImprovement','Allow AIMS-OS to use anonymized data to improve models', 'Opt-in only. Data is de-identified before use. You can opt out at any time.')}
+  </div>
+
+  <!-- Data Residency -->
+  <div class="ns-section" style="margin-bottom:20px">
+    <div class="ns-section-head">
+      <div class="ns-section-title">Data residency</div>
+      <div class="ns-section-desc">Set at account creation. Contact your account manager to request a region migration.</div>
+    </div>
+    <div class="dp-region-row">
+      <div>
+        <div class="dp-region-label">Primary region</div>
+        <div class="dp-region-hint">All data is stored and processed here by default</div>
+      </div>
+      <div style="text-align:right">
+        <div class="dp-region-val">US West (Oregon)</div>
+        <div class="dp-region-lock">🔒 Locked at account creation</div>
+      </div>
+    </div>
+    <div class="dp-region-row">
+      <div>
+        <div class="dp-region-label">Backup region</div>
+        <div class="dp-region-hint">Disaster recovery replica</div>
+      </div>
+      <div style="text-align:right">
+        <div class="dp-region-val">US East (Virginia)</div>
+        <div class="dp-region-lock">🔒 Locked at account creation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="ns-section" style="border-color:rgba(239,68,68,.2);margin-bottom:20px">
+    <div class="ns-section-head" style="border-color:rgba(239,68,68,.12)">
+      <div class="ns-section-title" style="color:#EF4444">Danger zone</div>
+      <div class="ns-section-desc">These actions are irreversible. Proceed with caution.</div>
+    </div>
+    <div class="dp-danger-row">
+      <div>
+        <div class="dp-danger-label">Delete all conversation history</div>
+        <div class="dp-danger-hint">Permanently removes all agent and workflow conversation threads. Cannot be undone.</div>
+      </div>
+      <button class="dp-danger-btn" onclick="toast('This action requires confirmation from a second admin. A confirmation email has been sent.','info')">Delete history</button>
+    </div>
+    <div class="dp-danger-row">
+      <div>
+        <div class="dp-danger-label">Request workspace deletion</div>
+        <div class="dp-danger-hint">Sends a deletion request to your AIMS-OS account manager. All data will be purged within 30 days.</div>
+      </div>
+      <button class="dp-danger-btn" onclick="toast('Workspace deletion request submitted — your account manager will reach out within 48 hours','info')">Request deletion</button>
+    </div>
+  </div>
+
+</div>`;
+}
+
 function gdSave() {
   const t = document.getElementById('gd-save-toast');
   if (!t) return;
@@ -15232,7 +15449,7 @@ function route() {
   } else if (parts[0]==='governance-defaults') {
     renderGovernanceDefaults();
   } else if (parts[0]==='data-privacy') {
-    renderComingSoonSection('Data & Privacy','Data retention, export, and compliance settings.','Lock');
+    renderDataPrivacy();
   } else if (parts[0]==='notifications') {
     renderNotifications();
   } else {
