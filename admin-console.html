@@ -5198,6 +5198,48 @@ html.theme-light .fs-cancel-btn:hover{
 .cw-new-btn { display:flex; align-items:center; gap:6px; width:100%; padding:8px 12px; background:transparent; border:1px dashed var(--color-border-neutral-default); border-radius:8px; font-size:12px; font-weight:600; color:var(--pri); cursor:pointer; transition:border-color .12s,background .12s; }
 .cw-new-btn:hover { border-color:var(--pri); background:var(--pri-12); }
 .cw-new-btn:disabled { color:var(--color-text-disabled); border-color:var(--line); cursor:not-allowed; background:transparent; }
+/* ── Notifications Settings ─────────────────────────────── */
+.ns-wrap { max-width:820px; padding:28px 32px 64px; }
+.ns-page-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; gap:16px; }
+.ns-page-title { font-size:18px; font-weight:700; color:var(--color-text-title); }
+.ns-page-sub { font-size:13px; color:var(--color-text-caption); margin-top:4px; }
+.ns-section { background:var(--surface); border:1px solid var(--color-border-neutral-subtle); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.ns-section-head { padding:16px 20px 14px; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.ns-section-title { font-size:12px; font-weight:700; color:var(--color-text-caption); text-transform:uppercase; letter-spacing:.06em; }
+.ns-section-desc { font-size:12px; color:var(--color-text-caption); margin-top:3px; }
+.ns-channel-row { display:flex; align-items:center; gap:14px; padding:14px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.ns-channel-row:last-child { border-bottom:none; }
+.ns-channel-ico { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ns-channel-info { flex:1; min-width:0; }
+.ns-channel-name { font-size:13px; font-weight:600; color:var(--color-text-title); }
+.ns-channel-hint { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.ns-channel-action { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.ns-connect-btn { font-size:12px; font-weight:600; color:var(--pri); background:var(--pri-12); border:1px solid var(--color-border-primary-default); border-radius:7px; padding:5px 11px; cursor:pointer; display:flex; align-items:center; gap:5px; transition:background .12s; }
+.ns-connect-btn:hover { background:var(--pri-20,rgba(99,102,241,.2)); }
+.ns-ch-input { height:32px; padding:0 10px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:7px; font-size:12px; color:var(--color-text-title); outline:none; width:160px; box-sizing:border-box; }
+.ns-ch-input:focus { border-color:var(--color-border-primary-default); }
+/* Rules matrix */
+.ns-rules-table { width:100%; border-collapse:collapse; }
+.ns-rules-th { padding:10px 16px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--color-text-caption); background:var(--bg2); text-align:left; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.ns-rules-th:not(:first-child) { text-align:center; width:80px; }
+.ns-rules-cat { padding:10px 20px 6px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--color-text-disabled); background:var(--bg2); border-bottom:1px solid var(--color-border-neutral-subtle); }
+.ns-rules-tr td { padding:11px 16px; border-bottom:1px solid var(--color-border-neutral-subtle); vertical-align:middle; }
+.ns-rules-tr:last-child td { border-bottom:none; }
+.ns-rules-tr:hover td { background:var(--hover); }
+.ns-rules-event { font-size:13px; font-weight:500; color:var(--color-text-title); }
+.ns-rules-sub { font-size:11.5px; color:var(--color-text-caption); margin-top:2px; }
+.ns-rules-cell { text-align:center; }
+.ns-check { width:18px; height:18px; border-radius:5px; border:1.5px solid var(--color-border-neutral-default); background:transparent; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:background .12s,border-color .12s; flex-shrink:0; }
+.ns-check.on { background:var(--pri); border-color:var(--pri); }
+/* Digest row */
+.ns-pref-row { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--color-border-neutral-subtle); gap:16px; }
+.ns-pref-row:last-child { border-bottom:none; }
+.ns-pref-label { font-size:13px; font-weight:500; color:var(--color-text-title); }
+.ns-pref-hint { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
+.ns-select { height:32px; padding:0 28px 0 10px; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:7px; font-size:12px; color:var(--color-text-title); outline:none; appearance:none; -webkit-appearance:none; cursor:pointer; box-sizing:border-box; background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 9px center; }
+.ns-select:focus { border-color:var(--color-border-primary-default); }
+.ns-save-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); background:var(--color-bg-success-default,#0f7b55); color:#fff; font-size:13px; font-weight:600; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity .2s,transform .2s; pointer-events:none; z-index:9000; }
+.ns-save-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 /* Light-mode: slideout panel */
 html.theme-light .pa-slideout { background:rgba(255,255,255,0.98); }
 /* Light-mode switcher overrides */
@@ -11634,6 +11676,216 @@ function acSend() {
   }, 750 + Math.random() * 500);
 }
 
+/* ── Notifications Settings state ── */
+const _ns = {
+  channels: {
+    inapp:   { enabled: true,  label: 'In-app',  hint: 'Shown in the notification panel inside AIMS-OS' },
+    email:   { enabled: true,  label: 'Email',   hint: 'Sent to thomas.gonzalez@aimsos.ai' },
+    slack:   { enabled: false, label: 'Slack',   hint: 'Not connected', connected: false, channel: '' },
+    webhook: { enabled: false, label: 'Webhook', hint: 'POST JSON payloads to your endpoint', url: '' },
+  },
+  rules: [
+    { cat:'Agent events',      id:'agent-fail',    event:'Agent failure',          sub:'Worker or network crashes or exceeds retry limit',    inapp:true,  email:true,  slack:false },
+    { cat:'Agent events',      id:'agent-done',    event:'Agent task complete',     sub:'Long-running agent finishes successfully',            inapp:true,  email:false, slack:false },
+    { cat:'Agent events',      id:'agent-approve', event:'Human approval required', sub:'Workflow paused at a Human-in-the-Loop gate',         inapp:true,  email:true,  slack:true  },
+    { cat:'Governance events', id:'gov-approve',   event:'Approval request',        sub:'Promotion packet or policy change needs your review',  inapp:true,  email:true,  slack:false },
+    { cat:'Governance events', id:'gov-breach',    event:'Policy breach detected',  sub:'An agent or workflow violated a governance rule',      inapp:true,  email:true,  slack:true  },
+    { cat:'Security events',   id:'sec-cert',      event:'Certificate expiring',    sub:'SSO or TLS certificate expires within 7 days',         inapp:true,  email:true,  slack:false },
+    { cat:'Security events',   id:'sec-auth',      event:'Unauthorized access',     sub:'Login attempt from unknown IP or failed MFA',          inapp:true,  email:true,  slack:true  },
+    { cat:'Data events',       id:'data-drift',    event:'Schema drift detected',   sub:'Source schema changed from last ingestion',            inapp:true,  email:false, slack:false },
+    { cat:'Data events',       id:'data-quality',  event:'Data quality alert',      sub:'Field quality score dropped below threshold',          inapp:true,  email:false, slack:false },
+    { cat:'System events',     id:'sys-update',    event:'Platform updated',        sub:'New version of AIMS-OS deployed to your tenant',       inapp:true,  email:false, slack:false },
+    { cat:'System events',     id:'sys-billing',   event:'Billing action required', sub:'Invoice due, payment method expiring, or seat limit',  inapp:true,  email:true,  slack:false },
+  ],
+  digest: 'realtime',
+  quietHours: { enabled: false, from: '22:00', to: '08:00' },
+  tz: 'America/Mexico_City',
+};
+
+function nsToggleChannel(id) {
+  _ns.channels[id].enabled = !_ns.channels[id].enabled;
+  renderNotifications();
+}
+function nsToggleRule(id, col) {
+  const r = _ns.rules.find(r => r.id === id);
+  if (r) { r[col] = !r[col]; _cwRenderRuleRow(id); }
+}
+function _cwRenderRuleRow(id) {
+  ['inapp','email','slack'].forEach(col => {
+    const el = document.getElementById(`nsr-${id}-${col}`);
+    if (!el) return;
+    const r = _ns.rules.find(r => r.id === id);
+    el.className = 'ns-check' + (r[col] ? ' on' : '');
+    el.innerHTML = r[col] ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
+  });
+}
+function nsToggleQuiet() {
+  _ns.quietHours.enabled = !_ns.quietHours.enabled;
+  const row = document.getElementById('ns-quiet-extra');
+  if (row) row.style.display = _ns.quietHours.enabled ? 'flex' : 'none';
+}
+function nsSave() {
+  const t = document.getElementById('ns-save-toast');
+  if (!t) return;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function renderNotifications() {
+  const cats = [...new Set(_ns.rules.map(r => r.cat))];
+  const ch = _ns.channels;
+
+  const channelIcos = {
+    inapp:   { bg:'rgba(99,102,241,.12)', border:'rgba(99,102,241,.25)', color:'#818CF8', svg:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>` },
+    email:   { bg:'rgba(6,182,212,.12)',  border:'rgba(6,182,212,.25)',  color:'#22D3EE', svg:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>` },
+    slack:   { bg:'rgba(236,72,153,.12)', border:'rgba(236,72,153,.25)', color:'#F472B6', svg:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>` },
+    webhook: { bg:'rgba(245,158,11,.12)', border:'rgba(245,158,11,.25)', color:'#FCD34D', svg:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>` },
+  };
+
+  $('content').innerHTML = `
+    <div class="ns-wrap">
+      <div class="ns-page-head">
+        <div>
+          <div class="ns-page-title">Notifications</div>
+          <div class="ns-page-sub">Configure where and when you receive alerts from AIMS-OS.</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="nsSave()">Save changes</button>
+      </div>
+
+      <!-- Delivery Channels -->
+      <div class="ns-section">
+        <div class="ns-section-head">
+          <div class="ns-section-title">Delivery channels</div>
+          <div class="ns-section-desc">Choose how you receive notifications. At least one channel must stay on.</div>
+        </div>
+        ${Object.entries(ch).map(([id, c]) => {
+          const ico = channelIcos[id];
+          return `<div class="ns-channel-row">
+            <div class="ns-channel-ico" style="background:${ico.bg};border:1px solid ${ico.border};color:${ico.color}">${ico.svg}</div>
+            <div class="ns-channel-info">
+              <div class="ns-channel-name">${c.label}</div>
+              <div class="ns-channel-hint">${
+                id === 'slack' && !c.connected ? 'Not connected — connect to enable' :
+                id === 'webhook' ? (c.url || 'No endpoint configured') :
+                c.hint
+              }</div>
+            </div>
+            <div class="ns-channel-action">
+              ${id === 'slack' && !c.connected
+                ? `<button class="ns-connect-btn" onclick="toast('Slack OAuth — connect via Integrations &amp; Credentials','info')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Connect Slack
+                  </button>`
+                : id === 'webhook'
+                ? `<input class="ns-ch-input" placeholder="https://your-endpoint/hook" value="${c.url}" oninput="_ns.channels.webhook.url=this.value" style="margin-right:6px">`
+                : ''
+              }
+              <label class="ids-toggle">
+                <input type="checkbox" ${c.enabled ? 'checked' : ''} onchange="nsToggleChannel('${id}')">
+                <span class="ids-toggle-track"></span>
+                <span class="ids-toggle-thumb"></span>
+              </label>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <!-- Notification Rules -->
+      <div class="ns-section">
+        <div class="ns-section-head">
+          <div class="ns-section-title">Notification rules</div>
+          <div class="ns-section-desc">Choose which events notify you, and on which channels.</div>
+        </div>
+        <table class="ns-rules-table">
+          <thead>
+            <tr>
+              <th class="ns-rules-th">Event</th>
+              <th class="ns-rules-th">In-app</th>
+              <th class="ns-rules-th">Email</th>
+              <th class="ns-rules-th">Slack</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cats.map(cat => {
+              const rows = _ns.rules.filter(r => r.cat === cat);
+              return `<tr><td colspan="4" class="ns-rules-cat">${cat}</td></tr>` +
+                rows.map(r => `<tr class="ns-rules-tr">
+                  <td>
+                    <div class="ns-rules-event">${r.event}</div>
+                    <div class="ns-rules-sub">${r.sub}</div>
+                  </td>
+                  ${['inapp','email','slack'].map(col => `
+                  <td class="ns-rules-cell">
+                    <button id="nsr-${r.id}-${col}" class="ns-check${r[col] ? ' on' : ''}"
+                      onclick="nsToggleRule('${r.id}','${col}')" title="${r.event} via ${col}">
+                      ${r[col] ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+                    </button>
+                  </td>`).join('')}
+                </tr>`).join('');
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Digest & Quiet Hours -->
+      <div class="ns-section">
+        <div class="ns-section-head">
+          <div class="ns-section-title">Digest &amp; quiet hours</div>
+          <div class="ns-section-desc">Control delivery frequency and silence notifications when you're off the clock.</div>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Email digest frequency</div>
+            <div class="ns-pref-hint">How often email notifications are batched and sent</div>
+          </div>
+          <select class="ns-select" onchange="_ns.digest=this.value">
+            <option value="realtime" ${_ns.digest==='realtime'?'selected':''}>Real-time (immediate)</option>
+            <option value="hourly"   ${_ns.digest==='hourly'  ?'selected':''}>Hourly digest</option>
+            <option value="daily"    ${_ns.digest==='daily'   ?'selected':''}>Daily digest (9 AM)</option>
+            <option value="weekly"   ${_ns.digest==='weekly'  ?'selected':''}>Weekly digest (Monday)</option>
+          </select>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Quiet hours</div>
+            <div class="ns-pref-hint">Suppress non-critical notifications during these hours</div>
+          </div>
+          <label class="ids-toggle">
+            <input type="checkbox" ${_ns.quietHours.enabled ? 'checked' : ''} onchange="nsToggleQuiet()">
+            <span class="ids-toggle-track"></span>
+            <span class="ids-toggle-thumb"></span>
+          </label>
+        </div>
+        <div id="ns-quiet-extra" class="ns-pref-row" style="display:${_ns.quietHours.enabled?'flex':'none'};background:var(--bg2);gap:24px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;color:var(--color-text-caption);min-width:32px">From</span>
+            <input type="time" class="ns-ch-input" value="${_ns.quietHours.from}" onchange="_ns.quietHours.from=this.value" style="width:110px">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;color:var(--color-text-caption);min-width:16px">To</span>
+            <input type="time" class="ns-ch-input" value="${_ns.quietHours.to}" onchange="_ns.quietHours.to=this.value" style="width:110px">
+          </div>
+        </div>
+        <div class="ns-pref-row">
+          <div>
+            <div class="ns-pref-label">Timezone</div>
+            <div class="ns-pref-hint">Used for digest scheduling and quiet hours</div>
+          </div>
+          <select class="ns-select" onchange="_ns.tz=this.value" style="width:220px">
+            <option value="America/Mexico_City" ${_ns.tz==='America/Mexico_City'?'selected':''}>America/Mexico City (UTC-6)</option>
+            <option value="America/New_York"    ${_ns.tz==='America/New_York'   ?'selected':''}>America/New York (UTC-5)</option>
+            <option value="America/Los_Angeles" ${_ns.tz==='America/Los_Angeles'?'selected':''}>America/Los Angeles (UTC-8)</option>
+            <option value="Europe/London"       ${_ns.tz==='Europe/London'      ?'selected':''}>Europe/London (UTC+0)</option>
+            <option value="Europe/Madrid"       ${_ns.tz==='Europe/Madrid'      ?'selected':''}>Europe/Madrid (UTC+1)</option>
+            <option value="UTC"                 ${_ns.tz==='UTC'                ?'selected':''}>UTC</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="ns-save-toast" class="ns-save-toast">Changes saved</div>
+  `;
+}
+
 function renderComingSoonSection(title, desc, icon) {
   $('content').innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:16px;text-align:center;padding:40px">
@@ -14541,7 +14793,7 @@ function route() {
   } else if (parts[0]==='data-privacy') {
     renderComingSoonSection('Data & Privacy','Data retention, export, and compliance settings.','Lock');
   } else if (parts[0]==='notifications') {
-    renderComingSoonSection('Notifications','Alert channels, rules, and delivery preferences.','Bell');
+    renderNotifications();
   } else {
     renderHome();
   }
