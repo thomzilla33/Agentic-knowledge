@@ -18734,7 +18734,8 @@ function route() {
     'billing':'billing',
     'governance-defaults':'governance-defaults',
     'data-privacy':'data-privacy',
-    'notifications':'notifications'
+    'notifications':'notifications',
+    'tenants':'tenants'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -22872,7 +22873,6 @@ function _tdPlanPill(plan) {
 }
 
 function renderTenantDirectory(tenantId) {
-  setActiveNav('tenants');
   if (tenantId) {
     const t = MOCK_TENANTS.find(x => x.id === tenantId);
     if (t) _tdState.drawerTenantId = tenantId;
