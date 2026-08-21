@@ -12994,6 +12994,9 @@ const AC_SECTIONS = [
     { id:'notifications',       roles:['super-admin'],                              name:'Notifications',              desc:'Alert channels, rules, and delivery preferences',   state:'active', route:'notifications' },
     { id:'audit',               roles:['super-admin','regional-admin','tenant-admin'], name:'Audit & Compliance',      desc:'Activity logs and compliance reporting',            state:'active', route:'audit' },
   ]},
+  { group:'Super Admin', roles:['super-admin','regional-admin'], items:[
+    { id:'tenants', roles:['super-admin','regional-admin'], name:'Tenant Directory', desc:'View and manage all organizations on the platform', state:'active', route:'tenants' },
+  ]},
 ];
 
 const AC_ALERTS = [
