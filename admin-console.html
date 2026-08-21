@@ -7705,6 +7705,8 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .ds-btn--tertiary { background:transparent; color:var(--btn-tertiary-fg); }
 .ds-btn--tertiary:hover { background:var(--btn-tertiary-hover-bg); }
 .ds-btn--tertiary:active { background:var(--btn-tertiary-active-bg); }
+.ds-btn--danger { background:var(--status-error-bg); color:var(--red); border-color:rgba(239,68,68,.2); }
+.ds-btn--danger:hover { background:rgba(239,68,68,.15); }
 .ds-btn--warning { background:var(--btn-warning-bg); color:#fff; }
 .ds-btn--warning:hover { background:var(--btn-warning-hover-bg); }
 .ds-btn--warning:active { background:var(--btn-warning-active-bg); }
@@ -10425,7 +10427,6 @@ let _tdState = {
   filterPlan: 'all',
   filterStatus: 'all',
   filterStudio: 'all',
-  drawerTenantId: null,
   drawerTab: 'overview'
 };
 
@@ -22315,7 +22316,7 @@ function closeDrawer() {
   state.drawerOpen = false;
   $('drawerOverlay').classList.remove('open');
   $('drawer').classList.remove('open');
-  if (typeof _tdState !== 'undefined') _tdState.drawerTenantId = null;
+  if (typeof _tdState !== 'undefined') _tdState.drawerTab = 'overview';
 }
 
 
@@ -22875,7 +22876,7 @@ function _tdPlanPill(plan) {
 function renderTenantDirectory(tenantId) {
   if (tenantId) {
     const t = MOCK_TENANTS.find(x => x.id === tenantId);
-    if (t) _tdState.drawerTenantId = tenantId;
+    if (t) { renderTenantDetail(t); return; }
   }
 
   const all = MOCK_TENANTS;
@@ -22908,7 +22909,7 @@ function renderTenantDirectory(tenantId) {
     const healthDot = { healthy:'#22c55e', trial:'#f59e0b', suspended:'#ef4444' }[t.health] || 'var(--t3)';
     const statusLabel = _tdHealthLabel(t.health);
     const statusTone = { healthy:'ok', trial:'warn', suspended:'idle' }[t.health] || 'idle';
-    return `<div class="op-row" onclick="tdOpenDrawer('${t.id}')" style="cursor:pointer">
+    return `<div class="op-row" onclick="navigate('#/tenants/${t.id}')" style="cursor:pointer">
       <div class="op-row-main" style="flex:1;gap:14px">
         <!-- Logo placeholder -->
         <div style="width:36px;height:36px;border-radius:9px;background:var(--canvas);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:var(--pri)">
@@ -23017,13 +23018,101 @@ function renderTenantDirectory(tenantId) {
     const inp = document.querySelector('.td-search input');
     if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
   }
-  if (_tdState.drawerTenantId) setTimeout(() => tdOpenDrawer(_tdState.drawerTenantId), 0);
 }
 
-function tdOpenDrawer(tenantId) {
+// ── Tenant action helpers ────────────────────────────────────────────────────
+
+function tdToggleStudio(tenantId, studioId) {
   const t = MOCK_TENANTS.find(x => x.id === tenantId);
   if (!t) return;
-  _tdState.drawerTenantId = tenantId;
+  t.studios[studioId] = !t.studios[studioId];
+  const label = { agentic:'Agentic Studio', governance:'Governance Studio', workforce:'Workforce Studio', data:'Data Studio' }[studioId] || studioId;
+  toast(`${label} ${t.studios[studioId] ? 'enabled' : 'disabled'} for ${t.name}`, t.studios[studioId] ? 'success' : 'info');
+  _tdState.drawerTab = 'studios';
+  renderTenantDetail(t);
+}
+
+function tdToggleFeature(tenantId, featureId) {
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t) return;
+  t.features[featureId] = !t.features[featureId];
+  const label = { sso:'SSO', mfa:'MFA', apiAccess:'API Access', customRoles:'Custom Roles', advancedAudit:'Advanced Audit' }[featureId] || featureId;
+  toast(`${label} ${t.features[featureId] ? 'enabled' : 'disabled'}`, t.features[featureId] ? 'success' : 'info');
+  _tdState.drawerTab = 'features';
+  renderTenantDetail(t);
+}
+
+function tdSetGovernance(tenantId, field, value) {
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t) return;
+  if (field === 'sandboxMode') t.governance.sandboxMode = value;
+  else if (field === 'truthPlane') t.governance.truthPlane = t.governance.truthPlane === 'enabled' ? 'disabled' : 'enabled';
+  else if (field === 'humanInLoop') t.governance.humanInLoop = !t.governance.humanInLoop;
+  else if (field === 'auditRetention') t.governance.auditRetention = parseInt(value) || t.governance.auditRetention;
+  toast('Governance settings saved', 'success');
+  _tdState.drawerTab = 'governance';
+  renderTenantDetail(t);
+}
+
+function tdSuspendTenant(tenantId) {
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t) return;
+  if (t.health === 'suspended') {
+    t.health = 'healthy'; t.status = 'active';
+    toast(`${t.name} reinstated`, 'success');
+  } else {
+    t.health = 'suspended'; t.status = 'suspended';
+    toast(`${t.name} suspended`, 'info');
+  }
+  _tdState.drawerTab = 'overview';
+  renderTenantDetail(t);
+}
+
+function tdChangePlan(tenantId, plan) {
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t || !plan || plan === t.plan) return;
+  t.plan = plan;
+  toast(`Plan changed to ${plan.charAt(0).toUpperCase()+plan.slice(1)}`, 'success');
+  _tdState.drawerTab = 'billing';
+  renderTenantDetail(t);
+}
+
+function tdAdjustSeats(tenantId, delta) {
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t) return;
+  const newVal = Math.max(t.billing.seatsUsed, t.billing.seats + delta);
+  t.billing.seats = newVal;
+  toast(`Seats updated to ${newVal}`, 'success');
+  _tdState.drawerTab = 'billing';
+  renderTenantDetail(t);
+}
+
+function tdRemoveAdmin(tenantId, email) {
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t || t.admins.length <= 1) { toast('At least one admin is required', 'error'); return; }
+  t.admins = t.admins.filter(a => a !== email);
+  toast(`${email} removed as admin`, 'info');
+  _tdState.drawerTab = 'admins';
+  renderTenantDetail(t);
+}
+
+function tdAddAdmin(tenantId) {
+  const email = prompt('Enter admin email:');
+  if (!email || !email.includes('@')) return;
+  const t = MOCK_TENANTS.find(x => x.id === tenantId);
+  if (!t) return;
+  if (t.admins.includes(email)) { toast('Already an admin', 'error'); return; }
+  t.admins.push(email);
+  toast(`${email} added as admin`, 'success');
+  _tdState.drawerTab = 'admins';
+  renderTenantDetail(t);
+}
+
+// ── Tenant detail — full-page internal view ──────────────────────────────────
+
+function renderTenantDetail(tOrId) {
+  const t = typeof tOrId === 'string' ? MOCK_TENANTS.find(x => x.id === tOrId) : tOrId;
+  if (!t) { navigate('#/tenants'); return; }
   if (!_tdState.drawerTab) _tdState.drawerTab = 'overview';
 
   const tabs = [
@@ -23032,24 +23121,52 @@ function tdOpenDrawer(tenantId) {
     { id:'governance',  label:'Governance' },
     { id:'features',    label:'Features' },
     { id:'billing',     label:'Billing' },
-    { id:'admins',      label:'Admins' },
+    { id:'admins',      label:`Admins (${t.admins.length})` },
   ];
 
+  // ── Shared helpers ──
   function row(key, val, accent) {
-    const valClass = accent === 'green' ? 'td-row-val--green' : accent === 'red' ? 'td-row-val--red' : accent === 'amber' ? 'td-row-val--amber' : '';
-    return `<div class="td-row"><span class="td-row-key">${key}</span><span class="td-row-val ${valClass}">${val}</span></div>`;
+    const cls = accent==='green'?'td-row-val--green':accent==='red'?'td-row-val--red':accent==='amber'?'td-row-val--amber':'';
+    return `<div class="td-row"><span class="td-row-key">${key}</span><span class="td-row-val ${cls}">${val}</span></div>`;
+  }
+  function section(title, body, action) {
+    const hdr = action
+      ? `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="td-section-title" style="margin-bottom:0">${title}</div>${action}</div>`
+      : `<div class="td-section-title">${title}</div>`;
+    return `<div class="td-section">${hdr}${body}</div>`;
+  }
+  function toggle(on, onclick) {
+    return `<button onclick="${onclick}" aria-pressed="${on}"
+      style="flex-shrink:0;width:38px;height:22px;border-radius:11px;background:${on?'var(--pri)':'var(--line)'};border:none;cursor:pointer;position:relative;transition:background .15s">
+      <span style="position:absolute;top:3px;${on?'right':'left'}:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:right .15s,left .15s"></span>
+    </button>`;
   }
 
-  function section(title, body) {
-    return `<div class="td-section"><div class="td-section-title">${title}</div>${body}</div>`;
-  }
-
+  // ── Tab bodies ──
   let tabBody = '';
+
   if (_tdState.drawerTab === 'overview') {
     const utilPct = Math.round(t.billing.seatsUsed / t.billing.seats * 100);
     const barColor = utilPct > 90 ? '#f59e0b' : utilPct > 70 ? 'var(--pri)' : '#22c55e';
-    const utilAccent = utilPct > 90 ? 'amber' : '';
+    const isSuspended = t.health === 'suspended';
+
     tabBody =
+      // Quick actions strip
+      `<div style="display:flex;gap:8px;padding:16px 0 4px;flex-wrap:wrap">
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Viewing ${escapeHtml(t.name)} as tenant admin…','info')">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5"/><circle cx="8" cy="8" r="2"/></svg>
+          View as tenant
+        </button>
+        <button class="ds-btn ds-btn-sm ${isSuspended?'ds-btn--primary':'ds-btn--secondary'}" onclick="tdSuspendTenant('${t.id}')">
+          ${isSuspended
+            ? `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8h8"/><circle cx="8" cy="8" r="6"/></svg> Reinstate`
+            : `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="3" width="3" height="10" rx="1"/><rect x="9" y="3" width="3" height="10" rx="1"/></svg> Suspend`}
+        </button>
+        <button class="ds-btn ds-btn-sm ds-btn--danger" style="margin-left:auto" onclick="toast('Delete requires confirmation — contact platform team','error')">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2"/><path d="M5 4l.5 9h5l.5-9"/></svg>
+          Delete tenant
+        </button>
+      </div>` +
       section('Tenant info', [
         row('Name', escapeHtml(t.name)),
         row('Domain', `<code style="font-size:11px;background:var(--bg2);padding:2px 6px;border-radius:4px">${escapeHtml(t.domain)}</code>`),
@@ -23065,7 +23182,7 @@ function tdOpenDrawer(tenantId) {
         row('Seats provisioned', String(t.billing.seats)),
         row('Seats used', String(t.billing.seatsUsed)),
         `<div class="td-row"><span class="td-row-key">Seat utilization</span>
-          <span class="td-row-val ${utilAccent?'td-row-val--amber':''}" style="display:flex;align-items:center;gap:8px">
+          <span class="td-row-val ${utilPct>90?'td-row-val--amber':''}" style="display:flex;align-items:center;gap:8px">
             ${utilPct}%
             <span style="display:inline-block;width:80px;height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex-shrink:0">
               <span style="display:block;height:100%;width:${utilPct}%;background:${barColor};border-radius:3px"></span>
@@ -23081,141 +23198,208 @@ function tdOpenDrawer(tenantId) {
       { id:'workforce',  label:'Workforce Studio',   desc:'Human-in-the-loop task routing and assignments' },
       { id:'data',       label:'Data Studio',        desc:'Data modeling, ingestion, and governed access' },
     ];
-    tabBody = section('Studio entitlements',
+    const enabledCount = studioMap.filter(s => t.studios[s.id]).length;
+    tabBody = section(`Studio entitlements — ${enabledCount} of ${studioMap.length} enabled`,
       studioMap.map(s => {
         const on = t.studios[s.id];
-        return `<div class="td-row" style="align-items:flex-start;padding:12px 0">
+        return `<div class="td-row" style="padding:14px 0;align-items:center">
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:600;color:var(--t1)">${s.label}</div>
             <div style="font-size:11px;color:var(--t3);margin-top:2px">${s.desc}</div>
           </div>
-          <span style="font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0;color:${on?'#22c55e':'var(--t3)'}">
-            ${on
-              ? `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M3 8l4 4 6-6" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Enabled`
-              : `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:3px"><line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Disabled`}
-          </span>
+          ${toggle(on, `tdToggleStudio('${t.id}','${s.id}')`)}
         </div>`;
       }).join('')
     );
 
   } else if (_tdState.drawerTab === 'governance') {
-    const sandboxLabels = { open:'Open — no restrictions', scoped:'Scoped — per studio', strict:'Strict — approval required' };
-    const sbColor = { open:'var(--t2)', scoped:'var(--pri)', strict:'#f59e0b' }[t.governance.sandboxMode] || 'var(--t2)';
-    tabBody = section('Governance configuration', [
-      `<div class="td-row"><span class="td-row-key">Sandbox mode</span>
-        <span class="td-row-val" style="color:${sbColor};font-weight:500">${sandboxLabels[t.governance.sandboxMode]||t.governance.sandboxMode}</span>
-       </div>`,
-      row('Truth Plane', t.governance.truthPlane==='enabled'?'Enabled':'Disabled', t.governance.truthPlane==='enabled'?'green':'red'),
-      row('Human in the Loop', t.governance.humanInLoop?'Required':'Not required', t.governance.humanInLoop?'green':'red'),
-      row('Audit log retention', `${t.governance.auditRetention} days`),
-    ].join(''));
+    const sandboxOpts = [
+      { value:'open',   label:'Open',   desc:'No restrictions' },
+      { value:'scoped', label:'Scoped', desc:'Per studio' },
+      { value:'strict', label:'Strict', desc:'Approval required' },
+    ];
+    tabBody =
+      section('Sandbox mode',
+        `<div style="display:flex;gap:8px;margin-top:2px;flex-wrap:wrap">
+          ${sandboxOpts.map(o => `
+            <button onclick="tdSetGovernance('${t.id}','sandboxMode','${o.value}')"
+              class="ds-btn ds-btn-sm ${t.governance.sandboxMode===o.value?'ds-btn--primary':'ds-btn--secondary'}">
+              ${o.label}
+              <span style="font-size:10px;color:${t.governance.sandboxMode===o.value?'rgba(255,255,255,.7)':'var(--t3)'}"> — ${o.desc}</span>
+            </button>`).join('')}
+        </div>`
+      ) +
+      section('Controls',
+        [
+          `<div class="td-row" style="padding:12px 0;align-items:center">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--t1)">Truth Plane</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">Enforces governed data sources for this tenant</div>
+            </div>
+            ${toggle(t.governance.truthPlane==='enabled', `tdSetGovernance('${t.id}','truthPlane')`)}
+          </div>`,
+          `<div class="td-row" style="padding:12px 0;align-items:center">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--t1)">Human in the Loop</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">Requires human approval before agent actions execute</div>
+            </div>
+            ${toggle(t.governance.humanInLoop, `tdSetGovernance('${t.id}','humanInLoop')`)}
+          </div>`,
+          `<div class="td-row" style="padding:12px 0;align-items:center">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--t1)">Audit log retention</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">Days to retain full event logs</div>
+            </div>
+            <select onchange="tdSetGovernance('${t.id}','auditRetention',this.value)"
+              style="font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);color:var(--t1);cursor:pointer;font-family:inherit">
+              ${[30,60,90,180,365].map(d => `<option value="${d}" ${t.governance.auditRetention===d?'selected':''}>${d} days</option>`).join('')}
+            </select>
+          </div>`,
+        ].join('')
+      );
 
   } else if (_tdState.drawerTab === 'features') {
     const featureMap = [
-      { id:'sso',           label:'Single Sign-On (SSO)',     desc:'SAML/OIDC identity provider integration' },
-      { id:'mfa',           label:'Multi-Factor Auth',         desc:'TOTP, SMS, or hardware key enforcement' },
-      { id:'apiAccess',     label:'API Access',                desc:'REST and GraphQL endpoints for this tenant' },
-      { id:'customRoles',   label:'Custom Roles',              desc:'Tenant-defined roles beyond system defaults' },
-      { id:'advancedAudit', label:'Advanced Audit',            desc:'Full event log with export and retention controls' },
+      { id:'sso',           label:'Single Sign-On',   desc:'SAML/OIDC identity provider integration' },
+      { id:'mfa',           label:'Multi-Factor Auth', desc:'TOTP, SMS, or hardware key enforcement' },
+      { id:'apiAccess',     label:'API Access',         desc:'REST and GraphQL endpoints for this tenant' },
+      { id:'customRoles',   label:'Custom Roles',       desc:'Tenant-defined roles beyond system defaults' },
+      { id:'advancedAudit', label:'Advanced Audit',     desc:'Full event log with export and retention controls' },
     ];
     tabBody = section('Feature flags',
       featureMap.map(f => {
         const on = t.features[f.id];
-        return `<div class="td-row" style="align-items:flex-start;padding:11px 0">
+        return `<div class="td-row" style="padding:14px 0;align-items:center">
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:600;color:var(--t1)">${f.label}</div>
             <div style="font-size:11px;color:var(--t3);margin-top:2px">${f.desc}</div>
           </div>
-          <div style="flex-shrink:0;width:36px;height:20px;border-radius:10px;background:${on?'var(--pri)':'var(--line)'};position:relative;margin-top:2px">
-            <div style="position:absolute;top:3px;${on?'right':'left'}:3px;width:14px;height:14px;border-radius:50%;background:#fff"></div>
-          </div>
+          ${toggle(on, `tdToggleFeature('${t.id}','${f.id}')`)}
         </div>`;
       }).join('')
     );
 
   } else if (_tdState.drawerTab === 'billing') {
-    const utilPct2 = Math.round(t.billing.seatsUsed/t.billing.seats*100);
+    const utilPct2 = Math.round(t.billing.seatsUsed / t.billing.seats * 100);
+    const plans = ['starter','team','enterprise'];
     tabBody =
-      section('Subscription', [
-        row('Plan', _tdPlanPill(t.plan)),
-        row('Monthly revenue', t.billing.mrr>0 ? `<strong>$${t.billing.mrr.toLocaleString()}</strong><span style="color:var(--t3);font-size:11px">/mo</span>` : 'Trial — $0'),
+      section('Plan',
+        `<div style="display:flex;gap:8px;margin-top:2px;flex-wrap:wrap">
+          ${plans.map(p => `
+            <button onclick="tdChangePlan('${t.id}','${p}')"
+              class="ds-btn ds-btn-sm ${t.plan===p?'ds-btn--primary':'ds-btn--secondary'}"
+              style="text-transform:capitalize">${p}</button>`).join('')}
+        </div>`,
+      ) +
+      section('Revenue', [
+        row('Monthly revenue', t.billing.mrr>0
+          ? `<strong style="font-size:15px">$${t.billing.mrr.toLocaleString()}</strong><span style="color:var(--t3);font-size:11px">/mo</span>`
+          : '<span style="color:var(--t3)">Trial — $0</span>'),
         row('Renewal date', t.billing.renewalDate),
       ].join('')) +
-      section('Seats', [
-        row('Provisioned', String(t.billing.seats)),
-        row('Used', String(t.billing.seatsUsed)),
-        row('Available', String(t.billing.seats - t.billing.seatsUsed)),
-        `<div class="td-row"><span class="td-row-key">Utilization</span>
-          <span class="td-row-val" style="display:flex;align-items:center;gap:8px">
-            ${utilPct2}%
-            <span style="display:inline-block;width:80px;height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex-shrink:0">
-              <span style="display:block;height:100%;width:${utilPct2}%;background:${utilPct2>90?'#f59e0b':'var(--pri)'};border-radius:3px"></span>
+      section('Seats',
+        [
+          row('Provisioned', String(t.billing.seats)),
+          row('Used', String(t.billing.seatsUsed)),
+          row('Available', String(t.billing.seats - t.billing.seatsUsed)),
+          `<div class="td-row" style="align-items:center">
+            <span class="td-row-key">Adjust seats</span>
+            <span class="td-row-val" style="display:flex;align-items:center;gap:6px">
+              <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="tdAdjustSeats('${t.id}',-10)" style="padding:3px 8px;min-width:30px">−10</button>
+              <span style="font-size:13px;font-weight:600;min-width:30px;text-align:center">${t.billing.seats}</span>
+              <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="tdAdjustSeats('${t.id}',10)" style="padding:3px 8px;min-width:30px">+10</button>
             </span>
-          </span>
-        </div>`,
-      ].join(''));
+          </div>`,
+          `<div class="td-row"><span class="td-row-key">Utilization</span>
+            <span class="td-row-val" style="display:flex;align-items:center;gap:8px">
+              ${utilPct2}%
+              <span style="display:inline-block;width:80px;height:5px;background:var(--line);border-radius:3px;overflow:hidden;flex-shrink:0">
+                <span style="display:block;height:100%;width:${utilPct2}%;background:${utilPct2>90?'#f59e0b':'var(--pri)'};border-radius:3px"></span>
+              </span>
+            </span>
+          </div>`,
+        ].join('')
+      );
 
   } else if (_tdState.drawerTab === 'admins') {
-    tabBody = section(`Tenant admins (${t.admins.length})`,
+    tabBody = section(
+      `Admins`,
       t.admins.map(a => {
         const initials = a.split('@')[0].slice(0,2).toUpperCase();
-        return `<div class="td-row" style="padding:9px 0;align-items:center">
-          <div style="display:flex;align-items:center;gap:10px;flex:1">
+        return `<div class="td-row" style="padding:10px 0;align-items:center">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
             <div style="width:30px;height:30px;border-radius:50%;background:var(--pri-12);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--pri);flex-shrink:0">${initials}</div>
-            <span style="font-size:13px;color:var(--t1)">${escapeHtml(a)}</span>
+            <span style="font-size:13px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(a)}</span>
           </div>
-          <span class="td-plan-pill td-plan-pill--enterprise" style="font-size:10px">Admin</span>
+          <button class="ds-btn ds-btn-sm ds-btn--danger" onclick="tdRemoveAdmin('${t.id}','${a}')" style="flex-shrink:0">Remove</button>
         </div>`;
-      }).join('')
+      }).join(''),
+      `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="tdAddAdmin('${t.id}')">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+        Add admin
+      </button>`
     );
   }
 
-  // Build and open drawer
-  const drawerEl = document.getElementById('drawer');
-  const drawerOverlay = document.getElementById('drawerOverlay');
-  if (!drawerEl) return;
-
+  // ── Build full-page detail view ───────────────────────────────────────────
   const healthDot = { healthy:'#22c55e', trial:'#f59e0b', suspended:'#ef4444' }[t.health] || 'var(--t3)';
+  const isSuspended = t.health === 'suspended';
 
-  drawerOverlay.classList.add('open');
-  drawerEl.classList.add('open');
-  drawerEl.innerHTML = `
-    <!-- Drawer header -->
-    <div style="padding:18px 20px 0;border-bottom:1px solid var(--line)">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div style="width:40px;height:40px;border-radius:10px;background:var(--pri-12);border:1px solid rgba(43,127,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--pri);flex-shrink:0">
-            ${escapeHtml(t.name.slice(0,2).toUpperCase())}
-          </div>
-          <div>
-            <div style="font-size:16px;font-weight:700;color:var(--t1);line-height:1.2">${escapeHtml(t.name)}</div>
-            <div style="font-size:12px;color:var(--t3);margin-top:3px;display:flex;align-items:center;gap:6px">
-              <span>${escapeHtml(t.domain)}</span>
-              <span>·</span>
-              ${_tdPlanPill(t.plan)}
-              <span>·</span>
-              <span style="display:inline-flex;align-items:center;gap:4px">
-                <span style="width:6px;height:6px;border-radius:50%;background:${healthDot}"></span>
-                ${_tdHealthLabel(t.health)}
-              </span>
+  $('content').innerHTML = `
+    <!-- Sticky page header -->
+    <div class="ph">
+      <div class="ph-top">
+        <div class="ph-text">
+          <button onclick="navigate('#/tenants')" class="ds-btn ds-btn-sm ds-btn--tertiary" style="margin-bottom:6px;padding:0 6px 0 2px;gap:4px;color:var(--t3)">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4L6 8l4 4"/></svg>
+            Tenant Directory
+          </button>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:9px;background:var(--pri-12);border:1px solid rgba(43,127,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--pri);flex-shrink:0">
+              ${escapeHtml(t.name.slice(0,2).toUpperCase())}
+            </div>
+            <div>
+              <div class="ph-h1" style="margin:0">${escapeHtml(t.name)}</div>
+              <div style="font-size:12px;color:var(--t3);margin-top:2px;display:flex;align-items:center;gap:6px">
+                <span>${escapeHtml(t.domain)}</span>
+                <span>·</span>${_tdPlanPill(t.plan)}<span>·</span>
+                <span style="display:inline-flex;align-items:center;gap:4px">
+                  <span style="width:6px;height:6px;border-radius:50%;background:${healthDot}"></span>
+                  ${_tdHealthLabel(t.health)}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-        <button class="drawer-close" onclick="closeDrawer()" style="flex-shrink:0">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
-        </button>
-      </div>
-      <!-- Tab bar -->
-      <div style="display:flex;gap:2px">
-        ${tabs.map(tab => `
-          <button onclick="_tdState.drawerTab='${tab.id}';tdOpenDrawer('${tenantId}')"
-            style="font-size:12px;font-weight:${_tdState.drawerTab===tab.id?'600':'500'};padding:7px 11px;border:none;background:none;cursor:pointer;font-family:inherit;color:${_tdState.drawerTab===tab.id?'var(--pri)':'var(--t3)'};border-bottom:2px solid ${_tdState.drawerTab===tab.id?'var(--pri)':'transparent'};margin-bottom:-1px;border-radius:4px 4px 0 0">
-            ${tab.label}
-          </button>`).join('')}
+        <div class="ph-actions">
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Viewing ${escapeHtml(t.name)} as tenant admin…','info')">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5"/><circle cx="8" cy="8" r="2"/></svg>
+            View as tenant
+          </button>
+          <button class="ds-btn ds-btn-sm ${isSuspended?'ds-btn--primary':'ds-btn--secondary'}" onclick="tdSuspendTenant('${t.id}')">
+            ${isSuspended
+              ? `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8h8"/><circle cx="8" cy="8" r="6"/></svg> Reinstate`
+              : `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="3" width="3" height="10" rx="1"/><rect x="9" y="3" width="3" height="10" rx="1"/></svg> Suspend`}
+          </button>
+          <button class="ds-btn ds-btn-sm ds-btn--danger" onclick="toast('Delete requires confirmation — contact platform team','error')">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2"/><path d="M5 4l.5 9h5l.5-9"/></svg>
+            Delete
+          </button>
+        </div>
       </div>
     </div>
-    <!-- Drawer body -->
-    <div class="td-drawer-body">${tabBody}</div>`;
+
+    <!-- Tab bar -->
+    <div class="op-tabs" role="tablist" style="padding:0 24px">
+      ${tabs.map(tab => `
+        <button class="op-tab${_tdState.drawerTab===tab.id?' active':''}"
+          onclick="_tdState.drawerTab='${tab.id}';renderTenantDetail('${t.id}')">
+          ${tab.label}
+        </button>`).join('')}
+    </div>
+
+    <!-- Tab content -->
+    <div style="padding:24px;max-width:680px">${tabBody}</div>`;
 }
 
 /* ====================== AUDIT (full) ====================== */
