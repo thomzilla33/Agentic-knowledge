@@ -1260,12 +1260,13 @@ html.theme-light .ac-copilot-input{background:rgba(0,0,0,.03); color:var(--t1)}
    (with a parent <a>) still render normally. */
 .breadcrumb:not(:has(a)){display:none}
 
-.ph{padding:18px 32px 16px; position:sticky; top:0; background:var(--bg); z-index:10}
+.ph{padding:12px 24px 16px; position:sticky; top:0; background:var(--bg); z-index:10}
 .ph-top{display:flex; align-items:flex-start; gap:16px; margin-bottom:8px}
 .ph-text{flex:1; min-width:0}
-.ph-h1{font-size:22px; font-weight:600; color:var(--color-text-title); letter-spacing:-.01em; margin-bottom:4px}
-.ph-sub{font-size:13px; color:var(--color-text-subtitle)}
+.ph-h1{font-size:24px; font-weight:600; color:var(--color-text-title); letter-spacing:-.01em; margin-bottom:4px}
+.ph-sub{font-size:14px; color:var(--color-text-body)}
 .ph-actions{display:flex; gap:8px; align-items:center; flex-shrink:0}
+.ph-filters{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:4px}
 .ph-kpis{display:flex; gap:14px; margin-top:10px; flex-wrap:wrap}
 .kpi{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--t2)}
 .kpi-num{color:var(--t1); font-weight:600}
@@ -2356,7 +2357,7 @@ html.theme-light .int-issue-banner{
 .op-list{padding:8px 24px 32px; display:flex; flex-direction:column; gap:6px}
 .op-row{
   display:grid; grid-template-columns:160px 1fr 32px 140px; gap:16px;
-  align-items:center; padding:14px 14px 14px 18px;
+  align-items:center; padding:12px 16px; min-height:72px;
   background:var(--surface); border:0.5px solid var(--color-border-neutral-subtle); border-radius:var(--radius-m);
   cursor:pointer; transition:border-color .15s, border-width .15s, background .15s, box-shadow .15s;
 }
@@ -2364,7 +2365,7 @@ html.theme-light .int-issue-banner{
 .op-row-status .mkt-card-status{font-size:11px; padding:4px 9px}
 .op-row-main{display:flex; align-items:center; gap:12px; min-width:0}
 .op-row-text{min-width:0; flex:1}
-.op-row-name{font-size:14px; font-weight:600; color:var(--color-text-title); margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.op-row-name{font-size:16px; font-weight:600; color:var(--color-text-title); margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .op-row-meta{
   display:flex; align-items:center; gap:6px; flex-wrap:wrap;
   font-size:12px; color:var(--color-text-caption); font-weight:500;
@@ -2372,6 +2373,7 @@ html.theme-light .int-issue-banner{
 .op-row-meta .op-dot{color:var(--color-border-neutral-lighter); font-weight:400}
 .op-row-owner{display:flex; align-items:center; justify-content:center}
 .op-row-owner .ds-av{ cursor:default }
+.op-row--flex{ display:grid; grid-template-columns:1fr auto auto auto auto auto; align-items:center; gap:16px }
 .op-row-action{display:flex; justify-content:flex-end}
 .op-cta{
   display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px;
@@ -23085,7 +23087,7 @@ function renderTenantDirectory(tenantId) {
     const healthDot = { healthy:'#22c55e', trial:'#f59e0b', suspended:'#ef4444' }[t.health] || 'var(--t3)';
     const statusLabel = _tdHealthLabel(t.health);
     const statusTone = { healthy:'ok', trial:'warn', suspended:'idle' }[t.health] || 'idle';
-    return `<div class="op-row" onclick="navigate('#/tenants/${t.id}')" style="cursor:pointer">
+    return `<div class="op-row op-row--flex" onclick="navigate('#/tenants/${t.id}')" style="cursor:pointer">
       <div class="op-row-main" style="flex:1;gap:14px">
         <!-- Logo placeholder -->
         <div style="width:36px;height:36px;border-radius:var(--radius-m);background:var(--color-surface-primary-subtle);border:0.5px solid var(--color-border-neutral-subtle);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:var(--pri)">
@@ -23137,25 +23139,25 @@ function renderTenantDirectory(tenantId) {
           <div class="ph-h1">Tenant Directory</div>
           <div class="ph-sub">All organizations on the AIMS-OS platform. Click any row to inspect its configuration.</div>
         </div>
-        <div class="ph-actions">
-          <div class="td-search" style="min-width:220px">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            <input placeholder="Search by name or domain…" value="${escapeHtml(_tdState.search)}" oninput="_tdState.search=this.value;renderTenantDirectory()" />
-          </div>
-          <select class="td-filter-select" onchange="_tdState.filterPlan=this.value;renderTenantDirectory()">
-            <option value="all"${_tdState.filterPlan==='all'?' selected':''}>All plans</option>
-            <option value="enterprise"${_tdState.filterPlan==='enterprise'?' selected':''}>Enterprise</option>
-            <option value="team"${_tdState.filterPlan==='team'?' selected':''}>Team</option>
-            <option value="starter"${_tdState.filterPlan==='starter'?' selected':''}>Starter</option>
-          </select>
-          <select class="td-filter-select" onchange="_tdState.filterStudio=this.value;renderTenantDirectory()">
-            <option value="all"${_tdState.filterStudio==='all'?' selected':''}>All studios</option>
-            <option value="agentic"${_tdState.filterStudio==='agentic'?' selected':''}>Agentic</option>
-            <option value="governance"${_tdState.filterStudio==='governance'?' selected':''}>Governance</option>
-            <option value="workforce"${_tdState.filterStudio==='workforce'?' selected':''}>Workforce</option>
-            <option value="data"${_tdState.filterStudio==='data'?' selected':''}>Data</option>
-          </select>
+      </div>
+      <div class="ph-filters">
+        <div class="td-search" style="min-width:220px">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <input placeholder="Search by name or domain…" value="${escapeHtml(_tdState.search)}" oninput="_tdState.search=this.value;renderTenantDirectory()" />
         </div>
+        <select class="td-filter-select" onchange="_tdState.filterPlan=this.value;renderTenantDirectory()">
+          <option value="all"${_tdState.filterPlan==='all'?' selected':''}>All plans</option>
+          <option value="enterprise"${_tdState.filterPlan==='enterprise'?' selected':''}>Enterprise</option>
+          <option value="team"${_tdState.filterPlan==='team'?' selected':''}>Team</option>
+          <option value="starter"${_tdState.filterPlan==='starter'?' selected':''}>Starter</option>
+        </select>
+        <select class="td-filter-select" onchange="_tdState.filterStudio=this.value;renderTenantDirectory()">
+          <option value="all"${_tdState.filterStudio==='all'?' selected':''}>All studios</option>
+          <option value="agentic"${_tdState.filterStudio==='agentic'?' selected':''}>Agentic</option>
+          <option value="governance"${_tdState.filterStudio==='governance'?' selected':''}>Governance</option>
+          <option value="workforce"${_tdState.filterStudio==='workforce'?' selected':''}>Workforce</option>
+          <option value="data"${_tdState.filterStudio==='data'?' selected':''}>Data</option>
+        </select>
       </div>
       <!-- KPI strip -->
       <div class="ph-kpis">
