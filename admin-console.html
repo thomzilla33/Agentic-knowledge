@@ -23151,22 +23151,6 @@ function renderTenantDetail(tOrId) {
     const isSuspended = t.health === 'suspended';
 
     tabBody =
-      // Quick actions strip
-      `<div style="display:flex;gap:8px;padding:16px 0 4px;flex-wrap:wrap">
-        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Viewing ${escapeHtml(t.name)} as tenant admin…','info')">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5"/><circle cx="8" cy="8" r="2"/></svg>
-          View as tenant
-        </button>
-        <button class="ds-btn ds-btn-sm ${isSuspended?'ds-btn--primary':'ds-btn--secondary'}" onclick="tdSuspendTenant('${t.id}')">
-          ${isSuspended
-            ? `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8h8"/><circle cx="8" cy="8" r="6"/></svg> Reinstate`
-            : `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="3" width="3" height="10" rx="1"/><rect x="9" y="3" width="3" height="10" rx="1"/></svg> Suspend`}
-        </button>
-        <button class="ds-btn ds-btn-sm ds-btn--danger" style="margin-left:auto" onclick="toast('Delete requires confirmation — contact platform team','error')">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2"/><path d="M5 4l.5 9h5l.5-9"/></svg>
-          Delete tenant
-        </button>
-      </div>` +
       section('Tenant info', [
         row('Name', escapeHtml(t.name)),
         row('Domain', `<code style="font-size:11px;background:var(--bg2);padding:2px 6px;border-radius:4px">${escapeHtml(t.domain)}</code>`),
