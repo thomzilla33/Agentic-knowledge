@@ -539,7 +539,7 @@ html.persona-user [data-admin-only]{display:none !important}
 }
 .avatar-sm{
   width:16px; height:16px; border-radius:50%;
-  background:var(--grad-identity);
+  background:var(--av-col-green-bg);
   display:flex; align-items:center; justify-content:center;
   font-size:10px; font-weight:700; color:#fff;
   cursor:pointer; flex-shrink:0; border:none; font-family:inherit;
@@ -568,7 +568,7 @@ html.persona-user [data-admin-only]{display:none !important}
 }
 .tb-um-avatar{
   width:40px; height:40px; border-radius:50%;
-  background:var(--grad-identity);
+  background:var(--av-col-blue-bg);
   display:flex; align-items:center; justify-content:center;
   font-size:14px; font-weight:600; color:#fff; flex-shrink:0;
   box-shadow:0 0 0 2px var(--pri-25);
@@ -1369,7 +1369,7 @@ html.theme-light .btn-primary.btn-outline{color:var(--cyan); border-color:var(--
 .conn-meta{display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--t2)}
 .conn-meta strong{color:var(--t1); font-weight:600}
 .conn-foot{display:flex; align-items:center; gap:8px; padding-top:8px; border-top:0.5px solid var(--color-border-neutral-subtle); font-size:12px; color:var(--color-text-body)}
-.conn-foot .av{width:18px; height:18px; border-radius:50%; background:var(--grad); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0}
+.conn-foot .ds-av{ flex-shrink:0 }
 .conn-by{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 /* icon-btn defined in topbar section above — this duplicate removed to avoid override */
 
@@ -2371,12 +2371,7 @@ html.theme-light .int-issue-banner{
 }
 .op-row-meta .op-dot{color:var(--color-border-neutral-lighter); font-weight:400}
 .op-row-owner{display:flex; align-items:center; justify-content:center}
-.op-row-avatar{
-  width:26px; height:26px; border-radius:50%;
-  background:linear-gradient(135deg,var(--cyan),var(--purple));
-  color:#fff; font-size:10px; font-weight:800;
-  display:flex; align-items:center; justify-content:center; letter-spacing:-.02em;
-}
+.op-row-owner .ds-av{ cursor:default }
 .op-row-action{display:flex; justify-content:flex-end}
 .op-cta{
   display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px;
@@ -19333,7 +19328,7 @@ function opRowHTML(i) {
         </div>
       </div>
       <div class="op-row-owner">
-        ${i.connectedBy ? `<span class="op-row-avatar" title="Connected by ${escapeHtml(i.connectedBy.name)}">${escapeHtml(i.connectedBy.initials)}</span>` : ''}
+        ${i.connectedBy ? `<div class="ds-av ds-av-md" style="background:var(--av-col-${_paAvatarColor(i.connectedBy.initials)}-bg)" title="Connected by ${escapeHtml(i.connectedBy.name)}">${escapeHtml(i.connectedBy.initials)}</div>` : ''}
       </div>
       <div class="op-row-action">
         ${isBlocked
@@ -23647,7 +23642,7 @@ function auditTable(events, full) {
             <td title="${escapeHtml(e.tsAbs||'')}">${escapeHtml(e.ts)}</td>
             <td><span class="audit-ev ${e.sev==='info'?'info':e.sev==='warn'?'warn':'crit'}">${e.sev.toUpperCase()}</span></td>
             <td><span class="audit-ev">${escapeHtml(e.event)}</span></td>
-            <td><div class="audit-actor">${e.actorType==='agent'?'<span style="color:var(--purple);font-weight:600" title="Agent"><svg width=\'10\' height=\'10\' viewBox=\'0 0 16 16\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\' aria-hidden=\'true\' style=\'vertical-align:-1px;margin-right:3px\'><rect x=\'3\' y=\'5\' width=\'10\' height=\'7\' rx=\'1.4\'/><circle cx=\'6\' cy=\'8.5\' r=\'.8\'/><circle cx=\'10\' cy=\'8.5\' r=\'.8\'/><path d=\'M8 2v3M5.5 12v2M10.5 12v2\'/></svg></span>':e.actorType==='system'?'<span style="color:var(--t3)" title="System"><svg width=\'10\' height=\'10\' viewBox=\'0 0 16 16\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\' aria-hidden=\'true\' style=\'vertical-align:-1px;margin-right:3px\'><circle cx=\'8\' cy=\'8\' r=\'2\'/><path d=\'M8 1.5v2.2M8 12.3v2.2M14.5 8h-2.2M3.7 8H1.5M12.6 3.4l-1.6 1.6M5 11l-1.6 1.6M12.6 12.6L11 11M5 5L3.4 3.4\'/></svg></span>':'<div class="av" style="width:18px;height:18px;border-radius:50%;background:var(--grad);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">'+(e.actor[0]||'').toUpperCase()+'</div>'}<span>${escapeHtml(e.actor)}</span></div></td>
+            <td><div class="audit-actor">${e.actorType==='agent'?'<span style="color:var(--purple);font-weight:600" title="Agent"><svg width=\'10\' height=\'10\' viewBox=\'0 0 16 16\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\' aria-hidden=\'true\' style=\'vertical-align:-1px;margin-right:3px\'><rect x=\'3\' y=\'5\' width=\'10\' height=\'7\' rx=\'1.4\'/><circle cx=\'6\' cy=\'8.5\' r=\'.8\'/><circle cx=\'10\' cy=\'8.5\' r=\'.8\'/><path d=\'M8 2v3M5.5 12v2M10.5 12v2\'/></svg></span>':e.actorType==='system'?'<span style="color:var(--t3)" title="System"><svg width=\'10\' height=\'10\' viewBox=\'0 0 16 16\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\' aria-hidden=\'true\' style=\'vertical-align:-1px;margin-right:3px\'><circle cx=\'8\' cy=\'8\' r=\'2\'/><path d=\'M8 1.5v2.2M8 12.3v2.2M14.5 8h-2.2M3.7 8H1.5M12.6 3.4l-1.6 1.6M5 11l-1.6 1.6M12.6 12.6L11 11M5 5L3.4 3.4\'/></svg></span>':_paAvHTML(e.actor, e.actor, (e.actor.match(/\b\w/g)||[]).slice(0,2).join('').toUpperCase(), 'ds-av-xs')}<span>${escapeHtml(e.actor)}</span></div></td>
             ${full?`<td>${e.resource?'<a href="#/integrations/'+e.resource+'" style="color:var(--pri);text-decoration:none" onclick="event.stopPropagation()">'+escapeHtml(e.resource)+'</a>':'<span style="color:var(--t3)">—</span>'}</td>`:''}
             <td>${e.studio?'<span style="font-size:11px;color:var(--t2)">'+STUDIO_META[e.studio].label+'</span>':'<span style="color:var(--t3)">—</span>'}</td>
             ${full?`<td style="color:var(--t3);font-family:'SF Mono',Menlo,monospace;font-size:11px">${e.ip||'—'}</td>`:''}
