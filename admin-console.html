@@ -317,9 +317,31 @@
   --btn-tertiary-hover-bg: rgba(255,255,255,0.05);
   --btn-tertiary-focus-bg: rgba(255,255,255,0.08);
   --btn-tertiary-active-bg:rgba(255,255,255,0.15);
-  --btn-warning-bg:        #c22222;
-  --btn-warning-hover-bg:  #a31616;
-  --btn-warning-active-bg: #880f0f;
+  --btn-warning-bg:        #e05252;
+  --btn-warning-hover-bg:  #b83838;
+  --btn-warning-active-bg: #992222;
+  /* ── DS Canonical surface / field / base tokens ── */
+  --canvas:         #0A0E1A;    /* = --bg  */
+  --surface:        #0D1120;    /* = --bg2 */
+  --surface-raised: #131C2E;    /* = --bg3 */
+  --foreground:     rgba(255,255,255,0.80);
+  --muted:          rgba(255,255,255,0.05);
+  --muted-foreground:rgba(255,255,255,0.60);
+  --destructive:    #e05252;
+  --field-bg:       rgba(255,255,255,0.08);
+  --field-border:   rgba(255,255,255,0.10);
+  --field-border-hover:rgba(255,255,255,0.20);
+  --field-border-focus:#2b7fff;
+  --field-text:     rgba(255,255,255,0.80);
+  --field-placeholder:rgba(255,255,255,0.30);
+  --field-label:    rgba(255,255,255,0.60);
+  --field-icon:     rgba(255,255,255,0.30);
+  --shadow-elevation-1:2px 2px 8px 1px rgba(0,0,0,0.06);
+  --shadow-elevation-2:4px 4px 12px 2px rgba(0,0,0,0.08);
+  --shadow-elevation-3:4px 4px 12px 2px rgba(0,0,0,0.12);
+  --shadow-elevation-4:8px 8px 16px 8px rgba(0,0,0,0.08);
+  --radius-none:0px; --radius-xs:2px; --radius-s:4px; --radius-m:8px;
+  --radius-l:16px; --radius-xl:24px; --radius-xxl:32px; --radius-full:100px;
 }
 html,body{height:100%}
 body{
@@ -332,14 +354,20 @@ body{
 /* ── TOPBAR (fixed full width, blur backdrop) ── */
 .topbar{
   position:fixed; top:0; left:0; right:0; height:36px; z-index:20;
-  display:flex; align-items:center; gap:8px; padding:0 8px;
+  display:flex; align-items:center; justify-content:space-between; padding:0 8px;
   background:var(--topbar-bg);
   border-bottom:1px solid var(--topbar-divider);
   backdrop-filter:blur(20px) saturate(1.8);
   -webkit-backdrop-filter:blur(20px) saturate(1.8);
 }
-.tb-left{flex:1; display:flex; align-items:center; gap:6px}
-.tb-right{flex:1; display:flex; align-items:center; gap:4px; justify-content:flex-end}
+/* DS: Left zone — shrinks to content, flex-shrink:0 prevents collapsing */
+.tb-left{display:flex; align-items:center; gap:6px; flex-shrink:0}
+/* DS: Right zone — fixed 232×28px (Sub-A 80 + 1px divider + 8gap + Sub-B 136 + 4+4 pad = 232) */
+.tb-right{width:232px; height:28px; display:flex; align-items:center; gap:8px; flex-shrink:0}
+/* DS Sub-A: 3 icon buttons exactly 80×24px, gap:4 */
+.tb-sub-a{width:80px; height:24px; display:flex; align-items:center; gap:4px; flex-shrink:0}
+/* isotipo is decorative (sits behind AI btn gradient in DS — not a separate visible element) */
+.tb-isotipo{display:none}
 
 .tb-context-wrap{position:relative; flex-shrink:0; display:inline-flex; align-items:center}
 .tb-context{
@@ -352,7 +380,7 @@ body{
 .tb-context-logo{
   width:16px; height:16px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  font-size:10px; font-weight:700; color:#fff; flex-shrink:0;
+  font-size:10px; font-weight:600; color:#fff; flex-shrink:0;
   letter-spacing:-.3px; overflow:hidden;
   box-shadow:0 0 0 1px var(--topbar-avatar-ring);
 }
@@ -418,7 +446,7 @@ html.mode-operate .mode-banner{display:block}
   display:inline-flex; align-items:center; justify-content:center;
   min-width:16px; height:16px; padding:0 5px;
   background:var(--amber); color:#1a0f00;
-  font-size:10px; font-weight:800; border-radius:8px; line-height:1;
+  font-size:10px; font-weight:600; border-radius:8px; line-height:1;
 }
 .tb-mode-badge:empty{display:none}
 @media (max-width:780px){
@@ -469,16 +497,16 @@ html.persona-user [data-admin-only]{display:none !important}
 }
 .icon-btn:hover{background:var(--topbar-btn-hover-bg); color:var(--t1)}
 .icon-btn.ai-btn{
-  background:radial-gradient(circle at 61% 68%, var(--pri) 29%, var(--teal) 61%);
+  background:radial-gradient(circle at 61% 68%, #2173ff 29%, #09e2ab 61%);
   border-radius:8px;
   box-shadow:var(--shadow-glow-ai);
   color:#fff;
 }
-.icon-btn.ai-btn:hover{background:radial-gradient(circle at 61% 68%, var(--pri) 29%, var(--teal) 61%); opacity:.85; color:#fff}
+.icon-btn.ai-btn:hover{opacity:.85; color:#fff}
 /* notif-bell-wrap / notif-bell-dot → shared/notif-panel.css */
 .tb-divider-v{
   display:inline-block; width:1px; height:28px;
-  background:var(--topbar-divider); margin:0 2px; flex-shrink:0; align-self:center;
+  background:var(--topbar-divider); flex-shrink:0; align-self:center;
 }
 
 .tb-identity{
@@ -542,14 +570,14 @@ html.persona-user [data-admin-only]{display:none !important}
   width:40px; height:40px; border-radius:50%;
   background:var(--grad-identity);
   display:flex; align-items:center; justify-content:center;
-  font-size:14px; font-weight:700; color:#fff; flex-shrink:0;
+  font-size:14px; font-weight:600; color:#fff; flex-shrink:0;
   box-shadow:0 0 0 2px var(--pri-25);
 }
-.tb-um-name{font-size:14px; font-weight:700; color:var(--topbar-menu-text); line-height:1.3}
+.tb-um-name{font-size:14px; font-weight:600; color:var(--topbar-menu-text); line-height:1.3}
 .tb-um-email{font-size:11.5px; color:var(--topbar-menu-text-dim); margin-top:3px}
 .tb-um-section{
   padding:6px 16px 4px;
-  font-size:10px; font-weight:800; color:var(--topbar-menu-text-dim);
+  font-size:10px; font-weight:600; color:var(--topbar-menu-text-dim);
   text-transform:uppercase; letter-spacing:.08em;
 }
 .tb-um-workspace{
@@ -562,11 +590,11 @@ html.persona-user [data-admin-only]{display:none !important}
 .tb-um-ws-logo{
   width:36px; height:36px; border-radius:8px;
   display:flex; align-items:center; justify-content:center;
-  font-size:12px; font-weight:700; color:#fff; flex-shrink:0;
+  font-size:12px; font-weight:600; color:#fff; flex-shrink:0;
   background:var(--grad-identity);
 }
 .tb-um-ws-info{flex:1; min-width:0; text-align:left}
-.tb-um-ws-name{font-size:13px; font-weight:700; color:var(--topbar-menu-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.tb-um-ws-name{font-size:13px; font-weight:600; color:var(--topbar-menu-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .tb-um-ws-role{font-size:11px; color:var(--topbar-menu-text-dim); margin-top:2px}
 .tb-um-sep{height:1px; background:var(--topbar-menu-border); margin:4px 0}
 .tb-um-item{
@@ -593,7 +621,7 @@ html.persona-user [data-admin-only]{display:none !important}
 .tb-um-theme-btn{
   width:26px; height:22px; border:none; border-radius:4px; cursor:pointer;
   background:transparent; color:var(--topbar-text); display:flex; align-items:center; justify-content:center;
-  font-size:10px; font-weight:700; font-family:inherit;
+  font-size:10px; font-weight:600; font-family:inherit;
   transition:background .1s, color .1s;
 }
 .tb-um-theme-btn:hover{background:var(--topbar-btn-hover-bg); color:var(--t1)}
@@ -1227,7 +1255,7 @@ html.theme-light .ac-copilot-input{background:rgba(0,0,0,.03); color:var(--t1)}
 .ph{padding:18px 32px 16px; position:sticky; top:0; background:var(--bg); z-index:10}
 .ph-top{display:flex; align-items:flex-start; gap:16px; margin-bottom:8px}
 .ph-text{flex:1; min-width:0}
-.ph-h1{font-size:22px; font-weight:700; color:var(--t1); letter-spacing:-.01em; margin-bottom:4px}
+.ph-h1{font-size:22px; font-weight:600; color:var(--t1); letter-spacing:-.01em; margin-bottom:4px}
 .ph-sub{font-size:13px; color:var(--t2)}
 .ph-actions{display:flex; gap:8px; align-items:center; flex-shrink:0}
 .ph-kpis{display:flex; gap:14px; margin-top:10px; flex-wrap:wrap}
@@ -1335,8 +1363,7 @@ html.theme-light .btn-primary.btn-outline{color:var(--cyan); border-color:var(--
 .conn-foot{display:flex; align-items:center; gap:8px; padding-top:8px; border-top:1px solid var(--line); font-size:12px; color:var(--t2)}
 .conn-foot .av{width:18px; height:18px; border-radius:50%; background:var(--grad); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0}
 .conn-by{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.icon-btn{background:transparent; border:none; color:var(--t2); cursor:pointer; padding:4px; border-radius:var(--r4); display:flex}
-.icon-btn:hover{background:var(--hover); color:var(--t1)}
+/* icon-btn defined in topbar section above — this duplicate removed to avoid override */
 
 /* ── Source tabs + filter pills ── */
 .src-tabs{display:flex; gap:2px; padding:4px; background:var(--hover); border:1px solid var(--line); border-radius:var(--r8); margin-bottom:12px; flex-wrap:wrap}
@@ -2293,7 +2320,7 @@ html.theme-light .int-issue-banner{
 .op-tab-count{
   display:inline-flex; align-items:center; justify-content:center;
   min-width:22px; height:18px; padding:0 6px;
-  font-size:10px; font-weight:800; border-radius:9px; line-height:1;
+  font-size:10px; font-weight:600; border-radius:9px; line-height:1;
 }
 .op-tab-count-warn{background:var(--operate-alert); color:var(--amber)}
 .op-tab-count-ok{background:rgba(5,223,114,0.12); color:var(--green)}
@@ -2324,7 +2351,7 @@ html.theme-light .int-issue-banner{
 .op-row-status .mkt-card-status{font-size:11px; padding:4px 9px}
 .op-row-main{display:flex; align-items:center; gap:12px; min-width:0}
 .op-row-text{min-width:0; flex:1}
-.op-row-name{font-size:14px; font-weight:700; color:var(--t1); margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.op-row-name{font-size:14px; font-weight:600; color:var(--t1); margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .op-row-meta{
   display:flex; align-items:center; gap:6px; flex-wrap:wrap;
   font-size:12px; color:var(--t3); font-weight:500;
@@ -6412,14 +6439,17 @@ html.theme-light .audit-filter-input{background:#FFFFFF; border-color:var(--line
 .td-page{padding:28px 32px 60px;max-width:1200px;}
 .td-stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
 .td-stat{background:var(--canvas);border:1px solid var(--line);border-radius:12px;padding:14px 18px;}
-.td-stat-val{font-size:26px;font-weight:700;color:var(--t1);line-height:1;}
+.td-stat-val{font-size:26px;font-weight:600;color:var(--t1);line-height:1;}
 .td-stat-label{font-size:11px;color:var(--t3);margin-top:4px;}
 .td-stat-sub{font-size:11px;color:var(--pri);margin-top:2px;}
 .td-filters{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
-.td-search{flex:1;min-width:200px;max-width:320px;display:flex;align-items:center;gap:6px;background:var(--canvas);border:1px solid var(--line);border-radius:8px;padding:7px 10px;}
-.td-search input{background:none;border:none;outline:none;font-size:13px;color:var(--t1);width:100%;font-family:inherit;}
-.td-search input::placeholder{color:var(--t3);}
-.td-filter-select{font-size:12px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--canvas);color:var(--t1);cursor:pointer;font-family:inherit;outline:none;}
+.td-search{flex:1;min-width:200px;max-width:320px;display:flex;align-items:center;gap:6px;background:var(--field-bg);border:1px solid var(--field-border);border-radius:var(--radius-m);padding:7px 10px;transition:border-color .15s;}
+.td-search:focus-within{border-color:var(--field-border-focus);}
+.td-search input{background:none;border:none;outline:none;font-size:13px;color:var(--field-text);width:100%;font-family:inherit;}
+.td-search input::placeholder{color:var(--field-placeholder);}
+.td-filter-select{font-size:12px;padding:7px 10px;border-radius:var(--radius-m);border:1px solid var(--field-border);background:var(--field-bg);color:var(--field-text);cursor:pointer;font-family:inherit;outline:none;transition:border-color .15s;}
+.td-filter-select:hover{border-color:var(--field-border-hover);}
+.td-filter-select:focus{border-color:var(--field-border-focus);}
 .td-table-wrap{background:var(--canvas);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
 .td-table{width:100%;border-collapse:collapse;}
 .td-table th{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;padding:10px 16px;text-align:left;border-bottom:1px solid var(--line);background:var(--bg);}
@@ -7603,7 +7633,7 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .pa-tab { background:none; border:none; padding:10px 16px; font-size:13px; font-weight:500; color:var(--color-text-subtitle); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .15s,border-color .15s; }
 .pa-tab:hover { color:var(--color-text-title); }
 .pa-tab.active { color:var(--pri); border-bottom-color:var(--pri); font-weight:600; }
-.pa-tab-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; background:var(--bg3); border-radius:9px; font-size:11px; font-weight:700; color:var(--color-text-subtitle); margin-left:5px; }
+.pa-tab-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; background:var(--bg3); border-radius:9px; font-size:11px; font-weight:600; color:var(--color-text-subtitle); margin-left:5px; }
 .pa-tab.active .pa-tab-count { background:var(--pri-12); color:var(--pri); }
 
 /* ── Filters bar ── */
@@ -7705,8 +7735,8 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .ds-btn--tertiary { background:transparent; color:var(--btn-tertiary-fg); }
 .ds-btn--tertiary:hover { background:var(--btn-tertiary-hover-bg); }
 .ds-btn--tertiary:active { background:var(--btn-tertiary-active-bg); }
-.ds-btn--danger { background:var(--status-error-bg); color:var(--red); border-color:rgba(239,68,68,.2); }
-.ds-btn--danger:hover { background:rgba(239,68,68,.15); }
+.ds-btn--danger { background:rgba(224,82,82,0.12); color:var(--color-text-error); border-color:rgba(153,34,34,0.35); }
+.ds-btn--danger:hover { background:rgba(224,82,82,0.20); border-color:rgba(153,34,34,0.50); }
 .ds-btn--warning { background:var(--btn-warning-bg); color:#fff; }
 .ds-btn--warning:hover { background:var(--btn-warning-hover-bg); }
 .ds-btn--warning:active { background:var(--btn-warning-active-bg); }
@@ -8646,6 +8676,27 @@ html.theme-light .ob-confirm-inp { background:#fff; }
 .cap-drawer-deactivate-btn:hover { background:rgba(239,68,68,.14); }
 html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
 
+/* ── Role Switcher ── */
+.tb-role-chip{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:10px;font-size:10px;font-weight:600;letter-spacing:.04em;cursor:pointer;border:1px solid;transition:opacity .15s;white-space:nowrap;background:transparent;flex-shrink:0}
+.tb-role-chip:hover{opacity:.8}
+.tb-role-chip[data-role="super-admin"]{color:#A78BFA;border-color:rgba(167,139,250,.35)}
+.tb-role-chip[data-role="regional-admin"]{color:#06B6D4;border-color:rgba(6,182,212,.35)}
+.tb-role-chip[data-role="tenant-admin"]{color:#2B7FFF;border-color:rgba(43,127,255,.35)}
+.tb-role-chip[data-role="user"]{color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2)}
+.tb-role-chip .rs-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tb-role-chip[data-role="super-admin"] .rs-dot{background:#A78BFA}
+.tb-role-chip[data-role="regional-admin"] .rs-dot{background:#06B6D4}
+.tb-role-chip[data-role="tenant-admin"] .rs-dot{background:#2B7FFF}
+.tb-role-chip[data-role="user"] .rs-dot{background:rgba(255,255,255,.4)}
+.rs-dropdown{position:fixed;z-index:10002;background:var(--topbar-menu-bg);border:1px solid var(--topbar-menu-border);border-radius:8px;padding:4px;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,.4);display:none}
+.rs-dropdown.open{display:block}
+.rs-option{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:transparent;cursor:pointer;border-radius:5px;font-size:12px;color:var(--topbar-menu-text);text-align:left;transition:background .1s}
+.rs-option:hover{background:var(--topbar-menu-item-hover)}
+.rs-option.rs-active{background:var(--topbar-menu-item-sel)}
+.rs-option-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.rs-sep{height:1px;background:var(--topbar-menu-border);margin:4px 0}
+.rs-label-hint{font-size:10px;color:var(--topbar-menu-text-dim);padding:4px 10px 2px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+
 </style>
 <link rel="stylesheet" href="shared/notif-panel.css">
 </head>
@@ -8711,6 +8762,31 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
 
     <!-- Mode toggle (Browse / Operate) — orchestration thesis -->
     <div class="tb-mode-toggle" role="group" aria-label="Mode" id="tbModeToggle" style="display:none"></div>
+
+    <!-- Role Switcher Chip (demo) -->
+    <div style="position:relative">
+      <button class="tb-role-chip" id="roleChip" data-role="super-admin" onclick="toggleRoleDropdown(event)" aria-haspopup="true" aria-expanded="false">
+        <span class="rs-dot"></span>
+        <span id="roleChipLabel">Super Admin</span>
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true"><path d="M1.5 2.5L4 5l2.5-2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="rs-dropdown" id="roleDropdown">
+        <div class="rs-label-hint">Preview as role</div>
+        <button class="rs-option rs-active" data-role="super-admin" onclick="setRole('super-admin')">
+          <span class="rs-option-dot" style="background:#A78BFA"></span>Super Admin
+        </button>
+        <button class="rs-option" data-role="regional-admin" onclick="setRole('regional-admin')">
+          <span class="rs-option-dot" style="background:#06B6D4"></span>Regional Admin
+        </button>
+        <button class="rs-option" data-role="tenant-admin" onclick="setRole('tenant-admin')">
+          <span class="rs-option-dot" style="background:#2B7FFF"></span>Tenant Admin
+        </button>
+        <div class="rs-sep"></div>
+        <button class="rs-option" data-role="user" onclick="setRole('user')">
+          <span class="rs-option-dot" style="background:rgba(255,255,255,.4)"></span>User
+        </button>
+      </div>
+    </div>
   </div>
 
   <button class="tb-search-btn" type="button" onclick="toast('Global search · ⌘K')" aria-label="Search">
@@ -8720,19 +8796,22 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
   </button>
 
   <div class="tb-right">
-    <button class="icon-btn ai-btn" aria-label="AI Assistant" onclick="toast('AI Assistant · ⌘/')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5c.5 0 1 .4 1.1.9l1.1 4.9c.1.3.3.5.6.6l4.9 1.1c.5.1.9.6.9 1.1s-.4 1-.9 1.1l-4.9 1.1c-.3.1-.5.3-.6.6l-1.1 4.9c-.1.5-.6.9-1.1.9s-1-.4-1.1-.9l-1.1-4.9c-.1-.3-.3-.5-.6-.6l-4.9-1.1c-.5-.1-.9-.6-.9-1.1s.4-1 .9-1.1l4.9-1.1c.3-.1.5-.3.6-.6l1.1-4.9c.1-.5.6-.9 1.1-.9z" fill="currentColor"/><path d="M19.5 3c.2 0 .4.2.5.4l.4 1.7.4-1.7c0-.2.2-.4.5-.4s.4.2.5.4l.4 1.7 1.7.4c.2 0 .4.2.4.5s-.2.4-.4.5l-1.7.4-.4 1.7c0 .2-.2.4-.5.4s-.4-.2-.5-.4l-.4-1.7-1.7-.4c-.2 0-.4-.2-.4-.5s.2-.4.4-.5l1.7-.4z" fill="currentColor" opacity=".75"/></svg>
-    </button>
-    <span class="notif-bell-wrap">
-      <button class="icon-btn" id="notifBellLauncher" type="button" aria-label="Notifications" aria-haspopup="dialog" aria-expanded="false" onclick="_toggleNotifications(event)">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <!-- DS Right zone: Sub-A 80×24 (3 icon btns) + divider + Sub-B 136×28 = 232px -->
+    <div class="tb-sub-a">
+      <button class="icon-btn ai-btn" aria-label="AI Assistant" onclick="toast('AI Assistant · ⌘/')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5c.5 0 1 .4 1.1.9l1.1 4.9c.1.3.3.5.6.6l4.9 1.1c.5.1.9.6.9 1.1s-.4 1-.9 1.1l-4.9 1.1c-.3.1-.5.3-.6.6l-1.1 4.9c-.1.5-.6.9-1.1.9s-1-.4-1.1-.9l-1.1-4.9c-.1-.3-.3-.5-.6-.6l-4.9-1.1c-.5-.1-.9-.6-.9-1.1s.4-1 .9-1.1l4.9-1.1c.3-.1.5-.3.6-.6l1.1-4.9c.1-.5.6-.9 1.1-.9z" fill="currentColor"/><path d="M19.5 3c.2 0 .4.2.5.4l.4 1.7.4-1.7c0-.2.2-.4.5-.4s.4.2.5.4l.4 1.7 1.7.4c.2 0 .4.2.4.5s-.2.4-.4.5l-1.7.4-.4 1.7c0 .2-.2.4-.5.4s-.4-.2-.5-.4l-.4-1.7-1.7-.4c-.2 0-.4-.2-.4-.5s.2-.4.4-.5l1.7-.4z" fill="currentColor" opacity=".75"/></svg>
       </button>
-      <span class="notif-bell-dot" id="notif-bell-dot" aria-label="Unread notifications">3</span>
-      <div class="notif-menu" id="notif-menu" role="dialog" aria-label="Notifications" aria-hidden="true"></div>
-    </span>
-    <button class="icon-btn" aria-label="Settings menu" onclick="toast('Already in Settings')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-    </button>
+      <span class="notif-bell-wrap">
+        <button class="icon-btn" id="notifBellLauncher" type="button" aria-label="Notifications" aria-haspopup="dialog" aria-expanded="false" onclick="_toggleNotifications(event)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </button>
+        <span class="notif-bell-dot" id="notif-bell-dot" aria-label="Unread notifications">3</span>
+        <div class="notif-menu" id="notif-menu" role="dialog" aria-label="Notifications" aria-hidden="true"></div>
+      </span>
+      <button class="icon-btn" aria-label="Settings menu" onclick="toast('Already in Settings')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
     <span class="tb-divider-v"></span>
     <div class="tb-identity" role="button" tabindex="0" aria-label="Account menu" aria-haspopup="menu" onclick="toggleUserMenu()" onkeydown="if(event.key==='Enter'||event.key===' ')toggleUserMenu()">
       <button class="tb-ws-badge" type="button" onclick="event.stopPropagation();toggleUserMenu()" aria-label="Workspace">
@@ -8870,72 +8949,87 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
       <!-- Scrollable nav -->
       <div class="ssb-scroll">
 
-        <!-- PERSONAL -->
-        <div class="ssb-group">
+        <!-- PERSONAL — visible to all roles -->
+        <div class="ssb-group" data-roles="super-admin,regional-admin,tenant-admin,user">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Personal</span></div>
 
-          <button class="ssb-item" data-route="my-settings" onclick="navigate('#/my-settings')">
+          <button class="ssb-item" data-route="my-settings" data-roles="super-admin,regional-admin,tenant-admin,user" onclick="navigate('#/my-settings')">
             <span class="ssb-item-label">My Settings</span>
           </button>
         </div>
 
-        <!-- TENANT -->
-        <div class="ssb-group">
+        <!-- MY WORKSPACE — user (no admin) only -->
+        <div class="ssb-group" data-roles="user" style="display:none">
+          <div class="ssb-grp-h"><span class="ssb-grp-label">My Workspace</span></div>
+
+          <button class="ssb-item" data-route="my-team" data-roles="user" onclick="toast('My Team — read-only')">
+            <span class="ssb-item-label">My Team</span>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="opacity:.4;flex-shrink:0" aria-label="Read-only"><circle cx="6" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 10c0-2 2-3.5 4.5-3.5s4.5 1.5 4.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </button>
+
+          <button class="ssb-item" data-route="my-studios" data-roles="user" onclick="toast('My Studios — read-only')">
+            <span class="ssb-item-label">My Studios</span>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="opacity:.4;flex-shrink:0" aria-label="Read-only"><circle cx="6" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 10c0-2 2-3.5 4.5-3.5s4.5 1.5 4.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- TENANT — super-admin, regional-admin, tenant-admin -->
+        <div class="ssb-group" data-roles="super-admin,regional-admin,tenant-admin">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Tenant</span></div>
 
-          <button class="ssb-item" data-route="people" onclick="navigate('#/people')">
+          <button class="ssb-item" data-route="people" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/people')">
             <span class="ssb-item-label">People & Access</span>
           </button>
 
-          <button class="ssb-item" data-route="organization" onclick="navigate('#/organization')">
+          <button class="ssb-item" data-route="organization" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/organization')">
             <span class="ssb-item-label">Organization</span>
           </button>
 
-          <button class="ssb-item" data-route="identity" onclick="navigate('#/identity')">
+          <button class="ssb-item" data-route="identity" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/identity')">
             <span class="ssb-item-label">Identity & Security</span>
           </button>
 
-          <button class="ssb-item" data-route="studios" onclick="navigate('#/studios')">
+          <button class="ssb-item" data-route="studios" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/studios')">
             <span class="ssb-item-label">Studios & Entitlements</span>
           </button>
 
-          <button class="ssb-item" data-route="billing" onclick="navigate('#/billing')">
+          <button class="ssb-item" data-route="billing" data-roles="super-admin,tenant-admin" onclick="navigate('#/billing')">
             <span class="ssb-item-label">Billing & Subscription</span>
           </button>
         </div>
 
-        <!-- PLATFORM -->
-        <div class="ssb-group">
+        <!-- PLATFORM — super-admin (all), regional-admin (partial) -->
+        <div class="ssb-group" data-roles="super-admin,regional-admin">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
 
-          <button class="ssb-item" data-route="governance-defaults" onclick="navigate('#/governance-defaults')">
+          <button class="ssb-item" data-route="governance-defaults" data-roles="super-admin" onclick="navigate('#/governance-defaults')">
             <span class="ssb-item-label">Governance Defaults</span>
             <span class="ssb-item-badge ssb-item-badge--green">2</span>
           </button>
 
-          <button class="ssb-item" data-route="data-privacy" onclick="navigate('#/data-privacy')">
+          <button class="ssb-item" data-route="data-privacy" data-roles="super-admin" onclick="navigate('#/data-privacy')">
             <span class="ssb-item-label">Data & Privacy</span>
           </button>
 
-          <button class="ssb-item" data-route="integrations">
+          <button class="ssb-item" data-route="integrations" data-roles="super-admin,regional-admin">
             <span class="ssb-item-label">Integrations & Credentials</span>
             <span class="ssb-item-alert" title="1 integration failing"></span>
           </button>
 
-          <button class="ssb-item" data-route="notifications" onclick="navigate('#/notifications')">
+          <button class="ssb-item" data-route="notifications" data-roles="super-admin" onclick="navigate('#/notifications')">
             <span class="ssb-item-label">Notifications</span>
             <span class="ssb-item-badge">4</span>
           </button>
 
-          <button class="ssb-item" data-route="audit" data-admin-only>
+          <button class="ssb-item" data-route="audit" data-roles="super-admin,regional-admin,tenant-admin">
             <span class="ssb-item-label">Audit & Compliance</span>
           </button>
         </div>
 
-        <!-- SUPER ADMIN -->
-        <div class="ssb-group" id="ssbSuperAdmin">
+        <!-- SUPER ADMIN — super-admin and regional-admin -->
+        <div class="ssb-group" id="ssbSuperAdmin" data-roles="super-admin,regional-admin">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Super Admin</span></div>
-          <button class="ssb-item" data-route="tenants" onclick="navigate('#/tenants')">
+          <button class="ssb-item" data-route="tenants" data-roles="super-admin,regional-admin" onclick="navigate('#/tenants')">
             <span class="ssb-item-label">Tenant Directory</span>
           </button>
         </div>
@@ -9008,6 +9102,71 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
 <div class="toast-container" id="toasts"></div>
 
 <script>
+/* ====================== ROLE SWITCHER ====================== */
+const ROLE_CONFIG = {
+  'super-admin':    { label:'Super Admin',    dot:'#A78BFA' },
+  'regional-admin': { label:'Regional Admin', dot:'#06B6D4' },
+  'tenant-admin':   { label:'Tenant Admin',   dot:'#2B7FFF' },
+  'user':           { label:'User',           dot:'rgba(255,255,255,.4)' }
+};
+let activeRole = 'super-admin';
+
+function setRole(role) {
+  activeRole = role;
+  const cfg = ROLE_CONFIG[role];
+  // Update chip appearance
+  const chip = document.getElementById('roleChip');
+  if (chip) { chip.dataset.role = role; }
+  const lbl = document.getElementById('roleChipLabel');
+  if (lbl) lbl.textContent = cfg.label;
+  // Update dropdown active state
+  document.querySelectorAll('.rs-option').forEach(o => {
+    o.classList.toggle('rs-active', o.dataset.role === role);
+  });
+  // Close dropdown
+  const dd = document.getElementById('roleDropdown');
+  if (dd) dd.classList.remove('open');
+  if (chip) chip.setAttribute('aria-expanded', 'false');
+  // Apply sidebar visibility
+  updateSidebarForRole();
+  toast('Viewing as ' + cfg.label, 'success');
+}
+
+function toggleRoleDropdown(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('roleDropdown');
+  if (!dd) return;
+  const chip = document.getElementById('roleChip');
+  const rect = chip.getBoundingClientRect();
+  dd.style.left = rect.left + 'px';
+  dd.style.top  = (rect.bottom + 4) + 'px';
+  const open = dd.classList.toggle('open');
+  chip.setAttribute('aria-expanded', String(open));
+}
+
+function updateSidebarForRole() {
+  // Groups
+  document.querySelectorAll('.ssb-group[data-roles]').forEach(function(group) {
+    const allowed = group.dataset.roles.split(',');
+    group.style.display = allowed.includes(activeRole) ? '' : 'none';
+  });
+  // Individual items that have mixed access within a group
+  document.querySelectorAll('.ssb-item[data-roles]').forEach(function(item) {
+    const allowed = item.dataset.roles.split(',');
+    item.style.display = allowed.includes(activeRole) ? '' : 'none';
+  });
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#roleChip') && !e.target.closest('#roleDropdown')) {
+    const dd = document.getElementById('roleDropdown');
+    if (dd) dd.classList.remove('open');
+    const chip = document.getElementById('roleChip');
+    if (chip) chip.setAttribute('aria-expanded', 'false');
+  }
+});
+
 /* ====================== DATA ====================== */
 
 const CATEGORIES = [
@@ -11998,8 +12157,8 @@ function _obRender() {
       <div class="ob-foot">
         <div class="ob-foot-left">Step 1 of 4</div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="closeOffboardWizard()">Cancel</button>
-          <button class="btn btn-primary" onclick="_obGoStep(2)">Next: Reassign resources</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="closeOffboardWizard()">Cancel</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="_obGoStep(2)">Next: Reassign resources</button>
         </div>
       </div>
     `;
@@ -12078,8 +12237,8 @@ function _obRender() {
       <div class="ob-foot">
         <div class="ob-foot-left">Step 2 of 4</div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="_obGoStep(1)">Back</button>
-          <button class="btn btn-primary" onclick="_obGoStep(3)">Next: Set timeline</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="_obGoStep(1)">Back</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="_obGoStep(3)">Next: Set timeline</button>
         </div>
       </div>
     `;
@@ -12124,8 +12283,8 @@ function _obRender() {
       <div class="ob-foot">
         <div class="ob-foot-left">Step 3 of 4</div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="_obGoStep(2)">Back</button>
-          <button class="btn btn-primary" onclick="_obGoStep(4)">Next: Confirm &amp; execute</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="_obGoStep(2)">Back</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="_obGoStep(4)">Next: Confirm &amp; execute</button>
         </div>
       </div>
     `;
@@ -12180,8 +12339,8 @@ function _obRender() {
           This cannot be undone
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="_obGoStep(3)">Back</button>
-          <button class="btn btn-primary" id="obConfirmBtn"
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="_obGoStep(3)">Back</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" id="obConfirmBtn"
             style="background:var(--red); border-color:var(--red); opacity:${matched?1:0.4}; cursor:${matched?'pointer':'not-allowed'}"
             onclick="_obExecute()"
             ${matched?'':' disabled'}>
@@ -12740,8 +12899,8 @@ function _cwRender() {
         </div>
       </div>
       <div class="pa-slideout-foot">
-        <button class="btn btn-ghost btn-sm" onclick="cwClose()">Cancel</button>
-        <button id="cwSaveBtn" class="btn btn-primary btn-sm" onclick="cwCreate()" style="opacity:.4;pointer-events:none">Create workspace</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="cwClose()">Cancel</button>
+        <button id="cwSaveBtn" class="ds-btn ds-btn-sm ds-btn--primary" onclick="cwCreate()" style="opacity:.4;pointer-events:none">Create workspace</button>
       </div>
     </div>`;
   document.body.appendChild(c);
@@ -13030,7 +13189,7 @@ function renderNotifications() {
           <div class="ns-page-title">Notifications</div>
           <div class="ns-page-sub">Configure where and when you receive alerts from AIMS-OS.</div>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="nsSave()">Save changes</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="nsSave()">Save changes</button>
       </div>
 
       <!-- Delivery Channels -->
@@ -13316,14 +13475,14 @@ function renderDataPrivacy() {
         <div class="dp-export-label">Export all tenant data</div>
         <div class="dp-export-hint" id="dp-last-export">Last export: ${_dp.lastExport}</div>
       </div>
-      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="dpExport()">Request export</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" style="flex-shrink:0" onclick="dpExport()">Request export</button>
     </div>
     <div class="dp-export-row">
       <div>
         <div class="dp-export-label">Data subject request</div>
         <div class="dp-export-hint">GDPR / CCPA — submit a request to access, correct, or delete an individual's personal data</div>
       </div>
-      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="toast('Data subject request form coming soon','info')">Submit request</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" style="flex-shrink:0" onclick="toast('Data subject request form coming soon','info')">Submit request</button>
     </div>
   </div>
 
@@ -13442,8 +13601,8 @@ function renderBilling() {
       <div class="bl-plan-detail">50 seats · Unlimited studios · Priority support · SLA 99.9%</div>
       <div class="bl-plan-detail" style="margin-top:6px">Next billing: <strong style="color:var(--color-text-title)">${b.plan.nextDate}</strong></div>
       <div class="bl-plan-actions">
-        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="toast('Plan management coming soon','info')">Change plan</button>
-        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;color:var(--color-text-caption)" onclick="toast('A cancellation request has been sent to your account manager','info')">Cancel subscription</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Plan management coming soon','info')">Change plan</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" style="color:var(--color-text-caption)" onclick="toast('A cancellation request has been sent to your account manager','info')">Cancel subscription</button>
       </div>
     </div>
     <div style="text-align:right;flex-shrink:0">
@@ -13462,7 +13621,7 @@ function renderBilling() {
       <div class="bl-usage-label">Seats occupied</div>
       ${blUsageBar(b.plan.seats, b.plan.seatsLimit)}
       <div class="bl-usage-val${seatsWarn ? '" style="color:#F59E0B' : ''}">${b.plan.seats} / ${b.plan.seatsLimit}</div>
-      ${seatsWarn ? `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0" onclick="navigate('#/people')">Manage seats</button>` : ''}
+      ${seatsWarn ? `<button class="ds-btn ds-btn-sm ds-btn--secondary" style="font-size:11px;padding:4px 10px;flex-shrink:0" onclick="navigate('#/people')">Manage seats</button>` : ''}
     </div>
     <div class="bl-usage-row">
       <div class="bl-usage-label">Storage</div>
@@ -13487,7 +13646,7 @@ function renderBilling() {
         <div class="bl-pm-name">•••• •••• •••• ${b.payment.last4}</div>
         <div class="bl-pm-sub">Expires ${b.payment.expiry} · ${b.payment.holder}</div>
       </div>
-      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="toast('Payment method update coming soon','info')">Update card</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" style="flex-shrink:0" onclick="toast('Payment method update coming soon','info')">Update card</button>
     </div>
   </div>
 
@@ -13502,14 +13661,14 @@ function renderBilling() {
         <div class="ns-pref-label">Billing email</div>
         <div class="ns-pref-hint">billing@contoso.com</div>
       </div>
-      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="toast('Billing contact updated','success')">Edit</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Billing contact updated','success')">Edit</button>
     </div>
     <div class="ns-pref-row">
       <div>
         <div class="ns-pref-label">Billing address</div>
         <div class="ns-pref-hint">One Microsoft Way, Redmond, WA 98052, USA</div>
       </div>
-      <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px" onclick="toast('Billing address updated','success')">Edit</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Billing address updated','success')">Edit</button>
     </div>
   </div>
 
@@ -13589,8 +13748,8 @@ function renderGovernanceDefaults() {
         </div>
       </div>
       <div class="gd-req-actions">
-        <button class="btn btn-ghost btn-sm" onclick="gdReject('${r.id}')">Reject</button>
-        <button class="btn btn-primary btn-sm" onclick="gdApprove('${r.id}')">Approve</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="gdReject('${r.id}')">Reject</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="gdApprove('${r.id}')">Approve</button>
       </div>
     </div>`;
   }
@@ -13609,7 +13768,7 @@ function renderGovernanceDefaults() {
           <div class="ns-page-title">Governance Defaults</div>
           <div class="ns-page-sub">Tenant-wide defaults for the Sandbox / Truth plane model. Workspace overrides take precedence where set.</div>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="gdSave()">Save changes</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="gdSave()">Save changes</button>
       </div>
 
       <!-- Promotion Requests -->
@@ -23153,7 +23312,7 @@ function renderTenantDetail(tOrId) {
     tabBody =
       section('Tenant info', [
         row('Name', escapeHtml(t.name)),
-        row('Domain', `<code style="font-size:11px;background:var(--bg2);padding:2px 6px;border-radius:4px">${escapeHtml(t.domain)}</code>`),
+        row('Domain', `<code style="font-size:11px;background:var(--surface);border:1px solid var(--field-border);padding:2px 6px;border-radius:var(--radius-xs)">${escapeHtml(t.domain)}</code>`),
         row('Plan', _tdPlanPill(t.plan)),
         row('Status', _tdHealthLabel(t.health), t.health==='healthy'?'green':t.health==='suspended'?'red':'amber'),
         row('Tenant ID', `<code style="font-size:10px;color:var(--t3)">${t.id}</code>`),
@@ -23235,7 +23394,7 @@ function renderTenantDetail(tOrId) {
               <div style="font-size:11px;color:var(--t3);margin-top:2px">Days to retain full event logs</div>
             </div>
             <select onchange="tdSetGovernance('${t.id}','auditRetention',this.value)"
-              style="font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);color:var(--t1);cursor:pointer;font-family:inherit">
+              style="font-size:12px;padding:5px 8px;border-radius:var(--radius-s);border:1px solid var(--field-border);background:var(--field-bg);color:var(--field-text);cursor:pointer;font-family:inherit;outline:none;transition:border-color .15s">
               ${[30,60,90,180,365].map(d => `<option value="${d}" ${t.governance.auditRetention===d?'selected':''}>${d} days</option>`).join('')}
             </select>
           </div>`,
@@ -23972,10 +24131,10 @@ function _paintAdDrawer() {
     </div>
 
     <div class="ad-foot">
-      <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard?.writeText('${escapeHtml(eventId)}').then(()=>toast('Event ID copied','success'))">Copy event ID</button>
-      <button class="btn btn-ghost btn-sm" onclick="toast('cURL copied to clipboard','success')">Copy as cURL</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="navigator.clipboard?.writeText('${escapeHtml(eventId)}').then(()=>toast('Event ID copied','success'))">Copy event ID</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('cURL copied to clipboard','success')">Copy as cURL</button>
       <div style="flex:1"></div>
-      <button class="btn btn-ghost btn-sm" onclick="closeAuditDetail();auditFilters.search='${escapeHtml(e.resource||e.actor)}';renderAudit()">Filter by ${escapeHtml(e.resource || e.actor.split(':')[0] || 'actor')}</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="closeAuditDetail();auditFilters.search='${escapeHtml(e.resource||e.actor)}';renderAudit()">Filter by ${escapeHtml(e.resource || e.actor.split(':')[0] || 'actor')}</button>
     </div>
   `;
 }
