@@ -8998,8 +8998,8 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
           </button>
         </div>
 
-        <!-- PLATFORM — super-admin (all), regional-admin (partial) -->
-        <div class="ssb-group" data-roles="super-admin,regional-admin">
+        <!-- PLATFORM — super-admin (all), regional-admin (partial), tenant-admin (audit only) -->
+        <div class="ssb-group" data-roles="super-admin,regional-admin,tenant-admin">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
 
           <button class="ssb-item" data-route="governance-defaults" data-roles="super-admin" onclick="navigate('#/governance-defaults')">
@@ -9129,6 +9129,11 @@ function setRole(role) {
   if (chip) chip.setAttribute('aria-expanded', 'false');
   // Apply sidebar visibility
   updateSidebarForRole();
+  // Re-render home if currently on home so cards/alerts update
+  const curHash = (window.location.hash || '').replace(/^#\/?/, '');
+  if (curHash === '' || curHash === 'home') {
+    if (typeof renderAdminHome === 'function') renderAdminHome();
+  }
   toast('Viewing as ' + cfg.label, 'success');
 }
 
@@ -12968,23 +12973,34 @@ function renderWorkspaceSwitcherItems() {
 
 /* ── Admin Console Home ─────────────────────────────────── */
 const AC_SECTIONS = [
-  { group:'Personal', items:[
-    { id:'my-settings',  name:'My Settings',             desc:'Your personal preferences and account details',         state:'active', route:'my-settings' },
+  { group:'Personal', roles:['super-admin','regional-admin','tenant-admin','user'], items:[
+    { id:'my-settings',  roles:['super-admin','regional-admin','tenant-admin','user'], name:'My Settings',             desc:'Your personal preferences and account details',         state:'active', route:'my-settings' },
   ]},
-  { group:'Tenant', items:[
-    { id:'people',       name:'People & Access',          desc:'Manage users, roles, and workspace invitations',        state:'active', route:'people' },
-    { id:'organization', name:'Organization',             desc:'Configure your organization structure and details',     state:'active', route:'organization' },
-    { id:'identity',     name:'Identity & Security',      desc:'SSO, MFA, and authentication policies',                state:'active', route:'identity' },
-    { id:'studios',      name:'Studios & Entitlements',   desc:'Manage licensed products and studio access',           state:'active', route:'studios' },
-    { id:'billing',      name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'active', route:'billing' },
+  { group:'My Workspace', roles:['user'], items:[
+    { id:'my-team',      roles:['user'], name:'My Team',              desc:'View your teammates and their roles (read-only)',       state:'active', route:'my-team' },
+    { id:'my-studios',   roles:['user'], name:'My Studios',           desc:'Studios and features you have access to (read-only)',   state:'active', route:'my-studios' },
   ]},
-  { group:'Platform', items:[
-    { id:'governance-defaults', name:'Governance Defaults',        desc:'Default policies applied across all studios',       state:'active', route:'governance-defaults' },
-    { id:'data-privacy',        name:'Data & Privacy',             desc:'Data retention, export, and compliance settings',   state:'active', route:'data-privacy' },
-    { id:'integrations',        name:'Integrations & Credentials', desc:'Authenticate and govern third-party connections',   state:'active', alert:1, route:'integrations' },
-    { id:'notifications',       name:'Notifications',              desc:'Alert channels, rules, and delivery preferences',   state:'active', route:'notifications' },
-    { id:'audit',               name:'Audit & Compliance',         desc:'Activity logs and compliance reporting',            state:'active', route:'audit' },
+  { group:'Tenant', roles:['super-admin','regional-admin','tenant-admin'], items:[
+    { id:'people',       roles:['super-admin','regional-admin','tenant-admin'], name:'People & Access',          desc:'Manage users, roles, and workspace invitations',        state:'active', route:'people' },
+    { id:'organization', roles:['super-admin','regional-admin','tenant-admin'], name:'Organization',             desc:'Configure your organization structure and details',     state:'active', route:'organization' },
+    { id:'identity',     roles:['super-admin','regional-admin','tenant-admin'], name:'Identity & Security',      desc:'SSO, MFA, and authentication policies',                state:'active', route:'identity' },
+    { id:'studios',      roles:['super-admin','regional-admin','tenant-admin'], name:'Studios & Entitlements',   desc:'Manage licensed products and studio access',           state:'active', route:'studios' },
+    { id:'billing',      roles:['super-admin','tenant-admin'],                  name:'Billing & Subscription',   desc:'Plans, invoices, and payment methods',                 state:'active', route:'billing' },
   ]},
+  { group:'Platform', roles:['super-admin','regional-admin','tenant-admin'], items:[
+    { id:'governance-defaults', roles:['super-admin'],                              name:'Governance Defaults',        desc:'Default policies applied across all studios',       state:'active', route:'governance-defaults' },
+    { id:'data-privacy',        roles:['super-admin'],                              name:'Data & Privacy',             desc:'Data retention, export, and compliance settings',   state:'active', route:'data-privacy' },
+    { id:'integrations',        roles:['super-admin','regional-admin'],             name:'Integrations & Credentials', desc:'Authenticate and govern third-party connections',   state:'active', alert:1, route:'integrations' },
+    { id:'notifications',       roles:['super-admin'],                              name:'Notifications',              desc:'Alert channels, rules, and delivery preferences',   state:'active', route:'notifications' },
+    { id:'audit',               roles:['super-admin','regional-admin','tenant-admin'], name:'Audit & Compliance',      desc:'Activity logs and compliance reporting',            state:'active', route:'audit' },
+  ]},
+];
+
+const AC_ALERTS = [
+  { roles:['super-admin','regional-admin'], type:'warn', section:'Integrations & Credentials', desc:'1 integration is failing',                route:'integrations' },
+  { roles:['super-admin'],                  type:'info', section:'Governance Defaults',         desc:'2 promotion requests awaiting approval',  route:'governance-defaults' },
+  { roles:['super-admin'],                  type:'info', section:'Notifications',               desc:'4 unread alerts across workspaces',       route:'notifications' },
+  { roles:['tenant-admin'],                 type:'info', section:'People & Access',             desc:'3 pending invitations awaiting response', route:'people' },
 ];
 
 /* ── Admin Copilot chat responses ── */
@@ -14096,52 +14112,41 @@ function renderAdminHome() {
       <!-- Two-zone body -->
       <div class="ac-cmd-body">
 
-        <!-- LEFT: Needs Attention (35%) -->
+        <!-- LEFT: Needs Attention (35%) — filtered by role -->
         <section class="ac-cmd-left">
           <h2 class="ac-home-section-label">Needs Attention</h2>
 
-          <div class="ac-alert-row ac-alert-row--real">
-            <span class="ac-alert-dot ac-alert-dot--warn"></span>
-            <div class="ac-alert-body">
-              <span class="ac-alert-section">Integrations &amp; Credentials</span>
-              <span class="ac-alert-desc">1 integration is failing</span>
-            </div>
-            <a class="ac-alert-cta" onclick="location.hash='#/integrations'">Review →</a>
-          </div>
-
-          <div class="ac-alert-row ac-alert-row--real">
-            <span class="ac-alert-dot ac-alert-dot--info"></span>
-            <div class="ac-alert-body">
-              <span class="ac-alert-section">Governance Defaults</span>
-              <span class="ac-alert-desc">2 promotion requests awaiting approval</span>
-            </div>
-            <a class="ac-alert-cta" onclick="location.hash='#/governance-defaults'">Review →</a>
-          </div>
-
-          <div class="ac-alert-row ac-alert-row--real">
-            <span class="ac-alert-dot ac-alert-dot--info"></span>
-            <div class="ac-alert-body">
-              <span class="ac-alert-section">Notifications</span>
-              <span class="ac-alert-desc">4 unread alerts across workspaces</span>
-            </div>
-            <a class="ac-alert-cta" onclick="location.hash='#/notifications'">Review →</a>
-          </div>
-
-          <p class="ac-home-empty-note">
-            Items requiring action across all sections appear here.
-          </p>
+          ${(function() {
+            const visible = AC_ALERTS.filter(a => a.roles.includes(activeRole));
+            if (!visible.length) return '<p class="ac-home-empty-note">No items requiring attention right now.</p>';
+            return visible.map(a => `
+              <div class="ac-alert-row ac-alert-row--real">
+                <span class="ac-alert-dot ac-alert-dot--${a.type}"></span>
+                <div class="ac-alert-body">
+                  <span class="ac-alert-section">${a.section}</span>
+                  <span class="ac-alert-desc">${a.desc}</span>
+                </div>
+                <a class="ac-alert-cta" onclick="location.hash='#/${a.route}'">Review →</a>
+              </div>`).join('') + '<p class="ac-home-empty-note">Items requiring action across all sections appear here.</p>';
+          })()}
         </section>
 
-        <!-- RIGHT: Section Grid (65%) -->
+        <!-- RIGHT: Section Grid (65%) — filtered by role -->
         <section class="ac-cmd-right">
-          ${AC_SECTIONS.map(group => `
-            <div class="ac-section-group">
-              <h3 class="ac-section-group-label">${group.group}</h3>
-              <div class="ac-section-cards">
-                ${group.items.map(item => cardHtml(item)).join('')}
-              </div>
-            </div>
-          `).join('')}
+          ${(function() {
+            return AC_SECTIONS
+              .filter(g => g.roles.includes(activeRole))
+              .map(g => {
+                const visibleItems = g.items.filter(i => i.roles.includes(activeRole));
+                if (!visibleItems.length) return '';
+                return `<div class="ac-section-group">
+                  <h3 class="ac-section-group-label">${g.group}</h3>
+                  <div class="ac-section-cards">
+                    ${visibleItems.map(item => cardHtml(item)).join('')}
+                  </div>
+                </div>`;
+              }).join('');
+          })()}
         </section>
 
       </div>
