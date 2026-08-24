@@ -6187,6 +6187,145 @@ html.theme-light{
   --cyan-25:rgba(14,116,144,0.25);
   --cyan-28:rgba(14,116,144,0.28);
   --cyan-40:rgba(14,116,144,0.40);
+
+  /* ── AIMS-OS DS tokens — light values ─────────────────────────────────────
+     Source of truth: aims-os-design-system src/index.css `.light` block.
+     These are defined once at :root with dark values; without these overrides
+     every view migrated to DS tokens renders dark-on-light in light mode. */
+
+  /* Text */
+  --color-text-title:                 #000000;                 /* Text/Title            */
+  --color-text-subtitle:              #2a2a2a;                 /* Text/Subtitle         */
+  --color-text-label:                 #2a2a2a;                 /* Text/Label            */
+  --color-text-body:                  #5C5C5C;                 /* Text/Body             */
+  --color-text-caption:               #5c5c5c;                 /* Text/Caption          */
+  --color-text-disabled:              #bababa;                 /* Text/Disabled         */
+  --color-text-error:                 #5f2120;                 /* Text/Error            */
+  --color-text-negative:              #ffffff;                 /* Text/Negative — always white */
+  --sb-text:                          var(--color-text-negative); /* sidebar stays dark navy   */
+
+  /* Borders */
+  --color-border-neutral-subtle:      #E4E4E7;                 /* Border/Neutral/Subtle  */
+  --color-border-neutral-lighter:     #BABABA;                 /* Border/Neutral/Lighter */
+  --color-border-neutral-default:     #5c5c5c;                 /* Border/Neutral/Default */
+  --color-border-primary-default:     #2173ff;                 /* Border/Primary/Default */
+
+  /* Base surfaces / fields */
+  --canvas:                           #E4ECF7;
+  --surface:                          #F2F7FF;                 /* brand-blue tint, not flat white */
+  --surface-raised:                   #EBF2FF;                 /* elevated, blue tint    */
+  --foreground:                       #1a1a1a;
+  --muted:                            #0000000a;
+  --muted-foreground:                 #5c5c5c;
+  --destructive:                      #d32f2f;
+  --field-bg:                         #ffffff;
+  --field-border:                     #5c5c5c;
+
+  /* Tags */
+  --tag-neutral-bg:                   #f2f2f2;
+  --tag-neutral-bd:                   #5c5c5c;
+  --tag-neutral-fg:                   #2a2a2a;
+  --tag-informative-bg:               #e9f1ff;
+  --tag-informative-bd:               #2173ff;
+  --tag-informative-fg:               #001740;
+  --tag-success-bg:                   #e5fdf8;
+  --tag-success-bd:                   #009978;
+  --tag-success-fg:                   #003328;
+  --tag-alert-bg:                     #ffeedb;
+  --tag-alert-bd:                     #b25102;
+  --tag-alert-fg:                     #663c00;
+  --tag-error-bg:                     #fdeded;
+  --tag-error-bd:                     #992222;
+  --tag-error-fg:                     #5f2120;
+  --tag-primary-bg:                   #2173ff;
+  --tag-primary-fg:                   #ffffff;
+  --tag-secondary-bg:                 #ffffff;
+  --tag-secondary-bd:                 #5c5c5c;
+  --tag-secondary-fg:                 #2a2a2a;
+  --tag-purple-bg:                    #f3e9fd;
+  --tag-purple-bd:                    #7b27ed;
+  --tag-purple-fg:                    #2c075c;
+  --tag-lightblue-bg:                 #e5f8ff;
+  --tag-lightblue-bd:                 #00b5d9;
+  --tag-lightblue-fg:                 #0c4a6e;
+  --tag-limegreen-bg:                 #f9fee5;
+  --tag-limegreen-bd:                 #a0da1d;
+  --tag-limegreen-fg:                 #3e5c0a;
+
+  /* Buttons */
+  --btn-primary-active-bg:            #001a5c;
+  --btn-primary-bg:                   #2173ff;
+  --btn-primary-hover-bg:             #002f80;
+  --btn-secondary-active-bg:          rgba(0,0,0,0.078);
+  --btn-secondary-bg:                 #ffffff;
+  --btn-secondary-border:             #5c5c5c;
+  --btn-secondary-disabled-bd:        #bababa;
+  --btn-secondary-disabled-bg:        #fafafa;
+  --btn-secondary-disabled-fg:        #bababa;
+  --btn-secondary-fg:                 var(--color-text-label);
+  --btn-secondary-hover-bd:           #d9d9d9;
+  --btn-secondary-hover-bg:           #f2f2f2;
+  --btn-tertiary-active-bg:           #ebebeb;
+  --btn-tertiary-fg:                  var(--color-text-label);
+  --btn-tertiary-hover-bg:            #fafafa;
+  --btn-warning-active-bg:            #991b1b;
+  --btn-warning-bg:                   #d32f2f;
+  --btn-warning-hover-bg:             #b91c1c;
+
+  /* Fields */
+  --field-border-focus:               #2173ff;
+  --field-border-hover:               #2a2a2a;
+  --field-placeholder:                #bababa;
+  --field-text:                       #2a2a2a;
+
+  /* Badges */
+  --badge-alert:                      #ed6c02;
+  --badge-error:                      #d32f2f;
+  --badge-in-progress:                #2173ff;
+  --badge-neutral:                    #bababa;
+  --badge-success:                    #00765f;
+
+  /* Sidebar */
+  --sb-bg:                            var(--color-surface-neutral-black);
+  --sb-icon-active:                   var(--color-icon-neutral-light);
+  --sb-icon-default:                  rgba(128,175,255,1);
+  --sb-icon-hover-bg:                 var(--color-surface-neutral-black);
+  --sb-row-hover:                     rgba(42,42,42,1);
+  --sb-separator:                     rgba(186,186,186,1);
+
+  /* Table */
+  --table-bg:                         transparent;
+  --table-cell-text:                  var(--color-text-body);
+  --table-header-bg:                  #EEF5FF;
+  --table-row-hover-bg:               var(--color-surface-neutral-default);
+  --table-row-selected-bg:            var(--color-surface-primary-more-subtle);
+
+  /* Topbar menu */
+  --topbar-menu-bg:                   rgba(255,255,255,1.00);
+  --topbar-menu-border:               rgba(0,0,0,0.10);
+  --topbar-menu-item-hover:           rgba(0,0,0,0.04);
+  --topbar-menu-item-sel:             rgba(233,241,255,1.00);
+  --topbar-menu-text:                 rgba(42,42,42,1.00);
+  --topbar-menu-text-dim:             rgba(92,92,92,1.00);
+
+  /* Avatars */
+  --av-col-blue-bg:                   #1a5fd4;
+  --av-col-green-bg:                  #047857;
+
+  /* Shadows */
+  --shadow-elevation-1:               2px 2px 8px 1px rgba(0,0,0,0.06);
+  --shadow-elevation-2:               4px 4px 12px 2px rgba(0,0,0,0.08);
+  --shadow-glow-ai:                   4px 8px 12px 8px rgba(9,226,171,0.16);
+
+  /* Misc */
+  --code-bg:                          rgba(0,0,0,0.08);
+
+  /* Aliased targets */
+  --color-icon-neutral-light:         #ffffff;
+  --color-surface-neutral-black:      #000000;
+  --color-surface-primary-more-subtle: #f6f9ff;
+  --color-surface-neutral-default:    #f2f2f2;                 /* Surface/Neutral/Default */
+  --color-surface-primary-subtle:     #E9F1FF;                 /* Surface/Primary/Subtle  */
 }
 
 /* Body backdrop */
@@ -7911,7 +8050,7 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 .pa-invite-name{font-size:13px;font-weight:600;color:var(--color-text-title);}
 .pa-invite-meta{font-size:11px;color:var(--color-text-caption);margin-top:1px;}
 .pa-invite-actions{display:flex;gap:6px;flex-shrink:0;}
-.pa-invite-btn{font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:1px solid var(--color-border-neutral-subtle);background:var(--color-surface-raised);color:var(--color-text-body);cursor:pointer;font-family:inherit;transition:background .12s;}
+.pa-invite-btn{font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:1px solid var(--color-border-neutral-subtle);background:var(--surface-raised);color:var(--color-text-body);cursor:pointer;font-family:inherit;transition:background .12s;}
 .pa-invite-btn:hover{background:var(--bg3);}
 .pa-invite-btn--danger{color:#f87171;border-color:rgba(239,68,68,.2);}
 .pa-invite-btn--danger:hover{background:rgba(239,68,68,.06);}
@@ -8959,8 +9098,8 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" fill="rgba(255,255,255,0.90)"/><rect x="8" y="2" width="4" height="4" rx="1" fill="rgba(255,255,255,0.60)"/><rect x="2" y="8" width="4" height="4" rx="1" fill="rgba(255,255,255,0.60)"/><rect x="8" y="8" width="4" height="4" rx="1" fill="rgba(255,255,255,0.90)"/></svg>
         </div>
         <div>
-          <div style="font-size:12px;font-weight:700;color:var(--t1);letter-spacing:-.01em;line-height:1.2">AIMS OS</div>
-          <div style="font-size:10px;font-weight:500;color:var(--t3);line-height:1.3">Admin Console</div>
+          <div style="font-size:12px;font-weight:700;color:var(--sb-text);letter-spacing:-.01em;line-height:1.2">AIMS OS</div>
+          <div style="font-size:10px;font-weight:500;color:var(--sb-text);opacity:.6;line-height:1.3">Admin Console</div>
         </div>
       </div>
       <!-- Back to Studio -->
