@@ -845,7 +845,6 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
   height:100%; padding:0; max-width:none;
   box-sizing:border-box;
 }
-@keyframes ac-pulse{0%,100%{opacity:.5} 50%{opacity:1}}
 
 /* ── Admin Console Command Center Home ────────────────── */
 .ac-cmd-wrap{
@@ -882,11 +881,26 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
 .ac-alert-desc{font-size:12px; color:var(--color-text-body);}
 .ac-alert-cta{font-size:12px; font-weight:600; color:var(--pri); text-decoration:none; cursor:pointer; flex-shrink:0; white-space:nowrap;}
 .ac-alert-cta:hover{opacity:.75;}
-.ac-alert-row--skeleton{padding:16px 14px;}
-.ac-skeleton{height:14px; border-radius:4px; background:rgba(255,255,255,0.05); animation:ac-pulse 2s ease-in-out infinite;}
-.ac-skeleton--wide{width:85%;}
-.ac-skeleton--medium{width:60%;}
 .ac-home-empty-note{font-size:11px; color:var(--t3); margin-top:4px; padding:0 2px; line-height:1.5;}
+
+/* Attention header: count + severity breakdown */
+.ac-home-attention-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px;}
+.ac-home-attention-head .ac-home-section-label{margin-bottom:0;}
+.ac-attention-count{font-size:18px; font-weight:700; color:var(--color-text-title); line-height:1;}
+.ac-attention-breakdown{display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+.ac-attention-tally{display:flex; align-items:center; gap:6px; font-size:11px; color:var(--color-text-caption);}
+
+/* Attention empty state */
+.ac-attention-empty{
+  display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;
+  padding:32px 20px; border-radius:var(--radius-m);
+  border:0.5px dashed var(--color-border-neutral-subtle);
+}
+.ac-attention-empty-icon{color:var(--green); opacity:.9;}
+.ac-attention-empty-title{font-size:13px; font-weight:600; color:var(--color-text-title);}
+.ac-attention-empty .ac-home-empty-note{margin-top:0; text-align:center; max-width:34ch;}
+.ac-attention-empty-cta{font-size:12px; font-weight:600; color:var(--pri); text-decoration:none; cursor:pointer; margin-top:4px;}
+.ac-attention-empty-cta:hover{opacity:.75;}
 
 /* Sections Grid */
 .ac-cmd-right{flex:1; overflow:auto; display:flex; flex-direction:column; gap:24px;}
@@ -14128,12 +14142,34 @@ function renderAdminHome() {
 
         <!-- LEFT: Needs Attention (35%) — filtered by role -->
         <section class="ac-cmd-left">
-          <h2 class="ac-home-section-label">Needs Attention</h2>
-
           ${(function() {
             const visible = AC_ALERTS.filter(a => a.roles.includes(activeRole));
-            if (!visible.length) return '<p class="ac-home-empty-note">No items requiring attention right now.</p>';
-            return visible.map(a => `
+            const TALLY = { warn:['warning','warnings'], info:['info','info'], ok:['resolved','resolved'] };
+            const counts = visible.reduce((m, a) => { m[a.type] = (m[a.type] || 0) + 1; return m; }, {});
+            const breakdown = ['warn','info','ok'].filter(t => counts[t]).map(t => `
+              <span class="ac-attention-tally">
+                <span class="ac-alert-dot ac-alert-dot--${t}"></span>${counts[t]} ${TALLY[t][counts[t] === 1 ? 0 : 1]}
+              </span>`).join('');
+
+            const head = `
+              <div class="ac-home-attention-head">
+                <h2 class="ac-home-section-label">Needs Attention</h2>
+                ${visible.length ? `<span class="ac-attention-count">${visible.length}</span>` : ''}
+              </div>
+              ${visible.length ? `<div class="ac-attention-breakdown">${breakdown}</div>` : ''}`;
+
+            if (!visible.length) {
+              const canAudit = ['super-admin','regional-admin','tenant-admin'].includes(activeRole);
+              return head + `
+                <div class="ac-attention-empty">
+                  <svg class="ac-attention-empty-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>
+                  <div class="ac-attention-empty-title">You're all caught up</div>
+                  <p class="ac-home-empty-note">Items requiring action across all sections appear here.</p>
+                  ${canAudit ? `<a class="ac-attention-empty-cta" onclick="location.hash='#/audit'">View activity log →</a>` : ''}
+                </div>`;
+            }
+
+            return head + visible.map(a => `
               <div class="ac-alert-row ac-alert-row--real">
                 <span class="ac-alert-dot ac-alert-dot--${a.type}"></span>
                 <div class="ac-alert-body">
@@ -14141,7 +14177,7 @@ function renderAdminHome() {
                   <span class="ac-alert-desc">${a.desc}</span>
                 </div>
                 <a class="ac-alert-cta" onclick="location.hash='#/${a.route}'">Review →</a>
-              </div>`).join('') + '<p class="ac-home-empty-note">Items requiring action across all sections appear here.</p>';
+              </div>`).join('');
           })()}
         </section>
 
