@@ -956,6 +956,15 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
 .ac-stat-icon svg{width:16px; height:16px}
 .ac-stat-value{font-size:24px; font-weight:700; color:var(--color-text-title); line-height:1; letter-spacing:-.02em;}
 .ac-stat-label{font-size:11px; color:var(--color-text-caption); margin-top:5px; font-weight:500;}
+.ac-stat-row{display:flex; align-items:baseline; gap:7px; flex-wrap:wrap;}
+.ac-stat-delta{
+  font-size:11px; font-weight:600; line-height:1;
+  padding:2px 6px; border-radius:20px; white-space:nowrap;
+  background:var(--tag-success-bg); color:var(--tag-success-fg);
+  border:0.5px solid var(--tag-success-bd);
+}
+.ac-stat-note{font-size:11px; font-weight:600; white-space:nowrap; color:#F97316;}
+.ac-stat-note--ok{color:var(--tag-success-bd);}
 
 /* Section card icon */
 .ac-card-icon{width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-bottom:8px;}
@@ -14259,10 +14268,32 @@ function renderAdminHome() {
   const el = document.getElementById('content');
   if (!el) return;
 
-  const totalUsers = AC_WORKSPACES.reduce((s, w) => s + (w.members || 0), 0) || 42;
-  const totalWorkspaces = AC_WORKSPACES.length || 2;
-  const totalIntegrations = 7;
-  const totalStudios = 3;
+  /* Every stat is derived from the dataset the admin can open one click away,
+     so the strip can never contradict the page it links to. Deltas appear only
+     where the data supports one — no invented trends. */
+
+  // Members: the browsable roster in People & Access.
+  const totalUsers = MOCK_PEOPLE.length;
+
+  // Recent joiners, anchored to the newest joinDate in the data rather than to
+  // the wall clock, so the prototype reports the same number whenever it is opened.
+  const _joinTimes = MOCK_PEOPLE
+    .map(p => Date.parse(p.joinDate))
+    .filter(t => !isNaN(t));
+  const _newestJoin = _joinTimes.length ? Math.max(..._joinTimes) : 0;
+  const newUsers = _joinTimes.filter(t => _newestJoin - t <= 30 * 864e5).length;
+
+  // 'all' is the tenant-wide pseudo-entry in the switcher, not a workspace.
+  const totalWorkspaces = AC_WORKSPACES.filter(w => w.id !== 'all').length;
+
+  // Studios that grant permissions, excluding the Platform section.
+  const totalStudios = PERM_TREE.filter(st => st.id !== 'studio-platform').length;
+
+  // Same bucketing the Integrations view uses, so both agree.
+  const _connectedInts = INTEGRATIONS.filter(i => i.connected);
+  const totalIntegrations = _connectedInts.length;
+  const intsNeedAttention = _connectedInts
+    .filter(i => bucketOf(deriveStatus(i)) === 'needs_attention').length;
 
   function cardHtml(item) {
     const ic = _acIcons[item.id] || { svg:'', bg:'var(--bg3)', color:'var(--t3)' };
@@ -14303,8 +14334,11 @@ function renderAdminHome() {
       <div class="ac-stats-strip">
         <div class="ac-stat-card" style="--ac-stat-accent:#6366f1">
           <div class="ac-stat-icon"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 5a5 5 0 0110 0H3z"/></svg></div>
-          <div class="ac-stat-value">${totalUsers}</div>
-          <div class="ac-stat-label">Total members</div>
+          <div class="ac-stat-row">
+            <span class="ac-stat-value">${totalUsers}</span>
+            ${newUsers > 0 ? `<span class="ac-stat-delta">+${newUsers} new</span>` : ''}
+          </div>
+          <div class="ac-stat-label">Total members${newUsers > 0 ? ' · last 30 days' : ''}</div>
         </div>
         <div class="ac-stat-card" style="--ac-stat-accent:#0ea5e9">
           <div class="ac-stat-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M2 8l6-5 6 5"/><path d="M6 14v-4h4v4"/></svg></div>
@@ -14318,7 +14352,12 @@ function renderAdminHome() {
         </div>
         <div class="ac-stat-card" style="--ac-stat-accent:#f59e0b">
           <div class="ac-stat-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.1 3.1l1.4 1.4M11.5 11.5l1.4 1.4M11.5 3.1l-1.4 1.4M3.1 11.5L4.5 10"/></svg></div>
-          <div class="ac-stat-value">${totalIntegrations}</div>
+          <div class="ac-stat-row">
+            <span class="ac-stat-value">${totalIntegrations}</span>
+            ${intsNeedAttention > 0
+              ? `<span class="ac-stat-note">${intsNeedAttention} need attention</span>`
+              : `<span class="ac-stat-note ac-stat-note--ok">All healthy</span>`}
+          </div>
           <div class="ac-stat-label">Integrations</div>
         </div>
       </div>
