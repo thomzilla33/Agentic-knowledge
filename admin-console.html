@@ -10099,7 +10099,7 @@ const PA_ROLES = [
   { id:'viewer',              label:'Viewer',              system:true,  color:'#64748b', desc:'Read-only access across all non-sensitive studio content',                                memberIds:['sc','ap','lt'] },
   { id:'agent-builder',       label:'Agent Builder',       system:false, color:'#f97316', desc:'Create and manage AI workers, agentic networks, and workflow definitions',               memberIds:['sb','dp','jh','lt'] },
   { id:'data-steward',        label:'Data Steward',        system:false, color:'#8b5cf6', desc:'Manage model definitions, governance policies, and data lineage graphs',                 memberIds:['mg','np'] },
-  { id:'compliance-auditor',  label:'Compliance Auditor',  system:false, color:'#0ea5e9', desc:'Read-only access to audit logs, governance events, and lineage — no write permissions',  memberIds:['ok'] },
+  { id:'compliance-auditor',  label:'Compliance Auditor',  system:false, color:'#0ea5e9', desc:'Read-only access to audit logs, governance events, data lineage, and access settings',  memberIds:['ok'] },
 ];
 
 const PA_MEMBER_ROLES = {
@@ -10239,15 +10239,34 @@ const PERM_TREE = [
     { id:'feat-pl-members', label:'People & Access', desc:'Member and role management', children:[
       { id:'pl.members.manage', label:'Manage members and roles', desc:'Invite, suspend, and remove members, and assign roles' },
     ]},
+    { id:'feat-pl-identity', label:'Identity & Security', desc:'Sign-in and authentication policy', children:[
+      { id:'pl.identity.view',   label:'View identity settings', desc:'Read SSO, MFA, and authentication policies' },
+      { id:'pl.identity.manage', label:'Manage identity settings', desc:'Configure SSO, MFA, and authentication policies' },
+    ]},
+    { id:'feat-pl-studios', label:'Studios & Entitlements', desc:'Licensed products and studio access', children:[
+      { id:'pl.studios.view',   label:'View entitlements',   desc:'See licensed studios and who has access' },
+      { id:'pl.studios.manage', label:'Manage entitlements', desc:'Grant and revoke studio access' },
+    ]},
     { id:'feat-pl-billing', label:'Billing & Subscription', desc:'Subscription and payment management', children:[
       { id:'pl.billing.view',   label:'View billing',   desc:'See subscription and invoice details' },
       { id:'pl.billing.manage', label:'Manage billing', desc:'Update plan, payment, and billing contacts' },
     ]},
+    { id:'feat-pl-privacy', label:'Data & Privacy', desc:'Retention, export, and compliance settings', children:[
+      { id:'pl.privacy.view',   label:'View data policies',   desc:'Read retention, export, and compliance settings' },
+      { id:'pl.privacy.manage', label:'Manage data policies', desc:'Configure retention, export, and compliance settings' },
+    ]},
     { id:'feat-pl-integrations', label:'Integrations & Credentials', desc:'Third-party connections and their credentials', children:[
       { id:'pl.integrations.manage', label:'Manage integrations', desc:'Install and configure workspace integrations' },
     ]},
+    { id:'feat-pl-notifications', label:'Notifications', desc:'Alert channels, rules, and delivery', children:[
+      { id:'pl.notifications.manage', label:'Manage notification rules', desc:'Configure alert channels, rules, and delivery preferences' },
+    ]},
     { id:'feat-pl-audit', label:'Audit & Compliance', desc:'Tenant-wide event history', children:[
       { id:'pl.audit.view', label:'View audit log', desc:'Read audit events across all studios' },
+    ]},
+    { id:'feat-pl-tenants', label:'Tenant Directory', desc:'Organizations on the platform', children:[
+      { id:'pl.tenants.view',   label:'View tenant directory', desc:'See all organizations on the platform' },
+      { id:'pl.tenants.manage', label:'Manage tenants',        desc:'Create, configure, and suspend organizations' },
     ]},
   ]},
 ];
@@ -10259,12 +10278,12 @@ const PA_PERM_TREE = PERM_TREE.map(s => ({
 }));
 
 const PA_ROLE_PERMS = {
-  'workspace-admin':   new Set(['ag.workers.view','ag.workers.run','ag.workers.manage','ag.networks.view','ag.networks.manage','ag.workflows.manage','ag.hitl.manage','gov.policy.view','gov.policy.manage','gov.promotions.view','gov.promotions.approve','gov.domains.manage','gov.resolution.manage','hx.models.view','hx.models.author','hx.lineage.view','hx.connectors.manage','pl.settings.view','pl.members.manage','pl.billing.view','pl.billing.manage','pl.integrations.manage','pl.audit.view']),
+  'workspace-admin':   new Set(['ag.workers.view','ag.workers.run','ag.workers.manage','ag.networks.view','ag.networks.manage','ag.workflows.manage','ag.hitl.manage','gov.policy.view','gov.policy.manage','gov.promotions.view','gov.promotions.approve','gov.domains.manage','gov.resolution.manage','hx.models.view','hx.models.author','hx.lineage.view','hx.connectors.manage','pl.settings.view','pl.members.manage','pl.billing.view','pl.billing.manage','pl.integrations.manage','pl.audit.view','pl.identity.view','pl.identity.manage','pl.studios.view','pl.studios.manage','pl.privacy.view','pl.privacy.manage','pl.notifications.manage']),
   'developer':         new Set(['ag.workers.view','ag.workers.run','ag.workers.manage','ag.networks.view','ag.networks.manage','ag.workflows.manage','hx.models.view','hx.lineage.view','hx.connectors.manage','pl.settings.view','pl.integrations.manage']),
   'viewer':            new Set(['ag.workers.view','ag.networks.view','gov.policy.view','gov.promotions.view','hx.models.view','hx.lineage.view','pl.settings.view','pl.audit.view']),
   'agent-builder':     new Set(['ag.workers.view','ag.workers.run','ag.workers.manage','ag.networks.view','ag.networks.manage','ag.workflows.manage','ag.hitl.manage']),
-  'data-steward':      new Set(['hx.models.view','hx.models.author','hx.lineage.view','hx.connectors.manage','gov.policy.view','gov.promotions.view']),
-  'compliance-auditor':new Set(['ag.workers.view','ag.networks.view','gov.policy.view','gov.promotions.view','hx.models.view','hx.lineage.view','pl.audit.view']),
+  'data-steward':      new Set(['hx.models.view','hx.models.author','hx.lineage.view','hx.connectors.manage','gov.policy.view','gov.promotions.view','pl.privacy.view']),
+  'compliance-auditor':new Set(['ag.workers.view','ag.networks.view','gov.policy.view','gov.promotions.view','hx.models.view','hx.lineage.view','pl.audit.view','pl.identity.view','pl.studios.view','pl.privacy.view']),
 };
 
 // Maps PA_USER_PERM_TREE node codes → PERM_TREE leaf IDs used in PA_ROLE_PERMS
