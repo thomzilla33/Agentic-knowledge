@@ -927,7 +927,6 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
 .ac-card-desc{font-size:12px; color:var(--color-text-body); line-height:1.4; flex:1;}
 .ac-card-footer{display:flex; align-items:center; gap:8px; margin-top:6px;}
 .ac-card-badge{font-size:10px; font-weight:600; letter-spacing:.03em;}
-.ac-card-badge--active{color:var(--green);}
 .ac-card-badge--soon{color:var(--t3);}
 .ac-card-alert-badge{
   font-size:10px; font-weight:600;
@@ -7966,6 +7965,24 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .pa-mx-cell--view{color:var(--color-text-body);}
 .pa-mx-cell--none{color:var(--color-text-disabled);}
 .pa-mx-legend{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:10px;}
+
+/* Permission-save confirmation: diff + affected members */
+.pa-perm-diff{
+  display:flex; flex-direction:column; gap:6px; width:100%;
+  margin:4px 0 12px; padding:10px 12px; text-align:left;
+  border-radius:var(--radius-m); background:var(--surface-raised);
+  border:0.5px solid var(--color-border-neutral-subtle);
+}
+.pa-perm-diff-row{display:flex; gap:8px; align-items:baseline; font-size:12px;}
+.pa-perm-diff-verb{font-weight:700; font-size:10px; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; flex-shrink:0;}
+.pa-perm-diff-verb--grant{color:var(--tag-success-bd);}
+.pa-perm-diff-verb--revoke{color:var(--color-text-error);}
+.pa-perm-diff-list{color:var(--color-text-body); line-height:1.5;}
+.pa-perm-affected{display:flex; flex-direction:column; align-items:center; gap:6px; margin-bottom:4px;}
+.pa-perm-avatars{display:flex;}
+.pa-perm-avatars .ds-av{margin-left:-6px; border:1.5px solid var(--surface);}
+.pa-perm-avatars .ds-av:first-child{margin-left:0;}
+.pa-perm-affected-names{font-size:11px; color:var(--color-text-caption); line-height:1.5;}
 .pa-role-card2 { background:var(--bg2); border:1px solid var(--color-border-neutral-default); border-radius:12px; overflow:hidden; cursor:pointer; transition:border-color .15s,box-shadow .15s; }
 .pa-role-card2:hover { border-color:var(--color-border-primary-default); box-shadow:0 4px 20px rgba(43,127,255,0.12); }
 .pa-role-card2-hdr { height:4px; }
@@ -14326,7 +14343,6 @@ function renderAdminHome() {
         <div class="ac-card-name">${item.name}</div>
         <div class="ac-card-desc">${item.desc}</div>
         <div class="ac-card-footer">
-          <span class="ac-card-badge ac-card-badge--active">● Active</span>
           ${item.alert ? `<span class="ac-card-alert-badge">⚠ ${item.alert}</span>` : ''}
           <span class="ac-card-arrow">›</span>
         </div>
@@ -14453,6 +14469,7 @@ function renderAdminHome() {
 let _paState = {
   tab: 'members',
   rolesView: 'overview',   // 'overview' | 'matrix'
+  rolePermsConfirmId: null,
   memberSearch: '',
   memberStatus: 'all',
   memberRole: '',
@@ -15173,6 +15190,11 @@ function renderPeople(subTab) {
       ${_paState.roleEditId ? renderRoleEditModal() : ''}
     </div>
 
+    <!-- Role permission save confirmation -->
+    <div class="rc-overlay ${_paState.rolePermsConfirmId ? 'open' : ''}" onclick="if(event.target===this)paClosePermsConfirm()">
+      ${_paState.rolePermsConfirmId ? renderRolePermsConfirmModal() : ''}
+    </div>
+
     <!-- Role delete modal -->
     <div class="rc-overlay ${_paState.roleDeleteId ? 'open' : ''}" onclick="if(event.target===this)paCloseRoleDelete()">
       ${_paState.roleDeleteId ? renderRoleDeleteModal() : ''}
@@ -15479,23 +15501,29 @@ const PA_MX_WRITE_VERBS = ['.manage', '.author', '.approve'];
 function _paMxState(leafIds, rolePerms) {
   const held = leafIds.filter(id => rolePerms.has(id));
   if (!held.length) return { kind:'none', held };
-  if (held.some(id => PA_MX_WRITE_VERBS.some(v => id.endsWith(v)))) return { kind:'full', held };
+  /* Show the verb the role actually holds rather than flattening every write
+     permission into one label. This is only unambiguous because no feature in
+     PERM_TREE carries more than one write permission — asserted below. */
+  const write = held.find(id => PA_MX_WRITE_VERBS.some(v => id.endsWith(v)));
+  if (write) return { kind:'full', held, verb: _paMxLeafLabel(write).split(' ')[0] };
+  if (held.some(id => id.endsWith('.run'))) return { kind:'run', held };
   return { kind:'view', held };
 }
 
 const _paMxIcons = {
   full: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>',
   view: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="1.75"/></svg>',
+  run:  '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M5 3.5l7 4.5-7 4.5z"/></svg>',
   none: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 8h8"/></svg>',
 };
-const _paMxLabels = { full:'Full access', view:'View only', none:'No access' };
+const _paMxLabels = { full:'Full access', run:'Run only', view:'View only', none:'No access' };
 
 function _paMxCellHTML(st, featureLabel) {
   const tip = st.held.length
     ? `${featureLabel}: ${st.held.map(id => _paMxLeafLabel(id)).join(', ')}`
     : `${featureLabel}: no permissions granted`;
   return `<span class="pa-mx-cell pa-mx-cell--${st.kind}" title="${escapeHtml(tip)}">
-      ${_paMxIcons[st.kind]}${_paMxLabels[st.kind]}
+      ${_paMxIcons[st.kind]}${st.verb || _paMxLabels[st.kind]}
     </span>`;
 }
 
@@ -15517,8 +15545,11 @@ function paSetRolesView(v) {
 
 function renderPeopleRolesMatrix() {
   const roles = PA_ROLES;
-  const legend = ['full','view','none'].map(k =>
-    `<span class="pa-mx-cell pa-mx-cell--${k}">${_paMxIcons[k]}${_paMxLabels[k]}</span>`).join('');
+  const legend = [
+    ['full', 'Manage · Edit · Approve — can make changes'],
+    ['view', 'View only'],
+    ['none', 'No access'],
+  ].map(pair => `<span class="pa-mx-cell pa-mx-cell--${pair[0]}">${_paMxIcons[pair[0]]}${pair[1]}</span>`).join('');
 
   const rows = PERM_TREE.map(studio => {
     const featureRows = (studio.children || []).map(f => {
@@ -16906,7 +16937,7 @@ function renderRoleDetail(roleId) {
     ${!r.system ? `
     <div style="padding:16px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px">
       <button class="ds-btn ds-btn-sm ds-btn--tertiary" style="color:var(--color-text-error)" onclick="paDeleteRole('${roleId}')">Delete role</button>
-      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSaveRolePerms('${roleId}')">Save changes</button>
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paRequestSaveRolePerms('${roleId}')">Save changes</button>
     </div>` : ''}`;
 }
 
@@ -17213,6 +17244,85 @@ function renderRoleDeleteModal() {
       <div class="pa-delete-modal-foot">
         <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseRoleDelete()">Cancel</button>
         <button class="ds-btn ds-btn-sm ds-btn--warning" onclick="paConfirmRoleDelete()">Delete role</button>
+      </div>
+    </div>`;
+}
+
+/* Saving role permissions changes access for every member holding the role,
+   which the silent success toast never communicated. Confirm first, and say
+   exactly who is affected and what changes. */
+function paRequestSaveRolePerms(roleId) {
+  const r = PA_ROLES.find(x => x.id === roleId);
+  const edits = _paState.rolePermEdits[roleId];
+  if (!r || !edits) { paSaveRolePerms(roleId); return; }
+  if (!(r.memberIds || []).length) { paSaveRolePerms(roleId); return; }  // nobody affected
+  _paState.rolePermsConfirmId = roleId;
+  renderPeople(_paState.tab);
+}
+
+function paClosePermsConfirm() {
+  _paState.rolePermsConfirmId = null;
+  renderPeople(_paState.tab);
+}
+
+function paConfirmSaveRolePerms() {
+  const roleId = _paState.rolePermsConfirmId;
+  _paState.rolePermsConfirmId = null;
+  if (roleId) paSaveRolePerms(roleId);
+  renderPeople(_paState.tab);
+}
+
+function _paPermDiff(roleId) {
+  const before = PA_ROLE_PERMS[roleId] || new Set();
+  const after  = _paState.rolePermEdits[roleId] || before;
+  return {
+    granted: [...after].filter(id => !before.has(id)),
+    revoked: [...before].filter(id => !after.has(id)),
+  };
+}
+
+function renderRolePermsConfirmModal() {
+  const roleId = _paState.rolePermsConfirmId;
+  const r = PA_ROLES.find(x => x.id === roleId);
+  if (!r) return '';
+  const members = (r.memberIds || []).map(id => MOCK_PEOPLE.find(p => p.id === id)).filter(Boolean);
+  const diff = _paPermDiff(roleId);
+
+  const line = (items, verb) => items.length
+    ? `<div class="pa-perm-diff-row">
+         <span class="pa-perm-diff-verb pa-perm-diff-verb--${verb}">${verb === 'grant' ? 'Granting' : 'Revoking'}</span>
+         <span class="pa-perm-diff-list">${items.map(id => escapeHtml(_paMxLeafLabel(id))).join(', ')}</span>
+       </div>`
+    : '';
+
+  return `
+    <div class="pa-delete-modal">
+      <button class="pm-drawer-close" style="position:absolute;top:12px;right:12px" onclick="paClosePermsConfirm()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <div class="pa-delete-modal-icon">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" style="color:#F97316"><path d="M8 1.5l6.5 12h-13L8 1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5v3.2M8 11.6h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="pa-delete-modal-title">Change access for ${members.length} ${members.length === 1 ? 'member' : 'members'}?</div>
+      <div class="pa-delete-modal-body">
+        Saving updates permissions for everyone assigned to
+        <strong>${escapeHtml(r.label)}</strong>. It takes effect immediately.
+      </div>
+      ${(diff.granted.length || diff.revoked.length) ? `
+        <div class="pa-perm-diff">
+          ${line(diff.revoked, 'revoke')}
+          ${line(diff.granted, 'grant')}
+        </div>` : ''}
+      ${members.length ? `
+        <div class="pa-perm-affected">
+          <div class="pa-perm-avatars">
+            ${members.slice(0, 6).map(m => _paAvHTML(m.id, m.name, m.initials, 'ds-av-md')).join('')}
+          </div>
+          <span class="pa-perm-affected-names">${members.map(m => escapeHtml(m.name)).join(', ')}</span>
+        </div>` : ''}
+      <div class="pa-delete-modal-foot">
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paClosePermsConfirm()">Cancel</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paConfirmSaveRolePerms()">Save changes</button>
       </div>
     </div>`;
 }
