@@ -7909,6 +7909,54 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 
 /* ── Roles grid ── */
 .pa-roles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+
+/* Roles view switcher + permission matrix */
+.pa-roles-switch{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap;}
+.pa-roles-switch-note{font-size:11px; color:var(--color-text-caption);}
+.pa-matrix-scroll{overflow-x:auto; border:0.5px solid var(--color-border-neutral-subtle); border-radius:var(--radius-m); background:var(--surface);}
+.pa-matrix{border-collapse:separate; border-spacing:0; width:100%; min-width:820px; font-size:12px;}
+.pa-matrix th, .pa-matrix td{padding:10px 12px; text-align:left; vertical-align:middle;}
+.pa-matrix thead th{
+  position:sticky; top:0; z-index:2;
+  background:var(--table-header-bg); color:var(--color-text-caption);
+  font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  border-bottom:0.5px solid var(--color-border-neutral-subtle); white-space:nowrap;
+}
+/* Sticky cells need an OPAQUE base: --table-header-bg and --table-row-hover-bg
+   are translucent in dark mode, so scrolled columns would show through. The
+   gradient composites the tint over --surface without hardcoding a colour. */
+.pa-matrix thead th:first-child{
+  left:0; z-index:3; min-width:230px;
+  background-color:var(--surface);
+  background-image:linear-gradient(var(--table-header-bg), var(--table-header-bg));
+}
+.pa-matrix tbody td:first-child{
+  position:sticky; left:0; z-index:1; background:var(--surface);
+  border-right:0.5px solid var(--color-border-neutral-subtle);
+}
+.pa-matrix tbody tr:not(.pa-mx-group):hover td:first-child{
+  background-color:var(--surface);
+  background-image:linear-gradient(var(--table-row-hover-bg), var(--table-row-hover-bg));
+}
+.pa-mx-role{display:flex; align-items:center; gap:6px;}
+.pa-mx-role-dot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
+.pa-mx-group td{
+  position:static; background:var(--color-surface-neutral-default);
+  font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--color-text-caption);
+  border-top:0.5px solid var(--color-border-neutral-subtle);
+  border-bottom:0.5px solid var(--color-border-neutral-subtle);
+}
+.pa-matrix tbody tr:not(.pa-mx-group):hover td{background:var(--table-row-hover-bg);}
+.pa-mx-group-label{position:sticky; left:12px; display:inline-block;}
+.pa-mx-feat{font-weight:600; color:var(--color-text-title);}
+.pa-mx-feat-desc{font-size:11px; color:var(--color-text-caption); margin-top:1px;}
+.pa-mx-cell{display:inline-flex; align-items:center; gap:5px; white-space:nowrap; cursor:default;}
+.pa-mx-cell svg{flex-shrink:0;}
+.pa-mx-cell--full{color:var(--tag-success-bd);}
+.pa-mx-cell--view{color:var(--color-text-body);}
+.pa-mx-cell--none{color:var(--color-text-disabled);}
+.pa-mx-legend{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:10px;}
 .pa-role-card2 { background:var(--bg2); border:1px solid var(--color-border-neutral-default); border-radius:12px; overflow:hidden; cursor:pointer; transition:border-color .15s,box-shadow .15s; }
 .pa-role-card2:hover { border-color:var(--color-border-primary-default); box-shadow:0 4px 20px rgba(43,127,255,0.12); }
 .pa-role-card2-hdr { height:4px; }
@@ -14346,6 +14394,7 @@ function renderAdminHome() {
 
 let _paState = {
   tab: 'members',
+  rolesView: 'overview',   // 'overview' | 'matrix'
   memberSearch: '',
   memberStatus: 'all',
   memberRole: '',
@@ -15030,7 +15079,19 @@ function renderPeople(subTab) {
         </button>
       </div>
 
-      ${activeTab === 'members' ? renderPeopleMembers() : activeTab === 'roles' ? renderPeopleRolesList() : renderPeopleGroups()}
+      ${activeTab === 'members' ? renderPeopleMembers()
+        : activeTab === 'roles' ? `
+            <div class="pa-roles-switch">
+              <div class="ct-sort">
+                <button class="ct-sort-btn ${_paState.rolesView==='overview'?'active':''}" onclick="paSetRolesView('overview')">Overview</button>
+                <button class="ct-sort-btn ${_paState.rolesView==='matrix'?'active':''}" onclick="paSetRolesView('matrix')">Permission details</button>
+              </div>
+              ${_paState.rolesView==='matrix'
+                ? `<span class="pa-roles-switch-note">Read-only. Edit a role from Overview to change permissions.</span>`
+                : ''}
+            </div>
+            ${_paState.rolesView==='matrix' ? renderPeopleRolesMatrix() : renderPeopleRolesList()}`
+        : renderPeopleGroups()}
     </div>
 
     <!-- Member / Role detail drawer -->
@@ -15345,6 +15406,97 @@ function renderPeopleRolesList() {
       </div>`;
   };
   return `<div class="pa-roles-grid">${PA_ROLES.map(renderRole2).join('')}</div>`;
+}
+
+/* ── Permission matrix ─────────────────────────────────────────────────────
+   Read-only comparison of what every role can do, derived from PA_ROLE_PERMS.
+   Authoring stays in the role edit modal — this view answers "who can do
+   what?", which the role cards cannot without opening each one.
+
+   Three states are enough: the permission ids encode the verb, and no role in
+   PA_ROLE_PERMS holds `.run` without also holding a write verb, so a separate
+   "run only" state would never render. */
+const PA_MX_WRITE_VERBS = ['.manage', '.author', '.approve'];
+
+function _paMxState(leafIds, rolePerms) {
+  const held = leafIds.filter(id => rolePerms.has(id));
+  if (!held.length) return { kind:'none', held };
+  if (held.some(id => PA_MX_WRITE_VERBS.some(v => id.endsWith(v)))) return { kind:'full', held };
+  return { kind:'view', held };
+}
+
+const _paMxIcons = {
+  full: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>',
+  view: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="1.75"/></svg>',
+  none: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 8h8"/></svg>',
+};
+const _paMxLabels = { full:'Full access', view:'View only', none:'No access' };
+
+function _paMxCellHTML(st, featureLabel) {
+  const tip = st.held.length
+    ? `${featureLabel}: ${st.held.map(id => _paMxLeafLabel(id)).join(', ')}`
+    : `${featureLabel}: no permissions granted`;
+  return `<span class="pa-mx-cell pa-mx-cell--${st.kind}" title="${escapeHtml(tip)}">
+      ${_paMxIcons[st.kind]}${_paMxLabels[st.kind]}
+    </span>`;
+}
+
+let _paMxLeafIndex = null;
+function _paMxLeafLabel(id) {
+  if (!_paMxLeafIndex) {
+    _paMxLeafIndex = {};
+    PERM_TREE.forEach(st => (st.children||[]).forEach(f => (f.children||[]).forEach(l => {
+      _paMxLeafIndex[l.id] = l.label;
+    })));
+  }
+  return _paMxLeafIndex[id] || id;
+}
+
+function paSetRolesView(v) {
+  _paState.rolesView = v;
+  renderPeople('roles');
+}
+
+function renderPeopleRolesMatrix() {
+  const roles = PA_ROLES;
+  const legend = ['full','view','none'].map(k =>
+    `<span class="pa-mx-cell pa-mx-cell--${k}">${_paMxIcons[k]}${_paMxLabels[k]}</span>`).join('');
+
+  const rows = PERM_TREE.map(studio => {
+    const featureRows = (studio.children || []).map(f => {
+      const leafIds = (f.children || []).map(l => l.id);
+      const cells = roles.map(r => {
+        const perms = _paState.rolePermEdits[r.id] || PA_ROLE_PERMS[r.id] || new Set();
+        return `<td>${_paMxCellHTML(_paMxState(leafIds, perms), f.label)}</td>`;
+      }).join('');
+      return `<tr>
+          <td>
+            <div class="pa-mx-feat">${escapeHtml(f.label)}</div>
+            ${f.desc ? `<div class="pa-mx-feat-desc">${escapeHtml(f.desc)}</div>` : ''}
+          </td>
+          ${cells}
+        </tr>`;
+    }).join('');
+    return `<tr class="pa-mx-group"><td colspan="${roles.length + 1}"><span class="pa-mx-group-label">${escapeHtml(studio.label)}</span></td></tr>${featureRows}`;
+  }).join('');
+
+  return `
+    <div class="pa-matrix-scroll">
+      <table class="pa-matrix">
+        <thead>
+          <tr>
+            <th>Capability</th>
+            ${roles.map(r => `<th>
+              <span class="pa-mx-role">
+                <span class="pa-mx-role-dot" style="background:${r.color}"></span>${escapeHtml(r.label)}
+              </span>
+            </th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="pa-mx-legend">${legend}</div>`;
 }
 
 function renderMemberDrawer(personId) {
