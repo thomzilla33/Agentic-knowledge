@@ -10198,7 +10198,7 @@ const PERM_TREE = [
       { id:'ag.networks.manage', label:'Manage networks', desc:'Build and deploy agent orchestration graphs' },
     ]},
     { id:'feat-ag-workflows', label:'Workflows', desc:'Workflow definitions and publishing', children:[
-      { id:'ag.workflows.manage', label:'Create & edit workflows', desc:'Build and publish workflow definitions' },
+      { id:'ag.workflows.manage', label:'Edit workflows', desc:'Create, edit, and publish workflow definitions' },
     ]},
     { id:'feat-ag-hitl', label:'Human-in-the-loop', desc:'Agent escalation management', children:[
       { id:'ag.hitl.manage', label:'Manage escalations', desc:'Review and resolve agent escalations' },
@@ -10207,7 +10207,7 @@ const PERM_TREE = [
   { id:'studio-governance', label:'Governance Studio', color:'#10b981', children:[
     { id:'feat-gov-policies', label:'Policies', desc:'Workspace governance rules and enforcement', children:[
       { id:'gov.policy.view',   label:'View policies',         desc:'Read governance rules and configurations' },
-      { id:'gov.policy.manage', label:'Create & edit policies', desc:'Author and enforce workspace-wide policies' },
+      { id:'gov.policy.manage', label:'Edit policies', desc:'Create and enforce tenant-wide governance policies' },
     ]},
     { id:'feat-gov-promotions', label:'Promotions', desc:'Staged model promotion approvals', children:[
       { id:'gov.promotions.view',    label:'View promotions',    desc:'See promotion packets and their status' },
@@ -10223,7 +10223,7 @@ const PERM_TREE = [
   { id:'studio-helix', label:'Helix Data Studio', color:'#8b5cf6', children:[
     { id:'feat-hx-models', label:'Models', desc:'Semantic model catalog and authoring', children:[
       { id:'hx.models.view',   label:'View models',   desc:'Browse semantic model catalog' },
-      { id:'hx.models.author', label:'Author models', desc:'Create and version model definitions' },
+      { id:'hx.models.author', label:'Edit models', desc:'Create and version semantic model definitions' },
     ]},
     { id:'feat-hx-lineage', label:'Lineage', desc:'Data lineage graph visualization', children:[
       { id:'hx.lineage.view', label:'View lineage', desc:'Inspect data lineage graphs' },
@@ -10233,20 +10233,20 @@ const PERM_TREE = [
     ]},
   ]},
   { id:'studio-platform', label:'Platform', color:'#64748b', children:[
-    { id:'feat-pl-settings', label:'Settings', desc:'Workspace configuration', children:[
-      { id:'pl.settings.view', label:'View settings', desc:'Read workspace configuration' },
+    { id:'feat-pl-settings', label:'Organization', desc:'Organization structure and details', children:[
+      { id:'pl.settings.view', label:'View organization', desc:'Read organization structure and details' },
     ]},
-    { id:'feat-pl-members', label:'Members & Roles', desc:'Member and role management', children:[
-      { id:'pl.members.manage', label:'Manage members & roles', desc:'Invite, suspend, remove members; edit roles' },
+    { id:'feat-pl-members', label:'People & Access', desc:'Member and role management', children:[
+      { id:'pl.members.manage', label:'Manage members and roles', desc:'Invite, suspend, and remove members, and assign roles' },
     ]},
-    { id:'feat-pl-billing', label:'Billing', desc:'Subscription and payment management', children:[
+    { id:'feat-pl-billing', label:'Billing & Subscription', desc:'Subscription and payment management', children:[
       { id:'pl.billing.view',   label:'View billing',   desc:'See subscription and invoice details' },
       { id:'pl.billing.manage', label:'Manage billing', desc:'Update plan, payment, and billing contacts' },
     ]},
-    { id:'feat-pl-integrations', label:'Integrations', desc:'Workspace integration management', children:[
+    { id:'feat-pl-integrations', label:'Integrations & Credentials', desc:'Third-party connections and their credentials', children:[
       { id:'pl.integrations.manage', label:'Manage integrations', desc:'Install and configure workspace integrations' },
     ]},
-    { id:'feat-pl-audit', label:'Audit Log', desc:'Workspace event history', children:[
+    { id:'feat-pl-audit', label:'Audit & Compliance', desc:'Tenant-wide event history', children:[
       { id:'pl.audit.view', label:'View audit log', desc:'Read audit events across all studios' },
     ]},
   ]},
@@ -15810,31 +15810,18 @@ function renderMemberDrawer(personId) {
     </div>` : ''}`;
   overviewContent += '</div>';
 
-  const PERM_META = {
-    'ag.workers.view':       { label:'View workers',         studio:'Agentic Studio',    color:'#06B6D4' },
-    'ag.workers.run':        { label:'Run workers',          studio:'Agentic Studio',    color:'#06B6D4' },
-    'ag.workers.manage':     { label:'Manage workers',       studio:'Agentic Studio',    color:'#06B6D4' },
-    'ag.networks.view':      { label:'View networks',        studio:'Agentic Studio',    color:'#06B6D4' },
-    'ag.networks.manage':    { label:'Manage networks',      studio:'Agentic Studio',    color:'#06B6D4' },
-    'ag.workflows.manage':   { label:'Manage workflows',     studio:'Agentic Studio',    color:'#06B6D4' },
-    'ag.hitl.manage':        { label:'Manage HITL queues',   studio:'Agentic Studio',    color:'#06B6D4' },
-    'gov.policy.view':       { label:'View policies',        studio:'Governance Studio', color:'#10b981' },
-    'gov.policy.manage':     { label:'Manage policies',      studio:'Governance Studio', color:'#10b981' },
-    'gov.promotions.view':   { label:'View promotions',      studio:'Governance Studio', color:'#10b981' },
-    'gov.promotions.approve':{ label:'Approve promotions',   studio:'Governance Studio', color:'#10b981' },
-    'gov.domains.manage':    { label:'Manage domains',       studio:'Governance Studio', color:'#10b981' },
-    'gov.resolution.manage': { label:'Manage resolutions',   studio:'Governance Studio', color:'#10b981' },
-    'hx.models.view':        { label:'View models',          studio:'Helix Studio',      color:'#8b5cf6' },
-    'hx.models.author':      { label:'Author models',        studio:'Helix Studio',      color:'#8b5cf6' },
-    'hx.lineage.view':       { label:'View lineage',         studio:'Helix Studio',      color:'#8b5cf6' },
-    'hx.connectors.manage':  { label:'Manage connectors',    studio:'Helix Studio',      color:'#8b5cf6' },
-    'pl.settings.view':      { label:'View settings',        studio:'Platform',          color:'#64748b' },
-    'pl.members.manage':     { label:'Manage members',       studio:'Platform',          color:'#64748b' },
-    'pl.billing.view':       { label:'View billing',         studio:'Platform',          color:'#64748b' },
-    'pl.billing.manage':     { label:'Manage billing',       studio:'Platform',          color:'#64748b' },
-    'pl.integrations.manage':{ label:'Manage integrations',  studio:'Platform',          color:'#64748b' },
-    'pl.audit.view':         { label:'View audit logs',      studio:'Platform',          color:'#64748b' },
-  };
+  /* Derived from PERM_TREE — the single source of permission labels.
+     This used to be a hand-maintained copy, and it had drifted: the same
+     permission id rendered as 'Manage HITL queues' here and 'Manage
+     escalations' in the roles matrix. Deriving it keeps one name per id. */
+  const PERM_META = (function buildPermMeta() {
+    const meta = {};
+    PERM_TREE.forEach(studio => (studio.children || []).forEach(feature =>
+      (feature.children || []).forEach(leaf => {
+        meta[leaf.id] = { label: leaf.label, studio: studio.label, color: studio.color };
+      })));
+    return meta;
+  })();
   const allEffectivePerms = [...new Set(memberRoles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]))];
   const permSources = {};
   allEffectivePerms.forEach(pid => {
