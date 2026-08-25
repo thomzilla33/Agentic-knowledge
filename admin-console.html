@@ -8488,6 +8488,56 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 .ids-copy-btn:hover { border-color:var(--pri); color:var(--pri); }
 .ids-upload-btn { background:none; border:1px dashed var(--line); border-radius:var(--r8); padding:10px 14px; font-size:12px; color:var(--t3); cursor:pointer; width:100%; text-align:center; transition:border-color .15s,color .15s; }
 .ids-upload-btn:hover { border-color:var(--pri); color:var(--pri); }
+.ids-configured-row { display:flex; align-items:center; gap:10px; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); padding:10px 14px; }
+.ids-configured-icon { color:var(--green); font-size:14px; flex-shrink:0; }
+.ids-configured-body { flex:1; min-width:0; }
+.ids-configured-name { font-size:12px; font-weight:600; color:var(--t1); }
+.ids-configured-sub { font-size:11px; color:var(--t3); margin-top:1px; font-family:monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ids-configured-edit { background:none; border:1px solid var(--line); border-radius:var(--r8); padding:4px 10px; font-size:11px; font-weight:600; color:var(--t3); cursor:pointer; white-space:nowrap; transition:border-color .15s,color .15s; flex-shrink:0; }
+.ids-configured-edit:hover { border-color:var(--pri); color:var(--pri); }
+/* IdP modal */
+.idp-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:9100; display:none; align-items:center; justify-content:center; }
+.idp-overlay.open { display:flex; }
+.idp-modal { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12); width:520px; max-width:calc(100vw - 32px); max-height:calc(100vh - 48px); display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,.5); }
+.idp-modal-head { display:flex; align-items:center; justify-content:space-between; padding:18px 20px 16px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.idp-modal-title { font-size:15px; font-weight:700; color:var(--t1); }
+.idp-modal-close { background:none; border:none; color:var(--t3); font-size:18px; cursor:pointer; line-height:1; padding:2px 6px; border-radius:6px; transition:background .1s,color .1s; }
+.idp-modal-close:hover { background:var(--hover); color:var(--t1); }
+.idp-tabs { display:flex; gap:0; border-bottom:1px solid var(--line); padding:0 20px; flex-shrink:0; }
+.idp-tab { padding:10px 0; margin-right:20px; font-size:13px; font-weight:500; color:var(--t3); cursor:pointer; border-bottom:2px solid transparent; transition:color .15s,border-color .15s; background:none; border-top:none; border-left:none; border-right:none; }
+.idp-tab.active { color:var(--pri); border-bottom-color:var(--pri); }
+.idp-body { flex:1; overflow-y:auto; padding:20px; }
+.idp-drop-zone { border:2px dashed var(--line); border-radius:var(--r12); padding:36px 20px; text-align:center; cursor:pointer; transition:border-color .15s,background .15s; position:relative; }
+.idp-drop-zone:hover, .idp-drop-zone.drag-over { border-color:var(--pri); background:var(--pri-10); }
+.idp-drop-icon { font-size:28px; margin-bottom:10px; color:var(--t3); }
+.idp-drop-title { font-size:13px; font-weight:600; color:var(--t1); margin-bottom:4px; }
+.idp-drop-sub { font-size:12px; color:var(--t3); }
+.idp-drop-file-input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+.idp-url-label { font-size:12px; font-weight:600; color:var(--t2); margin-bottom:6px; }
+.idp-url-row { display:flex; gap:8px; }
+.idp-url-input { flex:1; background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); padding:9px 12px; font-size:13px; color:var(--t1); outline:none; font-family:monospace; transition:border-color .15s; }
+.idp-url-input:focus { border-color:var(--pri); }
+.idp-url-fetch { background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); padding:9px 16px; font-size:13px; font-weight:600; color:var(--t2); cursor:pointer; white-space:nowrap; transition:border-color .15s,color .15s,background .15s; flex-shrink:0; }
+.idp-url-fetch:hover { border-color:var(--pri); color:var(--pri); }
+.idp-url-hint { font-size:11px; color:var(--t3); margin-top:8px; line-height:1.5; }
+.idp-spinner { display:flex; align-items:center; gap:10px; padding:20px 0; color:var(--t3); font-size:13px; }
+.idp-spinner-dot { width:18px; height:18px; border:2px solid var(--line); border-top-color:var(--pri); border-radius:50%; animation:idp-spin .7s linear infinite; flex-shrink:0; }
+@keyframes idp-spin { to { transform:rotate(360deg); } }
+.idp-preview { background:var(--bg3); border:1px solid var(--line); border-radius:var(--r8); overflow:hidden; margin-top:16px; }
+.idp-preview-header { padding:10px 14px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:8px; }
+.idp-preview-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--t3); }
+.idp-preview-ok { font-size:11px; color:var(--green); font-weight:600; }
+.idp-preview-row { display:flex; padding:9px 14px; border-bottom:1px solid var(--line); gap:10px; }
+.idp-preview-row:last-child { border-bottom:none; }
+.idp-preview-key { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--t3); width:140px; flex-shrink:0; padding-top:1px; }
+.idp-preview-val { font-size:12px; color:var(--t1); font-family:monospace; word-break:break-all; }
+.idp-preview-warn { color:var(--yellow); }
+.idp-footer { display:flex; align-items:center; justify-content:flex-end; gap:8px; padding:14px 20px; border-top:1px solid var(--line); flex-shrink:0; }
+.idp-btn-cancel { background:none; border:1px solid var(--line); border-radius:var(--r8); padding:8px 18px; font-size:13px; font-weight:600; color:var(--t2); cursor:pointer; transition:border-color .15s,color .15s; }
+.idp-btn-cancel:hover { border-color:var(--t2); color:var(--t1); }
+.idp-btn-save { background:var(--pri); border:none; border-radius:var(--r8); padding:8px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; transition:opacity .15s; }
+.idp-btn-save:disabled { opacity:.4; cursor:default; }
+.idp-btn-save:not(:disabled):hover { opacity:.85; }
 /* MFA enforcement cards */
 .ids-mfa-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .ids-mfa-card { background:var(--bg3); border:2px solid var(--line); border-radius:var(--r12); padding:14px; cursor:pointer; transition:border-color .15s,box-shadow .15s; }
@@ -19987,6 +20037,7 @@ let _idsState = {
   mfaAppEnabled: true,
   mfaSmsEnabled: true,
   mfaHwkEnabled: false,
+  idpMeta: null,                // null = not configured; object = configured metadata
 };
 
 function _idsRerender() { renderIdentity(); }
@@ -20053,7 +20104,7 @@ function renderIdentity() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
           </div>
           <div class="ids-method-body">
-            <div class="ids-method-name">SAML 2.0 — Azure AD ${s.ssoEnabled ? '<span class="ids-method-badge ids-badge-active" style="margin-left:6px;">Configured</span>' : ''}</div>
+            <div class="ids-method-name">SAML 2.0 — Azure AD ${s.ssoEnabled && s.idpMeta ? '<span class="ids-method-badge ids-badge-active" style="margin-left:6px;">Configured</span>' : s.ssoEnabled ? '<span class="ids-method-badge ids-badge-required" style="margin-left:6px;">Pending setup</span>' : ''}</div>
             <div class="ids-method-desc">Enterprise SSO via your organization's identity provider.</div>
           </div>
           ${toggle('ssoEnabled', false)}
@@ -20077,7 +20128,16 @@ function renderIdentity() {
         </div>
         <div class="ids-copy-row" style="margin-bottom:0;">
           <span class="ids-copy-label">IdP Metadata</span>
-          <button class="ids-upload-btn" onclick="toast('IdP metadata upload coming soon','info')">↑ Upload IdP metadata XML or paste URL</button>
+          ${s.idpMeta ? `
+          <div class="ids-configured-row" style="flex:1">
+            <span class="ids-configured-icon">✓</span>
+            <div class="ids-configured-body">
+              <div class="ids-configured-name">${escapeHtml(s.idpMeta.entityId)}</div>
+              <div class="ids-configured-sub">Cert expires ${escapeHtml(s.idpMeta.certExpiry)} · Updated just now</div>
+            </div>
+            <button class="ids-configured-edit" onclick="openIdpPanel()">Update</button>
+          </div>` : `
+          <button class="ids-upload-btn" style="flex:1" onclick="openIdpPanel()">↑ Upload IdP metadata XML or paste URL</button>`}
         </div>
       </div>` : ''}
     </div>
@@ -20241,6 +20301,164 @@ function renderIdentity() {
 
 </div>
   `;
+}
+
+/* ====================== IdP METADATA UPLOAD PANEL ====================== */
+
+let _idpPanelState = { tab: 'upload', parsing: false, parsed: null, urlVal: '' };
+
+function openIdpPanel() {
+  _idpPanelState = { tab: 'upload', parsing: false, parsed: null, urlVal: '' };
+  let c = document.getElementById('idpPanelContainer');
+  if (!c) {
+    c = document.createElement('div');
+    c.id = 'idpPanelContainer';
+    document.body.appendChild(c);
+  }
+  c.innerHTML = _idpPanelHtml();
+  requestAnimationFrame(() => document.getElementById('idpOverlay').classList.add('open'));
+}
+
+function closeIdpPanel() {
+  const o = document.getElementById('idpOverlay');
+  if (o) o.classList.remove('open');
+  setTimeout(() => document.getElementById('idpPanelContainer')?.remove(), 200);
+}
+
+function _idpPanelHtml() {
+  const st = _idpPanelState;
+  const uploadBody = `
+    <div class="idp-drop-zone" id="idpDropZone"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="idpHandleDrop(event)">
+      <input class="idp-drop-file-input" type="file" accept=".xml,application/xml,text/xml" onchange="idpHandleFile(this.files[0])">
+      <div class="idp-drop-icon">⬆</div>
+      <div class="idp-drop-title">Drop your IdP metadata XML here</div>
+      <div class="idp-drop-sub">or click to browse files · .xml only · max 1 MB</div>
+    </div>
+    ${st.parsing ? `<div class="idp-spinner"><div class="idp-spinner-dot"></div>Parsing metadata…</div>` : ''}
+    ${st.parsed ? _idpPreviewHtml(st.parsed) : ''}`;
+
+  const urlBody = `
+    <div class="idp-url-label">Metadata URL</div>
+    <div class="idp-url-row">
+      <input class="idp-url-input" id="idpUrlInput" type="url"
+        placeholder="https://login.microsoftonline.com/…/federationmetadata/2007-06/…"
+        value="${escapeHtml(st.urlVal)}"
+        oninput="_idpPanelState.urlVal=this.value">
+      <button class="idp-url-fetch" onclick="idpFetchUrl()">Fetch</button>
+    </div>
+    <div class="idp-url-hint">AIMS-OS will periodically re-fetch this URL to keep your certificate up to date.</div>
+    ${st.parsing ? `<div class="idp-spinner" style="margin-top:12px"><div class="idp-spinner-dot"></div>Fetching…</div>` : ''}
+    ${st.parsed ? _idpPreviewHtml(st.parsed) : ''}`;
+
+  return `
+  <div class="idp-overlay" id="idpOverlay" onclick="if(event.target===this)closeIdpPanel()">
+    <div class="idp-modal">
+      <div class="idp-modal-head">
+        <div class="idp-modal-title">Configure IdP metadata</div>
+        <button class="idp-modal-close" onclick="closeIdpPanel()">✕</button>
+      </div>
+      <div class="idp-tabs">
+        <button class="idp-tab${st.tab==='upload'?' active':''}" onclick="idpSwitchTab('upload')">Upload XML</button>
+        <button class="idp-tab${st.tab==='url'?' active':''}" onclick="idpSwitchTab('url')">Metadata URL</button>
+      </div>
+      <div class="idp-body">
+        ${st.tab === 'upload' ? uploadBody : urlBody}
+      </div>
+      <div class="idp-footer">
+        <button class="idp-btn-cancel" onclick="closeIdpPanel()">Cancel</button>
+        <button class="idp-btn-save" id="idpSaveBtn" ${st.parsed ? '' : 'disabled'} onclick="idpSave()">Save configuration</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function _idpPreviewHtml(p) {
+  const certWarn = p.certDaysLeft < 60;
+  return `
+  <div class="idp-preview" style="margin-top:16px">
+    <div class="idp-preview-header">
+      <span class="idp-preview-title">Parsed metadata</span>
+      <span class="idp-preview-ok">✓ Valid</span>
+    </div>
+    <div class="idp-preview-row"><div class="idp-preview-key">Entity ID</div><div class="idp-preview-val">${escapeHtml(p.entityId)}</div></div>
+    <div class="idp-preview-row"><div class="idp-preview-key">SSO URL</div><div class="idp-preview-val">${escapeHtml(p.ssoUrl)}</div></div>
+    <div class="idp-preview-row"><div class="idp-preview-key">Protocol</div><div class="idp-preview-val">${escapeHtml(p.protocol)}</div></div>
+    <div class="idp-preview-row">
+      <div class="idp-preview-key">Cert expires</div>
+      <div class="idp-preview-val${certWarn?' idp-preview-warn':''}">${escapeHtml(p.certExpiry)} ${certWarn?'⚠ Renew soon':''}</div>
+    </div>
+  </div>`;
+}
+
+function _idpRerender() {
+  const c = document.getElementById('idpPanelContainer');
+  if (!c) return;
+  const wasOpen = document.getElementById('idpOverlay')?.classList.contains('open');
+  c.innerHTML = _idpPanelHtml();
+  if (wasOpen) requestAnimationFrame(() => document.getElementById('idpOverlay')?.classList.add('open'));
+}
+
+function idpSwitchTab(tab) {
+  _idpPanelState.tab = tab;
+  _idpPanelState.parsing = false;
+  _idpPanelState.parsed = null;
+  _idpRerender();
+}
+
+function idpHandleDrop(e) {
+  e.preventDefault();
+  document.getElementById('idpDropZone')?.classList.remove('drag-over');
+  const file = e.dataTransfer?.files?.[0];
+  if (file) idpHandleFile(file);
+}
+
+function idpHandleFile(file) {
+  if (!file) return;
+  _idpPanelState.parsing = true;
+  _idpPanelState.parsed = null;
+  _idpRerender();
+  setTimeout(() => {
+    _idpPanelState.parsing = false;
+    _idpPanelState.parsed = {
+      entityId: 'https://sts.windows.net/9b3c6f2a-1d4e-4a78-b832-contoso/',
+      ssoUrl:   'https://login.microsoftonline.com/9b3c6f2a-1d4e-4a78-b832-contoso/saml2',
+      protocol: 'HTTP-POST',
+      certExpiry: '2026-11-14',
+      certDaysLeft: 81,
+    };
+    _idpRerender();
+  }, 900);
+}
+
+function idpFetchUrl() {
+  const url = document.getElementById('idpUrlInput')?.value?.trim() || _idpPanelState.urlVal;
+  if (!url) { toast('Enter a metadata URL first', 'error'); return; }
+  _idpPanelState.urlVal = url;
+  _idpPanelState.parsing = true;
+  _idpPanelState.parsed = null;
+  _idpRerender();
+  setTimeout(() => {
+    _idpPanelState.parsing = false;
+    _idpPanelState.parsed = {
+      entityId:    'https://sts.windows.net/9b3c6f2a-1d4e-4a78-b832-contoso/',
+      ssoUrl:      'https://login.microsoftonline.com/9b3c6f2a-1d4e-4a78-b832-contoso/saml2',
+      protocol:    'HTTP-Redirect',
+      certExpiry:  '2025-04-02',
+      certDaysLeft: 45,
+    };
+    _idpRerender();
+  }, 1100);
+}
+
+function idpSave() {
+  if (!_idpPanelState.parsed) return;
+  _idsState.idpMeta = { ..._idpPanelState.parsed };
+  closeIdpPanel();
+  toast('IdP metadata saved — SAML 2.0 configured', 'success');
+  _idsRerender();
 }
 
 /* ====================== IDENTITY & SECURITY end ====================== */
