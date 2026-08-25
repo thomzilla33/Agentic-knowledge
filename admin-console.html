@@ -12036,6 +12036,147 @@ function inboxQuickAction(id, action, ev) {
   toast(`${action} · ${r?.integration || ''} — flow coming soon`);
 }
 
+function openInboxDetailPanel(id) {
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  const existing = document.getElementById('idpContainer');
+  if (existing) existing.remove();
+
+  const meta  = REQUEST_STATUS_META[r.status] || REQUEST_STATUS_META.pending_review;
+  const isPending = r.status === 'pending_review' || r.status === 'in_review';
+  const isQuoted  = r.status === 'quoted';
+
+  const kv = (label, value) => `
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);">${label}</div>
+      <div style="font-size:13px;color:var(--t1);">${value}</div>
+    </div>`;
+
+  const avatarBg = ['#6366f1','#06b6d4','#8b5cf6','#10b981','#f59e0b','#ef4444'];
+  const av = avatarBg[r.id.charCodeAt(r.id.length-1) % avatarBg.length];
+
+  const timelineSteps = [];
+  timelineSteps.push({ dot:'var(--t3)', label:'Submitted', sub: r.requestedAt + ' · ' + r.requester.dept });
+  if (r.status !== 'pending_review') timelineSteps.push({ dot:'var(--cyan)', label:'Under review', sub:'Integration team' });
+  if (r.quote) timelineSteps.push({ dot:'var(--purple)', label:'Quote issued', sub:`$${r.quote.amount.toLocaleString()} · ${r.quote.etaWeeks}w ETA` });
+  if (r.status === 'in_progress') timelineSteps.push({ dot:'var(--cyan)', label:'Build in progress', sub:'Integration team' });
+  if (r.status === 'done')     timelineSteps.push({ dot:'var(--green)', label:'Delivered', sub: r.quote?.notes || '' });
+  if (r.status === 'rejected') timelineSteps.push({ dot:'var(--red)', label:'Rejected', sub: r.rejectionReason || '' });
+
+  const timelineHTML = timelineSteps.map((s, i) => `
+    <div style="display:flex;gap:10px;${i < timelineSteps.length-1 ? '' : ''}">
+      <div style="display:flex;flex-direction:column;align-items:center;width:14px;flex-shrink:0;">
+        <div style="width:10px;height:10px;border-radius:50%;background:${s.dot};flex-shrink:0;margin-top:2px;"></div>
+        ${i < timelineSteps.length-1 ? `<div style="flex:1;width:1px;background:var(--line);margin:3px 0;"></div>` : ''}
+      </div>
+      <div style="padding-bottom:${i < timelineSteps.length-1 ? '12px' : '0'};">
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">${s.label}</div>
+        ${s.sub ? `<div style="font-size:11px;color:var(--t3);margin-top:1px;line-height:1.4;">${s.sub}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  const actionBar = isPending ? `
+    <div style="display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--line);flex-shrink:0;">
+      <button style="flex:1;height:34px;background:var(--green);border:none;border-radius:var(--r8);font-size:12px;font-weight:700;color:#fff;cursor:pointer;" onclick="closeInboxDetailPanel();toast('Approved — ${r.integration.replace(/'/g,'')}: request sent to integration team','success')">Approve</button>
+      <button style="flex:1;height:34px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;" onclick="toast('Quote requested from integration team','info')">Request quote</button>
+      <button style="height:34px;padding:0 14px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:12px;font-weight:600;color:var(--red);cursor:pointer;" onclick="closeInboxDetailPanel();toast('Rejected — ${r.integration.replace(/'/g,'')}','info')">Reject</button>
+    </div>` : isQuoted ? `
+    <div style="display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--line);flex-shrink:0;">
+      <button style="flex:1;height:34px;background:var(--pri);border:none;border-radius:var(--r8);font-size:12px;font-weight:700;color:#fff;cursor:pointer;" onclick="closeInboxDetailPanel();toast('Quote approved — build starts this sprint','success')">Approve quote</button>
+      <button style="height:34px;padding:0 14px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:12px;font-weight:600;color:var(--red);cursor:pointer;" onclick="closeInboxDetailPanel();toast('Quote rejected','info')">Reject</button>
+    </div>` : '';
+
+  const c = document.createElement('div');
+  c.id = 'idpContainer';
+  c.innerHTML = `
+    <div class="pa-slideout-overlay" id="idpOverlay" onclick="closeInboxDetailPanel()"></div>
+    <div class="pa-slideout" id="idpDrawer" style="width:420px;display:flex;flex-direction:column;padding:0;">
+
+      <!-- Header -->
+      <div class="pa-slideout-head" style="flex-shrink:0;">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div class="pa-slideout-title" style="margin:0;">${escapeHtml(r.integration)}</div>
+            <span class="req-status-chip" style="background:${meta.bg};color:${meta.color};border:1px solid ${meta.border};height:20px;padding:0 7px;font-size:10px;font-weight:700;border-radius:10px;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;">
+              <span style="width:5px;height:5px;border-radius:50%;background:${meta.color};"></span>${meta.label}
+            </span>
+            ${r.priority === 'high' ? `<span style="font-size:9px;font-weight:800;color:var(--amber);letter-spacing:.06em;">HIGH</span>` : ''}
+          </div>
+          <div class="pa-slideout-sub">${escapeHtml(r.vendor)} · ${escapeHtml(r.requester.tenant)}</div>
+        </div>
+        <button class="pa-slideout-close" onclick="closeInboxDetailPanel()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <!-- Scrollable body -->
+      <div style="flex:1;overflow-y:auto;padding:0 20px 20px;">
+
+        <!-- Requester -->
+        <div style="display:flex;align-items:center;gap:10px;padding:16px 0;border-bottom:1px solid var(--line);">
+          <div style="width:36px;height:36px;border-radius:50%;background:${av};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">${escapeHtml(r.requester.initials)}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--t1);">${escapeHtml(r.requester.name)}</div>
+            <div style="font-size:11px;color:var(--t3);">${escapeHtml(r.requester.dept)} · ${escapeHtml(r.age)}</div>
+          </div>
+        </div>
+
+        <!-- Business intent -->
+        <div style="padding:14px 0;border-bottom:1px solid var(--line);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:7px;">Business intent</div>
+          <div style="font-size:13px;color:var(--t1);line-height:1.6;">${escapeHtml(r.businessIntent || '—')}</div>
+        </div>
+
+        <!-- Request details grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);">
+          ${kv('Timeline', escapeHtml(r.timeline || '—'))}
+          ${kv('Est. users', r.estimatedUsers)}
+          ${kv('Access type', escapeHtml((r.actionTypes||[]).join(' + ')))}
+          ${kv('Data sensitivity', [r.hasPII ? 'PII' : null, r.hasFinancial ? 'Financial' : null].filter(Boolean).join(', ') || 'Standard')}
+        </div>
+
+        <!-- Quote / notes -->
+        ${r.quote ? `
+        <div style="padding:14px 0;border-bottom:1px solid var(--line);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:7px;">Quote</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px;">
+            <span style="font-size:22px;font-weight:800;color:var(--t1);">$${r.quote.amount.toLocaleString()}</span>
+            <span style="font-size:12px;color:var(--t3);">${r.quote.etaWeeks}w estimated</span>
+          </div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.5;">${escapeHtml(r.quote.notes)}</div>
+        </div>` : ''}
+
+        <!-- Rejection reason -->
+        ${r.rejectionReason ? `
+        <div style="padding:12px 14px;background:var(--status-error-bg);border:1px solid rgba(239,68,68,.2);border-radius:var(--r8);margin:14px 0;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--red);margin-bottom:5px;">Rejection reason</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.5;">${escapeHtml(r.rejectionReason)}</div>
+        </div>` : ''}
+
+        <!-- Timeline -->
+        <div style="padding:14px 0;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:12px;">Activity</div>
+          ${timelineHTML}
+        </div>
+
+      </div>
+
+      <!-- Action bar -->
+      ${actionBar}
+    </div>`;
+  document.body.appendChild(c);
+  requestAnimationFrame(() => {
+    document.getElementById('idpOverlay').classList.add('open');
+    document.getElementById('idpDrawer').classList.add('open');
+  });
+}
+
+function closeInboxDetailPanel() {
+  const o = document.getElementById('idpOverlay');
+  const d = document.getElementById('idpDrawer');
+  if (o) { o.classList.remove('open'); d.classList.remove('open'); }
+}
+
 function _inboxBucket(status) {
   if (status === 'pending_review' || status === 'in_review') return 'pending';
   return status;
@@ -12153,7 +12294,7 @@ function requestRowHTML(r) {
 
   const preview = (r.businessIntent || '').replace(/\s+/g, ' ').trim();
   return `
-    <div class="inbox-row ${isSelected?'is-selected':''} ${isPending?'is-pending':''}" role="listitem" onclick="toast('Detail panel — coming soon. Full request thread + form summary opens here.')">
+    <div class="inbox-row ${isSelected?'is-selected':''} ${isPending?'is-pending':''}" role="listitem" onclick="openInboxDetailPanel('${r.id}')">
       <label class="inbox-row-check" onclick="event.stopPropagation()">
         <input type="checkbox" ${isSelected?'checked':''} onchange="toggleInboxRow('${r.id}')"/>
       </label>
@@ -12189,7 +12330,7 @@ function requestRowHTML(r) {
       </div>
       <div class="inbox-row-action">
         <div class="inbox-quick-actions">${quickActions}</div>
-        <button class="inbox-open" type="button" onclick="event.stopPropagation();toast('Open ${escapeHtml(r.integration).replace(/'/g,'')} detail — flow coming soon')" aria-label="Open ${escapeHtml(r.integration)} detail">
+        <button class="inbox-open" type="button" onclick="event.stopPropagation();openInboxDetailPanel('${r.id}')" aria-label="Open ${escapeHtml(r.integration)} detail">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2l4 4-4 4"/></svg>
         </button>
       </div>
