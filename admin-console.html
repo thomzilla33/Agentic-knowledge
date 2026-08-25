@@ -8205,15 +8205,63 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 .pa-eff-stat { text-align:center; flex:1; }
 .pa-eff-num { font-size:20px; font-weight:700; color:var(--pri); line-height:1; }
 .pa-eff-lbl { font-size:11px; color:var(--color-text-caption); font-weight:500; margin-top:3px; }
-.pa-tree-row { display:flex; align-items:center; height:44px; border-bottom:1px solid var(--color-border-neutral-subtle); padding:0 16px; transition:background .12s; }
+.pa-tree-row { display:flex; align-items:center; min-height:44px; border-bottom:1px solid var(--color-border-neutral-subtle); padding:8px 16px; transition:background .12s; }
 .pa-tree-row:hover { background:var(--table-row-hover-bg); }
 .pa-tree-row:last-child { border-bottom:none; }
 .pa-tree-expand { width:20px; height:20px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--color-text-disabled); flex-shrink:0; border-radius:4px; cursor:pointer; transition:background .12s; }
 .pa-tree-expand:hover { background:var(--table-row-hover-bg); }
 .pa-tree-label { flex:1; min-width:0; margin-left:8px; }
 .pa-tree-name { font-size:13px; font-weight:500; color:var(--color-text-title); }
-.pa-tree-code { font-size:11px; color:var(--color-text-caption); font-family:'SF Mono','Fira Code',monospace; }
+.pa-tree-desc { font-size:11.5px; color:var(--color-text-caption); margin-top:1px; line-height:1.35; }
+.pa-tree-code { font-size:10.5px; color:var(--color-text-disabled); font-family:'SF Mono','Fira Code',monospace; margin-top:1px; }
 .pa-tree-meta { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+/* #10 — Drill-down breadcrumb + label btn */
+.pa-drill-breadcrumb { display:flex; align-items:center; gap:2px; padding:8px 16px; background:var(--table-header-bg); border-bottom:1px solid var(--color-border-neutral-subtle); flex-wrap:wrap; }
+.pa-drill-crumb { font-size:12px; font-weight:500; color:var(--color-text-subtitle); background:none; border:none; cursor:pointer; padding:3px 6px; border-radius:6px; transition:background .12s,color .12s; }
+.pa-drill-crumb:hover { background:var(--bg3); color:var(--color-text-title); }
+.pa-drill-crumb-root { color:var(--pri); }
+.pa-drill-crumb-root:hover { background:rgba(99,102,241,.08); color:var(--pri); }
+.pa-drill-crumb-active { color:var(--color-text-title); font-weight:600; cursor:default; }
+.pa-drill-crumb-active:hover { background:none; }
+.pa-drill-sep { font-size:13px; color:var(--color-text-disabled); user-select:none; line-height:1; padding:0 2px; }
+.pa-drill-label-btn { background:none; border:none; cursor:pointer; font-size:13px; font-weight:500; color:var(--color-text-title); padding:0; text-align:left; transition:color .12s; }
+.pa-drill-label-btn:hover { color:var(--pri); text-decoration:underline; }
+.pa-drill-into-btn { background:none; border:1px solid var(--color-border-neutral-subtle); border-radius:5px; cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; color:var(--color-text-caption); transition:background .12s,border-color .12s,color .12s; flex-shrink:0; }
+.pa-drill-into-btn:hover { background:var(--bg3); border-color:var(--color-border-neutral-default); color:var(--pri); }
+/* #14 — Scope picker */
+.pa-scope-btn { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:500; color:var(--color-text-subtitle); background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:6px; padding:3px 8px 3px 9px; cursor:pointer; transition:background .12s,border-color .12s,color .12s; white-space:nowrap; }
+.pa-scope-btn:hover { background:var(--bg2); border-color:var(--pri); color:var(--color-text-title); }
+.pa-scope-option { display:flex; align-items:center; gap:10px; width:100%; padding:9px 14px; background:none; border:none; cursor:pointer; transition:background .1s; text-align:left; }
+.pa-scope-option:hover { background:var(--bg3); }
+.pa-scope-option.active { background:rgba(99,102,241,.06); }
+.pa-scope-option-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.pa-scope-option-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.pa-scope-option-label { font-size:12.5px; font-weight:500; color:var(--color-text-title); }
+.pa-scope-option-desc  { font-size:11px; color:var(--color-text-caption); }
+.pa-scope-option.active .pa-scope-option-label { color:var(--pri); }
+/* #13 — Effective permissions summary view */
+.pa-eff-view { }
+.pa-eff-section { border-bottom:1px solid var(--color-border-neutral-subtle); }
+.pa-eff-section:last-child { border-bottom:none; }
+.pa-eff-section-hd { display:flex; align-items:center; gap:8px; padding:9px 16px 9px 16px; cursor:pointer; background:var(--table-header-bg); border-bottom:1px solid var(--color-border-neutral-subtle); transition:background .12s; }
+.pa-eff-section-hd:hover { background:var(--bg3); }
+.pa-eff-section-name { font-size:12px; font-weight:600; color:var(--color-text-title); flex:1; }
+.pa-eff-section-count { font-size:11px; color:var(--color-text-caption); font-weight:500; }
+.pa-eff-row { display:flex; align-items:center; gap:12px; padding:9px 16px 9px 36px; border-bottom:1px solid var(--color-border-neutral-subtle); }
+.pa-eff-row:last-child { border-bottom:none; }
+.pa-eff-row-state { width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pa-eff-row-state--eff-granted { background:var(--tag-success-bg); color:var(--badge-success); }
+.pa-eff-row-state--eff-denied  { background:var(--tag-error-bg);   color:var(--badge-error); }
+.pa-eff-row-state--eff-none    { background:var(--bg3); color:var(--color-text-disabled); }
+.pa-eff-row-body { flex:1; min-width:0; }
+.pa-eff-row-name { font-size:12.5px; font-weight:500; color:var(--color-text-title); }
+.pa-eff-row-code { font-size:10.5px; color:var(--color-text-disabled); font-family:'SF Mono','Fira Code',monospace; margin-top:1px; }
+.pa-eff-row-meta { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.pa-eff-src { font-size:11px; font-weight:500; border-radius:4px; padding:2px 7px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
+.pa-eff-src--role   { background:rgba(99,102,241,.1);  color:var(--pri); border:1px solid rgba(99,102,241,.2); }
+.pa-eff-src--direct { background:var(--tag-success-bg); color:var(--badge-success); border:1px solid var(--tag-success-bd); }
+.pa-eff-src--denied { background:var(--tag-error-bg);   color:var(--badge-error);   border:1px solid var(--tag-error-bd); }
+.pa-eff-src--none   { background:var(--bg3); color:var(--color-text-disabled); border:1px solid var(--color-border-neutral-subtle); }
 .pa-tree-scope { font-size:11px; font-weight:500; color:var(--color-text-caption); background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:4px; padding:1px 6px; }
 .pa-role-tag-sm { font-size:11px; font-weight:600; background:var(--tag-success-bg); color:var(--tag-success-fg); border:1px solid var(--tag-success-bd); border-radius:4px; padding:1px 6px; display:flex; align-items:center; gap:3px; white-space:nowrap; }
 .pa-toggle{
@@ -8420,6 +8468,11 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 .ids-check-desc { font-size:12px; color:var(--t3); margin-left:25px; margin-top:2px; }
 /* Session grid */
 .ids-session-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+/* #15 Session & password policy redesign */
+.ids-policy-group { }
+.ids-policy-group + .ids-policy-group { margin-top:20px; padding-top:20px; border-top:1px solid var(--line); }
+.ids-policy-group-title { font-size:12px; font-weight:700; color:var(--t1); letter-spacing:.03em; margin-bottom:14px; }
+.ids-field-hint { font-size:11px; color:var(--t3); margin-top:4px; line-height:1.45; }
 
 /* ====================== STUDIOS & ENTITLEMENTS ====================== */
 .ste-wrap { max-width:860px; padding:32px 24px 64px; }
@@ -14574,10 +14627,20 @@ let _paState = {
   studioAccessPersonId: null,
   studioAccessEdits: new Set(),
   studioAccessPath: [],
+  // #14: Scope picker
+  scopePickerNodeId: null,
+  scopePickerRect: null,
   // V2: User permission tree
   userAccessId: null,
   userAccessTab: 'governance',
+  permDrillPath: [],   // [{id, label}] — breadcrumb for perm tree drill-down
   detailTab: 'overview',
+  // V2: Role full-page view
+  roleAccessId: null,
+  roleAccessTab: 'overview',
+  // V2: Group full-page view
+  groupAccessId: null,
+  groupAccessTab: 'overview',
   effectiveMode: false,
   pendingChanges: [],
   applyChangesOpen: false,
@@ -14613,110 +14676,110 @@ let _paState = {
 // ── Permission tree fixture (governance tab) — binary granted / not-granted ──
 const PA_USER_PERM_TREE = {
   governance: [
-    { id:'gov-drives', label:'Drives', code:'governance.drive', expanded:true,
+    { id:'gov-drives', label:'Drives', code:'governance.drive', desc:'Manage files and folders within governance drives', expanded:true,
       state:'g-role', role:'Manager', scope:'Tenant', locked:true,
       children:[
-        { id:'gov-drives-view',   label:'View Drives',    code:'governance.drive.view',          state:'g-inh', scope:'Tenant', locked:true },
-        { id:'gov-drives-up',     label:'Upload files',   code:'governance.drive.upload',        state:'g-inh', scope:'Tenant', locked:true },
-        { id:'gov-drives-folder', label:'Create folders', code:'governance.drive.folder.create', state:'g-inh', scope:'Tenant', locked:true },
+        { id:'gov-drives-view',   label:'View Drives',    desc:'Browse and read files within authorized drives',          code:'governance.drive.view',          state:'g-inh', scope:'Tenant', locked:true },
+        { id:'gov-drives-up',     label:'Upload files',   desc:'Add new files and documents to governance drives',        code:'governance.drive.upload',        state:'g-inh', scope:'Tenant', locked:true },
+        { id:'gov-drives-folder', label:'Create folders', desc:'Organize content by creating folder structures',          code:'governance.drive.folder.create', state:'g-inh', scope:'Tenant', locked:true },
       ]},
-    { id:'gov-sandbox', label:'Sandboxes', code:'governance.sandbox', expanded:true,
+    { id:'gov-sandbox', label:'Sandboxes', code:'governance.sandbox', desc:'Work within isolated environments before promoting to production', expanded:true,
       state:'g-role', role:'Manager', scope:'Own', locked:true,
       children:[
-        { id:'gov-sb-view',    label:'View Sandboxes',    code:'governance.sandbox.view',    state:'g-inh', scope:'Own', locked:true },
-        { id:'gov-sb-det',     label:'Sandbox details',   code:'governance.sandbox.details', state:'g-inh', scope:'Own', locked:true },
-        { id:'gov-sb-claims',  label:'View claims',       code:'governance.sandbox.claims',  state:'g-inh', scope:'Own', locked:true },
-        { id:'gov-sb-bundles', label:'Manage bundles',    code:'governance.sandbox.bundles', state:'g-direct', scope:'Own' },
-        { id:'gov-sb-sources', label:'Connect sources',   code:'governance.sandbox.sources', state:'', scope:'Own' },
-        { id:'gov-sb-promo',   label:'Promote sandboxes', code:'governance.sandbox.promote', state:'', scope:'Own' },
+        { id:'gov-sb-view',    label:'View Sandboxes',    desc:'List and browse available sandbox environments',          code:'governance.sandbox.view',    state:'g-inh', scope:'Own', locked:true },
+        { id:'gov-sb-det',     label:'Sandbox details',   desc:'Access configuration and metadata for a sandbox',        code:'governance.sandbox.details', state:'g-inh', scope:'Own', locked:true },
+        { id:'gov-sb-claims',  label:'View claims',       desc:'See the knowledge claims stored in a sandbox',           code:'governance.sandbox.claims',  state:'g-inh', scope:'Own', locked:true },
+        { id:'gov-sb-bundles', label:'Manage bundles',    desc:'Create and edit content bundles within a sandbox',       code:'governance.sandbox.bundles', state:'g-direct', scope:'Own' },
+        { id:'gov-sb-sources', label:'Connect sources',   desc:'Link external data sources to a sandbox',                code:'governance.sandbox.sources', state:'', scope:'Own' },
+        { id:'gov-sb-promo',   label:'Promote sandboxes', desc:'Move validated content from sandbox to the truth plane', code:'governance.sandbox.promote', state:'', scope:'Own' },
       ]},
-    { id:'gov-truth', label:'Truth Plane', code:'governance.truthplane', expanded:false, state:'',
+    { id:'gov-truth', label:'Truth Plane', code:'governance.truthplane', desc:'Access and manage the authoritative knowledge base', expanded:false, state:'',
       children:[
-        { id:'gov-truth-view',  label:'View truth plane', code:'governance.truthplane.view',  state:'' },
-        { id:'gov-truth-facts', label:'Manage facts',     code:'governance.truthplane.facts', state:'' },
+        { id:'gov-truth-view',  label:'View truth plane', desc:'Read facts and claims in the production truth plane', code:'governance.truthplane.view',  state:'' },
+        { id:'gov-truth-facts', label:'Manage facts',     desc:'Edit, approve, or retire facts in the truth plane',  code:'governance.truthplane.facts', state:'' },
       ]},
-    { id:'gov-packs', label:'Promotion Packs', code:'governance.packs', expanded:false, state:'',
+    { id:'gov-packs', label:'Promotion Packs', code:'governance.packs', desc:'Bundle content changes for review and approval', expanded:false, state:'',
       children:[
-        { id:'gov-packs-view',   label:'View packs',   code:'governance.packs.view',   state:'g-direct' },
-        { id:'gov-packs-create', label:'Create packs', code:'governance.packs.create', state:'' },
+        { id:'gov-packs-view',   label:'View packs',   desc:'Browse promotion packets and their review status', code:'governance.packs.view',   state:'g-direct' },
+        { id:'gov-packs-create', label:'Create packs', desc:'Assemble new promotion packets for approval',      code:'governance.packs.create', state:'' },
       ]},
   ],
   datastudio: [
-    { id:'ds-models', label:'Data Models', code:'datastudio.models', expanded:true,
+    { id:'ds-models', label:'Data Models', code:'datastudio.models', desc:'Browse and manage entity schemas and data model definitions', expanded:true,
       state:'g-role', role:'Data Steward', scope:'Tenant', locked:true,
       children:[
-        { id:'ds-models-view',    label:'View models',     code:'datastudio.models.view',    state:'g-inh', scope:'Tenant', locked:true },
-        { id:'ds-models-author',  label:'Author models',   code:'datastudio.models.author',  state:'g-inh', scope:'Tenant', locked:true },
-        { id:'ds-models-publish', label:'Publish models',  code:'datastudio.models.publish', state:'', scope:'Tenant' },
-        { id:'ds-models-deprecate', label:'Deprecate models', code:'datastudio.models.deprecate', state:'', scope:'Tenant' },
+        { id:'ds-models-view',      label:'View models',      desc:'Read data model definitions, entities, and attributes',                         code:'datastudio.models.view',      state:'g-inh', scope:'Tenant', locked:true },
+        { id:'ds-models-author',    label:'Author models',    desc:'Create and edit data model drafts',                                             code:'datastudio.models.author',    state:'g-inh', scope:'Tenant', locked:true },
+        { id:'ds-models-publish',   label:'Publish models',   desc:'Promote a model from Draft to Published state, making it available platform-wide', code:'datastudio.models.publish',   state:'', scope:'Tenant' },
+        { id:'ds-models-deprecate', label:'Deprecate models', desc:'Mark a published model as deprecated so consumers can migrate away',            code:'datastudio.models.deprecate', state:'', scope:'Tenant' },
       ]},
-    { id:'ds-lineage', label:'Lineage', code:'datastudio.lineage', expanded:false, state:'g-direct', scope:'Tenant',
+    { id:'ds-lineage', label:'Lineage', code:'datastudio.lineage', desc:'Explore how data flows between entities and upstream sources', expanded:false, state:'g-direct', scope:'Tenant',
       children:[
-        { id:'ds-lineage-view',  label:'View lineage graph', code:'datastudio.lineage.view',  state:'g-direct', scope:'Tenant' },
-        { id:'ds-lineage-trace', label:'Trace relationships', code:'datastudio.lineage.trace', state:'', scope:'Tenant' },
+        { id:'ds-lineage-view',  label:'View lineage graph',  desc:'See the full dependency graph for data models and pipelines', code:'datastudio.lineage.view',  state:'g-direct', scope:'Tenant' },
+        { id:'ds-lineage-trace', label:'Trace relationships', desc:'Follow data lineage from a specific field back to its origin', code:'datastudio.lineage.trace', state:'', scope:'Tenant' },
       ]},
-    { id:'ds-connectors', label:'Connectors', code:'datastudio.connectors', expanded:false, state:'',
+    { id:'ds-connectors', label:'Connectors', code:'datastudio.connectors', desc:'Configure and authenticate connections to external data sources', expanded:false, state:'',
       children:[
-        { id:'ds-conn-view',   label:'View connectors',    code:'datastudio.connectors.view',   state:'' },
-        { id:'ds-conn-manage', label:'Manage connectors',  code:'datastudio.connectors.manage', state:'' },
-        { id:'ds-conn-test',   label:'Test connections',   code:'datastudio.connectors.test',   state:'' },
+        { id:'ds-conn-view',   label:'View connectors',    desc:'List configured source connections and their status',     code:'datastudio.connectors.view',   state:'' },
+        { id:'ds-conn-manage', label:'Manage connectors',  desc:'Add, edit, or remove data source connections',           code:'datastudio.connectors.manage', state:'' },
+        { id:'ds-conn-test',   label:'Test connections',   desc:'Run a connectivity test against a configured data source', code:'datastudio.connectors.test',   state:'' },
       ]},
   ],
   agentic: [
-    { id:'ag-workers', label:'AI Workers', code:'agentic.workers', expanded:true,
+    { id:'ag-workers', label:'AI Workers', code:'agentic.workers', desc:'Control access to AI worker agents and their execution', expanded:true,
       state:'g-role', role:'Data Steward', scope:'Tenant', locked:true,
       children:[
-        { id:'ag-workers-view',   label:'View workers',    code:'agentic.workers.view',   state:'g-inh', scope:'Tenant', locked:true },
-        { id:'ag-workers-run',    label:'Run workers',     code:'agentic.workers.run',    state:'g-inh', scope:'Tenant', locked:true },
-        { id:'ag-workers-manage', label:'Manage workers',  code:'agentic.workers.manage', state:'', scope:'Tenant' },
-        { id:'ag-workers-deploy', label:'Deploy workers',  code:'agentic.workers.deploy', state:'', scope:'Tenant' },
+        { id:'ag-workers-view',   label:'View workers',    desc:'Browse AI workers and read their configurations and run history',  code:'agentic.workers.view',   state:'g-inh', scope:'Tenant', locked:true },
+        { id:'ag-workers-run',    label:'Run workers',     desc:'Trigger AI worker executions manually or on a schedule',          code:'agentic.workers.run',    state:'g-inh', scope:'Tenant', locked:true },
+        { id:'ag-workers-manage', label:'Manage workers',  desc:'Edit worker configurations, prompts, and tool bindings',          code:'agentic.workers.manage', state:'', scope:'Tenant' },
+        { id:'ag-workers-deploy', label:'Deploy workers',  desc:'Publish a worker to production so it can be invoked by the platform', code:'agentic.workers.deploy', state:'', scope:'Tenant' },
       ]},
-    { id:'ag-networks', label:'Agentic Networks', code:'agentic.networks', expanded:false, state:'',
+    { id:'ag-networks', label:'Agentic Networks', code:'agentic.networks', desc:'Manage multi-agent topologies and orchestration graphs', expanded:false, state:'',
       children:[
-        { id:'ag-net-view',   label:'View networks',   code:'agentic.networks.view',   state:'' },
-        { id:'ag-net-manage', label:'Manage networks', code:'agentic.networks.manage', state:'' },
+        { id:'ag-net-view',   label:'View networks',   desc:'Browse agentic network definitions and their connected workers', code:'agentic.networks.view',   state:'' },
+        { id:'ag-net-manage', label:'Manage networks', desc:'Create and edit agentic network topologies',                   code:'agentic.networks.manage', state:'' },
       ]},
-    { id:'ag-hitl', label:'Human in the Loop', code:'agentic.hitl', expanded:false, state:'g-direct', scope:'Own',
+    { id:'ag-hitl', label:'Human in the Loop', code:'agentic.hitl', desc:'Handle human review checkpoints within agentic workflows', expanded:false, state:'g-direct', scope:'Own',
       children:[
-        { id:'ag-hitl-view',    label:'View handoffs',    code:'agentic.hitl.view',    state:'g-direct', scope:'Own' },
-        { id:'ag-hitl-approve', label:'Approve handoffs', code:'agentic.hitl.approve', state:'g-direct', scope:'Own' },
-        { id:'ag-hitl-config',  label:'Configure HITL',   code:'agentic.hitl.config',  state:'', scope:'Own' },
+        { id:'ag-hitl-view',    label:'View handoffs',    desc:'See pending human-review tasks generated by AI workers',     code:'agentic.hitl.view',    state:'g-direct', scope:'Own' },
+        { id:'ag-hitl-approve', label:'Approve handoffs', desc:'Accept or reject AI decisions that require human sign-off',  code:'agentic.hitl.approve', state:'g-direct', scope:'Own' },
+        { id:'ag-hitl-config',  label:'Configure HITL',   desc:'Set the conditions under which a worker pauses for human review', code:'agentic.hitl.config',  state:'', scope:'Own' },
       ]},
-    { id:'ag-workflows', label:'Workflows', code:'agentic.workflows', expanded:false, state:'',
+    { id:'ag-workflows', label:'Workflows', code:'agentic.workflows', desc:'Define and run multi-step automated task sequences', expanded:false, state:'',
       children:[
-        { id:'ag-wf-view',   label:'View workflows',   code:'agentic.workflows.view',   state:'' },
-        { id:'ag-wf-manage', label:'Manage workflows', code:'agentic.workflows.manage', state:'' },
+        { id:'ag-wf-view',   label:'View workflows',   desc:'Browse workflow definitions and their execution logs',     code:'agentic.workflows.view',   state:'' },
+        { id:'ag-wf-manage', label:'Manage workflows', desc:'Create, edit, and delete workflow step configurations',    code:'agentic.workflows.manage', state:'' },
       ]},
   ],
   admin: [
-    { id:'adm-members', label:'Members', code:'admin.members', expanded:true,
+    { id:'adm-members', label:'Members', code:'admin.members', desc:'Manage who can access the workspace and their account status', expanded:true,
       state:'g-role', role:'Workspace Admin', scope:'Tenant', locked:true,
       children:[
-        { id:'adm-members-view',   label:'View members',   code:'admin.members.view',   state:'g-inh', scope:'Tenant', locked:true },
-        { id:'adm-members-invite', label:'Invite members', code:'admin.members.invite', state:'g-inh', scope:'Tenant', locked:true },
-        { id:'adm-members-remove', label:'Remove members', code:'admin.members.remove', state:'g-inh', scope:'Tenant', locked:true },
-        { id:'adm-members-suspend', label:'Suspend members', code:'admin.members.suspend', state:'', scope:'Tenant' },
+        { id:'adm-members-view',    label:'View members',    desc:'List all workspace members and their profile details',      code:'admin.members.view',    state:'g-inh', scope:'Tenant', locked:true },
+        { id:'adm-members-invite',  label:'Invite members',  desc:'Send invitations to bring new users into the workspace',   code:'admin.members.invite',  state:'g-inh', scope:'Tenant', locked:true },
+        { id:'adm-members-remove',  label:'Remove members',  desc:'Permanently remove a member from the workspace',           code:'admin.members.remove',  state:'g-inh', scope:'Tenant', locked:true },
+        { id:'adm-members-suspend', label:'Suspend members', desc:'Temporarily disable a member account without removing it', code:'admin.members.suspend', state:'', scope:'Tenant' },
       ]},
-    { id:'adm-roles', label:'Roles & Permissions', code:'admin.roles', expanded:false, state:'g-direct', scope:'Tenant',
+    { id:'adm-roles', label:'Roles & Permissions', code:'admin.roles', desc:'Define and assign permission bundles across the platform', expanded:false, state:'g-direct', scope:'Tenant',
       children:[
-        { id:'adm-roles-view',   label:'View roles',   code:'admin.roles.view',   state:'g-direct', scope:'Tenant' },
-        { id:'adm-roles-manage', label:'Manage roles', code:'admin.roles.manage', state:'', scope:'Tenant' },
+        { id:'adm-roles-view',   label:'View roles',   desc:'Browse role definitions and see which permissions each role grants', code:'admin.roles.view',   state:'g-direct', scope:'Tenant' },
+        { id:'adm-roles-manage', label:'Manage roles', desc:'Create custom roles and modify the permissions they grant',         code:'admin.roles.manage', state:'', scope:'Tenant' },
       ]},
-    { id:'adm-integrations', label:'Integrations', code:'admin.integrations', expanded:false, state:'',
+    { id:'adm-integrations', label:'Integrations', code:'admin.integrations', desc:'Connect external services and manage third-party credentials', expanded:false, state:'',
       children:[
-        { id:'adm-int-view',   label:'View integrations',   code:'admin.integrations.view',   state:'' },
-        { id:'adm-int-manage', label:'Manage integrations', code:'admin.integrations.manage', state:'' },
-        { id:'adm-int-auth',   label:'Authenticate connectors', code:'admin.integrations.auth', state:'' },
+        { id:'adm-int-view',   label:'View integrations',       desc:'List configured third-party integrations and their connection status',        code:'admin.integrations.view',   state:'' },
+        { id:'adm-int-manage', label:'Manage integrations',     desc:'Add, configure, or remove integration connections',                          code:'admin.integrations.manage', state:'' },
+        { id:'adm-int-auth',   label:'Authenticate connectors', desc:'Authorize the platform to access external services on behalf of the org',    code:'admin.integrations.auth',   state:'' },
       ]},
-    { id:'adm-audit', label:'Audit & Compliance', code:'admin.audit', expanded:false, state:'',
+    { id:'adm-audit', label:'Audit & Compliance', code:'admin.audit', desc:'Review and export a tamper-evident log of platform activity', expanded:false, state:'',
       children:[
-        { id:'adm-audit-view',   label:'View audit log',    code:'admin.audit.view',   state:'' },
-        { id:'adm-audit-export', label:'Export audit data', code:'admin.audit.export', state:'' },
+        { id:'adm-audit-view',   label:'View audit log',    desc:'Read the chronological log of admin and user actions',   code:'admin.audit.view',   state:'' },
+        { id:'adm-audit-export', label:'Export audit data', desc:'Download audit log data for external compliance tools',  code:'admin.audit.export', state:'' },
       ]},
-    { id:'adm-billing', label:'Billing', code:'admin.billing', expanded:false, state:'',
+    { id:'adm-billing', label:'Billing', code:'admin.billing', desc:'Access payment information, usage limits, and subscription details', expanded:false, state:'',
       children:[
-        { id:'adm-billing-view',   label:'View billing',   code:'admin.billing.view',   state:'' },
-        { id:'adm-billing-manage', label:'Manage billing', code:'admin.billing.manage', state:'' },
+        { id:'adm-billing-view',   label:'View billing',   desc:'See current plan, usage, and past invoices',          code:'admin.billing.view',   state:'' },
+        { id:'adm-billing-manage', label:'Manage billing', desc:'Update payment methods, plans, and billing contacts', code:'admin.billing.manage', state:'' },
       ]},
   ],
 };
@@ -14757,7 +14820,7 @@ function _paChevron(expanded) {
   return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(${expanded?0:-90}deg);transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>`;
 }
 
-function _paRenderTreeNode(node, depth) {
+function _paRenderTreeNode(node, depth, drillable) {
   depth = depth || 0;
   const indent = depth * 22;
   const isParent = node.children && node.children.length;
@@ -14767,14 +14830,23 @@ function _paRenderTreeNode(node, depth) {
   if (node.partialCount) meta += `<span style="font-size:11px;color:var(--t3)">${node.partialCount}</span>`;
   if (node.locked && node.scope) meta += `<span class="pa-tree-scope">${node.scope}</span>`;
   else if (node.scope && !node.locked && node.state && node.state!=='g-denied' && node.state!=='g-pdeny' && node.state!=='g-padd' && node.state!=='')
-    meta += `<select class="pa-tree-scope-sel" aria-label="Scope" style="font-size:12px;color:var(--t1);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-family:inherit;outline:none;cursor:pointer"><option${node.scope==='Own'?' selected':''}>Own</option><option${node.scope==='Tenant'?' selected':''}>Tenant</option></select>`;
+    meta += `<button class="pa-scope-btn" onclick="paOpenScopePicker('${node.id}',this);event.stopPropagation()" aria-label="Set scope for ${escapeHtml(node.label)}">${escapeHtml(node.scope||'Tenant')}<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg></button>`;
+
+  // #10: parent nodes in drill-capable view show a "drill in" chevron button
+  const canDrillIn = isParent && !drillable;  // top-level tree is drillable; children shown after drilling are flat
+  if (isParent && !drillable) {
+    meta += `<button class="pa-drill-into-btn" onclick="paDrillInto('${node.id}','${escapeHtml(node.label).replace(/'/g,"\\'")}');event.stopPropagation()" title="View ${escapeHtml(node.label)} permissions" aria-label="Drill into ${escapeHtml(node.label)}">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
+    </button>`;
+  }
 
   const toggleClick = node.locked ? null : `paToggleUserPerm('${node.id}')`;
   let html = `<div class="pa-tree-row" role="treeitem" style="padding-left:${16+indent}px" id="parow-${node.id}">
     ${isParent ? `<button class="pa-tree-expand" onclick="paToggleTree('${node.id}')" id="paexp-${node.id}" aria-label="Expand ${escapeHtml(node.label)}">${_paChevron(node.expanded)}</button>` : '<span style="width:20px;flex-shrink:0"></span>'}
     ${_paCbHTML(node.state, toggleClick)}
     <div class="pa-tree-label">
-      <div class="pa-tree-name">${escapeHtml(node.label)}</div>
+      <div class="pa-tree-name">${isParent && !drillable ? `<button class="pa-drill-label-btn" onclick="paDrillInto('${node.id}','${escapeHtml(node.label).replace(/'/g,"\\'")}')" title="Explore ${escapeHtml(node.label)}">${escapeHtml(node.label)}</button>` : escapeHtml(node.label)}</div>
+      ${node.desc ? `<div class="pa-tree-desc">${escapeHtml(node.desc)}</div>` : ''}
       <div class="pa-tree-code">${node.code}</div>
     </div>
     <div class="pa-tree-meta">${meta}</div>
@@ -14802,6 +14874,208 @@ function paToggleTree(id) {
   const btn = document.getElementById('paexp-' + id);
   if (ch) ch.style.display = node.expanded ? '' : 'none';
   if (btn) btn.innerHTML = _paChevron(node.expanded);
+}
+
+// #13 — Effective permissions summary view
+function _paRenderEffectiveView(studioNodes) {
+  function stateInfo(st) {
+    if (!st || st === '') return { label:'Not granted', cls:'eff-none', icon:'' };
+    if (st === 'g-denied' || st === 'g-pdeny') return { label:'Denied',      cls:'eff-denied', icon:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' };
+    return { label:'Granted', cls:'eff-granted', icon:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>' };
+  }
+  function sourceTag(node) {
+    if (!node.state || node.state === '') return `<span class="pa-eff-src pa-eff-src--none">Not granted</span>`;
+    if (node.state === 'g-role' || node.state === 'g-inh') {
+      const roleName = node.role || 'Role';
+      return `<span class="pa-eff-src pa-eff-src--role"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> via ${escapeHtml(roleName)}</span>`;
+    }
+    if (node.state === 'g-direct' || node.state === 'g-padd') {
+      return `<span class="pa-eff-src pa-eff-src--direct"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg> Direct grant</span>`;
+    }
+    if (node.state === 'g-denied' || node.state === 'g-pdeny') {
+      return `<span class="pa-eff-src pa-eff-src--denied"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Explicitly denied</span>`;
+    }
+    return `<span class="pa-eff-src pa-eff-src--none">Not granted</span>`;
+  }
+
+  if (!studioNodes || !studioNodes.length) {
+    return `<div style="padding:48px 24px;text-align:center">
+      <div style="font-size:13px;font-weight:600;color:var(--color-text-subtitle)">No permissions for this studio</div>
+    </div>`;
+  }
+
+  return studioNodes.map(parent => {
+    const children = parent.children || [];
+    const si = stateInfo(parent.state);
+    // Only render children rows; show parent as section header
+    const childRows = children.map(child => {
+      const csi = stateInfo(child.state);
+      const scope = child.scope ? `<span class="pa-tree-scope" style="font-size:10px">${child.scope}</span>` : '';
+      return `<div class="pa-eff-row">
+        <div class="pa-eff-row-state pa-eff-row-state--${csi.cls}">
+          ${csi.icon}
+        </div>
+        <div class="pa-eff-row-body">
+          <div class="pa-eff-row-name">${escapeHtml(child.label)}</div>
+          <div class="pa-eff-row-code">${child.code}</div>
+        </div>
+        <div class="pa-eff-row-meta">
+          ${scope}
+          ${sourceTag(child)}
+        </div>
+      </div>`;
+    }).join('');
+
+    // Parent row as section header
+    const parentGranted = children.filter(c => c.state && c.state !== '' && c.state !== 'g-denied' && c.state !== 'g-pdeny').length;
+    const parentTotal   = children.length;
+    return `<div class="pa-eff-section">
+      <div class="pa-eff-section-hd" onclick="paDrillInto('${parent.id}','${escapeHtml(parent.label).replace(/'/g,"\\'")}')">
+        <div class="pa-eff-section-name">${escapeHtml(parent.label)}</div>
+        <div class="pa-eff-section-count">${parentGranted}/${parentTotal} granted</div>
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
+      </div>
+      ${childRows || `<div style="padding:10px 16px 10px 40px;font-size:12px;color:var(--color-text-disabled)">No child permissions</div>`}
+    </div>`;
+  }).join('');
+}
+
+// #10 — Permission drill-down navigation
+function _paFindNode(id) {
+  function find(nodes) {
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      if (n.children) { const f = find(n.children); if (f) return f; }
+    }
+  }
+  return find(Object.values(PA_USER_PERM_TREE).flat());
+}
+
+function paDrillInto(nodeId, label) {
+  _paState.permDrillPath = [...(_paState.permDrillPath || []), { id: nodeId, label }];
+  renderPeople();
+}
+
+function paDrillBackTo(index) {
+  _paState.permDrillPath = (_paState.permDrillPath || []).slice(0, index);
+  renderPeople();
+}
+
+function paClearPermDrill() {
+  _paState.permDrillPath = [];
+  renderPeople();
+}
+
+// #14 — Scope picker
+const PA_SCOPE_LEVELS = [
+  { id:'Company',  label:'Company',       desc:'All workspaces in your organization',   dot:'var(--pri)',                   indent:0  },
+  { id:'Tenant',   label:'Tenant',        desc:'This workspace only',                  dot:'var(--color-text-subtitle)',    indent:16 },
+  { id:'Teams',    label:'Teams / Groups',desc:'Members of the same group(s)',          dot:'var(--color-text-caption)',     indent:32 },
+  { id:'Shared',   label:'Shared with me',desc:'Resources explicitly shared with you', dot:'var(--color-text-disabled)',    indent:48 },
+  { id:'Own',      label:'My own',        desc:'Only resources you created',           dot:'var(--color-text-disabled)',    indent:64 },
+];
+
+function paOpenScopePicker(nodeId, btn) {
+  if (_paState.scopePickerNodeId === nodeId) { paCloseScopePicker(); return; }
+  const rect = btn.getBoundingClientRect();
+  _paState.scopePickerNodeId = nodeId;
+  _paState.scopePickerRect = { top: rect.bottom + 6, left: rect.left };
+  _paRenderScopePickerOverlay();
+}
+
+function paCloseScopePicker() {
+  _paState.scopePickerNodeId = null;
+  const el = document.getElementById('paScopePicker');
+  if (el) el.remove();
+  const bd = document.getElementById('paScopePickerBd');
+  if (bd) bd.remove();
+}
+
+function paSetNodeScope(nodeId, scopeId) {
+  function set(nodes) {
+    for (const n of nodes) {
+      if (n.id === nodeId) { n.scope = scopeId; return true; }
+      if (n.children && set(n.children)) return true;
+    }
+  }
+  const all = Object.values(PA_USER_PERM_TREE).flat();
+  set(all);
+  paCloseScopePicker();
+  renderPeople();
+}
+
+function _paRenderScopePickerOverlay() {
+  // Remove existing
+  paCloseScopePicker();
+  const r = _paState.scopePickerRect;
+  const nid = _paState.scopePickerNodeId;
+
+  // Find current scope of this node
+  function findNode(nodes) {
+    for (const n of nodes) {
+      if (n.id === nid) return n;
+      if (n.children) { const f = findNode(n.children); if (f) return f; }
+    }
+  }
+  const node = findNode(Object.values(PA_USER_PERM_TREE).flat());
+  const currentScope = node ? (node.scope || 'Tenant') : 'Tenant';
+
+  const bd = document.createElement('div');
+  bd.id = 'paScopePickerBd';
+  bd.style.cssText = 'position:fixed;inset:0;z-index:10050;';
+  bd.onclick = () => paCloseScopePicker();
+
+  const picker = document.createElement('div');
+  picker.id = 'paScopePicker';
+  picker.style.cssText = `position:fixed;top:${r.top}px;left:${r.left}px;z-index:10051;width:260px;background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden;`;
+  picker.onclick = e => e.stopPropagation();
+
+  picker.innerHTML = `
+    <div style="padding:10px 14px 8px;border-bottom:1px solid var(--color-border-neutral-subtle)">
+      <div style="font-size:11px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.07em">Select scope</div>
+      <div style="font-size:11px;color:var(--color-text-disabled);margin-top:2px">How broadly this permission applies</div>
+    </div>
+    ${PA_SCOPE_LEVELS.map(s => {
+      const active = currentScope === s.id;
+      return `<button class="pa-scope-option ${active?'active':''}" style="padding-left:${14+s.indent}px" onclick="paSetNodeScope('${nid}','${s.id}')">
+        <span class="pa-scope-option-dot" style="background:${s.dot}"></span>
+        <span class="pa-scope-option-body">
+          <span class="pa-scope-option-label">${s.label}</span>
+          <span class="pa-scope-option-desc">${s.desc}</span>
+        </span>
+        ${active ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
+      </button>`;
+    }).join('')}
+  `;
+
+  document.body.appendChild(bd);
+  document.body.appendChild(picker);
+}
+
+// Renders the breadcrumb + drilled-into children for the perm tree
+function _paRenderDrillView(drillPath, studioLabel) {
+  const deepest = drillPath[drillPath.length - 1];
+  const node = _paFindNode(deepest.id);
+  const children = (node && node.children) ? node.children : [];
+
+  const crumbs = [
+    `<button class="pa-drill-crumb pa-drill-crumb-root" onclick="paClearPermDrill()">${studioLabel}</button>`,
+    ...drillPath.map((c, i) => {
+      const isLast = i === drillPath.length - 1;
+      return `<span class="pa-drill-sep">›</span>
+              <button class="pa-drill-crumb ${isLast ? 'pa-drill-crumb-active' : ''}" onclick="paDrillBackTo(${i + 1})">${escapeHtml(c.label)}</button>`;
+    })
+  ].join('');
+
+  return `
+    <div class="pa-drill-breadcrumb">${crumbs}</div>
+    <div role="tree" aria-label="${escapeHtml(deepest.label)} permissions">
+      ${children.length
+        ? children.map(c => _paRenderTreeNode(c, 0, true)).join('')
+        : `<div style="padding:48px 24px;text-align:center">
+            <div style="font-size:13px;font-weight:600;color:var(--color-text-subtitle)">No child permissions</div>
+           </div>`}
+    </div>`;
 }
 
 // Returns the first role object that grants at least one of permIds for userId
@@ -15193,7 +15467,7 @@ function renderUserAccessView(personId) {
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:0">
             <div class="pa-tabs" style="border-radius:12px 12px 0 0;overflow:hidden;flex:1">
               ${[['governance','Governance'],['datastudio','Data Studio'],['agentic','Agentic'],['admin','Admin']].map(([k,lbl])=>`
-                <button class="pa-tab ${studioTab===k?'active':''}" onclick="_paState.userAccessTab='${k}';renderPeople()">${lbl}</button>`).join('')}
+                <button class="pa-tab ${studioTab===k?'active':''}" onclick="_paState.userAccessTab='${k}';_paState.permDrillPath=[];renderPeople()">${lbl}</button>`).join('')}
             </div>
             <div class="pa-eff-mode-wrap">
               <button class="pa-eff-mode-btn ${!effectiveMode?'active':''}" onclick="_paState.effectiveMode=false;renderPeople()">User permissions</button>
@@ -15211,13 +15485,24 @@ function renderUserAccessView(personId) {
               </select>
               ${effectiveMode ? `<span style="font-size:11px;color:var(--pri);background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);border-radius:6px;padding:3px 8px">Effective view — all sources merged</span>` : ''}
             </div>
-            <div role="tree" aria-label="${studioTab} permissions">
-              ${treeNodes.length ? treeNodes.map(n=>_paRenderTreeNode(n,0)).join('') : `
-                <div style="padding:48px 24px;text-align:center">
-                  <div style="font-size:13px;font-weight:600;color:var(--color-text-subtitle);margin-bottom:4px">No permissions configured</div>
-                  <div style="font-size:12px;color:var(--color-text-caption)">This studio has no permissions for this user.</div>
-                </div>`}
-            </div>
+            ${(()=>{
+              const drillPath = _paState.permDrillPath || [];
+              const studioMeta2 = [['governance','Governance'],['datastudio','Data Studio'],['agentic','Agentic'],['admin','Admin']];
+              const studioLabel = (studioMeta2.find(([k])=>k===studioTab)||['',''])[1];
+              if (effectiveMode) {
+                return `<div class="pa-eff-view">${_paRenderEffectiveView(treeNodes)}</div>`;
+              }
+              if (drillPath.length > 0) {
+                return _paRenderDrillView(drillPath, studioLabel);
+              }
+              return `<div role="tree" aria-label="${studioTab} permissions">
+                ${treeNodes.length ? treeNodes.map(n=>_paRenderTreeNode(n,0,false)).join('') : `
+                  <div style="padding:48px 24px;text-align:center">
+                    <div style="font-size:13px;font-weight:600;color:var(--color-text-subtitle);margin-bottom:4px">No permissions configured</div>
+                    <div style="font-size:12px;color:var(--color-text-caption)">This studio has no permissions for this user.</div>
+                  </div>`}
+              </div>`;
+            })()}
           </div>
         </div>
       </div>`;
@@ -15322,6 +15607,440 @@ function renderUserAccessView(personId) {
   `;
 }
 
+/* ── Role full-page view ─────────────────────────────────────────────── */
+function renderRoleAccessView(roleId) {
+  const r = PA_ROLES.find(x => x.id === roleId);
+  if (!r) return '';
+  const tab       = _paState.roleAccessTab || 'overview';
+  const members   = (r.memberIds || []).map(id => MOCK_PEOPLE.find(p => p.id === id)).filter(Boolean);
+  const editPerms = _paState.rolePermEdits[roleId] || PA_ROLE_PERMS[roleId] || new Set();
+
+  // Permission counts per studio
+  const STUDIO_META = [
+    { id:'agentic',    label:'Agentic Studio',    color:'#06B6D4' },
+    { id:'governance', label:'Governance Studio',  color:'#10b981' },
+    { id:'datastudio', label:'Data Studio',        color:'#8b5cf6' },
+    { id:'admin',      label:'Admin',              color:'#f97316' },
+  ];
+  function permCountForStudio(studioLabel) {
+    const studio = PERM_TREE.find(s => s.label === studioLabel || s.id === studioLabel);
+    if (!studio) return { granted:0, total:0 };
+    const leaves = _ptLeaves(studio);
+    return { granted: leaves.filter(id => editPerms.has(id)).length, total: leaves.length };
+  }
+  const totalPerms = PERM_TREE.reduce((n,s) => n + _ptLeaves(s).length, 0);
+  const grantedPerms = PERM_TREE.reduce((n,s) => n + _ptLeaves(s).filter(id => editPerms.has(id)).length, 0);
+
+  // ── OVERVIEW TAB ──────────────────────────────────────────
+  const ROLE_ACTIVITY = {
+    'workspace-admin': [
+      { type:'role',   msg:'Edgardo Sierra assigned to this role',       time:'Aug 12, 2026' },
+      { type:'edit',   msg:'Permission "Manage escalations" enabled',    time:'Aug 3, 2026'  },
+      { type:'create', msg:'Role created by system',                     time:'Jan 12, 2025' },
+    ],
+    'developer': [
+      { type:'role',   msg:'Lucía Torres assigned to this role',         time:'Aug 10, 2026' },
+      { type:'edit',   msg:'Permissions updated by Thom González',       time:'Jul 28, 2026' },
+    ],
+    'data-steward': [
+      { type:'role',   msg:'Nicolás Paredes assigned to this role',      time:'Aug 5, 2026'  },
+      { type:'edit',   msg:'"Create & edit lineage" permission enabled', time:'Jul 20, 2026' },
+      { type:'create', msg:'Role created by María González',             time:'Mar 1, 2026'  },
+    ],
+    'agent-builder': [
+      { type:'role',   msg:'Lucía Torres assigned to this role',         time:'Aug 9, 2026'  },
+      { type:'edit',   msg:'"Deploy workers" permission added',          time:'Aug 1, 2026'  },
+    ],
+    'compliance-auditor': [
+      { type:'view',   msg:'Olga Kowalski accessed audit log',           time:'Jul 28, 2026' },
+      { type:'create', msg:'Role created by María González',             time:'Apr 15, 2026' },
+    ],
+    'viewer': [
+      { type:'role',   msg:'Sarah Chen assigned to this role',           time:'Aug 9, 2026'  },
+      { type:'create', msg:'Role created by system',                     time:'Jan 12, 2025' },
+    ],
+  };
+  const actEvents = (ROLE_ACTIVITY[roleId] || [{ type:'create', msg:'Role created', time:'—' }]).slice(0,3);
+  const ACT_ICONS = {
+    role:   { color:'#2b7fff', bg:'rgba(43,127,255,.12)',   path:'<path d="M9.5 5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM3.5 14a3.5 3.5 0 017 0M13.5 6l1 1-3 3-2-2 1-1 1 1 2-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    edit:   { color:'#8b5cf6', bg:'rgba(139,92,246,.12)',   path:'<path d="M11 3l2 2-7 7H4v-2L11 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    create: { color:'#10b981', bg:'rgba(16,185,129,.12)',   path:'<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' },
+    view:   { color:'#64748b', bg:'rgba(100,116,139,.1)',   path:'<path d="M8 5c-2.8 0-5 3-5 3s2.2 3 5 3 5-3 5-3-2.2-3-5-3zm0 5a2 2 0 110-4 2 2 0 010 4z" fill="currentColor"/>' },
+  };
+
+  const overviewTab = `
+    <div class="pa-ov-stats">
+      <div class="pa-ov-stat"><div class="pa-ov-stat-v">${members.length}</div><div class="pa-ov-stat-l">Members assigned</div></div>
+      <div class="pa-ov-stat"><div class="pa-ov-stat-v">${grantedPerms}</div><div class="pa-ov-stat-l">Permissions granted</div></div>
+      <div class="pa-ov-stat"><div class="pa-ov-stat-v">${r.system ? 'System' : 'Custom'}</div><div class="pa-ov-stat-l">Role type</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px">
+      <!-- Studio breakdown -->
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-caption);margin-bottom:12px">Permissions by studio</div>
+        ${STUDIO_META.map(s => {
+          const counts = permCountForStudio(s.label);
+          const pct = counts.total ? Math.round(counts.granted / counts.total * 100) : 0;
+          return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer" onclick="paSetRoleAccessTab('permissions')">
+            <div style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                <span style="font-size:12px;font-weight:500;color:var(--color-text-title)">${escapeHtml(s.label)}</span>
+                <span style="font-size:11px;color:var(--color-text-caption)">${counts.granted}/${counts.total}</span>
+              </div>
+              <div style="height:4px;border-radius:2px;background:var(--color-border-neutral-subtle)">
+                <div style="height:4px;border-radius:2px;background:${s.color};width:${pct}%;transition:width .3s"></div>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <!-- Recent activity -->
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-caption);margin-bottom:12px">Recent activity</div>
+        ${actEvents.map((e,i) => {
+          const ic = ACT_ICONS[e.type] || ACT_ICONS.view;
+          const isLast = i === actEvents.length - 1;
+          return `<div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">
+              <div style="width:24px;height:24px;border-radius:50%;background:${ic.bg};display:flex;align-items:center;justify-content:center">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="color:${ic.color}">${ic.path}</svg>
+              </div>
+              ${!isLast ? '<div style="width:1px;flex:1;min-height:8px;background:var(--color-border-neutral-subtle);margin:2px auto 0"></div>' : ''}
+            </div>
+            <div style="flex:1;min-width:0;padding-bottom:${isLast?0:10}px">
+              <div style="font-size:12.5px;color:var(--color-text-title);line-height:1.35">${escapeHtml(e.msg)}</div>
+              <div style="font-size:11px;color:var(--color-text-caption);margin-top:2px">${escapeHtml(e.time)}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Recent members -->
+    <div style="margin-top:24px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-caption);margin-bottom:12px">Members (${members.length})</div>
+      ${members.slice(0,5).map(m => {
+        const statusColor = m.status==='active'?'var(--badge-success)':m.status==='invited'?'#f59e0b':'#ef4444';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--color-border-neutral-subtle);cursor:pointer" onclick="paOpenUserAccess('${m.id}')">
+          ${_paAvHTML(m.id, m.name, m.initials, 'ds-av-sm')}
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(m.name)}</div>
+            <div style="font-size:11px;color:var(--color-text-caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(m.email)}</div>
+          </div>
+          <span style="font-size:10px;font-weight:600;color:${statusColor}">${m.status==='active'?'Active':m.status==='invited'?'Invited':'Suspended'}</span>
+        </div>`;
+      }).join('')}
+      ${members.length > 5 ? `<div style="padding-top:8px"><button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paSetRoleAccessTab('members')">View all ${members.length} members →</button></div>` : ''}
+    </div>
+  `;
+
+  // ── PERMISSIONS TAB ──────────────────────────────────────
+  const permTabHtml = '<div style="padding:0 0 20px">' +
+    PERM_TREE.map(studio => {
+      const sLeaves = studio.children.flatMap(f => (f.children||[]).map(p => p.id));
+      const sCount  = sLeaves.filter(id => editPerms.has(id)).length;
+      const sCls    = sCount === sLeaves.length ? ' rc-tree-count--all' : sCount > 0 ? ' rc-tree-count--some' : '';
+      return `<div class="rd-perm-studio">
+        <div class="rd-perm-studio-head">
+          <div class="rd-perm-studio-dot" style="background:${studio.color}"></div>
+          <div class="rd-perm-studio-name">${escapeHtml(studio.label)}</div>
+          <span class="rc-tree-count${sCls}">${sCount}/${sLeaves.length}</span>
+        </div>` +
+        studio.children.map(feat => {
+          const fLeaves = (feat.children||[]).map(p => p.id);
+          const fCount  = fLeaves.filter(id => editPerms.has(id)).length;
+          const fCls    = fCount === fLeaves.length ? ' rc-tree-count--all' : fCount > 0 ? ' rc-tree-count--some' : '';
+          return `<div class="rd-feat-section">
+            <div class="rd-feat-head">
+              <span class="rd-feat-name">${escapeHtml(feat.label)}</span>
+              <span class="rc-tree-count${fCls}">${fCount}/${fLeaves.length}</span>
+            </div>` +
+            (feat.children||[]).map(perm => {
+              const on = editPerms.has(perm.id);
+              return `<label class="rd-perm-leaf">
+                <span class="rd-sw">
+                  <input type="checkbox" ${on?'checked':''} ${r.system?'disabled':''}
+                    onchange="paToggleRolePerm('${roleId}','${perm.id}',this.checked)">
+                  <span class="rd-sw-track"></span><span class="rd-sw-thumb"></span>
+                </span>
+                <div class="rd-perm-label">
+                  <div class="rd-perm-name">${escapeHtml(perm.label)}</div>
+                  <div class="rd-perm-desc">${escapeHtml(perm.desc)}</div>
+                </div>
+              </label>`;
+            }).join('') + '</div>';
+        }).join('') + '</div>';
+    }).join('') + '</div>';
+
+  // ── MEMBERS TAB ──────────────────────────────────────────
+  const membersTabHtml = members.length === 0
+    ? '<div style="padding:32px 0;text-align:center;color:var(--color-text-caption);font-size:13px">No members assigned to this role.</div>'
+    : '<div style="display:flex;flex-direction:column;gap:0">' + members.map(m => {
+        const statusColor = m.status==='active'?'var(--badge-success)':m.status==='invited'?'#f59e0b':'#ef4444';
+        const otherRoles  = (PA_MEMBER_ROLES[m.id]||[]).filter(rid => rid !== roleId).map(rid => PA_ROLES.find(x=>x.id===rid)).filter(Boolean).map(x=>x.label);
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--color-border-neutral-subtle);cursor:pointer" onclick="paOpenUserAccess('${m.id}')">
+          ${_paAvHTML(m.id, m.name, m.initials, 'ds-av-sm')}
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(m.name)}</span>
+              <span style="font-size:10px;font-weight:600;color:${statusColor}">${m.status==='active'?'Active':m.status==='invited'?'Invited':'Suspended'}</span>
+            </div>
+            <div style="font-size:11px;color:var(--color-text-caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(m.email)}${otherRoles.length?' · '+otherRoles.join(', '):''}</div>
+          </div>
+          ${!r.system ? `<button class="rd-remove-btn" onclick="event.stopPropagation();paRoleRemoveMember('${roleId}','${m.id}',event)">Remove</button>` : ''}
+        </div>`;
+      }).join('') + '</div>';
+
+  // ── ACTIVITY TAB ─────────────────────────────────────────
+  const allActEvents = ROLE_ACTIVITY[roleId] || [{ type:'create', msg:'Role created', time:'—' }];
+  const activityTabHtml = '<div style="display:flex;flex-direction:column;gap:0">'
+    + allActEvents.map((e,i) => {
+        const ic = ACT_ICONS[e.type] || ACT_ICONS.view;
+        const isLast = i === allActEvents.length - 1;
+        return `<div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">
+            <div style="width:24px;height:24px;border-radius:50%;background:${ic.bg};display:flex;align-items:center;justify-content:center">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="color:${ic.color}">${ic.path}</svg>
+            </div>
+            ${!isLast ? '<div style="width:1px;flex:1;min-height:8px;background:var(--color-border-neutral-subtle);margin:2px auto 0"></div>' : ''}
+          </div>
+          <div style="flex:1;min-width:0;padding-bottom:${isLast?0:12}px">
+            <div style="font-size:12.5px;color:var(--color-text-title);line-height:1.35">${escapeHtml(e.msg)}</div>
+            <div style="font-size:11px;color:var(--color-text-caption);margin-top:2px">${escapeHtml(e.time)}</div>
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+
+  const TABS = [
+    { id:'overview',     label:'Overview' },
+    { id:'permissions',  label:`Permissions (${grantedPerms})` },
+    { id:'members',      label:`Members (${members.length})` },
+    { id:'activity',     label:'Activity' },
+  ];
+  const tabContent = tab==='overview' ? overviewTab : tab==='permissions' ? permTabHtml : tab==='members' ? membersTabHtml : activityTabHtml;
+
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button onclick="paCloseRoleAccess()" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;color:var(--color-text-caption);font-size:13px;padding:0" onmouseover="this.style.color='var(--color-text-title)'" onmouseout="this.style.color='var(--color-text-caption)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Roles & Permissions
+      </button>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-disabled)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      <span style="font-size:13px;color:var(--color-text-title)">${escapeHtml(r.label)}</span>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:44px;height:44px;border-radius:12px;background:${r.color}18;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="22" height="22" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1.5L2 4v4c0 3.3 2.6 6 6 6s6-2.7 6-6V4L8 1.5z" stroke="${r.color}" stroke-width="1.3" fill="${r.color}20"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-size:20px;font-weight:700;color:var(--color-text-title);line-height:1.2">${escapeHtml(r.label)}</div>
+          <div style="font-size:13px;color:var(--color-text-caption);margin-top:3px">${escapeHtml(r.desc||'')} ${r.system ? '· <span style="color:var(--color-text-disabled)">System role · read-only</span>' : '· <span style="color:var(--color-text-disabled)">Custom role</span>'}</div>
+        </div>
+      </div>
+      ${!r.system ? `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paOpenRoleEdit('${roleId}')">Edit role</button>` : ''}
+    </div>
+
+    <div class="pa-dtab-bar" style="margin-bottom:20px">
+      ${TABS.map(t => `<button class="pa-dtab ${tab===t.id?'pa-dtab--active':''}" onclick="paSetRoleAccessTab('${t.id}')">${escapeHtml(t.label)}</button>`).join('')}
+    </div>
+
+    <div class="pa-dtab-content">
+      ${tabContent}
+    </div>
+    ${!r.system && tab==='permissions' ? `<div style="padding:16px 0;border-top:1px solid var(--color-border-neutral-subtle);display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <button class="ds-btn ds-btn-sm ds-btn--tertiary" style="color:var(--color-text-error)" onclick="paDeleteRole('${roleId}')">Delete role</button>
+      <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paRequestSaveRolePerms('${roleId}')">Save changes</button>
+    </div>` : ''}
+  `;
+}
+
+/* ── Group full-page view ────────────────────────────────────────────── */
+function renderGroupAccessView(groupId) {
+  const g = PA_GROUPS.find(x => x.id === groupId);
+  if (!g) return '';
+  const tab     = _paState.groupAccessTab || 'overview';
+  const members = g.memberIds.map(id => MOCK_PEOPLE.find(p=>p.id===id)).filter(Boolean);
+
+  const GROUP_ACTIVITY = {
+    'engineering': [
+      { type:'role',   msg:'Sebastián Blandón added to group',            time:'Aug 15, 2026' },
+      { type:'edit',   msg:'Group description updated by Thom González',  time:'Aug 3, 2026'  },
+      { type:'create', msg:'Group created by Thom González',              time:'Jan 12, 2025' },
+    ],
+    'data-ai': [
+      { type:'role',   msg:'Naomi Park added to group',                   time:'Aug 10, 2026' },
+      { type:'create', msg:'Group created by María González',             time:'Mar 1, 2026'  },
+    ],
+    'compliance': [
+      { type:'view',   msg:'Olga Kowalski accessed group settings',       time:'Jul 28, 2026' },
+      { type:'create', msg:'Group created by system',                     time:'Apr 15, 2026' },
+    ],
+  };
+  const actEvents = (GROUP_ACTIVITY[groupId] || [{ type:'create', msg:'Group created', time:'—' }]);
+  const ACT_ICONS = {
+    role:   { color:'#2b7fff', bg:'rgba(43,127,255,.12)', path:'<path d="M9.5 5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM3.5 14a3.5 3.5 0 017 0M13.5 6l1 1-3 3-2-2 1-1 1 1 2-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    edit:   { color:'#8b5cf6', bg:'rgba(139,92,246,.12)', path:'<path d="M11 3l2 2-7 7H4v-2L11 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    create: { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' },
+    view:   { color:'#64748b', bg:'rgba(100,116,139,.1)', path:'<path d="M8 5c-2.8 0-5 3-5 3s2.2 3 5 3 5-3 5-3-2.2-3-5-3zm0 5a2 2 0 110-4 2 2 0 010 4z" fill="currentColor"/>' },
+  };
+
+  const allStudios = ['agentic','helix','governance','data'];
+  const SCOL = { agentic:'#06B6D4', helix:'#8b5cf6', governance:'#10b981', data:'#64748b' };
+
+  // ── OVERVIEW TAB
+  const overviewTab = `
+    <div class="pa-ov-stats">
+      <div class="pa-ov-stat"><div class="pa-ov-stat-v">${members.length}</div><div class="pa-ov-stat-l">Members</div></div>
+      <div class="pa-ov-stat"><div class="pa-ov-stat-v">${(g.studios||[]).length}</div><div class="pa-ov-stat-l">Studios with access</div></div>
+      <div class="pa-ov-stat"><div class="pa-ov-stat-v">${actEvents.length}</div><div class="pa-ov-stat-l">Activity events</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px">
+      <!-- Members preview -->
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-caption);margin-bottom:12px">Members</div>
+        ${members.slice(0,5).map(m => {
+          const statusColor = m.status==='active'?'var(--badge-success)':m.status==='invited'?'#f59e0b':'#ef4444';
+          return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--color-border-neutral-subtle);cursor:pointer" onclick="paOpenUserAccess('${m.id}')">
+            ${_paAvHTML(m.id,m.name,m.initials,'ds-av-sm')}
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12.5px;font-weight:600;color:var(--color-text-title)">${escapeHtml(m.name)}</div>
+              <div style="font-size:11px;color:var(--color-text-caption)">${m.status==='active'?'Active':m.status==='invited'?'Invited':'Suspended'}</div>
+            </div>
+          </div>`;
+        }).join('')}
+        ${members.length > 5 ? `<div style="padding-top:8px"><button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paSetGroupAccessTab('members')">View all ${members.length} →</button></div>` : ''}
+      </div>
+      <!-- Recent activity -->
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-caption);margin-bottom:12px">Recent activity</div>
+        ${actEvents.slice(0,3).map((e,i,arr) => {
+          const ic = ACT_ICONS[e.type]||ACT_ICONS.view;
+          const isLast = i === arr.length-1;
+          return `<div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">
+              <div style="width:24px;height:24px;border-radius:50%;background:${ic.bg};display:flex;align-items:center;justify-content:center">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="color:${ic.color}">${ic.path}</svg>
+              </div>
+              ${!isLast?'<div style="width:1px;flex:1;min-height:8px;background:var(--color-border-neutral-subtle);margin:2px auto 0"></div>':''}
+            </div>
+            <div style="flex:1;min-width:0;padding-bottom:${isLast?0:10}px">
+              <div style="font-size:12.5px;color:var(--color-text-title);line-height:1.35">${escapeHtml(e.msg)}</div>
+              <div style="font-size:11px;color:var(--color-text-caption);margin-top:2px">${escapeHtml(e.time)}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Studio access -->
+    <div style="margin-top:24px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-caption);margin-bottom:12px">Studio access</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${allStudios.map(s => {
+          const active = (g.studios||[]).includes(s);
+          const sc = SCOL[s]||'#64748b';
+          return `<div style="padding:6px 12px;border-radius:8px;border:1px solid ${active?sc:'var(--color-border-neutral-subtle)'};background:${active?sc+'1a':'transparent'};font-size:12px;font-weight:600;color:${active?sc:'var(--color-text-disabled)'};display:flex;align-items:center;gap:5px">
+            ${active?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}${s}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+
+  // ── MEMBERS TAB
+  const membersTabHtml = `<div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+    <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenGroupDetail('${groupId}');_paState.groupDetailTab='members'">+ Add member</button>
+  </div>` + (members.length === 0
+    ? '<div style="padding:32px 0;text-align:center;color:var(--color-text-caption);font-size:13px">No members yet.</div>'
+    : '<div style="display:flex;flex-direction:column;gap:0">' + members.map(m => {
+        const statusColor = m.status==='active'?'var(--badge-success)':m.status==='invited'?'#f59e0b':'#ef4444';
+        const mRoles = (PA_MEMBER_ROLES[m.id]||[]).map(rid=>PA_ROLES.find(r=>r.id===rid)).filter(Boolean);
+        const mfa = PA_MFA[m.id];
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--color-border-neutral-subtle);cursor:pointer" onclick="paOpenUserAccess('${m.id}')">
+          ${_paAvHTML(m.id,m.name,m.initials,'ds-av-sm')}
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(m.name)}</span>
+              <span style="font-size:10px;font-weight:600;color:${statusColor}">${m.status==='active'?'Active':m.status==='invited'?'Invited':'Suspended'}</span>
+            </div>
+            <div style="font-size:11px;color:var(--color-text-caption)">${mRoles.map(r=>r.label).join(', ')||'No roles'}</div>
+          </div>
+          <span title="MFA ${mfa?'enabled':'disabled'}" style="color:${mfa?'var(--badge-success)':'var(--color-text-disabled)'}">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </span>
+          <button class="pa-row-btn pa-row-btn--danger" title="Remove from group" onclick="event.stopPropagation();paRemoveFromGroup('${groupId}','${m.id}')">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>`;
+      }).join('') + '</div>');
+
+  // ── ACTIVITY TAB
+  const activityTabHtml = '<div style="display:flex;flex-direction:column;gap:0">'
+    + actEvents.map((e,i) => {
+        const ic = ACT_ICONS[e.type]||ACT_ICONS.view;
+        const isLast = i===actEvents.length-1;
+        return `<div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">
+            <div style="width:24px;height:24px;border-radius:50%;background:${ic.bg};display:flex;align-items:center;justify-content:center">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="color:${ic.color}">${ic.path}</svg>
+            </div>
+            ${!isLast?'<div style="width:1px;flex:1;min-height:8px;background:var(--color-border-neutral-subtle);margin:2px auto 0"></div>':''}
+          </div>
+          <div style="flex:1;min-width:0;padding-bottom:${isLast?0:12}px">
+            <div style="font-size:12.5px;color:var(--color-text-title);line-height:1.35">${escapeHtml(e.msg)}</div>
+            <div style="font-size:11px;color:var(--color-text-caption);margin-top:2px">${escapeHtml(e.time)}</div>
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+
+  const TABS = [
+    { id:'overview', label:'Overview' },
+    { id:'members',  label:`Members (${members.length})` },
+    { id:'activity', label:'Activity' },
+  ];
+  const tabContent = tab==='overview' ? overviewTab : tab==='members' ? membersTabHtml : activityTabHtml;
+
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button onclick="paCloseGroupAccess()" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;color:var(--color-text-caption);font-size:13px;padding:0" onmouseover="this.style.color='var(--color-text-title)'" onmouseout="this.style.color='var(--color-text-caption)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Groups
+      </button>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-disabled)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      <span style="font-size:13px;color:var(--color-text-title)">${escapeHtml(g.name)}</span>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:44px;height:44px;border-radius:12px;background:${g.color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div style="width:16px;height:16px;border-radius:50%;background:${g.color}"></div>
+        </div>
+        <div>
+          <div style="font-size:20px;font-weight:700;color:var(--color-text-title);line-height:1.2">${escapeHtml(g.name)}</div>
+          <div style="font-size:13px;color:var(--color-text-caption);margin-top:3px">${escapeHtml(g.desc||'')}</div>
+        </div>
+      </div>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paOpenGroupDetail('${groupId}')">Edit group</button>
+    </div>
+
+    <div class="pa-dtab-bar" style="margin-bottom:20px">
+      ${TABS.map(t => `<button class="pa-dtab ${tab===t.id?'pa-dtab--active':''}" onclick="paSetGroupAccessTab('${t.id}')">${escapeHtml(t.label)}</button>`).join('')}
+    </div>
+
+    <div class="pa-dtab-content">
+      ${tabContent}
+    </div>
+  `;
+}
+
 function renderPeople(subTab) {
   if (subTab) _paState.tab = subTab;
 
@@ -15329,6 +16048,14 @@ function renderPeople(subTab) {
   if (_paState.userAccessId) {
     $('content').innerHTML = renderUserAccessView(_paState.userAccessId);
     paShowChangesBar((_paState.pendingChanges||[]).length > 0);
+    return;
+  }
+  if (_paState.roleAccessId) {
+    $('content').innerHTML = renderRoleAccessView(_paState.roleAccessId);
+    return;
+  }
+  if (_paState.groupAccessId) {
+    $('content').innerHTML = renderGroupAccessView(_paState.groupAccessId);
     return;
   }
 
@@ -16741,6 +17468,12 @@ function renderRoleDetail(roleId) {
       </button>
     </div>
 
+    <div style="padding:0 20px 12px;border-bottom:1px solid var(--color-border-neutral-subtle)">
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" style="width:100%" onclick="paOpenRoleAccess('${roleId}')">
+        View full profile →
+      </button>
+    </div>
+
     <div class="rd-tabs">
       <button class="rd-tab ${tab==='permissions'?'active':''}" onclick="paSetRoleDetailTab('permissions')">Permissions</button>
       <button class="rd-tab ${tab==='members'?'active':''}" onclick="paSetRoleDetailTab('members')">Members (${members.length})</button>
@@ -17343,6 +18076,25 @@ function paSaveStudioAccess() {
   _paRerender();
 }
 
+function paOpenRoleAccess(roleId) {
+  _paState.roleAccessId = roleId;
+  _paState.roleAccessTab = 'overview';
+  _paState.roleDetailId = null;
+  _paState.memberDetailId = null;
+  _paRerender();
+}
+function paCloseRoleAccess() { _paState.roleAccessId = null; _paRerender(); }
+function paSetRoleAccessTab(tab) { _paState.roleAccessTab = tab; _paRerender(); }
+
+function paOpenGroupAccess(groupId) {
+  _paState.groupAccessId = groupId;
+  _paState.groupAccessTab = 'overview';
+  _paState.groupDetailId = null;
+  _paRerender();
+}
+function paCloseGroupAccess() { _paState.groupAccessId = null; _paRerender(); }
+function paSetGroupAccessTab(tab) { _paState.groupAccessTab = tab; _paRerender(); }
+
 function paOpenRoleDetail(roleId) {
   _paState.roleDetailId = roleId;
   _paState.roleDetailTab = 'permissions';
@@ -17543,7 +18295,13 @@ function renderGroupDetail(groupId) {
     </button>
   </div>
 
-  <div class="rd-tabs" style="margin-top:16px">
+  <div style="padding:12px 20px;border-bottom:1px solid var(--color-border-neutral-subtle)">
+    <button class="ds-btn ds-btn-sm ds-btn--secondary" style="width:100%" onclick="paOpenGroupAccess('${groupId}')">
+      View full profile →
+    </button>
+  </div>
+
+  <div class="rd-tabs">
     <button class="rd-tab ${tab==='members'?'active':''}" onclick="paSetGroupDetailTab('members')">Members (${members.length})</button>
     <button class="rd-tab ${tab==='settings'?'active':''}" onclick="paSetGroupDetailTab('settings')">Settings</button>
     <button class="rd-tab ${tab==='activity'?'active':''}" onclick="paSetGroupDetailTab('activity')">Activity</button>
@@ -18779,19 +19537,47 @@ function renderIdentity() {
   <div class="ms-section">
     <div class="ms-section-title">Session &amp; password policy</div>
     <div class="ms-card">
-      <div class="ids-session-grid">
-        <div class="ms-field">
-          <label class="ms-label">Session timeout</label>
-          <select class="ms-select">
-            <option>1 hour</option>
-            <option selected>8 hours</option>
-            <option>24 hours</option>
-            <option>7 days</option>
-            <option>Never (not recommended)</option>
-          </select>
+
+      <!-- Session sub-section -->
+      <div class="ids-policy-group">
+        <div class="ids-policy-group-title">Session</div>
+        <div class="ids-session-grid">
+          <div class="ms-field">
+            <label class="ms-label">Idle timeout</label>
+            <select class="ms-select">
+              <option>30 minutes</option>
+              <option>1 hour</option>
+              <option selected>8 hours</option>
+              <option>24 hours</option>
+              <option>Never (not recommended)</option>
+            </select>
+            <div class="ids-field-hint">Sign out inactive members after this period.</div>
+          </div>
+          <div class="ms-field">
+            <label class="ms-label">Max session duration</label>
+            <select class="ms-select">
+              <option>1 day</option>
+              <option selected>7 days</option>
+              <option>30 days</option>
+              <option>No limit</option>
+            </select>
+            <div class="ids-field-hint">Force re-authentication after this period regardless of activity.</div>
+          </div>
         </div>
-        <div class="ms-field">
-          <label class="ms-label">Minimum password length</label>
+        <div style="margin-top:14px;">
+          <div class="ids-check-item">
+            <input type="checkbox" id="allow-remember-me" checked onchange="toast('Setting updated','success')">
+            <label class="ids-check-label" for="allow-remember-me">Allow "Stay signed in"</label>
+          </div>
+          <div class="ids-check-desc">Members can skip re-authentication on trusted devices for up to the max session duration.</div>
+        </div>
+      </div>
+
+      <!-- Password requirements sub-section -->
+      <div class="ids-policy-group">
+        <div class="ids-policy-group-title">Password requirements</div>
+        <div class="ms-field" style="max-width:220px;">
+          <label class="ms-label">Minimum length</label>
           <select class="ms-select">
             <option>8 characters</option>
             <option selected>12 characters</option>
@@ -18799,17 +19585,31 @@ function renderIdentity() {
             <option>20 characters</option>
           </select>
         </div>
-        <div class="ms-field">
-          <label class="ms-label">Password complexity</label>
-          <select class="ms-select">
-            <option>Letters only</option>
-            <option>Letters + numbers</option>
-            <option selected>Letters + numbers + symbols</option>
-          </select>
+        <div class="ids-check-list" style="margin-top:14px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:6px;">Must contain</div>
+          <div>
+            <div class="ids-check-item">
+              <input type="checkbox" id="pw-upper" checked onchange="toast('Setting updated','success')">
+              <label class="ids-check-label" for="pw-upper">Uppercase letters (A–Z)</label>
+            </div>
+          </div>
+          <div style="margin-top:6px;">
+            <div class="ids-check-item">
+              <input type="checkbox" id="pw-nums" checked onchange="toast('Setting updated','success')">
+              <label class="ids-check-label" for="pw-nums">Numbers (0–9)</label>
+            </div>
+          </div>
+          <div style="margin-top:6px;">
+            <div class="ids-check-item">
+              <input type="checkbox" id="pw-sym" checked onchange="toast('Setting updated','success')">
+              <label class="ids-check-label" for="pw-sym">Symbols (!@#$…)</label>
+            </div>
+          </div>
         </div>
       </div>
+
       <div class="ms-save-row">
-        <button class="ms-btn-save" onclick="toast('Session policy saved','success')">Save policy</button>
+        <button class="ms-btn-save" onclick="toast('Session &amp; password policy saved','success')">Save policy</button>
       </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { Member, PaRole } from '../types';
 import {
-  getMembers, getRoles, getMemberRoles,
+  getMembers, getRoles, getGroups, getMemberRoles,
   assignMemberToRole, removeMemberFromRole,
 } from '../mockApi/people';
 import { MembersList } from '../components/people-access/MembersList';
@@ -26,11 +26,11 @@ interface PickerState {
 function useData() {
   const [rev, setRev] = useState(0);
   const bump = useCallback(() => setRev(r => r + 1), []);
-  return { members: getMembers(), roles: getRoles(), memberRoles: getMemberRoles(), bump, rev };
+  return { members: getMembers(), roles: getRoles(), groups: getGroups(), memberRoles: getMemberRoles(), bump, rev };
 }
 
 export function PeopleAccessScreen() {
-  const { members, roles, memberRoles, bump } = useData();
+  const { members, roles, groups, memberRoles, bump } = useData();
   const [view, setView] = useState<View>({ kind: 'members-list' });
   const [picker, setPicker] = useState<PickerState | null>(null);
 
@@ -139,6 +139,7 @@ export function PeopleAccessScreen() {
         <MemberDetail
           member={currentMember}
           roles={roles}
+          groups={groups}
           memberRoles={memberRoles[currentMember.id] ?? []}
           onBack={() => setView({ kind: 'members-list' })}
           onAssignRole={() => setPicker({ mode: 'assign-role', contextId: currentMember.id })}

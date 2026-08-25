@@ -1,14 +1,16 @@
-import { MEMBERS, PA_ROLES, MEMBER_ROLES_INIT } from '../fixtures/people';
-import type { Member, PaRole } from '../types';
+import { MEMBERS, PA_ROLES, PA_GROUPS, MEMBER_ROLES_INIT } from '../fixtures/people';
+import type { Member, PaRole, PaGroup } from '../types';
 
 let members: Member[] = MEMBERS.map(m => ({ ...m, studios: [...m.studios] }));
 let roles: PaRole[] = PA_ROLES.map(r => ({ ...r, memberIds: [...r.memberIds] }));
+const groups: PaGroup[] = PA_GROUPS.map(g => ({ ...g, memberIds: [...g.memberIds] }));
 let memberRoles: Record<string, string[]> = Object.fromEntries(
   Object.entries(MEMBER_ROLES_INIT).map(([k, v]) => [k, [...v]])
 );
 
 export function getMembers(): Member[] { return members; }
 export function getRoles(): PaRole[] { return roles; }
+export function getGroups(): PaGroup[] { return groups; }
 export function getMemberRoles(): Record<string, string[]> { return memberRoles; }
 
 export function assignMemberToRole(roleId: string, memberId: string): void {

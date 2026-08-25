@@ -180,6 +180,7 @@ export type ImpactResult = {
 
 export type MemberStatus = 'active' | 'invited' | 'suspended';
 export type StudioId = 'ag' | 'gov' | 'helix';
+export type PermState = 'granted' | 'inherited' | 'denied' | 'none';
 
 export interface Member {
   id: string;
@@ -197,6 +198,28 @@ export interface PaRole {
   description: string;
   isBuiltIn: boolean;
   memberIds: string[];
+}
+
+export interface PaGroup {
+  id: string;
+  name: string;
+  description: string;
+  memberIds: string[];
+  color: string;
+}
+
+export interface PermDef {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  studioId: StudioId;
+}
+
+export interface MemberPermState {
+  permId: string;
+  state: PermState;
+  sourceRole?: string;
 }
 
 // ── API error ────────────────────────────────────────────────────────────────
