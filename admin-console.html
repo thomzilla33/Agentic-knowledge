@@ -3385,107 +3385,35 @@ html.theme-light .cap-readonly-tag{
 /* ── Requests inbox — Gmail/Linear-style (post-Edgardo polish) ── */
 .inbox-wrap{padding:22px 32px 24px; max-width:1280px; margin:0 auto}
 
-.inbox-head{
-  display:flex; align-items:center; gap:14px;
-  margin-bottom:14px;
-}
-.inbox-head-l{display:flex; align-items:baseline; gap:10px; flex:1; min-width:0; flex-wrap:wrap}
-.inbox-title{
-  font-size:22px; font-weight:800;
-  color:var(--t1); letter-spacing:-0.015em;
-  margin:0;
-}
-.inbox-count{
-  font-size:12.5px; color:var(--t3);
-}
-.inbox-count b{font-weight:700}
-.inbox-new-btn{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:8px 13px;
-  background:var(--int-cyan-10);
-  border:1px solid var(--int-cyan-32);
-  color:var(--int-cyan);
-  border-radius:8px;
-  font-family:inherit; font-size:12.5px; font-weight:600;
-  cursor:pointer;
-  transition:background .12s, border-color .12s;
-}
-.inbox-new-btn:hover{
-  background:var(--int-cyan-16);
-  border-color:var(--int-cyan-50);
-}
-html.theme-light .inbox-new-btn{background:var(--int-cyan-06); color:var(--int-cyan); border-color:var(--int-cyan-32)}
-html.theme-light .inbox-new-btn:hover{background:var(--int-cyan-10); border-color:var(--int-cyan-45)}
+/* inbox header uses ns-page-head + ns-page-title + ns-page-sub (L5338) + ds-btn (L7961) */
 
-.inbox-toolbar{
-  display:flex; align-items:center; gap:14px;
-  margin-bottom:10px;
-  flex-wrap:wrap;
-}
-.inbox-tabs{display:flex; gap:4px; flex-wrap:wrap}
-.inbox-tab{
-  display:inline-flex; align-items:center; gap:7px;
-  padding:7px 11px;
-  border-radius:7px;
-  background:transparent;
-  border:1px solid transparent;
-  color:var(--t2);
-  font-family:inherit; font-size:12px; font-weight:600;
-  cursor:pointer;
-  transition:background .12s, border-color .12s, color .12s;
-}
-.inbox-tab:hover{background:rgba(255,255,255,0.03); color:var(--t1)}
-.inbox-tab.is-active{
-  background:rgba(255,255,255,0.05);
-  border-color:rgba(255,255,255,0.10);
-  color:var(--t1);
-}
-html.theme-light .inbox-tab{color:var(--t2)}
-html.theme-light .inbox-tab:hover{background:var(--hover); color:var(--t1)}
-html.theme-light .inbox-tab.is-active{background:#FFFFFF; border-color:var(--line); color:var(--t1)}
-.inbox-tab-count{
-  display:inline-flex; align-items:center; justify-content:center;
-  min-width:18px; padding:1px 6px;
-  border-radius:99px;
-  background:rgba(255,255,255,0.06);
-  color:var(--t3);
-  font-size:10.5px; font-weight:700;
-  font-variant-numeric:tabular-nums;
-}
-.inbox-tab-count.is-warn{background:rgba(251,191,36,0.16); color:var(--status-warn)}
-.inbox-tab-count.is-purple{background:rgba(167,139,250,0.16); color:var(--purple-lt)}
-.inbox-tab-count.is-cyan{background:var(--int-cyan-16); color:var(--int-cyan)}
-.inbox-tab-count.is-ok{background:var(--em-16); color:var(--status-ok)}
-.inbox-tab-count.is-bad{background:var(--red-16); color:var(--status-error)}
-html.theme-light .inbox-tab-count{background:#F1F5F9; color:var(--t3)}
+/* inbox toolbar uses pa-tabs + pa-tab (L7869) — count badge color overrides */
+.inbox-toolbar{display:flex; align-items:center; gap:0; margin-bottom:12px; flex-wrap:wrap}
+/* count color accents on pa-tab-count */
+.pa-tab .itc-warn{background:rgba(251,191,36,0.16); color:var(--status-warn)}
+.pa-tab .itc-purple{background:rgba(167,139,250,0.16); color:var(--purple-lt)}
+.pa-tab .itc-cyan{background:var(--int-cyan-16); color:var(--int-cyan)}
+.pa-tab .itc-ok{background:var(--em-16); color:var(--status-ok)}
+.pa-tab .itc-bad{background:var(--red-16); color:var(--status-error)}
 
-.inbox-search{
-  flex:1; min-width:220px; max-width:380px;
-  display:flex; align-items:center; gap:8px;
-  padding:7px 10px;
-  background:rgba(255,255,255,0.022);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:8px;
-  color:var(--t3);
-}
-.inbox-search:focus-within{border-color:var(--int-cyan-40); background:var(--int-cyan-04)}
-.inbox-search input{
-  flex:1;
-  background:transparent; border:none; outline:none;
-  color:var(--t1); font-family:inherit; font-size:12.5px;
-}
-.inbox-search input::placeholder{color:var(--t3)}
+/* inbox search uses .dsf-search from DS Filters component */
 .inbox-search-kbd{
-  font-family:'SF Mono','Menlo',monospace;
-  font-size:10.5px;
-  color:var(--t3);
-  padding:1px 5px;
-  border-radius:4px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.10);
+  font-family:'SF Mono','Menlo',monospace; font-size:10.5px; color:var(--t3);
+  padding:1px 5px; border-radius:4px;
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.10);
+  flex-shrink:0;
 }
-html.theme-light .inbox-search{background:#FFFFFF; border-color:var(--line)}
-html.theme-light .inbox-search-kbd{background:#F1F5F9; border-color:var(--line); color:var(--t3)}
+html.theme-light .inbox-search-kbd{background:#F1F5F9; border-color:var(--line)}
+/* ── DS Filters Component (.dsf-*) ── */
+.dsf-bar{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:16px}
+.dsf-search{display:flex; align-items:center; gap:8px; height:40px; padding:0 12px;
+  min-width:200px; max-width:340px; flex:1 1 200px;
+  background:var(--field-bg); border:1px solid var(--field-border); border-radius:8px;}
+.dsf-search:focus-within{border-color:var(--field-border-focus)}
+.dsf-search-ic{color:var(--t3); flex-shrink:0}
+.dsf-search input{flex:1; min-width:0; background:transparent; border:none; outline:none;
+  color:var(--t1); font-family:inherit; font-size:13px}
+.dsf-search input::placeholder{color:var(--t3)}
 
 .inbox-bulkbar{
   display:flex; align-items:center; gap:10px;
@@ -3519,27 +3447,25 @@ html.theme-light .inbox-bulkbar-btn{background:#FFFFFF; border-color:var(--line)
 html.theme-light .inbox-bulkbar-btn:hover{background:var(--hover); border-color:var(--line-strong)}
 
 .inbox-list{
-  background:rgba(255,255,255,0.012);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:11px;
+  background:var(--table-bg);
+  border:0.5px solid var(--color-border-neutral-subtle);
+  border-radius:var(--radius-m);
   overflow:hidden;
 }
-html.theme-light .inbox-list{background:#FFFFFF; border-color:var(--line)}
 .inbox-list-h{
   display:grid;
   grid-template-columns:28px 168px minmax(0, 1fr) 180px 130px 80px;
   align-items:center;
   gap:14px;
-  padding:9px 14px;
-  background:rgba(255,255,255,0.018);
-  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:11px 14px;
+  background:var(--color-surface-neutral-default);
+  border-bottom:1px solid var(--color-border-neutral-subtle);
 }
-html.theme-light .inbox-list-h{background:rgba(15,23,42,0.012); border-bottom-color:var(--line)}
 .inbox-list-h-check{display:flex; align-items:center; justify-content:center}
 .inbox-list-h-l{
-  font-size:10.5px; font-weight:700;
-  text-transform:uppercase; letter-spacing:.06em;
-  color:var(--t3);
+  font-size:11px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.04em;
+  color:var(--color-text-caption);
 }
 .inbox-list-h-action{text-align:right}
 
@@ -3548,18 +3474,16 @@ html.theme-light .inbox-list-h{background:rgba(15,23,42,0.012); border-bottom-co
   grid-template-columns:28px 168px minmax(0, 1fr) 180px 130px 80px;
   align-items:center;
   gap:14px;
-  padding:10px 14px;
-  border-bottom:1px solid rgba(255,255,255,0.05);
+  padding:0 14px;
+  height:60px;
+  border-bottom:1px solid var(--color-border-neutral-subtle);
   cursor:pointer;
-  transition:background .12s;
+  transition:background .15s;
   position:relative;
 }
 .inbox-row:last-child{border-bottom:none}
-.inbox-row:hover{background:var(--int-cyan-04)}
-html.theme-light .inbox-row:hover{background:var(--int-cyan-04)}
-html.theme-light .inbox-row{border-bottom-color:var(--line)}
-.inbox-row.is-selected{background:var(--int-cyan-08)}
-html.theme-light .inbox-row.is-selected{background:var(--int-cyan-06)}
+.inbox-row:hover{background:var(--table-row-hover-bg)}
+.inbox-row.is-selected{background:var(--table-row-selected-bg)}
 .inbox-row.is-pending::before{
   content:''; position:absolute; left:0; top:6px; bottom:6px;
   width:3px; border-radius:0 2px 2px 0;
@@ -12579,9 +12503,8 @@ function renderRequestsInbox() {
   const allSelected = allFilteredIds.length > 0 && allFilteredIds.every(id => inboxState.selected.has(id));
 
   const tab = (label, key, count, accent) => `
-    <button class="inbox-tab ${inboxState.filter===key?'is-active':''}" type="button" onclick="setInboxFilter('${key}')">
-      <span>${escapeHtml(label)}</span>
-      ${count !== null ? `<span class="inbox-tab-count ${accent||''}">${count}</span>` : ''}
+    <button class="pa-tab ${inboxState.filter===key?'active':''}" type="button" onclick="setInboxFilter('${key}')">
+      ${escapeHtml(label)}${count !== null ? `<span class="pa-tab-count ${accent?'itc-'+accent:''}">${count}</span>` : ''}
     </button>
   `;
 
@@ -12589,28 +12512,28 @@ function renderRequestsInbox() {
     <div class="breadcrumb"><a href="#/integrations">Integrations</a><span class="crumb-sep">›</span><span class="crumb-current">Requests</span></div>
 
     <section class="inbox-wrap">
-      <header class="inbox-head">
-        <div class="inbox-head-l">
-          <h1 class="inbox-title">Requests</h1>
-          <span class="inbox-count">${REQUESTS.length} total${counts.pending > 0 ? ` · <b style="color:var(--status-warn)">${counts.pending} waiting on you</b>` : ''}</span>
+      <div class="ns-page-head" style="margin-bottom:20px">
+        <div>
+          <div class="ns-page-title">Requests</div>
+          <div class="ns-page-sub">${REQUESTS.length} total${counts.pending > 0 ? ` · <b style="color:var(--status-warn)">${counts.pending} waiting on you</b>` : ''}</div>
         </div>
-        <button class="inbox-new-btn" type="button" onclick="openRequestModal()">
+        <button class="ds-btn ds-btn-sm ds-btn--primary" type="button" onclick="openRequestModal()">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           New request
         </button>
-      </header>
+      </div>
 
       <div class="inbox-toolbar">
-        <div class="inbox-tabs">
+        <div class="pa-tabs" style="border-bottom:none;margin-bottom:0;gap:2px;flex:1">
           ${tab('All',         'all',         counts.all,         '')}
-          ${tab('Pending',     'pending',     counts.pending,     'is-warn')}
-          ${tab('Quoted',      'quoted',      counts.quoted,      'is-purple')}
-          ${tab('In progress', 'in_progress', counts.in_progress, 'is-cyan')}
-          ${tab('Delivered',   'done',        counts.done,        'is-ok')}
-          ${counts.rejected > 0 ? tab('Rejected', 'rejected', counts.rejected, 'is-bad') : ''}
+          ${tab('Pending',     'pending',     counts.pending,     'warn')}
+          ${tab('Quoted',      'quoted',      counts.quoted,      'purple')}
+          ${tab('In progress', 'in_progress', counts.in_progress, 'cyan')}
+          ${tab('Delivered',   'done',        counts.done,        'ok')}
+          ${counts.rejected > 0 ? tab('Rejected', 'rejected', counts.rejected, 'bad') : ''}
         </div>
-        <label class="inbox-search">
-          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12" stroke-linecap="round"/></svg>
+        <label class="dsf-search" style="max-width:300px;height:36px">
+          <svg class="dsf-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12"/></svg>
           <input id="inboxSearchInput" type="text" placeholder="Search vendor, requester, scope…" value="${escapeHtml(inboxState.search||'')}" oninput="setInboxSearch(this.value)"/>
           <kbd class="inbox-search-kbd">⌘K</kbd>
         </label>
