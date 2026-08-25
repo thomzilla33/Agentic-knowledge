@@ -8237,6 +8237,32 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 .pm-activity-event { font-size:12.5px; color:var(--color-text-title); line-height:1.35; }
 .pm-activity-time { font-size:12px; color:var(--color-text-caption); margin-top:2px; }
 
+/* ── Member detail page ── */
+.pa-dtabs { display:flex; gap:0; border-bottom:1px solid var(--color-border-neutral-default); padding:0 24px; }
+.pa-dtab { padding:10px 14px; font-size:13px; font-weight:500; color:var(--color-text-subtitle); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; transition:color .15s,border-color .15s; margin-bottom:-1px; white-space:nowrap; }
+.pa-dtab:hover { color:var(--color-text-title); }
+.pa-dtab.active { color:var(--pri); border-bottom-color:var(--pri); font-weight:600; }
+.pa-dtab-count { background:var(--bg3); color:var(--color-text-caption); font-size:11px; font-weight:600; border-radius:8px; padding:1px 6px; margin-left:5px; }
+.pa-dtab-content { padding:24px; }
+/* Overview stat cards */
+.pa-ov-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+.pa-ov-stat { background:var(--bg2); border:1px solid var(--color-border-neutral-default); border-radius:10px; padding:16px; }
+.pa-ov-stat-v { font-size:24px; font-weight:700; color:var(--color-text-title); line-height:1; }
+.pa-ov-stat-l { font-size:12px; color:var(--color-text-caption); margin-top:5px; font-weight:500; }
+.pa-ov-sh { font-size:11px; font-weight:700; color:var(--color-text-caption); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+.pa-ov-studio { display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--bg2); border:1px solid var(--color-border-neutral-default); border-radius:8px; margin-bottom:6px; cursor:pointer; transition:border-color .15s,background .12s; }
+.pa-ov-studio:hover { border-color:var(--pri); background:var(--pri-06,rgba(99,102,241,.05)); }
+.pa-ov-studio-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.pa-ov-studio-name { font-size:13px; font-weight:600; color:var(--color-text-title); flex:1; }
+.pa-ov-studio-count { font-size:12px; color:var(--color-text-caption); }
+/* Effective permissions toggle */
+.pa-eff-mode-wrap { display:flex; background:var(--bg3); border:1px solid var(--color-border-neutral-default); border-radius:8px; overflow:hidden; }
+.pa-eff-mode-btn { padding:6px 14px; font-size:12px; font-weight:500; color:var(--color-text-subtitle); background:none; border:none; cursor:pointer; transition:background .15s,color .15s; white-space:nowrap; }
+.pa-eff-mode-btn.active { background:var(--pri); color:#fff; }
+/* Denied toggle state */
+.pa-toggle.denied { background:rgba(239,68,68,.1); border:1.5px solid rgba(239,68,68,.35); cursor:not-allowed; display:flex; align-items:center; justify-content:center; }
+.pa-toggle.denied::after { display:none; }
+
 /* ── Studio access modal ── */
 .sa-studio-row { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--color-border-neutral-subtle); }
 .sa-studio-row:last-child { border-bottom:none; }
@@ -14514,6 +14540,8 @@ let _paState = {
   // V2: User permission tree
   userAccessId: null,
   userAccessTab: 'governance',
+  detailTab: 'overview',
+  effectiveMode: false,
   pendingChanges: [],
   applyChangesOpen: false,
   // Groups tab
@@ -14677,6 +14705,9 @@ function _paBtnHTML(label, variant, size, onclick, extraAttr) {
 }
 
 function _paCbHTML(state, onclick) {
+  if (state === 'g-denied') {
+    return `<div class="pa-toggle denied" role="switch" aria-checked="false" title="Explicitly denied"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--red,#ef4444)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>`;
+  }
   const granted  = state === 'g-direct' || state === 'g-role' || state === 'g-inh';
   const locked   = state === 'g-role'   || state === 'g-inh';
   const cls      = locked ? (granted ? 'on-locked' : 'off-locked') : (granted ? 'on' : '');
@@ -14841,6 +14872,8 @@ function paToggleUserPerm(nodeId) {
 function paOpenUserAccess(personId) {
   _paState.userAccessId = personId;
   _paState.pendingChanges = [];
+  _paState.detailTab = 'overview';
+  _paState.effectiveMode = false;
   _paRecomputeUserTree(personId);
   renderPeople();
   paShowChangesBar(false);
@@ -14849,6 +14882,8 @@ function paOpenUserAccess(personId) {
 function paCloseUserAccess() {
   _paState.userAccessId = null;
   _paState.pendingChanges = [];
+  _paState.detailTab = 'overview';
+  _paState.effectiveMode = false;
   paShowChangesBar(false);
   renderPeople();
 }
@@ -14942,12 +14977,33 @@ function paApplyChanges() {
 function renderUserAccessView(personId) {
   const p = MOCK_PEOPLE.find(x => x.id === personId);
   if (!p) return '';
-  const memberRoles = (PA_MEMBER_ROLES[p.id] || []).map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
-  const tab = _paState.userAccessTab || 'governance';
-  const treeNodes = PA_USER_PERM_TREE[tab] || [];
-  const pending = _paState.pendingChanges || [];
+
+  const memberRoles  = (PA_MEMBER_ROLES[p.id] || []).map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
+  const memberGroups = PA_GROUPS.filter(g => (g.memberIds || []).includes(p.id));
+  const detailTab    = _paState.detailTab    || 'overview';
+  const studioTab    = _paState.userAccessTab || 'governance';
+  const effectiveMode = !!_paState.effectiveMode;
+  const pending      = _paState.pendingChanges || [];
   const statusBadgeV = p.status==='active'?'success':p.status==='invited'?'alert':'error';
   const statusLabelV = p.status==='active'?'Active':p.status==='invited'?'Invited':'Suspended';
+
+  // Count granted permissions per studio
+  function countGranted(arr) {
+    return (arr||[]).reduce((n,nd)=>{
+      const g = nd.state && nd.state !== '' && nd.state !== 'g-denied';
+      return n + (g?1:0) + countGranted(nd.children||[]);
+    }, 0);
+  }
+  const studioMeta = [
+    { key:'governance', name:'Governance Studio', color:'#10b981' },
+    { key:'datastudio', name:'Data Studio',       color:'#8b5cf6' },
+    { key:'agentic',    name:'Agentic Studio',    color:'#06B6D4' },
+    { key:'admin',      name:'Admin',             color:'#f97316' },
+  ];
+  const grantedPerStudio = {};
+  studioMeta.forEach(s => { grantedPerStudio[s.key] = countGranted(PA_USER_PERM_TREE[s.key]||[]); });
+  const totalGranted     = Object.values(grantedPerStudio).reduce((a,b)=>a+b,0);
+  const studiosWithAccess = Object.values(grantedPerStudio).filter(c=>c>0).length;
 
   /* Apply-changes confirmation modal */
   const applyModal = _paState.applyChangesOpen ? `
@@ -14990,111 +15046,241 @@ function renderUserAccessView(personId) {
       </div>
     </div>` : '';
 
+  // ── SVG icon helper for activity rows ────────────────────
+  const actIconSvg = t => t==='auth'
+    ? '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+    : t==='edit'
+    ? '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'
+    : t==='group'
+    ? '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'
+    : t==='role'
+    ? '<circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>'
+    : '<polyline points="20 6 9 17 4 12"/>';
+
+  // ── Tab content ───────────────────────────────────────────
+  let tabContent = '';
+
+  if (detailTab === 'overview') {
+    const activity = [
+      { msg:'Signed in from Chrome on macOS',         time:'2 hours ago',          type:'auth'  },
+      { msg:'Updated Data Studio model configuration', time:'Yesterday at 2:34 PM', type:'edit'  },
+      { msg:'Added to Engineering group by Admin',     time:'Aug 20 at 9:15 AM',    type:'group' },
+      { msg:'Role updated: Viewer → Contributor',      time:'Aug 18 at 4:10 PM',    type:'role'  },
+    ];
+    tabContent = `
+      <div class="pa-ov-stats">
+        <div class="pa-ov-stat">
+          <div class="pa-ov-stat-v">${studiosWithAccess}</div>
+          <div class="pa-ov-stat-l">Studios with access</div>
+        </div>
+        <div class="pa-ov-stat">
+          <div class="pa-ov-stat-v">${totalGranted}</div>
+          <div class="pa-ov-stat-l">Permissions granted</div>
+        </div>
+        <div class="pa-ov-stat">
+          <div class="pa-ov-stat-v">${memberRoles.length}</div>
+          <div class="pa-ov-stat-l">Roles assigned</div>
+        </div>
+        <div class="pa-ov-stat">
+          <div class="pa-ov-stat-v">${memberGroups.length}</div>
+          <div class="pa-ov-stat-l">Groups</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <div class="pa-ov-sh">Studio access</div>
+          ${studioMeta.map(s=>`
+            <div class="pa-ov-studio" onclick="_paState.detailTab='permissions';_paState.userAccessTab='${s.key}';renderPeople()">
+              <div class="pa-ov-studio-dot" style="background:${s.color}"></div>
+              <div class="pa-ov-studio-name">${s.name}</div>
+              <div class="pa-ov-studio-count">${grantedPerStudio[s.key]>0 ? grantedPerStudio[s.key]+' permissions' : '<span style="color:var(--color-text-disabled)">No access</span>'}</div>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-disabled)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>`).join('')}
+        </div>
+        <div>
+          <div class="pa-ov-sh">Recent activity</div>
+          <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:10px;overflow:hidden">
+            ${activity.map((a,i)=>`
+              <div class="pm-activity-row" style="padding:11px 14px;${i===activity.length-1?'border-bottom:none':''}">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--bg3);border:1px solid var(--color-border-neutral-default);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-caption)" stroke-width="2">${actIconSvg(a.type)}</svg>
+                </div>
+                <div>
+                  <div class="pm-activity-event">${a.msg}</div>
+                  <div class="pm-activity-time">${a.time}</div>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+
+  } else if (detailTab === 'permissions') {
+    const treeNodes = PA_USER_PERM_TREE[studioTab] || [];
+    const notGranted = (PA_USER_PERM_TREE[studioTab]||[]).reduce((n,nd)=>n+1+(nd.children?nd.children.length:0),0) - (grantedPerStudio[studioTab]||0);
+    tabContent = `
+      <div class="pa-access-layout">
+        <!-- Left rail -->
+        <div class="pa-access-rail" style="width:256px">
+          <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:14px 16px">
+            <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Permission states</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--color-text-subtitle)">
+              <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-direct')}<span>Granted directly</span></div>
+              <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-inh')}<span>Inherited from role</span></div>
+              <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-denied')}<span>Explicitly denied</span></div>
+              <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('')}<span>Not granted</span></div>
+            </div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:14px 16px">
+            <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Scope levels</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              ${[['Company','0','var(--pri)'],['Tenant','12','var(--color-text-subtitle)'],['Teams / Groups','24','var(--color-text-caption)'],['Shared with me','36','var(--color-text-disabled)'],['My own','48','var(--color-text-disabled)']].map(([name,pl,col])=>`
+                <div style="display:flex;align-items:center;gap:6px;padding-left:${pl}px">
+                  <span style="width:${pl==='0'?6:4}px;height:${pl==='0'?6:4}px;border-radius:50%;background:${col};flex-shrink:0"></span>
+                  <span style="font-size:12px;color:${col}">${name}</span>
+                </div>`).join('')}
+            </div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;overflow:hidden">
+            <div class="pa-eff-top"></div>
+            <div style="padding:14px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Access summary</div>
+              <div style="display:flex;gap:4px">
+                <div class="pa-eff-stat"><div class="pa-eff-num">${grantedPerStudio[studioTab]||0}</div><div class="pa-eff-lbl">Granted</div></div>
+                <div class="pa-eff-stat"><div class="pa-eff-num" style="color:var(--color-text-disabled)">${notGranted}</div><div class="pa-eff-lbl">Not granted</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Main area -->
+        <div class="pa-access-main">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:0">
+            <div class="pa-tabs" style="border-radius:12px 12px 0 0;overflow:hidden;flex:1">
+              ${[['governance','Governance'],['datastudio','Data Studio'],['agentic','Agentic'],['admin','Admin']].map(([k,lbl])=>`
+                <button class="pa-tab ${studioTab===k?'active':''}" onclick="_paState.userAccessTab='${k}';renderPeople()">${lbl}</button>`).join('')}
+            </div>
+            <div class="pa-eff-mode-wrap">
+              <button class="pa-eff-mode-btn ${!effectiveMode?'active':''}" onclick="_paState.effectiveMode=false;renderPeople()">User permissions</button>
+              <button class="pa-eff-mode-btn ${effectiveMode?'active':''}" onclick="_paState.effectiveMode=true;renderPeople()">Effective</button>
+            </div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-top:none;border-radius:0 0 12px 12px;overflow:hidden">
+            <div style="padding:10px 14px;border-bottom:1px solid var(--color-border-neutral-subtle);display:flex;gap:8px;align-items:center;background:var(--table-header-bg)">
+              <div class="pa-search-wrap" style="max-width:220px">
+                <svg class="pa-search-icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                <input class="pa-search" style="height:32px" placeholder="Filter permissions…" aria-label="Filter permissions">
+              </div>
+              <select class="pa-filter-select" aria-label="Filter by state">
+                <option>All states</option><option>Granted</option><option>Inherited</option><option>Denied</option><option>Not granted</option>
+              </select>
+              ${effectiveMode ? `<span style="font-size:11px;color:var(--pri);background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);border-radius:6px;padding:3px 8px">Effective view — all sources merged</span>` : ''}
+            </div>
+            <div role="tree" aria-label="${studioTab} permissions">
+              ${treeNodes.length ? treeNodes.map(n=>_paRenderTreeNode(n,0)).join('') : `
+                <div style="padding:48px 24px;text-align:center">
+                  <div style="font-size:13px;font-weight:600;color:var(--color-text-subtitle);margin-bottom:4px">No permissions configured</div>
+                  <div style="font-size:12px;color:var(--color-text-caption)">This studio has no permissions for this user.</div>
+                </div>`}
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+  } else if (detailTab === 'roles') {
+    tabContent = memberRoles.length
+      ? `<div style="display:flex;flex-direction:column;gap:8px">${memberRoles.map(r=>`
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:10px">
+            <div style="width:36px;height:36px;border-radius:8px;background:${r.color||'var(--pri)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.9">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(r.label)}</div>
+              <div style="font-size:12px;color:var(--color-text-caption);margin-top:2px">${escapeHtml(r.desc||'No description')}</div>
+            </div>
+            ${r.system ? `<span class="ds-tag ds-tag-sm ds-tag--neutral">System</span>` : ''}
+          </div>`).join('')}</div>`
+      : `<div class="pm-empty"><div class="pm-empty-h">No roles assigned</div><div class="pm-empty-p">This member has no roles. Assign a role to grant permissions.</div></div>`;
+
+  } else if (detailTab === 'groups') {
+    tabContent = memberGroups.length
+      ? `<div style="display:flex;flex-direction:column;gap:8px">${memberGroups.map(g=>`
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:10px">
+            <div style="width:36px;height:36px;border-radius:8px;background:${g.color}22;border:1px solid ${g.color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${g.color}" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(g.name)}</div>
+              <div style="font-size:12px;color:var(--color-text-caption);margin-top:2px">${escapeHtml(g.desc||'')}</div>
+            </div>
+            <span style="font-size:12px;color:var(--color-text-caption)">${(g.memberIds||[]).length} members</span>
+          </div>`).join('')}</div>`
+      : `<div class="pm-empty"><div class="pm-empty-h">No groups</div><div class="pm-empty-p">This member is not part of any group.</div></div>`;
+
+  } else if (detailTab === 'activity') {
+    const log = [
+      { msg:'Signed in from Chrome on macOS',         time:'2 hours ago',          type:'auth'  },
+      { msg:'Updated Data Studio model configuration', time:'Yesterday at 2:34 PM', type:'edit'  },
+      { msg:'Added to Engineering group by Admin',     time:'Aug 20 at 9:15 AM',    type:'group' },
+      { msg:'Role updated: Viewer → Contributor',      time:'Aug 18 at 4:10 PM',    type:'role'  },
+      { msg:'Approved promotion packet GV-2200',       time:'Aug 15 at 11:30 AM',   type:'check' },
+      { msg:'Signed in from Safari on macOS',          time:'Aug 12 at 8:05 AM',    type:'auth'  },
+    ];
+    tabContent = `
+      <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;overflow:hidden">
+        ${log.map((a,i)=>`
+          <div class="pm-activity-row" style="padding:12px 16px;${i===log.length-1?'border-bottom:none':''}">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--color-border-neutral-default);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-caption)" stroke-width="2">${actIconSvg(a.type)}</svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="pm-activity-event">${a.msg}</div>
+              <div class="pm-activity-time">${a.time}</div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+
   return `
-    <!-- Page header — back + title only, no duplicate Apply button -->
     <div class="ph">
       <div class="ph-top">
         <div class="ph-text" style="display:flex;align-items:center;gap:10px">
-          <button class="ds-btn ds-btn-sm ds-btn--tertiary" onclick="paCloseUserAccess()" aria-label="Back to People & Access" style="padding:0 8px;min-width:32px">
+          <button class="ds-btn ds-btn-sm ds-btn--tertiary" onclick="paCloseUserAccess()" aria-label="Back to People &amp; Access" style="padding:0 8px;min-width:32px">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <div>
-            <div class="ph-h1">Access — ${escapeHtml(p.name)}</div>
-            <div class="ph-sub">Effective permissions and role assignments</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            ${_paAvHTML(p.id, p.name, p.initials, 'ds-av-md')}
+            <div>
+              <div class="ph-h1" style="font-size:18px">${escapeHtml(p.name)}</div>
+              <div class="ph-sub" style="display:flex;align-items:center;gap:8px">
+                <span>${escapeHtml(p.email)}</span>
+                <span class="ds-badge ds-badge--${statusBadgeV}" style="font-size:11px">${statusLabelV}</span>
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="ph-actions">
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Password reset email sent','success')">Reset password</button>
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" style="color:var(--red,#ef4444)" onclick="toast('Member deactivated','success')">Deactivate</button>
         </div>
       </div>
     </div>
 
-    <!-- Two-column layout -->
-    <div class="pa-access-layout">
-
-      <!-- ── Left rail ── -->
-      <div class="pa-access-rail">
-
-        <!-- Profile card -->
-        <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:18px">
-          <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
-            ${_paAvHTML(p.id, p.name, p.initials, 'ds-av-xxl')}
-            <div style="flex:1;min-width:0">
-              <div style="font-size:15px;font-weight:700;color:var(--color-text-title);line-height:1.2">${escapeHtml(p.name)}</div>
-              <div style="font-size:12px;color:var(--color-text-caption);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.email)}</div>
-              <div style="margin-top:7px;display:flex;align-items:center;gap:6px">
-                ${_paBadgeHTML(statusBadgeV)}
-                <span style="font-size:12px;color:var(--color-text-subtitle);font-weight:500">${statusLabelV}</span>
-              </div>
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div>
-              <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Roles</div>
-              <div style="display:flex;flex-wrap:wrap;gap:5px">
-                ${memberRoles.length
-                  ? memberRoles.map(r => _paTagHTML(r.label, r.id==='workspace-admin'?'informative':r.system?'secondary':'neutral', 'sm')).join('')
-                  : `<span style="font-size:12px;color:var(--color-text-disabled)">No roles assigned</span>`}
-              </div>
-            </div>
-            <div>
-              <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Tenant type</div>
-              <div style="font-size:13px;font-weight:500;color:var(--color-text-title)">${memberRoles.some(r=>r.id==='workspace-admin')?'Owner':'Member'}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Effective access stats — gradient top bar (appears once per view) -->
-        <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;overflow:hidden">
-          <div class="pa-eff-top"></div>
-          <div style="padding:14px 16px">
-            <div style="font-size:12px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Effective access</div>
-            <div style="display:flex;gap:4px">
-              <div class="pa-eff-stat"><div class="pa-eff-num">24</div><div class="pa-eff-lbl">Granted</div></div>
-              <div class="pa-eff-stat"><div class="pa-eff-num" style="color:var(--color-text-disabled)">8</div><div class="pa-eff-lbl">Not granted</div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Legend — two states -->
-        <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:14px 16px">
-          <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Permission states</div>
-          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--color-text-subtitle)">
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-direct')}<span>Granted</span></div>
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('g-inh')}<span>Granted via role (locked)</span></div>
-            <div style="display:flex;align-items:center;gap:7px">${_paCbHTML('')}<span>Not granted</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Main: permission tree ── -->
-      <div class="pa-access-main">
-        <!-- Studio tabs -->
-        <div class="pa-tabs" style="margin-bottom:0;border-radius:12px 12px 0 0;overflow:hidden">
-          ${[['governance','Governance'],['datastudio','Data Studio'],['agentic','Agentic'],['admin','Admin']].map(([k,label]) => `
-            <button class="pa-tab ${tab===k?'active':''}" onclick="_paState.userAccessTab='${k}';renderPeople()">${label}</button>`).join('')}
-        </div>
-
-        <!-- Tree container -->
-        <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-top:none;border-radius:0 0 12px 12px;overflow:hidden">
-          <!-- Filter bar -->
-          <div style="padding:10px 14px;border-bottom:1px solid var(--color-border-neutral-subtle);display:flex;gap:8px;align-items:center;background:var(--table-header-bg)">
-            <div class="pa-search-wrap" style="max-width:220px">
-              <svg class="pa-search-icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              <input class="pa-search" style="height:32px" placeholder="Filter permissions…" aria-label="Filter permissions">
-            </div>
-            <select class="pa-filter-select" aria-label="Filter by state">
-              <option>All states</option><option>Granted</option><option>Denied</option><option>Pending</option>
-            </select>
-          </div>
-          <!-- Tree rows -->
-          <div role="tree" aria-label="${tab.charAt(0).toUpperCase()+tab.slice(1)} permissions">
-            ${treeNodes.length ? treeNodes.map(n=>_paRenderTreeNode(n,0)).join('') : `
-              <div style="padding:48px 24px;text-align:center">
-                <div style="font-size:13px;font-weight:600;color:var(--color-text-subtitle);margin-bottom:4px">No permissions configured</div>
-                <div style="font-size:12px;color:var(--color-text-caption)">This studio has no permissions for this user.</div>
-              </div>`}
-          </div>
-        </div>
-      </div>
+    <div class="pa-dtabs">
+      ${[
+        ['overview',    'Overview',    ''],
+        ['permissions', 'Permissions', ''],
+        ['roles',       'Roles',       memberRoles.length],
+        ['groups',      'Groups',      memberGroups.length],
+        ['activity',    'Activity',    ''],
+      ].map(([k,label,cnt])=>`
+        <button class="pa-dtab ${detailTab===k?'active':''}" onclick="_paState.detailTab='${k}';renderPeople()">
+          ${label}${cnt ? `<span class="pa-dtab-count">${cnt}</span>` : ''}
+        </button>`).join('')}
     </div>
+
+    <div class="pa-dtab-content">
+      ${tabContent}
+    </div>
+
     ${applyModal}
   `;
 }
