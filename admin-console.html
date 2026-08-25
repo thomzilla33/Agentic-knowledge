@@ -336,6 +336,10 @@
   --field-placeholder:rgba(255,255,255,0.30);
   --field-label:    rgba(255,255,255,0.60);
   --field-icon:     rgba(255,255,255,0.30);
+  /* Header tokens */
+  --header-title:  var(--color-text-title);
+  --header-desc:   #94A3B8;
+  --header-back-icon: rgba(255,255,255,0.40);
   /* Filters bar tokens (--fi-*) — dark */
   --fi-chip-bg:            rgba(255,255,255,0.05);
   --fi-chip-border:        rgba(255,255,255,0.15);
@@ -5442,9 +5446,10 @@ html.theme-light .fs-cancel-btn:hover{
 .cw-new-btn:disabled { color:var(--color-text-disabled); border-color:var(--line); cursor:not-allowed; background:transparent; }
 /* ── Notifications Settings ─────────────────────────────── */
 .ns-wrap { max-width:820px; padding:28px 32px 64px; }
-.ns-page-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; gap:16px; }
-.ns-page-title { font-size:18px; font-weight:700; color:var(--color-text-title); }
-.ns-page-sub { font-size:13px; color:var(--color-text-caption); margin-top:4px; }
+.ns-page-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; gap:16px; }
+.ns-page-icon { display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:6px; background:rgba(43,127,255,0.12); flex-shrink:0; }
+.ns-page-title { font-size:24px; font-weight:600; color:var(--header-title); }
+.ns-page-sub { font-size:14px; color:var(--header-desc); margin-top:4px; }
 .ns-section { background:var(--surface); border:1px solid var(--color-border-neutral-subtle); border-radius:12px; overflow:hidden; margin-bottom:20px; }
 .ns-section-head { padding:16px 20px 14px; border-bottom:1px solid var(--color-border-neutral-subtle); }
 .ns-section-title { font-size:12px; font-weight:700; color:var(--color-text-caption); text-transform:uppercase; letter-spacing:.06em; }
@@ -6358,6 +6363,10 @@ html.theme-light{
   --fi-view-icon:          rgba(0,0,0,0.40);
   --fi-sort-icon:          rgba(0,0,0,0.40);
   --fi-sort-text:          rgba(0,0,0,0.65);
+  /* Header tokens */
+  --header-title:  var(--color-text-title);
+  --header-desc:   #64748B;
+  --header-back-icon: rgba(0,0,0,0.40);
 
   /* Tags */
   --tag-neutral-bg:                   #f2f2f2;
@@ -12824,10 +12833,13 @@ function renderMyRequests() {
           <div class="ns-page-title">My Requests</div>
           <div class="ns-page-sub">${MY_REQUESTS.length} total${counts.quoted > 0 ? ` · <b style="color:var(--purple)">${counts.quoted} awaiting your approval</b>` : ''}</div>
         </div>
-        <button class="ds-btn ds-btn-sm ds-btn--primary" type="button" onclick="navigate('#/request')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" type="button" onclick="toast('Export coming soon','info')">Export</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" type="button" onclick="navigate('#/request')">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           New request
         </button>
+        </div>
       </div>
 
       <!-- Status tabs row -->
@@ -13070,10 +13082,13 @@ function renderRequestsInbox() {
           <div class="ns-page-title">Requests</div>
           <div class="ns-page-sub">${REQUESTS.length} total${counts.pending > 0 ? ` · <b style="color:var(--status-warn)">${counts.pending} waiting on you</b>` : ''}</div>
         </div>
-        <button class="ds-btn ds-btn-sm ds-btn--primary" type="button" onclick="openRequestModal()">
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="ds-btn ds-btn-sm ds-btn--secondary" type="button" onclick="toast('Export coming soon','info')">Export</button>
+          <button class="ds-btn ds-btn-sm ds-btn--primary" type="button" onclick="openRequestModal()">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           New request
         </button>
+        </div>
       </div>
 
       <!-- Status tabs row -->
