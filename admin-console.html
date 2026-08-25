@@ -3642,6 +3642,90 @@ html.theme-light .inbox-open:hover{background:var(--int-cyan-08); color:var(--in
   .inbox-row-status, .inbox-row-requester, .inbox-row-quote{display:none}
 }
 
+/* ── My Requests (user-facing receptor view) ── */
+.mr-wrap{padding:28px 32px 80px; max-width:1060px}
+.mr-list{
+  background:var(--table-bg);
+  border:0.5px solid var(--color-border-neutral-subtle);
+  border-radius:var(--radius-m);
+  overflow:hidden;
+}
+.mr-list-h{
+  display:grid; grid-template-columns:150px minmax(0,1fr) 170px 130px 36px;
+  align-items:center; gap:14px; padding:11px 16px;
+  background:var(--color-surface-neutral-default);
+  border-bottom:1px solid var(--color-border-neutral-subtle);
+}
+.mr-list-h span{font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--color-text-caption)}
+.mr-row{
+  display:grid; grid-template-columns:150px minmax(0,1fr) 170px 130px 36px;
+  align-items:center; gap:14px; padding:0 16px; height:72px;
+  border-bottom:1px solid var(--color-border-neutral-subtle);
+  cursor:pointer; transition:background .15s; position:relative;
+}
+.mr-row:last-child{border-bottom:none}
+.mr-row:hover{background:var(--table-row-hover-bg)}
+.mr-row.is-quoted::before{
+  content:''; position:absolute; left:0; top:8px; bottom:8px;
+  width:3px; border-radius:0 2px 2px 0; background:var(--purple);
+}
+.mr-main{min-width:0; display:flex; flex-direction:column; gap:3px}
+.mr-title{font-size:13.5px; font-weight:600; color:var(--color-text-title); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mr-meta{font-size:11.5px; color:var(--color-text-subtitle); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mr-ticket{font-size:11px; color:var(--t3); font-family:'SF Mono',Menlo,monospace}
+.mr-quote{text-align:right}
+.mr-quote-amt{font-size:13.5px; font-weight:700; color:var(--color-text-title); font-variant-numeric:tabular-nums}
+.mr-quote-eta{font-size:11.5px; color:var(--color-text-subtitle); margin-top:1px}
+.mr-quote-pending{font-size:12px; font-style:italic; color:var(--t3)}
+.mr-action{display:flex; justify-content:flex-end; align-items:center; gap:6px}
+.mr-open-btn{
+  display:flex; align-items:center; justify-content:center;
+  width:32px; height:32px; border-radius:7px;
+  background:transparent; border:1px solid transparent;
+  color:var(--t3); cursor:pointer; transition:all .12s;
+}
+.mr-open-btn:hover{background:var(--hover); border-color:var(--line); color:var(--t1)}
+.mr-empty{padding:48px 24px; text-align:center}
+.mr-empty-t{font-size:14px; font-weight:700; color:var(--t1); margin-bottom:4px}
+.mr-empty-d{font-size:12.5px; color:var(--t3)}
+/* My Request detail slide-out */
+.mr-detail{padding:0}
+.mr-detail-head{
+  display:flex; align-items:flex-start; gap:12px;
+  padding:20px 20px 16px; border-bottom:1px solid var(--color-border-neutral-subtle);
+}
+.mr-detail-logo{
+  width:40px; height:40px; border-radius:10px; flex-shrink:0;
+  background:var(--bg3); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:800; color:var(--t2);
+}
+.mr-detail-title{font-size:16px; font-weight:700; color:var(--color-text-title); margin-bottom:3px}
+.mr-detail-ticket{font-size:11px; color:var(--t3); font-family:'SF Mono',Menlo,monospace}
+.mr-detail-body{padding:16px 20px; display:flex; flex-direction:column; gap:16px}
+.mr-detail-section-t{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--t3); margin-bottom:8px}
+.mr-detail-kv{display:grid; grid-template-columns:120px 1fr; gap:6px 14px; font-size:12.5px}
+.mr-detail-kv-k{color:var(--color-text-subtitle)}
+.mr-detail-kv-v{color:var(--color-text-title); font-weight:500}
+.mr-quote-box{
+  background:rgba(167,139,250,0.06); border:1px solid var(--purple-22);
+  border-radius:10px; padding:14px 16px;
+}
+.mr-quote-box-title{font-size:12px; font-weight:700; color:var(--purple); margin-bottom:10px; display:flex; align-items:center; gap:6px}
+.mr-quote-amount{font-size:26px; font-weight:800; color:var(--color-text-title); letter-spacing:-0.02em; margin-bottom:4px; font-variant-numeric:tabular-nums}
+.mr-quote-note{font-size:12px; color:var(--t2); line-height:1.55; margin-bottom:14px}
+.mr-quote-actions{display:flex; gap:8px}
+.mr-reject-box{
+  background:var(--status-error-bg); border:1px solid var(--red-32);
+  border-radius:10px; padding:14px 16px;
+  font-size:12.5px; color:var(--t2); line-height:1.55;
+}
+.mr-reject-label{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--status-error); margin-bottom:6px}
+@media (max-width:900px){
+  .mr-list-h, .mr-row{grid-template-columns:120px minmax(0,1fr) 130px 36px}
+  .mr-list-h span:nth-child(3), .mr-row .mr-quote{display:none}
+}
+
 /* ── Users cross-instance view (Sprint C — Edgardo Batch 3c) ── */
 .users-wrap{padding:24px 32px 60px; max-width:1200px}
 .users-h{
@@ -9482,6 +9566,10 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
           <button class="ssb-item" data-route="my-settings" data-roles="super-admin,regional-admin,tenant-admin,user" onclick="navigate('#/my-settings')">
             <span class="ssb-item-label">My Settings</span>
           </button>
+          <button class="ssb-item" data-route="my-requests" data-roles="super-admin,regional-admin,tenant-admin,user" onclick="navigate('#/my-requests')">
+            <span class="ssb-item-label">My Requests</span>
+            <span class="ssb-item-badge" id="mrBadge">1</span>
+          </button>
         </div>
 
         <!-- MY WORKSPACE — user (no admin) only -->
@@ -11980,6 +12068,7 @@ function submitRequest() {
 
 // Inbox UI state — bucket filter, search, bulk select
 const inboxState = { filter: 'all', search: '', selected: new Set() };
+let _mrState = { filter: 'all', search: '' };
 
 function setInboxFilter(f) { inboxState.filter = f; renderRequestsInbox(); }
 function setInboxSearch(v) { inboxState.search = v; renderRequestsInbox(); setTimeout(()=>{ const el = document.getElementById('inboxSearchInput'); if (el) { el.focus(); el.setSelectionRange(v.length, v.length); }}, 0); }
@@ -12487,6 +12576,258 @@ function _filteredRequests() {
     return true;
   });
 }
+
+/* ====================== MY REQUESTS (receptor view) ====================== */
+
+function _mrBucket(status) {
+  if (status === 'pending_review' || status === 'in_review') return 'pending';
+  if (status === 'quoted') return 'quoted';
+  if (status === 'in_progress') return 'in_progress';
+  if (status === 'done') return 'done';
+  if (status === 'rejected') return 'rejected';
+  return 'pending';
+}
+
+function setMrFilter(f) { _mrState.filter = f; renderMyRequests(); }
+function setMrSearch(v) {
+  _mrState.search = v; renderMyRequests();
+  setTimeout(() => { const el = document.getElementById('mrSearchInput'); if (el) { el.focus(); el.setSelectionRange(v.length,v.length); } }, 0);
+}
+
+function renderMyRequests() {
+  const q = (_mrState.search || '').toLowerCase().trim();
+  const filtered = MY_REQUESTS.filter(r => {
+    if (_mrState.filter !== 'all' && _mrBucket(r.status) !== _mrState.filter) return false;
+    if (q) {
+      const hay = `${r.integration} ${r.vendor} ${r.ticket} ${r.businessIntent}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const counts = {
+    all: MY_REQUESTS.length,
+    pending: MY_REQUESTS.filter(r => _mrBucket(r.status) === 'pending').length,
+    quoted:  MY_REQUESTS.filter(r => r.status === 'quoted').length,
+    in_progress: MY_REQUESTS.filter(r => r.status === 'in_progress').length,
+    done:    MY_REQUESTS.filter(r => r.status === 'done').length,
+    rejected:MY_REQUESTS.filter(r => r.status === 'rejected').length
+  };
+
+  // Update sidebar badge — quoted items need user action
+  const badge = document.getElementById('mrBadge');
+  if (badge) { badge.textContent = counts.quoted; badge.style.display = counts.quoted > 0 ? '' : 'none'; }
+
+  const tab = (label, key, count, accent) =>
+    `<button class="pa-tab ${_mrState.filter===key?'active':''}" type="button" onclick="setMrFilter('${key}')">
+      ${escapeHtml(label)}${count !== null ? `<span class="pa-tab-count ${accent?'itc-'+accent:''}">${count}</span>` : ''}
+    </button>`;
+
+  $('content').innerHTML = `
+    <div class="breadcrumb"><span class="crumb-current">My Requests</span></div>
+
+    <div class="mr-wrap">
+      <div class="ns-page-head" style="margin-bottom:20px">
+        <div>
+          <div class="ns-page-title">My Requests</div>
+          <div class="ns-page-sub">${MY_REQUESTS.length} total${counts.quoted > 0 ? ` · <b style="color:var(--purple)">${counts.quoted} awaiting your approval</b>` : ''}</div>
+        </div>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" type="button" onclick="navigate('#/request')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          New request
+        </button>
+      </div>
+
+      <div class="inbox-toolbar">
+        <div class="pa-tabs" style="border-bottom:none;margin-bottom:0;gap:2px;flex:1">
+          ${tab('All',         'all',         counts.all,         '')}
+          ${tab('Pending',     'pending',     counts.pending,     'warn')}
+          ${tab('Quoted',      'quoted',      counts.quoted,      'purple')}
+          ${tab('In progress', 'in_progress', counts.in_progress, 'cyan')}
+          ${tab('Delivered',   'done',        counts.done,        'ok')}
+          ${counts.rejected > 0 ? tab('Rejected','rejected',counts.rejected,'bad') : ''}
+        </div>
+        <label class="dsf-search" style="max-width:280px;height:36px">
+          <svg class="dsf-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12"/></svg>
+          <input id="mrSearchInput" type="text" placeholder="Search integration, description…" value="${escapeHtml(_mrState.search||'')}" oninput="setMrSearch(this.value)"/>
+        </label>
+      </div>
+
+      <div class="mr-list" role="list">
+        <div class="mr-list-h">
+          <span>Status</span>
+          <span>Request</span>
+          <span style="text-align:right">Quote / ETA</span>
+          <span style="text-align:right">Action</span>
+          <span></span>
+        </div>
+        ${filtered.length === 0
+          ? `<div class="mr-empty">
+               <div class="mr-empty-t">${q ? 'No requests match your search' : 'Nothing here yet'}</div>
+               <div class="mr-empty-d">${q ? 'Try different keywords.' : 'Submit a new request and track its progress here.'}</div>
+             </div>`
+          : filtered.map(r => _mrRowHTML(r)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function _mrRowHTML(r) {
+  const meta = REQUEST_STATUS_META[r.status] || REQUEST_STATUS_META.pending_review;
+  const isQuoted = r.status === 'quoted';
+  const isDone   = r.status === 'done';
+  const isRejected = r.status === 'rejected';
+
+  const quoteCol = r.quote
+    ? `<div class="mr-quote">
+         <div class="mr-quote-amt">$${r.quote.amount.toLocaleString()}</div>
+         <div class="mr-quote-eta">${r.quote.etaWeeks}w ETA</div>
+       </div>`
+    : isRejected
+      ? `<div class="mr-quote"><div class="mr-quote-pending">Closed</div></div>`
+      : `<div class="mr-quote"><div class="mr-quote-pending">Awaiting quote</div></div>`;
+
+  const actionCol = isQuoted
+    ? `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="event.stopPropagation();openMrDetail('${r.id}')" style="white-space:nowrap">Review quote</button>`
+    : isDone
+      ? `<button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="event.stopPropagation();toast('Opening ${escapeHtml(r.integration)} integration…','info')" style="white-space:nowrap">Open →</button>`
+      : `<span></span>`;
+
+  return `
+    <div class="mr-row ${isQuoted?'is-quoted':''}" role="listitem" onclick="openMrDetail('${r.id}')">
+      <div>
+        <span class="req-status-chip" style="background:${meta.bg};color:${meta.color};border-color:${meta.border}">
+          <span class="req-status-dot" style="background:${meta.color}"></span>${meta.label}
+        </span>
+      </div>
+      <div class="mr-main">
+        <div class="mr-title">${escapeHtml(r.integration)}</div>
+        <div class="mr-meta">${escapeHtml((r.businessIntent||'').slice(0,90))}${(r.businessIntent||'').length>90?'…':''}</div>
+        <div class="mr-ticket">${escapeHtml(r.ticket)} · ${escapeHtml(r.age)}</div>
+      </div>
+      ${quoteCol}
+      <div class="mr-action">${actionCol}</div>
+      <button class="mr-open-btn" onclick="event.stopPropagation();openMrDetail('${r.id}')" aria-label="View details">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2h7v7M12 2L6 8M2 6v6h6"/></svg>
+      </button>
+    </div>
+  `;
+}
+
+function openMrDetail(id) {
+  const r = MY_REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  const meta = REQUEST_STATUS_META[r.status] || REQUEST_STATUS_META.pending_review;
+  const isQuoted = r.status === 'quoted';
+  const isRejected = r.status === 'rejected';
+  const isDone = r.status === 'done';
+
+  document.getElementById('inboxActionModal')?.remove();
+  const m = document.createElement('div');
+  m.id = 'inboxActionModal';
+  m.innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9200;display:flex;align-items:flex-end;justify-content:flex-end" onclick="if(event.target===this)document.getElementById('inboxActionModal')?.remove()">
+      <div style="width:420px;max-width:100vw;height:100%;background:var(--bg2);border-left:1px solid var(--color-border-neutral-subtle);display:flex;flex-direction:column;animation:slideInRight .2s ease-out">
+        <!-- Head -->
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:20px 20px 16px;border-bottom:1px solid var(--color-border-neutral-subtle)">
+          <div style="width:44px;height:44px;border-radius:10px;background:var(--bg3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--t2);flex-shrink:0">${escapeHtml(r.integration.slice(0,2).toUpperCase())}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:16px;font-weight:700;color:var(--color-text-title)">${escapeHtml(r.integration)}</div>
+            <div style="font-size:11px;color:var(--t3);font-family:'SF Mono',Menlo,monospace;margin-top:2px">${escapeHtml(r.ticket)}</div>
+            <span class="req-status-chip" style="background:${meta.bg};color:${meta.color};border-color:${meta.border};margin-top:8px;display:inline-flex">
+              <span class="req-status-dot" style="background:${meta.color}"></span>${meta.label}
+            </span>
+          </div>
+          <button onclick="document.getElementById('inboxActionModal')?.remove()" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:20px;line-height:1;padding:0;flex-shrink:0">×</button>
+        </div>
+
+        <!-- Body -->
+        <div style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:16px">
+
+          <!-- Details -->
+          <div>
+            <div class="mr-detail-section-t">Request details</div>
+            <div class="mr-detail-kv">
+              <span class="mr-detail-kv-k">Vendor</span><span class="mr-detail-kv-v">${escapeHtml(r.vendor)}</span>
+              <span class="mr-detail-kv-k">Permissions</span><span class="mr-detail-kv-v">${(r.actionTypes||[]).join(' + ')}</span>
+              <span class="mr-detail-kv-k">PII data</span><span class="mr-detail-kv-v">${r.hasPII?'Yes':'No'}</span>
+              <span class="mr-detail-kv-k">Financial data</span><span class="mr-detail-kv-v">${r.hasFinancial?'Yes':'No'}</span>
+              <span class="mr-detail-kv-k">Submitted</span><span class="mr-detail-kv-v">${escapeHtml(r.submittedAt)}</span>
+            </div>
+          </div>
+
+          <!-- Business intent -->
+          <div>
+            <div class="mr-detail-section-t">Business intent</div>
+            <div style="font-size:12.5px;color:var(--t2);line-height:1.6">${escapeHtml(r.businessIntent)}</div>
+          </div>
+
+          ${isQuoted ? `
+          <!-- Quote — action needed -->
+          <div class="mr-quote-box">
+            <div class="mr-quote-box-title">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2v4l2.5 2.5"/><circle cx="8" cy="9" r="6"/></svg>
+              Quote received — your approval needed
+            </div>
+            <div class="mr-quote-amount">$${r.quote.amount.toLocaleString()} · ${r.quote.etaWeeks}w ETA</div>
+            <div class="mr-quote-note">${escapeHtml(r.quote.notes)}</div>
+            <div class="mr-quote-actions">
+              <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="acceptMrQuote('${r.id}')">Accept quote</button>
+              <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="declineMrQuote('${r.id}')">Decline</button>
+            </div>
+          </div>
+          ` : r.quote ? `
+          <!-- Quote (already accepted) -->
+          <div>
+            <div class="mr-detail-section-t">Approved quote</div>
+            <div class="mr-detail-kv">
+              <span class="mr-detail-kv-k">Amount</span><span class="mr-detail-kv-v">$${r.quote.amount.toLocaleString()}</span>
+              <span class="mr-detail-kv-k">ETA</span><span class="mr-detail-kv-v">${r.quote.etaWeeks} weeks</span>
+              <span class="mr-detail-kv-k">Scope</span><span class="mr-detail-kv-v">${escapeHtml(r.quote.notes)}</span>
+              ${r.deliveredAt ? `<span class="mr-detail-kv-k">Delivered</span><span class="mr-detail-kv-v">${escapeHtml(r.deliveredAt)}</span>` : ''}
+            </div>
+          </div>
+          ` : ''}
+
+          ${isDone ? `
+          <button class="ds-btn ds-btn-md ds-btn--primary" onclick="toast('Opening ${escapeHtml(r.integration)} integration…','info')">
+            Open integration →
+          </button>
+          ` : ''}
+
+          ${isRejected ? `
+          <div class="mr-reject-box">
+            <div class="mr-reject-label">Reason for rejection</div>
+            ${escapeHtml(r.rejectionReason||'No reason provided.')}
+          </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(m);
+}
+
+function acceptMrQuote(id) {
+  const r = MY_REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  r.status = 'in_progress';
+  document.getElementById('inboxActionModal')?.remove();
+  toast(`Quote for ${r.integration} accepted — work begins shortly`, 'success');
+  renderMyRequests();
+}
+
+function declineMrQuote(id) {
+  const r = MY_REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  r.status = 'rejected';
+  r.rejectionReason = 'Declined by requester.';
+  document.getElementById('inboxActionModal')?.remove();
+  toast(`Quote for ${r.integration} declined`, 'info');
+  renderMyRequests();
+}
+
+/* ====================== REQUESTS INBOX (admin view) ====================== */
 
 function renderRequestsInbox() {
   const counts = {
@@ -21584,7 +21925,8 @@ function route() {
     'studio-datastudio':'studio-datastudio',
     'studio-agentic':'studio-agentic',
     'my-studios':'my-studios',
-    'my-team':'my-team'
+    'my-team':'my-team',
+    'my-requests':'my-requests'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -21627,6 +21969,8 @@ function route() {
     renderPersonalDetail(parts[2]);
   } else if (parts[0]==='personal') {
     renderPersonal();
+  } else if (parts[0]==='my-requests') {
+    renderMyRequests();
   } else if (parts[0]==='my-settings') {
     renderMySettings();
   } else if (parts[0]==='my-studios') {
@@ -28890,6 +29234,57 @@ const REQUESTS = [
     businessIntent: 'Pull video engagement metrics for the Demand Gen dashboard.',
     requestedAt: '2026-05-01 16:45',
     quote: null, rejectionReason: 'Use case overlaps with existing HubSpot integration. Surfacing same metrics through HubSpot avoids duplicating costs.'
+  }
+];
+
+/* ── MY REQUESTS — Thomas González's own submitted requests ── */
+const MY_REQUESTS = [
+  {
+    id: 'mr-001', status: 'quoted', priority: 'high',
+    integration: 'Salesforce CRM', vendor: 'Salesforce, Inc.',
+    actionTypes: ['read', 'write'], hasPII: true, hasFinancial: true,
+    submittedAt: '2026-08-18', age: '1 week ago',
+    businessIntent: 'Expose deal stages and contact records to the Pipeline Agent so it can draft follow-up sequences without engineers touching the CRM.',
+    quote: { amount: 12000, etaWeeks: 3, notes: 'Custom connector. Includes writeback for task creation + 2 object schemas (Contact, Opportunity).' },
+    ticket: 'REQ-011'
+  },
+  {
+    id: 'mr-002', status: 'in_progress', priority: 'high',
+    integration: 'Stripe', vendor: 'Stripe, Inc.',
+    actionTypes: ['read', 'write'], hasPII: true, hasFinancial: true,
+    submittedAt: '2026-08-22', age: '3 days ago',
+    businessIntent: 'Need to expose invoice + subscription state to the Finance agent so it can answer revenue questions without engineers running queries.',
+    quote: { amount: 4200, etaWeeks: 2, notes: 'Standard connector, just needs PII review. Quote accepted 2026-08-19.' },
+    ticket: 'REQ-004'
+  },
+  {
+    id: 'mr-003', status: 'pending_review', priority: 'medium',
+    integration: 'Notion', vendor: 'Notion Labs, Inc.',
+    actionTypes: ['read'], hasPII: false, hasFinancial: false,
+    submittedAt: '2026-08-23', age: '2 days ago',
+    businessIntent: 'Index company wikis and product specs into Helix so the Research Agent can answer questions about internal processes without Slack interruptions.',
+    quote: null,
+    ticket: 'REQ-012'
+  },
+  {
+    id: 'mr-004', status: 'done', priority: 'low',
+    integration: 'GitHub', vendor: 'GitHub, Inc.',
+    actionTypes: ['read', 'write'], hasPII: false, hasFinancial: false,
+    submittedAt: '2026-07-31', age: '3 weeks ago',
+    businessIntent: 'Auto-create Linear issues from PRs + trigger CI review workflows through the Dev Agent.',
+    quote: { amount: 3600, etaWeeks: 1, notes: 'Delivered 2026-08-05. GitHub org connector with PR + Actions sync.' },
+    ticket: 'REQ-009',
+    deliveredAt: '2026-08-05'
+  },
+  {
+    id: 'mr-005', status: 'rejected', priority: 'low',
+    integration: 'HubSpot', vendor: 'HubSpot, Inc.',
+    actionTypes: ['read'], hasPII: true, hasFinancial: false,
+    submittedAt: '2026-07-17', age: '5 weeks ago',
+    businessIntent: 'Pull marketing attribution data for the RevOps dashboard.',
+    quote: null,
+    ticket: 'REQ-007',
+    rejectionReason: 'Marketing attribution is already available via the Salesforce CRM integration (in queue). Redundant connector would increase data governance surface unnecessarily.'
   }
 ];
 
