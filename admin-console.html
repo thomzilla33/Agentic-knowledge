@@ -17401,28 +17401,26 @@ function renderPeople(subTab) {
   const suspendedCount = MOCK_PEOPLE.filter(p => p.status === 'suspended').length;
 
   $('content').innerHTML = `
-    <div class="ph">
-      <div class="ph-top">
-        <div class="ph-text">
-          <div class="ph-h1">People &amp; Access</div>
-          <div class="ph-sub">Manage workspace members, roles, and permission assignments across all studios.</div>
-        </div>
-        <div class="ph-actions">
-          ${activeTab === 'roles'
-            ? `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenRoleCreate()">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                New role
-               </button>`
-            : activeTab === 'groups'
-            ? `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenGroupCreate()">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                New group
-               </button>`
-            : `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenInvite()">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                Invite member
-               </button>`}
-        </div>
+    <div class="ns-page-head">
+      <div>
+        <div class="ns-page-title">People &amp; Access</div>
+        <div class="ns-page-sub">Manage workspace members, roles, and permission assignments across all studios.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${activeTab === 'roles'
+          ? `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenRoleCreate()">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              New role
+             </button>`
+          : activeTab === 'groups'
+          ? `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenGroupCreate()">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              New group
+             </button>`
+          : `<button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paOpenInvite()">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Invite member
+             </button>`}
       </div>
     </div>
 
@@ -26885,16 +26883,14 @@ function renderAudit() {
       <span class="crumb-current">Audit log</span>
     </div>
 
-    <div class="ph">
-      <div class="ph-top">
-        <div class="ph-text">
-          <div class="ph-h1">Audit log</div>
-          <div class="ph-sub">Workspace-wide events for the last 90 days. Export to CSV or stream via webhook.</div>
-        </div>
-        <div class="ph-actions">
-          <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="openWebhookExport()">Configure webhook export</button>
-          <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="auditExportCSV()">Export CSV</button>
-        </div>
+    <div class="ns-page-head">
+      <div>
+        <div class="ns-page-title">Audit log</div>
+        <div class="ns-page-sub">Workspace-wide events for the last 90 days. Export to CSV or stream via webhook.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="openWebhookExport()">Configure webhook export</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="auditExportCSV()">Export CSV</button>
       </div>
     </div>
 
