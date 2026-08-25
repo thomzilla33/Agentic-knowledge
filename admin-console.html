@@ -7798,6 +7798,27 @@ html.theme-light .ms-input{background:var(--canvas);color:var(--t1);}
 html.theme-light .ms-input:disabled,html.theme-light .ms-input[readonly]{background:var(--bg2);}
 html.theme-light .ms-select{background:var(--canvas);color:var(--t1);}
 html.theme-light .ms-theme-card{background:var(--bg2);}
+.ms-divider{border:none;border-top:1px solid var(--line);margin:16px 0;}
+.ms-security-row{display:flex;align-items:center;gap:14px;}
+.ms-security-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ms-security-body{flex:1;min-width:0;}
+.ms-security-label{font-size:13px;font-weight:500;color:var(--t1);display:flex;align-items:center;flex-wrap:wrap;gap:4px;}
+.ms-security-sub{font-size:12px;color:var(--t3);margin-top:2px;}
+.ms-security-btn{font-size:12px;font-weight:500;color:var(--pri);background:var(--pri-10,rgba(99,102,241,.1));border:1px solid var(--pri-30,rgba(99,102,241,.3));border-radius:var(--r8);padding:6px 12px;cursor:pointer;white-space:nowrap;transition:background .15s;}
+.ms-security-btn:hover{background:var(--pri-20,rgba(99,102,241,.18));}
+.ms-session-row{display:flex;align-items:flex-start;gap:8px;padding:6px 10px;background:var(--bg3);border-radius:8px;color:var(--t3);}
+.ms-notif-row{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);}
+.ms-notif-body{flex:1;min-width:0;}
+.ms-notif-label{font-size:13px;font-weight:500;color:var(--t1);}
+.ms-notif-sub{font-size:12px;color:var(--t3);margin-top:2px;}
+.ms-toggle-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.ms-toggle{position:relative;display:inline-block;width:36px;height:20px;cursor:pointer;}
+.ms-toggle input{opacity:0;width:0;height:0;position:absolute;}
+.ms-toggle-track{position:absolute;inset:0;background:var(--bg3);border:1.5px solid var(--line);border-radius:10px;transition:background .2s,border-color .2s;}
+.ms-toggle-track::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .2s,background .2s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.ms-toggle input:checked + .ms-toggle-track{background:var(--pri);border-color:var(--pri);}
+.ms-toggle input:checked + .ms-toggle-track::after{transform:translateX(16px);}
+.ms-notif-channel{font-size:10.5px;color:var(--t3);font-weight:500;white-space:nowrap;}
 
 /* ====================== PEOPLE & ACCESS ====================== */
 
@@ -24848,6 +24869,153 @@ function renderMySettings() {
           <div class="ms-theme-label">System</div>
           <div class="ms-theme-check"></div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="ms-section">
+    <div class="ms-section-title">Security</div>
+    <div class="ms-card">
+
+      <!-- MFA -->
+      <div class="ms-security-row">
+        <div class="ms-security-icon" style="background:rgba(16,185,129,.12)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="#10b981" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="#10b981" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ms-security-body">
+          <div class="ms-security-label">Multi-factor authentication
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:#10b981;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:1px 7px;margin-left:6px">
+              <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#10b981"/><path d="M3 5l1.5 1.5L7 3.5" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Enabled
+            </span>
+          </div>
+          <div class="ms-security-sub">Authenticator app · Last verified 2 hours ago</div>
+        </div>
+        <button class="ms-security-btn" onclick="toast('MFA management coming in V1.2','info')">Manage</button>
+      </div>
+
+      <div class="ms-divider"></div>
+
+      <!-- Password -->
+      <div class="ms-security-row">
+        <div class="ms-security-icon" style="background:rgba(99,102,241,.12)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="var(--pri)" stroke-width="1.4"/><circle cx="8" cy="8" r="1.5" fill="var(--pri)"/><path d="M8 9.5V12" stroke="var(--pri)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ms-security-body">
+          <div class="ms-security-label">Password</div>
+          <div class="ms-security-sub">Last changed 47 days ago</div>
+        </div>
+        <button class="ms-security-btn" onclick="toast('A reset link has been sent to thomas.gonzalez@aimsos.ai','success')">Change password</button>
+      </div>
+
+      <div class="ms-divider"></div>
+
+      <!-- Sessions -->
+      <div class="ms-security-row" style="align-items:flex-start">
+        <div class="ms-security-icon" style="background:rgba(99,102,241,.12);margin-top:2px">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="9" rx="2" stroke="var(--pri)" stroke-width="1.4"/><path d="M5 13h6M8 12v1" stroke="var(--pri)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ms-security-body" style="flex:1">
+          <div class="ms-security-label">Active sessions <span style="font-size:12px;font-weight:600;color:var(--t2);margin-left:4px">2</span></div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+            <div class="ms-session-row">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/></svg>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12.5px;font-weight:500;color:var(--t1)">Chrome on macOS <span style="font-size:11px;font-weight:600;color:#10b981;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:1px 6px;margin-left:4px">Current</span></div>
+                <div style="font-size:11.5px;color:var(--t3);margin-top:1px">184.28.90.1 · New York, US · Just now</div>
+              </div>
+            </div>
+            <div class="ms-session-row">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M6 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12.5px;font-weight:500;color:var(--t1)">Safari on iPhone</div>
+                <div style="font-size:11.5px;color:var(--t3);margin-top:1px">98.45.12.7 · New York, US · 3h ago</div>
+              </div>
+              <button style="font-size:11.5px;color:#ef4444;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;white-space:nowrap" onclick="toast('Session revoked','success')">Revoke</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="ms-section">
+    <div class="ms-section-title">Notifications</div>
+    <div class="ms-card">
+      <div style="display:flex;flex-direction:column;gap:0">
+
+        <div class="ms-notif-row">
+          <div class="ms-notif-body">
+            <div class="ms-notif-label">Weekly activity digest</div>
+            <div class="ms-notif-sub">Summary of workspace activity every Monday morning</div>
+          </div>
+          <div class="ms-toggle-wrap">
+            <label class="ms-toggle">
+              <input type="checkbox" checked onchange="toast(this.checked?'Digest enabled':'Digest disabled','success')">
+              <span class="ms-toggle-track"></span>
+            </label>
+            <span class="ms-notif-channel">Email</span>
+          </div>
+        </div>
+
+        <div class="ms-notif-row">
+          <div class="ms-notif-body">
+            <div class="ms-notif-label">Security alerts</div>
+            <div class="ms-notif-sub">New sign-ins, MFA changes, and suspicious activity</div>
+          </div>
+          <div class="ms-toggle-wrap">
+            <label class="ms-toggle">
+              <input type="checkbox" checked onchange="toast(this.checked?'Alerts enabled':'Alerts disabled','success')">
+              <span class="ms-toggle-track"></span>
+            </label>
+            <span class="ms-notif-channel">Email + In-app</span>
+          </div>
+        </div>
+
+        <div class="ms-notif-row">
+          <div class="ms-notif-body">
+            <div class="ms-notif-label">Role and permission changes</div>
+            <div class="ms-notif-sub">When your roles or access is modified by an admin</div>
+          </div>
+          <div class="ms-toggle-wrap">
+            <label class="ms-toggle">
+              <input type="checkbox" checked onchange="toast(this.checked?'Enabled':'Disabled','success')">
+              <span class="ms-toggle-track"></span>
+            </label>
+            <span class="ms-notif-channel">Email + In-app</span>
+          </div>
+        </div>
+
+        <div class="ms-notif-row">
+          <div class="ms-notif-body">
+            <div class="ms-notif-label">Governance approvals</div>
+            <div class="ms-notif-sub">Promotion packets and resolution requests that need your review</div>
+          </div>
+          <div class="ms-toggle-wrap">
+            <label class="ms-toggle">
+              <input type="checkbox" checked onchange="toast(this.checked?'Enabled':'Disabled','success')">
+              <span class="ms-toggle-track"></span>
+            </label>
+            <span class="ms-notif-channel">In-app</span>
+          </div>
+        </div>
+
+        <div class="ms-notif-row" style="border-bottom:none">
+          <div class="ms-notif-body">
+            <div class="ms-notif-label">Workspace announcements</div>
+            <div class="ms-notif-sub">Platform updates and maintenance windows</div>
+          </div>
+          <div class="ms-toggle-wrap">
+            <label class="ms-toggle">
+              <input type="checkbox" onchange="toast(this.checked?'Enabled':'Disabled','success')">
+              <span class="ms-toggle-track"></span>
+            </label>
+            <span class="ms-notif-channel">Email</span>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
