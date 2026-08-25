@@ -3448,14 +3448,37 @@ html.theme-light .inbox-search-kbd{background:#F1F5F9; border-color:var(--line)}
   cursor:pointer; transition:background .12s, border-color .12s;
   flex-shrink:0; white-space:nowrap;
 }
-.fi-chip:hover{background:var(--fi-chip-hover-bg); border-color:var(--fi-chip-border)}
+.fi-chip:hover{background:var(--fi-chip-hover-bg)}
+/* Active chip — becomes a div container (not a button) */
 .fi-chip.is-active{
   background:var(--fi-chip-active-bg);
   border-color:var(--fi-chip-active-border);
-  color:var(--fi-chip-active-text);
+  cursor:default; padding-right:6px;
 }
 .fi-chip-ic{color:var(--fi-chip-icon); flex-shrink:0; width:14px; height:14px}
-.fi-chip.is-active .fi-chip-ic{color:var(--fi-chip-active-icon)}
+/* Tag inside active chip (informative style) */
+.fi-chip-tag{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:2px 6px; border-radius:4px;
+  background:var(--tag-informative-bg);
+  border:1px solid var(--tag-informative-bd);
+  color:var(--tag-informative-fg);
+  font-size:12px; font-weight:600; line-height:1;
+}
+.fi-chip-tag-x{
+  display:flex; align-items:center; justify-content:center;
+  background:none; border:none; cursor:pointer; padding:0;
+  color:var(--tag-informative-fg); opacity:.7; transition:opacity .1s;
+}
+.fi-chip-tag-x:hover{opacity:1}
+/* Chevron button inside active chip */
+.fi-chip-chevron{
+  display:flex; align-items:center; justify-content:center;
+  width:16px; height:16px; background:none; border:none;
+  cursor:pointer; color:var(--fi-chip-active-icon); flex-shrink:0;
+  transition:opacity .1s;
+}
+.fi-chip-chevron:hover{opacity:.7}
 /* "All filters" pill */
 .fi-all-filters{
   display:inline-flex; align-items:center; gap:6px;
@@ -12182,6 +12205,26 @@ function toggleInboxRow(id, ev) {
 }
 function clearInboxSelection() { inboxState.selected.clear(); renderRequestsInbox(); }
 
+/* Build a DS Filters chip — inactive (button) or active (div with tag + × + chevron) */
+function _fiChip(field, value, placeholder, openFn, clearExpr, rerenderFn) {
+  const chevronSvg = `<svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l4 4 4-4"/></svg>`;
+  const xSvg = `<svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>`;
+  if (!value) {
+    return `<button class="fi-chip" type="button" onclick="${openFn}('${field}', this)">
+      ${escapeHtml(placeholder)}
+      <svg class="fi-chip-ic" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l4 4 4-4"/></svg>
+    </button>`;
+  }
+  const label = value.length > 14 ? value.slice(0, 14) + '…' : value;
+  return `<div class="fi-chip is-active">
+    <span class="fi-chip-tag">
+      ${escapeHtml(label)}
+      <button class="fi-chip-tag-x" type="button" onclick="${clearExpr};${rerenderFn}()" aria-label="Remove filter">${xSvg}</button>
+    </span>
+    <button class="fi-chip-chevron" type="button" onclick="${openFn}('${field}', this.closest('.fi-chip'))" aria-label="Change filter">${chevronSvg}</button>
+  </div>`;
+}
+
 function clearInboxFilters() {
   inboxState.filterPriority = '';
   inboxState.filterRequester = '';
@@ -13052,16 +13095,10 @@ function renderRequestsInbox() {
             <input id="inboxSearchInput" type="text" placeholder="Search…" value="${escapeHtml(inboxState.search||'')}" oninput="setInboxSearch(this.value)"/>
           </label>
           <!-- Filter chips -->
-          <button class="fi-chip ${inboxState.filterPriority ? 'is-active' : ''}" type="button" onclick="openInboxFilterDropdown('priority', this)">
-            ${inboxState.filterPriority ? escapeHtml(inboxState.filterPriority) : 'Priority'}
-            <svg class="fi-chip-ic" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <button class="fi-chip ${inboxState.filterRequester ? 'is-active' : ''}" type="button" onclick="openInboxFilterDropdown('requester', this)">
-            ${inboxState.filterRequester ? escapeHtml(inboxState.filterRequester) : 'Requester'}
-            <svg class="fi-chip-ic" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
+          ${_fiChip('priority', inboxState.filterPriority, 'Priority', 'openInboxFilterDropdown', "inboxState.filterPriority=''", 'renderRequestsInbox')}
+          ${_fiChip('requester', inboxState.filterRequester, 'Requester', 'openInboxFilterDropdown', "inboxState.filterRequester=''", 'renderRequestsInbox')}
           ${(inboxState.filterPriority || inboxState.filterRequester)
-            ? `<button class="fi-clear" type="button" onclick="clearInboxFilters()">Clear filters</button>`
+            ? `<button class="fi-clear" type="button" onclick="clearInboxFilters()">Clear Filters</button>`
             : ''}
         </div>
         <div class="fi-bar-right">
