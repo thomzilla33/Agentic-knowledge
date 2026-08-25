@@ -472,6 +472,63 @@ textarea.input{resize:vertical; min-height:64px; line-height:1.5}
 
 /* notif-bell-wrap / notif-bell-dot → shared/notif-panel.css */
 
+/* ─── TOUR (demo walkthrough) ─── */
+.tour-trigger{
+  position:fixed; bottom:24px; left:24px; z-index:300;
+  display:flex; align-items:center; gap:7px;
+  padding:0 16px; height:36px;
+  background:var(--purple); color:#0d0517;
+  border:none; border-radius:20px;
+  font-family:inherit; font-size:12px; font-weight:800;
+  cursor:pointer; letter-spacing:.02em;
+  box-shadow:0 4px 16px rgba(167,139,250,0.35);
+  transition:transform .15s, box-shadow .15s;
+}
+.tour-trigger:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(167,139,250,0.45)}
+.tour-overlay{
+  position:fixed; inset:0; z-index:400;
+  background:rgba(0,0,0,0.6);
+  pointer-events:auto;
+  display:none;
+}
+.tour-overlay.active{display:block}
+.tour-spotlight{
+  position:fixed; z-index:410;
+  border-radius:10px;
+  box-shadow:0 0 0 9999px rgba(0,0,0,0.55);
+  pointer-events:none;
+  transition:all .25s ease;
+  display:none;
+}
+.tour-spotlight.active{display:block}
+.tour-popover{
+  position:fixed; z-index:420;
+  width:360px; background:var(--bg2);
+  border:1px solid var(--line-strong);
+  border-radius:14px;
+  box-shadow:0 16px 48px rgba(0,0,0,0.45);
+  padding:0;
+  opacity:0; transform:scale(.96);
+  pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;
+}
+.tour-popover.active{opacity:1; transform:scale(1); pointer-events:auto}
+.tour-popover-header{display:flex; align-items:center; justify-content:space-between; padding:14px 18px 0}
+.tour-popover-step{font-size:10.5px; font-weight:800; color:var(--t3); text-transform:uppercase; letter-spacing:.06em}
+.tour-popover-skip{background:transparent; border:none; color:var(--t3); font-size:11px; cursor:pointer; font-family:inherit; padding:2px 4px; border-radius:4px}
+.tour-popover-skip:hover{color:var(--t1)}
+.tour-popover-title{font-size:16px; font-weight:800; color:var(--t1); padding:10px 18px 6px; letter-spacing:-.01em; line-height:1.3}
+.tour-popover-body{font-size:13px; color:var(--t2); line-height:1.6; padding:0 18px 14px}
+.tour-popover-footer{display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-top:1px solid var(--line)}
+.tour-progress{display:flex; gap:5px; align-items:center}
+.tour-progress-dot{width:6px; height:6px; border-radius:50%; background:var(--line-strong); transition:background .15s, width .15s}
+.tour-progress-dot.active{background:var(--purple); width:14px; border-radius:4px}
+.tour-btns{display:flex; gap:8px}
+.tour-btn{height:30px; padding:0 14px; font-family:inherit; font-size:12px; font-weight:700; border-radius:7px; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--t1); transition:background .12s}
+.tour-btn:hover{background:var(--hover)}
+.tour-btn.primary{background:var(--purple); color:#0d0517; border-color:var(--purple)}
+.tour-btn.primary:hover{background:#9171f8}
+
 .theme-icon-sun{display:none}
 .theme-icon-moon{display:block}
 html.theme-light .theme-icon-sun{display:block}
@@ -650,6 +707,15 @@ html.theme-light .sidebar,html.theme-light .ssb{background:#FFFFFF;border-color:
 <aside class="drawer" id="drawer"></aside>
 
 <div class="toast-container" id="toasts"></div>
+
+<!-- Tour motor DOM -->
+<button class="tour-trigger" id="tourTrigger" onclick="startTour()">
+  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v4M8 11v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  Demo
+</button>
+<div class="tour-overlay" id="tourOverlay"></div>
+<div class="tour-spotlight" id="tourSpotlight"></div>
+<div class="tour-popover" id="tourPopover"></div>
 
 <script>
 function $(id){return document.getElementById(id)}
@@ -1276,6 +1342,187 @@ document.addEventListener('keydown', (e) => {
 /* ====================== BOOT ====================== */
 window.addEventListener('hashchange', render);
 render();
+
+/* ====================== TOUR MOTOR ====================== */
+
+const TOUR_STEPS = [
+  {
+    title: 'Agent Studio · Tools',
+    body: 'This is where integrations become agent capabilities. Any connector authenticated in Admin Studio that exposes tools shows up here. Let\'s walk through how it all works.',
+  },
+  {
+    title: 'Studio switcher',
+    body: 'Click here to switch surfaces: Admin Studio handles credentials, Data Studio maps data flow, and you\'re now in Agent Studio · Tools. All three views share the same workspace.',
+    target: '#tbContextBtn',
+  },
+  {
+    title: 'Secondary navigation',
+    body: 'Two main views: "Tools by integration" groups raw API methods by connector. "All wrappers" is a flat list of every pre-configured tool your team has created.',
+    target: 'aside.ssb',
+  },
+  {
+    title: 'What agents can actually do',
+    body: 'The hero shows you the full picture: 25 raw tools, 10 wrappers, 5 integrations, and 183 agent calls per day. This is the surface where you decide what agents are allowed to invoke.',
+    target: '.ag-hero',
+    route: 'tools',
+  },
+  {
+    title: 'Live metrics',
+    body: '"Calls/day" is the most important number here — it tells you which integrations agents are actually using versus just configured. Wrappers with zero calls are candidates for review.',
+    target: '.ag-hero-right',
+  },
+  {
+    title: 'Integration cards',
+    body: 'One card per authenticated integration that exposes tools. Click any card to drill into its raw tools and existing wrappers. The amber dot on Slack means 3 wrappers are pending review.',
+    target: '.ag-grid',
+    scrollToTarget: true,
+  },
+  {
+    title: 'Raw tools inside Jira',
+    body: 'Each row is a raw API function: create_issue, update_status, add_comment. Agents can call these directly, but you probably want to wrap them first to prevent accidental misuse.',
+    target: '.tool-row',
+    route: 'tools/jira',
+    scrollToTarget: true,
+  },
+  {
+    title: 'Create a wrapper',
+    body: 'Click "New wrapper" to lock specific parameters and only expose what the agent needs to fill. "Create Prone Ticket" locks project and issue type — the agent only fills summary and description. Safer, narrower, auditable.',
+    target: 'button.btn-primary.btn-sm',
+    scrollToTarget: true,
+  },
+  {
+    title: 'All Wrappers',
+    body: 'A flat view across every integration. 10 wrappers built by your team — each one a Lego piece an agent can pick up and use. Assign them in Agentic Studio to control exactly what each agent can do.',
+    target: '.wrap-card',
+    route: 'wrappers',
+    scrollToTarget: true,
+  },
+  {
+    title: 'You\'re set',
+    body: 'Build wrappers here, assign them to agents in Agentic Studio. The more specific the wrapper, the safer and more auditable the agent. Check Admin Studio for credential health.',
+  },
+];
+
+const tourState = { active: false, step: 0 };
+
+function startTour() {
+  tourState.active = true;
+  tourState.step = 0;
+  $('tourOverlay').classList.add('active');
+  paintTourStep();
+}
+
+function endTour() {
+  tourState.active = false;
+  $('tourOverlay').classList.remove('active');
+  $('tourSpotlight').classList.remove('active');
+  $('tourPopover').classList.remove('active');
+  $('tourSpotlight').style.cssText = '';
+  $('tourPopover').style.cssText = '';
+}
+
+function tourNext() {
+  if (tourState.step < TOUR_STEPS.length - 1) { tourState.step++; paintTourStep(); }
+  else endTour();
+}
+
+function tourPrev() {
+  if (tourState.step > 0) { tourState.step--; paintTourStep(); }
+}
+
+function paintTourStep() {
+  const step = TOUR_STEPS[tourState.step];
+  const n = tourState.step + 1;
+  const total = TOUR_STEPS.length;
+  const spotlight = $('tourSpotlight');
+  const popover   = $('tourPopover');
+
+  spotlight.classList.remove('active');
+  popover.classList.remove('active');
+
+  if (step.route) navigate(step.route);
+
+  popover.innerHTML = `
+    <div class="tour-popover-header">
+      <span class="tour-popover-step">Step ${n} of ${total}</span>
+      <button class="tour-popover-skip" onclick="endTour()">Skip tour \xd7</button>
+    </div>
+    <div class="tour-popover-title">${step.title}</div>
+    <div class="tour-popover-body">${step.body}</div>
+    <div class="tour-popover-footer">
+      <div class="tour-progress">
+        ${TOUR_STEPS.map((_,i)=>`<div class="tour-progress-dot${i===tourState.step?' active':''}"></div>`).join('')}
+      </div>
+      <div class="tour-btns">
+        ${n > 1 ? `<button class="tour-btn" onclick="tourPrev()">&#8592; Back</button>` : ''}
+        <button class="tour-btn primary" onclick="${n === total ? 'endTour()' : 'tourNext()'}">${n === total ? 'Finish' : 'Next →'}</button>
+      </div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    if (step.target) {
+      const targetEl = document.querySelector(step.target);
+      if (targetEl) {
+        if (step.scrollToTarget) {
+          const scrollContainer = document.querySelector('.content');
+          const targetRect = targetEl.getBoundingClientRect();
+          const TOPBAR_OFFSET = 80;
+          if (scrollContainer) {
+            const containerTop = scrollContainer.getBoundingClientRect().top;
+            scrollContainer.scrollBy({ top: targetRect.top - containerTop - TOPBAR_OFFSET, behavior:'smooth' });
+          } else {
+            targetEl.scrollIntoView({ behavior:'smooth', block:'start' });
+          }
+        }
+        const positionOverlay = () => {
+          const rect = targetEl.getBoundingClientRect();
+          const pad = 6;
+          spotlight.style.left   = (rect.left   - pad) + 'px';
+          spotlight.style.top    = (rect.top    - pad) + 'px';
+          spotlight.style.width  = (rect.width  + pad*2) + 'px';
+          spotlight.style.height = (rect.height + pad*2) + 'px';
+          spotlight.classList.add('active');
+
+          const pw = 360, ph = popover.offsetHeight || 280, mg = 16;
+          let pl, pt;
+          if (rect.bottom + ph + mg < window.innerHeight) {
+            pt = rect.bottom + 16;
+            pl = Math.min(Math.max(rect.left, 16), window.innerWidth - pw - 16);
+          } else if (rect.top - ph - mg > 0) {
+            pt = rect.top - ph - 16;
+            pl = Math.min(Math.max(rect.left, 16), window.innerWidth - pw - 16);
+          } else {
+            pt = (window.innerHeight - ph) / 2;
+            pl = (window.innerWidth  - pw) / 2;
+          }
+          popover.style.left = pl + 'px';
+          popover.style.top  = pt + 'px';
+          popover.classList.add('active');
+        };
+        setTimeout(positionOverlay, step.scrollToTarget ? 700 : 50);
+        if (step.scrollToTarget) setTimeout(positionOverlay, 1100);
+      } else {
+        spotlight.classList.remove('active');
+        popover.style.left = ((window.innerWidth  - 360) / 2) + 'px';
+        popover.style.top  = ((window.innerHeight - 280) / 2) + 'px';
+        popover.classList.add('active');
+      }
+    } else {
+      spotlight.classList.remove('active');
+      popover.style.left = ((window.innerWidth  - 360) / 2) + 'px';
+      popover.style.top  = ((window.innerHeight - 280) / 2) + 'px';
+      popover.classList.add('active');
+    }
+  }, step.route ? 250 : 50);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (!tourState.active) return;
+  if (e.key === 'Escape') endTour();
+  else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); tourNext(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); tourPrev(); }
+});
 
 
 /* ====================== THEME + PERSONA (parity with Admin Studio) ====================== */
