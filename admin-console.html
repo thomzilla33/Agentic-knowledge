@@ -12228,7 +12228,20 @@ function confirmInboxBulkAction(action) {
 function inboxQuickAction(id, action, ev) {
   if (ev) ev.stopPropagation();
   const r = REQUESTS.find(x => x.id === id);
-  toast(`${action} · ${r?.integration || ''} — flow coming soon`);
+  if (!r) return;
+  if (action === 'Approve') {
+    r.status = 'in_review';
+    renderRequestsInbox();
+    toast(`${r.integration} approved — sent to integration team`, 'success');
+  } else if (action === 'Approve quote') {
+    r.status = 'in_progress';
+    renderRequestsInbox();
+    toast(`Quote approved — ${r.integration} build starts this sprint`, 'success');
+  } else if (action === 'Reject') {
+    _openInboxRejectModal(id);
+  } else if (action === 'Assign') {
+    _openInboxAssignModal(id);
+  }
 }
 
 function openInboxDetailPanel(id) {
@@ -12270,15 +12283,20 @@ function openInboxDetailPanel(id) {
       </div>
     </div>`).join('');
 
+  const isInProgress = r.status === 'in_progress';
+  const AB_BTN = (label, style, fn) => `<button style="height:34px;padding:0 14px;border-radius:var(--r8);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;${style}" onclick="${fn}">${label}</button>`;
   const actionBar = isPending ? `
     <div style="display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--line);flex-shrink:0;">
-      <button style="flex:1;height:34px;background:var(--green);border:none;border-radius:var(--r8);font-size:12px;font-weight:700;color:#fff;cursor:pointer;" onclick="closeInboxDetailPanel();toast('Approved — ${r.integration.replace(/'/g,'')}: request sent to integration team','success')">Approve</button>
-      <button style="flex:1;height:34px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;" onclick="toast('Quote requested from integration team','info')">Request quote</button>
-      <button style="height:34px;padding:0 14px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:12px;font-weight:600;color:var(--red);cursor:pointer;" onclick="closeInboxDetailPanel();toast('Rejected — ${r.integration.replace(/'/g,'')}','info')">Reject</button>
+      ${AB_BTN('Approve', 'flex:1;background:var(--green);border:none;color:#fff;', `_inboxDetailApprove('${r.id}')`)}
+      ${AB_BTN('Request quote', 'flex:1;background:var(--bg3);border:1px solid var(--line);color:var(--t2);', `_openInboxQuoteModal('${r.id}')`)}
+      ${AB_BTN('Reject', 'background:var(--bg3);border:1px solid var(--line);color:var(--red);', `_openInboxRejectModal('${r.id}')`)}
     </div>` : isQuoted ? `
     <div style="display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--line);flex-shrink:0;">
-      <button style="flex:1;height:34px;background:var(--pri);border:none;border-radius:var(--r8);font-size:12px;font-weight:700;color:#fff;cursor:pointer;" onclick="closeInboxDetailPanel();toast('Quote approved — build starts this sprint','success')">Approve quote</button>
-      <button style="height:34px;padding:0 14px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:12px;font-weight:600;color:var(--red);cursor:pointer;" onclick="closeInboxDetailPanel();toast('Quote rejected','info')">Reject</button>
+      ${AB_BTN('Approve quote', 'flex:1;background:var(--pri);border:none;color:#fff;', `_inboxDetailApproveQuote('${r.id}')`)}
+      ${AB_BTN('Reject', 'background:var(--bg3);border:1px solid var(--line);color:var(--red);', `_openInboxRejectModal('${r.id}')`)}
+    </div>` : isInProgress ? `
+    <div style="display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--line);flex-shrink:0;">
+      ${AB_BTN('Mark as Done', 'flex:1;background:var(--green);border:none;color:#fff;', `_inboxDetailDone('${r.id}')`)}
     </div>` : '';
 
   const c = document.createElement('div');
@@ -12370,6 +12388,163 @@ function closeInboxDetailPanel() {
   const o = document.getElementById('idpOverlay');
   const d = document.getElementById('idpDrawer');
   if (o) { o.classList.remove('open'); d.classList.remove('open'); }
+}
+
+/* ── Inbox detail action handlers ── */
+
+function _inboxDetailApprove(id) {
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  r.status = 'in_review';
+  closeInboxDetailPanel();
+  renderRequestsInbox();
+  toast(`${r.integration} approved — sent to integration team`, 'success');
+}
+
+function _inboxDetailApproveQuote(id) {
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  r.status = 'in_progress';
+  closeInboxDetailPanel();
+  renderRequestsInbox();
+  toast(`Quote approved — ${r.integration} build starts this sprint`, 'success');
+}
+
+function _inboxDetailDone(id) {
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  r.status = 'done';
+  closeInboxDetailPanel();
+  renderRequestsInbox();
+  toast(`${r.integration} marked as delivered`, 'success');
+}
+
+function _openInboxRejectModal(id) {
+  document.getElementById('inboxActionModal')?.remove();
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  const m = document.createElement('div');
+  m.id = 'inboxActionModal';
+  m.innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9200;display:flex;align-items:center;justify-content:center;" onclick="if(event.target===this)document.getElementById('inboxActionModal')?.remove()">
+      <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);width:400px;max-width:calc(100vw - 32px);padding:24px;box-shadow:0 24px 64px rgba(0,0,0,.5);">
+        <div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;">Reject request</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:16px;">${escapeHtml(r.integration)} · ${escapeHtml(r.vendor)}</div>
+        <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:6px;display:block;">Reason <span style="color:var(--red);">*</span></label>
+        <textarea id="iam_reason" rows="3" placeholder="Explain why this request is being rejected…" style="width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);padding:9px 12px;font-size:13px;color:var(--t1);font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+        <div id="iam_err" style="display:none;font-size:11px;color:var(--red);margin-top:4px;">Reason is required.</div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+          <button style="height:32px;padding:0 16px;background:transparent;border:1px solid var(--line);border-radius:7px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;font-family:inherit;" onclick="document.getElementById('inboxActionModal')?.remove()">Cancel</button>
+          <button style="height:32px;padding:0 16px;background:var(--red);border:none;border-radius:7px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;" onclick="_inboxConfirmReject('${id}')">Reject</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(m);
+  setTimeout(() => m.querySelector('textarea')?.focus(), 50);
+}
+
+function _inboxConfirmReject(id) {
+  const reason = document.getElementById('iam_reason')?.value?.trim();
+  if (!reason) { document.getElementById('iam_err').style.display = 'block'; return; }
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  r.status = 'rejected';
+  r.rejectionReason = reason;
+  document.getElementById('inboxActionModal')?.remove();
+  closeInboxDetailPanel();
+  renderRequestsInbox();
+  toast(`${r.integration} rejected`, 'info');
+}
+
+function _openInboxQuoteModal(id) {
+  document.getElementById('inboxActionModal')?.remove();
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  m = document.createElement('div');
+  m.id = 'inboxActionModal';
+  m.innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9200;display:flex;align-items:center;justify-content:center;" onclick="if(event.target===this)document.getElementById('inboxActionModal')?.remove()">
+      <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);width:420px;max-width:calc(100vw - 32px);padding:24px;box-shadow:0 24px 64px rgba(0,0,0,.5);">
+        <div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;">Submit quote</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:20px;">${escapeHtml(r.integration)} · ${escapeHtml(r.vendor)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:6px;display:block;">Amount (USD) <span style="color:var(--red);">*</span></label>
+            <input id="iam_amount" type="number" min="0" placeholder="e.g. 12000" style="width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);padding:8px 12px;font-size:13px;color:var(--t1);font-family:inherit;outline:none;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:6px;display:block;">ETA (weeks) <span style="color:var(--red);">*</span></label>
+            <input id="iam_eta" type="number" min="1" placeholder="e.g. 3" style="width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);padding:8px 12px;font-size:13px;color:var(--t1);font-family:inherit;outline:none;box-sizing:border-box;">
+          </div>
+        </div>
+        <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:6px;display:block;">Notes</label>
+        <textarea id="iam_notes" rows="3" placeholder="Scope, assumptions, or caveats…" style="width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);padding:9px 12px;font-size:13px;color:var(--t1);font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+        <div id="iam_err" style="display:none;font-size:11px;color:var(--red);margin-top:4px;">Amount and ETA are required.</div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+          <button style="height:32px;padding:0 16px;background:transparent;border:1px solid var(--line);border-radius:7px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;font-family:inherit;" onclick="document.getElementById('inboxActionModal')?.remove()">Cancel</button>
+          <button style="height:32px;padding:0 16px;background:var(--pri);border:none;border-radius:7px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;" onclick="_inboxConfirmQuote('${id}')">Send quote</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(m);
+  setTimeout(() => m.querySelector('input')?.focus(), 50);
+}
+
+function _inboxConfirmQuote(id) {
+  const amount = parseFloat(document.getElementById('iam_amount')?.value);
+  const eta    = parseInt(document.getElementById('iam_eta')?.value, 10);
+  if (!amount || !eta) { document.getElementById('iam_err').style.display = 'block'; return; }
+  const notes = document.getElementById('iam_notes')?.value?.trim() || '';
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  r.status = 'quoted';
+  r.quote = { amount, etaWeeks: eta, notes };
+  document.getElementById('inboxActionModal')?.remove();
+  closeInboxDetailPanel();
+  renderRequestsInbox();
+  toast(`Quote sent — $${amount.toLocaleString()} · ${eta}w ETA`, 'success');
+}
+
+function _openInboxAssignModal(id) {
+  document.getElementById('inboxActionModal')?.remove();
+  const r = REQUESTS.find(x => x.id === id);
+  if (!r) return;
+  const MOCK_TEAM = [
+    { name:'Edgardo Sierra',  initials:'ES', role:'Integration Lead' },
+    { name:'Priya Patel',     initials:'PP', role:'Integration Engineer' },
+    { name:'Thomas González', initials:'TG', role:'Platform Admin' },
+    { name:'Diana Pérez',     initials:'DP', role:'Integration Engineer' },
+  ];
+  const m = document.createElement('div');
+  m.id = 'inboxActionModal';
+  m.innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9200;display:flex;align-items:center;justify-content:center;" onclick="if(event.target===this)document.getElementById('inboxActionModal')?.remove()">
+      <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);width:360px;max-width:calc(100vw - 32px);padding:24px;box-shadow:0 24px 64px rgba(0,0,0,.5);">
+        <div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:16px;">Assign request</div>
+        ${MOCK_TEAM.map((mem, i) => `
+          <label style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:4px;${i===0?'background:var(--hover);':''}" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='${i===0?'var(--hover)':'transparent'}'">
+            <input type="radio" name="iam_assignee" value="${escapeHtml(mem.name)}" ${i===0?'checked':''} style="accent-color:var(--pri);width:14px;height:14px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${escapeHtml(mem.initials)}</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--t1);">${escapeHtml(mem.name)}</div>
+              <div style="font-size:11px;color:var(--t3);">${escapeHtml(mem.role)}</div>
+            </div>
+          </label>`).join('')}
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+          <button style="height:32px;padding:0 16px;background:transparent;border:1px solid var(--line);border-radius:7px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;font-family:inherit;" onclick="document.getElementById('inboxActionModal')?.remove()">Cancel</button>
+          <button style="height:32px;padding:0 16px;background:var(--pri);border:none;border-radius:7px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;" onclick="_inboxConfirmAssign('${id}')">Assign</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(m);
+}
+
+function _inboxConfirmAssign(id) {
+  const chosen = document.querySelector('input[name="iam_assignee"]:checked')?.value || 'Edgardo Sierra';
+  const r = REQUESTS.find(x => x.id === id);
+  document.getElementById('inboxActionModal')?.remove();
+  renderRequestsInbox();
+  toast(`${r?.integration || 'Request'} assigned to ${chosen}`, 'success');
 }
 
 function _inboxBucket(status) {
