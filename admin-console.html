@@ -7758,7 +7758,11 @@ html.theme-light .theme-icon-moon{display:block}
 }
 
 /* ── My Settings ─────────────────────────────────────────── */
-.ms-wrap{max-width:720px;padding:32px 24px 64px;}
+.ms-wrap{max-width:720px;padding:24px 24px 64px;}
+.ms-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:32px;}
+.ms-tab{background:none;border:none;padding:10px 16px;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap;}
+.ms-tab:hover{color:var(--t1);}
+.ms-tab.active{color:var(--pri);border-bottom-color:var(--pri);font-weight:600;}
 .ms-section{margin-bottom:40px;}
 .ms-section-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:16px;}
 .ms-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r12);padding:24px;}
@@ -24778,14 +24782,26 @@ function renderBuildSDK() {
 
 /* ====================== MY SETTINGS ====================== */
 
-function renderMySettings() {
+let _msTab = 'profile';
+
+function renderMySettings(tab) {
+  if (tab) _msTab = tab;
   const saved = (() => { try { return localStorage.getItem('aims-theme'); } catch(e){ return null; } })();
   const active = saved === 'light' ? 'light' : saved === 'dark' ? 'dark' : 'system';
+  const t = _msTab;
 
   $('content').innerHTML = `
 <div class="ms-wrap">
 
-  <!-- PROFILE -->
+  <!-- TAB NAV -->
+  <div class="ms-tabs">
+    <button class="ms-tab ${t==='profile'?'active':''}" onclick="renderMySettings('profile')">Profile</button>
+    <button class="ms-tab ${t==='appearance'?'active':''}" onclick="renderMySettings('appearance')">Appearance</button>
+    <button class="ms-tab ${t==='security'?'active':''}" onclick="renderMySettings('security')">Security</button>
+    <button class="ms-tab ${t==='notifications'?'active':''}" onclick="renderMySettings('notifications')">Notifications</button>
+  </div>
+
+  ${t === 'profile' ? `<!-- PROFILE -->
   <div class="ms-section">
     <div class="ms-section-title">Profile</div>
     <div class="ms-card">
@@ -24849,7 +24865,9 @@ function renderMySettings() {
     </div>
   </div>
 
-  <!-- APPEARANCE -->
+  ` : ''}
+
+  ${t === 'appearance' ? `<!-- APPEARANCE -->
   <div class="ms-section">
     <div class="ms-section-title">Appearance</div>
     <div class="ms-card">
@@ -24873,7 +24891,9 @@ function renderMySettings() {
     </div>
   </div>
 
-  <!-- SECURITY -->
+  ` : ''}
+
+  ${t === 'security' ? `<!-- SECURITY -->
   <div class="ms-section">
     <div class="ms-section-title">Security</div>
     <div class="ms-card">
@@ -24940,7 +24960,9 @@ function renderMySettings() {
     </div>
   </div>
 
-  <!-- NOTIFICATIONS -->
+  ` : ''}
+
+  ${t === 'notifications' ? `<!-- NOTIFICATIONS -->
   <div class="ms-section">
     <div class="ms-section-title">Notifications</div>
     <div class="ms-card">
@@ -25019,6 +25041,7 @@ function renderMySettings() {
       </div>
     </div>
   </div>
+  ` : ''}
 
 </div>
   `;
