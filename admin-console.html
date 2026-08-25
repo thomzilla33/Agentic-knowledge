@@ -7823,6 +7823,42 @@ html.theme-light .ms-theme-card{background:var(--bg2);}
 .ms-toggle input:checked + .ms-toggle-track{background:var(--pri);border-color:var(--pri);}
 .ms-toggle input:checked + .ms-toggle-track::after{transform:translateX(16px);}
 .ms-notif-channel{font-size:10.5px;color:var(--t3);font-weight:500;white-space:nowrap;}
+/* My Settings — Notifications enhanced */
+.ms-notif-pause-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:var(--r8);margin-bottom:20px;}
+.ms-notif-pause-ico{color:#F59E0B;flex-shrink:0;}
+.ms-notif-pause-body{flex:1;min-width:0;}
+.ms-notif-pause-lbl{font-size:13px;font-weight:600;color:var(--t1);}
+.ms-notif-pause-sub{font-size:12px;color:var(--t3);margin-top:1px;}
+.ms-notif-pause-end{font-size:12px;font-weight:600;color:#F59E0B;cursor:pointer;flex-shrink:0;background:none;border:none;padding:0;}
+.ms-notif-pause-end:hover{text-decoration:underline;}
+.ms-notif-ch-section{margin-bottom:20px;}
+.ms-notif-ch-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:10px;}
+.ms-notif-ch-cards{display:flex;gap:10px;}
+.ms-notif-ch-card{flex:1;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r8);}
+.ms-notif-ch-card-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ms-notif-ch-card-info{flex:1;min-width:0;}
+.ms-notif-ch-card-name{font-size:12px;font-weight:600;color:var(--t1);}
+.ms-notif-ch-card-hint{font-size:11px;color:var(--t3);margin-top:1px;}
+.ms-notif-cat-head{display:flex;align-items:center;gap:8px;padding:10px 0 6px;border-top:1px solid var(--line);margin-top:4px;}
+.ms-notif-cat-head:first-child{border-top:none;margin-top:0;padding-top:0;}
+.ms-notif-cat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);}
+.ms-notif-row2{display:flex;align-items:flex-start;gap:16px;padding:9px 0;border-bottom:1px solid var(--line);}
+.ms-notif-row2:last-child{border-bottom:none;}
+.ms-notif-row2-body{flex:1;min-width:0;}
+.ms-notif-row2-label{font-size:13px;font-weight:500;color:var(--t1);}
+.ms-notif-row2-sub{font-size:12px;color:var(--t3);margin-top:2px;}
+.ms-notif-row2-chs{display:flex;gap:5px;align-items:center;flex-shrink:0;margin-top:3px;}
+.ms-notif-ch-pill{display:flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;user-select:none;transition:background .12s,color .12s,border-color .12s;border:1px solid var(--line);background:var(--bg3);color:var(--t3);}
+.ms-notif-ch-pill.on{background:var(--pri-10,rgba(99,102,241,.12));border-color:var(--pri-30,rgba(99,102,241,.3));color:var(--pri);}
+.ms-notif-ch-pill.locked{opacity:.45;cursor:not-allowed;}
+.ms-notif-pref-section{margin-top:20px;}
+.ms-notif-pref-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line);}
+.ms-notif-pref-row:last-child{border-bottom:none;}
+.ms-notif-pref-label{font-size:13px;font-weight:500;color:var(--t1);}
+.ms-notif-pref-hint{font-size:12px;color:var(--t3);margin-top:2px;}
+.ms-notif-select{height:30px;padding:0 28px 0 10px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:12px;color:var(--t1);cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+.ms-notif-select:focus{border-color:var(--pri);}
+.ms-notif-pause-select{height:30px;padding:0 28px 0 10px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:12px;color:var(--t1);cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;flex-shrink:0;}
 
 /* ====================== PEOPLE & ACCESS ====================== */
 
@@ -26420,81 +26456,252 @@ function renderMySettings(tab) {
   ${t === 'notifications' ? `<!-- NOTIFICATIONS -->
   <div class="ms-section">
     <div class="ms-section-title">Notifications</div>
-    <div class="ms-card">
-      <div style="display:flex;flex-direction:column;gap:0">
 
-        <div class="ms-notif-row">
-          <div class="ms-notif-body">
-            <div class="ms-notif-label">Weekly activity digest</div>
-            <div class="ms-notif-sub">Summary of workspace activity every Monday morning</div>
+    <!-- Channel controls -->
+    <div class="ms-notif-ch-section">
+      <div class="ms-notif-ch-section-title">Channels</div>
+      <div class="ms-notif-ch-cards">
+        <div class="ms-notif-ch-card">
+          <div class="ms-notif-ch-card-ico" style="background:rgba(99,102,241,.12);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#818CF8" stroke-width="1.8" stroke-linejoin="round"/><path d="M22 6L12 13 2 6" stroke="#818CF8" stroke-width="1.8" stroke-linecap="round"/></svg>
           </div>
-          <div class="ms-toggle-wrap">
-            <label class="ms-toggle">
-              <input type="checkbox" checked onchange="toast(this.checked?'Digest enabled':'Digest disabled','success')">
-              <span class="ms-toggle-track"></span>
-            </label>
-            <span class="ms-notif-channel">Email</span>
+          <div class="ms-notif-ch-card-info">
+            <div class="ms-notif-ch-card-name">Email</div>
+            <div class="ms-notif-ch-card-hint">thomas.gonzalez@aimsos.ai</div>
           </div>
+          <label class="ms-toggle">
+            <input type="checkbox" checked onchange="toast('Email notifications '+(this.checked?'on':'off'),'success')">
+            <span class="ms-toggle-track"></span>
+          </label>
         </div>
-
-        <div class="ms-notif-row">
-          <div class="ms-notif-body">
-            <div class="ms-notif-label">Security alerts</div>
-            <div class="ms-notif-sub">New sign-ins, MFA changes, and suspicious activity</div>
+        <div class="ms-notif-ch-card">
+          <div class="ms-notif-ch-card-ico" style="background:rgba(16,185,129,.12);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="#34D399" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20a2 2 0 004 0" stroke="#34D399" stroke-width="1.8" stroke-linecap="round"/></svg>
           </div>
-          <div class="ms-toggle-wrap">
-            <label class="ms-toggle">
-              <input type="checkbox" checked onchange="toast(this.checked?'Alerts enabled':'Alerts disabled','success')">
-              <span class="ms-toggle-track"></span>
-            </label>
-            <span class="ms-notif-channel">Email + In-app</span>
+          <div class="ms-notif-ch-card-info">
+            <div class="ms-notif-ch-card-name">In-app</div>
+            <div class="ms-notif-ch-card-hint">Bell icon · AIMS-OS</div>
           </div>
+          <label class="ms-toggle">
+            <input type="checkbox" checked onchange="toast('In-app notifications '+(this.checked?'on':'off'),'success')">
+            <span class="ms-toggle-track"></span>
+          </label>
         </div>
-
-        <div class="ms-notif-row">
-          <div class="ms-notif-body">
-            <div class="ms-notif-label">Role and permission changes</div>
-            <div class="ms-notif-sub">When your roles or access is modified by an admin</div>
-          </div>
-          <div class="ms-toggle-wrap">
-            <label class="ms-toggle">
-              <input type="checkbox" checked onchange="toast(this.checked?'Enabled':'Disabled','success')">
-              <span class="ms-toggle-track"></span>
-            </label>
-            <span class="ms-notif-channel">Email + In-app</span>
-          </div>
-        </div>
-
-        <div class="ms-notif-row">
-          <div class="ms-notif-body">
-            <div class="ms-notif-label">Governance approvals</div>
-            <div class="ms-notif-sub">Promotion packets and resolution requests that need your review</div>
-          </div>
-          <div class="ms-toggle-wrap">
-            <label class="ms-toggle">
-              <input type="checkbox" checked onchange="toast(this.checked?'Enabled':'Disabled','success')">
-              <span class="ms-toggle-track"></span>
-            </label>
-            <span class="ms-notif-channel">In-app</span>
-          </div>
-        </div>
-
-        <div class="ms-notif-row" style="border-bottom:none">
-          <div class="ms-notif-body">
-            <div class="ms-notif-label">Workspace announcements</div>
-            <div class="ms-notif-sub">Platform updates and maintenance windows</div>
-          </div>
-          <div class="ms-toggle-wrap">
-            <label class="ms-toggle">
-              <input type="checkbox" onchange="toast(this.checked?'Enabled':'Disabled','success')">
-              <span class="ms-toggle-track"></span>
-            </label>
-            <span class="ms-notif-channel">Email</span>
-          </div>
-        </div>
-
       </div>
     </div>
+
+    <!-- Event rules -->
+    <div class="ms-card">
+      <!-- Security & Access -->
+      <div class="ms-notif-cat-head">
+        <span class="ms-notif-cat-label">Security &amp; Access</span>
+      </div>
+      <div class="ms-notif-row2">
+        <div class="ms-notif-row2-body">
+          <div class="ms-notif-row2-label">Security alerts</div>
+          <div class="ms-notif-row2-sub">New sign-ins, MFA changes, and suspicious activity</div>
+        </div>
+        <div class="ms-notif-row2-chs">
+          <span class="ms-notif-ch-pill on locked" title="Required — cannot disable">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Email
+          </span>
+          <span class="ms-notif-ch-pill on locked" title="Required — cannot disable">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            In-app
+          </span>
+        </div>
+      </div>
+      <div class="ms-notif-row2">
+        <div class="ms-notif-row2-body">
+          <div class="ms-notif-row2-label">Role and permission changes</div>
+          <div class="ms-notif-row2-sub">When your roles or access is modified by an admin</div>
+        </div>
+        <div class="ms-notif-row2-chs">
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Email
+          </span>
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            In-app
+          </span>
+        </div>
+      </div>
+
+      <!-- Workspace Activity -->
+      <div class="ms-notif-cat-head">
+        <span class="ms-notif-cat-label">Workspace Activity</span>
+      </div>
+      <div class="ms-notif-row2">
+        <div class="ms-notif-row2-body">
+          <div class="ms-notif-row2-label">Weekly activity digest</div>
+          <div class="ms-notif-row2-sub">Summary of workspace activity every Monday morning</div>
+        </div>
+        <div class="ms-notif-row2-chs">
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Email
+          </span>
+          <span class="ms-notif-ch-pill" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            In-app
+          </span>
+        </div>
+      </div>
+      <div class="ms-notif-row2">
+        <div class="ms-notif-row2-body">
+          <div class="ms-notif-row2-label">Workspace announcements</div>
+          <div class="ms-notif-row2-sub">Platform updates and maintenance windows</div>
+        </div>
+        <div class="ms-notif-row2-chs">
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Email
+          </span>
+          <span class="ms-notif-ch-pill" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            In-app
+          </span>
+        </div>
+      </div>
+
+      <!-- Governance -->
+      <div class="ms-notif-cat-head">
+        <span class="ms-notif-cat-label">Governance</span>
+      </div>
+      <div class="ms-notif-row2">
+        <div class="ms-notif-row2-body">
+          <div class="ms-notif-row2-label">Governance approvals</div>
+          <div class="ms-notif-row2-sub">Promotion packets and resolution requests assigned to you</div>
+        </div>
+        <div class="ms-notif-row2-chs">
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Email
+          </span>
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            In-app
+          </span>
+        </div>
+      </div>
+      <div class="ms-notif-row2">
+        <div class="ms-notif-row2-body">
+          <div class="ms-notif-row2-label">Policy and knowledge binding updates</div>
+          <div class="ms-notif-row2-sub">When policies or bindings in your domains are changed</div>
+        </div>
+        <div class="ms-notif-row2-chs">
+          <span class="ms-notif-ch-pill" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Email
+          </span>
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            In-app
+          </span>
+        </div>
+      </div>
+
+      <!-- Agentic -->
+      <div class="ms-notif-cat-head">
+        <span class="ms-notif-cat-label">Agentic Studio</span>
+      </div>
+      <div class="ms-notif-row2">
+        <div class="ms-notif-row2-body">
+          <div class="ms-notif-row2-label">Human-in-the-Loop requests</div>
+          <div class="ms-notif-row2-sub">When an agent pauses and needs your input to continue</div>
+        </div>
+        <div class="ms-notif-row2-chs">
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Email
+          </span>
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            In-app
+          </span>
+        </div>
+      </div>
+      <div class="ms-notif-row2">
+        <div class="ms-notif-row2-body">
+          <div class="ms-notif-row2-label">Workflow completions and failures</div>
+          <div class="ms-notif-row2-sub">When workflows you own finish or encounter errors</div>
+        </div>
+        <div class="ms-notif-row2-chs">
+          <span class="ms-notif-ch-pill" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Email
+          </span>
+          <span class="ms-notif-ch-pill on" onclick="this.classList.toggle('on');toast('Saved','success')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0v5l2 2H4l2-2v-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            In-app
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery preferences -->
+    <div class="ms-notif-pref-section">
+      <div class="ms-notif-ch-section-title">Delivery preferences</div>
+      <div class="ms-card">
+        <div class="ms-notif-pref-row">
+          <div>
+            <div class="ms-notif-pref-label">Email frequency</div>
+            <div class="ms-notif-pref-hint">How often non-urgent email notifications are batched</div>
+          </div>
+          <select class="ms-notif-select" onchange="toast('Saved','success')">
+            <option>Send immediately</option>
+            <option selected>Daily digest (9 AM)</option>
+            <option>Weekly digest (Monday)</option>
+          </select>
+        </div>
+        <div class="ms-notif-pref-row">
+          <div>
+            <div class="ms-notif-pref-label">Quiet hours</div>
+            <div class="ms-notif-pref-hint">Suppress non-critical notifications during these hours</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label class="ms-toggle">
+              <input type="checkbox" checked id="msQuietToggle" onchange="document.getElementById('msQuietRange').style.opacity=this.checked?1:.4;toast('Saved','success')">
+              <span class="ms-toggle-track"></span>
+            </label>
+            <div id="msQuietRange" style="display:flex;align-items:center;gap:6px;">
+              <select class="ms-notif-select" onchange="toast('Saved','success')">
+                <option>10:00 PM</option>
+                <option>11:00 PM</option>
+                <option>9:00 PM</option>
+              </select>
+              <span style="font-size:12px;color:var(--t3);">to</span>
+              <select class="ms-notif-select" onchange="toast('Saved','success')">
+                <option>8:00 AM</option>
+                <option>7:00 AM</option>
+                <option>9:00 AM</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="ms-notif-pref-row">
+          <div>
+            <div class="ms-notif-pref-label">Pause all notifications</div>
+            <div class="ms-notif-pref-hint">Temporarily silence everything except security alerts</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label class="ms-toggle">
+              <input type="checkbox" id="msPauseToggle" onchange="toast(this.checked?'Notifications paused':'Notifications resumed','info')">
+              <span class="ms-toggle-track"></span>
+            </label>
+            <select class="ms-notif-select" onchange="toast('Saved','success')">
+              <option>For 1 hour</option>
+              <option>For 4 hours</option>
+              <option selected>Until tomorrow</option>
+              <option>Indefinitely</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
   ` : ''}
 
