@@ -14191,7 +14191,7 @@ function renderBilling() {
       <div class="bl-plan-detail">50 seats · Unlimited studios · Priority support · SLA 99.9%</div>
       <div class="bl-plan-detail" style="margin-top:6px">Next billing: <strong style="color:var(--color-text-title)">${b.plan.nextDate}</strong></div>
       <div class="bl-plan-actions">
-        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="toast('Plan management coming soon','info')">Change plan</button>
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="openChangePlanPanel()">Change plan</button>
         <button class="ds-btn ds-btn-sm ds-btn--secondary" style="color:var(--color-text-caption)" onclick="toast('A cancellation request has been sent to your account manager','info')">Cancel subscription</button>
       </div>
     </div>
@@ -14236,7 +14236,7 @@ function renderBilling() {
         <div class="bl-pm-name">•••• •••• •••• ${b.payment.last4}</div>
         <div class="bl-pm-sub">Expires ${b.payment.expiry} · ${b.payment.holder}</div>
       </div>
-      <button class="ds-btn ds-btn-sm ds-btn--secondary" style="flex-shrink:0" onclick="toast('Payment method update coming soon','info')">Update card</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" style="flex-shrink:0" onclick="openUpdateCardPanel()">Update card</button>
     </div>
   </div>
 
@@ -20378,6 +20378,130 @@ function closeLicensePanel() {
   if (!overlay) return;
   overlay.classList.remove('open');
   drawer.classList.remove('open');
+}
+
+/* ====================== CHANGE PLAN PANEL ====================== */
+
+const BL_PLANS = [
+  { id:'starter',     name:'Starter',     price:'Free',    period:'',                        seats:'Up to 5 seats',  studios:'1 studio',    support:'Community',      sla:null    },
+  { id:'growth',      name:'Growth',      price:'$1,200',  period:'/month',                  seats:'Up to 20 seats', studios:'2 studios',   support:'Email support',  sla:'99.5%' },
+  { id:'enterprise',  name:'Enterprise',  price:'$4,200',  period:'/month, billed annually', seats:'Up to 50 seats', studios:'All studios', support:'Priority support',sla:'99.9%' },
+  { id:'enterprise+', name:'Enterprise+', price:'Custom',  period:'',                        seats:'Unlimited seats',studios:'All studios', support:'Dedicated CSM',  sla:'99.99%'},
+];
+
+function openChangePlanPanel() {
+  if (document.getElementById('cpPanelContainer')) {
+    document.getElementById('cpOverlay').classList.add('open');
+    document.getElementById('cpDrawer').classList.add('open');
+    return;
+  }
+  const current = 'enterprise';
+  const planCards = BL_PLANS.map(p => {
+    const isCurrent = p.id === current;
+    const borderStyle = isCurrent ? 'border:1.5px solid var(--pri);' : 'border:1px solid var(--line);';
+    const btnLabel   = isCurrent ? 'Current plan' : (p.price === 'Custom' ? 'Contact sales' : 'Switch to ' + p.name);
+    const btnStyle   = isCurrent
+      ? 'background:var(--pri-10,rgba(99,102,241,.12));border:1px solid var(--pri-30,rgba(99,102,241,.3));color:var(--pri);cursor:default;'
+      : p.price === 'Custom'
+        ? 'background:var(--bg3);border:1px solid var(--line);color:var(--t2);cursor:pointer;'
+        : 'background:var(--pri);border:1px solid var(--pri);color:#fff;cursor:pointer;';
+    const onClick = isCurrent ? '' : p.price === 'Custom'
+      ? `onclick="toast('Connecting you to sales…','info')"`
+      : `onclick="toast('Plan change to ${p.name} submitted for review','success')"`;
+    const features = [p.seats, p.studios, p.support, p.sla ? 'SLA ' + p.sla : null].filter(Boolean);
+    return `<div style="background:var(--bg2);${borderStyle}border-radius:var(--r12);padding:16px;margin-bottom:10px;position:relative;">
+      ${isCurrent ? `<span style="position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;background:var(--pri);color:#fff;padding:2px 7px;border-radius:10px;">Current</span>` : ''}
+      <div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:2px;">${p.name}</div>
+      <div style="margin-bottom:10px;"><span style="font-size:20px;font-weight:800;color:var(--t1);">${p.price}</span>${p.period ? `<span style="font-size:11px;color:var(--t3);margin-left:3px;">${p.period}</span>` : ''}</div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">${features.map(item => `<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-6" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>${item}</div>`).join('')}</div>
+      <button style="width:100%;height:30px;border-radius:var(--r8);font-size:12px;font-weight:600;transition:opacity .12s;${btnStyle}" ${onClick} ${isCurrent ? 'disabled' : ''}>${btnLabel}</button>
+    </div>`;
+  }).join('');
+
+  const c = document.createElement('div');
+  c.id = 'cpPanelContainer';
+  c.innerHTML = `
+    <div class="pa-slideout-overlay" id="cpOverlay" onclick="closeChangePlanPanel()"></div>
+    <div class="pa-slideout" id="cpDrawer" style="width:380px;">
+      <div class="pa-slideout-head">
+        <div style="flex:1;min-width:0;"><div class="pa-slideout-title">Change plan</div><div class="pa-slideout-sub">Contoso Ltd · Currently on Enterprise</div></div>
+        <button class="pa-slideout-close" onclick="closeChangePlanPanel()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="pa-slideout-body">
+        <div class="pa-slideout-section" style="border-bottom:none;">
+          <div class="pa-slideout-section-h">Available plans</div>
+          ${planCards}
+          <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.5;">Downgrades take effect at the end of your current billing cycle. Upgrades are prorated and billed immediately.</div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(c);
+  requestAnimationFrame(() => {
+    document.getElementById('cpOverlay').classList.add('open');
+    document.getElementById('cpDrawer').classList.add('open');
+  });
+}
+
+function closeChangePlanPanel() {
+  const o = document.getElementById('cpOverlay');
+  const d = document.getElementById('cpDrawer');
+  if (o) { o.classList.remove('open'); d.classList.remove('open'); }
+}
+
+/* ====================== UPDATE CARD PANEL ====================== */
+
+function openUpdateCardPanel() {
+  if (document.getElementById('ucPanelContainer')) {
+    document.getElementById('ucOverlay').classList.add('open');
+    document.getElementById('ucDrawer').classList.add('open');
+    return;
+  }
+  const IS = 'width:100%;height:38px;padding:0 12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:13px;color:var(--t1);outline:none;box-sizing:border-box;';
+  const LS = 'display:block;font-size:11px;font-weight:600;color:var(--t3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;';
+  const c = document.createElement('div');
+  c.id = 'ucPanelContainer';
+  c.innerHTML = `
+    <div class="pa-slideout-overlay" id="ucOverlay" onclick="closeUpdateCardPanel()"></div>
+    <div class="pa-slideout" id="ucDrawer" style="width:380px;">
+      <div class="pa-slideout-head">
+        <div style="flex:1;min-width:0;"><div class="pa-slideout-title">Update payment method</div><div class="pa-slideout-sub">Replaces your current Visa ending in 4242</div></div>
+        <button class="pa-slideout-close" onclick="closeUpdateCardPanel()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="pa-slideout-body">
+        <div class="pa-slideout-section" style="border-bottom:none;">
+          <div style="margin-bottom:16px;"><label style="${LS}">Card number</label>
+            <div style="position:relative;"><input id="ucCardNum" style="${IS}padding-right:44px;" type="text" placeholder="•••• •••• •••• ••••" maxlength="19" oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/(.{4})/g,'$1 ').trim().substring(0,19)">
+              <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:.4;font-size:11px;font-weight:700;color:var(--t3);">VISA</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div><label style="${LS}">Expiry date</label><input style="${IS}" type="text" placeholder="MM / YY" maxlength="7" oninput="let v=this.value.replace(/[^0-9]/g,'');if(v.length>=2){v=v.slice(0,2)+' / '+v.slice(2,4);}this.value=v;"></div>
+            <div><label style="${LS}">CVC</label><input style="${IS}" type="text" placeholder="•••" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+          </div>
+          <div style="margin-bottom:16px;"><label style="${LS}">Name on card</label><input style="${IS}" type="text" placeholder="Full name as it appears on card"></div>
+          <div style="margin-bottom:24px;"><label style="${LS}">Billing ZIP / postal code</label><input style="${IS}" type="text" placeholder="e.g. 10118"></div>
+          <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);margin-bottom:20px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><path d="M12 2l7 4v6c0 5-7 10-7 10S5 17 5 12V6l7-4z" stroke="#10b981" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <div style="font-size:11px;color:var(--t3);line-height:1.5;">Card details are encrypted and never stored on our servers. Processed via Stripe PCI-DSS Level 1.</div>
+          </div>
+          <button style="width:100%;height:38px;background:var(--pri);border:none;border-radius:var(--r8);font-size:13px;font-weight:700;color:#fff;cursor:pointer;"
+            onclick="closeUpdateCardPanel();toast('Payment method updated successfully','success')">
+            Save payment method
+          </button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(c);
+  requestAnimationFrame(() => {
+    document.getElementById('ucOverlay').classList.add('open');
+    document.getElementById('ucDrawer').classList.add('open');
+  });
+}
+
+function closeUpdateCardPanel() {
+  const o = document.getElementById('ucOverlay');
+  const d = document.getElementById('ucDrawer');
+  if (o) { o.classList.remove('open'); d.classList.remove('open'); }
 }
 
 /* ====================== STUDIO SETTINGS ====================== */
