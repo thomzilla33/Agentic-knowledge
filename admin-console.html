@@ -22337,24 +22337,37 @@ function renderHome() {
   const isFiltering = state.activeCats.size>0 || state.activeCaps.size>0 || state.activeStates.size>0 || !!state.search || state.activeSrc!=='all' || !!state.activeStudio;
 
   $('content').innerHTML = `
-    <section class="mkt-hero">
-      <h1 class="mkt-hero-title">Connect your stack to AIMS-OS</h1>
-      <p class="mkt-hero-sub">${total} integrations across ${CATEGORIES.length} categories. Managed once at the workspace level, consumed by Governance, Agentic and Workforce.</p>
-      <div class="mkt-search-wrap">
-        <svg class="mkt-search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M12 12l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <input class="mkt-search-input" type="text" placeholder="Search Slack, Salesforce, Snowflake, GitHub…" value="${escapeHtml(state.search)}" oninput="setSearch(this.value)"/>
+    <div class="ns-page-head">
+      <div>
+        <div class="ns-page-title">Integrations &amp; Credentials</div>
+        <div class="ns-page-sub">Connect your stack to AIMS-OS — ${total} integrations across ${CATEGORIES.length} categories.</div>
       </div>
-      <div class="mkt-hero-stats">
-        <div class="mkt-hero-stat"><strong>${INTEGRATIONS.filter(i=>i.source==='official').length}</strong>Official integrations</div>
-        <div class="mkt-hero-stat"><strong>${partners.length}</strong>Verified partners</div>
-        <div class="mkt-hero-stat"><strong>${INTEGRATIONS.filter(i=>i.source==='private').length}</strong>Built by your team</div>
-        <div class="mkt-hero-stat"><strong>${CATEGORIES.length}</strong>Categories</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="openRequestModal()">Request integration</button>
+        <a class="ds-btn ds-btn-sm ds-btn--primary" href="#/build" style="text-decoration:none">Build your own</a>
       </div>
-      <div class="mkt-hero-anchor">
-        Need something the catalog does not have?
-        <a class="mkt-hero-anchor-link" href="javascript:void(0)" onclick="openRequestModal()">Request it from the AIMS team →</a>
-      </div>
-    </section>
+    </div>
+    <div class="dsf-bar" style="margin-bottom:20px">
+      <label class="dsf-search" style="flex:0 0 320px">
+        <svg class="dsf-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12"/></svg>
+        <input type="text" placeholder="Search Slack, Salesforce, Snowflake…" value="${escapeHtml(state.search)}" oninput="setSearch(this.value)"/>
+      </label>
+      <button class="fi-chip ${state.activeSrc==='official'?'is-active':''}" onclick="setSrc(state.activeSrc==='official'?'all':'official')">
+        <svg class="fi-chip-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2l1.8 3.6L14 6.3l-3 2.9.7 4.1L8 11.1l-3.7 2.2.7-4.1-3-2.9 4.2-.7z"/></svg>
+        Official
+        ${state.activeSrc==='official' ? `<span class="fi-chip-tag">${INTEGRATIONS.filter(i=>i.source==='official').length}</span><button class="fi-chip-tag-x" onclick="event.stopPropagation();setSrc('all')" aria-label="Clear"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg></button>` : `<span style="font-size:11px;color:var(--t3);margin-left:2px">${INTEGRATIONS.filter(i=>i.source==='official').length}</span>`}
+      </button>
+      <button class="fi-chip ${state.activeSrc==='partner'?'is-active':''}" onclick="setSrc(state.activeSrc==='partner'?'all':'partner')">
+        <svg class="fi-chip-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5.5 8.5l2 2 3-4"/><rect x="2" y="2" width="12" height="12" rx="3"/></svg>
+        Verified partners
+        ${state.activeSrc==='partner' ? `<span class="fi-chip-tag">${partners.length}</span><button class="fi-chip-tag-x" onclick="event.stopPropagation();setSrc('all')" aria-label="Clear"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg></button>` : `<span style="font-size:11px;color:var(--t3);margin-left:2px">${partners.length}</span>`}
+      </button>
+      <button class="fi-chip ${state.activeSrc==='private'?'is-active':''}" onclick="setSrc(state.activeSrc==='private'?'all':'private')">
+        <svg class="fi-chip-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="6" r="2.5"/><path d="M3 13c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg>
+        Built by your team
+        ${state.activeSrc==='private' ? `<span class="fi-chip-tag">${INTEGRATIONS.filter(i=>i.source==='private').length}</span><button class="fi-chip-tag-x" onclick="event.stopPropagation();setSrc('all')" aria-label="Clear"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg></button>` : `<span style="font-size:11px;color:var(--t3);margin-left:2px">${INTEGRATIONS.filter(i=>i.source==='private').length}</span>`}
+      </button>
+    </div>
 
     ${withIssues > 0 ? `<div class="int-issue-banner">
       <span class="int-issue-dot"></span>
@@ -22525,29 +22538,34 @@ function renderOperateHome() {
      </button>`;
 
   $('content').innerHTML = `
-    <section class="op-hero">
-      <div class="op-hero-left">
-        <div class="op-hero-eyebrow">
-          <span class="op-mode-tag">Operate</span>
+    <div class="ns-page-head">
+      <div>
+        <div class="ns-page-title">Integrations &amp; Credentials</div>
+        <div class="ns-page-sub">${counts.needs_attention > 0
+          ? `${counts.needs_attention} integration${counts.needs_attention===1?'':'s'} need your attention — resolve mapping gaps, expired credentials and schema drift.`
+          : `All connected integrations are mapped, validated and authenticated.`}</div>
+      </div>
+      ${counts.needs_attention > 0 ? `<div style="display:flex;align-items:center;gap:8px">
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="setOpTab('all')">View all</button>
+        <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="setOpTab('needs_attention')">Resolve ${counts.needs_attention} issue${counts.needs_attention===1?'':'s'}</button>
+      </div>` : ''}
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <div style="padding:10px 20px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:22px;font-weight:700;color:var(--status-ok);line-height:1">${counts.working}</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:3px">Working</div>
         </div>
-        <h1 class="op-hero-title">${counts.needs_attention > 0
-          ? `<span style="color:var(--status-warn)">${counts.needs_attention}</span> integration${counts.needs_attention===1?'':'s'} need your attention`
-          : `Everything is running clean`}</h1>
-        <span class="op-hero-time">Updated just now${connected.length ? ' · ' + connected.length + ' connected integration' + (connected.length===1?'':'s') : ''}</span>
-        <p class="op-hero-desc">${counts.needs_attention > 0
-          ? 'Resolve mapping gaps, expired credentials and schema drift before they break workflows downstream.'
-          : 'All connected integrations are mapped, validated and authenticated. Browse the catalog to add more.'}</p>
+        <div style="padding:10px 20px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:22px;font-weight:700;color:${counts.needs_attention > 0 ? '#fbbf24' : 'var(--t3)'};line-height:1">${counts.needs_attention}</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:3px">Needs attention</div>
+        </div>
+        <div style="padding:10px 20px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:var(--t3);line-height:1">${counts.inactive}</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:3px">Inactive</div>
+        </div>
       </div>
-      <div class="op-hero-right">
-        <div class="op-kpi is-ok"><div class="op-kpi-n" style="color:var(--status-ok)">${counts.working}</div><div class="op-kpi-l">Working</div></div>
-        <div class="op-kpi ${counts.needs_attention > 0 ? 'is-warn' : ''}"><div class="op-kpi-n" style="color:${counts.needs_attention > 0 ? '#fbbf24' : 'var(--t3)'}">${counts.needs_attention}</div><div class="op-kpi-l">Needs attention</div></div>
-        <div class="op-kpi is-idle"><div class="op-kpi-n" style="color:var(--t3)">${counts.inactive}</div><div class="op-kpi-l">Inactive</div></div>
-        ${counts.needs_attention > 0 ? `<button class="op-hero-cta" onclick="setOpTab('needs_attention')" aria-label="Jump to needs-attention list">
-          Resolve ${counts.needs_attention} issue${counts.needs_attention===1?'':'s'}
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10M9.5 4.5L13 8l-3.5 3.5"/></svg>
-        </button>` : ''}
-      </div>
-    </section>
+    </div>
 
     <div class="op-tabs" role="tablist" aria-label="Filter by status">
       ${tabBtn('needs_attention', 'Needs attention', counts.needs_attention, 'warn')}
@@ -22662,9 +22680,6 @@ function homeTabStripHTML(connectedCount, currentTab) {
         <span>Marketplace</span>
         <span class="home-tab-count">${INTEGRATIONS.length}</span>
       </button>
-      <span style="flex:1"></span>
-      <a class="ds-btn ds-btn-sm ds-btn--primary" href="javascript:void(0)" onclick="openRequestModal()" style="text-decoration:none">+ Request integration</a>
-      <a class="ds-btn ds-btn-sm ds-btn--secondary" href="#/build" style="text-decoration:none">+ Build your own</a>
     </div>
   `;
 }
@@ -22685,14 +22700,22 @@ function renderIntegratedHome(connected) {
   });
 
   $('content').innerHTML = `
-    <section class="mkt-hero" style="padding-bottom:28px">
-      <h1 class="mkt-hero-title">${connected.length} integration${connected.length===1?'':'s'} active in this workspace</h1>
-      <p class="mkt-hero-sub">${totalInstances} instance${totalInstances===1?'':'s'} across ${Object.keys(grouped).length} ${Object.keys(grouped).length===1?'category':'categories'}.${withIssues > 0 ? ` <strong style="color:var(--amber)">${withIssues} need your attention.</strong>` : ''} Find what your team is already using before connecting something new.</p>
+    <div class="ns-page-head">
+      <div>
+        <div class="ns-page-title">Integrations &amp; Credentials</div>
+        <div class="ns-page-sub">${connected.length} integration${connected.length===1?'':'s'} active in this workspace — ${totalInstances} instance${totalInstances===1?'':'s'} across ${Object.keys(grouped).length} ${Object.keys(grouped).length===1?'category':'categories'}.${withIssues > 0 ? ` <strong style="color:var(--amber)">${withIssues} need your attention.</strong>` : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="openRequestModal()">Request integration</button>
+        <a class="ds-btn ds-btn-sm ds-btn--primary" href="#/build" style="text-decoration:none">Build your own</a>
+      </div>
+    </div>
+    <div style="margin-bottom:20px">
       <div class="mkt-search-wrap">
         <svg class="mkt-search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M12 12l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         <input class="mkt-search-input" type="text" placeholder="Search your active integrations…" value="${escapeHtml(state.search)}" oninput="setSearch(this.value)"/>
       </div>
-    </section>
+    </div>
 
     ${homeTabStripHTML(connected.length, 'integrated')}
 
