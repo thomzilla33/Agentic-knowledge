@@ -15789,478 +15789,27 @@ function renderPeopleRolesMatrix() {
 function renderMemberDrawer(personId) {
   const p = MOCK_PEOPLE.find(x => x.id === personId); if (!p) return '';
   const memberRoles = (PA_MEMBER_ROLES[p.id] || []).map(rid => PA_ROLES.find(r => r.id === rid)).filter(Boolean);
-  const tab = _paState.memberDrawerTab;
-
-  const activityEvents = {
-    tg: [
-      { type:'login',   event:'Logged in',                              time:'Just now',    studio:'',                  detail:'' },
-      { type:'admin',   event:'Invited Priya Subramaniam',              time:'Aug 10, 2026',studio:'',                  detail:'Role: Compliance Officer' },
-      { type:'admin',   event:'Updated workspace billing plan',         time:'Jul 28, 2026',studio:'Platform',          detail:'Upgraded to Enterprise' },
-      { type:'role',    event:'Assigned "Workspace Admin" to Diana P.', time:'Jul 20, 2026',studio:'',                  detail:'' },
-      { type:'view',    event:'Viewed audit log',                       time:'Jul 15, 2026',studio:'Platform',          detail:'' },
-    ],
-    mg: [
-      { type:'login',   event:'Logged in',                              time:'2h ago',      studio:'',                  detail:'' },
-      { type:'edit',    event:'Edited governance policy',               time:'Aug 11, 2026',studio:'Governance Studio', detail:'AI Use Policy v2' },
-      { type:'publish', event:'Published model "Customer Churn v3"',    time:'Aug 5, 2026', studio:'Helix Studio',      detail:'' },
-      { type:'create',  event:'Created domain "Customer Analytics"',    time:'Aug 1, 2026', studio:'Governance Studio', detail:'' },
-      { type:'view',    event:'Viewed lineage report',                  time:'Jul 28, 2026',studio:'Helix Studio',      detail:'Customer 360 pipeline' },
-      { type:'login',   event:'Logged in',                              time:'Jul 25, 2026',studio:'',                  detail:'' },
-    ],
-    sc: [
-      { type:'suspend', event:'Account suspended',                      time:'Aug 9, 2026', studio:'',                  detail:'Pending access review' },
-      { type:'login',   event:'Last login before suspension',           time:'Aug 8, 2026', studio:'',                  detail:'' },
-      { type:'view',    event:'Accessed "Customer Success" agent',      time:'Aug 8, 2026', studio:'Agentic Studio',    detail:'' },
-      { type:'login',   event:'Logged in',                              time:'Aug 7, 2026', studio:'',                  detail:'' },
-    ],
-    ok: [
-      { type:'login',   event:'Logged in',                              time:'1 week ago',  studio:'',                  detail:'' },
-      { type:'view',    event:'Viewed audit log (read-only)',           time:'Jul 28, 2026',studio:'Platform',          detail:'' },
-      { type:'admin',   event:'Added as External Consultant',          time:'Jul 20, 2026',studio:'',                  detail:'Individual grants only' },
-    ],
-    ps: [
-      { type:'invite',  event:'Invitation sent',                        time:'Aug 10, 2026',studio:'',                  detail:'Email: priya.subramaniam@contoso.com' },
-    ],
-    jh: [
-      { type:'login',   event:'Logged in',                              time:'Yesterday',   studio:'',                  detail:'' },
-      { type:'deploy',  event:'Deployed "Invoice Processor" worker',    time:'Aug 8, 2026', studio:'Agentic Studio',    detail:'' },
-      { type:'create',  event:'Created network "AP Processing"',        time:'Aug 3, 2026', studio:'Agentic Studio',    detail:'' },
-      { type:'admin',   event:'Delete permissions restricted by admin', time:'Jul 30, 2026',studio:'',                  detail:'Workers, Networks, Workflows' },
-    ],
-    es: [
-      { type:'login',   event:'Logged in',                              time:'1h ago',      studio:'',                  detail:'' },
-      { type:'edit',    event:'Updated data connector "Salesforce CRM"',time:'Aug 12, 2026',studio:'Helix Studio',      detail:'' },
-      { type:'publish', event:'Published model "Revenue Forecast v4"',  time:'Aug 6, 2026', studio:'Helix Studio',      detail:'' },
-      { type:'view',    event:'Viewed governance dashboard',            time:'Jul 30, 2026',studio:'Governance Studio', detail:'' },
-    ],
-    sb: [
-      { type:'login',   event:'Logged in',                              time:'Yesterday',   studio:'',                  detail:'' },
-      { type:'deploy',  event:'Deployed "Email Responder" worker',      time:'Aug 9, 2026', studio:'Agentic Studio',    detail:'' },
-      { type:'create',  event:'Built agent network "Support Triage"',   time:'Aug 4, 2026', studio:'Agentic Studio',    detail:'' },
-      { type:'login',   event:'Logged in',                              time:'Aug 2, 2026', studio:'',                  detail:'' },
-    ],
-    np: [
-      { type:'login',   event:'Logged in',                              time:'4h ago',      studio:'',                  detail:'' },
-      { type:'edit',    event:'Approved promotion packet',              time:'Aug 10, 2026',studio:'Governance Studio', detail:'Customer 360 v2' },
-      { type:'create',  event:'Defined resolution rule "PII Redact"',   time:'Aug 5, 2026', studio:'Governance Studio', detail:'' },
-      { type:'view',    event:'Viewed model lineage',                   time:'Jul 29, 2026',studio:'Helix Studio',      detail:'Revenue Forecast pipeline' },
-    ],
-  }[p.id] || [
-    { type:'login', event:'Logged in',      time:p.lastActive||'—', studio:'', detail:'' },
-    { type:'admin', event:'Joined workspace',time:p.joinDate||'—',  studio:'', detail:'' },
-  ];
-
-  // --- profile meta ---
   const mfaOn = !!PA_MFA[p.id];
   const memberGroups = PA_GROUPS.filter(g => g.memberIds.includes(p.id));
   const effectivePermSet = new Set(memberRoles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]));
   const STUDIO_PREFIXES = [
-    { id:'agentic',    name:'Agentic Studio',    color:'#06B6D4', prefix:'ag.' },
+    { id:'agentic', name:'Agentic Studio', color:'#06B6D4', prefix:'ag.' },
     { id:'governance', name:'Governance Studio', color:'#10b981', prefix:'gov.' },
-    { id:'helix',      name:'Helix Data Studio', color:'#8b5cf6', prefix:'hx.' },
-    { id:'platform',   name:'Platform',          color:'#64748b', prefix:'pl.' },
+    { id:'helix', name:'Helix Data Studio', color:'#8b5cf6', prefix:'hx.' },
   ];
   const studioAccessList = STUDIO_PREFIXES.filter(s => [...effectivePermSet].some(pid => pid.startsWith(s.prefix)));
-
-  let overviewContent = '<div class="pa-slideout-body" style="display:contents">';
-
-  // status banners
-  if (p.status === 'suspended') {
-    overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner pm-suspend-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#ef4444" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#ef4444"/></svg><div><strong style="color:#ef4444">Account suspended</strong> — ${escapeHtml(p.suspendedReason || 'Access restricted by admin.')} This member cannot log in.</div></div></div>`;
-  }
-  if (p.status === 'invited') {
-    overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Invitation sent ${escapeHtml(p.invitedDate||p.joinDate||'')} — awaiting acceptance. <a href="#" onclick="paResendInvite('${p.id}');return false" style="color:var(--pri)">Resend →</a></div></div></div>`;
-  }
-  if (p.id === 'ok') {
-    overviewContent += `<div class="pa-slideout-section"><div class="pm-note-banner"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#f59e0b" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#f59e0b"/></svg><div>External account — access is limited to individual permission grants only. Changes require admin approval.</div></div></div>`;
-  }
-
-  // profile info card
-  overviewContent += `
-    <div class="pa-slideout-section" style="padding-bottom:12px">
-      <div class="pm-profile-grid">
-        <div class="pm-profile-item">
-          <div class="pm-profile-label">Email</div>
-          <div class="pm-profile-val" style="display:flex;align-items:center;gap:6px">
-            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.email)}</span>
-            <button class="pm-copy-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText('${escapeHtml(p.email)}');toast('Email copied','success')" title="Copy email">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 11V3h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="pm-profile-item">
-          <div class="pm-profile-label">MFA</div>
-          <div class="pm-profile-val">
-            ${mfaOn
-              ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--badge-success);font-weight:600"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Enabled</span>`
-              : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-caption)"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M6 11l4-4M10 11L6 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Not enabled</span>`
-            }
-          </div>
-        </div>
-        <div class="pm-profile-item">
-          <div class="pm-profile-label">Last active</div>
-          <div class="pm-profile-val">${escapeHtml(p.lastActive||'—')}</div>
-        </div>
-        <div class="pm-profile-item">
-          <div class="pm-profile-label">Member since</div>
-          <div class="pm-profile-val">${escapeHtml(p.joinDate||'—')}</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:0;margin-top:12px;padding-top:12px;border-top:1px solid var(--color-border-neutral-subtle);border-radius:8px;overflow:hidden;border:1px solid var(--color-border-neutral-subtle)">
-        <div style="flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--color-border-neutral-subtle)">
-          <div style="font-size:18px;font-weight:700;color:var(--color-text-title);line-height:1">${effectivePermSet.size}</div>
-          <div style="font-size:10.5px;color:var(--color-text-caption);margin-top:2px;text-transform:uppercase;letter-spacing:.04em">Permissions</div>
-        </div>
-        <div style="flex:1;text-align:center;padding:8px 4px;border-right:1px solid var(--color-border-neutral-subtle)">
-          <div style="font-size:18px;font-weight:700;color:var(--color-text-title);line-height:1">${studioAccessList.length}</div>
-          <div style="font-size:10.5px;color:var(--color-text-caption);margin-top:2px;text-transform:uppercase;letter-spacing:.04em">Studios</div>
-        </div>
-        <div style="flex:1;text-align:center;padding:8px 4px">
-          <div style="font-size:18px;font-weight:700;color:var(--color-text-title);line-height:1">${memberGroups.length}</div>
-          <div style="font-size:10.5px;color:var(--color-text-caption);margin-top:2px;text-transform:uppercase;letter-spacing:.04em">Groups</div>
-        </div>
-      </div>
-    </div>`;
-
-  // assigned roles
-  overviewContent += `
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h">Assigned roles</div>
-      ${memberRoles.length === 0
-        ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:10px 0">${p.status==='invited'?'Roles will apply once the invitation is accepted.':'No platform roles assigned. Use individual permission grants or assign a role below.'}</div>`
-        : memberRoles.map(r => {
-          const rPermCount = (PA_ROLE_PERMS[r.id] || new Set()).size;
-          return `<div class="pa-role-row2">
-            <div style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0;margin-top:2px"></div>
-            <div class="pa-role-row2-info" style="flex:1;min-width:0">
-              <div class="pa-role-row2-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                ${escapeHtml(r.label)}${r.system?` <span style="font-size:10px;color:var(--color-text-caption);font-weight:500">· System</span>`:''}
-                <span style="font-size:10px;color:var(--color-text-caption);background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-weight:500;white-space:nowrap">${rPermCount} perms</span>
-              </div>
-              <div class="pa-role-row2-desc">${escapeHtml(r.desc)}</div>
-            </div>
-            ${p.id !== 'tg' ? `<button class="pa-remove-btn" onclick="paRemoveRole('${p.id}','${r.id}')">Remove</button>` : ''}
-          </div>`;}).join('')
-      }
-      ${p.id !== 'tg' && p.status !== 'invited' ? `<button class="pa-add-role-btn" onclick="paOpenRolePicker('${p.id}')">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        Assign a role…
-      </button>` : ''}
-    </div>`;
-
-  // studio access
-  overviewContent += `
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h" style="display:flex;justify-content:space-between;align-items:center">
-        Studio access
-        <button class="ds-btn ds-btn-sm ds-btn--tertiary" onclick="paOpenStudioAccess('${p.id}')">Manage…</button>
-      </div>
-      ${studioAccessList.length === 0
-        ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:6px 0">No studio access — assign a role or manage access directly.</div>`
-        : studioAccessList.map(function(s) {
-            const sPermCount = [...effectivePermSet].filter(function(pid){ return pid.startsWith(s.prefix); }).length;
-            return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
-              + '<div style="width:8px;height:8px;border-radius:50%;background:' + s.color + ';flex-shrink:0"></div>'
-              + '<span style="font-size:12.5px;color:var(--color-text-title);flex:1">' + escapeHtml(s.name) + '</span>'
-              + '<span style="font-size:11px;color:var(--color-text-caption);margin-right:8px">' + sPermCount + ' perms</span>'
-              + '<span style="font-size:11px;color:var(--badge-success);font-weight:600">Active</span>'
-              + '</div>';
-          }).join('')
-      }
-    </div>`;
-
-  // groups membership
-  overviewContent += `
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h" style="display:flex;justify-content:space-between;align-items:center">
-        Groups
-        ${memberGroups.length > 0 ? `<span style="font-size:11px;color:var(--color-text-caption)">${memberGroups.length}</span>` : ''}
-      </div>
-      ${memberGroups.length === 0
-        ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:6px 0">Not a member of any group.</div>`
-        : `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${memberGroups.map(g => `
-          <span class="pm-group-chip" onclick="paCloseDrawer();paOpenGroupDetail('${g.id}')" title="Open group">
-            <span style="width:8px;height:8px;border-radius:50%;background:${g.color||'#64748b'};flex-shrink:0;display:inline-block"></span>
-            ${escapeHtml(g.name)}
-          </span>`).join('')}</div>`
-      }
-      ${p.status !== 'invited' ? (() => {
-        if (_paState.memberAddGroupOpen) {
-          const q = (_paState.memberAddGroupSearch||'').toLowerCase();
-          const already = memberGroups.map(g=>g.id);
-          const available = PA_GROUPS.filter(g =>
-            !already.includes(g.id) &&
-            (!q || g.name.toLowerCase().includes(q) || (g.desc||'').toLowerCase().includes(q))
-          );
-          const sel = _paState.memberAddGroupSelected;
-          return `<div style="border:1px solid var(--pri);border-radius:12px;overflow:hidden;margin-top:4px">
-            <div style="padding:12px 14px 0;background:rgba(43,127,255,0.04)">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-                <span style="font-size:12px;font-weight:700;color:var(--color-text-title)">Add to group${sel.size?' · <span style="color:var(--pri)">' + sel.size + ' selected</span>':''}</span>
-                <button onclick="paCloseMemberAddGroup()" style="background:none;border:none;cursor:pointer;color:var(--color-text-caption);font-size:11px;padding:2px 6px;border-radius:4px">Cancel</button>
-              </div>
-              <div style="position:relative">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--color-text-caption)"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-                <input class="rc-input" style="padding-left:28px;padding-top:7px;padding-bottom:7px;border-radius:8px;margin-bottom:10px" placeholder="Search groups…" value="${escapeHtml(_paState.memberAddGroupSearch||'')}" oninput="_paState.memberAddGroupSearch=this.value;_paRerender()">
-              </div>
-            </div>
-            <div style="max-height:200px;overflow-y:auto">
-              ${available.length === 0
-                ? `<div style="padding:16px 14px;font-size:12px;color:var(--color-text-disabled)">${q?'No groups match.':'Already in all groups.'}</div>`
-                : available.map(g => {
-                    const checked = sel.has(g.id);
-                    return `<div onclick="_paState.memberAddGroupSelected.has('${g.id}')?_paState.memberAddGroupSelected.delete('${g.id}'):_paState.memberAddGroupSelected.add('${g.id}');_paRerender()" style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--color-border-neutral-subtle);background:${checked?'rgba(43,127,255,0.06)':'transparent'}">
-                      <span style="width:10px;height:10px;border-radius:50%;background:${g.color||'#64748b'};flex-shrink:0;display:inline-block"></span>
-                      <div style="flex:1;min-width:0">
-                        <div style="font-size:13px;font-weight:600;color:var(--color-text-title)">${escapeHtml(g.name)}</div>
-                        <div style="font-size:11px;color:var(--color-text-caption)">${g.memberIds.length} member${g.memberIds.length!==1?'s':''}</div>
-                      </div>
-                      <div style="width:18px;height:18px;border-radius:5px;border:1.5px solid ${checked?'var(--pri)':'var(--color-border-neutral-default)'};background:${checked?'var(--pri)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">${checked?'<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
-                    </div>`;
-                  }).join('')}
-            </div>
-            <div style="padding:10px 14px;background:rgba(43,127,255,0.04);border-top:1px solid var(--color-border-neutral-subtle);display:flex;justify-content:flex-end">
-              <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paSubmitMemberAddGroup('${p.id}')" ${sel.size===0?'disabled style="opacity:.5;cursor:not-allowed"':''}>Add to ${sel.size||''} ${sel.size===1?'group':'groups'}</button>
-            </div>
-          </div>`;
-        }
-        return `<button class="pa-add-role-btn" onclick="paOpenMemberAddGroup()">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          Add to group…
-        </button>`;
-      })() : ''}
-    </div>`;
-
-  // danger zone
-  overviewContent += `
-    ${p.status !== 'invited' ? `
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h">Danger zone</div>
-      <div class="pm-danger-zone">
-        ${p.status === 'suspended'
-          ? `<div class="pm-danger-zone-h">Reinstate access</div>
-             <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paReinstate('${p.id}')">Reinstate member</button>`
-          : `<div class="pm-danger-zone-h">Suspend or remove</div>
-             <div style="display:flex;gap:8px;flex-wrap:wrap">
-               <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paSuspend('${p.id}')">Suspend access</button>
-               <button class="ds-btn ds-btn-sm ds-btn--warning" onclick="paRemoveMember('${p.id}')">Remove from workspace</button>
-             </div>
-             <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(239,68,68,.15)">
-               <div class="pm-danger-zone-h" style="margin-bottom:8px">Offboard member</div>
-               <p style="font-size:11.5px;color:var(--color-text-caption);margin:0 0 10px;line-height:1.5">Transfer owned agents, steward domains, and HITL items before revoking access. Generates an audit record and sends a notification email.</p>
-               <button class="cap-drawer-deactivate-btn" style="width:100%;margin:0" onclick="openOffboardWizard('${p.id}'); paCloseDrawer()">
-                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2zm0 1.5a4.5 4.5 0 110 9 4.5 4.5 0 010-9zm2.47 2.03L5.53 10.47m0-5.44l4.94 4.94" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-                 Offboard &amp; deactivate member…
-               </button>
-             </div>`
-        }
-      </div>
-    </div>` : ''}`;
-  overviewContent += '</div>';
-
-  /* Derived from PERM_TREE — the single source of permission labels.
-     This used to be a hand-maintained copy, and it had drifted: the same
-     permission id rendered as 'Manage HITL queues' here and 'Manage
-     escalations' in the roles matrix. Deriving it keeps one name per id. */
-  const PERM_META = (function buildPermMeta() {
-    const meta = {};
-    PERM_TREE.forEach(studio => (studio.children || []).forEach(feature =>
-      (feature.children || []).forEach(leaf => {
-        meta[leaf.id] = { label: leaf.label, studio: studio.label, color: studio.color };
-      })));
-    return meta;
-  })();
-  const allEffectivePerms = [...new Set(memberRoles.flatMap(r => [...(PA_ROLE_PERMS[r.id] || [])]))];
-  const permSources = {};
-  allEffectivePerms.forEach(pid => {
-    permSources[pid] = memberRoles.filter(r => (PA_ROLE_PERMS[r.id]||new Set()).has(pid)).map(r=>r.label);
-  });
-  const permsByStudio = allEffectivePerms.reduce((acc, pid) => {
-    const m = PERM_META[pid]; if (!m) return acc;
-    if (!acc[m.studio]) acc[m.studio] = { color: m.color, perms: [] };
-    acc[m.studio].perms.push({ pid, label: m.label });
-    return acc;
-  }, {});
-  const permsByStudioHTML = Object.entries(permsByStudio).map(function(entry) {
-    const studio = entry[0], color = entry[1].color, perms = entry[1].perms;
-    const permRows = perms.map(function(item) {
-      const pid = item.pid, label = item.label;
-      const src = permSources[pid] || [];
-      let srcBadge = '';
-      if (src.length === 1) {
-        srcBadge = '<span style="font-size:10px;color:var(--color-text-caption);background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:1px 5px;white-space:nowrap;flex-shrink:0">' + escapeHtml(src[0]) + '</span>';
-      } else if (src.length > 1) {
-        srcBadge = '<span style="font-size:10px;color:var(--pri);background:var(--pri-06);border:1px solid rgba(43,127,255,.2);border-radius:4px;padding:1px 5px;white-space:nowrap;flex-shrink:0">' + src.length + ' roles</span>';
-      }
-      return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
-        + '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="color:var(--badge-success);flex-shrink:0"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-        + '<span style="font-size:12.5px;color:var(--color-text-title);flex:1;min-width:0">' + escapeHtml(label) + '</span>'
-        + srcBadge
-        + '<span style="font-size:11px;color:var(--color-text-caption)">Tenant</span>'
-        + '</div>';
-    }).join('');
-    return '<div style="margin-bottom:14px">'
-      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
-      + '<div style="width:7px;height:7px;border-radius:50%;background:' + color + '"></div>'
-      + '<div style="font-size:11px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.04em">' + escapeHtml(studio) + '</div>'
-      + '<div style="font-size:11px;color:var(--color-text-caption)">· ' + perms.length + '</div>'
-      + '</div>' + permRows + '</div>';
-  }).join('');
-  const permContent = `
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h">Effective permissions</div>
-      ${memberRoles.length === 0
-        ? `<div style="font-size:12.5px;color:var(--color-text-caption);padding:10px 0">No roles assigned — no inherited permissions. Any access comes from individual grants.</div>`
-        : `<div style="font-size:12.5px;color:var(--color-text-subtitle);margin-bottom:14px;line-height:1.5">Inherited from <strong style="color:var(--color-text-title)">${memberRoles.map(r=>r.label).join(', ')}</strong>.</div>
-           ${permsByStudioHTML}
-           <div style="margin-top:4px;font-size:12px;color:var(--color-text-caption)">${allEffectivePerms.length} permissions total</div>`
-      }
-    </div>`;
-
-  const ACTIVITY_ICONS = {
-    login:   { color:'#2b7fff', bg:'rgba(43,127,255,.12)', path:'<path d="M7 10a3 3 0 100-6 3 3 0 000 6zm-4 4a4 4 0 017.45-2M15 4l1.5 1.5-4 4-2-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
-    edit:    { color:'#8b5cf6', bg:'rgba(139,92,246,.12)', path:'<path d="M11 3l2 2-7 7H4v-2L11 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
-    publish: { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<path d="M8 12V4M5 7l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>' },
-    create:  { color:'#06B6D4', bg:'rgba(6,182,212,.12)',  path:'<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' },
-    view:    { color:'#64748b', bg:'rgba(100,116,139,.1)', path:'<path d="M8 5c-2.8 0-5 3-5 3s2.2 3 5 3 5-3 5-3-2.2-3-5-3zm0 5a2 2 0 110-4 2 2 0 010 4z" fill="currentColor"/>' },
-    admin:   { color:'#f59e0b', bg:'rgba(245,158,11,.12)', path:'<path d="M8 2l1.4 2.9 3.3.5-2.4 2.3.6 3.2L8 9.4l-2.9 1.5.6-3.2L3.3 5.4l3.3-.5L8 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>' },
-    role:    { color:'#2b7fff', bg:'rgba(43,127,255,.12)', path:'<path d="M9.5 5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM3.5 14a3.5 3.5 0 017 0M13.5 6l1 1-3 3-2-2 1-1 1 1 2-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
-    suspend: { color:'#ef4444', bg:'rgba(239,68,68,.1)',   path:'<circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
-    invite:  { color:'#f59e0b', bg:'rgba(245,158,11,.12)', path:'<rect x="2" y="5" width="12" height="9" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M2 6l6 4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
-    deploy:  { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<rect x="2" y="10" width="12" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M8 2v8M5.5 4.5l2.5-2.5 2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
-  };
-  const STUDIO_COLORS = { 'Agentic Studio':'#06B6D4','Governance Studio':'#10b981','Helix Studio':'#8b5cf6','Platform':'#64748b' };
-
-  const activityRows = activityEvents.map(function(e, i) {
-    const ic = ACTIVITY_ICONS[e.type] || ACTIVITY_ICONS.view;
-    const isLast = i === activityEvents.length - 1;
-    const sc = e.studio ? STUDIO_COLORS[e.studio] : null;
-    const studioTag = sc
-      ? '<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:500;color:' + sc + ';background:' + sc + '1a;border:1px solid ' + sc + '33;border-radius:4px;padding:1px 6px;white-space:nowrap;flex-shrink:0;margin-left:4px"><span style="width:5px;height:5px;border-radius:50%;background:' + sc + ';display:inline-block;flex-shrink:0"></span>' + escapeHtml(e.studio) + '</span>'
-      : '';
-    const detailSpan = e.detail ? '<span style="color:var(--color-text-caption);margin-left:2px">· ' + escapeHtml(e.detail) + '</span>' : '';
-    const connector = isLast ? '' : '<div style="width:1px;flex:1;min-height:12px;background:var(--color-border-neutral-subtle);margin:2px auto 0"></div>';
-    return '<div style="display:flex;gap:10px;align-items:flex-start">'
-      + '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">'
-      + '<div style="width:24px;height:24px;border-radius:50%;background:' + ic.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-      + '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:' + ic.color + '">' + ic.path + '</svg>'
-      + '</div>'
-      + connector
-      + '</div>'
-      + '<div style="flex:1;min-width:0;padding-bottom:' + (isLast ? '4' : '14') + 'px">'
-      + '<div style="font-size:12.5px;color:var(--color-text-title);line-height:1.4;display:flex;align-items:center;flex-wrap:wrap;gap:3px">' + escapeHtml(e.event) + studioTag + '</div>'
-      + (e.detail ? '<div style="font-size:12px;color:var(--color-text-caption);margin-top:1px">' + escapeHtml(e.detail) + '</div>' : '')
-      + '<div style="font-size:11.5px;color:var(--color-text-caption);margin-top:2px">' + escapeHtml(e.time) + '</div>'
-      + '</div>'
-      + '</div>';
-  }).join('');
-
-  const activityContent = `
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h">Recent activity</div>
-      <div style="margin-top:4px">${activityRows}</div>
-      <div style="margin-top:14px">
-        <a href="#/audit" style="font-size:12px;color:var(--pri);text-decoration:none" onclick="paCloseDrawer();navigate('#/audit')">View full audit log →</a>
-      </div>
-    </div>`;
-
-  // --- notifications tab ---
-  const nd = PA_NOTIF[p.id] || { email:false, inapp:true, slack:null, webhook:null, cats:{}, feed:[] };
-  const NOTIF_CAT_META = {
-    governance: { label:'Governance', desc:'Policy updates, approvals, resolution requests', color:'#10b981', icon:'<path d="M8 2l5 3v4c0 3-2.5 5-5 6C5.5 14 3 12 3 9V5l5-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>' },
-    agentic:    { label:'Agentic',    desc:'Worker completions, errors, HITL requests',      color:'#06B6D4', icon:'<circle cx="8" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 14c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M12.5 4.5l1-1M3.5 4.5l-1-1M14.5 8h1M.5 8h1" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>' },
-    platform:   { label:'Platform',   desc:'Billing, member changes, workspace updates',    color:'#64748b', icon:'<rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 15h6M8 13v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
-    security:   { label:'Security',   desc:'Login alerts, MFA events, access changes',      color:'#f59e0b', icon:'<path d="M8 2l5 3v4c0 3-2.5 5-5 6C5.5 14 3 12 3 9V5l5-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
-  };
-  const NOTIF_FEED_ICONS = {
-    governance: { color:'#10b981', bg:'rgba(16,185,129,.12)', path:'<path d="M8 2l5 3v4c0 3-2.5 5-5 6C5.5 14 3 12 3 9V5l5-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>' },
-    agentic:    { color:'#06B6D4', bg:'rgba(6,182,212,.12)',  path:'<circle cx="8" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 14c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
-    platform:   { color:'#64748b', bg:'rgba(100,116,139,.1)', path:'<rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 15h6M8 13v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
-    security:   { color:'#f59e0b', bg:'rgba(245,158,11,.12)', path:'<path d="M8 2l5 3v4c0 3-2.5 5-5 6C5.5 14 3 12 3 9V5l5-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
-  };
-
-  // channels section
-  const channelRows = [
-    { key:'email',  label:'Email',     detail: nd.email  ? escapeHtml(p.email||'—') : 'Disabled',   on: nd.email,  icon:'<path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' },
-    { key:'inapp',  label:'In-app',    detail: nd.inapp  ? 'Always on'              : 'Disabled',    on: nd.inapp,  icon:'<rect x="2" y="2" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 15h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
-    { key:'slack',  label:'Slack',     detail: nd.slack  ? escapeHtml(nd.slack)      : 'Not connected',on:!!nd.slack,icon:'<path d="M6 2a2 2 0 00-2 2v4a2 2 0 104 0V4a2 2 0 00-2-2zM10 8a2 2 0 00-2 2v4a2 2 0 104 0v-4a2 2 0 00-2-2zM2 6a2 2 0 002 2h4a2 2 0 000-4H4a2 2 0 00-2 2zM8 10a2 2 0 002 2h4a2 2 0 000-4h-4a2 2 0 00-2 2z" stroke="currentColor" stroke-width="1.2"/>' },
-    { key:'webhook',label:'Webhook',   detail: nd.webhook ? escapeHtml(nd.webhook.replace('https://','')):'Not configured',on:!!nd.webhook,icon:'<path d="M12 5a3 3 0 100 6H9M4 11a3 3 0 100-6h3M7 8h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' },
-  ].map(function(ch) {
-    const onOff = ch.on
-      ? '<span style="font-size:11px;font-weight:600;color:var(--badge-success)">On</span>'
-      : '<span style="font-size:11px;color:var(--color-text-caption)">Off</span>';
-    return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
-      + '<div style="width:26px;height:26px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-      + '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="color:var(--color-text-subtitle)">' + ch.icon + '</svg>'
-      + '</div>'
-      + '<div style="flex:1;min-width:0">'
-      + '<div style="font-size:12.5px;font-weight:500;color:var(--color-text-title)">' + ch.label + '</div>'
-      + '<div style="font-size:11.5px;color:var(--color-text-caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">' + ch.detail + '</div>'
-      + '</div>'
-      + onOff
-      + '</div>';
-  }).join('');
-
-  // categories section
-  const catRows = Object.entries(NOTIF_CAT_META).map(function(entry) {
-    const key = entry[0], meta = entry[1];
-    const on = !!(nd.cats && nd.cats[key]);
-    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
-      + '<div style="width:26px;height:26px;border-radius:6px;background:' + meta.color + '1a;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-      + '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="color:' + meta.color + '">' + meta.icon + '</svg>'
-      + '</div>'
-      + '<div style="flex:1;min-width:0">'
-      + '<div style="font-size:12.5px;font-weight:500;color:var(--color-text-title)">' + meta.label + '</div>'
-      + '<div style="font-size:11.5px;color:var(--color-text-caption);line-height:1.3">' + meta.desc + '</div>'
-      + '</div>'
-      + (on
-        ? '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--badge-success);flex-shrink:0"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-        : '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--color-text-caption);flex-shrink:0"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>')
-      + '</div>';
-  }).join('');
-
-  // recent feed
-  const feedRows = nd.feed.length === 0
-    ? '<div style="font-size:12.5px;color:var(--color-text-caption);padding:8px 0">No recent notifications.</div>'
-    : nd.feed.map(function(n) {
-        const fi = NOTIF_FEED_ICONS[n.type] || NOTIF_FEED_ICONS.platform;
-        return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--color-border-neutral-subtle)">'
-          + '<div style="width:26px;height:26px;border-radius:50%;background:' + fi.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">'
-          + '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="color:' + fi.color + '">' + fi.path + '</svg>'
-          + '</div>'
-          + '<div style="flex:1;min-width:0">'
-          + '<div style="font-size:12.5px;color:var(--color-text-title);line-height:1.35' + (n.read ? '' : ';font-weight:600') + '">' + escapeHtml(n.msg) + (n.read ? '' : ' <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pri);vertical-align:middle;margin-left:3px"></span>') + '</div>'
-          + '<div style="font-size:11.5px;color:var(--color-text-caption);margin-top:2px">' + escapeHtml(n.time) + '</div>'
-          + '</div>'
-          + '</div>';
-      }).join('');
-
-  const notifContent = `
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h">Notification channels</div>
-      ${channelRows}
-    </div>
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h">Subscribed categories</div>
-      ${catRows}
-    </div>
-    <div class="pa-slideout-section">
-      <div class="pa-slideout-section-h" style="display:flex;justify-content:space-between;align-items:center">
-        Recent notifications
-        ${nd.feed.filter(function(n){return !n.read;}).length > 0 ? '<span style="font-size:11px;color:var(--pri);font-weight:600">' + nd.feed.filter(function(n){return !n.read;}).length + ' unread</span>' : ''}
-      </div>
-      ${feedRows}
-      <div style="margin-top:12px">
-        <a href="#/notifications" style="font-size:12px;color:var(--pri);text-decoration:none" onclick="paCloseDrawer();navigate('#/notifications')">Manage notification settings →</a>
-      </div>
-    </div>`;
-
   const statusBadgeV = p.status==='active'?'success':p.status==='invited'?'alert':'error';
   const statusLabelV = p.status==='active'?'Active':p.status==='invited'?'Invited':'Suspended';
 
+  const suspendedBanner = p.status === 'suspended'
+    ? `<div class="pm-note-banner pm-suspend-banner" style="margin:0 0 12px"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="6.5" stroke="#ef4444" stroke-width="1.3"/><path d="M8 5v3.5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".7" fill="#ef4444"/></svg><span style="color:#ef4444;font-weight:500">Account suspended</span> — ${escapeHtml(p.suspendedReason || 'Access restricted.')}</div>`
+    : p.status === 'invited'
+    ? `<div class="pm-note-banner" style="margin:0 0 12px"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M2 4h12v9H2zM2 4l6 5 6-5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Invitation pending acceptance.</div>`
+    : '';
+
   return `
     <div class="pa-slideout-head">
-      ${_paAvHTML(p.id,p.name,p.initials,'ds-av-xxl')}
+      ${_paAvHTML(p.id, p.name, p.initials, 'ds-av-xxl')}
       <div style="flex:1;min-width:0">
         <div class="pa-slideout-title">${escapeHtml(p.name)}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
@@ -16274,20 +15823,65 @@ function renderMemberDrawer(personId) {
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
     </div>
-    <div class="pa-slideout-tabs">
-      <button class="pa-slideout-tab ${tab==='overview'?'active':''}" onclick="paSetDrawerTab('overview')">Overview</button>
-      <button class="pa-slideout-tab ${tab==='permissions'?'active':''}" onclick="paSetDrawerTab('permissions')">Permissions</button>
-      <button class="pa-slideout-tab ${tab==='activity'?'active':''}" onclick="paSetDrawerTab('activity')">Activity</button>
-      <button class="pa-slideout-tab ${tab==='notifications'?'active':''}" onclick="paSetDrawerTab('notifications')">Notifications</button>
-    </div>
     <div class="pa-slideout-body">
-      ${tab === 'overview' ? overviewContent : tab === 'permissions' ? permContent : tab === 'activity' ? activityContent : notifContent}
+      <div class="pa-slideout-section">
+        ${suspendedBanner}
+        <div class="pm-profile-grid" style="margin-bottom:14px">
+          <div class="pm-profile-item">
+            <div class="pm-profile-label">Email</div>
+            <div class="pm-profile-val" style="display:flex;align-items:center;gap:6px">
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.email)}</span>
+              <button class="pm-copy-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText('${escapeHtml(p.email)}');toast('Email copied','success')" title="Copy email">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 11V3h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="pm-profile-item">
+            <div class="pm-profile-label">MFA</div>
+            <div class="pm-profile-val">
+              ${mfaOn
+                ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--badge-success);font-weight:600"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Enabled</span>`
+                : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-caption)"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Not enabled</span>`
+              }
+            </div>
+          </div>
+          <div class="pm-profile-item">
+            <div class="pm-profile-label">Last active</div>
+            <div class="pm-profile-val">${escapeHtml(p.lastActive||'—')}</div>
+          </div>
+          <div class="pm-profile-item">
+            <div class="pm-profile-label">Member since</div>
+            <div class="pm-profile-val">${escapeHtml(p.joinDate||'—')}</div>
+          </div>
+        </div>
+
+        ${memberRoles.length > 0 ? `
+        <div style="margin-bottom:12px">
+          <div class="pm-profile-label" style="margin-bottom:6px">Roles</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            ${memberRoles.map(r => `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;background:${r.color}18;color:${r.color};border:1px solid ${r.color}35;border-radius:20px;padding:3px 9px;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:${r.color};flex-shrink:0"></span>${escapeHtml(r.label)}</span>`).join('')}
+          </div>
+        </div>` : ''}
+
+        ${studioAccessList.length > 0 ? `
+        <div>
+          <div class="pm-profile-label" style="margin-bottom:6px">Studio access</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            ${studioAccessList.map(s => `
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:7px;font-size:12.5px">
+                <span style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0"></span>
+                <span style="font-weight:500;color:var(--color-text-title)">${escapeHtml(s.name)}</span>
+                <span style="margin-left:auto;font-size:11.5px;color:var(--color-text-caption)">${[...effectivePermSet].filter(pid => pid.startsWith(s.prefix)).length} permissions</span>
+              </div>`).join('')}
+          </div>
+        </div>` : `<div style="font-size:12.5px;color:var(--color-text-caption)">No studio access yet.</div>`}
+      </div>
     </div>
     <div class="pa-slideout-foot">
       <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="paCloseDrawer()">Close</button>
       <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="paCloseDrawer();paOpenUserAccess('${p.id}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-        Manage access
+        View full profile
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
       </button>
     </div>
   `;
