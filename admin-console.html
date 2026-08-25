@@ -8622,6 +8622,38 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 .ste-ws-studio-enabled { font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; background:var(--green-10); color:var(--green); border:1px solid var(--green-25); }
 .ste-ws-studio-disabled { font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; background:var(--hover); color:var(--t3); border:1px solid var(--line); }
 
+/* ====================== STUDIO SETTINGS ====================== */
+.ss-wrap { padding:28px 32px 64px; max-width:760px; }
+.ss-breadcrumb { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--t3); margin-bottom:20px; }
+.ss-bc-root { cursor:pointer; color:var(--t3); }
+.ss-bc-root:hover { color:var(--t1); }
+.ss-bc-current { font-weight:600; }
+.ss-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+.ss-header-ico { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ss-header-title { font-size:20px; font-weight:700; color:var(--t1); }
+.ss-header-sub { font-size:12px; color:var(--t3); margin-top:3px; }
+.ss-tab-bar { display:flex; gap:4px; border-bottom:1px solid var(--line); margin-bottom:28px; }
+.ss-tab { background:none; border:none; padding:8px 16px; font-size:13px; font-weight:500; color:var(--t3); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; border-radius:4px 4px 0 0; transition:color .15s; }
+.ss-tab:hover { color:var(--t1); background:var(--hover); }
+.ss-tab--active { color:var(--pri); border-bottom-color:var(--pri); font-weight:600; }
+.ss-section { }
+.ss-field-group { border:1px solid var(--line); border-radius:var(--r12); overflow:hidden; margin-top:16px; }
+.ss-field-row { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:16px 20px; border-top:1px solid var(--line); }
+.ss-field-row:first-child { border-top:none; }
+.ss-field-row--stacked { flex-wrap:wrap; gap:12px; }
+.ss-field-meta { flex:1; min-width:0; }
+.ss-field-label { font-size:13px; font-weight:500; color:var(--t1); }
+.ss-field-desc { font-size:12px; color:var(--t3); margin-top:3px; line-height:1.45; }
+.ss-stepper { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.ss-stepper-btn { width:28px; height:28px; border-radius:6px; border:1px solid var(--line); background:var(--bg2); color:var(--t1); font-size:16px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+.ss-stepper-btn:hover { background:var(--hover); }
+.ss-stepper-val { font-size:14px; font-weight:700; color:var(--t1); min-width:28px; text-align:center; }
+.ss-select { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r8); color:var(--t1); font-size:13px; padding:7px 12px; cursor:pointer; flex-shrink:0; min-width:150px; }
+.ss-select:focus { outline:none; border-color:var(--pri); }
+.ss-action-row { margin-top:20px; display:flex; }
+.ss-export-btn { display:flex; align-items:center; gap:8px; padding:8px 18px; border:1px solid var(--line); border-radius:var(--r8); background:var(--bg2); color:var(--t2); font-size:13px; font-weight:600; cursor:pointer; transition:background .15s,color .15s; }
+.ss-export-btn:hover { background:var(--hover); color:var(--t1); }
+
 /* ====================== ROLE DETAIL & CREATE ====================== */
 /* Permission tree */
 .rd-perm-studio { margin-bottom:16px; }
@@ -9416,14 +9448,9 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
           </button>
         </div>
 
-        <!-- PLATFORM — renamed to Studios: dynamic list of active studios for this tenant -->
+        <!-- ADMINISTRATION — cross-cutting tenant admin (integrations, notifications, audit) -->
         <div class="ssb-group" data-roles="super-admin,regional-admin,tenant-admin">
-          <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
-
-          <button class="ssb-item" data-route="governance-defaults" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/governance-defaults')">
-            <span class="ssb-item-label">Governance Defaults</span>
-            <span class="ssb-item-badge ssb-item-badge--green">2</span>
-          </button>
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Administration</span></div>
 
           <button class="ssb-item" data-route="integrations" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/integrations')">
             <span class="ssb-item-label">Integrations & Credentials</span>
@@ -20100,6 +20127,353 @@ function renderStudiosEntitlements() {
 
 /* ====================== STUDIOS & ENTITLEMENTS end ====================== */
 
+/* ====================== STUDIO SETTINGS ====================== */
+
+const _studioMeta = {
+  governance: {
+    name: 'Governance Studio',
+    color: '#10b981',
+    bg:    'rgba(16,185,129,.12)',
+    border:'rgba(16,185,129,.25)',
+    tabs:  ['General','Policies','Compliance'],
+  },
+  datastudio: {
+    name: 'Helix Data Studio',
+    color: '#8b5cf6',
+    bg:    'rgba(139,92,246,.12)',
+    border:'rgba(139,92,246,.25)',
+    tabs:  ['General','Sync & Retention'],
+  },
+  agentic: {
+    name: 'Agentic Studio',
+    color: '#06B6D4',
+    bg:    'rgba(6,182,212,.12)',
+    border:'rgba(6,182,212,.25)',
+    tabs:  ['General','Sandbox & Limits'],
+  },
+};
+
+let _studioTab = {};  /* studioId → active tab index */
+
+function studioSetTab(studioId, idx) {
+  _studioTab[studioId] = idx;
+  renderStudioSettings(studioId);
+}
+
+function renderStudioSettings(studioId) {
+  const meta = _studioMeta[studioId];
+  if (!meta) { renderHome(); return; }
+
+  const activeTab = _studioTab[studioId] || 0;
+
+  const tabBar = meta.tabs.map((t, i) => `
+    <button class="ss-tab ${i === activeTab ? 'ss-tab--active' : ''}"
+            onclick="studioSetTab('${studioId}',${i})">${t}</button>`).join('');
+
+  let body = '';
+  if (studioId === 'governance') {
+    body = _govSettingsBody(activeTab);
+  } else if (studioId === 'datastudio') {
+    body = _dsSettingsBody(activeTab);
+  } else {
+    body = _agenticSettingsBody(activeTab);
+  }
+
+  $('content').innerHTML = `
+<div class="ss-wrap">
+
+  <!-- Breadcrumb + header -->
+  <div class="ss-breadcrumb">
+    <span class="ss-bc-root" onclick="navigate('#/home')">Admin Studio</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    <span class="ss-bc-current" style="color:${meta.color}">${meta.name}</span>
+  </div>
+
+  <div class="ss-header">
+    <div class="ss-header-ico" style="background:${meta.bg};border:1px solid ${meta.border};">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="${meta.color}" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="${meta.color}" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <div class="ss-header-title">${meta.name}</div>
+      <div class="ss-header-sub">Studio-specific settings · Contoso Ltd tenant</div>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="ss-tab-bar">${tabBar}</div>
+
+  <!-- Tab body -->
+  <div class="ss-body">${body}</div>
+
+</div>`;
+}
+
+/* ---- Governance settings tabs ---- */
+function _govSettingsBody(tab) {
+  if (tab === 0) return `
+<div class="ss-section">
+  <div class="ms-section-title">General</div>
+
+  <div class="ss-field-group">
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Sandbox environment</div>
+        <div class="ss-field-desc">Allow authors to test policies in an isolated sandbox before publishing to production.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('Sandbox setting saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Sandbox / production separation</div>
+        <div class="ss-field-desc">Prevent sandbox data from leaking into production decisions.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('Separation policy saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">AI-assisted authoring</div>
+        <div class="ss-field-desc">Enable Copilot suggestions when drafting policies and model definitions.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('AI authoring setting saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+  </div>
+</div>`;
+
+  if (tab === 1) return `
+<div class="ss-section">
+  <div class="ms-section-title">Policies</div>
+
+  <div class="ss-field-group">
+
+    <div class="ss-field-row ss-field-row--stacked">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Minimum approvers for promotion</div>
+        <div class="ss-field-desc">Number of approvers required to promote a model change from Sandbox to Production.</div>
+      </div>
+      <div class="ss-stepper">
+        <button class="ss-stepper-btn" onclick="ssAdjust('approvers',-1)">−</button>
+        <span class="ss-stepper-val" id="ss-approvers-val">2</span>
+        <button class="ss-stepper-btn" onclick="ssAdjust('approvers',1)">+</button>
+      </div>
+    </div>
+
+    <div class="ss-field-row ss-field-row--stacked">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Auto-approve after (days)</div>
+        <div class="ss-field-desc">Automatically approve a pending promotion request if no reviewer acts within this period. Set to 0 to disable auto-approve.</div>
+      </div>
+      <div class="ss-stepper">
+        <button class="ss-stepper-btn" onclick="ssAdjust('autoapprove',-1)">−</button>
+        <span class="ss-stepper-val" id="ss-autoapprove-val">7</span>
+        <button class="ss-stepper-btn" onclick="ssAdjust('autoapprove',1)">+</button>
+      </div>
+    </div>
+
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Require change justification</div>
+        <div class="ss-field-desc">Authors must include a written justification when submitting a promotion request.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('Policy saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Lock approved models from editing</div>
+        <div class="ss-field-desc">Once a model reaches Published state, prevent edits without opening a new promotion request.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" onchange="toast('Lock policy saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+
+    <div class="ss-field-row ss-field-row--stacked">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Promotion request expiry (days)</div>
+        <div class="ss-field-desc">Open promotion requests that receive no action are automatically closed after this period.</div>
+      </div>
+      <div class="ss-stepper">
+        <button class="ss-stepper-btn" onclick="ssAdjust('expiry',-1)">−</button>
+        <span class="ss-stepper-val" id="ss-expiry-val">30</span>
+        <button class="ss-stepper-btn" onclick="ssAdjust('expiry',1)">+</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+  /* tab === 2 → Compliance */
+  return `
+<div class="ss-section">
+  <div class="ms-section-title">Compliance</div>
+
+  <div class="ss-field-group">
+
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">SOC 2 evidence export</div>
+        <div class="ss-field-desc">Generate automated audit evidence packages for SOC 2 Type II reviews.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('SOC 2 export enabled','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">GDPR data processing records</div>
+        <div class="ss-field-desc">Maintain an automated record of processing activities (ROPA) derived from model definitions.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('ROPA tracking enabled','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+
+    <div class="ss-field-row ss-field-row--stacked">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Data retention period</div>
+        <div class="ss-field-desc">How long Governance Studio retains promotion history, audit trails, and change logs.</div>
+      </div>
+      <select class="ss-select" onchange="toast('Retention period saved','success')">
+        <option>90 days</option>
+        <option selected>1 year</option>
+        <option>3 years</option>
+        <option>7 years</option>
+        <option>Indefinite</option>
+      </select>
+    </div>
+
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Include PII fields in audit log</div>
+        <div class="ss-field-desc">Log which users accessed or modified fields tagged as personally identifiable.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" onchange="toast('PII audit setting saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+
+  </div>
+
+  <div class="ss-action-row">
+    <button class="ss-export-btn" onclick="toast('Compliance export generated — check your email','success')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export compliance report
+    </button>
+  </div>
+</div>`;
+}
+
+/* ---- Helix Data Studio tabs ---- */
+function _dsSettingsBody(tab) {
+  if (tab === 0) return `
+<div class="ss-section">
+  <div class="ms-section-title">General</div>
+  <div class="ss-field-group">
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Schema validation on ingest</div>
+        <div class="ss-field-desc">Reject records that fail the model schema before they are stored.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('Validation setting saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Lineage tracking</div>
+        <div class="ss-field-desc">Automatically record data lineage for all ingested sources.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('Lineage tracking saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+  </div>
+</div>`;
+
+  return `
+<div class="ss-section">
+  <div class="ms-section-title">Sync & Retention</div>
+  <div class="ss-field-group">
+    <div class="ss-field-row ss-field-row--stacked">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Default sync frequency</div>
+        <div class="ss-field-desc">How often Helix re-ingests from connected sources when no schedule is set.</div>
+      </div>
+      <select class="ss-select" onchange="toast('Sync frequency saved','success')">
+        <option>Every hour</option>
+        <option selected>Every 6 hours</option>
+        <option>Every 24 hours</option>
+        <option>Manual only</option>
+      </select>
+    </div>
+    <div class="ss-field-row ss-field-row--stacked">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Raw data retention</div>
+        <div class="ss-field-desc">How long raw ingested data is kept before being purged.</div>
+      </div>
+      <select class="ss-select" onchange="toast('Retention period saved','success')">
+        <option>30 days</option>
+        <option selected>90 days</option>
+        <option>1 year</option>
+        <option>Indefinite</option>
+      </select>
+    </div>
+  </div>
+</div>`;
+}
+
+/* ---- Agentic Studio tabs ---- */
+function _agenticSettingsBody(tab) {
+  if (tab === 0) return `
+<div class="ss-section">
+  <div class="ms-section-title">General</div>
+  <div class="ss-field-group">
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Human-in-the-Loop by default</div>
+        <div class="ss-field-desc">New agents require human review before executing actions unless explicitly disabled per agent.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('HIL default saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Allow external tool calls</div>
+        <div class="ss-field-desc">Permit agents to call tools registered outside this tenant's Tool Registry.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" onchange="toast('External tools setting saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+  </div>
+</div>`;
+
+  return `
+<div class="ss-section">
+  <div class="ms-section-title">Sandbox & Limits</div>
+  <div class="ss-field-group">
+    <div class="ss-field-row">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Sandbox isolation</div>
+        <div class="ss-field-desc">Sandbox agents cannot access production data sources or trigger production workflows.</div>
+      </div>
+      <label class="ids-toggle"><input type="checkbox" checked onchange="toast('Sandbox isolation saved','success')"><span class="ids-toggle-track"></span><span class="ids-toggle-thumb"></span></label>
+    </div>
+    <div class="ss-field-row ss-field-row--stacked">
+      <div class="ss-field-meta">
+        <div class="ss-field-label">Max concurrent agent runs (tenant)</div>
+        <div class="ss-field-desc">Hard cap on simultaneous agent executions across the entire tenant.</div>
+      </div>
+      <div class="ss-stepper">
+        <button class="ss-stepper-btn" onclick="ssAdjust('agentcap',-5)">−</button>
+        <span class="ss-stepper-val" id="ss-agentcap-val">50</span>
+        <button class="ss-stepper-btn" onclick="ssAdjust('agentcap',5)">+</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+/* Stepper helper — shared across studio tabs */
+const _ssCounters = { approvers:2, autoapprove:7, expiry:30, agentcap:50 };
+function ssAdjust(key, delta) {
+  const min = { approvers:1, autoapprove:0, expiry:1, agentcap:5 }[key] ?? 0;
+  const max = { approvers:10, autoapprove:30, expiry:90, agentcap:200 }[key] ?? 999;
+  _ssCounters[key] = Math.max(min, Math.min(max, _ssCounters[key] + delta));
+  const el = document.getElementById(`ss-${key}-val`);
+  if (el) el.textContent = _ssCounters[key];
+  toast('Setting saved', 'success');
+}
+
+/* ====================== STUDIO SETTINGS end ====================== */
+
 function route() {
   const hash = window.location.hash.replace(/^#\/?/, '') || 'home';
   const parts = hash.split('/');
@@ -20117,10 +20491,13 @@ function route() {
     'identity':'identity',
     'studios':'studios',
     'billing':'billing',
-    'governance-defaults':'governance-defaults',
+    'governance-defaults':'studio-governance',
     'data-privacy':'data-privacy',
     'notifications':'notifications',
-    'tenants':'tenants'
+    'tenants':'tenants',
+    'studio-governance':'studio-governance',
+    'studio-datastudio':'studio-datastudio',
+    'studio-agentic':'studio-agentic'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -20176,7 +20553,13 @@ function route() {
   } else if (parts[0]==='billing') {
     renderBilling();
   } else if (parts[0]==='governance-defaults') {
-    renderGovernanceDefaults();
+    navigate('#/studio-governance');
+  } else if (parts[0]==='studio-governance') {
+    renderStudioSettings('governance');
+  } else if (parts[0]==='studio-datastudio') {
+    renderStudioSettings('datastudio');
+  } else if (parts[0]==='studio-agentic') {
+    renderStudioSettings('agentic');
   } else if (parts[0]==='data-privacy') {
     renderDataPrivacy();
   } else if (parts[0]==='notifications') {
