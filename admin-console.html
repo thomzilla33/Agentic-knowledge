@@ -24786,6 +24786,7 @@ let _msTab = 'profile';
 
 function renderMySettings(tab) {
   if (tab) _msTab = tab;
+  if (_msTab === 'appearance') _msTab = 'profile'; // merged into profile tab
   const saved = (() => { try { return localStorage.getItem('aims-theme'); } catch(e){ return null; } })();
   const active = saved === 'light' ? 'light' : saved === 'dark' ? 'dark' : 'system';
   const t = _msTab;
@@ -24796,7 +24797,6 @@ function renderMySettings(tab) {
   <!-- TAB NAV -->
   <div class="ms-tabs">
     <button class="ms-tab ${t==='profile'?'active':''}" onclick="renderMySettings('profile')">Profile</button>
-    <button class="ms-tab ${t==='appearance'?'active':''}" onclick="renderMySettings('appearance')">Appearance</button>
     <button class="ms-tab ${t==='security'?'active':''}" onclick="renderMySettings('security')">Security</button>
     <button class="ms-tab ${t==='notifications'?'active':''}" onclick="renderMySettings('notifications')">Notifications</button>
   </div>
@@ -24865,9 +24865,7 @@ function renderMySettings(tab) {
     </div>
   </div>
 
-  ` : ''}
-
-  ${t === 'appearance' ? `<!-- APPEARANCE -->
+  <!-- APPEARANCE (inside Profile tab) -->
   <div class="ms-section">
     <div class="ms-section-title">Appearance</div>
     <div class="ms-card">
