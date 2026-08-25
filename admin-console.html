@@ -14129,11 +14129,117 @@ function dpRetChange(idx, val) {
 }
 
 function dpExport() {
-  const t = document.getElementById('dp-export-toast');
   toast('Preparing data export — you will receive an email when it\'s ready', 'info');
   _dp.lastExport = 'Aug 19, 2026';
   const el = document.getElementById('dp-last-export');
   if (el) el.textContent = 'Last export: Aug 19, 2026';
+}
+
+/* ====================== DATA SUBJECT REQUEST PANEL ====================== */
+
+const DSR_TYPES = [
+  { id:'access',      label:'Right to access',       sub:'Receive a copy of all personal data we hold about an individual (GDPR Art. 15 / CCPA)' },
+  { id:'rectify',     label:'Right to rectification', sub:'Correct inaccurate or incomplete personal data (GDPR Art. 16)' },
+  { id:'erasure',     label:'Right to erasure',       sub:'Delete personal data where there is no compelling reason for its continued processing (GDPR Art. 17)' },
+  { id:'restrict',    label:'Right to restriction',   sub:'Restrict processing while accuracy or legitimacy is contested (GDPR Art. 18)' },
+  { id:'portability', label:'Data portability',       sub:'Receive personal data in a structured, machine-readable format (GDPR Art. 20)' },
+  { id:'object',      label:'Right to object',        sub:'Object to processing for direct marketing, research, or legitimate interests (GDPR Art. 21)' },
+];
+
+let _dsrType = 'access';
+
+function openDSRPanel() {
+  if (document.getElementById('dsrContainer')) {
+    document.getElementById('dsrOverlay').classList.add('open');
+    document.getElementById('dsrDrawer').classList.add('open');
+    return;
+  }
+  const IS = 'width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);font-size:13px;color:var(--t1);outline:none;box-sizing:border-box;';
+  const LS = 'display:block;font-size:11px;font-weight:600;color:var(--t3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;';
+
+  const typeOptions = DSR_TYPES.map(t => `
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r8);cursor:pointer;margin-bottom:6px;background:var(--bg2);transition:border-color .12s;" id="dsr-opt-${t.id}">
+      <input type="radio" name="dsrType" value="${t.id}" ${t.id === 'access' ? 'checked' : ''} onchange="_dsrType=this.value;document.querySelectorAll('[id^=dsr-opt-]').forEach(el=>el.style.borderColor='var(--line)');document.getElementById('dsr-opt-'+this.value).style.borderColor='var(--pri)';" style="margin-top:2px;accent-color:var(--pri);flex-shrink:0;">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--t1);">${t.label}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4;">${t.sub}</div>
+      </div>
+    </label>`).join('');
+
+  const c = document.createElement('div');
+  c.id = 'dsrContainer';
+  c.innerHTML = `
+    <div class="pa-slideout-overlay" id="dsrOverlay" onclick="closeDSRPanel()"></div>
+    <div class="pa-slideout" id="dsrDrawer" style="width:440px;display:flex;flex-direction:column;padding:0;">
+
+      <div class="pa-slideout-head" style="flex-shrink:0;">
+        <div style="flex:1;min-width:0;">
+          <div class="pa-slideout-title">Data subject request</div>
+          <div class="pa-slideout-sub">GDPR / CCPA — submit on behalf of an individual</div>
+        </div>
+        <button class="pa-slideout-close" onclick="closeDSRPanel()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:0 20px 20px;">
+
+        <!-- Request type -->
+        <div style="padding:16px 0;border-bottom:1px solid var(--line);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:10px;">Request type</div>
+          ${typeOptions}
+        </div>
+
+        <!-- Data subject info -->
+        <div style="padding:16px 0;border-bottom:1px solid var(--line);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:12px;">Data subject</div>
+          <div style="margin-bottom:12px;"><label style="${LS}">Full name</label><input style="${IS}height:36px;" type="text" placeholder="Legal full name of the individual"></div>
+          <div style="margin-bottom:12px;"><label style="${LS}">Email address</label><input style="${IS}height:36px;" type="email" placeholder="The email address associated with their data"></div>
+          <div style="margin-bottom:0;">
+            <label style="${LS}">Relationship to organisation</label>
+            <select style="${IS}height:36px;padding-right:28px;">
+              <option value="">Select relationship…</option>
+              <option value="employee">Current employee</option>
+              <option value="former">Former employee</option>
+              <option value="customer">Customer</option>
+              <option value="prospect">Prospect / lead</option>
+              <option value="contractor">Contractor / partner</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div style="padding:16px 0;border-bottom:1px solid var(--line);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:10px;">Additional details</div>
+          <textarea style="${IS}height:96px;resize:vertical;line-height:1.5;" placeholder="Describe the specific data in scope, any relevant dates, or supporting context for the request…"></textarea>
+        </div>
+
+        <!-- Legal notice -->
+        <div style="display:flex;align-items:flex-start;gap:9px;padding:12px 14px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r8);margin-top:16px;margin-bottom:20px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--t3)" stroke-width="1.6"/><path d="M12 8v4M12 16h.01" stroke="var(--t3)" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div style="font-size:11px;color:var(--t3);line-height:1.5;">Identity verification is required before processing. The data subject will receive a verification email. Requests are processed within <strong style="color:var(--t2);">30 days</strong> per GDPR / CCPA requirements.</div>
+        </div>
+
+        <button style="width:100%;height:38px;background:var(--pri);border:none;border-radius:var(--r8);font-size:13px;font-weight:700;color:#fff;cursor:pointer;"
+          onclick="closeDSRPanel();toast('Data subject request submitted — verification email sent to the individual','success')">
+          Submit request
+        </button>
+
+      </div>
+    </div>`;
+  document.body.appendChild(c);
+  requestAnimationFrame(() => {
+    document.getElementById('dsrOverlay').classList.add('open');
+    document.getElementById('dsrDrawer').classList.add('open');
+    document.getElementById('dsr-opt-access').style.borderColor = 'var(--pri)';
+  });
+}
+
+function closeDSRPanel() {
+  const o = document.getElementById('dsrOverlay');
+  const d = document.getElementById('dsrDrawer');
+  if (o) { o.classList.remove('open'); d.classList.remove('open'); }
 }
 
 function renderDataPrivacy() {
@@ -14213,7 +14319,7 @@ function renderDataPrivacy() {
         <div class="dp-export-label">Data subject request</div>
         <div class="dp-export-hint">GDPR / CCPA — submit a request to access, correct, or delete an individual's personal data</div>
       </div>
-      <button class="ds-btn ds-btn-sm ds-btn--secondary" style="flex-shrink:0" onclick="toast('Data subject request form coming soon','info')">Submit request</button>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" style="flex-shrink:0" onclick="openDSRPanel()">Submit request</button>
     </div>
   </div>
 
