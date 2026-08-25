@@ -8654,6 +8654,36 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 .ss-export-btn { display:flex; align-items:center; gap:8px; padding:8px 18px; border:1px solid var(--line); border-radius:var(--r8); background:var(--bg2); color:var(--t2); font-size:13px; font-weight:600; cursor:pointer; transition:background .15s,color .15s; }
 .ss-export-btn:hover { background:var(--hover); color:var(--t1); }
 
+/* ====================== MY STUDIOS ====================== */
+.myst-wrap { padding:28px 32px 64px; max-width:680px; }
+.myst-header { margin-bottom:28px; }
+.myst-header-title { font-size:20px; font-weight:700; color:var(--t1); margin-bottom:4px; }
+.myst-header-sub { font-size:13px; color:var(--t3); }
+.myst-grid { display:flex; flex-direction:column; gap:16px; }
+.myst-card { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r12); overflow:hidden; }
+.myst-card-head { display:flex; align-items:center; gap:14px; padding:18px 20px; }
+.myst-studio-ico { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.myst-studio-meta { flex:1; min-width:0; }
+.myst-studio-name { font-size:15px; font-weight:700; color:var(--t1); }
+.myst-studio-role { font-size:12px; color:var(--t3); margin-top:3px; }
+.myst-studio-role strong { color:var(--t2); }
+.myst-feature-count { font-size:11px; color:var(--t3); margin-top:4px; }
+.myst-launch-btn { display:flex; align-items:center; gap:7px; padding:7px 16px; border-radius:var(--r8); border:1px solid; background:transparent; font-size:13px; font-weight:600; cursor:pointer; flex-shrink:0; transition:opacity .15s; }
+.myst-launch-btn:hover { opacity:.75; }
+.myst-features-toggle { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; border-top:1px solid var(--line); font-size:12px; color:var(--t3); cursor:pointer; user-select:none; }
+.myst-features-toggle:hover { background:var(--hover); color:var(--t2); }
+.myst-toggle-lbl { font-size:11px; }
+.myst-feature-list { padding:4px 0 8px; border-top:1px solid var(--line); }
+.myst-feature-row { display:flex; align-items:center; gap:10px; padding:7px 20px; }
+.myst-feature-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.myst-dot-on { background:var(--green); }
+.myst-dot-off { background:var(--line); }
+.myst-feature-name { font-size:13px; color:var(--t2); flex:1; }
+.myst-feature-name--off { color:var(--t3); }
+.myst-no-access { font-size:11px; color:var(--t3); background:var(--bg3); padding:2px 8px; border-radius:20px; }
+.myst-help-note { display:flex; align-items:flex-start; gap:8px; margin-top:24px; font-size:12px; color:var(--t3); line-height:1.45; }
+.myst-help-note svg { flex-shrink:0; margin-top:1px; }
+
 /* ====================== ROLE DETAIL & CREATE ====================== */
 /* Permission tree */
 .rd-perm-studio { margin-bottom:16px; }
@@ -9417,9 +9447,8 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="opacity:.4;flex-shrink:0" aria-label="Read-only"><circle cx="6" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 10c0-2 2-3.5 4.5-3.5s4.5 1.5 4.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           </button>
 
-          <button class="ssb-item" data-route="my-studios" data-roles="user" onclick="toast('My Studios — read-only')">
+          <button class="ssb-item" data-route="my-studios" data-roles="user" onclick="navigate('#/my-studios')">
             <span class="ssb-item-label">My Studios</span>
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="opacity:.4;flex-shrink:0" aria-label="Read-only"><circle cx="6" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 10c0-2 2-3.5 4.5-3.5s4.5 1.5 4.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           </button>
         </div>
 
@@ -20497,7 +20526,9 @@ function route() {
     'tenants':'tenants',
     'studio-governance':'studio-governance',
     'studio-datastudio':'studio-datastudio',
-    'studio-agentic':'studio-agentic'
+    'studio-agentic':'studio-agentic',
+    'my-studios':'my-studios',
+    'my-team':'my-team'
   };
   const baseRoute = parts[0];
   const activeKey = ssbMap[baseRoute] || baseRoute;
@@ -20542,6 +20573,10 @@ function route() {
     renderPersonal();
   } else if (parts[0]==='my-settings') {
     renderMySettings();
+  } else if (parts[0]==='my-studios') {
+    renderMyStudios();
+  } else if (parts[0]==='my-team') {
+    toast('My Team — coming soon', 'info');
   } else if (parts[0]==='people') {
     renderPeople(parts[1] || null);
   } else if (parts[0]==='organization') {
@@ -26080,6 +26115,127 @@ function renderBuildSDK() {
     </div>
   `;
 }
+
+/* ====================== MY STUDIOS ====================== */
+
+/* Mock: which features the current user (TG) can access per studio */
+const MY_STUDIO_ACCESS = [
+  {
+    id: 'agentic',
+    name: 'Agentic Studio',
+    color: '#06B6D4', bg: 'rgba(6,182,212,.12)', border: 'rgba(6,182,212,.25)',
+    role: 'Agent Builder',
+    seatStatus: 'assigned',
+    launchUrl: '../agentic-studio.html',
+    features: [
+      { name: 'AI Workers',          access: true  },
+      { name: 'Agentic Networks',    access: true  },
+      { name: 'Human-in-the-Loop',   access: true  },
+      { name: 'Workflow Builder',    access: true  },
+      { name: 'Agent Analytics',     access: true  },
+      { name: 'Custom Tool Registry',access: false },
+      { name: 'Agentic Sandbox',     access: true  },
+    ],
+  },
+  {
+    id: 'governance',
+    name: 'Governance Studio',
+    color: '#10b981', bg: 'rgba(16,185,129,.12)', border: 'rgba(16,185,129,.25)',
+    role: 'Knowledge Curator',
+    seatStatus: 'assigned',
+    launchUrl: '../governance-studio.html',
+    features: [
+      { name: 'Policy Engine',       access: true  },
+      { name: 'Knowledge Bindings',  access: true  },
+      { name: 'Promotion Packets',   access: true  },
+      { name: 'Domain Management',   access: false },
+      { name: 'Resolution Requests', access: true  },
+      { name: 'Compliance Reports',  access: false },
+    ],
+  },
+  {
+    id: 'helix',
+    name: 'Helix Data Studio',
+    color: '#8b5cf6', bg: 'rgba(139,92,246,.12)', border: 'rgba(139,92,246,.25)',
+    role: 'Data Viewer',
+    seatStatus: 'assigned',
+    launchUrl: '../helix-data-studio.html',
+    features: [
+      { name: 'Data Connectors',        access: false },
+      { name: 'Model Definitions',      access: true  },
+      { name: 'Lineage Graph',          access: true  },
+      { name: 'Changelog & Versioning', access: true  },
+      { name: 'Scope Switcher',         access: true  },
+      { name: 'Advanced Profiling',     access: false },
+    ],
+  },
+];
+
+let _myStudiosExpanded = {};
+
+function myStudiosToggleExpand(id) {
+  _myStudiosExpanded[id] = !_myStudiosExpanded[id];
+  renderMyStudios();
+}
+
+function renderMyStudios() {
+  const cards = MY_STUDIO_ACCESS.map(s => {
+    const accessible = s.features.filter(f => f.access).length;
+    const total = s.features.length;
+    const expanded = _myStudiosExpanded[s.id];
+
+    const featureList = expanded ? s.features.map(f => `
+      <div class="myst-feature-row">
+        <span class="myst-feature-dot ${f.access ? 'myst-dot-on' : 'myst-dot-off'}"></span>
+        <span class="myst-feature-name ${f.access ? '' : 'myst-feature-name--off'}">${f.name}</span>
+        ${f.access ? '' : '<span class="myst-no-access">No access</span>'}
+      </div>`).join('') : '';
+
+    return `
+    <div class="myst-card">
+      <div class="myst-card-head">
+        <div class="myst-studio-ico" style="background:${s.bg};border:1px solid ${s.border};">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="${s.color}" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="${s.color}" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="myst-studio-meta">
+          <div class="myst-studio-name">${s.name}</div>
+          <div class="myst-studio-role">Your role: <strong>${s.role}</strong></div>
+          <div class="myst-feature-count">${accessible} of ${total} features available</div>
+        </div>
+        <button class="myst-launch-btn" style="border-color:${s.border};color:${s.color};" onclick="toast('Launching ${s.name}…','info')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Launch
+        </button>
+      </div>
+
+      <div class="myst-features-toggle" onclick="myStudiosToggleExpand('${s.id}')">
+        <span>Features (${accessible} accessible)</span>
+        <span class="myst-toggle-lbl">${expanded ? '▲ Collapse' : '▼ Show features'}</span>
+      </div>
+
+      ${expanded ? `<div class="myst-feature-list">${featureList}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  $('content').innerHTML = `
+<div class="myst-wrap">
+  <div class="myst-header">
+    <div class="myst-header-title">My Studios</div>
+    <div class="myst-header-sub">Studios and features available to you in the Contoso Ltd workspace.</div>
+  </div>
+
+  <div class="myst-grid">
+    ${cards}
+  </div>
+
+  <div class="myst-help-note">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    To request access to additional studios or features, contact your workspace admin.
+  </div>
+</div>`;
+}
+
+/* ====================== MY STUDIOS end ====================== */
 
 /* ====================== MY SETTINGS ====================== */
 
