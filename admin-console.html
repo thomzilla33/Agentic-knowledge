@@ -336,6 +336,25 @@
   --field-placeholder:rgba(255,255,255,0.30);
   --field-label:    rgba(255,255,255,0.60);
   --field-icon:     rgba(255,255,255,0.30);
+  /* Filters bar tokens (--fi-*) — dark */
+  --fi-chip-bg:            rgba(255,255,255,0.05);
+  --fi-chip-border:        rgba(255,255,255,0.15);
+  --fi-chip-text:          rgba(255,255,255,0.70);
+  --fi-chip-icon:          rgba(255,255,255,0.40);
+  --fi-chip-hover-bg:      rgba(255,255,255,0.08);
+  --fi-chip-active-bg:     rgba(43,127,255,0.08);
+  --fi-chip-active-border: #2b7fff;
+  --fi-chip-active-text:   #A8C8FF;
+  --fi-chip-active-icon:   rgba(168,200,255,0.80);
+  --fi-clear-text:         rgba(255,255,255,0.45);
+  --fi-clear-hover:        rgba(255,255,255,0.80);
+  --fi-badge-bg:           #2b7fff;
+  --fi-badge-text:         #ffffff;
+  --fi-view-active-bg:     #2b7fff;
+  --fi-view-active-icon:   #ffffff;
+  --fi-view-icon:          rgba(255,255,255,0.40);
+  --fi-sort-icon:          rgba(255,255,255,0.40);
+  --fi-sort-text:          rgba(255,255,255,0.65);
   --shadow-elevation-1:2px 2px 8px 1px rgba(0,0,0,0.06);
   --shadow-elevation-2:4px 4px 12px 2px rgba(0,0,0,0.08);
   --shadow-elevation-3:4px 4px 12px 2px rgba(0,0,0,0.12);
@@ -3415,6 +3434,63 @@ html.theme-light .inbox-search-kbd{background:#F1F5F9; border-color:var(--line)}
   color:var(--t1); font-family:inherit; font-size:13px}
 .dsf-search input::placeholder{color:var(--t3)}
 
+/* ── DS Filters bar (.fi-*) ──────────────────────────────────────── */
+.fi-bar{display:flex; align-items:center; gap:8px; width:100%; height:40px; margin-bottom:16px}
+.fi-bar-left{display:flex; align-items:center; gap:8px; flex:1; min-width:0}
+.fi-bar-right{display:flex; align-items:center; gap:8px; flex-shrink:0}
+/* Inactive dropdown chip */
+.fi-chip{
+  display:inline-flex; align-items:center; gap:6px;
+  height:40px; padding:0 12px; border-radius:8px;
+  border:0.5px solid var(--fi-chip-border);
+  background:var(--fi-chip-bg); color:var(--fi-chip-text);
+  font-size:13px; font-weight:500; font-family:inherit;
+  cursor:pointer; transition:background .12s, border-color .12s;
+  flex-shrink:0; white-space:nowrap;
+}
+.fi-chip:hover{background:var(--fi-chip-hover-bg); border-color:var(--fi-chip-border)}
+.fi-chip.is-active{
+  background:var(--fi-chip-active-bg);
+  border-color:var(--fi-chip-active-border);
+  color:var(--fi-chip-active-text);
+}
+.fi-chip-ic{color:var(--fi-chip-icon); flex-shrink:0; width:14px; height:14px}
+.fi-chip.is-active .fi-chip-ic{color:var(--fi-chip-active-icon)}
+/* "All filters" pill */
+.fi-all-filters{
+  display:inline-flex; align-items:center; gap:6px;
+  height:40px; padding:0 16px; border-radius:9999px;
+  border:1px solid var(--field-border);
+  background:var(--field-bg); color:var(--field-text);
+  font-size:14px; font-weight:500; font-family:inherit;
+  cursor:pointer; transition:border-color .12s; flex-shrink:0;
+}
+.fi-all-filters:hover{border-color:var(--field-border-hover)}
+.fi-all-filters-ic{color:var(--field-icon); width:14px; height:14px; flex-shrink:0}
+/* Sort controls */
+.fi-sort-wrap{display:flex; align-items:center; gap:24px; flex-shrink:0}
+.fi-sort-dir{
+  display:flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:4px;
+  background:transparent; border:none;
+  color:var(--fi-sort-icon); cursor:pointer; transition:background .12s;
+}
+.fi-sort-dir:hover{background:var(--fi-chip-bg)}
+.fi-sort-label{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:14px; font-weight:500; color:var(--fi-sort-text);
+  background:none; border:none; font-family:inherit; cursor:pointer;
+  transition:opacity .12s;
+}
+.fi-sort-label:hover{opacity:.8}
+/* Clear filters link */
+.fi-clear{
+  font-size:13px; font-weight:500; background:none; border:none;
+  color:var(--fi-clear-text); cursor:pointer; font-family:inherit;
+  transition:color .12s; white-space:nowrap;
+}
+.fi-clear:hover{color:var(--fi-clear-hover)}
+
 .inbox-bulkbar{
   display:flex; align-items:center; gap:10px;
   padding:8px 12px;
@@ -6240,6 +6316,25 @@ html.theme-light{
   --destructive:                      #d32f2f;
   --field-bg:                         #ffffff;
   --field-border:                     #5c5c5c;
+  /* Filters bar tokens (--fi-*) — light */
+  --fi-chip-bg:            rgba(250,250,250,1);
+  --fi-chip-border:        rgba(186,186,186,1);
+  --fi-chip-text:          #2a2a2a;
+  --fi-chip-icon:          rgba(0,0,0,0.40);
+  --fi-chip-hover-bg:      #f2f2f2;
+  --fi-chip-active-bg:     rgba(33,115,255,0.06);
+  --fi-chip-active-border: #2173ff;
+  --fi-chip-active-text:   #001740;
+  --fi-chip-active-icon:   #001740;
+  --fi-clear-text:         rgba(0,0,0,0.45);
+  --fi-clear-hover:        rgba(0,0,0,0.80);
+  --fi-badge-bg:           #2173ff;
+  --fi-badge-text:         #ffffff;
+  --fi-view-active-bg:     #2173ff;
+  --fi-view-active-icon:   #ffffff;
+  --fi-view-icon:          rgba(0,0,0,0.40);
+  --fi-sort-icon:          rgba(0,0,0,0.40);
+  --fi-sort-text:          rgba(0,0,0,0.65);
 
   /* Tags */
   --tag-neutral-bg:                   #f2f2f2;
@@ -12067,7 +12162,7 @@ function submitRequest() {
 }
 
 // Inbox UI state — bucket filter, search, bulk select
-const inboxState = { filter: 'all', search: '', selected: new Set() };
+const inboxState = { filter: 'all', search: '', selected: new Set(), filterPriority: '', filterRequester: '', sortDir: 'desc' };
 let _mrState = { filter: 'all', search: '' };
 
 function setInboxFilter(f) { inboxState.filter = f; renderRequestsInbox(); }
@@ -12086,6 +12181,52 @@ function toggleInboxRow(id, ev) {
   renderRequestsInbox();
 }
 function clearInboxSelection() { inboxState.selected.clear(); renderRequestsInbox(); }
+
+function clearInboxFilters() {
+  inboxState.filterPriority = '';
+  inboxState.filterRequester = '';
+  renderRequestsInbox();
+}
+
+function toggleInboxSort() {
+  inboxState.sortDir = inboxState.sortDir === 'desc' ? 'asc' : 'desc';
+  renderRequestsInbox();
+}
+
+function openInboxFilterDropdown(field, btn) {
+  document.getElementById('inboxFilterDropdown')?.remove();
+  const optionsByField = {
+    priority:  ['High', 'Medium', 'Low'],
+    requester: [...new Set(INBOX_REQUESTS.map(r => r.requester).filter(Boolean))]
+  };
+  const options = optionsByField[field] || [];
+  const rect = btn.getBoundingClientRect();
+  const dd = document.createElement('div');
+  dd.id = 'inboxFilterDropdown';
+  dd.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.bottom+4}px;z-index:9300;
+    background:var(--bg2);border:1px solid var(--color-border-neutral-subtle);border-radius:10px;
+    padding:4px;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.18)`;
+  const current = field === 'priority' ? inboxState.filterPriority : inboxState.filterRequester;
+  options.forEach(opt => {
+    const item = document.createElement('button');
+    item.style.cssText = `display:flex;align-items:center;gap:8px;width:100%;text-align:left;
+      padding:8px 12px;border-radius:7px;border:none;cursor:pointer;font-family:inherit;font-size:13px;
+      background:${current===opt?'var(--hover)':'transparent'};color:var(--t1);transition:background .1s`;
+    item.onmouseenter = () => { item.style.background = 'var(--hover)'; };
+    item.onmouseleave = () => { item.style.background = current===opt?'var(--hover)':'transparent'; };
+    item.textContent = opt;
+    item.onclick = () => {
+      if (field === 'priority') inboxState.filterPriority = inboxState.filterPriority === opt ? '' : opt;
+      else inboxState.filterRequester = inboxState.filterRequester === opt ? '' : opt;
+      dd.remove();
+      renderRequestsInbox();
+    };
+    dd.appendChild(item);
+  });
+  document.body.appendChild(dd);
+  const close = e => { if (!dd.contains(e.target) && e.target !== btn) { dd.remove(); document.removeEventListener('click', close, true); } };
+  setTimeout(() => document.addEventListener('click', close, true), 0);
+}
 function inboxBulkAction(action) {
   const ids = [...inboxState.selected];
   const reqs = REQUESTS.filter(r => ids.includes(r.id));
@@ -12567,14 +12708,22 @@ function _inboxBucket(status) {
 
 function _filteredRequests() {
   const q = (inboxState.search||'').toLowerCase();
-  return REQUESTS.filter(r => {
+  let list = REQUESTS.filter(r => {
     if (inboxState.filter !== 'all' && _inboxBucket(r.status) !== inboxState.filter) return false;
+    if (inboxState.filterPriority && (r.priority||'').toLowerCase() !== inboxState.filterPriority.toLowerCase()) return false;
+    if (inboxState.filterRequester && (r.requester?.name||'') !== inboxState.filterRequester) return false;
     if (q) {
       const hay = `${r.integration} ${r.vendor} ${r.requester?.name||''} ${r.requester?.dept||''} ${r.businessIntent||''} ${(r.actionTypes||[]).join(' ')}`.toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
   });
+  list = [...list].sort((a, b) => {
+    const da = new Date(a.submittedAt||0).getTime();
+    const db = new Date(b.submittedAt||0).getTime();
+    return inboxState.sortDir === 'asc' ? da - db : db - da;
+  });
+  return list;
 }
 
 /* ====================== MY REQUESTS (receptor view) ====================== */
@@ -12638,19 +12787,39 @@ function renderMyRequests() {
         </button>
       </div>
 
-      <div class="inbox-toolbar">
-        <div class="pa-tabs" style="border-bottom:none;margin-bottom:0;gap:2px;flex:1">
-          ${tab('All',         'all',         counts.all,         '')}
-          ${tab('Pending',     'pending',     counts.pending,     'warn')}
-          ${tab('Quoted',      'quoted',      counts.quoted,      'purple')}
-          ${tab('In progress', 'in_progress', counts.in_progress, 'cyan')}
-          ${tab('Delivered',   'done',        counts.done,        'ok')}
-          ${counts.rejected > 0 ? tab('Rejected','rejected',counts.rejected,'bad') : ''}
+      <!-- Status tabs row -->
+      <div class="pa-tabs" style="margin-bottom:12px">
+        ${tab('All',         'all',         counts.all,         '')}
+        ${tab('Pending',     'pending',     counts.pending,     'warn')}
+        ${tab('Quoted',      'quoted',      counts.quoted,      'purple')}
+        ${tab('In progress', 'in_progress', counts.in_progress, 'cyan')}
+        ${tab('Delivered',   'done',        counts.done,        'ok')}
+        ${counts.rejected > 0 ? tab('Rejected','rejected',counts.rejected,'bad') : ''}
+      </div>
+
+      <!-- DS Filters bar -->
+      <div class="fi-bar">
+        <div class="fi-bar-left">
+          <label class="dsf-search" style="width:200px;flex:none;height:40px">
+            <svg class="dsf-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12"/></svg>
+            <input id="mrSearchInput" type="text" placeholder="Search…" value="${escapeHtml(_mrState.search||'')}" oninput="setMrSearch(this.value)"/>
+          </label>
         </div>
-        <label class="dsf-search" style="max-width:280px;height:36px">
-          <svg class="dsf-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12"/></svg>
-          <input id="mrSearchInput" type="text" placeholder="Search integration, description…" value="${escapeHtml(_mrState.search||'')}" oninput="setMrSearch(this.value)"/>
-        </label>
+        <div class="fi-bar-right">
+          <button class="fi-all-filters" type="button" onclick="toast('All filters coming soon','info')">
+            All filters
+            <svg class="fi-all-filters-ic" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 3h12M3 7h8M5 11h4" stroke-linecap="round"/></svg>
+          </button>
+          <div class="fi-sort-wrap">
+            <button class="fi-sort-dir" type="button" aria-label="Sort direction">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M4 9l4 4 4-4"/></svg>
+            </button>
+            <button class="fi-sort-label" type="button">
+              Date
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="mr-list" role="list">
@@ -12864,20 +13033,54 @@ function renderRequestsInbox() {
         </button>
       </div>
 
-      <div class="inbox-toolbar">
-        <div class="pa-tabs" style="border-bottom:none;margin-bottom:0;gap:2px;flex:1">
-          ${tab('All',         'all',         counts.all,         '')}
-          ${tab('Pending',     'pending',     counts.pending,     'warn')}
-          ${tab('Quoted',      'quoted',      counts.quoted,      'purple')}
-          ${tab('In progress', 'in_progress', counts.in_progress, 'cyan')}
-          ${tab('Delivered',   'done',        counts.done,        'ok')}
-          ${counts.rejected > 0 ? tab('Rejected', 'rejected', counts.rejected, 'bad') : ''}
+      <!-- Status tabs row -->
+      <div class="pa-tabs" style="margin-bottom:12px">
+        ${tab('All',         'all',         counts.all,         '')}
+        ${tab('Pending',     'pending',     counts.pending,     'warn')}
+        ${tab('Quoted',      'quoted',      counts.quoted,      'purple')}
+        ${tab('In progress', 'in_progress', counts.in_progress, 'cyan')}
+        ${tab('Delivered',   'done',        counts.done,        'ok')}
+        ${counts.rejected > 0 ? tab('Rejected', 'rejected', counts.rejected, 'bad') : ''}
+      </div>
+
+      <!-- DS Filters bar -->
+      <div class="fi-bar">
+        <div class="fi-bar-left">
+          <!-- Search — DS Input style -->
+          <label class="dsf-search" style="width:200px;flex:none;height:40px">
+            <svg class="dsf-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12"/></svg>
+            <input id="inboxSearchInput" type="text" placeholder="Search…" value="${escapeHtml(inboxState.search||'')}" oninput="setInboxSearch(this.value)"/>
+          </label>
+          <!-- Filter chips -->
+          <button class="fi-chip ${inboxState.filterPriority ? 'is-active' : ''}" type="button" onclick="openInboxFilterDropdown('priority', this)">
+            ${inboxState.filterPriority ? escapeHtml(inboxState.filterPriority) : 'Priority'}
+            <svg class="fi-chip-ic" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="fi-chip ${inboxState.filterRequester ? 'is-active' : ''}" type="button" onclick="openInboxFilterDropdown('requester', this)">
+            ${inboxState.filterRequester ? escapeHtml(inboxState.filterRequester) : 'Requester'}
+            <svg class="fi-chip-ic" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          ${(inboxState.filterPriority || inboxState.filterRequester)
+            ? `<button class="fi-clear" type="button" onclick="clearInboxFilters()">Clear filters</button>`
+            : ''}
         </div>
-        <label class="dsf-search" style="max-width:300px;height:36px">
-          <svg class="dsf-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12"/></svg>
-          <input id="inboxSearchInput" type="text" placeholder="Search vendor, requester, scope…" value="${escapeHtml(inboxState.search||'')}" oninput="setInboxSearch(this.value)"/>
-          <kbd class="inbox-search-kbd">⌘K</kbd>
-        </label>
+        <div class="fi-bar-right">
+          <!-- All filters pill -->
+          <button class="fi-all-filters" type="button" onclick="toast('All filters coming soon','info')">
+            All filters
+            <svg class="fi-all-filters-ic" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 3h12M3 7h8M5 11h4" stroke-linecap="round"/></svg>
+          </button>
+          <!-- Sort -->
+          <div class="fi-sort-wrap">
+            <button class="fi-sort-dir" type="button" onclick="toggleInboxSort()" aria-label="Toggle sort direction">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M4 9l4 4 4-4"/></svg>
+            </button>
+            <button class="fi-sort-label" type="button" onclick="toggleInboxSort()">
+              Date
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       ${selectedCount > 0 ? `
