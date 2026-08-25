@@ -1247,6 +1247,10 @@ html.theme-light .ac-copilot-input{background:rgba(0,0,0,.03); color:var(--t1)}
 .ssb-item-badge--green{
   background:var(--status-ok); color:#001a0e;
 }
+/* Studios section in sub-sidebar */
+.ssb-studio-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-right:2px}
+.ssb-item--studio{gap:10px}
+
 .ssb-badge-soon{
   background:var(--purple-10); color:var(--purple);
   border:1px solid var(--purple-22);
@@ -9262,39 +9266,47 @@ html.theme-light .cap-drawer-deactivate-btn { background:rgba(239,68,68,.05); }
           </button>
         </div>
 
-        <!-- PLATFORM — super-admin (all), regional-admin (partial), tenant-admin (audit only) -->
+        <!-- PLATFORM — renamed to Studios: dynamic list of active studios for this tenant -->
         <div class="ssb-group" data-roles="super-admin,regional-admin,tenant-admin">
           <div class="ssb-grp-h"><span class="ssb-grp-label">Platform</span></div>
 
-          <button class="ssb-item" data-route="governance-defaults" data-roles="super-admin" onclick="navigate('#/governance-defaults')">
+          <button class="ssb-item" data-route="governance-defaults" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/governance-defaults')">
             <span class="ssb-item-label">Governance Defaults</span>
             <span class="ssb-item-badge ssb-item-badge--green">2</span>
           </button>
 
-          <button class="ssb-item" data-route="data-privacy" data-roles="super-admin" onclick="navigate('#/data-privacy')">
-            <span class="ssb-item-label">Data & Privacy</span>
-          </button>
-
-          <button class="ssb-item" data-route="integrations" data-roles="super-admin,regional-admin">
+          <button class="ssb-item" data-route="integrations" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/integrations')">
             <span class="ssb-item-label">Integrations & Credentials</span>
             <span class="ssb-item-alert" title="1 integration failing"></span>
           </button>
 
-          <button class="ssb-item" data-route="notifications" data-roles="super-admin" onclick="navigate('#/notifications')">
+          <button class="ssb-item" data-route="notifications" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/notifications')">
             <span class="ssb-item-label">Notifications</span>
             <span class="ssb-item-badge">4</span>
           </button>
 
-          <button class="ssb-item" data-route="audit" data-roles="super-admin,regional-admin,tenant-admin">
+          <button class="ssb-item" data-route="audit" data-roles="super-admin,regional-admin,tenant-admin" onclick="navigate('#/audit')">
             <span class="ssb-item-label">Audit & Compliance</span>
           </button>
         </div>
 
-        <!-- SUPER ADMIN — super-admin and regional-admin -->
-        <div class="ssb-group" id="ssbSuperAdmin" data-roles="super-admin,regional-admin">
-          <div class="ssb-grp-h"><span class="ssb-grp-label">Super Admin</span></div>
-          <button class="ssb-item" data-route="tenants" data-roles="super-admin,regional-admin" onclick="navigate('#/tenants')">
-            <span class="ssb-item-label">Tenant Directory</span>
+        <!-- STUDIOS — active studios for this tenant (replaces former Super Admin / static platform list) -->
+        <div class="ssb-group" data-roles="super-admin,regional-admin,tenant-admin">
+          <div class="ssb-grp-h"><span class="ssb-grp-label">Studios</span></div>
+
+          <button class="ssb-item ssb-item--studio" data-route="studio-governance" onclick="navigate('#/studio-governance')">
+            <span class="ssb-studio-dot" style="background:#10b981"></span>
+            <span class="ssb-item-label">Governance Studio</span>
+          </button>
+
+          <button class="ssb-item ssb-item--studio" data-route="studio-datastudio" onclick="navigate('#/studio-datastudio')">
+            <span class="ssb-studio-dot" style="background:#8b5cf6"></span>
+            <span class="ssb-item-label">Data Studio</span>
+          </button>
+
+          <button class="ssb-item ssb-item--studio" data-route="studio-agentic" onclick="navigate('#/studio-agentic')">
+            <span class="ssb-studio-dot" style="background:#06B6D4"></span>
+            <span class="ssb-item-label">Agentic Studio</span>
           </button>
         </div>
 
