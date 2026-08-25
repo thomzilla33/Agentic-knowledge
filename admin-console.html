@@ -8521,6 +8521,78 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 .ste-tag-addon    { background:rgba(249,115,22,.1);  color:#f97316; }
 .ste-tag-beta     { background:var(--indigo-15); color:var(--indigo); }
 
+/* Request add-on button (inline in feature row) */
+.ste-feature-row--locked { background:rgba(249,115,22,.03); }
+.ste-request-btn {
+  flex-shrink:0; margin-left:16px;
+  padding:5px 14px; border-radius:var(--r8);
+  border:1px solid rgba(249,115,22,.45);
+  background:rgba(249,115,22,.08);
+  color:#f97316; font-size:12px; font-weight:600;
+  cursor:pointer; white-space:nowrap; transition:background .15s,border-color .15s;
+}
+.ste-request-btn:hover { background:rgba(249,115,22,.15); border-color:rgba(249,115,22,.7); }
+
+/* Request add-on modal */
+.ste-addon-modal-overlay {
+  position:fixed; inset:0; z-index:10000;
+  background:rgba(0,0,0,.55); display:flex;
+  align-items:center; justify-content:center;
+  animation:fadeIn .15s ease;
+}
+.ste-addon-modal-box {
+  background:var(--bg2); border:1px solid var(--line);
+  border-radius:16px; width:480px; max-width:calc(100vw - 48px);
+  box-shadow:0 24px 64px rgba(0,0,0,.45);
+  animation:slideUp .18s ease;
+}
+@keyframes slideUp { from { transform:translateY(12px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.ste-addon-modal-header {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  padding:20px 20px 0;
+}
+.ste-addon-modal-eyebrow { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#f97316; margin-bottom:4px; }
+.ste-addon-modal-title { font-size:17px; font-weight:700; color:var(--t1); }
+.ste-addon-modal-close {
+  background:none; border:none; cursor:pointer; padding:4px;
+  color:var(--t3); border-radius:6px; line-height:0;
+}
+.ste-addon-modal-close:hover { color:var(--t1); background:var(--hover); }
+.ste-addon-modal-body { padding:16px 20px; }
+.ste-addon-modal-sub { font-size:13px; color:var(--t2); margin:0 0 10px; line-height:1.5; }
+.ste-addon-modal-studio-lbl { font-size:12px; color:var(--t3); margin:0 0 16px; }
+.ste-addon-modal-studio-lbl strong { color:var(--t2); }
+.ste-addon-field-label { display:block; font-size:12px; font-weight:600; color:var(--t2); margin-bottom:6px; }
+.ste-addon-textarea {
+  width:100%; box-sizing:border-box; resize:vertical;
+  background:var(--bg1); border:1px solid var(--line); border-radius:var(--r8);
+  color:var(--t1); font-size:13px; padding:10px 12px; line-height:1.5;
+  font-family:inherit; min-height:80px; transition:border-color .15s;
+}
+.ste-addon-textarea:focus { outline:none; border-color:var(--pri); }
+.ste-addon-modal-note {
+  display:flex; align-items:flex-start; gap:7px;
+  margin-top:12px; padding:10px 12px;
+  background:var(--bg3); border-radius:var(--r8);
+  font-size:12px; color:var(--t3); line-height:1.45;
+}
+.ste-addon-modal-note svg { flex-shrink:0; margin-top:1px; }
+.ste-addon-modal-footer {
+  display:flex; justify-content:flex-end; gap:10px;
+  padding:14px 20px; border-top:1px solid var(--line);
+}
+.ste-addon-cancel-btn {
+  padding:7px 18px; border-radius:var(--r8); border:1px solid var(--line);
+  background:none; color:var(--t2); font-size:13px; font-weight:600; cursor:pointer;
+}
+.ste-addon-cancel-btn:hover { background:var(--hover); }
+.ste-addon-submit-btn {
+  padding:7px 18px; border-radius:var(--r8); border:none;
+  background:var(--pri); color:#fff; font-size:13px; font-weight:600; cursor:pointer;
+  transition:opacity .15s;
+}
+.ste-addon-submit-btn:hover { opacity:.88; }
+
 /* Workspace × Studio matrix */
 .ste-matrix-wrap { margin-bottom:36px; }
 .ste-matrix-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--t3); margin-bottom:14px; }
@@ -19731,6 +19803,49 @@ function steToggleExpand(id) {
   renderStudiosEntitlements();
 }
 
+function steRequestAddon(studioName, featureName, featureDesc) {
+  const existing = document.getElementById('ste-addon-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'ste-addon-modal';
+  modal.className = 'ste-addon-modal-overlay';
+  modal.innerHTML = `
+    <div class="ste-addon-modal-box" role="dialog" aria-modal="true" aria-labelledby="ste-addon-title">
+      <div class="ste-addon-modal-header">
+        <div>
+          <div class="ste-addon-modal-eyebrow">Add-on request</div>
+          <div class="ste-addon-modal-title" id="ste-addon-title">${featureName}</div>
+        </div>
+        <button class="ste-addon-modal-close" onclick="document.getElementById('ste-addon-modal').remove()" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="ste-addon-modal-body">
+        <p class="ste-addon-modal-sub">${featureDesc}</p>
+        <p class="ste-addon-modal-studio-lbl">Studio: <strong>${studioName}</strong></p>
+        <label class="ste-addon-field-label" for="ste-addon-note">Message to your account manager <span style="color:var(--t3);font-weight:400">(optional)</span></label>
+        <textarea id="ste-addon-note" class="ste-addon-textarea" placeholder="Tell us why you need this add-on and your expected usage…" rows="4"></textarea>
+        <div class="ste-addon-modal-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Your account manager will follow up within 1 business day with pricing and activation details.
+        </div>
+      </div>
+      <div class="ste-addon-modal-footer">
+        <button class="ste-addon-cancel-btn" onclick="document.getElementById('ste-addon-modal').remove()">Cancel</button>
+        <button class="ste-addon-submit-btn" onclick="steSubmitAddonRequest('${featureName}')">Send request</button>
+      </div>
+    </div>`;
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+  setTimeout(() => document.getElementById('ste-addon-note')?.focus(), 50);
+}
+
+function steSubmitAddonRequest(featureName) {
+  document.getElementById('ste-addon-modal')?.remove();
+  toast(`Request sent — your account manager will follow up about ${featureName}`, 'success');
+}
+
 /* Workspace × Studio activation state — derived from AC_WORKSPACES */
 const _steWsStudios = (() => {
   const state = {};
@@ -19825,17 +19940,20 @@ function renderStudiosEntitlements() {
       const key = `${s.id}__${f.name}`;
       const on = st.featureOn[key];
       const tagClass = { included:'ste-tag-included', addon:'ste-tag-addon', beta:'ste-tag-beta' }[f.tag];
+      const rightSlot = (f.tag === 'addon' && !on)
+        ? `<button class="ste-request-btn" onclick="steRequestAddon('${s.name}','${f.name}','${f.desc}')">Request add-on</button>`
+        : `<label class="ids-toggle" style="margin-left:16px;">
+            <input type="checkbox" ${on ? 'checked' : ''} onchange="steToggleFeature('${key}')">
+            <span class="ids-toggle-track"></span>
+            <span class="ids-toggle-thumb"></span>
+           </label>`;
       return `
-      <div class="ste-feature-row">
+      <div class="ste-feature-row ${!on && f.tag === 'addon' ? 'ste-feature-row--locked' : ''}">
         <div>
           <div class="ste-feature-name">${f.name} <span class="ste-feature-tag ${tagClass}">${f.tag}</span></div>
           <div class="ste-feature-desc">${f.desc}</div>
         </div>
-        <label class="ids-toggle" style="margin-left:16px;">
-          <input type="checkbox" ${on ? 'checked' : ''} onchange="steToggleFeature('${key}')">
-          <span class="ids-toggle-track"></span>
-          <span class="ids-toggle-thumb"></span>
-        </label>
+        ${rightSlot}
       </div>`;
     }).join('');
 
