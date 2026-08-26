@@ -2403,7 +2403,7 @@ html.theme-light .int-issue-banner{
 }
 
 /* List */
-.op-list{padding:8px 24px 32px; display:flex; flex-direction:column; gap:6px}
+.op-list{padding:8px 32px 32px; display:flex; flex-direction:column; gap:6px}
 .op-row{
   display:grid; grid-template-columns:160px 1fr 32px 140px; gap:16px;
   align-items:center; padding:12px 16px; min-height:72px;
@@ -22526,11 +22526,22 @@ function renderOperateHome() {
     ? connected
     : byBucket[tab] || [];
 
-  const tabBtn = (id, label, count, accent) =>
-    `<button class="op-tab ${tab===id?'active':''}" data-bucket="${id}" onclick="setOperateTab('${id}')">
-       <span class="op-tab-label">${label}</span>
-       <span class="op-tab-count op-tab-count-${accent}">${count}</span>
-     </button>`;
+  const accentColor = {warn:'var(--amber)', ok:'var(--green)', idle:'var(--t3)', neutral:'var(--t2)'};
+  const accentBg    = {warn:'rgba(251,191,36,0.15)', ok:'rgba(5,223,114,0.12)', idle:'rgba(148,163,184,0.15)', neutral:'var(--hover)'};
+  const tabBtn = (id, label, count, accent) => {
+    const isActive = tab === id;
+    const col = accentColor[accent] || 'var(--t2)';
+    const bg  = accentBg[accent]    || 'var(--hover)';
+    const xBtn = id !== 'all'
+      ? `<button class="fi-chip-tag-x" onclick="event.stopPropagation();setOperateTab('all')" aria-label="Clear"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg></button>`
+      : '';
+    return `<button class="fi-chip ${isActive?'is-active':''}" onclick="setOperateTab(tab==='${id}'?'all':'${id}')">
+      ${label}
+      ${isActive
+        ? `<span class="fi-chip-tag" style="background:${bg};color:${col}">${count}</span>${xBtn}`
+        : `<span style="font-size:11px;color:${col};margin-left:2px">${count}</span>`}
+    </button>`;
+  };
 
   $('content').innerHTML = `
     <div class="ns-page-head">
@@ -22545,7 +22556,7 @@ function renderOperateHome() {
         <button class="ds-btn ds-btn-sm ds-btn--primary" onclick="setOpTab('needs_attention')">Resolve ${counts.needs_attention} issue${counts.needs_attention===1?'':'s'}</button>
       </div>` : ''}
     </div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:0 32px">
       <div style="display:flex;align-items:center;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">
         <div style="padding:10px 20px;text-align:center;border-right:1px solid var(--border)">
           <div style="font-size:22px;font-weight:700;color:var(--status-ok);line-height:1">${counts.working}</div>
@@ -22562,7 +22573,7 @@ function renderOperateHome() {
       </div>
     </div>
 
-    <div class="op-tabs" role="tablist" aria-label="Filter by status">
+    <div class="dsf-bar" style="padding:0 32px;margin-bottom:16px;flex-wrap:nowrap">
       ${tabBtn('needs_attention', 'Needs attention', counts.needs_attention, 'warn')}
       ${tabBtn('working', 'Working', counts.working, 'ok')}
       ${tabBtn('inactive', 'Inactive', counts.inactive, 'idle')}
