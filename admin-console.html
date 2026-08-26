@@ -16165,12 +16165,12 @@ function _paCbHTML(state, onclick) {
   if (state === 'g-denied') {
     return `<div class="pa-toggle denied" role="switch" aria-checked="false" title="Explicitly denied"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--red,#ef4444)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>`;
   }
-  const granted  = state === 'g-direct' || state === 'g-role' || state === 'g-inh';
-  const locked   = state === 'g-role'   || state === 'g-inh';
-  const cls      = locked ? (granted ? 'on-locked' : 'off-locked') : (granted ? 'on' : '');
-  const label    = granted ? 'Granted' : 'Not granted';
-  const click    = (!locked && onclick) ? ` onclick="${onclick}"` : '';
-  return `<div class="pa-toggle ${cls}"${click} role="switch" aria-checked="${granted}" title="${label}"></div>`;
+  const granted   = state === 'g-direct' || state === 'g-role' || state === 'g-inh';
+  const inherited = state === 'g-role'   || state === 'g-inh';
+  const cls       = inherited ? (granted ? 'on-locked' : 'off-locked') : (granted ? 'on' : '');
+  const label     = granted ? (inherited ? 'Inherited — click to override' : 'Granted') : 'Not granted';
+  const click     = onclick ? ` onclick="${onclick}"` : '';
+  return `<div class="pa-toggle ${cls}"${click} role="switch" aria-checked="${granted}" title="${label}" style="${inherited ? 'cursor:pointer;opacity:.75' : ''}"></div>`;
 }
 
 function _paChevron(expanded) {
@@ -16185,8 +16185,7 @@ function _paRenderTreeNode(node, depth, drillable) {
   if (node.role)         meta += `<span class="pa-role-tag-sm"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>${escapeHtml(node.role)}</span>`;
   if (node.via)          meta += `<span class="pa-tree-scope">via ${escapeHtml(node.via)}</span>`;
   if (node.partialCount) meta += `<span style="font-size:11px;color:var(--t3)">${node.partialCount}</span>`;
-  if (node.locked && node.scope) meta += `<span class="pa-tree-scope">${node.scope}</span>`;
-  else if (node.scope && !node.locked && node.state && node.state!=='g-denied' && node.state!=='g-pdeny' && node.state!=='g-padd' && node.state!=='')
+  if (node.state === 'g-direct' || node.state === 'g-role' || node.state === 'g-inh')
     meta += `<button class="pa-scope-btn" onclick="paOpenScopePicker('${node.id}',this);event.stopPropagation()" aria-label="Set scope for ${escapeHtml(node.label)}">${escapeHtml(node.scope||'Tenant')}<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg></button>`;
 
   // #10: parent nodes in drill-capable view show a "drill in" chevron button
@@ -16503,10 +16502,11 @@ function _paRecomputeUserTree(userId) {
     const grantingRole = permIds.length ? _paGetGrantingRole(permIds, userId) : null;
 
     if (parentGrantingRole && grantingRole) {
-      // Child whose parent is also role-granted → inherited (locked)
+      // Child whose parent is also role-granted → inherited
       node.state  = 'g-inh';
-      node.locked = true;
+      node.locked = false;
       node.role   = undefined;
+      node.scope  = node.scope || 'Tenant';
     } else if (grantingRole) {
       node.state  = 'g-role';
       node.locked = true;
@@ -16560,31 +16560,34 @@ function _paTrackChange(n) {
 
 function paToggleUserPerm(nodeId) {
   const node = _paFindNode(nodeId);
-  if (!node || node.locked) return;
+  if (!node || node.state === 'g-denied') return;
 
-  const wasGranted = node.state === 'g-direct';
-  node.state = wasGranted ? '' : 'g-direct';
+  // Explicit override: inherited/role → g-direct; g-direct → '' (reverts to inherited)
+  const wasExplicit = node.state === 'g-direct';
+  node.state = wasExplicit ? '' : 'g-direct';
+  if (node.state === 'g-direct' && !node.scope) node.scope = 'Tenant';
 
   _paTrackChange(node);
-  _paPatchNodeToggle(node);
 
-  // Parent acts as master switch — cascade ON and OFF to all unlocked children
+  // Cascade to children: toggle all non-denied children
   if (node.children && node.children.length) {
-    const newState = node.state; // already flipped above
+    const newState = node.state;
     node.children.forEach(child => {
-      if (child.locked) return;
+      if (child.state === 'g-denied') return;
       child.state = newState;
+      if (newState === 'g-direct' && !child.scope) child.scope = 'Tenant';
       _paTrackChange(child);
-      _paPatchNodeToggle(child);
     });
   }
 
-  // Update changes bar count label without re-rendering the whole view
+  // Full re-render so scope buttons and states update correctly
+  renderPeople();
+
   const bar = document.getElementById('paChangesBar');
   if (bar) {
     bar.classList.add('visible');
-    const label = document.getElementById('paChangesLabel');
-    if (label) label.textContent = _paState.pendingChanges.length + ' unsaved change' + (_paState.pendingChanges.length !== 1 ? 's' : '');
+    const lbl = document.getElementById('paChangesLabel');
+    if (lbl) lbl.textContent = _paState.pendingChanges.length + ' unsaved change' + (_paState.pendingChanges.length !== 1 ? 's' : '');
   }
 }
 
