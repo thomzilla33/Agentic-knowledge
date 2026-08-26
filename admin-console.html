@@ -673,7 +673,7 @@ html.theme-light .tb-um-sep{background:rgba(0,0,0,0.08)}
 /* ── APP layout (below fixed topbar) ── */
 .app{
   display:flex; width:100%; height:100vh;
-  padding:44px 8px 8px 0; gap:8px;
+  padding:37px 8px 8px 0; gap:8px;
   overflow:hidden; box-sizing:border-box;
 }
 
@@ -1736,7 +1736,7 @@ html.theme-light .btn-primary.btn-outline{color:var(--cyan); border-color:var(--
 }
 .drawer-overlay.open{opacity:1; pointer-events:all}
 .drawer{
-  position:fixed; top:0; right:0; bottom:0; width:480px; max-width:100vw;
+  position:fixed; top:37px; right:0; bottom:0; width:480px; max-width:100vw;
   background:var(--bg2); border-left:1px solid var(--line);
   z-index:100; display:flex; flex-direction:column;
   transform:translateX(100%); transition:transform .25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -8386,8 +8386,12 @@ tr.pa-row-sel > td{background:color-mix(in srgb,var(--pri) 5%,var(--bg))!importa
 
 /* ── Permission tree (V2 User Access view) ── */
 .pa-access-layout { display:flex; gap:20px; align-items:flex-start; }
-.pa-access-rail { width:300px; flex-shrink:0; display:flex; flex-direction:column; gap:14px; }
+.pa-access-rail { width:256px; flex-shrink:0; display:flex; flex-direction:column; gap:14px; }
 .pa-access-main { flex:1; min-width:0; }
+@media (max-width:900px) {
+  .pa-access-layout { flex-direction:column; }
+  .pa-access-rail { width:100%; }
+}
 .pa-eff-top { height:3px; background:linear-gradient(135deg,var(--pri) 0%,#09E2AB 100%); border-radius:12px 12px 0 0; }
 .pa-eff-stat { text-align:center; flex:1; }
 .pa-eff-num { font-size:20px; font-weight:700; color:var(--pri); line-height:1; }
@@ -15990,6 +15994,7 @@ let _paState = {
   roleAccessId: null,
   roleAccessTab: 'overview',
   roleAccessStudioTab: 'governance',
+  rolePermScopes: {},
   // V2: Group full-page view
   groupAccessId: null,
   groupAccessTab: 'overview',
@@ -16331,7 +16336,7 @@ function paOpenScopePicker(nodeId, btn) {
   if (_paState.scopePickerNodeId === nodeId) { paCloseScopePicker(); return; }
   const rect = btn.getBoundingClientRect();
   _paState.scopePickerNodeId = nodeId;
-  _paState.scopePickerRect = { top: rect.bottom + 6, left: rect.left };
+  _paState.scopePickerRect = { top: rect.bottom + 6, left: rect.left, right: rect.right };
   _paRenderScopePickerOverlay();
 }
 
@@ -16354,6 +16359,54 @@ function paSetNodeScope(nodeId, scopeId) {
   set(all);
   paCloseScopePicker();
   renderPeople();
+}
+
+function paOpenRoleScopePicker(roleId, permId, btn) {
+  const key = roleId + '__' + permId;
+  if (_paState.scopePickerNodeId === key) { paCloseScopePicker(); return; }
+  const rect = btn.getBoundingClientRect();
+  _paState.scopePickerNodeId = key;
+  _paState.scopePickerRect = { top: rect.bottom + 6, left: rect.left, right: rect.right };
+  _paState._scopePickerIsRole = true;
+  _paState._scopePickerRoleId = roleId;
+  _paState._scopePickerPermId = permId;
+  const currentScope = (_paState.rolePermScopes && _paState.rolePermScopes[key]) || 'Tenant';
+  const bd = document.createElement('div');
+  bd.id = 'paScopePickerBd';
+  bd.style.cssText = 'position:fixed;inset:0;z-index:10050;';
+  bd.onclick = () => paCloseScopePicker();
+  const picker = document.createElement('div');
+  picker.id = 'paScopePicker';
+  const pickerW = 260;
+  const pickerLeft = Math.max(8, Math.min(rect.right - pickerW, window.innerWidth - pickerW - 8));
+  picker.style.cssText = `position:fixed;top:${rect.bottom+6}px;left:${pickerLeft}px;z-index:10051;width:${pickerW}px;background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden;`;
+  picker.onclick = e => e.stopPropagation();
+  picker.innerHTML = `
+    <div style="padding:10px 14px 8px;border-bottom:1px solid var(--color-border-neutral-subtle)">
+      <div style="font-size:11px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.07em">Select scope</div>
+      <div style="font-size:11px;color:var(--color-text-disabled);margin-top:2px">How broadly this permission applies</div>
+    </div>
+    ${PA_SCOPE_LEVELS.map(s => {
+      const active = currentScope === s.id;
+      return `<button class="pa-scope-option ${active?'active':''}" style="padding-left:${14+s.indent}px" onclick="paSetRolePermScope('${roleId}','${permId}','${s.id}')">
+        <span class="pa-scope-option-dot" style="background:${s.dot}"></span>
+        <span class="pa-scope-option-body">
+          <span class="pa-scope-option-label">${s.label}</span>
+          <span class="pa-scope-option-desc">${s.desc}</span>
+        </span>
+        ${active ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
+      </button>`;
+    }).join('')}`;
+  document.body.appendChild(bd);
+  document.body.appendChild(picker);
+}
+
+function paSetRolePermScope(roleId, permId, scopeId) {
+  if (!_paState.rolePermScopes) _paState.rolePermScopes = {};
+  _paState.rolePermScopes[roleId + '__' + permId] = scopeId;
+  paCloseScopePicker();
+  const d = document.getElementById('content');
+  if (d && _paState.roleAccessId) d.innerHTML = renderRoleAccessView(_paState.roleAccessId);
 }
 
 function _paRenderScopePickerOverlay() {
@@ -16379,7 +16432,10 @@ function _paRenderScopePickerOverlay() {
 
   const picker = document.createElement('div');
   picker.id = 'paScopePicker';
-  picker.style.cssText = `position:fixed;top:${r.top}px;left:${r.left}px;z-index:10051;width:260px;background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden;`;
+  const _pw = 260;
+  const _anchor = r.right || r.left;
+  const _pl = Math.max(8, Math.min(_anchor - _pw, window.innerWidth - _pw - 8));
+  picker.style.cssText = `position:fixed;top:${r.top}px;left:${_pl}px;z-index:10051;width:${_pw}px;background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden;`;
   picker.onclick = e => e.stopPropagation();
 
   picker.innerHTML = `
@@ -16783,7 +16839,7 @@ function renderUserAccessView(personId) {
     tabContent = `
       <div class="pa-access-layout">
         <!-- Left rail -->
-        <div class="pa-access-rail" style="width:256px">
+        <div class="pa-access-rail">
           <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:14px 16px">
             <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Permission states</div>
             <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--color-text-subtitle)">
@@ -17106,7 +17162,7 @@ function renderRoleAccessView(roleId) {
 
   const permTabHtml = `<div class="pa-access-layout">
     <!-- Left rail -->
-    <div class="pa-access-rail" style="width:256px">
+    <div class="pa-access-rail">
       <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:14px 16px">
         <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Permission states</div>
         <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--color-text-subtitle)">
@@ -17173,7 +17229,11 @@ function renderRoleAccessView(roleId) {
               </div>` +
               (feat.children||[]).map(perm => {
                 const on = editPerms.has(perm.id);
-                return `<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid var(--color-border-neutral-subtle)">
+                const scopeKey = roleId + '__' + perm.id;
+                const scope = (_paState.rolePermScopes && _paState.rolePermScopes[scopeKey]) || 'Tenant';
+                const scopeDisabled = r.system || !on;
+                const scopeOnclick = scopeDisabled ? '' : `paOpenRoleScopePicker('${roleId}','${perm.id}',this);event.stopPropagation()`;
+                return `<div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--color-border-neutral-subtle)">
                   <label style="display:flex;align-items:flex-start;gap:12px;flex:1;cursor:${r.system?'default':'pointer'}">
                     <span class="rd-sw" style="margin-top:2px;flex-shrink:0">
                       <input type="checkbox" ${on?'checked':''} ${r.system?'disabled':''}
@@ -17186,6 +17246,11 @@ function renderRoleAccessView(roleId) {
                       <div style="font-size:10.5px;font-family:'SF Mono','Fira Code',monospace;color:var(--color-text-disabled);margin-top:3px">${escapeHtml(perm.id)}</div>
                     </div>
                   </label>
+                  <button class="pa-scope-btn" style="${scopeDisabled?'opacity:.4;cursor:default':''}"
+                    onclick="${scopeOnclick}"
+                    aria-label="Set scope for ${escapeHtml(perm.label)}" ${scopeDisabled?'disabled':''}>
+                    ${escapeHtml(scope)}<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+                  </button>
                 </div>`;
               }).join('') + '</div>';
           }).join('')
