@@ -2335,6 +2335,22 @@ html.theme-light .int-issue-banner{
 .op-kpi.is-warn .op-kpi-l{color:var(--status-warn);}
 .op-kpi.is-idle .op-kpi-l{color:var(--t3);}
 
+/* Operate split-view section headers */
+.op-section-head{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 32px 6px;
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--t3);
+  border-bottom:1px solid var(--border);
+  margin-bottom:4px;
+}
+.op-section-head--warn{ color:var(--amber) }
+.op-section-head--ok{ color:var(--green) }
+.op-section-count{
+  font-size:11px; font-weight:600;
+  background:var(--hover); padding:1px 7px;
+  border-radius:10px; color:var(--t2); text-transform:none; letter-spacing:0;
+}
 /* Primary CTA next to KPIs when needs_attention > 0 */
 .op-hero-cta{
   display:inline-flex; align-items:center; gap:8px;
@@ -22348,10 +22364,6 @@ function renderHome() {
       </div>
     </div>
     <div class="dsf-bar" style="margin-bottom:20px;padding:0 32px;flex-wrap:nowrap">
-      <label class="dsf-search" style="flex:1 1 160px;min-width:0;max-width:240px">
-        <svg class="dsf-search-ic" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5L12 12"/></svg>
-        <input type="text" placeholder="Search integrations…" value="${escapeHtml(state.search)}" oninput="setSearch(this.value)"/>
-      </label>
       <button class="fi-chip ${state.activeSrc==='official'?'is-active':''}" onclick="setSrc(state.activeSrc==='official'?'all':'official')">
         Official
         ${state.activeSrc==='official' ? `<span class="fi-chip-tag">${INTEGRATIONS.filter(i=>i.source==='official').length}</span><button class="fi-chip-tag-x" onclick="event.stopPropagation();setSrc('all')" aria-label="Clear"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg></button>` : `<span style="font-size:11px;color:var(--t3);margin-left:2px">${INTEGRATIONS.filter(i=>i.source==='official').length}</span>`}
@@ -22364,6 +22376,10 @@ function renderHome() {
         Your team
         ${state.activeSrc==='private' ? `<span class="fi-chip-tag">${INTEGRATIONS.filter(i=>i.source==='private').length}</span><button class="fi-chip-tag-x" onclick="event.stopPropagation();setSrc('all')" aria-label="Clear"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg></button>` : `<span style="font-size:11px;color:var(--t3);margin-left:2px">${INTEGRATIONS.filter(i=>i.source==='private').length}</span>`}
       </button>
+      ${connected.length > 0 ? `<button class="fi-chip ${state.activeStates.has('connected')?'is-active':''}" onclick="toggleState('connected')">
+        Connected
+        ${state.activeStates.has('connected') ? `<span class="fi-chip-tag" style="background:rgba(5,223,114,0.12);color:var(--green)">${connected.length}</span><button class="fi-chip-tag-x" onclick="event.stopPropagation();toggleState('connected')" aria-label="Clear"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg></button>` : `<span style="font-size:11px;color:var(--green);margin-left:2px">${connected.length}</span>`}
+      </button>` : ''}
     </div>
 
     ${withIssues > 0 ? `<div class="int-issue-banner">
@@ -22372,30 +22388,6 @@ function renderHome() {
       <button class="int-issue-cta" onclick="setHomeTab('integrated')">Review →</button>
     </div>` : ''}
 
-    ${connected.length > 0 ? `
-      <div class="active-strip">
-        <div class="active-strip-text">
-          <div class="active-strip-title">
-            <span class="kpi-dot ${withIssues>0?'warn':'ok'}"></span> Active in your workspace
-          </div>
-          <div class="active-strip-sub">${connected.length} integrations connected · last update ${escapeHtml(connected[0].lastRun||'—')}</div>
-        </div>
-        <div class="active-strip-avatars">
-          ${connected.slice(0,5).map(i => {
-            const studios = ['governance','agentic','workforce'].filter(s => getStudioState(i, s) === 'active').map(s => STUDIO_META[s].label);
-            const tooltip = `${i.name} · ${i.health}${studios.length ? '\nActive in: '+studios.join(', ') : ''}`;
-            return `
-              <div class="active-avatar" title="${escapeHtml(tooltip)}" onclick="navigate('#/integrations/${i.slug}')">
-                ${logo(i, 'active')}
-                <span class="active-dot health-${i.health}"></span>
-              </div>
-            `;
-          }).join('')}
-          ${connected.length>5 ? `<div class="active-more">+${connected.length-5} more</div>` : ''}
-        </div>
-        <button class="ds-btn ds-btn-sm ds-btn--secondary active-strip-cta" onclick="setHomeTab('integrated')">View all</button>
-      </div>
-    ` : ''}
 
     ${!isFiltering ? `
       <div class="featured-wrap">
@@ -22583,13 +22575,31 @@ function renderOperateHome() {
     </div>
 
     <div class="op-list">
-      ${visible.length === 0
-        ? `<div class="op-empty">
-             <div class="op-empty-ic">✓</div>
-             <div class="op-empty-t">Nothing here</div>
-             <div class="op-empty-d">${tab === 'needs_attention' ? 'All integrations are healthy.' : tab === 'working' ? 'No working integrations yet.' : 'Switch tabs to see other integrations.'}</div>
-           </div>`
-        : visible.map(opRowHTML).join('')}
+      ${tab === 'all'
+        ? (() => {
+            if (connected.length === 0) return `<div class="op-empty"><div class="op-empty-ic">✓</div><div class="op-empty-t">No connected integrations</div><div class="op-empty-d">Browse the catalog to connect your first integration.</div></div>`;
+            let html = '';
+            if (byBucket.needs_attention.length > 0) {
+              html += `<div class="op-section-head op-section-head--warn"><span>Needs attention</span><span class="op-section-count">${byBucket.needs_attention.length}</span></div>`;
+              html += byBucket.needs_attention.map(opRowHTML).join('');
+            }
+            if (byBucket.working.length > 0) {
+              html += `<div class="op-section-head op-section-head--ok"${byBucket.needs_attention.length > 0 ? ' style="margin-top:20px"' : ''}><span>Working</span><span class="op-section-count">${byBucket.working.length}</span></div>`;
+              html += byBucket.working.map(opRowHTML).join('');
+            }
+            if (byBucket.inactive.length > 0) {
+              html += `<div class="op-section-head"${(byBucket.needs_attention.length + byBucket.working.length) > 0 ? ' style="margin-top:20px"' : ''}><span>Inactive</span><span class="op-section-count">${byBucket.inactive.length}</span></div>`;
+              html += byBucket.inactive.map(opRowHTML).join('');
+            }
+            return html;
+          })()
+        : visible.length === 0
+          ? `<div class="op-empty">
+               <div class="op-empty-ic">✓</div>
+               <div class="op-empty-t">Nothing here</div>
+               <div class="op-empty-d">${tab === 'needs_attention' ? 'All integrations are healthy.' : tab === 'working' ? 'No working integrations yet.' : 'Switch tabs to see other integrations.'}</div>
+             </div>`
+          : visible.map(opRowHTML).join('')}
     </div>
   `;
 }
