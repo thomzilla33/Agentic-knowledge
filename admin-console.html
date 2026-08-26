@@ -15989,6 +15989,7 @@ let _paState = {
   // V2: Role full-page view
   roleAccessId: null,
   roleAccessTab: 'overview',
+  roleAccessStudioTab: 'governance',
   // V2: Group full-page view
   groupAccessId: null,
   groupAccessTab: 'overview',
@@ -17088,43 +17089,111 @@ function renderRoleAccessView(roleId) {
     </div>
   `;
 
-  // ── PERMISSIONS TAB ──────────────────────────────────────
-  const permTabHtml = '<div style="padding:0 0 20px">' +
-    PERM_TREE.map(studio => {
-      const sLeaves = studio.children.flatMap(f => (f.children||[]).map(p => p.id));
-      const sCount  = sLeaves.filter(id => editPerms.has(id)).length;
-      const sCls    = sCount === sLeaves.length ? ' rc-tree-count--all' : sCount > 0 ? ' rc-tree-count--some' : '';
-      return `<div class="rd-perm-studio">
-        <div class="rd-perm-studio-head">
-          <div class="rd-perm-studio-dot" style="background:${studio.color}"></div>
-          <div class="rd-perm-studio-name">${escapeHtml(studio.label)}</div>
-          <span class="rc-tree-count${sCls}">${sCount}/${sLeaves.length}</span>
-        </div>` +
-        studio.children.map(feat => {
-          const fLeaves = (feat.children||[]).map(p => p.id);
-          const fCount  = fLeaves.filter(id => editPerms.has(id)).length;
-          const fCls    = fCount === fLeaves.length ? ' rc-tree-count--all' : fCount > 0 ? ' rc-tree-count--some' : '';
-          return `<div class="rd-feat-section">
-            <div class="rd-feat-head">
-              <span class="rd-feat-name">${escapeHtml(feat.label)}</span>
-              <span class="rc-tree-count${fCls}">${fCount}/${fLeaves.length}</span>
-            </div>` +
-            (feat.children||[]).map(perm => {
-              const on = editPerms.has(perm.id);
-              return `<label class="rd-perm-leaf">
-                <span class="rd-sw">
-                  <input type="checkbox" ${on?'checked':''} ${r.system?'disabled':''}
-                    onchange="paToggleRolePerm('${roleId}','${perm.id}',this.checked)">
-                  <span class="rd-sw-track"></span><span class="rd-sw-thumb"></span>
-                </span>
-                <div class="rd-perm-label">
-                  <div class="rd-perm-name">${escapeHtml(perm.label)}</div>
-                  <div class="rd-perm-desc">${escapeHtml(perm.desc)}</div>
-                </div>
-              </label>`;
-            }).join('') + '</div>';
-        }).join('') + '</div>';
-    }).join('') + '</div>';
+
+  // ── PERMISSIONS TAB ──────────────────────────────────────────
+  const roleStudioTab = _paState.roleAccessStudioTab || 'governance';
+  const roleStudioTabMap = [
+    ['governance','Governance','studio-governance'],
+    ['datastudio','Data Studio','studio-helix'],
+    ['agentic','Agentic','studio-agentic'],
+    ['admin','Admin','studio-platform'],
+  ];
+  const curRoleStudioId = (roleStudioTabMap.find(([k])=>k===roleStudioTab)||roleStudioTabMap[0])[2];
+  const curRoleStudio   = PERM_TREE.find(s => s.id === curRoleStudioId);
+  const curRoleLeaves   = curRoleStudio ? curRoleStudio.children.flatMap(f=>(f.children||[]).map(p=>p.id)) : [];
+  const curRoleGranted  = curRoleLeaves.filter(id => editPerms.has(id)).length;
+  const curRoleNotGranted = curRoleLeaves.length - curRoleGranted;
+
+  const permTabHtml = `<div class="pa-access-layout">
+    <!-- Left rail -->
+    <div class="pa-access-rail" style="width:256px">
+      <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Permission states</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--color-text-subtitle)">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;background:var(--pri);border:1px solid var(--pri)">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6.5 4.5,9 10.5,3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span>Enabled</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="display:inline-block;width:20px;height:20px;border-radius:5px;border:1.5px solid var(--color-border-neutral-default);background:transparent"></span>
+            <span>Not granted</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:600;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Scope levels</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${[['Company','0','var(--pri)'],['Tenant','12','var(--color-text-subtitle)'],['Teams / Groups','24','var(--color-text-caption)'],['Shared with me','36','var(--color-text-disabled)'],['My own','48','var(--color-text-disabled)']].map(([name,pl,col])=>`
+            <div style="display:flex;align-items:center;gap:6px;padding-left:${pl}px">
+              <span style="width:${pl==='0'?6:4}px;height:${pl==='0'?6:4}px;border-radius:50%;background:${col};flex-shrink:0"></span>
+              <span style="font-size:12px;color:${col}">${name}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-radius:12px;overflow:hidden">
+        <div class="pa-eff-top"></div>
+        <div style="padding:14px 16px">
+          <div style="font-size:12px;font-weight:700;color:var(--color-text-caption);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Access summary</div>
+          <div style="display:flex;gap:4px">
+            <div class="pa-eff-stat"><div class="pa-eff-num">${curRoleGranted}</div><div class="pa-eff-lbl">Enabled</div></div>
+            <div class="pa-eff-stat"><div class="pa-eff-num" style="color:var(--color-text-disabled)">${curRoleNotGranted}</div><div class="pa-eff-lbl">Not granted</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Main area -->
+    <div class="pa-access-main">
+      <div style="display:flex;align-items:center;margin-bottom:0">
+        <div class="pa-tabs" style="border-radius:12px 12px 0 0;overflow:hidden;flex:1">
+          ${roleStudioTabMap.map(([k,lbl])=>`
+            <button class="pa-tab ${roleStudioTab===k?'active':''}" onclick="_paState.roleAccessStudioTab='${k}';_paRerender()">${lbl}</button>`).join('')}
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--color-border-neutral-default);border-top:none;border-radius:0 0 12px 12px;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid var(--color-border-neutral-subtle);display:flex;gap:8px;align-items:center;background:var(--table-header-bg)">
+          <div class="pa-search-wrap" style="max-width:220px">
+            <svg class="pa-search-icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <input class="pa-search" style="height:32px" placeholder="Filter permissions…" aria-label="Filter permissions">
+          </div>
+          <select class="pa-filter-select" aria-label="Filter by state">
+            <option>All states</option><option>Enabled</option><option>Not granted</option>
+          </select>
+        </div>
+        <div role="tree" aria-label="${(roleStudioTabMap.find(([k])=>k===roleStudioTab)||roleStudioTabMap[0])[1]} permissions">
+          ${curRoleStudio ? curRoleStudio.children.map(feat => {
+            const fLeaves = (feat.children||[]).map(p => p.id);
+            const fCount  = fLeaves.filter(id => editPerms.has(id)).length;
+            const fCls    = fCount === fLeaves.length ? ' rc-tree-count--all' : fCount > 0 ? ' rc-tree-count--some' : '';
+            return `<div class="rd-feat-section" style="border-bottom:1px solid var(--color-border-neutral-subtle)">
+              <div class="rd-feat-head" style="padding:10px 16px">
+                <span class="rd-feat-name">${escapeHtml(feat.label)}</span>
+                <span class="rc-tree-count${fCls}">${fCount}/${fLeaves.length}</span>
+              </div>` +
+              (feat.children||[]).map(perm => {
+                const on = editPerms.has(perm.id);
+                return `<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid var(--color-border-neutral-subtle)">
+                  <label style="display:flex;align-items:flex-start;gap:12px;flex:1;cursor:${r.system?'default':'pointer'}">
+                    <span class="rd-sw" style="margin-top:2px;flex-shrink:0">
+                      <input type="checkbox" ${on?'checked':''} ${r.system?'disabled':''}
+                        onchange="paToggleRolePerm('${roleId}','${perm.id}',this.checked)">
+                      <span class="rd-sw-track"></span><span class="rd-sw-thumb"></span>
+                    </span>
+                    <div class="rd-perm-label" style="flex:1;min-width:0">
+                      <div class="rd-perm-name">${escapeHtml(perm.label)}</div>
+                      <div class="rd-perm-desc" style="font-size:11px;color:var(--color-text-caption);margin-top:1px">${escapeHtml(perm.desc||'')}</div>
+                      <div style="font-size:10.5px;font-family:'SF Mono','Fira Code',monospace;color:var(--color-text-disabled);margin-top:3px">${escapeHtml(perm.id)}</div>
+                    </div>
+                  </label>
+                </div>`;
+              }).join('') + '</div>';
+          }).join('')
+          : '<div style="padding:48px 24px;text-align:center"><div style="font-size:13px;color:var(--color-text-caption)">No permissions in this studio.</div></div>'}
+        </div>
+      </div>
+    </div>
+  </div>`;
 
   // ── MEMBERS TAB ──────────────────────────────────────────
   const membersTabHtml = members.length === 0
@@ -19428,6 +19497,7 @@ function paSaveStudioAccess() {
 function paOpenRoleAccess(roleId) {
   _paState.roleAccessId = roleId;
   _paState.roleAccessTab = 'overview';
+  _paState.roleAccessStudioTab = 'governance';
   _paState.roleDetailId = null;
   _paState.memberDetailId = null;
   _paRerender();
