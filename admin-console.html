@@ -22539,7 +22539,7 @@ function renderOperateHome() {
       ${label}
       ${isActive
         ? `<span class="fi-chip-tag" style="background:${bg};color:${col}">${count}</span>${xBtn}`
-        : `<span style="font-size:11px;color:${col};margin-left:2px">${count}</span>`}
+        : `<span class="fi-chip-tag" style="background:${bg};color:${col}">${count}</span>`}
     </button>`;
   };
 
@@ -22579,10 +22579,7 @@ function renderOperateHome() {
       ${tabBtn('inactive', 'Inactive', counts.inactive, 'idle')}
       ${tabBtn('all', 'All connected', connected.length, 'neutral')}
       <span style="flex:1"></span>
-      <a class="op-link" href="#/integrations" onclick="setMode('browse');return false;">
-        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
-        Browse catalog
-      </a>
+      <button class="ds-btn ds-btn-sm ds-btn--secondary" onclick="setMode('browse')">Browse catalog</button>
     </div>
 
     <div class="op-list">
