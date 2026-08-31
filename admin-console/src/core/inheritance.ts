@@ -58,7 +58,7 @@ function resolveNotCascadable(def: SettingDef, scopeId: string, fixture: Fixture
 
 function resolveWalkUp(
   def: SettingDef,
-  scopeId: string,
+  _scopeId: string,
   chain: string[], // [self, parent, grandparent, …, root]
   values: { settingId: string; scopeId: string; value: unknown; setBy: string; setAt: string; packageVersion: string }[]
 ): ResolvedValue {
@@ -120,7 +120,7 @@ function resolveWalkUp(
 }
 
 function resolveAddOnly(
-  def: SettingDef,
+  _def: SettingDef,
   scopeId: string,
   chain: string[],
   values: { settingId: string; scopeId: string; value: unknown }[]
