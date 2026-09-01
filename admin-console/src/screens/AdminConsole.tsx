@@ -11,6 +11,9 @@ import { ALL_FIXTURES, PRINCIPALS } from '../fixtures';
 import { SettingsPanel } from '../components/sections/SettingsPanel';
 import { AuditPanel } from '../components/sections/AuditPanel';
 import { OrganizationSection } from '../components/sections/OrganizationSection';
+import { MySettingsSection } from '../components/sections/MySettingsSection';
+import { BillingSection } from '../components/sections/BillingSection';
+import { NotificationsSection } from '../components/sections/NotificationsSection';
 import { PeopleAccessScreen } from './PeopleAccess';
 import { Spinner } from '../components/primitives/Spinner';
 import { InlineMessage } from '../components/primitives/InlineMessage';
@@ -143,6 +146,12 @@ export function AdminConsole({ sectionId, scopeId, origin }: AdminConsoleProps) 
               <PeopleAccessScreen />
             ) : activeSectionId === 'organization' ? (
               <OrganizationSection />
+            ) : activeSectionId === 'my-settings' ? (
+              <MySettingsSection />
+            ) : activeSectionId === 'billing-subscription' ? (
+              <BillingSection />
+            ) : activeSectionId === 'notifications' ? (
+              <NotificationsSection />
             ) : (
               <SettingsPanel
                 key={`${activeSectionId}-${activeScopeId}-${dataRevision}`}
