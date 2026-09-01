@@ -10,6 +10,7 @@ import { SECTION_MAP } from '../fixtures/sections';
 import { ALL_FIXTURES, PRINCIPALS } from '../fixtures';
 import { SettingsPanel } from '../components/sections/SettingsPanel';
 import { AuditPanel } from '../components/sections/AuditPanel';
+import { OrganizationSection } from '../components/sections/OrganizationSection';
 import { PeopleAccessScreen } from './PeopleAccess';
 import { Spinner } from '../components/primitives/Spinner';
 import { InlineMessage } from '../components/primitives/InlineMessage';
@@ -140,6 +141,8 @@ export function AdminConsole({ sectionId, scopeId, origin }: AdminConsoleProps) 
               <AuditPanel />
             ) : activeSectionId === 'people-access' ? (
               <PeopleAccessScreen />
+            ) : activeSectionId === 'organization' ? (
+              <OrganizationSection />
             ) : (
               <SettingsPanel
                 key={`${activeSectionId}-${activeScopeId}-${dataRevision}`}
