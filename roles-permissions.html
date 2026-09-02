@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIMS-OS — Roles & Permissions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+/* ─── Design Tokens ─────────────────────────────────────── */
+:root {
+  --brand:    #2173FF;
+  --blue4:    #80AFFF;
+  --blue2:    #E9F1FF;
+  --blue1:    #F6F9FF;
+  --teal:     #09E2AB;
+  --teal5:    #00A07E;
+  --grad:     linear-gradient(135deg, #2173FF 0%, #09E2AB 100%);
+  --tx1:      #2A2A2A;
+  --tx2:      #5C5C5C;
+  --pg:       #FAFAFA;
+  --card:     #FFFFFF;
+  --fill:     #F2F2F2;
+  --border:   #D9D9D9;
+  --err:      #D32F2F;
+  --err-bg:   #FDEDED;
+  --warn:     #ED6C02;
+  --warn-bg:  #FFF4E5;
+  --info:     #00B5D9;
+  --info-bg:  #E5F8FF;
+  --succ:     #00A07E;
+  --succ-bg:  #E5FDF8;
+  --topbar:   56px;
+  --sidebar:  240px;
+  --pad:      32px;
+  --rail:     360px;
+  --r-card:   12px;
+  --r-btn:    8px;
+  --row-table:48px;
+  --row-tree: 44px;
+  --tree-ind: 24px;
+  --bar-h:    64px;
+}
+html.dark {
+  --tx1:   #FFFFFF;
+  --tx2:   #B5B5B5;
+  --pg:    #000000;
+  --card:  #141414;
+  --fill:  #1E1E1E;
+  --border:#2A2A2A;
+  --blue2: #1A2A4A;
+  --blue1: #111D33;
+  --err-bg:#2D1111;
+  --succ-bg:#0D2420;
+}
+
+/* ─── Reset & Base ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--tx1);
+  background: var(--pg);
+  min-height: 100vh;
+}
+h1,h2,h3,h4,h5,h6 { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+button { cursor: pointer; font-family: inherit; }
+a { color: var(--brand); text-decoration: none; }
+
+/* ─── Layout Shell ──────────────────────────────────────── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--topbar);
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px;
+  gap: 12px;
+}
+.topbar-brand {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800; font-size: 16px;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.topbar-divider { width: 1px; height: 20px; background: var(--border); }
+.topbar-section { font-size: 13px; font-weight: 500; color: var(--tx2); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.avatar-sm {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--brand); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+}
+
+.sidebar {
+  position: fixed; top: var(--topbar); left: 0; bottom: 0; z-index: 90;
+  width: var(--sidebar);
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.sidebar-section-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--tx2); padding: 20px 16px 6px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; font-size: 13px; font-weight: 500;
+  color: var(--tx2); border-radius: 0; cursor: pointer;
+  transition: background .15s, color .15s;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.sidebar-item:hover { background: var(--fill); color: var(--tx1); }
+.sidebar-item.active { background: var(--blue2); color: var(--brand); font-weight: 600; }
+.sidebar-item svg { flex-shrink: 0; }
+
+.content {
+  margin-left: var(--sidebar);
+  margin-top: var(--topbar);
+  padding: var(--pad);
+  min-height: calc(100vh - var(--topbar));
+  padding-bottom: calc(var(--pad) + var(--bar-h) + 16px);
+}
+
+/* ─── Page Header ───────────────────────────────────────── */
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-title { font-size: 22px; font-weight: 700; color: var(--tx1); }
+.page-subtitle { font-size: 13px; color: var(--tx2); margin-top: 2px; }
+.page-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ─── Tabs ──────────────────────────────────────────────── */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.tab-btn {
+  padding: 10px 16px; font-size: 13px; font-weight: 500;
+  color: var(--tx2); border: none; background: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+}
+.tab-btn:hover { color: var(--tx1); }
+.tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+
+/* ─── Buttons ───────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; border-radius: var(--r-btn);
+  border: none; padding: 0 14px; height: 36px;
+  transition: opacity .15s, background .15s;
+  white-space: nowrap;
+}
+.btn:hover { opacity: .88; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-secondary { background: var(--fill); color: var(--tx1); border: 1px solid var(--border); }
+.btn-ghost { background: transparent; color: var(--tx2); border: 1px solid var(--border); }
+.btn-danger { background: var(--err); color: #fff; }
+.btn-sm { height: 30px; padding: 0 10px; font-size: 12px; }
+.btn-icon { padding: 0 8px; min-width: 36px; justify-content: center; }
+
+/* ─── Cards ─────────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+.card-body { padding: 20px; }
+
+/* ─── Table ─────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--tx2); text-align: left;
+  padding: 0 16px; height: 40px;
+  border-bottom: 1px solid var(--border);
+  background: var(--fill);
+  white-space: nowrap;
+}
+tbody tr {
+  height: var(--row-table);
+  border-bottom: 1px solid var(--border);
+  transition: background .12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--fill); }
+tbody td {
+  padding: 0 16px; font-size: 13px; vertical-align: middle;
+}
+.td-user { display: flex; align-items: center; gap: 10px; height: var(--row-table); }
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #fff;
+}
+.user-name { font-weight: 600; color: var(--tx1); font-size: 13px; }
+.user-email { font-size: 12px; color: var(--tx2); }
+
+/* ─── Chips / Badges ────────────────────────────────────── */
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; border-radius: 20px;
+  padding: 2px 8px; white-space: nowrap;
+}
+.chip-blue   { background: var(--blue2); color: var(--brand); }
+.chip-green  { background: var(--succ-bg); color: var(--succ); }
+.chip-amber  { background: var(--warn-bg); color: var(--warn); }
+.chip-red    { background: var(--err-bg); color: var(--err); }
+.chip-gray   { background: var(--fill); color: var(--tx2); }
+.chip-teal   { background: #E0FDF6; color: var(--teal5); }
+
+/* ─── Search + Filter Bar ───────────────────────────────── */
+.filter-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.search-wrap {
+  position: relative; flex: 1; min-width: 200px; max-width: 320px;
+}
+.search-wrap input {
+  width: 100%; height: 36px; padding: 0 12px 0 36px;
+  border: 1px solid var(--border); border-radius: var(--r-btn);
+  background: var(--card); color: var(--tx1);
+  font-family: inherit; font-size: 13px;
+  outline: none; transition: border-color .15s;
+}
+.search-wrap input:focus { border-color: var(--brand); }
+.search-wrap input::placeholder { color: var(--tx2); }
+.search-icon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--tx2); pointer-events: none;
+}
+.filter-select {
+  height: 36px; padding: 0 10px; border: 1px solid var(--border);
+  border-radius: var(--r-btn); background: var(--card); color: var(--tx1);
+  font-family: inherit; font-size: 13px; outline: none; cursor: pointer;
+}
+
+/* ─── V2: Two-pane layout ───────────────────────────────── */
+.access-layout { display: flex; gap: 20px; align-items: flex-start; }
+.access-rail {
+  width: var(--rail); flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.access-main { flex: 1; min-width: 0; }
+
+/* ─── User Profile Card ─────────────────────────────────── */
+.profile-card .avatar-lg {
+  width: 56px; height: 56px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.profile-meta { flex: 1; min-width: 0; }
+.profile-name { font-size: 15px; font-weight: 700; }
+.profile-email { font-size: 12px; color: var(--tx2); }
+
+/* ─── Effective Access Card ─────────────────────────────── */
+.eff-card-top {
+  height: 3px; background: var(--grad); border-radius: var(--r-card) var(--r-card) 0 0;
+}
+.eff-stat { text-align: center; flex: 1; }
+.eff-stat-num { font-size: 22px; font-weight: 700; color: var(--brand); }
+.eff-stat-lbl { font-size: 11px; color: var(--tx2); font-weight: 500; }
+
+/* ─── Permission Tree ───────────────────────────────────── */
+.tree-section { margin-bottom: 8px; }
+.tree-section-hdr {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px; cursor: pointer;
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--tx2); background: var(--fill);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+.tree-section-hdr:hover { background: var(--border); }
+.tree-row {
+  display: flex; align-items: center;
+  height: var(--row-tree);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  transition: background .12s;
+}
+.tree-row:hover { background: var(--fill); }
+.tree-row:last-child { border-bottom: none; }
+.tree-indent { flex-shrink: 0; }
+.tree-expand {
+  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  border: none; background: none; color: var(--tx2); flex-shrink: 0; border-radius: 4px;
+  transition: background .12s;
+}
+.tree-expand:hover { background: var(--fill); }
+.tree-label { flex: 1; min-width: 0; }
+.tree-perm-name { font-size: 13px; font-weight: 500; color: var(--tx1); }
+.tree-perm-code { font-size: 11px; font-weight: 500; color: var(--tx2); font-family: 'SF Mono', 'Fira Code', monospace; }
+.tree-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.tree-scope-badge {
+  font-size: 11px; font-weight: 500; color: var(--tx2); background: var(--fill);
+  border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px;
+}
+.tree-scope-select {
+  font-size: 12px; font-weight: 500; color: var(--tx1); background: var(--card);
+  border: 1px solid var(--border); border-radius: 6px; padding: 3px 6px;
+  font-family: inherit; outline: none; cursor: pointer;
+}
+.tree-role-tag {
+  font-size: 11px; font-weight: 600; background: var(--succ-bg); color: var(--succ);
+  border-radius: 4px; padding: 1px 6px; display: flex; align-items: center; gap: 3px;
+}
+
+/* ─── Checkboxes ────────────────────────────────────────── */
+.perm-cb {
+  width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--border); background: var(--card);
+  cursor: pointer; transition: all .15s; position: relative;
+}
+.perm-cb.granted-direct  { background: var(--brand); border-color: var(--brand); }
+.perm-cb.granted-role    { background: var(--succ); border-color: var(--succ); cursor: not-allowed; }
+.perm-cb.granted-inh     { background: var(--brand); border-color: var(--blue4); opacity: .55; cursor: not-allowed; }
+.perm-cb.denied          { background: var(--err-bg); border-color: var(--err); }
+.perm-cb.partial         { background: var(--card); border-color: var(--brand); }
+.perm-cb.pending-add     { background: transparent; border: 2px dashed var(--brand); }
+.perm-cb.pending-deny    { background: transparent; border: 2px dashed var(--err); opacity: .7; }
+.perm-cb.none            { background: var(--card); border-color: var(--border); }
+.perm-cb svg             { pointer-events: none; }
+
+/* ─── Roles Grid (V3) ───────────────────────────────────── */
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.role-card { cursor: pointer; transition: box-shadow .15s; }
+.role-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.role-card-hdr {
+  height: 6px; border-radius: var(--r-card) var(--r-card) 0 0;
+}
+.role-card-body { padding: 16px 20px; }
+.role-card-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.role-card-desc { font-size: 12px; color: var(--tx2); margin-bottom: 12px; line-height: 1.4; }
+.role-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 12px; border-top: 1px solid var(--border);
+}
+.role-member-count { font-size: 12px; color: var(--tx2); font-weight: 500; }
+
+/* ─── Drawer (O1) ───────────────────────────────────────── */
+.overlay-bg {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.45); backdrop-filter: blur(2px);
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.overlay-bg.open { opacity: 1; pointer-events: all; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+  width: 480px; background: var(--card);
+  box-shadow: -4px 0 32px rgba(0,0,0,.16);
+  transform: translateX(100%); transition: transform .25s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-hdr {
+  display: flex; align-items: center; padding: 20px 24px;
+  border-bottom: 1px solid var(--border); gap: 12px;
+}
+.drawer-title { font-size: 17px; font-weight: 700; flex: 1; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
+.drawer-ftr {
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+
+/* ─── Modal (O2) ────────────────────────────────────────── */
+.modal-wrap {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.modal-wrap.open { opacity: 1; pointer-events: all; }
+.modal-bg {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(2px);
+}
+.modal {
+  position: relative; z-index: 1;
+  width: 560px; background: var(--card);
+  border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  transform: scale(.96); transition: transform .2s cubic-bezier(.4,0,.2,1);
+}
+.modal-wrap.open .modal { transform: scale(1); }
+.modal-hdr {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-title { font-size: 17px; font-weight: 700; }
+.modal-body { padding: 20px 24px; }
+.modal-ftr {
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+
+/* ─── Change Row in Modal ───────────────────────────────── */
+.change-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.change-row:last-child { border-bottom: none; }
+.change-perm { flex: 1; }
+.change-perm-name { font-size: 13px; font-weight: 600; }
+.change-perm-code { font-size: 11px; color: var(--tx2); font-family: monospace; }
+.change-arrow { font-size: 16px; color: var(--tx2); }
+
+/* ─── Pending Changes Bar ───────────────────────────────── */
+.changes-bar {
+  position: fixed; bottom: 0; left: var(--sidebar); right: 0; z-index: 150;
+  height: var(--bar-h);
+  background: var(--card);
+  border-top: 2px solid var(--brand);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--pad);
+  box-shadow: 0 -4px 20px rgba(0,0,0,.1);
+  transform: translateY(100%); transition: transform .25s cubic-bezier(.4,0,.2,1);
+}
+.changes-bar.visible { transform: translateY(0); }
+.changes-label { font-size: 13px; font-weight: 600; color: var(--tx1); }
+.changes-sub { font-size: 12px; color: var(--tx2); }
+
+/* ─── Toast ─────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: calc(var(--bar-h) + 16px); right: 24px; z-index: 400;
+  background: var(--tx1); color: var(--pg);
+  border-radius: 10px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  transform: translateY(20px); opacity: 0;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-icon { width: 20px; height: 20px; background: var(--succ); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* ─── Skeleton / Loading ────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skel {
+  border-radius: 6px; overflow: hidden;
+  background: linear-gradient(90deg, var(--fill) 25%, var(--border) 50%, var(--fill) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.2s infinite ease-in-out;
+}
+
+/* ─── Error State ───────────────────────────────────────── */
+.error-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 48px 24px; text-align: center; gap: 12px;
+}
+.error-icon { font-size: 40px; }
+.error-title { font-size: 16px; font-weight: 700; color: var(--tx1); }
+.error-desc { font-size: 13px; color: var(--tx2); max-width: 360px; line-height: 1.5; }
+
+/* ─── Empty State ───────────────────────────────────────── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 64px 24px; text-align: center; gap: 12px;
+}
+
+/* ─── Read-only overlay ─────────────────────────────────── */
+.readonly-banner {
+  background: var(--warn-bg); border: 1px solid var(--warn);
+  border-radius: var(--r-card); padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; margin-bottom: 20px;
+}
+.readonly-banner svg { color: var(--warn); flex-shrink: 0; }
+
+/* ─── Dev Switcher ──────────────────────────────────────── */
+#switcher {
+  position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+  z-index: 9999; display: flex; gap: 4px;
+  background: rgba(0,0,0,.85); backdrop-filter: blur(8px);
+  border-radius: 20px; padding: 4px 6px;
+}
+.sw-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600; padding: 4px 10px;
+  border-radius: 14px; border: none;
+  color: rgba(255,255,255,.6); background: transparent;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.sw-btn:hover { color: #fff; background: rgba(255,255,255,.1); }
+.sw-btn.active { background: var(--brand); color: #fff; }
+
+/* ─── Focus visible ─────────────────────────────────────── */
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* ─── Form fields in drawer ─────────────────────────────── */
+.field-group { margin-bottom: 20px; }
+.field-label { font-size: 12px; font-weight: 600; color: var(--tx2); margin-bottom: 6px; display: block; }
+.field-input {
+  width: 100%; height: 40px; padding: 0 12px;
+  border: 1px solid var(--border); border-radius: var(--r-btn);
+  background: var(--card); color: var(--tx1);
+  font-family: inherit; font-size: 13px; outline: none;
+  transition: border-color .15s;
+}
+.field-input:focus { border-color: var(--brand); }
+.field-textarea {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: var(--r-btn);
+  background: var(--card); color: var(--tx1);
+  font-family: inherit; font-size: 13px; outline: none; resize: vertical; min-height: 80px;
+  transition: border-color .15s;
+}
+.field-textarea:focus { border-color: var(--brand); }
+
+/* ─── Permission group in drawer ────────────────────────── */
+.perm-group { margin-bottom: 16px; }
+.perm-group-hdr {
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--tx2); margin-bottom: 8px;
+}
+.perm-row-drawer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.perm-row-drawer:last-child { border-bottom: none; }
+.perm-toggle {
+  position: relative; width: 36px; height: 20px;
+  background: var(--fill); border-radius: 10px;
+  cursor: pointer; transition: background .2s;
+  border: none;
+}
+.perm-toggle.on { background: var(--brand); }
+.perm-toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #fff; transition: transform .2s;
+}
+.perm-toggle.on::after { transform: translateX(16px); }
+
+/* ─── User row detail (inline roles list) ───────────────── */
+.role-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--blue2); color: var(--brand);
+  font-size: 11px; font-weight: 600; border-radius: 4px;
+  padding: 2px 6px; margin-right: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     DEV SWITCHER
+════════════════════════════════════════════════════════ -->
+<div id="switcher" role="toolbar" aria-label="View switcher">
+  <button class="sw-btn active" onclick="setView('v1')">V1 Users</button>
+  <button class="sw-btn" onclick="setView('v2')">V2 Access</button>
+  <button class="sw-btn" onclick="setView('v3')">V3 Roles</button>
+  <button class="sw-btn" onclick="setView('drawer')">Drawer</button>
+  <button class="sw-btn" onclick="setView('modal')">Modal</button>
+  <button class="sw-btn" onclick="toggleDark()">Dark</button>
+  <button class="sw-btn" onclick="setView('loading')">Loading</button>
+  <button class="sw-btn" onclick="setView('error')">Error</button>
+  <button class="sw-btn" onclick="setView('readonly')">Read-only</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TOPBAR
+════════════════════════════════════════════════════════ -->
+<header class="topbar" role="banner">
+  <span class="topbar-brand">AIMS-OS</span>
+  <div class="topbar-divider"></div>
+  <span class="topbar-section">Admin Console</span>
+  <div class="topbar-right">
+    <div class="avatar-sm" aria-label="Logged in as Super Admin">SA</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════════ -->
+<nav class="sidebar" aria-label="Admin navigation">
+  <div class="sidebar-section-label">Organization</div>
+  <button class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Overview
+  </button>
+  <button class="sidebar-item active" aria-current="page">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    People & Access
+  </button>
+  <button class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+    Studios
+  </button>
+  <button class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Governance
+  </button>
+  <div class="sidebar-section-label">Settings</div>
+  <button class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════════════════════ -->
+<main class="content" id="main-content">
+
+  <!-- ── READONLY BANNER (hidden by default) ── -->
+  <div class="readonly-banner" id="readonly-banner" style="display:none" role="alert">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+    <span><strong>View-only mode.</strong> You have read access to this organization's permissions. Contact an admin to make changes.</span>
+  </div>
+
+  <!-- ══ V1: USERS TABLE ══════════════════════════════════ -->
+  <div id="view-v1">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">People &amp; Access</h1>
+        <p class="page-subtitle">Manage members, roles, and permissions across your organization.</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary" onclick="openDrawer()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Manage Roles
+        </button>
+        <button class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="20 8 20 14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Invite User
+        </button>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true">Members <span class="chip chip-gray" style="margin-left:6px">6</span></button>
+      <button class="tab-btn" role="tab" aria-selected="false">Roles <span class="chip chip-gray" style="margin-left:6px">4</span></button>
+      <button class="tab-btn" role="tab" aria-selected="false">Invitations <span class="chip chip-amber" style="margin-left:6px">2 pending</span></button>
+    </div>
+
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" placeholder="Search members…" aria-label="Search members">
+      </div>
+      <select class="filter-select" aria-label="Filter by role">
+        <option>All roles</option>
+        <option>Owner</option>
+        <option>Admin</option>
+        <option>Manager</option>
+        <option>Viewer</option>
+      </select>
+      <select class="filter-select" aria-label="Filter by status">
+        <option>All statuses</option>
+        <option>Active</option>
+        <option>Invited</option>
+        <option>Suspended</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table role="grid" aria-label="Organization members">
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Role</th>
+              <th scope="col">Status</th>
+              <th scope="col">Last active</th>
+              <th scope="col">Joined</th>
+              <th scope="col" style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /view-v1 -->
+
+  <!-- ══ V2: USER ACCESS ══════════════════════════════════ -->
+  <div id="view-v2" style="display:none">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="setView('v1')" aria-label="Back to users">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div>
+          <h1 class="page-title">Access — David Cardenas</h1>
+          <p class="page-subtitle">Reviewing effective permissions and role assignments</p>
+        </div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary" onclick="openModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Apply Changes
+        </button>
+      </div>
+    </div>
+
+    <div class="access-layout">
+      <!-- Rail -->
+      <div class="access-rail">
+        <!-- Profile -->
+        <div class="card card-body">
+          <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px">
+            <div class="avatar-lg" style="background:#7B5EA7">DC</div>
+            <div class="profile-meta">
+              <div class="profile-name">David Cardenas</div>
+              <div class="profile-email">d.cardenas@example.com</div>
+              <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+                <span class="chip chip-green">Active</span>
+                <span class="chip chip-blue">Admin</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--tx2);margin-bottom:6px;font-weight:600">ROLES</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+            <span class="role-pill">Manager</span>
+            <span class="role-pill">Governance Lead</span>
+          </div>
+          <div style="font-size:12px;color:var(--tx2);margin-bottom:6px;font-weight:600">TENANT TYPE</div>
+          <div style="font-size:13px;font-weight:500">Admin</div>
+        </div>
+
+        <!-- Effective Access card (gradient top bar — appears ONCE per view) -->
+        <div class="card">
+          <div class="eff-card-top" aria-hidden="true"></div>
+          <div class="card-body">
+            <div style="font-size:13px;font-weight:700;margin-bottom:14px">Effective access</div>
+            <div style="display:flex;gap:0">
+              <div class="eff-stat">
+                <div class="eff-stat-num">24</div>
+                <div class="eff-stat-lbl">Granted</div>
+              </div>
+              <div class="eff-stat">
+                <div class="eff-stat-num" style="color:var(--err)">2</div>
+                <div class="eff-stat-lbl">Denied</div>
+              </div>
+              <div class="eff-stat">
+                <div class="eff-stat-num" style="color:var(--warn)">2</div>
+                <div class="eff-stat-lbl">Pending</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="card card-body">
+          <div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:12px">PERMISSION STATES</div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="perm-cb granted-direct" style="pointer-events:none">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span>Granted — direct</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="perm-cb granted-inh" style="pointer-events:none">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span>Granted — inherited</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="perm-cb granted-role" style="pointer-events:none">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span>Granted — from role</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="perm-cb denied" style="pointer-events:none">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--err)" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <span>Denied — explicit</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="perm-cb partial" style="pointer-events:none">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <span>Partial (mixed children)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="perm-cb pending-add" style="pointer-events:none">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <span>Pending — add</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="perm-cb pending-deny" style="pointer-events:none">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--err)" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <span>Pending — deny</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="perm-cb none" style="pointer-events:none"></div>
+              <span>Not granted</span>
+            </div>
+          </div>
+        </div>
+      </div><!-- /rail -->
+
+      <!-- Main: Permission Tree -->
+      <div class="access-main">
+        <div class="tabs" role="tablist" style="margin-bottom:16px">
+          <button class="tab-btn active" role="tab" aria-selected="true">Governance</button>
+          <button class="tab-btn" role="tab" aria-selected="false">Data Studio</button>
+          <button class="tab-btn" role="tab" aria-selected="false">Admin</button>
+          <button class="tab-btn" role="tab" aria-selected="false">Integrations</button>
+        </div>
+
+        <div class="card">
+          <div class="filter-bar" style="padding:12px 16px;margin-bottom:0;border-bottom:1px solid var(--border)">
+            <div class="search-wrap" style="max-width:240px">
+              <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="search" placeholder="Filter permissions…" aria-label="Filter permissions">
+            </div>
+            <select class="filter-select" aria-label="Filter by state">
+              <option>All states</option>
+              <option>Granted</option>
+              <option>Denied</option>
+              <option>Pending</option>
+              <option>Not granted</option>
+            </select>
+          </div>
+
+          <div role="tree" aria-label="Governance permissions" id="perm-tree"></div>
+        </div>
+      </div><!-- /main -->
+    </div><!-- /access-layout -->
+  </div><!-- /view-v2 -->
+
+  <!-- ══ V3: ROLES GRID ═══════════════════════════════════ -->
+  <div id="view-v3" style="display:none">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Roles</h1>
+        <p class="page-subtitle">Define roles and the permissions they grant across your organization.</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary" onclick="openDrawer()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Role
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" placeholder="Search roles…" aria-label="Search roles">
+      </div>
+    </div>
+
+    <div class="roles-grid" id="roles-grid"></div>
+  </div><!-- /view-v3 -->
+
+  <!-- ══ LOADING STATE ════════════════════════════════════ -->
+  <div id="view-loading" style="display:none">
+    <div class="page-header">
+      <div>
+        <div class="skel" style="width:180px;height:24px;margin-bottom:8px"></div>
+        <div class="skel" style="width:280px;height:14px"></div>
+      </div>
+      <div class="skel" style="width:110px;height:36px;border-radius:8px"></div>
+    </div>
+    <div class="card">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+        <div class="skel" style="width:200px;height:36px;border-radius:8px"></div>
+      </div>
+      <table style="width:100%">
+        <thead><tr>
+          <th style="padding:12px 16px;background:var(--fill);border-bottom:1px solid var(--border)">
+            <div class="skel" style="width:60px;height:12px"></div>
+          </th>
+          <th style="padding:12px 16px;background:var(--fill);border-bottom:1px solid var(--border)">
+            <div class="skel" style="width:40px;height:12px"></div>
+          </th>
+          <th style="padding:12px 16px;background:var(--fill);border-bottom:1px solid var(--border)">
+            <div class="skel" style="width:50px;height:12px"></div>
+          </th>
+          <th style="padding:12px 16px;background:var(--fill);border-bottom:1px solid var(--border)">
+            <div class="skel" style="width:70px;height:12px"></div>
+          </th>
+        </tr></thead>
+        <tbody id="skel-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ ERROR STATE ══════════════════════════════════════ -->
+  <div id="view-error" style="display:none">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">People &amp; Access</h1>
+        <p class="page-subtitle">Manage members, roles, and permissions across your organization.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="error-state">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title">Unable to load members</div>
+        <div class="error-desc">Something went wrong while fetching organization data. This may be a temporary issue — please try again. If the problem persists, contact support.</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-primary" onclick="setView('v1')">Try again</button>
+          <button class="btn btn-ghost">Contact support</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main><!-- /content -->
+
+<!-- ═══════════════════════════════════════════════════════
+     OVERLAYS
+════════════════════════════════════════════════════════ -->
+
+<!-- O1: Add/Edit Role Drawer -->
+<div class="overlay-bg" id="drawer-bg" onclick="closeDrawer()" aria-hidden="true"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title-text">
+  <div class="drawer-hdr">
+    <h2 class="drawer-title" id="drawer-title-text">New Role</h2>
+    <button class="btn btn-ghost btn-sm btn-icon" onclick="closeDrawer()" aria-label="Close drawer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="field-group">
+      <label class="field-label" for="role-name">Role name</label>
+      <input class="field-input" id="role-name" type="text" placeholder="e.g. Data Analyst">
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="role-desc">Description</label>
+      <textarea class="field-textarea" id="role-desc" placeholder="What does this role allow?"></textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="role-color">Color</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:#2173FF;color:#fff;width:28px;height:28px;padding:0;border-radius:50%" onclick="selectColor(this,'#2173FF')" aria-label="Blue"></button>
+        <button class="btn btn-sm" style="background:#00A07E;color:#fff;width:28px;height:28px;padding:0;border-radius:50%" onclick="selectColor(this,'#00A07E')" aria-label="Green"></button>
+        <button class="btn btn-sm" style="background:#7B5EA7;color:#fff;width:28px;height:28px;padding:0;border-radius:50%" onclick="selectColor(this,'#7B5EA7')" aria-label="Purple"></button>
+        <button class="btn btn-sm" style="background:#ED6C02;color:#fff;width:28px;height:28px;padding:0;border-radius:50%" onclick="selectColor(this,'#ED6C02')" aria-label="Orange"></button>
+        <button class="btn btn-sm" style="background:#00B5D9;color:#fff;width:28px;height:28px;padding:0;border-radius:50%" onclick="selectColor(this,'#00B5D9')" aria-label="Teal"></button>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:20px 0;padding-top:20px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px">Permissions</div>
+
+      <div class="perm-group">
+        <div class="perm-group-hdr">Governance</div>
+        <div class="perm-row-drawer">
+          <div>
+            <div style="font-size:13px;font-weight:500">View Sandboxes</div>
+            <div style="font-size:11px;color:var(--tx2);font-family:monospace">governance.sandbox.view</div>
+          </div>
+          <button class="perm-toggle on" onclick="togglePerm(this)" role="switch" aria-checked="true" aria-label="View Sandboxes"></button>
+        </div>
+        <div class="perm-row-drawer">
+          <div>
+            <div style="font-size:13px;font-weight:500">Manage Drives</div>
+            <div style="font-size:11px;color:var(--tx2);font-family:monospace">governance.drive</div>
+          </div>
+          <button class="perm-toggle on" onclick="togglePerm(this)" role="switch" aria-checked="true" aria-label="Manage Drives"></button>
+        </div>
+        <div class="perm-row-drawer">
+          <div>
+            <div style="font-size:13px;font-weight:500">Promote Sandboxes</div>
+            <div style="font-size:11px;color:var(--tx2);font-family:monospace">governance.sandbox.promote</div>
+          </div>
+          <button class="perm-toggle" onclick="togglePerm(this)" role="switch" aria-checked="false" aria-label="Promote Sandboxes"></button>
+        </div>
+        <div class="perm-row-drawer">
+          <div>
+            <div style="font-size:13px;font-weight:500">View Truth Plane</div>
+            <div style="font-size:11px;color:var(--tx2);font-family:monospace">governance.truthplane.view</div>
+          </div>
+          <button class="perm-toggle" onclick="togglePerm(this)" role="switch" aria-checked="false" aria-label="View Truth Plane"></button>
+        </div>
+      </div>
+
+      <div class="perm-group">
+        <div class="perm-group-hdr">Data Studio</div>
+        <div class="perm-row-drawer">
+          <div>
+            <div style="font-size:13px;font-weight:500">View Models</div>
+            <div style="font-size:11px;color:var(--tx2);font-family:monospace">datastudio.models.view</div>
+          </div>
+          <button class="perm-toggle on" onclick="togglePerm(this)" role="switch" aria-checked="true" aria-label="View Models"></button>
+        </div>
+        <div class="perm-row-drawer">
+          <div>
+            <div style="font-size:13px;font-weight:500">Create Models</div>
+            <div style="font-size:11px;color:var(--tx2);font-family:monospace">datastudio.models.create</div>
+          </div>
+          <button class="perm-toggle" onclick="togglePerm(this)" role="switch" aria-checked="false" aria-label="Create Models"></button>
+        </div>
+      </div>
+
+      <div class="perm-group">
+        <div class="perm-group-hdr">Admin</div>
+        <div class="perm-row-drawer">
+          <div>
+            <div style="font-size:13px;font-weight:500">Manage Users</div>
+            <div style="font-size:11px;color:var(--tx2);font-family:monospace">admin.users.manage</div>
+          </div>
+          <button class="perm-toggle" onclick="togglePerm(this)" role="switch" aria-checked="false" aria-label="Manage Users"></button>
+        </div>
+        <div class="perm-row-drawer">
+          <div>
+            <div style="font-size:13px;font-weight:500">Manage Roles</div>
+            <div style="font-size:11px;color:var(--tx2);font-family:monospace">admin.roles.manage</div>
+          </div>
+          <button class="perm-toggle" onclick="togglePerm(this)" role="switch" aria-checked="false" aria-label="Manage Roles"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-ftr">
+    <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveRole()">Save role</button>
+  </div>
+</aside>
+
+<!-- O2: Apply Changes Modal -->
+<div class="modal-wrap" id="modal-wrap" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+  <div class="modal-bg" onclick="closeModal()"></div>
+  <div class="modal">
+    <div class="modal-hdr">
+      <div>
+        <h2 class="modal-title" id="modal-title-text">Apply permission changes</h2>
+        <p style="font-size:13px;color:var(--tx2);margin-top:4px">Review the following changes before saving. This cannot be undone.</p>
+      </div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal()" aria-label="Close modal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">
+        2 pending changes — David Cardenas
+      </div>
+      <div class="change-row">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--succ-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--succ)" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <div class="change-perm">
+          <div class="change-perm-name">View Promotion Packs</div>
+          <div class="change-perm-code">governance.packs.view</div>
+        </div>
+        <span class="chip chip-green">Grant</span>
+        <div style="text-align:right;font-size:12px;color:var(--tx2)">Own scope</div>
+      </div>
+      <div class="change-row">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--err-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--err)" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <div class="change-perm">
+          <div class="change-perm-name">Promote Sandboxes</div>
+          <div class="change-perm-code">governance.sandbox.promote</div>
+        </div>
+        <span class="chip chip-red">Deny</span>
+        <div style="text-align:right;font-size:12px;color:var(--tx2)">Own scope</div>
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="applyChanges()" id="apply-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Apply 2 changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Changes Bar -->
+<div class="changes-bar" id="changes-bar" role="status" aria-live="polite">
+  <div>
+    <div class="changes-label">2 unsaved changes</div>
+    <div class="changes-sub">David Cardenas · Governance</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-ghost" onclick="discardChanges()">Discard</button>
+    <button class="btn btn-primary" onclick="openModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      Apply changes
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert" aria-live="assertive">
+  <div class="toast-icon">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <span id="toast-msg">Changes applied successfully</span>
+</div>
+
+<script>
+// ─── Data ────────────────────────────────────────────────────
+
+const USERS = [
+  { initials:'DC', color:'#7B5EA7', name:'David Cardenas',   email:'d.cardenas@example.com',  roles:['Manager','Governance Lead'], status:'active', lastActive:'2 hours ago', joined:'Jan 14, 2025' },
+  { initials:'SL', color:'#2173FF', name:'Sofia López',      email:'sofia.lopez@example.com',  roles:['Admin'],                     status:'active', lastActive:'Yesterday',   joined:'Aug 3, 2024'  },
+  { initials:'MP', color:'#00A07E', name:'Miguel Paredes',   email:'m.paredes@example.com',    roles:['Viewer'],                    status:'active', lastActive:'3 days ago',  joined:'Mar 22, 2025' },
+  { initials:'AK', color:'#ED6C02', name:'Aisha Khan',       email:'aisha.khan@example.com',   roles:['Manager'],                   status:'active', lastActive:'1 week ago',  joined:'Nov 9, 2024'  },
+  { initials:'TR', color:'#00B5D9', name:'Thomas Rivera',    email:'t.rivera@example.com',     roles:['Viewer'],                    status:'invited',lastActive:'—',           joined:'Aug 18, 2026' },
+  { initials:'LN', color:'#D32F2F', name:'Luna Nakamura',    email:'luna.n@example.com',       roles:['Admin','Manager'],           status:'active', lastActive:'4 hours ago', joined:'Feb 11, 2025' },
+];
+
+const ROLES = [
+  { color:'#2173FF', name:'Admin',          desc:'Full access to all organization settings, users, and configurations.',         members:3, system:true  },
+  { color:'#00A07E', name:'Manager',         desc:'Manage team members and access governance and data studio features.',          members:5, system:false },
+  { color:'#7B5EA7', name:'Governance Lead', desc:'Full control over governance studio including promotions and truth plane.',    members:2, system:false },
+  { color:'#ED6C02', name:'Viewer',          desc:'Read-only access to all shared resources. Cannot modify any settings.',       members:8, system:false },
+];
+
+// Permission tree fixture — David Cardenas, Governance tab
+const TREE_DATA = [
+  {
+    id:'gov-drives', label:'Drives', code:'governance.drive', expanded:true,
+    state:'role', role:'Manager', scope:'Tenant', scopeLocked:true,
+    children:[
+      { id:'gov-drives-view',   label:'View Drives',   code:'governance.drive.view',          state:'inherited-role', via:'Drives', scope:'Tenant', scopeLocked:true },
+      { id:'gov-drives-up',     label:'Upload files',  code:'governance.drive.upload',        state:'inherited-role', via:'Drives', scope:'Tenant', scopeLocked:true },
+      { id:'gov-drives-folder', label:'Create folders',code:'governance.drive.folder.create', state:'inherited-role', via:'Drives', scope:'Tenant', scopeLocked:true },
+    ]
+  },
+  {
+    id:'gov-sandbox', label:'Sandboxes', code:'governance.sandbox', expanded:true,
+    state:'direct', scope:'Own', partial:true, partialCount:'4 of 6',
+    children:[
+      { id:'gov-sb-view',    label:'View Sandboxes',    code:'governance.sandbox.view',    state:'role',     role:'Manager', scope:'Own', scopeLocked:true },
+      { id:'gov-sb-det',     label:'Sandbox details',   code:'governance.sandbox.details', state:'inherited', via:'Sandboxes', scope:'Own' },
+      { id:'gov-sb-claims',  label:'View claims',       code:'governance.sandbox.claims',  state:'inherited', via:'Sandboxes', scope:'Own' },
+      { id:'gov-sb-bundles', label:'Manage bundles',    code:'governance.sandbox.bundles', state:'inherited', via:'Sandboxes', scope:'Own' },
+      { id:'gov-sb-sources', label:'Connect sources',   code:'governance.sandbox.sources', state:'denied' },
+      { id:'gov-sb-promo',   label:'Promote sandboxes', code:'governance.sandbox.promote', state:'pending-deny' },
+    ]
+  },
+  {
+    id:'gov-truth', label:'Truth Plane', code:'governance.truthplane', expanded:false,
+    state:'none', scope:null,
+    children:[
+      { id:'gov-truth-view',  label:'View truth plane', code:'governance.truthplane.view',  state:'none' },
+      { id:'gov-truth-facts', label:'Manage facts',     code:'governance.truthplane.facts', state:'none' },
+    ]
+  },
+  {
+    id:'gov-packs', label:'Promotion Packs', code:'governance.packs', expanded:false,
+    state:'partial', partialCount:'1 pending',
+    children:[
+      { id:'gov-packs-view',   label:'View packs',   code:'governance.packs.view',   state:'pending-add' },
+      { id:'gov-packs-create', label:'Create packs', code:'governance.packs.create', state:'none' },
+    ]
+  },
+];
+
+// ─── Helpers ─────────────────────────────────────────────────
+
+function svgCheck(color='#fff') {
+  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
+}
+function svgDash(color='var(--err)') {
+  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+}
+function svgPlus(color='var(--brand)') {
+  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+}
+function svgChevron(dir='down') {
+  const r = dir==='right'?'-90':dir==='up'?'180':'0';
+  return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(${r}deg);transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>`;
+}
+
+function cbHTML(state) {
+  const map = {
+    'role':          `<div class="perm-cb granted-role" aria-checked="true" title="Granted via role">${svgCheck()}</div>`,
+    'direct':        `<div class="perm-cb granted-direct" aria-checked="true">${svgCheck()}</div>`,
+    'partial':       `<div class="perm-cb partial" aria-checked="mixed">${svgDash('var(--brand)')}</div>`,
+    'inherited':     `<div class="perm-cb granted-inh" aria-checked="true">${svgCheck()}</div>`,
+    'inherited-role':`<div class="perm-cb granted-role" aria-checked="true" title="Inherited from role">${svgCheck()}</div>`,
+    'denied':        `<div class="perm-cb denied" aria-checked="false">${svgDash()}</div>`,
+    'pending-add':   `<div class="perm-cb pending-add" aria-checked="false">${svgPlus()}</div>`,
+    'pending-deny':  `<div class="perm-cb pending-deny" aria-checked="false">${svgDash()}</div>`,
+    'none':          `<div class="perm-cb none" aria-checked="false"></div>`,
+  };
+  return map[state] || map.none;
+}
+
+function scopeHTML(node) {
+  if (node.scopeLocked) return `<span class="tree-scope-badge">${node.scope||''}</span>`;
+  if (node.state==='denied'||node.state==='pending-deny'||node.state==='pending-add'||node.state==='none') return '';
+  if (node.scope) return `<select class="tree-scope-select" aria-label="Scope"><option ${node.scope==='Own'?'selected':''}>Own</option><option ${node.scope==='Tenant'?'selected':''}>Tenant</option></select>`;
+  return '';
+}
+
+function metaHTML(node) {
+  let parts = '';
+  if (node.role)         parts += `<span class="tree-role-tag">${svgCheck('var(--succ)')} ${node.role}</span>`;
+  if (node.via)          parts += `<span class="chip chip-gray">via ${node.via}</span>`;
+  if (node.partialCount) parts += `<span style="font-size:11px;color:var(--tx2)">${node.partialCount}</span>`;
+  parts += scopeHTML(node);
+  return `<div class="tree-meta">${parts}</div>`;
+}
+
+// ─── Render Functions ─────────────────────────────────────────
+
+function renderUsers() {
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = USERS.map(u => `
+    <tr>
+      <td>
+        <div class="td-user">
+          <div class="user-avatar" style="background:${u.color}">${u.initials}</div>
+          <div>
+            <div class="user-name">${u.name}</div>
+            <div class="user-email">${u.email}</div>
+          </div>
+        </div>
+      </td>
+      <td>${u.roles.map(r=>`<span class="role-pill">${r}</span>`).join('')}</td>
+      <td>${u.status==='active'?'<span class="chip chip-green">Active</span>':'<span class="chip chip-amber">Invited</span>'}</td>
+      <td style="color:var(--tx2);font-size:13px">${u.lastActive}</td>
+      <td style="color:var(--tx2);font-size:13px">${u.joined}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="setView('v2')" aria-label="View ${u.name} access">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderTreeNode(node, depth=0) {
+  const isParent = node.children && node.children.length;
+  const indent = depth * 24;
+  let html = `
+    <div class="tree-row" role="treeitem" aria-expanded="${isParent?node.expanded:'undefined'}" style="padding-left:${16+indent}px" id="row-${node.id}">
+      ${isParent ? `<button class="tree-expand" onclick="toggleTree('${node.id}')" aria-label="Expand ${node.label}" id="exp-${node.id}">${svgChevron(node.expanded?'down':'right')}</button>` : '<span style="width:20px;flex-shrink:0"></span>'}
+      ${cbHTML(node.state)}
+      <div class="tree-label" style="margin-left:8px">
+        <div class="tree-perm-name">${node.label}</div>
+        <div class="tree-perm-code">${node.code}</div>
+      </div>
+      ${metaHTML(node)}
+    </div>
+  `;
+  if (isParent && node.expanded) {
+    html += `<div id="children-${node.id}" role="group">`;
+    html += node.children.map(c=>renderTreeNode(c, depth+1)).join('');
+    html += `</div>`;
+  } else if (isParent) {
+    html += `<div id="children-${node.id}" role="group" style="display:none">`;
+    html += node.children.map(c=>renderTreeNode(c, depth+1)).join('');
+    html += `</div>`;
+  }
+  return html;
+}
+
+function renderTree() {
+  document.getElementById('perm-tree').innerHTML =
+    TREE_DATA.map(n=>renderTreeNode(n)).join('');
+}
+
+function toggleTree(id) {
+  const node = findNode(id, TREE_DATA);
+  if (!node) return;
+  node.expanded = !node.expanded;
+  const ch = document.getElementById(`children-${id}`);
+  const btn = document.getElementById(`exp-${id}`);
+  if (ch) ch.style.display = node.expanded ? '' : 'none';
+  if (btn) btn.innerHTML = svgChevron(node.expanded?'down':'right');
+  const row = document.getElementById(`row-${id}`);
+  if (row) row.setAttribute('aria-expanded', node.expanded);
+}
+
+function findNode(id, nodes) {
+  for (const n of nodes) {
+    if (n.id===id) return n;
+    if (n.children) { const f=findNode(id, n.children); if(f) return f; }
+  }
+  return null;
+}
+
+function renderRoles() {
+  document.getElementById('roles-grid').innerHTML = ROLES.map(r => `
+    <div class="card role-card" onclick="openDrawer()" tabindex="0" role="button" aria-label="Edit ${r.name} role">
+      <div class="role-card-hdr" style="background:${r.color}"></div>
+      <div class="role-card-body">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div class="role-card-name">${r.name}</div>
+          ${r.system?'<span class="chip chip-gray">System</span>':''}
+        </div>
+        <div class="role-card-desc">${r.desc}</div>
+        <div class="role-card-footer">
+          <span class="role-member-count">${r.members} member${r.members!==1?'s':''}</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openDrawer()">Edit</button>
+            ${!r.system?`<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation()" style="color:var(--err)">Delete</button>`:''}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderSkeletonRows() {
+  const tbody = document.getElementById('skel-rows');
+  if (!tbody) return;
+  tbody.innerHTML = Array.from({length:6}).map(()=>`
+    <tr style="height:48px;border-bottom:1px solid var(--border)">
+      <td style="padding:0 16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="skel" style="width:32px;height:32px;border-radius:50%"></div>
+          <div>
+            <div class="skel" style="width:120px;height:13px;margin-bottom:5px"></div>
+            <div class="skel" style="width:160px;height:11px"></div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:0 16px"><div class="skel" style="width:70px;height:20px;border-radius:10px"></div></td>
+      <td style="padding:0 16px"><div class="skel" style="width:55px;height:20px;border-radius:10px"></div></td>
+      <td style="padding:0 16px"><div class="skel" style="width:80px;height:13px;border-radius:6px"></div></td>
+    </tr>
+  `).join('');
+}
+
+// ─── View Switcher ────────────────────────────────────────────
+
+const VIEWS = ['v1','v2','v3','loading','error'];
+let currentView = 'v1';
+let isDark = false;
+let pendingVisible = false;
+
+function setView(v) {
+  // Handle special states
+  const isSpecial = v==='drawer'||v==='modal'||v==='readonly';
+
+  // Close overlays
+  closeDrawer(true); closeModal(true);
+  document.getElementById('readonly-banner').style.display='none';
+
+  // Hide changes bar unless v2
+  if (v!=='v2' && v!=='modal' && v!=='drawer') {
+    setChangesBar(false);
+  }
+
+  if (!isSpecial) {
+    VIEWS.forEach(id=>{ const el=document.getElementById('view-'+id); if(el)el.style.display='none'; });
+    const target = document.getElementById('view-'+v);
+    if (target) target.style.display='';
+    currentView = v;
+    if (v==='v2') { setChangesBar(true); renderTree(); }
+    if (v==='loading') renderSkeletonRows();
+  } else if (v==='drawer') {
+    // Show v3 underneath
+    VIEWS.forEach(id=>{ const el=document.getElementById('view-'+id); if(el)el.style.display='none'; });
+    document.getElementById('view-v3').style.display='';
+    currentView='v3';
+    renderRoles();
+    setTimeout(openDrawer, 50);
+  } else if (v==='modal') {
+    VIEWS.forEach(id=>{ const el=document.getElementById('view-'+id); if(el)el.style.display='none'; });
+    document.getElementById('view-v2').style.display='';
+    currentView='v2';
+    renderTree(); setChangesBar(true);
+    setTimeout(openModal, 50);
+  } else if (v==='readonly') {
+    VIEWS.forEach(id=>{ const el=document.getElementById('view-'+id); if(el)el.style.display='none'; });
+    document.getElementById('view-v1').style.display='';
+    currentView='v1';
+    document.getElementById('readonly-banner').style.display='flex';
+    // Disable interactive controls
+  }
+
+  // Update switcher buttons
+  document.querySelectorAll('.sw-btn').forEach(b=>{
+    b.classList.remove('active');
+    const map = {'V1 Users':'v1','V2 Access':'v2','V3 Roles':'v3','Drawer':'drawer','Modal':'modal','Loading':'loading','Error':'error','Read-only':'readonly'};
+    if (map[b.textContent]===v) b.classList.add('active');
+    if (b.textContent==='Dark') b.classList.toggle('active', isDark);
+  });
+}
+
+function toggleDark() {
+  isDark = !isDark;
+  document.documentElement.classList.toggle('dark', isDark);
+  document.querySelectorAll('.sw-btn').forEach(b=>{
+    if(b.textContent==='Dark') b.classList.toggle('active',isDark);
+  });
+}
+
+// ─── Overlay Controls ─────────────────────────────────────────
+
+function openDrawer() {
+  document.getElementById('drawer-bg').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer').focus();
+}
+function closeDrawer(silent=false) {
+  document.getElementById('drawer-bg').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+
+function openModal() {
+  document.getElementById('modal-wrap').classList.add('open');
+}
+function closeModal(silent=false) {
+  document.getElementById('modal-wrap').classList.remove('open');
+}
+
+function setChangesBar(visible) {
+  pendingVisible = visible;
+  document.getElementById('changes-bar').classList.toggle('visible', visible);
+}
+
+function discardChanges() {
+  setChangesBar(false);
+  showToast('Changes discarded');
+}
+
+function applyChanges() {
+  const btn = document.getElementById('apply-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin .8s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Applying…`;
+  setTimeout(()=>{
+    closeModal();
+    setChangesBar(false);
+    btn.disabled=false;
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Apply 2 changes`;
+    showToast('Permissions updated for David Cardenas');
+  }, 1400);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function saveRole() {
+  closeDrawer();
+  showToast('Role saved successfully');
+  renderRoles();
+}
+
+function selectColor(btn, color) {}
+
+function togglePerm(btn) {
+  btn.classList.toggle('on');
+  const checked = btn.classList.contains('on');
+  btn.setAttribute('aria-checked', checked);
+}
+
+// ─── Keyboard nav for drawer ──────────────────────────────────
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('modal-wrap').classList.contains('open')) { closeModal(); return; }
+    if(document.getElementById('drawer').classList.contains('open')) { closeDrawer(); return; }
+  }
+});
+
+// CSS spin keyframe
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+
+// ─── Init ─────────────────────────────────────────────────────
+renderUsers();
+renderRoles();
+setView('v1');
+</script>
+</body>
+</html>

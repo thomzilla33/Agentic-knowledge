@@ -9,8 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#0a0d1a; --bg2:#0f172e; --bg3:#0d1323;
-  --t1:#F1F5F9; --t2:#94A3B8; --t3:#64748B;
+  --bg:#0A0E1A; --bg2:#0D1120; --bg3:#131C2E;
+  --shell-app-bg:linear-gradient(144deg,#020618 0%,#0F172B 50%,#020618 100%);
+  --t1:#F1F5F9; --t2:#94A3B8; --t3:#94A3B8;
   --line:rgba(255,255,255,0.08);
   --line-strong:rgba(255,255,255,0.14);
   --hover:rgba(255,255,255,0.04);
@@ -23,7 +24,7 @@
 
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%; overflow:hidden}
-body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--t1); font-size:14px}
+body{font-family:'Inter',system-ui,sans-serif; background:var(--shell-app-bg); color:var(--t1); font-size:14px}
 
 /* ── TOPBAR ── */
 .topbar{
@@ -245,7 +246,7 @@ body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(-
 
 .tl-body{padding:24px 32px 40px}
 
-/* Widget pattern (matches settings.html) */
+/* Widget pattern (matches admin-console.html) */
 .ov-widget{background:var(--bg2); border:1px solid var(--line); border-radius:12px; margin-bottom:14px; overflow:hidden}
 .ov-widget:last-child{margin-bottom:0}
 .ov-widget-h{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px 10px}
@@ -469,17 +470,64 @@ textarea.input{resize:vertical; min-height:64px; line-height:1.5}
 .tb-persona.is-user{background:rgba(6,182,212,0.08);color:var(--cyan);border-color:rgba(6,182,212,0.3)}
 @media (max-width:900px){.tb-persona-label{display:none}.tb-persona{padding:0 8px}}
 
-.notif-bell-wrap{position:relative;display:inline-flex;align-items:center}
-.notif-bell-dot{
-  position:absolute;top:-2px;right:-2px;
-  min-width:14px;height:14px;padding:0 3px;
-  background:#ef4444;color:#fff;
-  font-size:9px;font-weight:700;
-  border-radius:7px;
-  display:inline-flex;align-items:center;justify-content:center;
-  border:2px solid var(--bg, #050813);
-  pointer-events:none;
+/* notif-bell-wrap / notif-bell-dot → shared/notif-panel.css */
+
+/* ─── TOUR (demo walkthrough) ─── */
+.tour-trigger{
+  position:fixed; bottom:24px; left:24px; z-index:300;
+  display:flex; align-items:center; gap:7px;
+  padding:0 16px; height:36px;
+  background:var(--purple); color:#0d0517;
+  border:none; border-radius:20px;
+  font-family:inherit; font-size:12px; font-weight:800;
+  cursor:pointer; letter-spacing:.02em;
+  box-shadow:0 4px 16px rgba(167,139,250,0.35);
+  transition:transform .15s, box-shadow .15s;
 }
+.tour-trigger:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(167,139,250,0.45)}
+.tour-overlay{
+  position:fixed; inset:0; z-index:400;
+  background:rgba(0,0,0,0.6);
+  pointer-events:auto;
+  display:none;
+}
+.tour-overlay.active{display:block}
+.tour-spotlight{
+  position:fixed; z-index:410;
+  border-radius:10px;
+  box-shadow:0 0 0 9999px rgba(0,0,0,0.55);
+  pointer-events:none;
+  transition:all .25s ease;
+  display:none;
+}
+.tour-spotlight.active{display:block}
+.tour-popover{
+  position:fixed; z-index:420;
+  width:360px; background:var(--bg2);
+  border:1px solid var(--line-strong);
+  border-radius:14px;
+  box-shadow:0 16px 48px rgba(0,0,0,0.45);
+  padding:0;
+  opacity:0; transform:scale(.96);
+  pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;
+}
+.tour-popover.active{opacity:1; transform:scale(1); pointer-events:auto}
+.tour-popover-header{display:flex; align-items:center; justify-content:space-between; padding:14px 18px 0}
+.tour-popover-step{font-size:10.5px; font-weight:800; color:var(--t3); text-transform:uppercase; letter-spacing:.06em}
+.tour-popover-skip{background:transparent; border:none; color:var(--t3); font-size:11px; cursor:pointer; font-family:inherit; padding:2px 4px; border-radius:4px}
+.tour-popover-skip:hover{color:var(--t1)}
+.tour-popover-title{font-size:16px; font-weight:800; color:var(--t1); padding:10px 18px 6px; letter-spacing:-.01em; line-height:1.3}
+.tour-popover-body{font-size:13px; color:var(--t2); line-height:1.6; padding:0 18px 14px}
+.tour-popover-footer{display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-top:1px solid var(--line)}
+.tour-progress{display:flex; gap:5px; align-items:center}
+.tour-progress-dot{width:6px; height:6px; border-radius:50%; background:var(--line-strong); transition:background .15s, width .15s}
+.tour-progress-dot.active{background:var(--purple); width:14px; border-radius:4px}
+.tour-btns{display:flex; gap:8px}
+.tour-btn{height:30px; padding:0 14px; font-family:inherit; font-size:12px; font-weight:700; border-radius:7px; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--t1); transition:background .12s}
+.tour-btn:hover{background:var(--hover)}
+.tour-btn.primary{background:var(--purple); color:#0d0517; border-color:var(--purple)}
+.tour-btn.primary:hover{background:#9171f8}
 
 .theme-icon-sun{display:none}
 .theme-icon-moon{display:block}
@@ -494,7 +542,7 @@ html.persona-user [data-admin-only]{display:none !important}
 /* Light theme — minimal local overrides for agent-tools chrome */
 html.theme-light{
   --bg:#F8FAFC;
-  --t1:#0F172A;--t2:#334155;--t3:#64748B;
+  --t1:#0F172A;--t2:#334155;--t3:#94A3B8;
   --line:rgba(15,23,42,0.10);--line-strong:rgba(15,23,42,0.20);
   --hover:rgba(15,23,42,0.04);--hover-strong:rgba(15,23,42,0.08);
 }
@@ -503,6 +551,7 @@ html.theme-light .topbar{background:#FFFFFF;border-bottom-color:var(--line)}
 html.theme-light .sidebar,html.theme-light .ssb{background:#FFFFFF;border-color:var(--line)}
 
 </style>
+<link rel="stylesheet" href="shared/notif-panel.css">
 </head>
 <body>
 
@@ -520,7 +569,7 @@ html.theme-light .sidebar,html.theme-light .ssb{background:#FFFFFF;border-color:
     </button>
       <div class="studio-switcher" id="studioSwitcher" role="menu" aria-hidden="true">
         <div class="studio-switcher-h">Switch surface</div>
-        <a href="settings.html" class="studio-switcher-item" data-surface="admin">
+        <a href="admin-console.html" class="studio-switcher-item" data-surface="admin">
           <div class="studio-switcher-ico" style="background:rgba(6,182,212,0.10);color:#06B6D4;border:1px solid rgba(6,182,212,0.22)">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg>
           </div>
@@ -570,8 +619,9 @@ html.theme-light .sidebar,html.theme-light .ssb{background:#FFFFFF;border-color:
       <svg class="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
     <span class="notif-bell-wrap">
-      <button class="icon-btn" aria-label="Notifications" onclick="toast('3 unread notifications')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
-      <span class="notif-bell-dot">3</span>
+      <button class="icon-btn" id="notifBellLauncher" type="button" aria-label="Notifications" aria-haspopup="dialog" aria-expanded="false" onclick="_toggleNotifications(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+      <span class="notif-bell-dot" id="notif-bell-dot" aria-label="Unread notifications">3</span>
+      <div class="notif-menu" id="notif-menu" role="dialog" aria-label="Notifications" aria-hidden="true"></div>
     </span>
     <span class="tb-divider-v"></span>
     <button class="tb-persona" id="tbPersonaBtn" type="button" onclick="togglePersona()" title="Switch between admin and end-user views">
@@ -597,7 +647,7 @@ html.theme-light .sidebar,html.theme-light .ssb{background:#FFFFFF;border-color:
     <button class="sb-item" title="Agentic Studio · Agents and networks" aria-label="Agentic Studio · Agents and networks" onclick="window.location.href='agentic-studio.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="6" r="3"/><path d="M3 17c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></button>
     <button class="sb-item" title="Data Studio" aria-label="Data Studio" onclick="window.location.href='data-studio.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="11" rx="1.4"/><path d="M2.5 7h13M2.5 11h13M6.5 3.5v11M11.5 3.5v11"/></svg></button>
     <button class="sb-item active" title="Agent Studio · Tools" aria-label="Agent Studio · Tools" onclick="window.location.href='agent-tools.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.5" y="4.5" width="4" height="3" rx=".8"/><rect x="6.5" y="1.5" width="4" height="3" rx=".8"/><rect x="6.5" y="7.5" width="4" height="3" rx=".8"/><path d="M5.5 6h1M5.5 3H6a.5.5 0 01.5.5v1"/></svg></button>
-    <button class="sb-item" title="Admin Studio" aria-label="Admin Studio" onclick="window.location.href='settings.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="2"/><circle cx="4" cy="4" r="1.4"/><circle cx="14" cy="4" r="1.4"/><circle cx="4" cy="14" r="1.4"/><circle cx="14" cy="14" r="1.4"/><path d="M5 5l2.5 2.5M13 5L10.5 7.5M5 13l2.5-2.5M13 13L10.5 10.5"/></svg></button>
+    <button class="sb-item" title="Admin Studio" aria-label="Admin Studio" onclick="window.location.href='admin-console.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="2"/><circle cx="4" cy="4" r="1.4"/><circle cx="14" cy="4" r="1.4"/><circle cx="4" cy="14" r="1.4"/><circle cx="14" cy="14" r="1.4"/><path d="M5 5l2.5 2.5M13 5L10.5 7.5M5 13l2.5-2.5M13 13L10.5 10.5"/></svg></button>
   </nav>
 
   <aside class="ssb">
@@ -636,7 +686,7 @@ html.theme-light .sidebar,html.theme-light .ssb{background:#FFFFFF;border-color:
 
       <div class="ssb-group">
         <span class="ssb-grp-label">Cross-functional</span>
-        <a class="ssb-item" href="settings.html" style="text-decoration:none">
+        <a class="ssb-item" href="admin-console.html" style="text-decoration:none">
           <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="2"/><circle cx="3" cy="3" r="1.3"/><circle cx="13" cy="3" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="13" cy="13" r="1.3"/><path d="M4.1 4.1l2.5 2.5M11.9 4.1L9.4 6.6M4.1 11.9l2.5-2.5M11.9 11.9L9.4 9.4"/></svg></span>
           <span class="ssb-item-label">Admin Studio</span>
           <span style="font-size:11px; color:var(--t3); margin-left:auto">↗</span>
@@ -658,6 +708,15 @@ html.theme-light .sidebar,html.theme-light .ssb{background:#FFFFFF;border-color:
 
 <div class="toast-container" id="toasts"></div>
 
+<!-- Tour motor DOM -->
+<button class="tour-trigger" id="tourTrigger" onclick="startTour()">
+  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v4M8 11v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  Demo
+</button>
+<div class="tour-overlay" id="tourOverlay"></div>
+<div class="tour-spotlight" id="tourSpotlight"></div>
+<div class="tour-popover" id="tourPopover"></div>
+
 <script>
 function $(id){return document.getElementById(id)}
 function escapeHtml(s){return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -671,7 +730,7 @@ function toast(msg){
 /* ====================== MOCK DATA ====================== */
 
 // Integrations authenticated in Admin Studio AND exposing Tools (no Data Sync only).
-// Subset of what settings.html shows. Each has tools[] + wrappers[].
+// Subset of what admin-console.html shows. Each has tools[] + wrappers[].
 const AG_INTEGRATIONS = {
   jira: {
     slug:'jira', name:'Jira', vendor:'Atlassian', color:'#0052CC', logo:'jira',
@@ -832,7 +891,7 @@ function renderToolsList() {
           <span class="ag-hero-sub">Cross-functional with Admin Studio</span>
         </div>
         <h1 class="ag-hero-title">What agents can actually do</h1>
-        <p class="ag-hero-desc">These integrations are authenticated in <a href="settings.html" style="color:var(--cyan)">Admin Studio</a> and expose Tools. You can either let agents call the raw tools directly, or create pre-configured <strong style="color:var(--purple)">wrappers</strong> that lock specific parameters — what Edgardo calls "Lego pieces for agents."</p>
+        <p class="ag-hero-desc">These integrations are authenticated in <a href="admin-console.html" style="color:var(--cyan)">Admin Studio</a> and expose Tools. You can either let agents call the raw tools directly, or create pre-configured <strong style="color:var(--purple)">wrappers</strong> that lock specific parameters — what Edgardo calls "Lego pieces for agents."</p>
       </div>
       <div class="ag-hero-right">
         <div class="ag-kpi"><div class="ag-kpi-n" style="color:var(--t1)">${totalTools}</div><div class="ag-kpi-l">Tools</div></div>
@@ -848,7 +907,7 @@ function renderToolsList() {
           <div class="ag-section-title">Tools by integration</div>
           <div class="ag-section-sub">Click any integration to see its tools and configure wrappers</div>
         </div>
-        <a class="btn btn-ghost btn-sm" href="settings.html#/integrations">Authenticate more in Admin Studio ↗</a>
+        <a class="btn btn-ghost btn-sm" href="admin-console.html#/integrations">Authenticate more in Admin Studio ↗</a>
       </div>
 
       <div class="ag-empty-banner">
@@ -929,7 +988,7 @@ function renderToolDetail(slug) {
         </div>
       </div>
       <div class="tl-head-actions">
-        <a class="btn btn-ghost btn-sm" href="settings.html#/integrations/${c.slug}">Manage in Admin Studio ↗</a>
+        <a class="btn btn-ghost btn-sm" href="admin-console.html#/integrations/${c.slug}">Manage in Admin Studio ↗</a>
         <button class="btn btn-primary btn-sm" onclick="openWrapperCreator('${c.slug}')">+ Create wrapper</button>
       </div>
     </header>
@@ -1050,7 +1109,7 @@ function renderOverviewTab(c) {
         <span class="ov-widget-meta">Tools only · authenticated in Admin Studio</span>
       </header>
       <div class="ov-widget-body">
-        <p><strong style="color:var(--t1)">${escapeHtml(c.name)}</strong> exposes ${c.tools.length} tools to agents in your workspace. Tools and MCP are managed here; credentials and instance lifecycle are managed in <a href="settings.html#/integrations/${c.slug}" style="color:var(--cyan)">Admin Studio</a>. Data Sync events from ${escapeHtml(c.name)} flow into <a href="data-studio.html" style="color:var(--cyan)">Data Studio</a> separately.</p>
+        <p><strong style="color:var(--t1)">${escapeHtml(c.name)}</strong> exposes ${c.tools.length} tools to agents in your workspace. Tools and MCP are managed here; credentials and instance lifecycle are managed in <a href="admin-console.html#/integrations/${c.slug}" style="color:var(--cyan)">Admin Studio</a>. Data Sync events from ${escapeHtml(c.name)} flow into <a href="data-studio.html" style="color:var(--cyan)">Data Studio</a> separately.</p>
       </div>
     </section>
 
@@ -1284,6 +1343,187 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('hashchange', render);
 render();
 
+/* ====================== TOUR MOTOR ====================== */
+
+const TOUR_STEPS = [
+  {
+    title: 'Agent Studio · Tools',
+    body: 'This is where integrations become agent capabilities. Any connector authenticated in Admin Studio that exposes tools shows up here. Let\'s walk through how it all works.',
+  },
+  {
+    title: 'Studio switcher',
+    body: 'Click here to switch surfaces: Admin Studio handles credentials, Data Studio maps data flow, and you\'re now in Agent Studio · Tools. All three views share the same workspace.',
+    target: '#tbContextBtn',
+  },
+  {
+    title: 'Secondary navigation',
+    body: 'Two main views: "Tools by integration" groups raw API methods by connector. "All wrappers" is a flat list of every pre-configured tool your team has created.',
+    target: 'aside.ssb',
+  },
+  {
+    title: 'What agents can actually do',
+    body: 'The hero shows you the full picture: 25 raw tools, 10 wrappers, 5 integrations, and 183 agent calls per day. This is the surface where you decide what agents are allowed to invoke.',
+    target: '.ag-hero',
+    route: 'tools',
+  },
+  {
+    title: 'Live metrics',
+    body: '"Calls/day" is the most important number here — it tells you which integrations agents are actually using versus just configured. Wrappers with zero calls are candidates for review.',
+    target: '.ag-hero-right',
+  },
+  {
+    title: 'Integration cards',
+    body: 'One card per authenticated integration that exposes tools. Click any card to drill into its raw tools and existing wrappers. The amber dot on Slack means 3 wrappers are pending review.',
+    target: '.ag-grid',
+    scrollToTarget: true,
+  },
+  {
+    title: 'Raw tools inside Jira',
+    body: 'Each row is a raw API function: create_issue, update_status, add_comment. Agents can call these directly, but you probably want to wrap them first to prevent accidental misuse.',
+    target: '.tool-row',
+    route: 'tools/jira',
+    scrollToTarget: true,
+  },
+  {
+    title: 'Create a wrapper',
+    body: 'Click "New wrapper" to lock specific parameters and only expose what the agent needs to fill. "Create Prone Ticket" locks project and issue type — the agent only fills summary and description. Safer, narrower, auditable.',
+    target: 'button.btn-primary.btn-sm',
+    scrollToTarget: true,
+  },
+  {
+    title: 'All Wrappers',
+    body: 'A flat view across every integration. 10 wrappers built by your team — each one a Lego piece an agent can pick up and use. Assign them in Agentic Studio to control exactly what each agent can do.',
+    target: '.wrap-card',
+    route: 'wrappers',
+    scrollToTarget: true,
+  },
+  {
+    title: 'You\'re set',
+    body: 'Build wrappers here, assign them to agents in Agentic Studio. The more specific the wrapper, the safer and more auditable the agent. Check Admin Studio for credential health.',
+  },
+];
+
+const tourState = { active: false, step: 0 };
+
+function startTour() {
+  tourState.active = true;
+  tourState.step = 0;
+  $('tourOverlay').classList.add('active');
+  paintTourStep();
+}
+
+function endTour() {
+  tourState.active = false;
+  $('tourOverlay').classList.remove('active');
+  $('tourSpotlight').classList.remove('active');
+  $('tourPopover').classList.remove('active');
+  $('tourSpotlight').style.cssText = '';
+  $('tourPopover').style.cssText = '';
+}
+
+function tourNext() {
+  if (tourState.step < TOUR_STEPS.length - 1) { tourState.step++; paintTourStep(); }
+  else endTour();
+}
+
+function tourPrev() {
+  if (tourState.step > 0) { tourState.step--; paintTourStep(); }
+}
+
+function paintTourStep() {
+  const step = TOUR_STEPS[tourState.step];
+  const n = tourState.step + 1;
+  const total = TOUR_STEPS.length;
+  const spotlight = $('tourSpotlight');
+  const popover   = $('tourPopover');
+
+  spotlight.classList.remove('active');
+  popover.classList.remove('active');
+
+  if (step.route) navigate(step.route);
+
+  popover.innerHTML = `
+    <div class="tour-popover-header">
+      <span class="tour-popover-step">Step ${n} of ${total}</span>
+      <button class="tour-popover-skip" onclick="endTour()">Skip tour \xd7</button>
+    </div>
+    <div class="tour-popover-title">${step.title}</div>
+    <div class="tour-popover-body">${step.body}</div>
+    <div class="tour-popover-footer">
+      <div class="tour-progress">
+        ${TOUR_STEPS.map((_,i)=>`<div class="tour-progress-dot${i===tourState.step?' active':''}"></div>`).join('')}
+      </div>
+      <div class="tour-btns">
+        ${n > 1 ? `<button class="tour-btn" onclick="tourPrev()">&#8592; Back</button>` : ''}
+        <button class="tour-btn primary" onclick="${n === total ? 'endTour()' : 'tourNext()'}">${n === total ? 'Finish' : 'Next →'}</button>
+      </div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    if (step.target) {
+      const targetEl = document.querySelector(step.target);
+      if (targetEl) {
+        if (step.scrollToTarget) {
+          const scrollContainer = document.querySelector('.content');
+          const targetRect = targetEl.getBoundingClientRect();
+          const TOPBAR_OFFSET = 80;
+          if (scrollContainer) {
+            const containerTop = scrollContainer.getBoundingClientRect().top;
+            scrollContainer.scrollBy({ top: targetRect.top - containerTop - TOPBAR_OFFSET, behavior:'smooth' });
+          } else {
+            targetEl.scrollIntoView({ behavior:'smooth', block:'start' });
+          }
+        }
+        const positionOverlay = () => {
+          const rect = targetEl.getBoundingClientRect();
+          const pad = 6;
+          spotlight.style.left   = (rect.left   - pad) + 'px';
+          spotlight.style.top    = (rect.top    - pad) + 'px';
+          spotlight.style.width  = (rect.width  + pad*2) + 'px';
+          spotlight.style.height = (rect.height + pad*2) + 'px';
+          spotlight.classList.add('active');
+
+          const pw = 360, ph = popover.offsetHeight || 280, mg = 16;
+          let pl, pt;
+          if (rect.bottom + ph + mg < window.innerHeight) {
+            pt = rect.bottom + 16;
+            pl = Math.min(Math.max(rect.left, 16), window.innerWidth - pw - 16);
+          } else if (rect.top - ph - mg > 0) {
+            pt = rect.top - ph - 16;
+            pl = Math.min(Math.max(rect.left, 16), window.innerWidth - pw - 16);
+          } else {
+            pt = (window.innerHeight - ph) / 2;
+            pl = (window.innerWidth  - pw) / 2;
+          }
+          popover.style.left = pl + 'px';
+          popover.style.top  = pt + 'px';
+          popover.classList.add('active');
+        };
+        setTimeout(positionOverlay, step.scrollToTarget ? 700 : 50);
+        if (step.scrollToTarget) setTimeout(positionOverlay, 1100);
+      } else {
+        spotlight.classList.remove('active');
+        popover.style.left = ((window.innerWidth  - 360) / 2) + 'px';
+        popover.style.top  = ((window.innerHeight - 280) / 2) + 'px';
+        popover.classList.add('active');
+      }
+    } else {
+      spotlight.classList.remove('active');
+      popover.style.left = ((window.innerWidth  - 360) / 2) + 'px';
+      popover.style.top  = ((window.innerHeight - 280) / 2) + 'px';
+      popover.classList.add('active');
+    }
+  }, step.route ? 250 : 50);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (!tourState.active) return;
+  if (e.key === 'Escape') endTour();
+  else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); tourNext(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); tourPrev(); }
+});
+
 
 /* ====================== THEME + PERSONA (parity with Admin Studio) ====================== */
 
@@ -1325,5 +1565,16 @@ function togglePersona() {
 
 </script>
 
+<script>
+window.NOTIF_DATA = [
+  { id:'at1', source:'system',      eventType:'security',   severity:'critical', title:'Salesforce connector token expiring', desc:'OAuth token for Salesforce (Production) expires in 2 hours. Re-authenticate now.',         time:'14m ago',   day:'today',     unread:true  },
+  { id:'at2', source:'integration', eventType:'failure',    severity:'warning',  title:'OpenAI rate limit hit',               desc:'GPT-4o quota exceeded on the Lead Enrichment tool. Falling back to GPT-4o-mini.',          time:'41m ago',   day:'today',     unread:true  },
+  { id:'at3', source:'agent',       eventType:'completion', severity:'success',  title:'Tool suite published',                desc:'8 tools in the "CRM Utils" suite published to the Agent Marketplace successfully.',          time:'2h ago',    day:'today',     unread:false },
+  { id:'at4', source:'system',      eventType:'update',     severity:'info',     title:'SDK updated to v3.8.1',               desc:'Breaking change in the `run_tool` API. Review migration guide before next deployment.',      time:'Yesterday', day:'yesterday', unread:true  },
+  { id:'at5', source:'integration', eventType:'failure',    severity:'critical', title:'HubSpot webhook unreachable',          desc:'Endpoint https://hooks.aimsos.ai/hs returned 503 for 15 consecutive minutes.',              time:'Yesterday', day:'yesterday', unread:false },
+  { id:'at6', source:'system',      eventType:'update',     severity:'info',     title:'New tool template available',          desc:'"Async Batch Processor" template added. Handles up to 10k records with built-in retry.',      time:'3d ago',    day:'earlier',   unread:false },
+];
+</script>
+<script src="shared/notif-panel.js"></script>
 </body>
 </html>

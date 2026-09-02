@@ -9,7 +9,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased}
 :root{
-  --bg:#0a0d1a; --bg2:#0f172e; --sb:#000;
+  --bg:#0A0E1A; --bg2:#0D1120; --sb:#000;
   --cb:rgba(255,255,255,0.04); --cbh:rgba(255,255,255,0.07);
   --bd:rgba(255,255,255,0.08); --bds:rgba(255,255,255,0.16);
   --pri:#2B7FFF; --pri-bg:rgba(43,127,255,0.12); --pri-bd:rgba(43,127,255,0.30);
@@ -18,7 +18,7 @@ html{-webkit-font-smoothing:antialiased}
   --warn:#FDC700; --warn-bg:rgba(253,199,0,0.12);
   --pur:#A78BFA; --pur-bg:rgba(167,139,250,0.12);
   --t1:rgba(255,255,255,0.90); --t2:rgba(255,255,255,0.60);
-  --t3:rgba(255,255,255,0.38); --t4:rgba(255,255,255,0.22);
+  --t3:rgba(255,255,255,0.55); --t4:rgba(255,255,255,0.38);
   --grad:linear-gradient(135deg,#00C2C2 0%,#155DFC 100%);
   /* DS sidebar active state (Figma v6rmYKA2zmyXWOahlxLOeI · Sidebar page) */
   --grad-sb-active:radial-gradient(circle at 61% 68%,rgba(33,115,255,1) 29%,rgba(9,226,171,1) 61%);
@@ -366,7 +366,7 @@ html.theme-light{
   --shadow-tooltip:                      0 8px 24px rgba(33,115,255,0.12);
 
 }
-body{background:var(--shell-page-bg);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
+body{background:var(--shell-app-bg);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
 button,input,select,textarea{font-family:'Inter',sans-serif}
 a{text-decoration:none;color:inherit}
 
@@ -1048,7 +1048,7 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .insp-tog-lbl{font-size:14px;color:var(--t1)}
 .insp-sel-wrap{position:relative;margin-bottom:8px}
 .insp-sel{width:100%;height:32px;background:var(--cb);border:1px solid var(--bds);border-radius:var(--r6);padding:0 10px;color:var(--t1);font-size:12px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none}
-.insp-sel option{background:#0f172e}
+.insp-sel option{background:var(--bg2)}
 .insp-ta{width:100%;min-height:76px;background:var(--cb);border:1px solid var(--bd);border-radius:var(--r6);padding:8px;color:var(--t1);font-size:12px;outline:none;resize:none;font-family:inherit;transition:border-color .15s;line-height:1.5}
 .insp-ta:focus{border-color:var(--bds)}
 .insp-ta::placeholder{color:var(--t3);font-style:italic}
@@ -2662,6 +2662,7 @@ html.theme-light .search-footer-link{color:#7C3AED}
 .pri-ds--medium{background:var(--priority-medium)}
 .pri-ds--low{background:var(--priority-low)}
 </style>
+<link rel="stylesheet" href="shared/notif-panel.css">
 </head>
 <body>
 <div class="app">
@@ -6065,6 +6066,11 @@ function _renderAvatarMenu(){
   html += '</div>';
   html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'help\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.5a1.5 1.5 0 113 0c0 .8-1.5 1-1.5 2M8 11.5v.01" stroke-linecap="round"/></svg>Help &amp; docs</button>';
   html += '</div>';
+  if(userCan('canManageWorkspaceSettings')){
+    html += '<div class="am-section">';
+    html += '<button type="button" class="am-item" role="menuitem" onclick="event.stopPropagation();window.location.href=\'admin-console.html\'"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>Admin Console</button>';
+    html += '</div>';
+  }
   html += '<div class="am-section">';
   html += '<button type="button" class="am-item is-danger" role="menuitem" onclick="event.stopPropagation();_ctxAction(\'sign-out\')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16"><path d="M9 3H4a1 1 0 00-1 1v8a1 1 0 001 1h5M11 5l3 3-3 3M14 8H7" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>';
   html += '</div>';
@@ -11388,5 +11394,29 @@ document.addEventListener('keydown', function(e){ if((e.metaKey || e.ctrlKey) &&
     </div>
   </div>
 </div>
+<script>
+window.NOTIF_DATA = [
+  { id:'as1', source:'agent',    eventType:'failure',    severity:'critical', title:'Lead Qualifier halted — unhandled exception', desc:'RuntimeError on node "Enrich from Clearbit". 23 records pending. Check agent logs.',           time:'4m ago',    day:'today',     unread:true  },
+  { id:'as2', source:'workflow', eventType:'approval',   severity:'warning',  title:'Human approval required — Contract Renewal',  desc:'Workflow paused at "CFO Sign-off" step for Contoso Ltd. Lisa D. has been notified.',           time:'49m ago',   day:'today',     unread:true  },
+  { id:'as3', source:'agent',    eventType:'completion', severity:'success',  title:'Onboarding Sequence complete',                desc:'All 8 nodes finished for Northwind Corp. 0 manual interventions. 3 CRM tasks created.',        time:'2h ago',    day:'today',     unread:false },
+  { id:'as4', source:'workflow', eventType:'escalation', severity:'warning',  title:'SLA breach imminent — Invoice Processor',     desc:'Current run at 4h 48m against 5h SLA. Auto-escalation triggers in 12 min if not resolved.',   time:'3h ago',    day:'today',     unread:true  },
+  { id:'as5', source:'agent',    eventType:'completion', severity:'success',  title:'Email Triage processed 142 emails',           desc:'132 auto-resolved. 10 escalated to human queue. Avg confidence score: 91%.',                   time:'Yesterday', day:'yesterday', unread:false },
+  { id:'as6', source:'system',   eventType:'update',     severity:'info',     title:'Agentic Studio updated to v2.14.0',           desc:'New: parallel node execution, retry budget per workflow, improved Human-in-the-Loop UI.',      time:'3d ago',    day:'earlier',   unread:false },
+];
+</script>
+<script src="shared/notif-panel.js"></script>
+
+  <style>
+  .back-to-ws{position:fixed;top:10px;left:10px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:6px 12px 6px 8px;background:rgba(11,18,33,.88);border:1px solid rgba(255,255,255,.12);border-radius:20px;font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;text-decoration:none;backdrop-filter:blur(12px);transition:background .15s,border-color .15s,color .15s,transform .15s;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+  .back-to-ws:hover{background:rgba(20,32,60,.95);border-color:rgba(43,127,255,.4);color:#fff;transform:translateX(-1px)}
+  .back-to-ws svg{opacity:.6;transition:opacity .15s}
+  .back-to-ws:hover svg{opacity:1}
+  </style>
+  <a class="back-to-ws" href="index.html">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Workspaces
+  </a>
 </body>
 </html>

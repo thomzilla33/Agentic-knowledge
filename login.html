@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIMS-OS — Sign in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: linear-gradient(155.58deg, #020618 14.2%, #0f172b 50%, #020618 85.8%);
+      --surface: #0b1221;
+      --border: rgba(255,255,255,.07);
+      --text-1: #f1f5f9;
+      --text-2: #64748b;
+      --text-3: #3d5068;
+      --accent: #2B7FFF;
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background glow orbs */
+    body::before {
+      content: '';
+      position: fixed; top: -20%; left: -10%;
+      width: 60vw; height: 60vw;
+      background: radial-gradient(circle, rgba(43,127,255,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed; bottom: -20%; right: -10%;
+      width: 50vw; height: 50vw;
+      background: radial-gradient(circle, rgba(9,226,171,.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── Logo ────────────────────────────────────────── */
+    .auth-logo {
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none; margin-bottom: 28px;
+    }
+    .auth-logo-text {
+      font-size: 15px; font-weight: 800; letter-spacing: .15em;
+      text-transform: uppercase; display: flex; align-items: center;
+    }
+    .logo-aims { color: #fff; }
+    .logo-os {
+      background: linear-gradient(to top, #1B72FF, #09E2AB);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── Card ─────────────────────────────────────────── */
+    .auth-card {
+      width: 100%; max-width: 400px;
+      background: rgba(11,18,33,.94);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px; padding: 32px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 32px 80px rgba(0,0,0,.52), 0 0 0 1px rgba(255,255,255,.04) inset;
+      position: relative; z-index: 1;
+    }
+
+    /* ── View switching ───────────────────────────────── */
+    .auth-view { display: none; }
+    .auth-view.active { display: block; }
+
+    /* ── Typography ──────────────────────────────────── */
+    .auth-title { font-size: 20px; font-weight: 700; color: var(--text-1); margin-bottom: 4px; }
+    .auth-sub   { font-size: 13px; color: var(--text-2); margin-bottom: 24px; line-height: 1.6; }
+
+    /* ── Back link ───────────────────────────────────── */
+    .auth-back {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; color: var(--text-3); cursor: pointer;
+      margin-bottom: 18px; transition: color .15s;
+      background: none; border: none; font-family: inherit; padding: 0;
+    }
+    .auth-back:hover { color: var(--text-2); }
+
+    /* ── Form elements ───────────────────────────────── */
+    .form-group { margin-bottom: 14px; }
+    .form-label {
+      display: block; font-size: 11px; font-weight: 600;
+      color: var(--text-2); margin-bottom: 6px;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .form-input-wrap { position: relative; }
+    .form-input {
+      width: 100%; height: 40px; padding: 0 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.09); border-radius: 8px;
+      color: var(--text-1); font-size: 13.5px; font-family: inherit;
+      outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .form-input.has-icon { padding-right: 40px; }
+    .form-input:focus {
+      border-color: rgba(43,127,255,.5);
+      box-shadow: 0 0 0 3px rgba(43,127,255,.1);
+    }
+    .form-input::placeholder { color: var(--text-3); }
+    .mfa-input { text-align: center; font-size: 22px; letter-spacing: .3em; font-weight: 700; }
+
+    /* Password toggle */
+    .pw-toggle {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--text-3);
+      display: flex; align-items: center; padding: 4px; border-radius: 4px;
+      transition: color .15s;
+    }
+    .pw-toggle:hover { color: var(--text-2); }
+
+    /* Forgot link */
+    .forgot-link {
+      display: block; text-align: right; font-size: 12px; color: var(--text-3);
+      cursor: pointer; margin-top: 6px; transition: color .15s;
+      background: none; border: none; font-family: inherit; padding: 0;
+    }
+    .forgot-link:hover { color: var(--text-2); }
+
+    /* ── Buttons ──────────────────────────────────────── */
+    .btn-primary {
+      width: 100%; height: 40px; margin-top: 20px;
+      background: linear-gradient(135deg, var(--accent) 0%, #1a56c8 100%);
+      color: #fff; font-size: 13.5px; font-weight: 600; font-family: inherit;
+      border: none; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+      box-shadow: 0 4px 14px rgba(43,127,255,.35);
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(43,127,255,.45); }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary.loading .btn-label { display: none; }
+    .btn-primary.loading .btn-spinner { display: block; }
+    .btn-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin .6s linear infinite; display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-sso {
+      width: 100%; height: 40px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 8px; color: var(--text-2); font-size: 13px; font-weight: 500;
+      font-family: inherit; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .btn-sso:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14); color: var(--text-1); }
+
+    /* ── Divider ──────────────────────────────────────── */
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 18px 0; color: var(--text-3); font-size: 11px; font-weight: 500;
+    }
+    .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Error / success messages ─────────────────────── */
+    .form-error {
+      font-size: 11.5px; color: #f87171; margin-top: 8px;
+      display: none; padding: 8px 10px; background: rgba(248,113,113,.06);
+      border: 1px solid rgba(248,113,113,.18); border-radius: 6px;
+    }
+    .form-error.visible { display: block; }
+
+    .form-success {
+      text-align: center; padding: 20px 16px; margin-top: 16px;
+      background: rgba(16,185,129,.06); border: 1px solid rgba(16,185,129,.18); border-radius: 10px;
+    }
+    .form-success-title { font-size: 14px; font-weight: 600; color: var(--text-1); margin-top: 10px; }
+    .form-success-hint { font-size: 12px; color: var(--text-2); margin-top: 4px; line-height: 1.5; }
+
+    /* ── Resend ───────────────────────────────────────── */
+    .resend-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; font-size: 12px; color: var(--text-3); }
+    .resend-btn { background: none; border: none; font-family: inherit; font-size: 12px; color: var(--accent); cursor: pointer; padding: 0; }
+    .resend-btn:hover { text-decoration: underline; }
+
+    /* ── Footer ──────────────────────────────────────── */
+    .auth-footer { margin-top: 20px; text-align: center; font-size: 11px; color: var(--text-3); line-height: 1.6; position: relative; z-index: 1; }
+    .auth-footer a { color: var(--text-3); text-decoration: none; }
+    .auth-footer a:hover { color: var(--text-2); }
+
+    /* ── Focus rings ─────────────────────────────────── */
+    *:focus { outline: none; }
+    *:focus-visible { outline: 2px solid rgba(43,127,255,.6); outline-offset: 2px; border-radius: 4px; }
+    .form-input:focus-visible { outline: none; }
+    .btn-primary:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 2px; }
+
+    /* ── Tour engine ──────────────────────────────────── */
+    .tour-trigger{
+      position:fixed; bottom:18px; left:18px; z-index:80;
+      display:inline-flex; align-items:center; gap:6px; padding:0 16px 0 12px; height:38px;
+      border-radius:9999px; background:linear-gradient(135deg,#06B6D4 0%,#A78BFA 100%);
+      color:#fff; border:none; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600;
+      white-space:nowrap; overflow:hidden;
+      box-shadow:0 8px 24px rgba(6,182,212,.36), 0 2px 8px rgba(0,0,0,.28);
+      transition:transform .15s, box-shadow .15s;
+    }
+    .tour-trigger:hover,.tour-trigger:focus-visible{
+      transform:translateY(-2px);
+      box-shadow:0 14px 32px rgba(6,182,212,.50), 0 4px 12px rgba(0,0,0,.36); outline:none;
+    }
+    .tour-trigger svg{flex-shrink:0; margin-left:1px}
+    .tour-trigger-pulse{position:absolute; inset:0; border-radius:inherit; border:2px solid rgba(6,182,212,.6); animation:tourPulse 2s ease-out infinite; pointer-events:none}
+    .tour-trigger.seen .tour-trigger-pulse{display:none}
+    .tour-trigger.tour-active{display:none}
+    @keyframes tourPulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+
+    .tour-mask{position:fixed; z-index:9000; background:rgba(4,8,18,.55); pointer-events:auto; display:none}
+    .tour-mask.active{display:block}
+
+    .tour-spotlight{
+      position:fixed; z-index:9001; pointer-events:none; border-radius:14px; border:2px solid #06B6D4;
+      box-shadow:0 0 0 4px rgba(6,182,212,.18), 0 0 32px rgba(6,182,212,.55), 0 0 64px rgba(6,182,212,.25);
+      background:transparent; transition:all .28s cubic-bezier(.4,0,.2,1); opacity:0;
+    }
+    .tour-spotlight.active{opacity:1; animation:tourSpotlightPulse 2s ease-in-out infinite}
+    @keyframes tourSpotlightPulse{
+      0%,100%{box-shadow:0 0 0 4px rgba(6,182,212,.18), 0 0 32px rgba(6,182,212,.55), 0 0 64px rgba(6,182,212,.25)}
+      50%{box-shadow:0 0 0 6px rgba(6,182,212,.28), 0 0 48px rgba(6,182,212,.70), 0 0 96px rgba(6,182,212,.35)}
+    }
+
+    .tour-popover{
+      position:fixed; z-index:9002; width:360px; max-width:calc(100vw - 32px);
+      background:linear-gradient(180deg, rgba(20,28,48,.98) 0%, rgba(13,19,35,.98) 100%);
+      border:1px solid rgba(255,255,255,.14); border-radius:12px; backdrop-filter:blur(24px) saturate(1.8);
+      box-shadow:0 16px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04); padding:18px 20px;
+      opacity:0; transform:scale(.96) translateY(4px); pointer-events:none;
+      transition:opacity .2s ease-out, transform .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    .tour-popover.active{opacity:1; transform:scale(1) translateY(0); pointer-events:auto}
+    .tour-popover.is-sheet{left:8px !important; right:8px; top:auto !important; bottom:8px; width:auto; max-width:none}
+    .tour-popover-header{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+    .tour-popover-step{font-size:10.5px; font-weight:700; letter-spacing:.10em; text-transform:uppercase; color:#06B6D4; padding:2px 8px; border-radius:10px; background:rgba(6,182,212,.10); border:1px solid rgba(6,182,212,.25)}
+    .tour-popover-restart{background:transparent; border:none; cursor:pointer; color:rgba(255,255,255,.38); font-size:11px; padding:4px 6px; border-radius:5px; font-family:inherit}
+    .tour-popover-restart:hover{background:rgba(255,255,255,.04); color:rgba(255,255,255,.92)}
+    .tour-popover-skip{margin-left:auto; background:transparent; border:none; cursor:pointer; color:rgba(255,255,255,.38); font-size:11px; padding:4px 8px; border-radius:5px; font-family:inherit}
+    .tour-popover-skip:hover{background:rgba(255,255,255,.04); color:rgba(255,255,255,.92)}
+    .tour-popover-title{font-size:16px; font-weight:700; color:rgba(255,255,255,.92); line-height:1.3; margin-bottom:8px}
+    .tour-popover-body{font-size:13px; line-height:1.6; color:rgba(255,255,255,.60); margin-bottom:16px}
+    .tour-popover-body strong,.tour-popover-body b{color:rgba(255,255,255,.92); font-weight:600}
+    .tour-popover-footer{display:flex; align-items:center; gap:10px; padding-top:12px; border-top:1px solid rgba(255,255,255,.10)}
+    .tour-progress{display:inline-flex; gap:4px; flex:1}
+    .tour-progress-dot{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.08); transition:background .15s, transform .15s}
+    .tour-progress-dot.current{background:#06B6D4; transform:scale(1.4)}
+    .tour-progress-dot.done{background:rgba(6,182,212,.45)}
+    .tour-btn{padding:7px 14px; font-size:12.5px; font-weight:600; border-radius:6px; cursor:pointer; border:none; font-family:inherit; transition:.14s}
+    .tour-btn-prev{background:transparent; color:rgba(255,255,255,.60); border:1px solid rgba(255,255,255,.10)}
+    .tour-btn-prev:hover{background:rgba(255,255,255,.04); color:rgba(255,255,255,.92)}
+    .tour-btn-next{background:linear-gradient(135deg,#06B6D4 0%,#155DFC 100%); color:#fff; box-shadow:0 2px 8px rgba(6,182,212,.30)}
+    .tour-btn-next:hover{transform:translateY(-1px)}
+    .tour-sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+
+    @media (prefers-reduced-motion: reduce){
+      .tour-spotlight,.tour-spotlight.active{animation:none; transition:none}
+      .tour-popover{transition:none; transform:none}
+      .tour-trigger-pulse{display:none}
+    }
+    @media (max-width:520px){.tour-trigger{bottom:14px; left:14px}}
+  </style>
+</head>
+<body>
+
+  <!-- Logo -->
+  <a class="auth-logo" href="#">
+    <svg width="34" height="26" viewBox="479 340 646 499" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="aims-grad-login" gradientUnits="userSpaceOnUse" x1="998.9767" y1="471.5211" x2="729.8956" y2="931.9746">
+          <stop offset="0" stop-color="#09E2AB"/>
+          <stop offset="1" stop-color="#1B72FF"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#aims-grad-login)" d="M1120.01,802.69L880.38,387.64c-16.78-29.06-46.83-46.41-80.38-46.41c-33.55,0-63.6,17.35-80.38,46.41L479.99,802.69c-4.22,7.31-4.22,16.32,0,23.64c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82l99.34-172.07l78.87,136.61h-41.78c-7.86-12.37-21.64-20.62-37.35-20.62c-24.4,0-44.25,19.85-44.25,44.25s19.85,44.25,44.25,44.25c15.71,0,29.49-8.25,37.35-20.62h82.72c8.45,0,16.25-4.51,20.47-11.82c4.22-7.31,4.22-16.32,0-23.64L760.56,595.17c-4.22-7.31-12.03-11.82-20.47-11.82c-8.45,0-16.25,4.51-20.47,11.82l-112.99,195.7h-65.22l219.16-379.59c8.23-14.26,22.97-22.77,39.43-22.77c16.46,0,31.2,8.51,39.43,22.77l219.16,379.59h-65.22l-154.21-267.1c3.24-6.15,5.09-13.13,5.09-20.55c0-24.4-19.85-44.25-44.25-44.25s-44.25,19.85-44.25,44.25c0,23.79,18.89,43.21,42.46,44.16l161.05,278.94c4.22,7.31,12.03,11.82,20.47,11.82h119.81c8.45,0,16.25-4.51,20.47-11.82C1124.23,819.02,1124.23,810.01,1120.01,802.69z"/>
+    </svg>
+    <span class="auth-logo-text">
+      <span class="logo-aims">AIMS</span><span class="logo-os">OS</span>
+    </span>
+  </a>
+
+  <div class="auth-card">
+
+    <!-- ── Login view ──────────────────────────────────────── -->
+    <div class="auth-view active" id="viewLogin">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your AIMS-OS account</div>
+
+      <div class="form-group">
+        <label class="form-label" for="emailInput">Email</label>
+        <input class="form-input" id="emailInput" type="email" placeholder="you@company.com" autocomplete="email"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="passwordInput">Password</label>
+        <div class="form-input-wrap">
+          <input class="form-input has-icon" id="passwordInput" type="password" placeholder="Your password" autocomplete="current-password"/>
+          <button class="pw-toggle" id="pwToggle" onclick="togglePw()" type="button" aria-label="Toggle password visibility">
+            <svg id="eyeOpen" width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/>
+              <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+            <svg id="eyeClosed" width="14" height="14" viewBox="0 0 16 16" fill="none" style="display:none">
+              <path d="M2 2l12 12M6.5 6.6A2 2 0 0 0 9.4 9.5M4.2 4.3C2.7 5.3 1.5 6.8 1 8c1.2 3 4.1 5 7 5 1.4 0 2.7-.4 3.8-1.1M7 3.1C7.3 3 7.7 3 8 3c2.9 0 5.8 2 7 5-.3.7-.7 1.4-1.2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <button class="forgot-link" id="forgotLink" onclick="showView('forgot')" tabindex="0">Forgot password?</button>
+      </div>
+
+      <div class="form-error" id="loginError">Incorrect email or password. Please try again.</div>
+
+      <button class="btn-primary" id="signInBtn" onclick="signIn()">
+        <span class="btn-label">Sign in</span>
+        <div class="btn-spinner"></div>
+      </button>
+
+      <div class="auth-divider">or continue with</div>
+
+      <button class="btn-sso" id="ssoBtn" onclick="ssoSignIn()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="9" height="9" rx="1.5" fill="#EA4335"/>
+          <rect x="13" y="2" width="9" height="9" rx="1.5" fill="#34A853"/>
+          <rect x="2" y="13" width="9" height="9" rx="1.5" fill="#FBBC05"/>
+          <rect x="13" y="13" width="9" height="9" rx="1.5" fill="#4285F4"/>
+        </svg>
+        Sign in with SSO
+      </button>
+    </div>
+
+    <!-- ── MFA view ────────────────────────────────────────── -->
+    <div class="auth-view" id="viewMfa">
+      <button class="auth-back" onclick="showView('login')">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+      </button>
+      <div class="auth-title">Two-factor verification</div>
+      <div class="auth-sub">A 6-digit code was sent to your registered device. Check your authenticator app.</div>
+
+      <div class="form-group">
+        <label class="form-label" for="mfaInput">Verification code</label>
+        <input class="form-input mfa-input" id="mfaInput" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code"/>
+      </div>
+
+      <div class="form-error" id="mfaError">Invalid code. Please check and try again.</div>
+
+      <button class="btn-primary" id="mfaBtn" onclick="submitMFA()">
+        <span class="btn-label">Verify &amp; sign in</span>
+        <div class="btn-spinner"></div>
+      </button>
+
+      <div class="resend-row">
+        Didn't receive it?
+        <button class="resend-btn" onclick="resendCode(event)">Resend code</button>
+      </div>
+    </div>
+
+    <!-- ── Forgot password view ────────────────────────────── -->
+    <div class="auth-view" id="viewForgot">
+      <button class="auth-back" onclick="showView('login')">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to sign in
+      </button>
+      <div class="auth-title">Reset your password</div>
+      <div class="auth-sub">Enter your work email and we'll send a secure reset link, valid for 15 minutes.</div>
+
+      <div class="form-group">
+        <label class="form-label" for="resetEmail">Work email</label>
+        <input class="form-input" id="resetEmail" type="email" placeholder="you@company.com" autocomplete="email"/>
+      </div>
+
+      <button class="btn-primary" id="resetBtn" onclick="sendReset()">
+        <span class="btn-label">Send reset link</span>
+        <div class="btn-spinner"></div>
+      </button>
+
+      <div id="resetSuccess" style="display:none" class="form-success">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke="#10B981" stroke-width="1.5"/>
+          <path d="M9 14l3.5 3.5 7-7" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="form-success-title">Check your inbox</div>
+        <div class="form-success-hint">Reset link sent to <strong id="resetEmailDisplay"></strong></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="auth-footer">
+    AIMS-OS Platform · v2.4 · <a href="#">Security</a> · <a href="#">Privacy</a>
+  </div>
+
+  <!-- ── Tour markup ──────────────────────────────────────── -->
+  <button class="tour-trigger" id="tourTrigger" onclick="startTour()" aria-label="Start product demo">
+    <span class="tour-trigger-pulse"></span>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2l11 6-11 6V2z" fill="currentColor"/></svg>
+    <span class="tour-trigger-label">Demo</span>
+  </button>
+  <div class="tour-mask" id="tourMaskT"></div>
+  <div class="tour-mask" id="tourMaskR"></div>
+  <div class="tour-mask" id="tourMaskB"></div>
+  <div class="tour-mask" id="tourMaskL"></div>
+  <div class="tour-spotlight" id="tourSpotlight"></div>
+  <div class="tour-popover" id="tourPopover" role="dialog" aria-modal="true" aria-labelledby="tourTitle"></div>
+  <div class="tour-sr-only" id="tourLive" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+// ─── View management ──────────────────────────────────────────────────────────
+
+function showView(v) {
+  document.querySelectorAll('.auth-view').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1));
+  if (target) target.classList.add('active');
+}
+
+// ─── Password toggle ──────────────────────────────────────────────────────────
+
+let _pwVisible = false;
+function togglePw() {
+  _pwVisible = !_pwVisible;
+  const inp = document.getElementById('passwordInput');
+  inp.type = _pwVisible ? 'text' : 'password';
+  document.getElementById('eyeOpen').style.display  = _pwVisible ? 'none' : '';
+  document.getElementById('eyeClosed').style.display = _pwVisible ? '' : 'none';
+}
+
+// ─── Sign in ──────────────────────────────────────────────────────────────────
+
+let _signInTimer;
+function signIn() {
+  const btn = document.getElementById('signInBtn');
+  document.getElementById('loginError').classList.remove('visible');
+  btn.classList.add('loading'); btn.disabled = true;
+  clearTimeout(_signInTimer);
+  _signInTimer = setTimeout(() => {
+    btn.classList.remove('loading'); btn.disabled = false;
+    showView('mfa');
+  }, 1100);
+}
+
+// ─── MFA ──────────────────────────────────────────────────────────────────────
+
+function submitMFA() {
+  const btn  = document.getElementById('mfaBtn');
+  const code = document.getElementById('mfaInput').value.trim();
+  document.getElementById('mfaError').classList.remove('visible');
+  btn.classList.add('loading'); btn.disabled = true;
+  setTimeout(() => {
+    btn.classList.remove('loading'); btn.disabled = false;
+    if (code.length === 6) {
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('mfaError').classList.add('visible');
+    }
+  }, 950);
+}
+
+// ─── Forgot password ──────────────────────────────────────────────────────────
+
+function sendReset() {
+  const btn   = document.getElementById('resetBtn');
+  const email = document.getElementById('resetEmail').value.trim();
+  btn.classList.add('loading'); btn.disabled = true;
+  setTimeout(() => {
+    btn.classList.remove('loading'); btn.disabled = false;
+    document.getElementById('resetEmailDisplay').textContent = email || 'your email';
+    document.getElementById('resetSuccess').style.display = 'block';
+    btn.style.display = 'none';
+  }, 850);
+}
+
+function resendCode(e) {
+  const btn = e.target;
+  btn.textContent = 'Sent!'; btn.disabled = true;
+  setTimeout(() => { btn.textContent = 'Resend code'; btn.disabled = false; }, 3000);
+}
+
+function ssoSignIn() {
+  const btn = document.getElementById('ssoBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spinner" style="display:block;border-top-color:currentColor"></div>&nbsp;Redirecting to SSO…';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="9" height="9" rx="1.5" fill="#EA4335"/><rect x="13" y="2" width="9" height="9" rx="1.5" fill="#34A853"/><rect x="2" y="13" width="9" height="9" rx="1.5" fill="#FBBC05"/><rect x="13" y="13" width="9" height="9" rx="1.5" fill="#4285F4"/></svg> Sign in with SSO`;
+  }, 1800);
+}
+
+// ─── Tour steps ───────────────────────────────────────────────────────────────
+
+const PAGE_ON_TOUR_FINISH = 'index.html?tour=1';
+
+const TOUR_STEPS = [
+  {
+    title: 'Full sign-in walkthrough',
+    body: 'This demo covers the <strong>complete AIMS-OS authentication flow</strong> — email/password, two-factor verification, password reset, and SSO. Use <strong>← →</strong> or the buttons to navigate.',
+  },
+  {
+    title: 'Work email',
+    body: 'Enter your <strong>organization email address</strong>. AIMS-OS supports direct password auth and enterprise SSO — whichever your IT team configured.',
+    target: '#emailInput',
+    setup: () => showView('login'),
+  },
+  {
+    title: 'Password field',
+    body: 'Your credentials are <strong>never stored in plain text</strong>. Toggle visibility with the eye icon, or let your browser password manager fill it.',
+    target: '#passwordInput',
+  },
+  {
+    title: 'Forgot password?',
+    body: 'This link opens the <strong>password reset flow</strong>. A secure link is emailed to your registered address — valid for 15 minutes, single-use.',
+    target: '#forgotLink',
+  },
+  {
+    title: 'Password reset form',
+    body: 'Enter your work email and click <strong>Send reset link</strong>. AIMS-OS confirms delivery without revealing whether the account exists (security best practice).',
+    target: '#resetEmail',
+    setup: () => showView('forgot'),
+  },
+  {
+    title: 'Enterprise SSO',
+    body: 'If your org uses <strong>Okta, Azure AD, or Google Workspace</strong>, SSO sign-in bypasses the password form entirely — one click, SAML handshake, done.',
+    target: '#ssoBtn',
+    setup: () => showView('login'),
+  },
+  {
+    title: 'Sign in',
+    body: 'Clicking <strong>Sign in</strong> validates credentials and triggers two-factor authentication. Credentials are pre-filled for this demo.',
+    target: '#signInBtn',
+    setup: () => {
+      showView('login');
+      document.getElementById('emailInput').value = 'thomas.gonzalez@aimsos.ai';
+      document.getElementById('passwordInput').value = 'DemoPass2024!';
+    },
+  },
+  {
+    title: 'Two-factor authentication',
+    body: 'A <strong>6-digit code</strong> is sent to your registered device after each sign-in. MFA is mandatory on all AIMS-OS accounts — no bypass on production.',
+    target: '#mfaInput',
+    setup: () => showView('mfa'),
+  },
+  {
+    title: 'Entering your workspaces',
+    body: 'Code verified — you\'re in. The next screen is the <strong>Workspace Selector</strong>, your gateway to every organization on your account. Click <strong>Finish</strong> to go there now.',
+    setup: () => {
+      document.getElementById('mfaInput').value = '482931';
+    },
+  },
+];
+
+// ─── Tour engine ──────────────────────────────────────────────────────────────
+
+const TOUR_LS_STEP = 'aims-tour-login-step';
+const TOUR_LS_DONE = 'aims-tour-login-seen';
+let tourState = { active: false, stepIndex: 0 };
+let _tourLastFocus = null;
+
+function _tourSave(){ try{ localStorage.setItem(TOUR_LS_STEP, String(tourState.stepIndex)); }catch(e){} }
+function _tourClearProgress(){ try{ localStorage.removeItem(TOUR_LS_STEP); localStorage.setItem(TOUR_LS_DONE,'1'); }catch(e){} }
+
+function startTour(){
+  let i = 0;
+  try{ const s = localStorage.getItem(TOUR_LS_STEP); if (s!=null && +s>0 && +s<TOUR_STEPS.length) i=+s; }catch(e){}
+  startTourAt(i);
+}
+function restartTour(){ startTourAt(0); }
+function startTourAt(i){
+  tourState = { active:true, stepIndex: Math.max(0, Math.min(i|0, TOUR_STEPS.length-1)) };
+  _tourLastFocus = document.activeElement;
+  const t = document.getElementById('tourTrigger'); if(t) t.classList.add('tour-active');
+  paintTourStep();
+}
+function endTour(finished){
+  if (finished && typeof PAGE_ON_TOUR_FINISH === 'string') {
+    _tourClearProgress();
+    window.location.href = PAGE_ON_TOUR_FINISH;
+    return;
+  }
+  tourState.active = false;
+  const t = document.getElementById('tourTrigger');
+  if(t){ t.classList.remove('tour-active'); t.classList.add('seen'); }
+  ['tourMaskT','tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.remove('active'); });
+  const sp=document.getElementById('tourSpotlight'); if(sp) sp.classList.remove('active');
+  const po=document.getElementById('tourPopover'); if(po) po.classList.remove('active');
+  _tourClearProgress();
+  _tourRefreshTriggerLabel();
+  if(_tourLastFocus && _tourLastFocus.focus){ try{ _tourLastFocus.focus(); }catch(e){} }
+}
+function tourNext(){ if(tourState.stepIndex>=TOUR_STEPS.length-1){ endTour(true); return; } tourState.stepIndex++; _tourSave(); paintTourStep(); }
+function tourPrev(){ if(tourState.stepIndex<=0) return; tourState.stepIndex--; _tourSave(); paintTourStep(); }
+
+function paintTourStep(){
+  if(!tourState.active) return;
+  const step = TOUR_STEPS[tourState.stepIndex];
+  const isFirst = tourState.stepIndex===0, isLast = tourState.stepIndex===TOUR_STEPS.length-1;
+  if(typeof step.setup==='function'){ try{ step.setup(); }catch(e){} }
+  setTimeout(()=>{
+    const popover=document.getElementById('tourPopover'), spotlight=document.getElementById('tourSpotlight');
+    popover.innerHTML = `
+      <div class="tour-popover-header">
+        <span class="tour-popover-step">Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}</span>
+        ${!isFirst?`<button class="tour-popover-restart" onclick="restartTour()">Restart</button>`:''}
+        <button class="tour-popover-skip" onclick="endTour(false)">Skip tour</button>
+      </div>
+      <div class="tour-popover-title" id="tourTitle">${step.title}</div>
+      <div class="tour-popover-body">${step.body}</div>
+      <div class="tour-popover-footer">
+        <div class="tour-progress">${TOUR_STEPS.map((_,i)=>`<div class="tour-progress-dot ${i===tourState.stepIndex?'current':i<tourState.stepIndex?'done':''}"></div>`).join('')}</div>
+        ${!isFirst?`<button class="tour-btn tour-btn-prev" onclick="tourPrev()">← Back</button>`:''}
+        <button class="tour-btn tour-btn-next" onclick="${isLast?'endTour(true)':'tourNext()'}">${isLast?'Finish →':'Next →'}</button>
+      </div>`;
+    const targetEl = step.target ? document.querySelector(step.target) : null;
+    if(targetEl){
+      const place = ()=>{ _tourPlace(targetEl.getBoundingClientRect(), popover, spotlight); };
+      setTimeout(place, step.scrollToTarget ? 700 : 80);
+    } else {
+      _tourMaskFull(); spotlight.classList.remove('active'); _tourCenter(popover);
+    }
+    const live=document.getElementById('tourLive');
+    if(live) live.textContent=`Step ${tourState.stepIndex+1} of ${TOUR_STEPS.length}. ${step.title}`;
+    const nextBtn=popover.querySelector('.tour-btn-next'); if(nextBtn) setTimeout(()=>nextBtn.focus(), 80);
+  }, step.setup ? 160 : 50);
+}
+
+function _tourPlace(rect, popover, spotlight){
+  const pad=6;
+  spotlight.style.left=(rect.left-pad)+'px'; spotlight.style.top=(rect.top-pad)+'px';
+  spotlight.style.width=(rect.width+pad*2)+'px'; spotlight.style.height=(rect.height+pad*2)+'px';
+  spotlight.classList.add('active');
+  _tourMask(rect, pad);
+  if(window.innerWidth<560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  popover.classList.remove('is-sheet');
+  const pw=360, ph=popover.offsetHeight||260, m=16, W=window.innerWidth, H=window.innerHeight;
+  let top, left;
+  if(rect.bottom+ph+m<H){ top=rect.bottom+16; left=Math.min(Math.max(rect.left,16),W-pw-16); }
+  else if(rect.top-ph-m>0){ top=rect.top-ph-16; left=Math.min(Math.max(rect.left,16),W-pw-16); }
+  else { top=(H-ph)/2; left=(W-pw)/2; }
+  popover.style.left=left+'px'; popover.style.top=top+'px'; popover.classList.add('active');
+}
+function _tourMask(rect, pad){
+  const W=window.innerWidth, H=window.innerHeight;
+  const top=Math.max(0,rect.top-pad), bot=Math.min(H,rect.bottom+pad), lft=Math.max(0,rect.left-pad), rgt=Math.min(W,rect.right+pad);
+  const set=(id,l,t,w,h)=>{ const e=document.getElementById(id); e.style.left=l+'px'; e.style.top=t+'px'; e.style.width=Math.max(0,w)+'px'; e.style.height=Math.max(0,h)+'px'; e.classList.add('active'); };
+  set('tourMaskT',0,0,W,top); set('tourMaskB',0,bot,W,H-bot); set('tourMaskL',0,top,lft,bot-top); set('tourMaskR',rgt,top,W-rgt,bot-top);
+}
+function _tourMaskFull(){
+  const T=document.getElementById('tourMaskT'); T.style.left='0'; T.style.top='0'; T.style.width='100vw'; T.style.height='100vh'; T.classList.add('active');
+  ['tourMaskR','tourMaskB','tourMaskL'].forEach(id=>{ const e=document.getElementById(id); e.classList.remove('active'); });
+}
+function _tourCenter(popover){
+  if(window.innerWidth<560){ popover.classList.add('is-sheet'); popover.classList.add('active'); return; }
+  popover.classList.remove('is-sheet');
+  popover.style.left=((window.innerWidth-360)/2)+'px'; popover.style.top=((window.innerHeight-(popover.offsetHeight||260))/2)+'px';
+  popover.classList.add('active');
+}
+
+/* Keyboard nav */
+document.addEventListener('keydown',(e)=>{
+  if(!tourState.active) return;
+  if(e.key==='Escape'){ endTour(false); }
+  else if(e.key==='ArrowRight'){ e.preventDefault(); tourNext(); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); tourPrev(); }
+});
+/* Focus trap */
+document.addEventListener('keydown',(e)=>{
+  if(!tourState.active || e.key!=='Tab') return;
+  const po=document.getElementById('tourPopover');
+  const f=po.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+  if(!f.length) return;
+  const first=f[0], last=f[f.length-1];
+  if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
+
+function _tourRefreshTriggerLabel(){
+  const t=document.getElementById('tourTrigger'); if(!t) return;
+  const label=t.querySelector('.tour-trigger-label');
+  let saved=null; try{ saved=localStorage.getItem(TOUR_LS_STEP); }catch(e){}
+  if(saved!=null && +saved>0 && +saved<TOUR_STEPS.length){ if(label) label.textContent='Continue'; t.classList.add('seen'); }
+  else{ if(label) label.textContent='Demo'; try{ if(localStorage.getItem(TOUR_LS_DONE)) t.classList.add('seen'); }catch(e){} }
+}
+
+(function tourInit(){
+  _tourRefreshTriggerLabel();
+  try{
+    const q=new URLSearchParams(window.location.search).get('tour');
+    if(q!=null){ const n=parseInt(q,10); if(!isNaN(n)) startTourAt(Math.max(0,n-1)); }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>AIMS-OS · Data Studio</title>
+  <title>AIMS-OS · Helix Data Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#0A0E1A; --bg2:#0D1120; --bg3:#131C2E;
-  --shell-app-bg:linear-gradient(144deg,#020618 0%,#0F172B 50%,#020618 100%);
+  --bg:#0a0d1a; --bg2:#0f172e; --bg3:#0d1323;
   --t1:#F1F5F9; --t2:#94A3B8; --t3:#64748B;
   --line:rgba(255,255,255,0.08);
   --line-strong:rgba(255,255,255,0.14);
@@ -32,7 +31,7 @@ html.theme-light{
 }
 /* keep the left rail dark in light mode by re-scoping tokens onto the container */
 html.theme-light .ssb{
-  --bg:#0A0E1A; --bg2:#0D1120; --bg3:#131C2E;
+  --bg:#0a0d1a; --bg2:#0f172e; --bg3:#0d1323;
   --t1:#F1F5F9; --t2:#94A3B8; --t3:#64748B;
   --line:rgba(255,255,255,0.08); --line-strong:rgba(255,255,255,0.14);
   --hover:rgba(255,255,255,0.04); --hover-strong:rgba(255,255,255,0.08);
@@ -40,7 +39,7 @@ html.theme-light .ssb{
 
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%; overflow:hidden}
-body{font-family:'Inter',system-ui,sans-serif; background:var(--shell-app-bg); color:var(--t1); font-size:14px}
+body{font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--t1); font-size:14px}
 
 /* ── TOPBAR ── */
 .topbar{
@@ -6046,6 +6045,110 @@ html.theme-light .theme-icon-moon{display:none}
 .tb-identity{display:inline-flex;align-items:center;gap:6px}
 
 </style>
+<!-- ══════════ Helix decision-pin engine (feature-versioning §3) ══════════ -->
+<style id="hx-pins-css">
+.hx-pin{display:inline-flex; align-items:center; gap:5px; vertical-align:middle; padding:2px 8px 2px 6px; border-radius:999px; font:700 10.5px/1 Inter,system-ui,sans-serif; letter-spacing:.02em; cursor:pointer; border:1px solid; white-space:nowrap; transition:filter .12s}
+.hx-pin:hover{filter:brightness(1.14)}
+.hx-pin svg{width:11px;height:11px}
+.hx-pin-blocking{color:var(--amber,#f59e0b); border-color:var(--amber,#f59e0b); background:rgba(245,158,11,.12)}
+.hx-pin-open{color:var(--primary,#2b7fff); border-color:rgba(43,127,255,.5); background:rgba(43,127,255,.10)}
+.hx-pin-scrim{position:fixed; inset:0; background:rgba(2,6,24,.55); z-index:10000; opacity:0; transition:opacity .15s}
+.hx-pin-scrim.open{opacity:1}
+.hx-pin-drawer{position:fixed; top:0; right:0; height:100%; width:min(440px,94vw); background:var(--surface-raised,#131C2E); border-left:1px solid var(--line-strong,var(--line,rgba(255,255,255,.14))); z-index:10001; transform:translateX(100%); transition:transform .2s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; box-shadow:-12px 0 40px rgba(0,0,0,.4)}
+.hx-pin-drawer.open{transform:none}
+.hx-pin-dh{display:flex; align-items:flex-start; gap:12px; padding:20px; border-bottom:1px solid var(--line,rgba(255,255,255,.1))}
+.hx-pin-dh-ic{width:36px;height:36px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.hx-pin-dweight{display:inline-flex;align-items:center;font:700 10px/1 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.hx-pin-dweight.blocking{color:var(--amber,#f59e0b);background:rgba(245,158,11,.14)}
+.hx-pin-dweight.open{color:var(--primary,#2b7fff);background:rgba(43,127,255,.12)}
+.hx-pin-dcode{font:800 15px Inter,sans-serif;color:var(--t1,#e2e8f0);margin-top:8px}
+.hx-pin-dbody{padding:20px;overflow-y:auto;flex:1}
+.hx-pin-q{font:600 14px/1.5 Inter,sans-serif;color:var(--t1,#e2e8f0);margin-bottom:16px}
+.hx-pin-sec{font:700 10.5px/1 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--t3,#64748b);margin:0 0 8px}
+.hx-pin-opt{display:flex;align-items:flex-start;gap:9px;justify-content:space-between;padding:10px 12px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:9px;margin-bottom:8px;font:400 12.5px/1.45 Inter,sans-serif;color:var(--t1,#e2e8f0)}
+.hx-pin-opt.rec{border-color:var(--primary,#2b7fff);background:rgba(43,127,255,.07)}
+.hx-pin-opt-rec{font:700 9.5px/1 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--primary,#2b7fff);border:1px solid var(--primary,#2b7fff);border-radius:999px;padding:2px 6px;flex-shrink:0}
+.hx-pin-owner{margin-top:18px;padding-top:16px;border-top:1px solid var(--line,rgba(255,255,255,.1));font:400 12px Inter,sans-serif;color:var(--t3,#64748b)}
+.hx-pin-owner b{color:var(--t2,#94a3b8);font-weight:600}
+.hx-pin-df{padding:14px 20px;border-top:1px solid var(--line,rgba(255,255,255,.1));display:flex;justify-content:flex-end}
+.hx-pin-df button{padding:8px 16px;border-radius:8px;border:1px solid var(--line,rgba(255,255,255,.14));background:var(--hover,rgba(255,255,255,.05));color:var(--t1,#e2e8f0);font:600 12.5px Inter,sans-serif;cursor:pointer}
+.hx-pin-df button:hover{border-color:var(--primary,#2b7fff)}
+</style>
+<script id="hx-pins-js">
+window.HX_PINS = {
+  D2:{code:'D2',scope:'V1',weight:'blocking',owner:'Mike',question:'Are sample values masked, hydrated with consent, or ORI-mediated so the operator never sees the raw value?',options:[{label:'ORI-mediated — the operator sees a derived / redacted value only',recommended:true},{label:'Masked at rest, revealed only with explicit tenant consent'},{label:'Hydrated with consent — full value visible to the operator'}]},
+  AWS:{code:'AWS',scope:'V1',weight:'blocking',owner:'Edgardo, ratified by Mike',question:'How does an AIMS operator reach a tenant running in dedicated AWS?',options:[{label:'Brokered, audited session into the tenant VPC',recommended:true},{label:'Per-tenant operator identity federated into their account'},{label:'Tenant-initiated, time-boxed support grant'}]},
+  SCOPE:{code:'SCOPE',scope:'V1',weight:'blocking',owner:'Mike',question:'Is a mapping tenant-scoped or location-scoped?',options:[{label:'Tenant-scoped — one mapping per connector per tenant',recommended:true},{label:'Location-scoped — mapping can differ per site / location'}]},
+  D6:{code:'D6',scope:'V1',weight:'open',owner:'Mike',question:'Is email-attachment ingestion a supported source?',options:[{label:'Not in V1 — SFTP / batch only; revisit later',recommended:true},{label:'Yes — parse attachments from a monitored inbox'}]},
+  D5:{code:'D5',scope:'V1.5',weight:'open',owner:'Mike',question:'Is a table definition schema configuration or governed content?',options:[{label:'Governed content — versioned, reviewable, ownable',recommended:true},{label:'Schema configuration — infra-level, not user content'}]},
+  D4:{code:'D4',scope:'V1.5',weight:'open',owner:'Mike',question:'Is the request pipeline a product surface or an internal AIMS tool?',options:[{label:'Internal AIMS tool for V1.5; productize later',recommended:true},{label:'Product surface exposed to tenant requesters now'}]},
+  D3:{code:'D3',scope:'V2',weight:'open',owner:'Mike, with Julian on feasibility',question:'Who owns the card / widget builder: Helix Data Studio or Work Surfaces?',options:[{label:'Work Surfaces owns the builder; Helix supplies table definitions',recommended:true},{label:'Helix Data Studio owns an embedded builder'}]},
+  D1:{code:'D1',scope:'V3',weight:'open',owner:'Mike',question:'Does the consumption library live in Work Surfaces or Helix Data Studio?',options:[{label:'Work Surfaces hosts the employee library',recommended:true},{label:'Helix Data Studio hosts its own library'}]}
+};
+var HX_PIN_ICO='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9.5V14M5 2.5h6l-.7 4.2 2 2.3H3.7l2-2.3L5 2.5Z"/></svg>';
+window.hxPin=function(id){ var p=HX_PINS[id]; if(!p) return ''; var cls=p.weight==='blocking'?'hx-pin-blocking':'hx-pin-open';
+  return '<button type="button" class="hx-pin '+cls+'" onclick="event.stopPropagation();openHxPin(\''+id+'\')" title="Open decision '+p.code+' ('+p.weight+')" aria-label="Decision pin '+p.code+', '+p.weight+'">'+HX_PIN_ICO+p.code+'</button>'; };
+var _hxPinPrev=null;
+window.openHxPin=function(id){ var p=HX_PINS[id]; if(!p) return; closeHxPin(); _hxPinPrev=document.activeElement;
+  var scrim=document.createElement('div'); scrim.className='hx-pin-scrim'; scrim.id='hxPinScrim'; scrim.onclick=closeHxPin;
+  var wc=p.weight==='blocking'?'blocking':'open';
+  var wlabel=p.weight==='blocking'?'Blocking · blocks sprint':'Open · does not block';
+  var icbg=p.weight==='blocking'?'background:rgba(245,158,11,.14);color:var(--amber,#f59e0b)':'background:rgba(43,127,255,.12);color:var(--primary,#2b7fff)';
+  var d=document.createElement('aside'); d.className='hx-pin-drawer'; d.id='hxPinDrawer'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true'); d.setAttribute('aria-label','Decision '+p.code);
+  d.innerHTML='<div class="hx-pin-dh"><div class="hx-pin-dh-ic" style="'+icbg+'"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9.5V14M5 2.5h6l-.7 4.2 2 2.3H3.7l2-2.3L5 2.5Z"/></svg></div>'
+    +'<div style="min-width:0"><span class="hx-pin-dweight '+wc+'">'+wlabel+'</span><span style="margin-left:8px;font-size:11px;color:var(--t3,#64748b)">'+p.scope+'</span><div class="hx-pin-dcode">Decision '+p.code+'</div></div></div>'
+    +'<div class="hx-pin-dbody"><div class="hx-pin-q">'+p.question+'</div><div class="hx-pin-sec">Options</div>'
+    +p.options.map(function(o){return '<div class="hx-pin-opt'+(o.recommended?' rec':'')+'"><span>'+o.label+'</span>'+(o.recommended?'<span class="hx-pin-opt-rec">Recommended</span>':'')+'</div>';}).join('')
+    +'<div class="hx-pin-owner">Owner &middot; <b>'+p.owner+'</b></div></div>'
+    +'<div class="hx-pin-df"><button type="button" onclick="closeHxPin()">Close</button></div>';
+  document.body.appendChild(scrim); document.body.appendChild(d);
+  requestAnimationFrame(function(){ scrim.classList.add('open'); d.classList.add('open'); var b=d.querySelector('.hx-pin-df button'); if(b) b.focus(); });
+  d._keyh=function(e){ if(e.key==='Escape'){ closeHxPin(); } else if(e.key==='Tab'){ var f=d.querySelectorAll('button'); if(!f.length) return; var a=f[0],z=f[f.length-1]; if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();} else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();} } };
+  document.addEventListener('keydown', d._keyh);
+};
+window.closeHxPin=function(){ var d=document.getElementById('hxPinDrawer'), s=document.getElementById('hxPinScrim');
+  if(d&&d._keyh) document.removeEventListener('keydown', d._keyh);
+  if(d){ d.classList.remove('open'); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); },200); }
+  if(s){ s.classList.remove('open'); setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); },200); }
+  if(_hxPinPrev&&_hxPinPrev.focus){ try{_hxPinPrev.focus();}catch(e){} _hxPinPrev=null; }
+};
+</script>
+<!-- ══════════ Helix mapping helpers · sensitivity tier + masking (V1) ══════════ -->
+<style id="hx-map-css">
+.hx-sens{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font:700 9.5px/1.6 Inter,sans-serif;letter-spacing:.03em;text-transform:uppercase;border:1px solid;vertical-align:middle}
+.hx-sens-public{color:var(--t3,#64748b);border-color:var(--line,rgba(255,255,255,.16))}
+.hx-sens-internal{color:var(--primary,#2b7fff);border-color:rgba(43,127,255,.4);background:rgba(43,127,255,.08)}
+.hx-sens-confidential{color:var(--amber,#f59e0b);border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.10)}
+.hx-sens-restricted{color:#f87171;border-color:rgba(248,113,113,.45);background:rgba(248,113,113,.10)}
+.hx-samples{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:9px}
+.hx-samples-l{font:600 10px/1 Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--t3,#64748b)}
+.hx-sample{font:500 11px/1 ui-monospace,Menlo,monospace;color:var(--t2,#94a3b8);background:var(--hover,rgba(255,255,255,.05));border:1px solid var(--line,rgba(255,255,255,.1));border-radius:6px;padding:3px 7px}
+.hx-samples-note{font:italic 400 10.5px/1.3 Inter,sans-serif;color:var(--t3,#64748b)}
+/* Activation gate + drift-as-normal-flow (P4) */
+.hx-gate{display:flex;align-items:center;gap:12px;border:1px solid rgba(248,113,113,.35)!important;background:rgba(248,113,113,.07)!important}
+.hx-gate-ic{width:26px;height:26px;flex-shrink:0;color:#f87171}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.hx-drift{background:rgba(43,127,255,.06)!important;border-color:rgba(43,127,255,.28)!important}
+.hx-drift-ic{background:rgba(43,127,255,.14)!important;color:var(--primary,#2b7fff)!important}
+.hx-drift-pill{margin-left:auto;flex-shrink:0;align-self:center;font:700 10px/1 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--primary,#2b7fff);background:rgba(43,127,255,.12);border:1px solid rgba(43,127,255,.35);border-radius:999px;padding:4px 10px}
+.hx-newchip{display:inline-block;margin-left:7px;padding:1px 7px;border-radius:999px;font:700 9px/1.7 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--primary,#2b7fff);border:1px solid rgba(43,127,255,.4);background:rgba(43,127,255,.10);vertical-align:middle}
+.hx-stalechip{color:var(--amber,#f59e0b);border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.10)}
+.hx-stale-row{background:rgba(245,158,11,.04)}
+</style>
+<script id="hx-map-js">
+window.hxSensTier=function(name){ var n=(name||'').toLowerCase();
+  if(/ssn|social|passport|tax_id|national_id|dob|birth|salary|comp(ensation)?|bank|iban|card|routing|medical|diagnos/.test(n)) return {t:'Restricted',c:'restricted'};
+  if(/email|phone|mobile|address|full_?name|first_?name|last_?name|gender|ethnic|nationality|geo|lat|lon/.test(n)) return {t:'Confidential',c:'confidential'};
+  return {t:'Internal',c:'internal'}; };
+window.hxSensChip=function(name){ var s=hxSensTier(name); return '<span class="hx-sens hx-sens-'+s.c+'" title="Sensitivity tier: '+s.t+'">'+s.t+'</span>'; };
+window.hxMask=function(v,tier){ v=String(v==null?'':v); if(tier==='Public'||!tier) return v; if(v.length<=2) return '••'; return v.slice(0,1)+'••••'+(tier==='Restricted'?'':v.slice(-1)); };
+window.hxSampleRow=function(name){ var s=hxSensTier(name); var seed=(name||'x').length;
+  var raw=[ (seed%2 ? 'Jordan Reyes' : 'Priya Nair'), String(1000+(seed*37)%9000) ];
+  var chips=raw.map(function(r){ return '<span class="hx-sample">'+hxMask(r,s.t)+'</span>'; }).join('');
+  return '<div class="hx-samples"><span class="hx-samples-l">Sample values</span>'+chips
+    +'<span class="hx-samples-note">masked · ORI-mediated — operator never sees the raw value</span>'
+    +(typeof hxPin==='function'?hxPin('D2'):'')+'</div>'; };
+</script>
 <link rel="stylesheet" href="shared/notif-panel.css">
 </head>
 <body>
@@ -6059,7 +6162,7 @@ html.theme-light .theme-icon-moon{display:none}
       <div class="tb-context-logo">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.2" stroke="#fff" stroke-width="1.4"/><path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg>
       </div>
-      <span class="tb-context-name">Data Studio</span>
+      <span class="tb-context-name">Helix Data Studio</span>
       <svg class="tb-context-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
       <div class="studio-switcher" id="studioSwitcher" role="menu" aria-hidden="true">
@@ -6079,7 +6182,7 @@ html.theme-light .theme-icon-moon{display:none}
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10"/></svg>
           </div>
           <div class="studio-switcher-text">
-            <div class="studio-switcher-name">Data Studio</div>
+            <div class="studio-switcher-name">Helix Data Studio</div>
             <div class="studio-switcher-desc">Map data flow into AIMS tables</div>
           </div>
           <span class="studio-switcher-current">Current</span>
@@ -6125,10 +6228,11 @@ html.theme-light .theme-icon-moon{display:none}
     </button>
     <span class="tb-divider-v"></span>
     <div class="tb-identity" role="group" aria-label="Workspace and account">
-      <button class="tb-ws-badge" type="button" onclick="toast('Workspace switcher · stub')" aria-label="Workspace">
+      <button class="tb-ws-badge" type="button" onclick="toast('Tenant switcher · stub')" aria-label="Tenant">
         <span class="tb-ws-badge-logo">CL</span>
         <span class="tb-ws-badge-name">Contoso Ltd</span>
       </button>
+      <button type="button" class="hx-pin hx-pin-blocking" style="margin-left:2px" onclick="openHxPin('AWS')" title="Open decision AWS (blocking)" aria-label="Decision pin AWS, blocking"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9.5V14M5 2.5h6l-.7 4.2 2 2.3H3.7l2-2.3L5 2.5Z"/></svg>AWS</button>
       <button class="avatar-sm" type="button" onclick="toast('Account menu · stub')" aria-label="Account">TG</button>
     </div>
   </div>
@@ -6141,7 +6245,7 @@ html.theme-light .theme-icon-moon{display:none}
     <button class="sb-item" title="Control Tower" aria-label="Control Tower" onclick="toast('Control Tower · coming soon')"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M9 16v-5M6 16h6"/><rect x="6.5" y="8.5" width="5" height="2.5" rx="1"/><path d="M4 5a6 6 0 0110 0M6 6.5a3.5 3.5 0 016 0"/></svg></button>
     <div class="sb-divider"></div>
     <button class="sb-item" title="Agentic Studio · Agents and networks" aria-label="Agentic Studio · Agents and networks" onclick="window.location.href='agentic-studio.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="6" r="3"/><path d="M3 17c0-3.314 2.686-5 6-5s6 1.686 6 5"/></svg></button>
-    <button class="sb-item active" title="Data Studio" aria-label="Data Studio" onclick="window.location.href='data-studio.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="11" rx="1.4"/><path d="M2.5 7h13M2.5 11h13M6.5 3.5v11M11.5 3.5v11"/></svg></button>
+    <button class="sb-item active" title="Helix Data Studio" aria-label="Helix Data Studio" onclick="window.location.href='data-studio.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="11" rx="1.4"/><path d="M2.5 7h13M2.5 11h13M6.5 3.5v11M11.5 3.5v11"/></svg></button>
     <button class="sb-item" title="Agent Studio · Tools" aria-label="Agent Studio · Tools" onclick="window.location.href='agent-tools.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.5" y="4.5" width="4" height="3" rx=".8"/><rect x="6.5" y="1.5" width="4" height="3" rx=".8"/><rect x="6.5" y="7.5" width="4" height="3" rx=".8"/><path d="M5.5 6h1M5.5 3H6a.5.5 0 01.5.5v1"/></svg></button>
     <button class="sb-item" title="Admin Studio" aria-label="Admin Studio" onclick="window.location.href='admin-console.html'"><svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="2"/><circle cx="4" cy="4" r="1.4"/><circle cx="14" cy="4" r="1.4"/><circle cx="4" cy="14" r="1.4"/><circle cx="14" cy="14" r="1.4"/><path d="M5 5l2.5 2.5M13 5L10.5 7.5M5 13l2.5-2.5M13 13L10.5 10.5"/></svg></button>
   </nav>
@@ -6165,7 +6269,7 @@ html.theme-light .theme-icon-moon{display:none}
           <span class="ssb-item-label">Connections</span>
           <span class="ssb-item-alert" title="2 pending mapping"></span>
         </button>
-        <button class="ssb-item" data-route="tables" onclick="navigate('tables')">
+        <button class="ssb-item" data-route="tables" data-version="v1.5" onclick="navigate('tables')">
           <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.2"/><path d="M2 6.5h12M2 9.5h12M5.5 3v10M10.5 3v10" stroke-linecap="round"/></svg></span>
           <span class="ssb-item-label">Tables</span>
         </button>
@@ -6173,7 +6277,7 @@ html.theme-light .theme-icon-moon{display:none}
           <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="4" height="3" rx=".6"/><rect x="2" y="10" width="4" height="3" rx=".6"/><rect x="10" y="3" width="4" height="3" rx=".6"/><rect x="10" y="10" width="4" height="3" rx=".6"/><path d="M6 4.5h2v7h2M6 11.5h2v-7h2"/></svg></span>
           <span class="ssb-item-label">Field mappings</span>
         </button>
-        <button class="ssb-item" data-route="schema" onclick="navigate('schema')">
+        <button class="ssb-item" data-route="schema" data-version="v1.5" onclick="navigate('schema')">
           <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="4.5" cy="4" r="1.8"/><circle cx="4.5" cy="12" r="1.8"/><circle cx="11.5" cy="8" r="1.8"/><path d="M4.5 5.8v4.4M6.2 4.6l4.1 2.6M6.2 11.4l4.1-2.6"/></svg></span>
           <span class="ssb-item-label">Schema versions</span>
         </button>
@@ -6181,13 +6285,25 @@ html.theme-light .theme-icon-moon{display:none}
 
       <div class="ssb-group">
         <span class="ssb-grp-label">Author</span>
-        <button class="ssb-item" data-route="templates" onclick="navigate('templates')">
+        <button class="ssb-item" data-route="templates" data-version="v1.5" onclick="navigate('templates')">
           <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="2" y="2" width="6" height="12" rx="1"/><rect x="9" y="2" width="5" height="5.5" rx="1"/><rect x="9" y="8.5" width="5" height="5.5" rx="1"/></svg></span>
           <span class="ssb-item-label">Templates</span>
         </button>
         <button class="ssb-item" data-route="onboarding" onclick="navigate('onboarding')">
           <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l3-3 3 3 4-4"/><circle cx="13" cy="6" r="1.4"/></svg></span>
           <span class="ssb-item-label">Onboarding flow</span>
+        </button>
+      </div>
+
+      <div class="ssb-group" data-version="v2">
+        <span class="ssb-grp-label">Consume</span>
+        <button class="ssb-item" data-route="consumption" data-version="v2" onclick="navigate('consumption')">
+          <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5.5" height="5.5" rx="1"/><rect x="8.5" y="2" width="5.5" height="5.5" rx="1"/><rect x="2" y="8.5" width="5.5" height="5.5" rx="1"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1"/></svg></span>
+          <span class="ssb-item-label">Consumption</span>
+        </button>
+        <button class="ssb-item" data-route="library" data-version="v3" onclick="navigate('library')">
+          <span class="ssb-item-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h5a2 2 0 0 1 2 2V13a1.5 1.5 0 0 0-1.5-1.5H2V3.5Z"/><path d="M14 3.5H9a2 2 0 0 0-2 2V13a1.5 1.5 0 0 1 1.5-1.5H14V3.5Z"/></svg></span>
+          <span class="ssb-item-label">Tenant library</span>
         </button>
       </div>
 
@@ -6231,6 +6347,14 @@ html.theme-light .theme-icon-moon{display:none}
           Show errors
         </span>
         <span class="ssb-demo-toggle-state" id="dsErrState">Off</span>
+      </button>
+      <button class="ssb-demo-btn" onclick="hxTriggerDrift()" title="Simulate routine schema drift on an active connector">
+        <svg class="ssb-demo-btn-ic" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8a6 6 0 0 1 10.5-4M14 8a6 6 0 0 1-10.5 4"/><path d="M12 2v3h-3M4 14v-3h3"/></svg>
+        Trigger schema drift
+      </button>
+      <button class="ssb-demo-btn" onclick="hxResetDemo()" title="Restore all fixtures, close drawers and clear toasts">
+        <svg class="ssb-demo-btn-ic" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8a5.5 5.5 0 1 1 1.6 3.9M2.5 12V8.5H6"/></svg>
+        Reset demo
       </button>
     </div>
   </aside>
@@ -12372,7 +12496,7 @@ function togglePeerSecondary(dim) {
 
 
 /* Step metadata — v2 spec (May 2026). 7 steps. Account mapping removed
-   from linear flow (lives in Data Studio now per Edgardo's decision). */
+   from linear flow (lives in Helix Data Studio now per Edgardo's decision). */
 const TONB_STEPS = [
   { id:'welcome',      phase:1, title:'Welcome',              eyebrow:'Tenant' },
   { id:'org',          phase:1, title:'Your organization',    eyebrow:'Tenant' },
@@ -12927,7 +13051,7 @@ function renderTonbLanding() {
           <div class="tonb-foot-l"></div>
           <div class="tonb-foot-r">
             ${hasResume ? `<button class="tonb-btn" onclick="tonbStart('first_run')">Restart</button><button class="tonb-btn is-primary" onclick="tonbState.started=true;persistTonbState();renderTenantOnboarding()">Resume →</button>` : `
-            <button class="tonb-btn is-ghost" onclick="skipTenantOnboarding()" title="Skip the guided setup and explore Data Studio on your own. You can come back via the sidebar.">Skip for now, I’ll explore on my own</button>
+            <button class="tonb-btn is-ghost" onclick="skipTenantOnboarding()" title="Skip the guided setup and explore Helix Data Studio on your own. You can come back via the sidebar.">Skip for now, I’ll explore on my own</button>
             <button class="tonb-btn" onclick="tonbStart('add_site')">I'm just adding a ${vocab('site.single')}</button>
             <button class="tonb-btn is-primary" onclick="tonbStart('first_run')">Start first-time setup →</button>`}
           </div>
@@ -13285,7 +13409,7 @@ function _renderConnectStep() {
         </div>
         <div class="tonb-launch-l">
           <div class="tonb-launch-title" style="color:#34d39c">Connected ${escapeHtml(lastCompleted.name || lastCompleted.vendor || 'source')}</div>
-          <div class="tonb-launch-sub">A new Table <code style="font-family:'SF Mono', ui-monospace, monospace;background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:4px;color:var(--t1);">${escapeHtml(lastCompleted.object || 'data')}</code> is now in Data Studio with <b style="color:var(--t1)">${escapeHtml(String(lastCompleted.fieldsIncluded || 0))}</b> fields ready for templates.</div>
+          <div class="tonb-launch-sub">A new Table <code style="font-family:'SF Mono', ui-monospace, monospace;background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:4px;color:var(--t1);">${escapeHtml(lastCompleted.object || 'data')}</code> is now in Helix Data Studio with <b style="color:var(--t1)">${escapeHtml(String(lastCompleted.fieldsIncluded || 0))}</b> fields ready for templates.</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
           <button class="tonb-btn" onclick="openWizard()" title="Connect another source">+ Another</button>
@@ -13423,7 +13547,7 @@ function _renderApplyStep() {
 
 /* ---------- Phase 2 helpers — real Tables × Templates suggestions ---------- */
 
-/* Build a list of Table×Field rows from the real Data Studio surface.
+/* Build a list of Table×Field rows from the real Helix Data Studio surface.
    Returns null when there are no real Tables (so the apply step can
    fall back to mock data). */
 function _tonbTablesForApply() {
@@ -13547,7 +13671,7 @@ function _renderDoneStep() {
     ? obState.lastCompleted.name
     : (tonbState.connect.mocked ? 'Mock data (Salesforce + Stripe + GitHub)' : 'Not connected yet');
   const sourceObject = (typeof obState !== 'undefined' && obState && obState.lastCompleted && obState.lastCompleted.object) || null;
-  const mappingPending = !!sourceObject; // any real source needs canonical mapping in Data Studio
+  const mappingPending = !!sourceObject; // any real source needs canonical mapping in Helix Data Studio
 
   // Mark completed once.
   if (!tonbState.completedAt) {
@@ -13598,7 +13722,7 @@ function _renderDoneStep() {
       <div class="tonb-done-emoji" aria-hidden="true"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke="rgba(16,185,129,0.45)" stroke-width="1.4"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#34d39c" stroke-width="2"/></svg></div>
       <div class="tonb-done-title">${isAddSite ? `${cap(siteSingle)} added` : 'You&rsquo;re all set'}</div>
       <div class="tonb-done-sub">${isAddSite
-        ? `<b style="color:var(--t1)">${escapeHtml(w.name || `Your ${siteSingle}`)}</b> is set up. ${mappingPending ? `One thing left: map its source fields to your canonical schema.` : 'You can add another or jump into Data Studio.'}`
+        ? `<b style="color:var(--t1)">${escapeHtml(w.name || `Your ${siteSingle}`)}</b> is set up. ${mappingPending ? `One thing left: map its source fields to your canonical schema.` : 'You can add another or jump into Helix Data Studio.'}`
         : `<b style="color:var(--t1)">${escapeHtml(o.name || 'Your organization')}</b> is configured. ${mappingPending ? `One thing left: map your source fields to the canonical schema.` : 'You can jump into any Studio now.'}`}</div>
     </div>
 
@@ -13613,7 +13737,7 @@ function _renderDoneStep() {
         <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4l5 0M3 8l3 0M3 12l5 0M13 4l-3 4 3 4"/></svg>
       </div>
       <div class="tonb-done-primary-cta-l">
-        <div class="tonb-done-primary-cta-t">Map your fields in Data Studio</div>
+        <div class="tonb-done-primary-cta-t">Map your fields in Helix Data Studio</div>
         <div class="tonb-done-primary-cta-d">Open <code>${escapeHtml(sourceObject)}</code> and translate each ${escapeHtml(sourceLabel)} field into your canonical model. Then templates apply automatically.</div>
       </div>
       <div class="tonb-done-primary-cta-arrow">→</div>
@@ -13623,7 +13747,7 @@ function _renderDoneStep() {
     <div class="tonb-next-grid">
       <button class="tonb-next-card" onclick="location.hash='/connections'">
         <div class="tonb-next-card-h">
-          <span class="tonb-next-card-name">Open Data Studio</span>
+          <span class="tonb-next-card-name">Open Helix Data Studio</span>
           <span class="tonb-next-card-arrow">→</span>
         </div>
         <div class="tonb-next-card-desc">Connections, Tables, Templates, Field mappings, Schema versions.</div>
@@ -13841,7 +13965,7 @@ function renderFieldMappings() {
       }).join('')
     : `<div class="fm-empty">
         <div class="fm-empty-title">${q || filt !== 'all' ? 'No fields match your filters' : 'No mappings yet'}</div>
-        <div class="fm-empty-sub">${q || filt !== 'all' ? 'Try a different search term or clear the filter.' : 'Connect a source from Data Studio → Connections to see field mappings appear here.'}</div>
+        <div class="fm-empty-sub">${q || filt !== 'all' ? 'Try a different search term or clear the filter.' : 'Connect a source from Helix Data Studio → Connections to see field mappings appear here.'}</div>
       </div>`;
 
   $('content').innerHTML = `
@@ -14273,6 +14397,8 @@ function render() {
     return renderTemplates();
   }
   if (parts[0] === 'onboarding') return renderTenantOnboarding();
+  if (parts[0] === 'consumption' && typeof renderConsumptionScaffold === 'function') return renderConsumptionScaffold();
+  if (parts[0] === 'library' && typeof renderTenantLibraryScaffold === 'function') return renderTenantLibraryScaffold();
 
   renderConnections();
 }
@@ -14336,6 +14462,12 @@ function renderConnections() {
       </div>
     </section>
 
+    <div class="hx-callouts">
+      <div class="hx-callout"><span class="hx-callout-tier">V1.5</span><div class="hx-callout-b"><b style="color:var(--t1)">Semantic layer</b> — table definitions, template builder, table-scoped calculated fields, request intake. ${typeof hxPin==='function'?hxPin('D5'):''} ${typeof hxPin==='function'?hxPin('D4'):''}</div><button class="hx-callout-go" onclick="hxSetScope('v1.5')">Explore in V1.5 →</button></div>
+      <div class="hx-callout"><span class="hx-callout-tier">V2</span><div class="hx-callout-b"><b style="color:var(--t1)">Consumption</b> — cards, dashboards, in-conversation cards, field-level visibility.</div><button class="hx-callout-go" onclick="hxSetScope('v2')">Explore in V2 →</button></div>
+      <div class="hx-callout"><span class="hx-callout-tier">V3</span><div class="hx-callout-b"><b style="color:var(--t1)">Tenant self-service</b> — employee library, custom connector builder, integration Types 2 &amp; 3.</div><button class="hx-callout-go" onclick="hxSetScope('v3')">Explore in V3 →</button></div>
+    </div>
+
     <div class="ds-kpi-strip">
       <div class="ds-kpi"><span class="ds-kpi-v">${list.length}</span><span class="ds-kpi-k">Active</span></div>
       <div class="ds-kpi is-ok"><span class="ds-kpi-v">${mapped.length}</span><span class="ds-kpi-k">Mapped</span></div>
@@ -14348,7 +14480,10 @@ function renderConnections() {
           <div class="ds-section-title">Active connections <span style="font-size:11px;font-weight:600;color:var(--t3);margin-left:6px">${list.length}</span></div>
           <div class="ds-section-sub">${availableCount} more available to connect in Admin Studio</div>
         </div>
-        <a class="btn btn-ghost btn-sm" href="admin-console.html#/integrations">Connect new in Admin Studio ↗</a>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="openHxWorkQueue()">Cross-tenant queue</button>
+          <a class="btn btn-ghost btn-sm" href="admin-console.html#/integrations">Connect new in Admin Studio ↗</a>
+        </div>
       </div>
 
       <div class="toolbar">
@@ -14415,7 +14550,7 @@ function renderConnections() {
       <div class="ds-section-h">
         <div>
           <div class="ds-section-title">Data Sync candidates <span style="font-size:11px;font-weight:600;color:var(--t3);margin-left:6px">${availableCount}</span></div>
-          <div class="ds-section-sub">${dsPersona === 'admin' ? 'These integrations support Data Sync but are not authenticated yet. Activate one to bring it into Data Studio.' : 'You can request these integrations from your admin team. They will be authenticated in Admin Studio and made available to map.'}</div>
+          <div class="ds-section-sub">${dsPersona === 'admin' ? 'These integrations support Data Sync but are not authenticated yet. Activate one to bring it into Helix Data Studio.' : 'You can request these integrations from your admin team. They will be authenticated in Admin Studio and made available to map.'}</div>
         </div>
         ${dsPersona === 'admin'
           ? `<a class="btn btn-ghost btn-sm" href="admin-console.html#/integrations">Browse full Admin catalog ↗</a>`
@@ -14433,6 +14568,19 @@ function renderConnections() {
       </div>
 
       <div class="ds-grid">
+        <div class="ds-card is-inactive">
+          <span class="ds-card-status is-inactive"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:1px"><circle cx="6" cy="6" r="4"/></svg>Not activated</span>
+          <div class="ds-card-row">
+            <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(148,163,184,.14);color:var(--t2);flex-shrink:0"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3 3V14a.5.5 0 0 1-.5.5h-7A.5.5 0 0 1 4 14V1.5Z"/><path d="M9 1.5V4.5h3M6 8.5h4M6 11h4"/></svg></span>
+            <div><div class="ds-card-name" style="display:flex;align-items:center;gap:6px">Spreadsheet / flat file ${hxPin('D6')}</div><div class="ds-card-vendor">SFTP · scheduled batch</div></div>
+          </div>
+          <div style="font-size:11.5px; color:var(--t2); line-height:1.5">Deliver CSV / XLSX via SFTP or scheduled batch. Rows land in the mapping queue against the canonical schema.</div>
+          <span class="ds-card-tag">Certified source · Type 1 · File</span>
+          <div class="ds-card-footer">
+            <span style="font-size:10.5px; color:var(--t3); font-weight:500">SFTP endpoint provisioned on setup</span>
+            <button class="btn btn-primary btn-sm" onclick="openHxFileSource()">Set up →</button>
+          </div>
+        </div>
         ${DS_CATALOG.map(c => {
           const isAdmin = dsPersona === 'admin';
           return `
@@ -14448,7 +14596,7 @@ function renderConnections() {
                 </div>
               </div>
               <div style="font-size:11.5px; color:var(--t2); line-height:1.5">${escapeHtml(c.desc)}</div>
-              <span class="ds-card-tag">Data Sync · ${escapeHtml(c.category)}</span>
+              <span class="ds-card-tag">Certified connector · Type 1 · ${escapeHtml(c.category)}</span>
               <div class="ds-card-footer">
                 <span style="font-size:10.5px; color:var(--t3); font-weight:500">${isAdmin ? 'Opens Admin Studio' : 'Sends to Requests inbox'}</span>
                 ${isAdmin
@@ -14537,6 +14685,8 @@ function renderConnectionDetail(slug) {
         </div>
       </div>
       <div class="cn-head-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openHxHistory('${c.slug}')" title="Mapping version history">History</button>
+        <button class="btn btn-ghost btn-sm" onclick="openHxClone('${c.slug}')" ${c.mapped?'':'disabled aria-disabled="true" title="Resolve the mapping before cloning"'}>Clone to tenant</button>
         <a class="btn btn-ghost btn-sm" href="admin-console.html#/integrations/${c.slug}">Manage in Admin Studio ↗</a>
         <button class="btn btn-primary btn-sm" onclick="toast('Sync triggered — re-fetching latest events')">Sync now</button>
       </div>
@@ -14593,23 +14743,26 @@ function renderCnOverview(c) {
 
 function renderCnMapping(c) {
   return `
-    ${c.drift ? `
-      <div class="cn-alert">
-        <div class="cn-alert-ic">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    ${c.drift ? (function(){
+        const nNew = c.events.reduce((s,e)=>s+e.custom.filter(f=>!f.stale).length,0);
+        const nStale = c.events.reduce((s,e)=>s+e.custom.filter(f=>f.stale).length,0);
+        return `
+      <div class="cn-alert hx-drift">
+        <div class="cn-alert-ic hx-drift-ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>
         </div>
         <div class="cn-alert-body">
-          <div class="cn-alert-t">Schema drift detected upstream</div>
-          <div class="cn-alert-d">${escapeHtml(c.name)} started emitting new fields that AIMS has not seen before. They are listed under each event below — accept the AI suggestion, create a new schema field, or skip.</div>
+          <div class="cn-alert-t">Schema change from ${escapeHtml(c.name)} · routine</div>
+          <div class="cn-alert-d">${nNew} new field${nNew===1?'':'s'} arrived${nStale>0?` and ${nStale} field${nStale===1?'':'s'} stopped arriving`:''}. This is normal operation, not an error — resolve new fields below${nStale>0?', and choose what happens to fields that are no longer arriving':''}.</div>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="toast('Drift resolved · pending fields cleared')">Resolve all</button>
-      </div>
-    ` : ''}
+        <span class="hx-drift-pill">Routine</span>
+      </div>`;
+      })() : ''}
 
     <section class="ov-widget">
       <header class="ov-widget-h">
-        <h3 class="ov-widget-title">Field mapping</h3>
-        <span class="ov-widget-meta">${c.events.length} event type${c.events.length===1?'':'s'} from ${escapeHtml(c.name)}</span>
+        <h3 class="ov-widget-title" style="display:flex;align-items:center;gap:8px">Field mapping ${typeof hxPin==='function'?hxPin('SCOPE'):''}</h3>
+        <span class="ov-widget-meta">${c.events.length} event type${c.events.length===1?'':'s'} from ${escapeHtml(c.name)} · tenant-scoped</span>
       </header>
       <div class="ov-widget-body">
         ${c.events.map((e, eIdx) => `
@@ -14651,6 +14804,22 @@ function renderCnMapping(c) {
                     <span class="map-custom-h-count">${e.custom.length}</span>
                   </div>
                   ${e.custom.map((f, fIdx) => {
+                    if (f.stale) {
+                      const sd = f.decision || '';
+                      return `
+                      <div class="map-row hx-stale-row">
+                        <div>
+                          <div class="map-from-name">${escapeHtml(f.name)} <span class="hx-newchip hx-stalechip">No longer arriving</span></div>
+                          <div class="map-from-type">${escapeHtml(f.type||'—')}${typeof hxSensChip==='function'?hxSensChip(f.name):''}</div>
+                          <div class="hx-samples"><span class="hx-samples-note">Last value received ${escapeHtml(f.lastSeen||'recently')} · was mapped to <code>${escapeHtml(f.wasMappedTo||'—')}</code></span></div>
+                        </div>
+                        <div class="map-arrow"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/></svg></div>
+                        <div class="map-options">
+                          <label class="map-option ${sd==='keep'?'selected':''}"><input type="radio" name="m-${c.slug}-${eIdx}-${fIdx}" ${sd==='keep'?'checked':''} onchange="setDecision('${c.slug}', ${eIdx}, ${fIdx}, 'keep')"/><div class="map-option-text"><div class="map-option-label">Keep last known value</div><div class="map-option-sub">Field stays in the table, frozen at its last received value</div></div></label>
+                          <label class="map-option ${sd==='retire'?'selected':''}"><input type="radio" name="m-${c.slug}-${eIdx}-${fIdx}" ${sd==='retire'?'checked':''} onchange="setDecision('${c.slug}', ${eIdx}, ${fIdx}, 'retire')"/><div class="map-option-text"><div class="map-option-label">Retire field</div><div class="map-option-sub">Remove from the table going forward — resolves the activation gate</div></div></label>
+                        </div>
+                      </div>`;
+                    }
                     const decision = f.decision || (f.suggested ? 'accept' : 'create');
                     const isAccept = decision === 'accept';
                     const isCreate = decision === 'create';
@@ -14658,8 +14827,9 @@ function renderCnMapping(c) {
                     return `
                       <div class="map-row">
                         <div>
-                          <div class="map-from-name">${escapeHtml(f.name)}</div>
-                          <div class="map-from-type">${escapeHtml(f.type)}</div>
+                          <div class="map-from-name">${escapeHtml(f.name)}${f.isNew?' <span class="hx-newchip">New field</span>':''}</div>
+                          <div class="map-from-type">${escapeHtml(f.type)}${typeof hxSensChip==='function'?hxSensChip(f.name):''}</div>
+                          ${typeof hxSampleRow==='function'?hxSampleRow(f.name):''}
                         </div>
                         <div class="map-arrow"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
                         <div class="map-options">
@@ -14681,7 +14851,7 @@ function renderCnMapping(c) {
                           </label>
                           <label class="map-option ${isSkip?'selected':''}">
                             <input type="radio" name="m-${c.slug}-${eIdx}-${fIdx}" ${isSkip?'checked':''} onchange="setDecision('${c.slug}', ${eIdx}, ${fIdx}, 'skip')"/>
-                            <div class="map-option-text"><div class="map-option-label">Skip this field</div></div>
+                            <div class="map-option-text"><div class="map-option-label">Ignore this field</div><div class="map-option-sub">Field is dropped from ingestion — resolves the activation gate</div></div>
                           </label>
                         </div>
                       </div>
@@ -14693,19 +14863,32 @@ function renderCnMapping(c) {
           </div>
         `).join('')}
 
-        ${c.events.some(e => e.custom.some(f => !f.decision)) ? `
-          <div class="cn-activate-bar">
-            <div class="cn-activate-text"><strong>${c.events.reduce((s,e) => s + e.custom.filter(f => !f.decision).length, 0)} custom fields pending.</strong> Pick a decision for each above, or accept the suggestions in bulk.</div>
+        ${(function(){
+          const n = c.events.reduce((s,e) => s + e.custom.filter(f => !f.decision).length, 0);
+          if (n > 0) {
+            return `
+          <div class="cn-activate-bar hx-gate">
+            <svg class="hx-gate-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="10" height="6.5" rx="1.3"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>
+            <div class="cn-activate-text"><strong>Activation gate closed — source not active.</strong> ${n} field${n===1?'':'s'} must be resolved or ignored before ${escapeHtml(c.name)} can activate. Downstream tables show it as unavailable until then.</div>
             <button class="btn btn-ghost btn-sm" onclick="acceptAllSuggestions('${c.slug}')">Accept all suggestions</button>
+            <button class="btn btn-primary btn-sm" disabled aria-disabled="true" title="${n} field${n===1?'':'s'} still unresolved">Activate — ${n} unresolved</button>
+          </div>`;
+          }
+          if (!c.mapped) {
+            return `
+          <div class="cn-activate-bar" style="background:rgba(5,223,114,0.05); border-color:rgba(5,223,114,0.30)">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" style="color:var(--green);flex-shrink:0"><path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="cn-activate-text"><strong>All fields resolved — activation gate open.</strong> Activate to start the flow into your tables.</div>
             <button class="btn btn-primary btn-sm" onclick="activateMapping('${c.slug}')">Activate mapping</button>
-          </div>
-        ` : `
+          </div>`;
+          }
+          return `
           <div class="cn-activate-bar" style="background:rgba(5,223,114,0.04); border-color:rgba(5,223,114,0.25)">
             <svg width="18" height="18" viewBox="0 0 16 16" fill="none" style="color:var(--green);flex-shrink:0"><path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <div class="cn-activate-text"><strong>All custom fields resolved.</strong> Data is flowing into your tables.</div>
+            <div class="cn-activate-text"><strong>Source active.</strong> Data is flowing into your tables.</div>
             <button class="btn btn-ghost btn-sm" onclick="toast('Pipeline paused')">Pause sync</button>
-          </div>
-        `}
+          </div>`;
+        })()}
       </div>
     </section>
   `;
@@ -14817,13 +15000,16 @@ function acceptAllSuggestions(slug) {
   renderConnectionDetail(slug);
 }
 function activateMapping(slug) {
-  DS_CONNECTIONS[slug].mapped = true;
-  DS_CONNECTIONS[slug].drift = false;
-  // Auto-resolve any remaining undecided fields
-  DS_CONNECTIONS[slug].events.forEach(e => e.custom.forEach(f => {
-    if (!f.decision) f.decision = 'create';
-  }));
-  toast(escapeHtml(DS_CONNECTIONS[slug].name) + ' mapping activated — data is now flowing');
+  const c = DS_CONNECTIONS[slug];
+  // Activation gate: block unless every field is resolved or explicitly ignored.
+  const n = c.events.reduce((s, e) => s + e.custom.filter(f => !f.decision).length, 0);
+  if (n > 0) {
+    toast('Activation gate closed — ' + n + ' field' + (n===1?'':'s') + ' still unresolved');
+    return;
+  }
+  c.mapped = true;
+  c.drift = false;
+  toast(escapeHtml(c.name) + ' activated — data is now flowing');
   renderConnectionDetail(slug);
 }
 
@@ -15029,7 +15215,7 @@ function paintWizard() {
     for (let i = 0; i < segs.length; i++) { segs[i].classList.add('is-done'); segs[i].classList.remove('is-current'); }
     $('obBack').style.visibility = 'hidden';
     const nextBtn = $('obNext');
-    nextBtn.textContent = 'Open Data Studio dashboard →';
+    nextBtn.textContent = 'Open Helix Data Studio dashboard →';
     nextBtn.style.opacity = '1';
     nextBtn.onclick = function(){ obFinishAndGo('dashboard'); };
     $('obBody').innerHTML = renderStep_done();
@@ -16044,7 +16230,7 @@ function renderStep_preview() {
       <div class="ob-tile is-accent">
         <div class="ob-tile-l">Data type</div>
         <div class="ob-tile-v mono">${escapeHtml(sample.object)}</div>
-        <div class="ob-tile-s">Becomes a table in Data Studio</div>
+        <div class="ob-tile-s">Becomes a table in Helix Data Studio</div>
       </div>
       <div class="ob-tile">
         <div class="ob-tile-l">Fields found</div>
@@ -16403,8 +16589,8 @@ function renderStep_done() {
           <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4l5 0M3 8l3 0M3 12l5 0M13 4l-3 4 3 4"/></svg>
         </div>
         <div class="ob-done-card-t" style="color:var(--emerald)">Map fields to your canonical schema</div>
-        <div class="ob-done-card-d">Open <span style="font-family:ui-monospace,monospace;color:var(--t1)">${escapeHtml(sample.object)}</span> in Data Studio and translate each ${escapeHtml(cn.name)} field into your canonical model. Add transformations like <span style="font-family:ui-monospace,monospace;color:var(--t2)">trim</span>, <span style="font-family:ui-monospace,monospace;color:var(--t2)">lowercase</span>, or a dictionary lookup.</div>
-        <div class="ob-done-card-cta" style="color:var(--emerald)">Open Data Studio &rarr;</div>
+        <div class="ob-done-card-d">Open <span style="font-family:ui-monospace,monospace;color:var(--t1)">${escapeHtml(sample.object)}</span> in Helix Data Studio and translate each ${escapeHtml(cn.name)} field into your canonical model. Add transformations like <span style="font-family:ui-monospace,monospace;color:var(--t2)">trim</span>, <span style="font-family:ui-monospace,monospace;color:var(--t2)">lowercase</span>, or a dictionary lookup.</div>
+        <div class="ob-done-card-cta" style="color:var(--emerald)">Open Helix Data Studio &rarr;</div>
       </button>
       <button class="ob-done-card is-primary" onclick="obFinishAndGo('agent')">
         <div class="ob-done-card-ic">
@@ -16519,7 +16705,7 @@ function obFinishAndGo(action) {
     // there to advance to step 7 (Apply templates).
     setTimeout(() => { location.hash = '/onboarding'; }, 200);
   } else if (action === 'mapping') {
-    // Phase C: land on the new table's Mapping tab in Data Studio.
+    // Phase C: land on the new table's Mapping tab in Helix Data Studio.
     const obj = (obState.lastCompleted && obState.lastCompleted.object) || (cn && obSampleFor(cn.slug).object);
     if (obj) {
       tblRailTab = 'mapping';
@@ -16542,7 +16728,7 @@ function obFinishAndGo(action) {
     persistOb();
     setTimeout(() => { openWizard(); }, 220);
   } else {
-    // Default: open dashboard (already in Data Studio)
+    // Default: open dashboard (already in Helix Data Studio)
     render();
   }
 }
@@ -16568,7 +16754,7 @@ function renderOnboardingEmptyState() {
             <span class="ob-empty-eyebrow-dot"></span>
             ${resumeLabel}
           </div>
-          <h1 class="ob-empty-title">${resuming ? 'Pick up where you left off' : 'Welcome to Data Studio'}</h1>
+          <h1 class="ob-empty-title">${resuming ? 'Pick up where you left off' : 'Welcome to Helix Data Studio'}</h1>
           <p class="ob-empty-desc">${resuming ? 'Your progress is saved. Continue from where you stopped, or start over.' : 'Connect a source and start sending data to your agents and team. Six quick steps, about five minutes.'}</p>
 
           ${resuming ? '' : `
@@ -16643,8 +16829,8 @@ function renderOnboardingEmptyState() {
 /* ============ INTERACTIVE TOUR ============ */
 const DS_TOUR_STEPS = [
   {
-    title: 'Welcome to Data Studio',
-    body: "Data Studio turns raw source data into structured tables your agents can query. This tour walks through the setup flow that takes a workspace from empty to working in about a minute.",
+    title: 'Welcome to Helix Data Studio',
+    body: "Helix Data Studio turns raw source data into structured tables your agents can query. This tour walks through the setup flow that takes a workspace from empty to working in about a minute.",
     setup: () => {
       // Reset to first-time empty state and land on connections home
       obState = { phase:'pending', step:0, category:null, connector:null, auth:{}, mapping:[], sync:{}, lastCompleted:null };
@@ -16725,7 +16911,7 @@ const DS_TOUR_STEPS = [
   },
   {
     title: 'Step 6 — Refresh schedule',
-    body: '<b>What it does:</b> sets how often Data Studio re-fetches data from this source. <b>Input:</b> a cadence (real-time, hourly, daily, manual) plus an optional timestamp field for incremental sync. <b>Output:</b> a sync schedule the platform runs automatically. Match cadence to the data — events want real-time, ledgers want daily.',
+    body: '<b>What it does:</b> sets how often Helix Data Studio re-fetches data from this source. <b>Input:</b> a cadence (real-time, hourly, daily, manual) plus an optional timestamp field for incremental sync. <b>Output:</b> a sync schedule the platform runs automatically. Match cadence to the data — events want real-time, ledgers want daily.',
     setup: () => {
       obState.step = 5;
       persistOb();
@@ -16812,7 +16998,7 @@ const DS_TOUR_STEPS = [
   },
   {
     title: 'Tenant onboarding — the welcome flow',
-    body: '<b>What it does:</b> the 7-step flow a fresh tenant sees on first run. <b>Phase 1 — Tenant</b> (Welcome \u2192 Organization \u2192 Composite template \u2192 Peer comparison rules). <b>Phase 2 — Site</b> (Site profile \u2192 Connect data). <b>Phase 3 — Done</b> (summary with primary CTA <b>Map your fields in Data Studio</b>). Industry vocabulary swaps every term (store / branch / restaurant / plant) based on the picked preset. <b>Try it:</b> clear <code>aims_ds_tenant_onboarding_v1</code> in localStorage and refresh.',
+    body: '<b>What it does:</b> the 7-step flow a fresh tenant sees on first run. <b>Phase 1 — Tenant</b> (Welcome \u2192 Organization \u2192 Composite template \u2192 Peer comparison rules). <b>Phase 2 — Site</b> (Site profile \u2192 Connect data). <b>Phase 3 — Done</b> (summary with primary CTA <b>Map your fields in Helix Data Studio</b>). Industry vocabulary swaps every term (store / branch / restaurant / plant) based on the picked preset. <b>Try it:</b> clear <code>aims_ds_tenant_onboarding_v1</code> in localStorage and refresh.',
     setup: () => { location.hash = '/onboarding'; },
     target: '.tonb-h-eyebrow',
     scrollToTarget: true
@@ -17132,14 +17318,348 @@ function _tourRefreshTriggerLabel(){
 })();
 </script>
 
+<!-- ══════════ Helix scope switcher + demo apparatus (feature-versioning) ══════════ -->
+<style>
+.hx-vtoggle{position:fixed; bottom:16px; right:16px; z-index:9000; display:flex; align-items:center; gap:10px; background:var(--surface-raised,var(--bg2,#131C2E)); background-image:linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.05)); border:1.5px solid var(--line-strong,var(--line,rgba(255,255,255,.14))); border-radius:12px; padding:7px 9px 7px 11px; box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 10px 30px rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.28); font:600 12.5px/1 Inter,system-ui,sans-serif; color:var(--t2,#94a3b8); cursor:grab; touch-action:none; user-select:none}
+.hx-vtoggle.dragging{cursor:grabbing; border-color:var(--primary,#2b7fff); box-shadow:0 16px 42px rgba(0,0,0,.6),0 0 0 1px var(--primary,#2b7fff)}
+.hx-vt-grip{display:flex; color:var(--field-placeholder,rgba(255,255,255,.3))}
+.hx-vt-lbl{font-weight:700; color:var(--t1,#e2e8f0); letter-spacing:.02em}
+.hx-vt-seg{display:flex; gap:2px; background:var(--hover,rgba(255,255,255,.04)); border:1px solid var(--line,rgba(255,255,255,.1)); border-radius:9px; padding:2px}
+.hx-vt-seg button{display:flex; flex-direction:column; align-items:flex-start; gap:1px; padding:5px 10px; border-radius:7px; border:1px solid transparent; background:transparent; color:var(--t2,#94a3b8); font:600 11.5px/1 Inter,sans-serif; cursor:pointer; white-space:nowrap; transition:color .12s,background .12s}
+.hx-vt-seg button .hx-vt-sub{font-weight:500; font-size:9.5px; opacity:.7; letter-spacing:0}
+.hx-vt-seg button:hover:not(.on){color:var(--t1,#e2e8f0); background:var(--hover,rgba(255,255,255,.05))}
+.hx-vt-seg button.on{background:var(--primary,#2b7fff); color:#fff; border-color:var(--primary,#2b7fff); box-shadow:0 1px 5px rgba(43,127,255,.55)}
+.hx-vt-seg button.on .hx-vt-sub{opacity:.85}
+</style>
+<div class="hx-vtoggle" role="group" aria-label="Scope" title="Drag to reposition">
+  <span class="hx-vt-grip" aria-hidden="true"><svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="3" cy="3" r="1.2"/><circle cx="7" cy="3" r="1.2"/><circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="3" cy="11" r="1.2"/><circle cx="7" cy="11" r="1.2"/></svg></span>
+  <span class="hx-vt-lbl">Scope</span>
+  <div class="hx-vt-seg">
+    <button id="hx-scope-v1"   onclick="hxSetScope('v1')"><span>V1</span><span class="hx-vt-sub">Governed ingestion</span></button>
+    <button id="hx-scope-v1.5" onclick="hxSetScope('v1.5')"><span>V1.5</span><span class="hx-vt-sub">Semantic layer</span></button>
+    <button id="hx-scope-v2"   onclick="hxSetScope('v2')"><span>V2</span><span class="hx-vt-sub">Consumption</span></button>
+    <button id="hx-scope-v3"   onclick="hxSetScope('v3')"><span>V3</span><span class="hx-vt-sub">Tenant self-service</span></button>
+  </div>
+  <button class="hx-vt-cl" onclick="hxShowChangelog()" title="Scope changelog — what each tier ships" aria-label="Scope changelog"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5h7M5.5 8h7M5.5 12.5h4"/><circle cx="2.7" cy="3.5" r="1"/><circle cx="2.7" cy="8" r="1"/><circle cx="2.7" cy="12.5" r="1"/></svg></button>
+</div>
+<script>
+(function(){
+  var TIERS=['v1','v1.5','v2','v3'];
+  window.hxSetScope=function(sel){
+    var si=TIERS.indexOf(sel); if(si<0) return;
+    document.querySelectorAll('[data-version]').forEach(function(el){
+      var t=el.getAttribute('data-version'); if(t==='deferred'){ el.style.display='none'; return; }
+      var ti=TIERS.indexOf(t); el.style.display = (ti>=0 && ti<=si) ? '' : 'none';
+    });
+    document.querySelectorAll('.hx-callout').forEach(function(el){ el.style.display = (sel==='v1') ? '' : 'none'; });
+    TIERS.forEach(function(t){ var b=document.getElementById('hx-scope-'+t); if(b) b.classList.toggle('on', t===sel); });
+    try{ localStorage.setItem('hx-scope', sel); }catch(e){}
+  };
+  (function(){ /* draggable */
+    var el=document.querySelector('.hx-vtoggle'); if(!el) return; var KEY='hx-vt-pos', M=8, st=null;
+    function clamp(x,y){ var r=el.getBoundingClientRect(); return {x:Math.max(M,Math.min(x,innerWidth-r.width-M)), y:Math.max(M,Math.min(y,innerHeight-r.height-M))}; }
+    function place(x,y){ var p=clamp(x,y); el.style.left=p.x+'px'; el.style.top=p.y+'px'; el.style.right='auto'; el.style.bottom='auto'; }
+    try{ var s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&typeof s.x==='number') place(s.x,s.y); }catch(e){}
+    el.addEventListener('pointerdown',function(e){ if(e.target.closest('button')) return; var r=el.getBoundingClientRect(); st={px:e.clientX,py:e.clientY,ox:r.left,oy:r.top,moved:false}; try{el.setPointerCapture(e.pointerId);}catch(_){} e.preventDefault(); });
+    el.addEventListener('pointermove',function(e){ if(!st) return; var dx=e.clientX-st.px, dy=e.clientY-st.py; if(!st.moved&&Math.hypot(dx,dy)<3) return; st.moved=true; el.classList.add('dragging'); place(st.ox+dx, st.oy+dy); });
+    function end(){ if(!st) return; if(st.moved){ var r=el.getBoundingClientRect(); try{localStorage.setItem(KEY,JSON.stringify({x:r.left,y:r.top}));}catch(_){} var sw=function(ev){ev.stopPropagation();}; el.addEventListener('click',sw,true); setTimeout(function(){el.removeEventListener('click',sw,true);},60); } el.classList.remove('dragging'); st=null; }
+    el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+    addEventListener('resize',function(){ if(el.style.left){ var r=el.getBoundingClientRect(); place(r.left,r.top); } });
+  })();
+  var saved='v1'; try{ var v=localStorage.getItem('hx-scope'); if(v&&TIERS.indexOf(v)>=0) saved=v; }catch(e){}
+  if(document.readyState!=='loading') hxSetScope(saved); else document.addEventListener('DOMContentLoaded',function(){ hxSetScope(saved); });
+})();
+</script>
+<!-- ══════════ Helix V2/V3 scaffolds + scope callouts + re-apply observer (P6) ══════════ -->
+<style>
+.hx-tier-badge{display:inline-block;font:800 10px/1 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--primary,#2b7fff);background:rgba(43,127,255,.12);border:1px solid rgba(43,127,255,.35);border-radius:999px;padding:4px 10px;margin-bottom:12px}
+.hx-scaf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:8px}
+.hx-scaf-card{border:1px solid var(--card-border,var(--line));background:var(--card-bg,var(--bg2));border-radius:14px;padding:16px}
+.hx-scaf-card-t{display:flex;align-items:center;gap:8px;font:700 14px Inter,sans-serif;color:var(--t1,#e2e8f0);margin-bottom:6px}
+.hx-scaf-card-d{font:400 12.5px/1.5 Inter,sans-serif;color:var(--t2,#94a3b8)}
+.hx-scaf-soon{display:inline-block;margin-top:10px;font:600 10px/1 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--t3,#64748b);border:1px dashed var(--line,rgba(255,255,255,.18));border-radius:6px;padding:3px 8px}
+.hx-callouts{display:flex;flex-direction:column;gap:10px;margin:16px 0 4px}
+.hx-callout{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px dashed var(--line-strong,var(--line));border-radius:12px;background:rgba(43,127,255,.03)}
+.hx-callout-tier{flex-shrink:0;font:800 11px/1 Inter,sans-serif;letter-spacing:.05em;color:var(--primary,#2b7fff);border:1px solid rgba(43,127,255,.4);border-radius:8px;padding:5px 9px}
+.hx-callout-b{flex:1;min-width:0;font:400 12.5px/1.5 Inter,sans-serif;color:var(--t2,#94a3b8);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hx-callout-go{flex-shrink:0;padding:6px 12px;border-radius:8px;border:1px solid var(--line,rgba(255,255,255,.14));background:var(--hover,rgba(255,255,255,.05));color:var(--t1,#e2e8f0);font:600 11.5px Inter,sans-serif;cursor:pointer}
+.hx-callout-go:hover{border-color:var(--primary,#2b7fff)}
+</style>
+<script>
+(function(){
+  function card(t,d,soon){ return '<div class="hx-scaf-card"><div class="hx-scaf-card-t">'+t+'</div><div class="hx-scaf-card-d">'+d+'</div><span class="hx-scaf-soon">'+soon+'</span></div>'; }
+  function page(tier,title,desc,cards){ var el=document.getElementById('content'); if(!el) return;
+    el.innerHTML='<section class="surface"><div class="breadcrumb"><span class="crumb-current">'+title+'</span></div>'
+      +'<section class="hero"><div class="hero-main"><span class="hx-tier-badge">'+tier+'</span><h1 class="hero-title">'+title+'</h1><p class="hero-desc">'+desc+'</p></div></section>'
+      +'<div class="hx-scaf-grid">'+cards+'</div></section>'; }
+  window.renderConsumptionScaffold=function(){
+    var d3=(typeof hxPin==='function')?hxPin('D3'):'';
+    page('V2 · Consumption','Consumption','Build cards and dashboards from your certified table definitions and surface them in conversation. Scaffold for V2 — lower the scope to return to governed ingestion.',
+      card('Card builder '+d3,'Compose cards from table definitions — fields, filters and formatting.','V2 scaffold')
+      +card('Dashboard composition','Arrange cards into shareable dashboards per studio.','V2 scaffold')
+      +card('In-conversation cards','Drop live cards into ORI conversations.','V2 scaffold')
+      +card('Field-level visibility','A field can power a calculation without being rendered — resolved by policy, not a display toggle.','V2 scaffold')
+      +card('Grid / form / metric views','Multiple render modes over the same table definition.','V2 scaffold'));
+  };
+  window.renderTenantLibraryScaffold=function(){
+    var d1=(typeof hxPin==='function')?hxPin('D1'):'';
+    page('V3 · Tenant self-service','Tenant library','Employees turn approved cards and dashboards on or off by permission — no governance chrome. Scaffold for V3.',
+      card('Employee consumption library '+d1,'On/off by permission · no audit logs, no governance chrome.','V3 scaffold')
+      +card('Per-studio enablement toggles','Turn surfaces on per studio.','V3 scaffold')
+      +card('Promote to library','Publish a card or dashboard to the employee library.','V3 scaffold')
+      +card('Full approval hierarchy','Multi-level approval including a Helix Governance Studio step.','V3 scaffold')
+      +card('Custom connector builder','Webhook builder · OpenAPI import · SDK.','V3 scaffold')
+      +card('Integration Types 2 &amp; 3','Tool nodes, HITL and Council guardrails.','V3 scaffold')
+      +card('Enablement stats','Adoption metrics across the tenant.','V3 scaffold'));
+  };
+  // Re-apply the current scope after any content re-render so tagged regions + callouts stay correct.
+  function setup(){
+    var content=document.getElementById('content');
+    if(content && typeof hxSetScope==='function' && !content._hxObserved){
+      content._hxObserved=true;
+      var cur=function(){ try{ return localStorage.getItem('hx-scope')||'v1'; }catch(e){ return 'v1'; } };
+      new MutationObserver(function(){ hxSetScope(cur()); }).observe(content,{childList:true});
+    }
+  }
+  if(document.readyState!=='loading') setup(); else document.addEventListener('DOMContentLoaded',setup);
+})();
+</script>
+<!-- ══════════ Helix cross-tenant clone · diff · version history · work queue (V1) ══════════ -->
+<style>
+.hx-gd-body{padding:20px;overflow-y:auto;flex:1}
+.hx-diff{width:100%;border-collapse:collapse;font:400 12.5px Inter,sans-serif}
+.hx-diff th{text-align:left;font:700 10px/1 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--t3,#64748b);padding:0 10px 8px;border-bottom:1px solid var(--line,rgba(255,255,255,.1))}
+.hx-diff td{padding:9px 10px;border-bottom:1px solid var(--line,rgba(255,255,255,.06));color:var(--t1,#e2e8f0);vertical-align:top}
+.hx-diff .mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px}
+.hx-st{display:inline-flex;align-items:center;gap:5px;font:700 10px/1 Inter,sans-serif;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid}
+.hx-st-ok{color:var(--green,#05df72);border-color:rgba(5,223,114,.4);background:rgba(5,223,114,.10)}
+.hx-st-pend{color:var(--amber,#f59e0b);border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.10)}
+.hx-vrow{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line,rgba(255,255,255,.08))}
+.hx-vrow-dot{width:9px;height:9px;border-radius:50%;background:var(--line-strong,#475569);margin-top:4px;flex-shrink:0}
+.hx-vrow.cur .hx-vrow-dot{background:var(--primary,#2b7fff)}
+.hx-vrow-b{flex:1;min-width:0}
+.hx-vrow-t{font:600 12.5px Inter,sans-serif;color:var(--t1,#e2e8f0)}
+.hx-vrow-m{font:400 11.5px/1.5 Inter,sans-serif;color:var(--t3,#64748b);margin-top:2px}
+.hx-aims{display:inline-block;margin-left:6px;font:700 8.5px/1.6 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--cyan,#22d3ee);border:1px solid rgba(34,211,238,.4);border-radius:999px;padding:0 6px;vertical-align:middle}
+.hx-vrow-rb{align-self:center;padding:5px 11px;border-radius:7px;border:1px solid var(--line,rgba(255,255,255,.14));background:var(--hover,rgba(255,255,255,.05));color:var(--t1,#e2e8f0);font:600 11px Inter,sans-serif;cursor:pointer;flex-shrink:0}
+.hx-vrow-rb:hover{border-color:var(--primary,#2b7fff)}
+.hx-wq{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:10px;margin-bottom:10px}
+.hx-wq-b{flex:1;min-width:0}
+.hx-wq-t{font:600 13px Inter,sans-serif;color:var(--t1,#e2e8f0)}
+.hx-wq-m{font:400 11.5px Inter,sans-serif;color:var(--t3,#64748b);margin-top:2px}
+.hx-wq-open{padding:6px 12px;border-radius:7px;border:1px solid var(--line,rgba(255,255,255,.14));background:var(--hover,rgba(255,255,255,.05));color:var(--t1,#e2e8f0);font:600 11.5px Inter,sans-serif;cursor:pointer}
+.hx-wq-open:hover{border-color:var(--primary,#2b7fff)}
+</style>
+<script>
+(function(){
+  var TENANTS=['Contoso Ltd','Northwind Traders','Fabrikam Retail'];
+  var _prev=null;
+  function esc(s){ return (typeof escapeHtml==='function')?escapeHtml(String(s==null?'':s)):String(s==null?'':s); }
+  window.hxCloseDrawer=function(){
+    var d=document.getElementById('hxGenDrawer'), s=document.getElementById('hxGenScrim');
+    if(d&&d._keyh) document.removeEventListener('keydown', d._keyh);
+    if(d){ d.classList.remove('open'); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); },200); }
+    if(s){ s.classList.remove('open'); setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); },200); }
+    if(_prev&&_prev.focus){ try{_prev.focus();}catch(e){} _prev=null; }
+  };
+  window.hxOpenDrawer=function(o){
+    hxCloseDrawer(); _prev=document.activeElement;
+    var scrim=document.createElement('div'); scrim.className='hx-pin-scrim'; scrim.id='hxGenScrim'; scrim.onclick=hxCloseDrawer;
+    var d=document.createElement('aside'); d.className='hx-pin-drawer'; d.id='hxGenDrawer'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true'); d.setAttribute('aria-label',o.title||'Panel');
+    d.innerHTML='<div class="hx-pin-dh" style="justify-content:space-between">'
+      +'<div style="min-width:0">'+(o.badge?'<span class="hx-pin-dweight open">'+o.badge+'</span>':'')+'<div class="hx-pin-dcode" style="margin-top:'+(o.badge?'8px':'0')+'">'+esc(o.title)+'</div>'+(o.subtitle?'<div class="so-subtitle" style="margin-top:4px">'+o.subtitle+'</div>':'')+'</div>'
+      +'<button class="so-close" onclick="hxCloseDrawer()" aria-label="Close" style="background:none;border:0;color:var(--t2,#94a3b8);font-size:18px;cursor:pointer;line-height:1">✕</button></div>'
+      +'<div class="hx-gd-body">'+(o.body||'')+'</div>'
+      +'<div class="hx-pin-df">'+(o.foot||'<button type="button" onclick="hxCloseDrawer()">Close</button>')+'</div>';
+    document.body.appendChild(scrim); document.body.appendChild(d);
+    requestAnimationFrame(function(){ scrim.classList.add('open'); d.classList.add('open'); var f=d.querySelector('input,select,button.btn-primary,button'); if(f) f.focus(); });
+    d._keyh=function(e){ if(e.key==='Escape'){ hxCloseDrawer(); } else if(e.key==='Tab'){ var els=d.querySelectorAll('input,select,button,a[href]'); if(!els.length) return; var a=els[0],z=els[els.length-1]; if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();} else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();} } };
+    document.addEventListener('keydown', d._keyh);
+  };
+  function customFields(slug){ var c=DS_CONNECTIONS[slug]; return (c&&c.events?c.events:[]).reduce(function(a,e){ return a.concat((e.custom||[]).filter(function(f){return !f.stale;})); },[]); }
+  window.openHxClone=function(slug){ var c=DS_CONNECTIONS[slug]; if(!c) return;
+    var targets=TENANTS.filter(function(t){return t!=='Contoso Ltd';});
+    hxOpenDrawer({ title:'Clone mapping to another tenant', badge:'Cross-tenant', subtitle:esc(c.name)+' · from Contoso Ltd',
+      body:'<div class="hx-ff"><label>Source tenant</label><input value="Contoso Ltd" disabled></div>'
+        +'<div class="hx-ff"><label>Target tenant</label><select id="hxCloneTarget">'+targets.map(function(t){return '<option>'+t+'</option>';}).join('')+'</select></div>'
+        +'<div class="hx-samples" style="margin-top:2px"><span class="hx-samples-note">Standard fields carry over <b>resolved</b>. Custom fields arrive <b>pending</b> in the target tenant’s mapping queue.</span></div>',
+      foot:'<button type="button" onclick="hxCloseDrawer()">Cancel</button><button type="button" class="btn btn-primary" style="margin-left:8px" onclick="hxDoClone(\''+slug+'\')">Clone mapping</button>' });
+  };
+  window.hxDoClone=function(slug){ var t=(document.getElementById('hxCloneTarget')||{}).value||'the target tenant'; var c=DS_CONNECTIONS[slug];
+    if(typeof toast==='function') toast(esc(c.name)+' mapping cloned to '+t+' — standard resolved, custom fields pending','ok');
+    openHxDiff(slug, t); };
+  window.openHxDiff=function(slug, target){ var c=DS_CONNECTIONS[slug]; if(!c) return; target=target||'Northwind Traders';
+    var std=(c.events&&c.events[0]&&c.events[0].autoMappedCount)||22;
+    var cf=customFields(slug);
+    var rows='<tr><td><b>Standard fields</b><div class="hx-vrow-m">'+std+' auto-mapped</div></td><td><span class="hx-st hx-st-ok">Resolved</span></td><td><span class="hx-st hx-st-ok">Resolved</span></td></tr>';
+    rows+=cf.map(function(f){ var src=f.decision?'<span class="hx-st hx-st-ok">Resolved</span>':'<span class="hx-st hx-st-pend">Pending</span>'; return '<tr><td class="mono">'+esc(f.name)+'</td><td>'+src+'</td><td><span class="hx-st hx-st-pend">Pending</span></td></tr>'; }).join('');
+    if(!cf.length) rows+='<tr><td colspan="3" style="color:var(--t3)">No custom fields.</td></tr>';
+    hxOpenDrawer({ title:'Mapping diff', badge:'Cross-tenant', subtitle:esc(c.name)+' · Contoso Ltd vs '+esc(target),
+      body:'<table class="hx-diff"><thead><tr><th>Field</th><th>Contoso Ltd</th><th>'+esc(target)+'</th></tr></thead><tbody>'+rows+'</tbody></table>'
+        +'<div class="hx-samples" style="margin-top:14px"><span class="hx-samples-note">Divergence: custom fields are resolved in Contoso Ltd but land <b>pending</b> in '+esc(target)+' — an operator resolves them in that tenant’s queue.</span></div>',
+      foot:'<button type="button" onclick="hxCloseDrawer()">Close</button><button type="button" class="btn btn-primary" style="margin-left:8px" onclick="hxCloseDrawer();openHxWorkQueue()">Open cross-tenant queue</button>' });
+  };
+  window.openHxHistory=function(slug){ var c=DS_CONNECTIONS[slug]; if(!c) return;
+    var vers=[
+      {v:'v4',cur:true,when:'2h ago',who:'Maria González',what:'Activated mapping — data flowing'},
+      {v:'v3',when:'1 day ago',who:'J. Rivera',aims:true,what:'Resolved 3 custom fields inside the tenant'},
+      {v:'v2',when:'3 days ago',who:'Maria González',what:'Mapped 22 standard fields'},
+      {v:'v1',when:'2 months ago',who:'Maria González',what:'Connection activated'}
+    ];
+    var body=vers.map(function(x){ return '<div class="hx-vrow'+(x.cur?' cur':'')+'"><span class="hx-vrow-dot"></span><div class="hx-vrow-b"><div class="hx-vrow-t">'+x.v+(x.cur?' · current':'')+'</div><div class="hx-vrow-m">'+esc(x.what)+'<br>'+esc(x.who)+(x.aims?'<span class="hx-aims">AIMS</span>':'')+' · '+esc(x.when)+'</div></div>'+(x.cur?'':'<button class="hx-vrow-rb" onclick="hxRollback(\''+slug+'\',\''+x.v+'\')">Roll back</button>')+'</div>'; }).join('');
+    hxOpenDrawer({ title:'Mapping version history', badge:'Audit trail', subtitle:esc(c.name)+' · who mapped what', body:body });
+  };
+  window.hxRollback=function(slug,v){ hxCloseDrawer(); if(typeof toast==='function') toast('Rolled back '+esc(DS_CONNECTIONS[slug].name)+' mapping to '+v,'ok'); };
+  window.openHxWorkQueue=function(){
+    var q=[
+      {tenant:'Northwind Traders',connector:'Salesforce',slug:'salesforce',pending:6},
+      {tenant:'Fabrikam Retail',connector:'HubSpot',slug:'hubspot',pending:3},
+      {tenant:'Contoso Ltd',connector:'Snowflake',slug:'snowflake',pending:2}
+    ];
+    var body=q.map(function(r){ return '<div class="hx-wq"><div class="hx-wq-b"><div class="hx-wq-t">'+esc(r.connector)+' <span style="color:var(--t3);font-weight:500">· '+esc(r.tenant)+'</span></div><div class="hx-wq-m">'+r.pending+' field'+(r.pending===1?'':'s')+' pending · activation gate closed</div></div><button class="hx-wq-open" onclick="hxCloseDrawer();location.hash=\'#/connections/'+r.slug+'\';if(typeof setCnTab===\'function\')setCnTab(\'mapping\')">Open</button></div>'; }).join('');
+    hxOpenDrawer({ title:'Cross-tenant work queue', badge:'AIMS operator', subtitle:q.length+' mappings need attention across tenants', body:body });
+  };
+})();
+</script>
+<!-- ══════════ Helix drift trigger (V1 · drift as a recurring normal flow) ══════════ -->
+<script>
+window.hxResetDemo=function(){
+  // Restore all fixtures (in-memory objects re-init on reload), close drawers, clear toasts.
+  try{ if(typeof hxCloseDrawer==='function') hxCloseDrawer(); }catch(e){}
+  try{ if(typeof closeHxPin==='function') closeHxPin(); }catch(e){}
+  try{ if(typeof closeHxFileSource==='function') closeHxFileSource(); }catch(e){}
+  try{ if(typeof closeSlideout==='function') closeSlideout(); }catch(e){}
+  try{ document.querySelectorAll('.toast, .ds-toast, [class*="toast"]').forEach(function(t){ t.remove(); }); }catch(e){}
+  location.reload();
+};
+window.hxTriggerDrift=function(){
+  if(typeof DS_CONNECTIONS==='undefined'){ if(typeof toast==='function') toast('Connections not loaded'); return; }
+  var slug=null;
+  for(var k in DS_CONNECTIONS){ if(DS_CONNECTIONS[k].mapped && !DS_CONNECTIONS[k].drift){ slug=k; break; } }
+  if(!slug) slug=Object.keys(DS_CONNECTIONS)[0];
+  var c=DS_CONNECTIONS[slug]; if(!c||!c.events||!c.events[0]){ if(typeof toast==='function') toast('No active connector to drift'); return; }
+  var e=c.events[0]; e.custom=e.custom||[];
+  if(!e.custom.some(function(f){return f.isNew;})) e.custom.push({name:'review_sentiment__c', type:'String', suggested:null, isNew:true});
+  if(!e.custom.some(function(f){return f.stale;})) e.custom.push({name:'legacy_reviewer_id', type:'String', stale:true, wasMappedTo:'reviewer_id', lastSeen:'3 days ago'});
+  c.drift=true; c.mapped=false;
+  try{ eventOpenState[slug+':0']=true; }catch(_){}
+  if(typeof toast==='function') toast('Schema change on '+c.name+' — routine · 1 new field, 1 no longer arriving','ok');
+  location.hash='#/connections/'+slug;
+  if(typeof setCnTab==='function') setCnTab('mapping');
+  else if(typeof renderConnectionDetail==='function') renderConnectionDetail(slug);
+};
+</script>
+<!-- ══════════ Helix file-source setup drawer (V1 · spreadsheet / flat file) ══════════ -->
+<style>
+.hx-ff{margin-bottom:14px}
+.hx-ff > label{display:block; font:600 11px/1 Inter,sans-serif; letter-spacing:.04em; text-transform:uppercase; color:var(--t3,#64748b); margin-bottom:6px}
+.hx-ff input, .hx-ff select{width:100%; box-sizing:border-box; padding:8px 10px; border-radius:8px; border:1px solid var(--line,rgba(255,255,255,.14)); background:var(--hover,rgba(255,255,255,.04)); color:var(--t1,#e2e8f0); font:400 13px Inter,sans-serif}
+.hx-ff input:focus, .hx-ff select:focus{outline:none; border-color:var(--primary,#2b7fff)}
+.hx-ff-hint{font:400 11px/1.4 Inter,sans-serif; color:var(--t3,#64748b); margin-top:5px}
+.hx-ff-row{display:flex; gap:10px}
+.hx-ff-row > .hx-ff{flex:1}
+</style>
+<script>
+(function(){
+  var TENANTS=['Contoso Ltd','Northwind Traders','Fabrikam Retail'];
+  var _prev=null;
+  window.openHxFileSource=function(){
+    closeHxFileSource(); _prev=document.activeElement;
+    var scrim=document.createElement('div'); scrim.className='hx-pin-scrim'; scrim.id='hxSrcScrim'; scrim.onclick=closeHxFileSource;
+    var d=document.createElement('aside'); d.className='hx-pin-drawer'; d.id='hxSrcDrawer'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true'); d.setAttribute('aria-label','Set up file source');
+    var pin = (typeof hxPin==='function') ? hxPin('D6') : '';
+    d.innerHTML =
+      '<div class="hx-pin-dh"><div class="hx-pin-dh-ic" style="background:rgba(148,163,184,.14);color:var(--t2,#94a3b8)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3 3V14a.5.5 0 0 1-.5.5h-7A.5.5 0 0 1 4 14V1.5Z"/><path d="M9 1.5V4.5h3M6 8.5h4M6 11h4"/></svg></div>'
+      +'<div style="min-width:0"><span class="hx-pin-dweight open">Certified source · Type 1</span><div class="hx-pin-dcode" style="display:flex;align-items:center;gap:8px">Set up file source '+pin+'</div></div></div>'
+      +'<div class="hx-pin-dbody">'
+      +'<div class="hx-ff"><label>Source name</label><input id="hxSrcName" type="text" placeholder="e.g. Payroll export — West region" autocomplete="off"></div>'
+      +'<div class="hx-ff"><label>Delivery model</label><select id="hxSrcDelivery"><option>SFTP pull</option><option>Scheduled batch · 15 min</option><option>Historical batch (one-time)</option></select><div class="hx-ff-hint">Email-attachment ingestion is out of scope for V1 — see the D6 pin above.</div></div>'
+      +'<div class="hx-ff"><label>SFTP host &amp; path</label><input id="hxSrcHost" type="text" placeholder="sftp://ingest.helix.internal/dropzone/…" autocomplete="off"></div>'
+      +'<div class="hx-ff-row"><div class="hx-ff"><label>Tenant assignment</label><select id="hxSrcTenant">'+TENANTS.map(function(t){return '<option>'+t+'</option>';}).join('')+'</select></div>'
+      +'<div class="hx-ff"><label>Instance</label><select id="hxSrcInstance"><option>Development</option><option>Staging</option><option selected>Production</option></select></div></div>'
+      +'<div class="hx-ff"><label>Default sensitivity tier</label><select id="hxSrcSens"><option>Public</option><option selected>Internal</option><option>Confidential</option><option>Restricted</option></select><div class="hx-ff-hint">Applied to every field until overridden per-field in the mapping queue.</div></div>'
+      +'</div>'
+      +'<div class="hx-pin-df"><button type="button" onclick="closeHxFileSource()">Cancel</button><button type="button" class="btn btn-primary" style="margin-left:8px" onclick="hxCreateFileSource()">Create source</button></div>';
+    document.body.appendChild(scrim); document.body.appendChild(d);
+    requestAnimationFrame(function(){ scrim.classList.add('open'); d.classList.add('open'); var f=d.querySelector('#hxSrcName'); if(f) f.focus(); });
+    d._keyh=function(e){ if(e.key==='Escape'){ closeHxFileSource(); } else if(e.key==='Tab'){ var els=d.querySelectorAll('input,select,button'); if(!els.length) return; var a=els[0],z=els[els.length-1]; if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();} else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();} } };
+    document.addEventListener('keydown', d._keyh);
+  };
+  window.hxCreateFileSource=function(){
+    var name=(document.getElementById('hxSrcName')||{}).value||'File source';
+    var tenant=(document.getElementById('hxSrcTenant')||{}).value||'';
+    closeHxFileSource();
+    if(typeof toast==='function') toast('File source “'+name+'” created for '+tenant+' — fields queued for mapping','ok');
+  };
+  window.closeHxFileSource=function(){
+    var d=document.getElementById('hxSrcDrawer'), s=document.getElementById('hxSrcScrim');
+    if(d&&d._keyh) document.removeEventListener('keydown', d._keyh);
+    if(d){ d.classList.remove('open'); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); },200); }
+    if(s){ s.classList.remove('open'); setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); },200); }
+    if(_prev&&_prev.focus){ try{_prev.focus();}catch(e){} _prev=null; }
+  };
+})();
+</script>
+<!-- ══════════ Helix scope changelog (feature-versioning · shown in the switcher) ══════════ -->
+<style>
+.hx-vt-cl{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;border:1px solid var(--line,rgba(255,255,255,.12));background:transparent;color:var(--t2,#94a3b8);cursor:pointer;flex-shrink:0}
+.hx-vt-cl:hover{color:var(--t1,#e2e8f0);border-color:var(--primary,#2b7fff)}
+.hx-cl-tier{border:1px solid var(--line,rgba(255,255,255,.1));border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.hx-cl-tier.active{border-color:var(--primary,#2b7fff);background:rgba(43,127,255,.06)}
+.hx-cl-h{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.hx-cl-name{font:700 13.5px Inter,sans-serif;color:var(--t1,#e2e8f0)}
+.hx-cl-cur{font:700 9.5px/1 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--primary,#2b7fff);border:1px solid var(--primary,#2b7fff);border-radius:999px;padding:3px 8px}
+.hx-cl-switch{font:600 11px Inter,sans-serif;color:var(--t3,#64748b)}
+.hx-cl-h:hover .hx-cl-switch{color:var(--primary,#2b7fff)}
+.hx-cl-target{font:400 11px Inter,sans-serif;color:var(--t3,#64748b);margin:4px 0 10px}
+.hx-cl-sec{margin-bottom:8px}
+.hx-cl-sec-l{font:700 9.5px/1 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.hx-cl-sec-l.nw{color:var(--green,#05df72)}
+.hx-cl-sec-l.up{color:var(--primary,#2b7fff)}
+.hx-cl-sec-l.rm{color:var(--t3,#64748b)}
+.hx-cl-ul{margin:0;padding-left:16px}
+.hx-cl-ul li{font:400 12px/1.55 Inter,sans-serif;color:var(--t2,#94a3b8);margin-bottom:2px}
+</style>
+<script>
+window.HX_CHANGELOG=[
+ {tier:'v1',name:'V1 · Governed ingestion',target:'current sprint',
+  nw:['Connector list (admin setup) + certified connector setup — credentials · tenant · delivery model · instance','Spreadsheet / flat-file source via SFTP / batch','Mapping queue: ORI suggestion + confidence · manual override · create custom field · ignore field','Sensitivity tier chips + masking; sample values ORI-mediated','Activation gate (disabled-with-reason, live unresolved count)','Drift as a routine flow — new field + no-longer-arriving','Cross-tenant clone + diff + work queue','Mapping version history + rollback; audit incl. AIMS personnel','Decision pins: D2 · SCOPE · AWS · D6'],
+  up:[],rm:['Semantic layer / consumption / self-service — deferred to V1.5–V3']},
+ {tier:'v1.5',name:'V1.5 · Semantic layer',target:'next sprint',
+  nw:['Table definition browser · template builder','Field metadata; table-scoped calculated fields + ORI assist','Table refresh + staleness; table version history','Minimal request intake (form + one approval)','Decision pins: D5 · D4'],
+  up:['Mapping queue now feeds the table-definition browser'],rm:['Consumption + self-service — deferred to V2 / V3']},
+ {tier:'v2',name:'V2 · Consumption',target:'TBD',
+  nw:['Card builder fed by table definitions','Dashboard composition; in-conversation cards','Field-level visibility (policy-resolved); grid / form / metric','Decision pin: D3'],
+  up:['Table definitions selectable as card sources'],rm:['Tenant self-service — deferred to V3']},
+ {tier:'v3',name:'V3 · Tenant self-service',target:'TBD',
+  nw:['Employee library (permission-gated, no governance chrome)','Per-studio toggles; promote-to-library','Full approval hierarchy incl. Helix Governance Studio','Custom connector builder; integration Types 2 & 3; enablement stats','Decision pin: D1'],
+  up:['Cards + dashboards promotable to the employee library'],rm:['None — this is the complete version']}
+];
+window.hxShowChangelog=function(){
+  if(typeof hxOpenDrawer!=='function') return;
+  var cur='v1'; try{ cur=localStorage.getItem('hx-scope')||'v1'; }catch(e){}
+  function sec(lbl,arr,cls){ if(!arr||!arr.length) return ''; return '<div class="hx-cl-sec"><div class="hx-cl-sec-l '+cls+'">'+lbl+'</div><ul class="hx-cl-ul">'+arr.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>'; }
+  var body=HX_CHANGELOG.map(function(t){
+    var active=t.tier===cur;
+    return '<div class="hx-cl-tier'+(active?' active':'')+'">'
+      +'<button class="hx-cl-h" onclick="hxSetScope(\''+t.tier+'\');hxShowChangelog()">'
+      +'<span class="hx-cl-name">'+t.name+'</span>'+(active?'<span class="hx-cl-cur">Current</span>':'<span class="hx-cl-switch">Switch →</span>')+'</button>'
+      +'<div class="hx-cl-target">Release target · '+t.target+'</div>'
+      +sec('New',t.nw,'nw')+sec('Updated',t.up,'up')+sec('Removed / deferred',t.rm,'rm')
+      +'</div>';
+  }).join('');
+  hxOpenDrawer({title:'Scope changelog',badge:'Feature versioning',subtitle:'What each scope ships — click a tier to preview it live',body:body});
+};
+</script>
+
 <script>
 window.NOTIF_DATA = [
-  { id:'ds1', source:'integration', eventType:'failure',    severity:'critical', title:'Snowflake sync failed — orders table',    desc:'Schema drift detected: column `total_usd` renamed to `amount`. 3 downstream models broken.', time:'8m ago',    day:'today',     unread:true  },
-  { id:'ds2', source:'agent',       eventType:'completion', severity:'success',  title:'Data quality scan complete',             desc:'1,204 rows validated across 6 tables. 2 PII fields flagged for masking review.',              time:'22m ago',   day:'today',     unread:true  },
-  { id:'ds3', source:'workflow',    eventType:'approval',   severity:'warning',  title:'Schema change awaiting approval',        desc:'Adding nullable column `churn_score FLOAT` to `customers`. Requires DBA sign-off.',            time:'1h ago',    day:'today',     unread:true  },
-  { id:'ds4', source:'system',      eventType:'reminder',   severity:'info',     title:'Retention policy expires in 3 days',     desc:'Raw event logs older than 90 days will be purged on Aug 8. Archive if needed.',                time:'4h ago',    day:'today',     unread:false },
-  { id:'ds5', source:'integration', eventType:'completion', severity:'success',  title:'HubSpot CRM sync complete',              desc:'14,302 contact records synced. 0 conflicts. Next run scheduled for 02:00 UTC.',               time:'Yesterday', day:'yesterday', unread:false },
-  { id:'ds6', source:'system',      eventType:'security',   severity:'warning',  title:'Connector credential rotation due',      desc:'BigQuery service account key last rotated 87 days ago. Rotate within 3 days.',                 time:'2d ago',    day:'earlier',   unread:false },
+  { id:'hx1', source:'workflow',    eventType:'approval',   severity:'warning',  title:'Lineage change requires approval',        desc:'Column `revenue_net` in `fact_orders` reclassified from Bronze to Gold tier. Review impact.',  time:'5m ago',    day:'today',     unread:true  },
+  { id:'hx2', source:'agent',       eventType:'completion', severity:'success',  title:'Helix scan finished — 0 anomalies',       desc:'Full lineage scan across 34 models completed. All data contracts passing. No drift detected.', time:'31m ago',   day:'today',     unread:true  },
+  { id:'hx3', source:'system',      eventType:'security',   severity:'critical', title:'PII field exposed in Silver tier model',  desc:'`email` column in `dim_users` is accessible to non-DLP roles. Reclassify or mask immediately.',time:'58m ago',   day:'today',     unread:true  },
+  { id:'hx4', source:'integration', eventType:'failure',    severity:'warning',  title:'dbt run failed — staging layer',          desc:'Model `stg_salesforce__opportunities` failed: null constraint violation on `owner_id`.',       time:'3h ago',    day:'today',     unread:false },
+  { id:'hx5', source:'human',       eventType:'assignment', severity:'info',     title:'Data contract review assigned',           desc:'Carlos M. assigned you the Q3 contract review for `agg_pipeline_metrics`. Due Aug 9.',         time:'Yesterday', day:'yesterday', unread:true  },
+  { id:'hx6', source:'system',      eventType:'update',     severity:'info',     title:'Helix engine updated to v1.4.0',          desc:'New: cross-domain lineage graph, improved Gold tier confidence scoring, RBAC audit trail.',     time:'3d ago',    day:'earlier',   unread:false },
 ];
 </script>
 <script src="shared/notif-panel.js"></script>

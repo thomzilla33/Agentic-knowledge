@@ -10,8 +10,9 @@
 html{-webkit-font-smoothing:antialiased}
 :root{
   /* ── Surfaces ── */
-  --bg:#0a0d1a; --bg2:#0f172e; --sb:#000;
-  --bg-card:#0b1220; --bg-modal:#0c1428;
+  --bg:#0A0E1A; --bg2:#0D1120; --sb:#000;
+  --shell-app-bg:linear-gradient(144deg,#020618 0%,#0F172B 50%,#020618 100%);
+  --bg-card:#0D1120; --bg-modal:#131C2E;
   --cb:rgba(255,255,255,0.04); --cbh:rgba(255,255,255,0.07);
   --bd:rgba(255,255,255,0.08); --bds:rgba(255,255,255,0.16);
 
@@ -42,13 +43,13 @@ html{-webkit-font-smoothing:antialiased}
 
   /* ── Text tiers ── */
   --t1:rgba(255,255,255,0.90); --t2:rgba(255,255,255,0.60);
-  --t3:rgba(255,255,255,0.38); --t4:rgba(255,255,255,0.22);
+  --t3:rgba(255,255,255,0.55); --t4:rgba(255,255,255,0.38);
 
   /* ── Gradient + radii ── */
   --grad:linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-blue) 100%);
   --r4:4px;--r6:6px;--r8:8px;--r10:10px;--r12:12px;--r20:20px;
 }
-body{background:var(--bg);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
+body{background:var(--shell-app-bg);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
 button,input,select,textarea{font-family:'Inter',sans-serif}
 a{text-decoration:none;color:inherit}
 
@@ -60,7 +61,7 @@ a{text-decoration:none;color:inherit}
 .sidebar{
   width:52px;flex-shrink:0;
   margin-left:8px; /* 8px gap from left viewport edge */
-  background:#0d1323;
+  background:#131C2E;
   display:flex;flex-direction:column;
   border-radius:14px;
   border:1px solid rgba(255,255,255,0.08);
@@ -1592,7 +1593,7 @@ body.bldr-insp-resizing iframe{pointer-events:none}
 .insp-tog-lbl{font-size:13px;color:var(--t1)}
 .insp-sel-wrap{position:relative;margin-bottom:10px}
 .insp-sel{width:100%;height:32px;background:var(--cb);border:1px solid var(--bds);border-radius:var(--r6);padding:0 10px;color:var(--t1);font-size:12px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none}
-.insp-sel option{background:#0f172e}
+.insp-sel option{background:var(--bg2)}
 .insp-ta{width:100%;min-height:76px;background:var(--cb);border:1px solid var(--bd);border-radius:var(--r6);padding:9px;color:var(--t1);font-size:12px;outline:none;resize:none;font-family:inherit;transition:border-color .15s;line-height:1.5}
 .insp-ta:focus{border-color:var(--bds)}
 .insp-ta::placeholder{color:var(--t3);font-style:italic}
@@ -4465,6 +4466,7 @@ button.avatar-sm:hover{filter:brightness(1.08)}
   font-family:inherit;
 }
 </style>
+<link rel="stylesheet" href="shared/notif-panel.css">
 </head>
 <body>
 <div class="app">
@@ -4585,10 +4587,11 @@ button.avatar-sm:hover{filter:brightness(1.08)}
         <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
         <span id="demoStartLabel">Start demo</span>
       </button>
-      <button class="icon-btn tb-anchor" id="notifBtn" title="Notifications" onclick="toggleNotifs(event)" aria-haspopup="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        <span class="tb-dot" id="notifDot"></span>
-      </button>
+      <span class="notif-bell-wrap">
+        <button class="icon-btn" id="notifBellLauncher" type="button" aria-label="Notifications" aria-haspopup="dialog" aria-expanded="false" onclick="_toggleNotifications(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2a4 4 0 014 4c0 3 1 4 1 4H3s1-1 1-4a4 4 0 014-4zM6.5 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+        <span class="notif-bell-dot" id="notif-bell-dot" aria-label="Unread notifications">3</span>
+        <div class="notif-menu" id="notif-menu" role="dialog" aria-label="Notifications" aria-hidden="true"></div>
+      </span>
       <button class="icon-btn tb-anchor" id="activityBtn" title="Activity" onclick="toggleActivity(event)" aria-haspopup="true">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 6v2l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
       </button>
@@ -17746,5 +17749,17 @@ window.addEventListener('resize', () => {
   if (dot && _tbState.notifsUnread) dot.classList.add('on');
 })();
 </script>
+
+<script>
+window.NOTIF_DATA = [
+  { id:'ad1', source:'agent',    eventType:'failure',    severity:'critical', title:'Lead Qualifier halted — unhandled exception', desc:'RuntimeError on node "Enrich from Clearbit". 23 records pending. Check logs for traceback.',  time:'4m ago',    day:'today',     unread:true  },
+  { id:'ad2', source:'workflow', eventType:'approval',   severity:'warning',  title:'Human approval required',                     desc:'Contract Renewal workflow paused at "CFO Sign-off" step. Waiting on Lisa D. — 45 min.',       time:'49m ago',   day:'today',     unread:true  },
+  { id:'ad3', source:'agent',    eventType:'completion', severity:'success',  title:'Onboarding Sequence finished',                 desc:'All 8 nodes completed for Northwind Corp. 0 manual interventions. 3 tasks created in CRM.',   time:'2h ago',    day:'today',     unread:false },
+  { id:'ad4', source:'workflow', eventType:'escalation', severity:'warning',  title:'SLA breach imminent — Invoice Processor',      desc:'Current run at 4.8h against 5h SLA. Auto-escalation to on-call will trigger in 12 min.',      time:'3h ago',    day:'today',     unread:true  },
+  { id:'ad5', source:'agent',    eventType:'completion', severity:'success',  title:'Email Triage processed 142 emails',            desc:'132 resolved automatically. 10 escalated to human queue. Avg confidence: 91%.',               time:'Yesterday', day:'yesterday', unread:false },
+  { id:'ad6', source:'system',   eventType:'update',     severity:'info',     title:'Agentic Studio updated to v2.14.0',            desc:'New: parallel node execution, retry budget per workflow, improved Human-in-the-Loop UI.',      time:'3d ago',    day:'earlier',   unread:false },
+];
+</script>
+<script src="shared/notif-panel.js"></script>
 </body>
 </html>
