@@ -20,9 +20,722 @@ index faf5f4f..783d4f5 100644
    { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
    { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
+diff --git a/src/components/experimental/entity-header.tsx b/src/components/experimental/entity-header.tsx
+new file mode 100644
+index 0000000..2bb865c
+--- /dev/null
++++ b/src/components/experimental/entity-header.tsx
+@@ -0,0 +1,524 @@
++// DS-GAP: EntityHeader — identity card for a Unified Entity Profile. Built from
++// Figma node 19815-101547 ("Entity Header - WIP"). Closest DS component:
++// RecordHeader (src/components/ui/record-header.tsx), which this supersedes on
++// UEP surfaces — see "Why not RecordHeader" below. Not promoted: the Figma
++// frame is still marked WIP, so this stays in experimental/ until Michael
++// signs it off and it gets a non-WIP node.
++
++/**
++ * Entity Header — AIMS OS
++ *
++ * Identity card for a Unified Entity Profile. It identifies the entity you are
++ * looking at and surfaces what needs attention. It carries no detail — detail
++ * lives in the tabs below. It answers four questions, in this order:
++ *
++ *   1 · What is this?             → visual + title
++ *   2 · Where does it sit?        → source
++ *   3 · What is its status?       → state badge
++ *   4 · What needs attention?     → tags
++ *
++ * It does not answer *why*. That is the Overview's job.
++ *
++ * ── Why not RecordHeader ──────────────────────────────────────────────────
++ * RecordHeader branches on three record shapes (employee / customer / client)
++ * and carries the Next Best Action inside itself as a Signal bar. The Figma
++ * spec for this component does neither:
++ *   - Nothing in the structure is specific to a record shape. The same skeleton
++ *     has to hold a contact, a repair order and a store, so the only branch is
++ *     avatar-vs-highlight-icon, decided by whether the entity has a real-world
++ *     visual identity.
++ *   - The Next Best Action is a separate Card below the header, not a slot
++ *     inside it ("Under the header, never inside it… The header identifies the
++ *     entity; the card proposes"). See next-best-action-card.tsx.
++ * Both are load-bearing, so this is a different component rather than a
++ * variant of that one.
++ *
++ * ── It has no container of its own ────────────────────────────────────────
++ * Per the spec, the header is never placed directly on a page and never grows
++ * its own background — "a header with its own background inside a card
++ * produces a box within a box". The caller wraps it:
++ *
++ *     <CardContainer size="lg"><EntityHeader … /></CardContainer>
++ *
++ * It is FILL width inside that slot and never sets its own width. The
++ * breakpoint it responds to is the card's, not the viewport's — which is why
++ * `size` is a prop here rather than a media query.
++ *
++ * ── Composition ───────────────────────────────────────────────────────────
++ * AvatarCircle (sizeKey="lg" — its own doc names entity headers as the use
++ * case) · HighlightIcon · Tag · Button (variant="main" for Ask, which is the
++ * DS's Main Action Gradient) · Menu/MenuItem · Tooltip · Skeleton. No new
++ * colour semantics — every value is an existing token.
++ */
++
++import { useState } from "react"
++import { Info, MoreVertical, Sparkle } from "lucide-react"
++import { cn } from "@/lib/utils"
++import { AvatarCircle }  from "@/components/ui/avatar"
++import { HighlightIcon } from "@/components/ui/highlight-icon"
++import type { HighlightIconVariant } from "@/components/ui/highlight-icon"
++import { Tag }           from "@/components/ui/tag"
++import type { TagVariant } from "@/components/ui/tag"
++import { Button }        from "@/components/ui/button"
++import { Tooltip }       from "@/components/ui/tooltip"
++import { Skeleton }      from "@/components/ui/skeleton"
++import { Menu, MenuItem } from "@/components/ui/menu-item"
++
++// ── Types ─────────────────────────────────────────────────────────────────────
++
++export type EntityHeaderVariant = "default" | "loading" | "restricted"
++export type EntityHeaderSize    = "default" | "responsive"
++
++/**
++ * One question decides this: does the entity have a real-world visual identity
++ * — a face or a brand? Natural persons and branded entities (companies, sites,
++ * tenants, suppliers) get an avatar. Everything else — objects, assets,
++ * processes, transactions, documents — gets a highlight icon. Exactly one
++ * renders; never both, never neither.
++ *
++ * The rule is about the entity, not about whether the asset exists: a company
++ * with no logo still uses an avatar, falling back to initials. And initials are
++ * never derived from a code — RO-48291 has no initials, so it is an icon by
++ * definition.
++ */
++export type EntityVisual =
++  | { kind: "avatar"; src?: string; initials?: string }
++  | { kind: "icon"; iconName: string; iconVariant?: HighlightIconVariant }
++
++/**
++ * Three kinds of tag, one component. The vocabulary belongs to the tenant; the
++ * colour belongs to the platform.
++ *
++ * `signal` — something that needs attention, bounded in time or condition.
++ * `classification` — what kind of thing this is, and only when the visual is an
++ * avatar (a highlight icon already says the type).
++ *
++ * Left tags carry two colours only: `error` when something is broken or
++ * overdue, `alert` when it needs review, `neutral` for everything else. The
++ * test is not signal-vs-classification, it is whether someone has to do
++ * something about it. Classification is never coloured — that is what keeps the
++ * vocabulary scalable when a tenant defines a hundred of them.
++ */
++export interface EntityTag {
++  label:    string
++  role:     "signal" | "classification"
++  tone?:    "error" | "alert" | "neutral"
++  /** Sorts signals among themselves — higher is more severe. Ignored for classification. */
++  severity?: number
++  tooltip?: string
++}
++
++/**
++ * Icon says what kind of information this is, text says the value, tooltip
++ * names the field and adds context. The tooltip is not optional: it opens on
++ * hover AND on focus, always, even when the text is not truncated.
++ */
++export interface EntityMetaItem {
++  iconName: string
++  /** The value. Short form ≤ 8 chars, long form ≤ 24. */
++  label:    string
++  /** Field label + context, e.g. "Assigned agent · Manager Agent. Handling this account since Mar 3." */
++  tooltip:  string
++}
++
++export interface EntityMenuAction {
++  label:        string
++  destructive?: boolean
++  onClick?:     () => void
++}
++
++export interface EntityHeaderProps {
++  visual: EntityVisual
++  /** The entity's name or ID, exactly as the source system stores it. Never rewritten or reformatted. */
++  title: string
++  /**
++   * The system the record was pulled from — Workday, Salesforce, NetSuite, DMS,
++   * Helix Data Studio. One item, never two: a job title, a location, a region,
++   * a category or a parent company is not a source. When the entity was created
++   * in the platform itself the slot is removed, never filled with something else.
++   */
++  source?: { label: string; iconName?: string }
++  /** Exactly one. If several statuses are concurrent, the most blocking wins and the rest become signals. */
++  state?: { label: string; variant: TagVariant }
++  /** Max 6 plus overflow. Signals first (by severity), then classification. */
++  tags?: EntityTag[]
++  /**
++   * How many tags stay on the row before the rest collapse into +N. Tags are the
++   * flexible element: show fewer tags and a larger +N rather than truncating the
++   * title further — the identifier is what the user came to read.
++   */
++  maxVisibleTags?: number
++  /**
++   * Off by default. Most headers do not carry one. Turn it on only when the
++   * title is an opaque code — RO-48291 alone means nothing. One line, plain
++   * language, no status words: it says what the entity IS, never what is
++   * happening to it. The durability test: if the sentence could change next
++   * week, it is an activity note and belongs in the Overview.
++   */
++  description?: string
++  /** Max 6 — six is the maximum, not the goal. Aim for four. Beyond six it belongs in the Overview, not behind a +N chip. */
++  meta?: EntityMetaItem[]
++  /** Ask — opens a context-aware Personal Assistant in a side panel. It talks, it does not execute. */
++  onAsk?: () => void
++  askLabel?: string
++  /** Information — opens a side panel with the provenance of the fields in this header. One side panel at a time. */
++  onInformation?: () => void
++  /** Optional, off by default. Icon-only in Figma; a short label reads better in code, so the label is required when used. */
++  secondaryAction?: { label: string; onClick?: () => void }
++  /** Destructive and secondary actions only. Never a visible button. */
++  menuActions?: EntityMenuAction[]
++  variant?: EntityHeaderVariant
++  size?: EntityHeaderSize
++  /** Shown in place of the governed values when variant="restricted". Calm and explanatory — this is a state, not a failure. */
++  restrictedNote?: string
++  className?: string
++}
++
++// ── Helpers ───────────────────────────────────────────────────────────────────
++
++const TONE_TAG: Record<NonNullable<EntityTag["tone"]>, TagVariant> = {
++  error:   "error",
++  alert:   "alert",
++  neutral: "neutral",
++}
++
++/** Signals first, sorted by severity; classification after. The state badge keeps its own slot. */
++function orderTags(tags: EntityTag[]): EntityTag[] {
++  const signals = tags.filter(t => t.role === "signal").sort((a, b) => (b.severity ?? 0) - (a.severity ?? 0))
++  const classes = tags.filter(t => t.role === "classification")
++  return [...signals, ...classes]
++}
++
++/** Classification is never coloured, whatever tone the caller passed. */
++function tagVariant(tag: EntityTag): TagVariant {
++  if (tag.role === "classification") return "neutral"
++  return TONE_TAG[tag.tone ?? "neutral"]
++}
++
++const DOT = (
++  <span aria-hidden style={{ color: "var(--border-neutral-lighter, var(--field-border))", fontSize: 10, lineHeight: 1 }}>
++    ●
++  </span>
++)
++
++function Visual({ visual, title }: { visual: EntityVisual; title: string }) {
++  // The avatar exposes the entity's name as its accessible name, whether it
++  // renders a photo, a logo or initials. The highlight icon names the entity
++  // type — it is not decorative.
++  if (visual.kind === "avatar") {
++    return (
++      <span style={{ flexShrink: 0, display: "inline-flex" }} role="img" aria-label={title}>
++        <AvatarCircle
++          name={title}
++          sizeKey="lg"
++          avatarStyle={visual.src ? "photo" : "text"}
++          src={visual.src}
++          initials={visual.initials}
++        />
++      </span>
++    )
++  }
++  return (
++    <span style={{ flexShrink: 0, display: "inline-flex" }}>
++      <HighlightIcon size="lg" variant={visual.iconVariant ?? "informative"} iconName={visual.iconName} />
++    </span>
++  )
++}
++
++/** Title truncates last: flex 0 1 auto with min-width 0, ellipsis, full value in a tooltip. Never wraps. */
++function Title({ title, muted }: { title: string; muted?: boolean }) {
++  return (
++    <Tooltip content={title} side="cursor" triggerClassName="block min-w-0">
++      <h1
++        style={{
++          fontSize: 20, fontWeight: 600, lineHeight: 1.2, margin: 0,
++          color: muted ? "var(--field-supporting)" : "var(--color-text-title)",
++          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
++        }}
++      >
++        {title}
++      </h1>
++    </Tooltip>
++  )
++}
++
++function Source({ source }: { source: NonNullable<EntityHeaderProps["source"]> }) {
++  return (
++    <Tooltip content={`Source · ${source.label}`} side="cursor">
++      <span
++        style={{
++          display: "inline-flex", alignItems: "center", gap: 4, flexShrink: 0,
++          maxWidth: 160, fontSize: 12, fontWeight: 500, color: "var(--field-supporting)",
++          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
++        }}
++      >
++        {source.iconName && <HighlightIcon size="sm" variant="neutral" iconName={source.iconName} />}
++        {source.label}
++      </span>
++    </Tooltip>
++  )
++}
++
++/** Tags hug and collapse into +N one at a time — never a fixed width, so growth
++ *  in the title or source makes them collapse rather than overlap. The overflow
++ *  chip exposes the hidden tags to keyboard and screen reader, not only hover. */
++function TagGroup({ tags, maxVisible }: { tags: EntityTag[]; maxVisible: number }) {
++  const ordered = orderTags(tags).slice(0, 6)
++  const visible = ordered.slice(0, maxVisible)
++  const hidden  = ordered.slice(maxVisible)
++  return (
++    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, flexShrink: 1, minWidth: 0, flexWrap: "nowrap" }}>
++      {visible.map(tag => (
++        <Tooltip key={tag.label} content={tag.tooltip ?? tag.label} side="cursor">
++          <Tag variant={tagVariant(tag)} size="sm">{tag.label}</Tag>
++        </Tooltip>
++      ))}
++      {hidden.length > 0 && (
++        <Tooltip content={hidden.map(t => t.label).join(" · ")} side="cursor">
++          <span tabIndex={0} style={{ display: "inline-flex", borderRadius: 999, outlineOffset: 2 }}>
++            <Tag variant="neutral" size="sm">{`+${hidden.length}`}</Tag>
++          </span>
++        </Tooltip>
++      )}
++    </span>
++  )
++}
++
++/** Icon + text, always — the header has the width, and a bare icon forces the
++ *  user to interpret a symbol. Hidden entirely before it is stripped of text. */
++function MetaRow({ meta }: { meta: EntityMetaItem[] }) {
++  return (
++    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minWidth: 0 }}>
++      {meta.slice(0, 6).map((item, i) => (
++        <span key={item.label + i} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
++          {i > 0 && DOT}
++          <Tooltip content={item.tooltip} side="cursor">
++            <span
++              style={{
++                display: "inline-flex", alignItems: "center", gap: 4,
++                fontSize: 12, fontWeight: 500, color: "var(--field-supporting)",
++                maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
++              }}
++            >
++              <HighlightIcon size="sm" variant="neutral" iconName={item.iconName} />
++              {item.label}
++            </span>
++          </Tooltip>
++        </span>
++      ))}
++    </div>
++  )
++}
++
++/**
++ * The three actions sit in one row and look like one group, but they are three
++ * different kinds of thing — reading them as a row of buttons is the most
++ * common misreading of this component.
++ *
++ *   Ask         — the gradient button. Opens a context-aware Personal
++ *                 Assistant. It never resolves a task and never commits the
++ *                 user to anything, which is why it must not share the visual
++ *                 mark a Next Best Action uses: that one asks to be accepted.
++ *   Information — icon button. Explains where the fields on screen came from.
++ *   Menu        — destructive and secondary actions only, never a visible button.
++ *
++ * Actions are always visible. There is no hover reveal.
++ */
++function InformationButton({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) {
++  return (
++    <Tooltip content="Where these fields came from" side="cursor">
++      <Button
++        variant="tertiary" size="sm" disabled={disabled}
++        icon={<Info size={16} />} iconPosition="alone"
++        aria-label="Field information"
++        onClick={onClick}
++      />
++    </Tooltip>
++  )
++}
++
++function Actions({
++  onAsk, askLabel, secondaryAction, menuActions, disabled,
++}: Pick<EntityHeaderProps, "onAsk" | "askLabel" | "secondaryAction" | "menuActions"> & { disabled?: boolean }) {
++  const [menuOpen, setMenuOpen] = useState(false)
++  return (
++    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, position: "relative" }}>
++      {secondaryAction && (
++        <Button variant="secondary" size="sm" disabled={disabled} onClick={secondaryAction.onClick}>
++          {secondaryAction.label}
++        </Button>
++      )}
++      {onAsk && (
++        <Tooltip content="Ask about this entity" side="cursor">
++          <Button
++            variant="main" size="sm" disabled={disabled}
++            icon={<Sparkle size={13} />}
++            onClick={onAsk}
++          >
++            {askLabel ?? "Ask"}
++          </Button>
++        </Tooltip>
++      )}
++      {menuActions && menuActions.length > 0 && (
++        <>
++          <Button
++            variant="tertiary" size="sm" disabled={disabled}
++            icon={<MoreVertical size={16} />} iconPosition="alone"
++            aria-label="More actions"
++            aria-expanded={menuOpen}
++            onClick={() => setMenuOpen(v => !v)}
++          />
++          {menuOpen && (
++            <>
++              <div className="fixed inset-0 z-[10000]" onClick={() => setMenuOpen(false)} />
++              <div style={{ position: "absolute", top: "calc(100% + 4px)", right: 0, zIndex: 10001 }}>
++                <Menu>
++                  {menuActions.map(action => (
++                    <MenuItem
++                      key={action.label}
++                      size="sm"
++                      label={action.label}
++                      onClick={() => { setMenuOpen(false); action.onClick?.() }}
++                    />
++                  ))}
++                </Menu>
++              </div>
++            </>
++          )}
++        </>
++      )}
++    </div>
++  )
++}
++
++/** Skeleton matching the arrangement of its size. Never an empty state — saying
++ *  "nothing here" while data is in flight states something untrue. */
++function LoadingHeader({ size }: { size: EntityHeaderSize }) {
++  const stacked = size === "responsive"
++  return (
++    <div style={{ display: "flex", flexDirection: "column", gap: 12 }} aria-busy="true">
++      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
++        <Skeleton shape="circle" width={32} height={32} />
++        <Skeleton shape="text" width={stacked ? 160 : 200} height={18} />
++        <Skeleton shape="text" width={110} height={14} />
++        <span style={{ flex: 1 }} />
++        <Skeleton shape="text" width={80} height={24} />
++        <Skeleton shape="text" width={120} height={24} />
++      </div>
++      {stacked && <Skeleton shape="text" width="60%" height={14} />}
++      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
++        {[72, 88, 64, 96, 56].map((w, i) => <Skeleton key={i} shape="text" width={w} height={14} />)}
++      </div>
++    </div>
++  )
++}
++
++// ── Component ─────────────────────────────────────────────────────────────────
++
++export function EntityHeader({
++  visual,
++  title,
++  source,
++  state,
++  tags,
++  maxVisibleTags = 2,
++  description,
++  meta,
++  onAsk,
++  askLabel,
++  onInformation,
++  secondaryAction,
++  menuActions,
++  variant = "default",
++  size = "default",
++  restrictedNote = "You don't have access to these values. The fields exist and are governed.",
++  className,
++}: EntityHeaderProps) {
++  if (variant === "loading") {
++    return (
++      <header className={cn("w-full", className)}>
++        <LoadingHeader size={size} />
++      </header>
++    )
++  }
++
++  const restricted = variant === "restricted"
++  const stacked    = size === "responsive"
++  // Restricted removes the tag group rather than leaving it empty.
++  const shownTags  = restricted ? [] : (tags ?? [])
++  const shownMeta  = restricted ? [] : (meta ?? [])
++
++  const identityLeft = (
++    <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: "1 1 auto" }}>
++      <Visual visual={visual} title={title} />
++      {/* flex 0 1 auto + min-width 0: the title takes what remains after visual,
++          source, collapsed tags and actions, and truncates only there. */}
++      <div style={{ flex: "0 1 auto", minWidth: 0, marginLeft: 4 }}>
++        <Title title={title} muted={restricted} />
++      </div>
++      {source && !stacked && (
++        <>
++          {DOT}
++          <Source source={source} />
++        </>
++      )}
++      {shownTags.length > 0 && !stacked && <TagGroup tags={shownTags} maxVisible={maxVisibleTags} />}
++    </div>
++  )
++
++  const identityRight = (
++    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
++      {onInformation && <InformationButton onClick={onInformation} disabled={restricted} />}
++      {state && <Tag variant={state.variant} size="sm">{state.label}</Tag>}
++      <Actions
++        onAsk={onAsk}
++        askLabel={askLabel}
++        secondaryAction={secondaryAction}
++        menuActions={menuActions}
++        disabled={restricted}
++      />
++    </div>
++  )
++
++  return (
++    <header className={cn("w-full", className)} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++      {/* Row 1 — identity. The right side is fixed and never compressed. */}
++      <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
++        {identityLeft}
++        {identityRight}
++      </div>
++
++      {/* Responsive reflow: stack before you shrink. Source and tags get their
++          own rows rather than competing with the title. */}
++      {stacked && (source || shownTags.length > 0) && (
++        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minWidth: 0 }}>
++          {source && <Source source={source} />}
++          {shownTags.length > 0 && <TagGroup tags={shownTags} maxVisible={maxVisibleTags + 2} />}
++        </div>
++      )}
++
++      {description && !restricted && (
++        <Tooltip content={description} side="cursor" triggerClassName="block min-w-0 w-full">
++          <p
++            style={{
++              margin: 0, fontSize: 13, lineHeight: 1.5, color: "var(--field-supporting)",
++              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
++            }}
++          >
++            {description}
++          </p>
++        </Tooltip>
++      )}
++
++      {restricted && (
++        <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "var(--field-supporting)" }}>
++          {restrictedNote}
++        </p>
++      )}
++
++      {shownMeta.length > 0 && <MetaRow meta={shownMeta} />}
++    </header>
++  )
++}
++
++export default EntityHeader
+diff --git a/src/components/experimental/next-best-action-card.tsx b/src/components/experimental/next-best-action-card.tsx
+new file mode 100644
+index 0000000..b9b89b8
+--- /dev/null
++++ b/src/components/experimental/next-best-action-card.tsx
+@@ -0,0 +1,177 @@
++// DS-GAP: NextBestActionCard — the Next Best Action proposal that sits under
++// the Entity Header. Built from Figma node 19815-101547 ("Entity Header - WIP"
++// → Next Best Action Card). Closest DS component: CardContainer variant="purple"
++// size="lg", which this composes rather than replaces. Not promoted: same WIP
++// frame as entity-header.tsx.
++
++/**
++ * Next Best Action Card — AIMS OS
++ *
++ * The engine proposes; the human governs. This card is where a Next Best Action
++ * reaches a Unified Entity Profile.
++ *
++ * ── Placement ─────────────────────────────────────────────────────────────
++ * Under the Entity Header, never inside it. Full width, directly below, in its
++ * own Card Component — two records, two containers. Sixteen products were
++ * reviewed when this was specified and none puts the recommendation inside the
++ * record header: the header identifies the entity, the card proposes.
++ *
++ * ── It never stacks ───────────────────────────────────────────────────────
++ * One at a time. The engine has already prioritised, unified and discarded, so
++ * showing five is not trusting the engine — and stacked cards push the real
++ * content below the fold. If more exist, `moreCount` renders a counter that
++ * leads to the list.
++ *
++ * ── No action, no card ────────────────────────────────────────────────────
++ * When there is nothing to do the container does not render. This is not an
++ * empty state: there is nothing to say when there is nothing to do. Callers
++ * pass `null` for `action` and get nothing back.
++ *
++ * ── Why it must not look like Ask ─────────────────────────────────────────
++ * The Ask button produces summaries and commits the user to nothing. This card
++ * asks for a decision. They must not share a glyph or a colour, or the user
++ * cannot tell which one commits them to something — so this uses the Tag purple
++ * family and its own Sparkle label, never the Main Action Gradient.
++ */
++
++import { X } from "lucide-react"
++import { cn } from "@/lib/utils"
++import { CardContainer } from "@/components/ui/card-container"
++import { Button }        from "@/components/ui/button"
++import { Tooltip }       from "@/components/ui/tooltip"
++import { Sparkle }       from "lucide-react"
++
++export interface NextBestAction {
++  /**
++   * The action, not the engine name — "Assign a renewal check-in call", never
++   * "Next Best Action". Min 20 chars: under that it stops being an instruction
++   * and becomes a label. Target 40, max 60.
++   */
++  title: string
++  /** When the engine produced it. Without a timestamp and a rationale it is an order, not a proposal. */
++  timestamp: string
++  /**
++   * A fact and its consequence — "Their certificate expires in 45 days" is the
++   * fact, "requesting it now avoids a compliance gap" is why it matters. With
++   * only the fact the user cannot decide. Min 60, target 90, max 150: the card
++   * is full width so a single line could hold ~180 characters, but comprehension
++   * drops past 90 and long lines get skipped.
++   *
++   * It renders on one line and truncates — the full text lives in the tooltip.
++   */
++  rationale?: string
++  /**
++   * "view-details" is the default and should be used unless there is a reason
++   * not to: the card cannot guarantee it showed everything, so the safe path is
++   * always the one that opens the record. "accept" is reserved for actions that
++   * are neither destructive nor complex; which ones qualify is not yet decided.
++   */
++  variant?: "view-details" | "accept"
++}
++
++export interface NextBestActionCardProps {
++  /** Pass null when the engine returned nothing — the card does not render. */
++  action: NextBestAction | null
++  /** Accepting assigns to the agent, it never executes, and it always routes to the detail. Never "Call now". */
++  onAccept?: () => void
++  onViewDetails?: () => void
++  /** Session-only. Nothing is stored and nothing is fed back to the engine. */
++  onDismiss?: () => void
++  /** When the engine has more queued. Renders a counter that leads to the list — the card still never stacks. */
++  moreCount?: number
++  onViewAll?: () => void
++  label?: string
++  className?: string
++}
++
++export function NextBestActionCard({
++  action,
++  onAccept,
++  onViewDetails,
++  onDismiss,
++  moreCount,
++  onViewAll,
++  label = "Next Best Action",
++  className,
++}: NextBestActionCardProps) {
++  if (!action) return null
++
++  const offersAccept = action.variant === "accept" && Boolean(onAccept)
++
++  return (
++    <CardContainer variant="purple" size="lg" className={cn("w-full relative", className)}>
++      <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
++        {/* AI context — names the engine, so the title never has to. */}
++        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
++          <Sparkle size={13} style={{ color: "var(--tag-purple-bd)", flexShrink: 0 }} />
++          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-bd)" }}>{label}</span>
++          {typeof moreCount === "number" && moreCount > 0 && (
++            <Button variant="tertiary" size="sm" className="!px-0 ml-[8px]" onClick={onViewAll}>
++              {`+${moreCount} more`}
++            </Button>
++          )}
++        </div>
++
++        {/* The action, and when it was produced. */}
++        <div style={{ display: "flex", alignItems: "baseline", gap: 6, minWidth: 0 }}>
++          <Tooltip content={action.title} side="cursor" triggerClassName="block min-w-0">
++            <span
++              style={{
++                fontSize: 14, fontWeight: 600, lineHeight: 1.4, color: "var(--tag-purple-fg)",
++                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block",
++              }}
++            >
++              {action.title}
++            </span>
++          </Tooltip>
++          <span style={{ fontSize: 12, color: "var(--tag-purple-fg)", opacity: 0.7, flexShrink: 0, whiteSpace: "nowrap" }}>
++            {`· ${action.timestamp}`}
++          </span>
++        </div>
++
++        {/* One line, always. The card shows what fits; the tooltip carries the rest. */}
++        {action.rationale && (
++          <Tooltip content={action.rationale} side="cursor" triggerClassName="block min-w-0 w-full">
++            <span
++              style={{
++                fontSize: 13, lineHeight: 1.5, color: "var(--tag-purple-fg)", opacity: 0.9,
++                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block",
++              }}
++            >
++              {action.rationale}
++            </span>
++          </Tooltip>
++        )}
++
++        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
++          {offersAccept && (
++            <Button variant="primary" size="sm" onClick={onAccept}>
++              Accept
++            </Button>
++          )}
++          <Button variant="tertiary" size="sm" className={offersAccept ? undefined : "!px-0"} onClick={onViewDetails}>
++            View details
++          </Button>
++        </div>
++      </div>
++
++      {onDismiss && (
++        <button
++          type="button"
++          aria-label="Dismiss this recommendation"
++          onClick={onDismiss}
++          style={{
++            position: "absolute", top: 20, right: 20,
++            display: "inline-flex", alignItems: "center", justifyContent: "center",
++            width: 20, height: 20, borderRadius: 4, border: "none",
++            background: "transparent", color: "var(--tag-purple-fg)", cursor: "pointer",
++          }}
++        >
++          <X size={14} />
++        </button>
++      )}
++    </CardContainer>
++  )
++}
++
++export default NextBestActionCard
 diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
 new file mode 100644
-index 0000000..67b7045
+index 0000000..82e4171
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-contacts.tsx
 @@ -0,0 +1,541 @@
@@ -70,7 +783,7 @@ index 0000000..67b7045
 +import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
 +import {
 +  CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
-+  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG,
++  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG, entityState,
 +  getActivity, getDrives, getFacts,
 +} from "./ucpShared"
 +import type { UcpContact, UcpEntityType, UcpStatus } from "./ucpShared"
@@ -210,7 +923,7 @@ index 0000000..67b7045
 +  { key: "subtitle", header: "Context",           render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.subtitle}</span> },
 +  { key: "owner",  header: "Owner",  width: "13%", render: r => <span style={{ fontSize: 12, color: "var(--foreground)" }}>{r.owner}</span> },
 +  { key: "lastInteraction", header: "Last interaction", width: "14%", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.lastInteraction}</span> },
-+  { key: "status", header: "Status", width: "10%", render: r => <Tag variant={STATUS_TAG[r.status]} size="sm">{r.status}</Tag> },
++  { key: "status", header: "Status", width: "10%", render: r => { const s = entityState(r); return <Tag variant={s.variant} size="sm">{s.label}</Tag> } },
 +]
 +
 +// ── Screen ────────────────────────────────────────────────────────────────────
@@ -319,7 +1032,7 @@ index 0000000..67b7045
 +      viewMore: false,
 +    },
 +    tags:  [{ label: TYPE_LABEL[c.type] }],
-+    state: { label: c.status, variant: STATUS_TAG[c.status] },
++    state: entityState(c),
 +    showMenu:    true,
 +    onMenuClick: () => {},
 +    actions: [{ label: "Preview", variant: "tertiary", icon: "Eye", onClick: () => setPreview(c) }],
@@ -569,17 +1282,28 @@ index 0000000..67b7045
 +}
 diff --git a/src/screens/pm-thomas-ucp-profile.tsx b/src/screens/pm-thomas-ucp-profile.tsx
 new file mode 100644
-index 0000000..9aa249a
+index 0000000..25aa776
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-profile.tsx
-@@ -0,0 +1,725 @@
+@@ -0,0 +1,803 @@
 +/**
 + * UCP — Unified Contact Profile (detail view).
 + *
 + * Read-only by design: the record is assembled by ingestion and agents, not
-+ * typed in here, so there is no create/edit CTA in the Header. The one
-+ * always-present entry point is the record's assigned concierge — RecordHeader's
-+ * agent button — which opens a chat scoped to this record.
++ * typed in here, so there is no create CTA. The one always-present entry point
++ * is Ask — the Entity Header's gradient button — which opens the record's
++ * assigned concierge in a side panel.
++ *
++ * The identity card is EntityHeader (Figma 19815-101547), not RecordHeader:
++ * nothing in that spec's structure is specific to a record shape, and it puts
++ * the Next Best Action in its own card BELOW the header rather than inside it.
++ *
++ * One deviation from CLAUDE.md's generic detail-page rule, and it is deliberate:
++ * the page Header does NOT repeat the entity name, status tag and breadcrumb.
++ * The Entity Header spec makes its own title the page subject ("the title
++ * carries the profile heading level"), and the Figma view for this surface
++ * shows only the parent list above the card. Printing the name and state twice,
++ * 40px apart, is the thing that spec is avoiding.
 + *
 + * Tabs: Overview · Snapshot · Activity · Drives
 + *   Overview  → WidgetCanvasView (DS rule: any tab named Overview is a canvas)
@@ -595,7 +1319,6 @@ index 0000000..9aa249a
 +import { useWidgetSize }     from "@/components/layouts/widget-canvas-view"
 +import type { SidebarItem }  from "@/components/ui/sidebar"
 +import { Header }            from "@/components/ui/header"
-+import { Breadcrumb }        from "@/components/ui/breadcrumb"
 +import { Tabs }              from "@/components/ui/tabs"
 +import { Tag }               from "@/components/ui/tag"
 +import { Chip }              from "@/components/ui/chip"
@@ -610,12 +1333,13 @@ index 0000000..9aa249a
 +import { HighlightIcon }     from "@/components/ui/highlight-icon"
 +import { Pagination }        from "@/components/ui/pagination"
 +import { SlideOut }          from "@/components/ui/slide-out"
-+import { RecordHeader, RECORD_HEADER_RECOMMENDED_ACTIONS } from "@/components/ui/record-header"
-+import { Sparkle, Send, ScanLine, Inbox, HardDrive } from "lucide-react"
++import { EntityHeader }        from "@/components/experimental/entity-header"
++import { NextBestActionCard }  from "@/components/experimental/next-best-action-card"
++import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch } from "lucide-react"
 +import {
 +  CONTACTS, PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
-+  RECORD_VARIANT, STATUS_TAG,
-+  buildRecord, getActivity, getConciergeOpening, getConnections, getDrives,
++  TYPE_LABEL, entityState,
++  getActivity, getConciergeOpening, getConnections, getDrives,
 +  getFacts, getGovernance, getRisk,
 +} from "./ucpShared"
 +import type {
@@ -1086,10 +1810,18 @@ index 0000000..9aa249a
 +  const [actPage,    setActPage]    = useState(1)
 +  const [actSize,    setActSize]    = useState(ACTIVITY_PAGE_SIZE)
 +  const [chatOpen,   setChatOpen]   = useState(false)
++  const [infoOpen,   setInfoOpen]   = useState(false)
 +  const [drivePeek,  setDrivePeek]  = useState<UcpDrive | null>(null)
++  // Session-only, per the card's own rule: nothing is stored and nothing is fed
++  // back to the engine. Resets when the record changes.
++  const [nbaDismissed, setNbaDismissed] = useState<string | null>(null)
 +
-+  const variant = RECORD_VARIANT[contact.type]
-+  const record  = useMemo(() => buildRecord(contact), [contact])
++  // Ask and Information both open on the side — opening one closes the other,
++  // and the panel requested last wins.
++  const openChat = () => { setInfoOpen(false); setDrivePeek(null); setChatOpen(true) }
++  const openInfo = () => { setChatOpen(false); setDrivePeek(null); setInfoOpen(true) }
++
++  const state = entityState(contact)
 +
 +  const activityCount = useMemo(() => {
 +    const all = getActivity(contact)
@@ -1101,7 +1833,7 @@ index 0000000..9aa249a
 +      {
 +        uid: "ai-summary", title: `${contact.agent.name} — read on this record`,
 +        colSpan: 3, widthClass: "full", rowSpan: 5,
-+        content: <AiSummaryContent contact={contact} onAsk={() => setChatOpen(true)} />,
++        content: <AiSummaryContent contact={contact} onAsk={openChat} />,
 +      },
 +    ]
 +    if (contact.governance !== "empty") {
@@ -1179,17 +1911,11 @@ index 0000000..9aa249a
 +      onSidebarItemClick={onSidebarItemClick}
 +      header={isScrolled => (
 +        <Header
-+          size={isScrolled ? "compress" : "size-l"}
-+          title={contact.name}
-+          description={contact.subtitle}
-+          tag={<Tag variant={STATUS_TAG[contact.status]} size="sm">{contact.status}</Tag>}
-+          breadcrumb={
-+            <Breadcrumb
-+              depth={2}
-+              items={[{ label: "Contacts", href: "contacts" }, { label: contact.name }]}
-+              onNavigate={() => onBack?.()}
-+            />
-+          }
++          size={isScrolled ? "compress" : "size-m"}
++          title="Contacts"
++          backButton
++          showBackInCompress
++          onBack={() => onBack?.()}
 +        />
 +      )}
 +      pagination={
@@ -1207,17 +1933,36 @@ index 0000000..9aa249a
 +          : undefined
 +      }
 +    >
-+      <RecordHeader
-+        variant={variant}
-+        data={record}
-+        signal={contact.signal}
-+        assignedAgent={{
-+          id:         contact.agent.id,
-+          name:       contact.agent.name,
-+          onOpenChat: () => setChatOpen(true),
-+        }}
-+        actions={RECORD_HEADER_RECOMMENDED_ACTIONS[variant]}
-+      />
++      {/* The header has no container of its own — the card is the caller's. */}
++      <CardContainer size="lg" variant="default" className="w-full">
++        <EntityHeader
++          visual={{ kind: "avatar" }}
++          title={contact.name}
++          source={contact.source}
++          state={state}
++          tags={contact.tags}
++          meta={contact.meta}
++          onAsk={openChat}
++          onInformation={openInfo}
++          menuActions={[
++            { label: "Archive",       onClick: () => {} },
++            { label: "Duplicate",     onClick: () => {} },
++            { label: "Export record", onClick: () => {} },
++          ]}
++        />
++      </CardContainer>
++
++      {/* Under the header, never inside it. No action, no card. */}
++      {nbaDismissed !== contact.id && (
++        <div className="mt-[16px]">
++          <NextBestActionCard
++            action={contact.nba}
++            onAccept={() => {}}
++            onViewDetails={openChat}
++            onDismiss={() => setNbaDismissed(contact.id)}
++          />
++        </div>
++      )}
 +
 +      <Tabs
 +        className="mt-[24px] mb-[24px]"
@@ -1245,6 +1990,52 @@ index 0000000..9aa249a
 +      {tab === "drives" && <DrivesTab contact={contact} onPreview={setDrivePeek} />}
 +
 +      <ConciergeChat contact={contact} open={chatOpen} onClose={() => setChatOpen(false)} />
++
++      {/* Information — where the fields in the header came from. Not the
++          Overview and not the Knowledge tab: it explains what is on screen
++          right now, nothing more. */}
++      <SlideOut
++        open={infoOpen}
++        onClose={() => setInfoOpen(false)}
++        type="with-variants"
++        size="m"
++        title="Field sources"
++        subtitle={`Entity header · ${contact.name}`}
++        showIcon
++        iconContent={<FileSearch size={14} />}
++        showStatus={false}
++        showTopButton={false}
++        showTabs={false}
++        showSearchBar={false}
++        showChips={false}
++        showCta={false}
++      >
++        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
++          <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
++            Every value in the header above, and where it came from.
++          </span>
++          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++            {[
++              { field: "Title",  value: contact.name,      from: `${contact.source.label} · written exactly as the source system stores it` },
++              { field: "Source", value: contact.source.label, from: "Ingestion · the system this record was pulled from" },
++              { field: "State",  value: state.label,       from: "Lifecycle · the most blocking status on the record" },
++              { field: "Type",   value: TYPE_LABEL[contact.type], from: "Classification · assigned in Helix Data Studio" },
++              ...contact.tags.filter(t => t.role === "signal").map(t => ({
++                field: "Signal", value: t.label, from: t.tooltip ?? "Signal engine",
++              })),
++              ...contact.meta.map(m => ({ field: "Metadata", value: m.label, from: m.tooltip })),
++            ].map((row, i) => (
++              <div key={`${row.field}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
++                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
++                  {row.field}
++                </span>
++                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{row.value}</span>
++                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>{row.from}</span>
++              </div>
++            ))}
++          </div>
++        </div>
++      </SlideOut>
 +
 +      <SlideOut
 +        open={drivePeek !== null}
@@ -1300,10 +2091,10 @@ index 0000000..9aa249a
 +}
 diff --git a/src/screens/ucpShared.ts b/src/screens/ucpShared.ts
 new file mode 100644
-index 0000000..a3878b4
+index 0000000..30a34b0
 --- /dev/null
 +++ b/src/screens/ucpShared.ts
-@@ -0,0 +1,661 @@
+@@ -0,0 +1,825 @@
 +/**
 + * UCP — Unified Contact Profile: shared types + mock data.
 + *
@@ -1311,21 +2102,21 @@ index 0000000..a3878b4
 + * for the record shapes and the fixtures, so the list screen and the profile
 + * screen can't drift apart on what a contact is.
 + *
-+ * Two AIMS OS concepts are modelled here rather than invented:
++ * Three AIMS OS concepts are modelled here rather than invented:
 + *   - Knowledge planes (Truth 100% / Sandbox ~80% / Sources ~60%) — the same
 + *     three planes a TruthPack is built from. The Snapshot tab is this record's
 + *     facts organised by plane, so "how sure are we" is readable at a glance.
 + *   - Source Drives — drives, folders or documents attached from the company
 + *     catalog. This is what the profile's Drives tab lists (it replaces the
 + *     generic "Documents" tab a CRM would have).
++ *   - The Entity Header content model (Figma 19815-101547) — visual, title,
++ *     source, state badge, signal and classification tags, secondary metadata.
++ *     Every field below maps to a named slot in that spec; nothing is a
++ *     convenience field invented for this screen.
 + */
 +
-+import type {
-+  ClientRecord,
-+  CustomerRecord,
-+  EmployeeRecord,
-+  NextBestAction,
-+} from "@/components/ui/record-header"
++import type { EntityMetaItem, EntityTag } from "@/components/experimental/entity-header"
++import type { NextBestAction } from "@/components/experimental/next-best-action-card"
 +
 +// ── Entity ────────────────────────────────────────────────────────────────────
 +
@@ -1347,25 +2138,37 @@ index 0000000..a3878b4
 +  phone:           string
 +  company:         string
 +  owner:           string
++  /** Lifecycle, and what the list filters on. */
 +  status:          UcpStatus
++  /**
++   * The Entity Header's state badge — exactly one, and the most blocking status
++   * wins. Defaults to `status`; set it only when something more blocking is
++   * true of the record, in which case the lifecycle value moves to a tag.
++   */
++  stateBadge?:     { label: string; variant: TagVariantLite }
++  /**
++   * The system this record was pulled from. One item, never two — a job title,
++   * a location or a category is not a source. Omitted when the entity was
++   * created in the platform itself; the slot is removed, never refilled.
++   */
++  source:          { label: string; iconName: string }
++  /** Signals first (by severity), then classification. Max 6 including overflow. */
++  tags:            EntityTag[]
++  /** Max 6, aim for four. Every item carries a tooltip naming its field. */
++  meta:            EntityMetaItem[]
 +  lastInteraction: string
 +  /** AIMS OS is agent-first — every record has one assigned concierge. */
 +  agent:           { id: string; name: string }
-+  /** Drives the RecordHeader Signal. Not every record has something urgent. */
-+  signal:          NextBestAction
++  /**
++   * The engine's proposal, rendered as its own card BELOW the header — never
++   * inside it. null when there is nothing to do: no action, no card.
++   */
++  nba:             NextBestAction | null
 +  /** The agent's read on this record, shown as the Overview AI widget. */
 +  aiSummary:       { headline: string; detail: string; confidence: number }
 +  governance:      StudyState
 +  risk:            StudyState
 +  connections:     StudyState
-+}
-+
-+/** person → client · employee → employee · company → customer.
-+ *  Picked by which fields the record actually has, per the RecordHeader rule. */
-+export const RECORD_VARIANT: Record<UcpEntityType, "client" | "employee" | "customer"> = {
-+  person:   "client",
-+  employee: "employee",
-+  company:  "customer",
 +}
 +
 +export const TYPE_LABEL: Record<UcpEntityType, string> = {
@@ -1392,6 +2195,15 @@ index 0000000..a3878b4
 +  Archived: "error",
 +}
 +
++/**
++ * All three types here are entities with a real-world visual identity — a face
++ * or a brand — so all three use an avatar. That is also why each carries a
++ * classification tag: an avatar cannot communicate what kind of thing this is,
++ * where a highlight icon would.
++ */
++export function entityState(c: UcpContact): { label: string; variant: TagVariantLite } {
++  return c.stateBadge ?? { label: c.status, variant: STATUS_TAG[c.status] }
++}
 +// ── Knowledge planes ──────────────────────────────────────────────────────────
 +
 +export type KnowledgePlane = "truth" | "sandbox" | "sources"
@@ -1465,15 +2277,30 @@ index 0000000..a3878b4
 +}
 +
 +// ── Contacts ──────────────────────────────────────────────────────────────────
-+
 +export const CONTACTS: UcpContact[] = [
 +  {
 +    id: "ORG-0023", type: "company", name: "Meridian Corp",
 +    subtitle: "Financial Services · 2,400 employees · New York",
 +    email: "accounts@meridian.com", phone: "+1 (212) 555-0142", company: "Meridian Corp",
 +    owner: "Priya Nair", status: "Active", lastInteraction: "Aug 22, 2026",
++    source: { label: "Salesforce", iconName: "Cloud" },
++    tags: [
++      { label: "Renewal at risk", role: "signal", tone: "alert", severity: 3, tooltip: "Health dropped to 61 · renews Sep 5" },
++      { label: "Customer",        role: "classification" },
++      { label: "Enterprise",      role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "11 facts",     tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
++      { iconName: "Inbox",       label: "3 open",       tooltip: "Open items · 3 support escalations, oldest opened Jul 14." },
++      { iconName: "HardDrive",   label: "6 drives",     tooltip: "Source Drives · 6 attached, 1 failing to sync since Aug 26." },
++      { iconName: "Bot",         label: "Tier 1",       tooltip: "Assigned agent · Meridian Concierge, tier 1. Handling this account since Mar 3." },
++    ],
 +    agent: { id: "AGT-01", name: "Meridian Concierge" },
-+    signal: { severity: "alert", label: "Renewal in 12 days — account health dropped to 61", dueContext: "Renews Sep 5", actionLabel: "Schedule renewal call" },
++    nba: {
++      title: "Run the renewal outreach workflow",
++      timestamp: "2h ago",
++      rationale: "Usage grew 18% but three escalations are open and no proposal has been sent. The master agreement renews in 12 days.",
++    },
 +    aiSummary: {
 +      headline: "Renewal at risk — usage is up, sentiment is down.",
 +      detail: "Seat usage grew 18% this quarter but three support escalations opened since July, all routing through the same integration. Sandra Torres has asked twice about the migration timeline without a written answer. The renewal call is the place to close that gap.",
@@ -1486,8 +2313,20 @@ index 0000000..a3878b4
 +    subtitle: "Head of Compliance · Legal · Meridian Corp",
 +    email: "sarah.chen@meridian.com", phone: "+1 (212) 555-0188", company: "Meridian Corp",
 +    owner: "Priya Nair", status: "Active", lastInteraction: "Aug 28, 2026",
++    source: { label: "Salesforce", iconName: "Cloud" },
++    tags: [
++      { label: "Awaiting review", role: "signal", tone: "neutral", severity: 1, tooltip: "Governance addendum sent Aug 28 · no response due yet" },
++      { label: "Person",          role: "classification" },
++      { label: "Evaluator",       role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
++      { iconName: "Inbox",       label: "1 open",   tooltip: "Open items · governance addendum awaiting her review." },
++      { iconName: "Calendar",    label: "Since Jun", tooltip: "First interaction · June 9, 2026, via the account expansion." },
++      { iconName: "Bot",         label: "Tier 1",   tooltip: "Assigned agent · Deal Concierge, tier 1. Handling this contact since Jun 9." },
++    ],
 +    agent: { id: "AGT-02", name: "Deal Concierge" },
-+    signal: { severity: "informative", label: "Reviewing the governance addendum — no response due yet", dueContext: "Sent Aug 28" },
++    nba: null,
 +    aiSummary: {
 +      headline: "Technical evaluator, not the economic buyer.",
 +      detail: "Sarah has driven every compliance question on the Meridian expansion and cleared the data-residency review herself. She has never discussed price. Route commercial terms to Sandra Torres and keep Sarah on audit evidence.",
@@ -1500,8 +2339,24 @@ index 0000000..a3878b4
 +    subtitle: "Senior Operations Lead · Operations · Phoenix, AZ",
 +    email: "james.ortega@acme.com", phone: "+1 (602) 555-0100", company: "Acme Corp",
 +    owner: "Lisa Park", status: "Active", lastInteraction: "Sep 1, 2026",
++    source: { label: "Workday", iconName: "Building" },
++    tags: [
++      { label: "Review overdue", role: "signal", tone: "alert", severity: 3, tooltip: "Mid-year review with Lisa Park since Aug 20 · 12 days open" },
++      { label: "Employee",       role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "9 facts",   tooltip: "Verified facts · 5 on the Truth plane, 4 across Sandbox and Sources." },
++      { iconName: "Inbox",       label: "1 open",    tooltip: "Open items · mid-year performance review awaiting approval." },
++      { iconName: "KeyRound",    label: "Standard",  tooltip: "Access role · Standard, Operations scope. Unchanged since Aug 14." },
++      { iconName: "Calendar",    label: "4y 8m",     tooltip: "Tenure · started Jan 12, 2022." },
++      { iconName: "Bot",         label: "Tier 2",    tooltip: "Assigned agent · People Concierge, tier 2." },
++    ],
 +    agent: { id: "AGT-03", name: "People Concierge" },
-+    signal: { severity: "alert", label: "1 performance review pending your approval", dueContext: "Due in 3 days" },
++    nba: {
++      title: "Escalate the overdue performance review",
++      timestamp: "6h ago",
++      rationale: "The mid-year review has sat with Lisa Park for 12 days and blocks his promotion cycle, which closes at the end of the month.",
++    },
 +    aiSummary: {
 +      headline: "Consistent operator, overdue on one approval.",
 +      detail: "James has closed every quarterly governance check on time for six quarters. The one open item is his mid-year review, waiting on Lisa Park since Aug 20. Nothing else on this record needs attention.",
@@ -1514,8 +2369,24 @@ index 0000000..a3878b4
 +    subtitle: "Healthcare · 5,100 employees · Phoenix, AZ",
 +    email: "partnerships@northwindhealth.org", phone: "+1 (602) 555-0177", company: "Northwind Health",
 +    owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 30, 2026",
++    source: { label: "Salesforce", iconName: "Cloud" },
++    tags: [
++      { label: "Sync pending", role: "signal", tone: "alert", severity: 2, tooltip: "2 of 5 new clinic sites have not completed network sync" },
++      { label: "Customer",     role: "classification" },
++      { label: "Enterprise",   role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "11 facts",  tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
++      { iconName: "MapPin",      label: "5 sites",   tooltip: "Locations · 5 clinics added under the Aug 30 expansion." },
++      { iconName: "HardDrive",   label: "6 drives",  tooltip: "Source Drives · 6 attached, all syncing." },
++      { iconName: "Bot",         label: "Tier 1",    tooltip: "Assigned agent · Northwind Concierge, tier 1." },
++    ],
 +    agent: { id: "AGT-04", name: "Northwind Concierge" },
-+    signal: { severity: "success", label: "Expansion signed — 5 clinics added to the network", dueContext: "Confirmed Aug 30" },
++    nba: {
++      title: "Finish network sync for two clinic sites",
++      timestamp: "1d ago",
++      rationale: "Two of the five clinics added on Aug 30 are still unsynced, so their staff cannot reach the platform and the expansion is not fully live.",
++    },
 +    aiSummary: {
 +      headline: "Healthy account, expanding on its own initiative.",
 +      detail: "Northwind added five clinic sites without a discount request. Two of the five have not completed network sync, which is an onboarding task rather than a commercial risk.",
@@ -1528,8 +2399,25 @@ index 0000000..a3878b4
 +    subtitle: "VP of Operations · Meridian Corp",
 +    email: "sandra.torres@meridian.com", phone: "+1 (212) 555-0155", company: "Meridian Corp",
 +    owner: "Priya Nair", status: "Active", lastInteraction: "Sep 2, 2026",
++    source: { label: "Salesforce", iconName: "Cloud" },
++    tags: [
++      { label: "Awaiting us", role: "signal", tone: "error", severity: 4, tooltip: "Migration timeline asked twice · still unanswered since Aug 18" },
++      { label: "Person",      role: "classification" },
++      { label: "Buyer",       role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "10 facts",  tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
++      { iconName: "Inbox",       label: "1 open",    tooltip: "Open items · migration timeline request, unanswered for 15 days." },
++      { iconName: "Briefcase",   label: "$480K",     tooltip: "Deal value · Enterprise Renewal 2026, closes Sep 5." },
++      { iconName: "Bot",         label: "Tier 1",    tooltip: "Assigned agent · Deal Concierge, tier 1." },
++    ],
 +    agent: { id: "AGT-02", name: "Deal Concierge" },
-+    signal: { severity: "alert", label: "Asked for the migration timeline twice — still unanswered", dueContext: "Last asked Sep 2", actionLabel: "Send timeline" },
++    nba: {
++      title: "Send the migration timeline she asked for",
++      timestamp: "30m ago",
++      rationale: "She has raised it on the last two calls without a written answer, and she owns the budget line on a renewal that closes in 12 days.",
++      variant: "accept",
++    },
 +    aiSummary: {
 +      headline: "Economic buyer on the Meridian renewal.",
 +      detail: "Sandra owns the budget line and has raised the migration timeline in the last two calls without getting a written answer. That single open question is the strongest predictor of how the renewal lands.",
@@ -1542,8 +2430,24 @@ index 0000000..a3878b4
 +    subtitle: "Director of Operations · Operations · Phoenix, AZ",
 +    email: "lisa.park@acme.com", phone: "+1 (602) 555-0121", company: "Acme Corp",
 +    owner: "Marcus Webb", status: "Active", lastInteraction: "Sep 1, 2026",
++    source: { label: "Workday", iconName: "Building" },
++    tags: [
++      { label: "3 approvals due", role: "signal", tone: "alert", severity: 3, tooltip: "Oldest has been queued for 12 days" },
++      { label: "Employee",        role: "classification" },
++      { label: "Manager",         role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "9 facts",  tooltip: "Verified facts · 5 on the Truth plane, 4 across Sandbox and Sources." },
++      { iconName: "Inbox",       label: "3 open",   tooltip: "Open items · 3 reviews queued for her approval." },
++      { iconName: "Users",       label: "9 reports", tooltip: "Direct reports · 9 across Operations." },
++      { iconName: "KeyRound",    label: "Manager",  tooltip: "Access role · Manager, Operations scope." },
++    ],
 +    agent: { id: "AGT-03", name: "People Concierge" },
-+    signal: { severity: "alert", label: "3 reviews waiting on her approval", dueContext: "Oldest is 12 days old" },
++    nba: {
++      title: "Clear the three reviews in her queue",
++      timestamp: "4h ago",
++      rationale: "Three reviews are waiting on her approval and the oldest has been open 12 days, which is holding up two promotion cycles.",
++    },
 +    aiSummary: {
 +      headline: "Approval queue is the bottleneck, not her workload.",
 +      detail: "Lisa manages nine reports and has three reviews queued, the oldest open 12 days. Her own governance and policy items are all current.",
@@ -1556,8 +2460,18 @@ index 0000000..a3878b4
 +    subtitle: "IT Director · Meridian Corp",
 +    email: "david.park@meridian.com", phone: "+1 (212) 555-0163", company: "Meridian Corp",
 +    owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 19, 2026",
++    source: { label: "Salesforce", iconName: "Cloud" },
++    tags: [
++      { label: "Person",    role: "classification" },
++      { label: "Technical", role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
++      { iconName: "CheckCheck",  label: "Cleared",  tooltip: "Reviews · signed off SSO and data residency in July. Nothing open." },
++      { iconName: "Bot",         label: "Tier 1",   tooltip: "Assigned agent · Deal Concierge, tier 1." },
++    ],
 +    agent: { id: "AGT-02", name: "Deal Concierge" },
-+    signal: { severity: "neutral", label: "No open items on this record", dueContext: "Last reviewed Aug 19", dismissible: true },
++    nba: null,
 +    aiSummary: {
 +      headline: "Technical gatekeeper, currently unblocked.",
 +      detail: "David signed off on the SSO and data-residency reviews in July. No open questions since. He is the right contact if the migration timeline turns into an implementation plan.",
@@ -1570,8 +2484,24 @@ index 0000000..a3878b4
 +    subtitle: "Transportation · 890 employees · Dallas, TX",
 +    email: "hello@kestrellogistics.com", phone: "+1 (214) 555-0190", company: "Kestrel Logistics",
 +    owner: "Daniel Ruiz", status: "Inactive", lastInteraction: "Jun 14, 2026",
++    stateBadge: { label: "Dormant", variant: "alert" },
++    source: { label: "NetSuite", iconName: "Cloud" },
++    tags: [
++      { label: "80d no contact", role: "signal", tone: "error", severity: 4, tooltip: "Last interaction Jun 14, when the pilot closed" },
++      { label: "Inactive",       role: "signal", tone: "neutral", severity: 1, tooltip: "Lifecycle · moved to inactive Jul 1" },
++      { label: "Customer",       role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "11 facts", tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
++      { iconName: "CircleCheck", label: "Pilot ok", tooltip: "Pilot outcome · completed Jun 14 with all success criteria met." },
++      { iconName: "Bot",         label: "Tier 3",   tooltip: "Assigned agent · Kestrel Concierge, tier 3 since the account went dormant." },
++    ],
 +    agent: { id: "AGT-05", name: "Kestrel Concierge" },
-+    signal: { severity: "error", label: "No contact in 80 days — account went dormant after the pilot", dueContext: "Pilot ended Jun 14", actionLabel: "Open re-engagement" },
++    nba: {
++      title: "Open a re-engagement on the closed pilot",
++      timestamp: "3d ago",
++      rationale: "The pilot met every success criterion and then contact stopped without a churn signal, which usually means a sponsor change rather than a loss.",
++    },
 +    aiSummary: {
 +      headline: "Dormant since the pilot closed, no stated reason.",
 +      detail: "The pilot completed with all success criteria met, then contact stopped. No churn signal was ever recorded, which usually means a sponsor change rather than a lost deal.",
@@ -1584,8 +2514,19 @@ index 0000000..a3878b4
 +    subtitle: "VP of Operations · Operations · Remote",
 +    email: "marcus.webb@acme.com", phone: "+1 (602) 555-0134", company: "Acme Corp",
 +    owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 27, 2026",
++    source: { label: "Workday", iconName: "Building" },
++    tags: [
++      { label: "Employee", role: "classification" },
++      { label: "Manager",  role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "9 facts",  tooltip: "Verified facts · 5 on the Truth plane, 4 across Sandbox and Sources." },
++      { iconName: "CheckCheck",  label: "Cleared",  tooltip: "Approval queue · cleared Aug 27, nothing pending." },
++      { iconName: "FileCheck2",  label: "12 of 12", tooltip: "Policies signed · all 12, latest Data Handling v2.1." },
++      { iconName: "KeyRound",    label: "Exec",     tooltip: "Access role · Executive, Operations scope." },
++    ],
 +    agent: { id: "AGT-03", name: "People Concierge" },
-+    signal: { severity: "neutral", label: "No pending approvals", dueContext: "Queue cleared Aug 27", dismissible: true },
++    nba: null,
 +    aiSummary: {
 +      headline: "Clear queue, current on every policy.",
 +      detail: "Marcus cleared his approval queue on Aug 27 and has all twelve policies signed. Nothing on this record needs a decision this week.",
@@ -1598,8 +2539,19 @@ index 0000000..a3878b4
 +    subtitle: "CFO · Meridian Corp",
 +    email: "amy.chen@meridian.com", phone: "+1 (212) 555-0171", company: "Meridian Corp",
 +    owner: "Priya Nair", status: "Inactive", lastInteraction: "Apr 3, 2026",
++    stateBadge: { label: "Superseded", variant: "neutral" },
++    source: { label: "Salesforce", iconName: "Cloud" },
++    tags: [
++      { label: "Inactive", role: "signal", tone: "neutral", severity: 1, tooltip: "Lifecycle · marked inactive Apr 3" },
++      { label: "Person",   role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "10 facts",  tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
++      { iconName: "FileText",    label: "2024 MSA",  tooltip: "Contract history · approved the original Meridian agreement in 2024." },
++      { iconName: "UserRound",   label: "S. Torres", tooltip: "Superseded by · Sandra Torres, finance approvals since April." },
++    ],
 +    agent: { id: "AGT-02", name: "Deal Concierge" },
-+    signal: { severity: "neutral", label: "Marked inactive — no longer the finance contact", dueContext: "Updated Apr 3" },
++    nba: null,
 +    aiSummary: {
 +      headline: "Superseded as the finance contact.",
 +      detail: "Amy approved the original Meridian contract in 2024. Finance approvals have routed through Sandra Torres since April. Keep the record for contract history.",
@@ -1612,8 +2564,24 @@ index 0000000..a3878b4
 +    subtitle: "Industrial · 1,600 employees · Cleveland, OH",
 +    email: "ops@halden-mfg.com", phone: "+1 (216) 555-0118", company: "Halden Manufacturing",
 +    owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 25, 2026",
++    stateBadge: { label: "Under review", variant: "informative" },
++    source: { label: "NetSuite", iconName: "Cloud" },
++    tags: [
++      { label: "2 checks open", role: "signal", tone: "alert", severity: 2, tooltip: "Network segmentation evidence and sub-processor list · target Sep 12" },
++      { label: "Customer",      role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "11 facts", tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
++      { iconName: "ClipboardList", label: "4 of 6", tooltip: "Security review · 4 of 6 checks cleared, target Sep 12." },
++      { iconName: "HardDrive",   label: "6 drives", tooltip: "Source Drives · 6 attached, 1 failing to sync." },
++      { iconName: "Bot",         label: "Tier 2",   tooltip: "Assigned agent · Halden Concierge, tier 2." },
++    ],
 +    agent: { id: "AGT-06", name: "Halden Concierge" },
-+    signal: { severity: "informative", label: "Security review in progress — 4 of 6 checks cleared", dueContext: "Target Sep 12" },
++    nba: {
++      title: "Send the two open security-review items",
++      timestamp: "1d ago",
++      rationale: "Four of six checks have cleared and the remaining two sit with Halden, who have answered every prior request within two business days.",
++    },
 +    aiSummary: {
 +      headline: "Mid-review, on schedule.",
 +      detail: "Four of six security checks have cleared. The two open items are network segmentation evidence and the sub-processor list, both assigned to Halden's side.",
@@ -1626,8 +2594,25 @@ index 0000000..a3878b4
 +    subtitle: "Head of Data Platform · Halden Manufacturing",
 +    email: "tomas.ferreira@halden-mfg.com", phone: "+1 (216) 555-0126", company: "Halden Manufacturing",
 +    owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 25, 2026",
++    source: { label: "NetSuite", iconName: "Cloud" },
++    tags: [
++      { label: "Owns 2 blockers", role: "signal", tone: "alert", severity: 3, tooltip: "Network segmentation evidence and sub-processor list · target Sep 12" },
++      { label: "Person",         role: "classification" },
++      { label: "Technical",      role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
++      { iconName: "Inbox",       label: "2 open",   tooltip: "Open items · both remaining security-review checks." },
++      { iconName: "Clock",       label: "2d reply", tooltip: "Responsiveness · has answered every prior request within two business days." },
++      { iconName: "Bot",         label: "Tier 2",   tooltip: "Assigned agent · Halden Concierge, tier 2." },
++    ],
 +    agent: { id: "AGT-06", name: "Halden Concierge" },
-+    signal: { severity: "informative", label: "Owns the two open security-review items", dueContext: "Target Sep 12", actionLabel: "Send checklist" },
++    nba: {
++      title: "Send Tomás the remaining checklist items",
++      timestamp: "1d ago",
++      rationale: "He owns both open checks and replies within two business days, so a checklist is likely enough to close the review before Sep 12.",
++      variant: "accept",
++    },
 +    aiSummary: {
 +      headline: "Single owner of both blockers.",
 +      detail: "Tomás owns network segmentation evidence and the sub-processor list. He has answered every prior request within two business days, so a checklist is likely enough.",
@@ -1640,8 +2625,19 @@ index 0000000..a3878b4
 +    subtitle: "Account Director · Revenue · Chicago, IL",
 +    email: "elena.fischer@acme.com", phone: "+1 (312) 555-0149", company: "Acme Corp",
 +    owner: "Marcus Webb", status: "Active", lastInteraction: "Sep 2, 2026",
++    source: { label: "Workday", iconName: "Building" },
++    tags: [
++      { label: "Employee", role: "classification" },
++      { label: "Revenue",  role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "9 facts",  tooltip: "Verified facts · 5 on the Truth plane, 4 across Sandbox and Sources." },
++      { iconName: "Briefcase",   label: "2 accts",  tooltip: "Owned accounts · Halden Manufacturing and Kestrel Logistics." },
++      { iconName: "KeyRound",    label: "Standard", tooltip: "Access role · Standard, Revenue scope." },
++      { iconName: "Calendar",    label: "4y 8m",    tooltip: "Tenure · started Jan 12, 2022." },
++    ],
 +    agent: { id: "AGT-03", name: "People Concierge" },
-+    signal: { severity: "neutral", label: "No open items on this record", dueContext: "Last reviewed Sep 2", dismissible: true },
++    nba: null,
 +    aiSummary: {
 +      headline: "Owns two accounts mid-review, no personnel items open.",
 +      detail: "Elena carries Halden and Kestrel. Both have open account-side work, but nothing on her own employee record requires a decision.",
@@ -1654,8 +2650,18 @@ index 0000000..a3878b4
 +    subtitle: "Chief Nursing Officer · Northwind Health",
 +    email: "grace.okafor@northwindhealth.org", phone: "+1 (602) 555-0182", company: "Northwind Health",
 +    owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 30, 2026",
++    source: { label: "Salesforce", iconName: "Cloud" },
++    tags: [
++      { label: "Sponsor",  role: "classification" },
++      { label: "Person",   role: "classification" },
++    ],
++    meta: [
++      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
++      { iconName: "MapPin",      label: "5 sites",  tooltip: "Sponsored expansion · 5 clinic sites signed Aug 30." },
++      { iconName: "Bot",         label: "Tier 1",   tooltip: "Assigned agent · Northwind Concierge, tier 1." },
++    ],
 +    agent: { id: "AGT-04", name: "Northwind Concierge" },
-+    signal: { severity: "success", label: "Sponsored the 5-clinic expansion", dueContext: "Signed Aug 30" },
++    nba: null,
 +    aiSummary: {
 +      headline: "Executive sponsor of the expansion.",
 +      detail: "Grace drove the five-clinic expansion internally and signed without a discount request. Two clinics still need network sync — an onboarding task her team can close.",
@@ -1664,7 +2670,6 @@ index 0000000..a3878b4
 +    governance: "loaded", risk: "empty", connections: "loaded",
 +  },
 +]
-+
 +// ── Per-record collections ────────────────────────────────────────────────────
 +// Built from the contact itself so every profile reads as that record's own
 +// data rather than one shared fixture repeated 14 times.
@@ -1882,56 +2887,6 @@ index 0000000..a3878b4
 +    { label: "Trend",       value: "24 → 18",      icon: "ArrowDownRight", variant: "success"     },
 +  ]
 +}
-+
-+// ── RecordHeader payloads ─────────────────────────────────────────────────────
-+
-+export function buildRecord(c: UcpContact): EmployeeRecord | CustomerRecord | ClientRecord {
-+  if (c.type === "company") {
-+    const record: CustomerRecord = {
-+      accountName:    c.name,
-+      segment:        "Enterprise",
-+      owner:          c.owner,
-+      tier:           "Tier 1",
-+      industry:       FIRST_FIELD(c),
-+      renewalDate:    "Sep 5, 2026",
-+      mrr:            "$480K ARR",
-+      lastContact:    c.lastInteraction,
-+      openTickets:    3,
-+      adoptionLevel:  "High",
-+      primaryContact: "Sandra Torres",
-+    }
-+    return record
-+  }
-+  if (c.type === "employee") {
-+    const record: EmployeeRecord = {
-+      name:       c.name,
-+      role:       FIRST_FIELD(c),
-+      department: c.subtitle.split(" · ")[1] ?? "—",
-+      manager:    c.owner,
-+      location:   c.subtitle.split(" · ")[2] ?? "—",
-+      email:      c.email,
-+      phone:      c.phone,
-+      startDate:  "Jan 12, 2022",
-+      team:       c.subtitle.split(" · ")[1] ?? "—",
-+      accessRole: "Standard",
-+    }
-+    return record
-+  }
-+  const record: ClientRecord = {
-+    name:              c.name,
-+    company:           c.company,
-+    dealStage:         "Evaluation",
-+    dealValue:         "$480K",
-+    owner:             c.owner,
-+    email:             c.email,
-+    phone:             c.phone,
-+    leadSource:        "Account expansion",
-+    lastInteraction:   c.lastInteraction,
-+    expectedCloseDate: "Sep 5, 2026",
-+  }
-+  return record
-+}
-+
 +// ── Concierge chat ────────────────────────────────────────────────────────────
 +
 +export interface ConciergeTurn {

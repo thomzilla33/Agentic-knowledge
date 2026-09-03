@@ -5,21 +5,21 @@
  * for the record shapes and the fixtures, so the list screen and the profile
  * screen can't drift apart on what a contact is.
  *
- * Two AIMS OS concepts are modelled here rather than invented:
+ * Three AIMS OS concepts are modelled here rather than invented:
  *   - Knowledge planes (Truth 100% / Sandbox ~80% / Sources ~60%) — the same
  *     three planes a TruthPack is built from. The Snapshot tab is this record's
  *     facts organised by plane, so "how sure are we" is readable at a glance.
  *   - Source Drives — drives, folders or documents attached from the company
  *     catalog. This is what the profile's Drives tab lists (it replaces the
  *     generic "Documents" tab a CRM would have).
+ *   - The Entity Header content model (Figma 19815-101547) — visual, title,
+ *     source, state badge, signal and classification tags, secondary metadata.
+ *     Every field below maps to a named slot in that spec; nothing is a
+ *     convenience field invented for this screen.
  */
 
-import type {
-  ClientRecord,
-  CustomerRecord,
-  EmployeeRecord,
-  NextBestAction,
-} from "@/components/ui/record-header"
+import type { EntityMetaItem, EntityTag } from "@/components/experimental/entity-header"
+import type { NextBestAction } from "@/components/experimental/next-best-action-card"
 
 // ── Entity ────────────────────────────────────────────────────────────────────
 
@@ -41,25 +41,37 @@ export interface UcpContact {
   phone:           string
   company:         string
   owner:           string
+  /** Lifecycle, and what the list filters on. */
   status:          UcpStatus
+  /**
+   * The Entity Header's state badge — exactly one, and the most blocking status
+   * wins. Defaults to `status`; set it only when something more blocking is
+   * true of the record, in which case the lifecycle value moves to a tag.
+   */
+  stateBadge?:     { label: string; variant: TagVariantLite }
+  /**
+   * The system this record was pulled from. One item, never two — a job title,
+   * a location or a category is not a source. Omitted when the entity was
+   * created in the platform itself; the slot is removed, never refilled.
+   */
+  source:          { label: string; iconName: string }
+  /** Signals first (by severity), then classification. Max 6 including overflow. */
+  tags:            EntityTag[]
+  /** Max 6, aim for four. Every item carries a tooltip naming its field. */
+  meta:            EntityMetaItem[]
   lastInteraction: string
   /** AIMS OS is agent-first — every record has one assigned concierge. */
   agent:           { id: string; name: string }
-  /** Drives the RecordHeader Signal. Not every record has something urgent. */
-  signal:          NextBestAction
+  /**
+   * The engine's proposal, rendered as its own card BELOW the header — never
+   * inside it. null when there is nothing to do: no action, no card.
+   */
+  nba:             NextBestAction | null
   /** The agent's read on this record, shown as the Overview AI widget. */
   aiSummary:       { headline: string; detail: string; confidence: number }
   governance:      StudyState
   risk:            StudyState
   connections:     StudyState
-}
-
-/** person → client · employee → employee · company → customer.
- *  Picked by which fields the record actually has, per the RecordHeader rule. */
-export const RECORD_VARIANT: Record<UcpEntityType, "client" | "employee" | "customer"> = {
-  person:   "client",
-  employee: "employee",
-  company:  "customer",
 }
 
 export const TYPE_LABEL: Record<UcpEntityType, string> = {
@@ -86,6 +98,15 @@ export const STATUS_TAG: Record<UcpStatus, TagVariantLite> = {
   Archived: "error",
 }
 
+/**
+ * All three types here are entities with a real-world visual identity — a face
+ * or a brand — so all three use an avatar. That is also why each carries a
+ * classification tag: an avatar cannot communicate what kind of thing this is,
+ * where a highlight icon would.
+ */
+export function entityState(c: UcpContact): { label: string; variant: TagVariantLite } {
+  return c.stateBadge ?? { label: c.status, variant: STATUS_TAG[c.status] }
+}
 // ── Knowledge planes ──────────────────────────────────────────────────────────
 
 export type KnowledgePlane = "truth" | "sandbox" | "sources"
@@ -159,15 +180,30 @@ export interface UcpConnection {
 }
 
 // ── Contacts ──────────────────────────────────────────────────────────────────
-
 export const CONTACTS: UcpContact[] = [
   {
     id: "ORG-0023", type: "company", name: "Meridian Corp",
     subtitle: "Financial Services · 2,400 employees · New York",
     email: "accounts@meridian.com", phone: "+1 (212) 555-0142", company: "Meridian Corp",
     owner: "Priya Nair", status: "Active", lastInteraction: "Aug 22, 2026",
+    source: { label: "Salesforce", iconName: "Cloud" },
+    tags: [
+      { label: "Renewal at risk", role: "signal", tone: "alert", severity: 3, tooltip: "Health dropped to 61 · renews Sep 5" },
+      { label: "Customer",        role: "classification" },
+      { label: "Enterprise",      role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "11 facts",     tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
+      { iconName: "Inbox",       label: "3 open",       tooltip: "Open items · 3 support escalations, oldest opened Jul 14." },
+      { iconName: "HardDrive",   label: "6 drives",     tooltip: "Source Drives · 6 attached, 1 failing to sync since Aug 26." },
+      { iconName: "Bot",         label: "Tier 1",       tooltip: "Assigned agent · Meridian Concierge, tier 1. Handling this account since Mar 3." },
+    ],
     agent: { id: "AGT-01", name: "Meridian Concierge" },
-    signal: { severity: "alert", label: "Renewal in 12 days — account health dropped to 61", dueContext: "Renews Sep 5", actionLabel: "Schedule renewal call" },
+    nba: {
+      title: "Run the renewal outreach workflow",
+      timestamp: "2h ago",
+      rationale: "Usage grew 18% but three escalations are open and no proposal has been sent. The master agreement renews in 12 days.",
+    },
     aiSummary: {
       headline: "Renewal at risk — usage is up, sentiment is down.",
       detail: "Seat usage grew 18% this quarter but three support escalations opened since July, all routing through the same integration. Sandra Torres has asked twice about the migration timeline without a written answer. The renewal call is the place to close that gap.",
@@ -180,8 +216,20 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Head of Compliance · Legal · Meridian Corp",
     email: "sarah.chen@meridian.com", phone: "+1 (212) 555-0188", company: "Meridian Corp",
     owner: "Priya Nair", status: "Active", lastInteraction: "Aug 28, 2026",
+    source: { label: "Salesforce", iconName: "Cloud" },
+    tags: [
+      { label: "Awaiting review", role: "signal", tone: "neutral", severity: 1, tooltip: "Governance addendum sent Aug 28 · no response due yet" },
+      { label: "Person",          role: "classification" },
+      { label: "Evaluator",       role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
+      { iconName: "Inbox",       label: "1 open",   tooltip: "Open items · governance addendum awaiting her review." },
+      { iconName: "Calendar",    label: "Since Jun", tooltip: "First interaction · June 9, 2026, via the account expansion." },
+      { iconName: "Bot",         label: "Tier 1",   tooltip: "Assigned agent · Deal Concierge, tier 1. Handling this contact since Jun 9." },
+    ],
     agent: { id: "AGT-02", name: "Deal Concierge" },
-    signal: { severity: "informative", label: "Reviewing the governance addendum — no response due yet", dueContext: "Sent Aug 28" },
+    nba: null,
     aiSummary: {
       headline: "Technical evaluator, not the economic buyer.",
       detail: "Sarah has driven every compliance question on the Meridian expansion and cleared the data-residency review herself. She has never discussed price. Route commercial terms to Sandra Torres and keep Sarah on audit evidence.",
@@ -194,8 +242,24 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Senior Operations Lead · Operations · Phoenix, AZ",
     email: "james.ortega@acme.com", phone: "+1 (602) 555-0100", company: "Acme Corp",
     owner: "Lisa Park", status: "Active", lastInteraction: "Sep 1, 2026",
+    source: { label: "Workday", iconName: "Building" },
+    tags: [
+      { label: "Review overdue", role: "signal", tone: "alert", severity: 3, tooltip: "Mid-year review with Lisa Park since Aug 20 · 12 days open" },
+      { label: "Employee",       role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "9 facts",   tooltip: "Verified facts · 5 on the Truth plane, 4 across Sandbox and Sources." },
+      { iconName: "Inbox",       label: "1 open",    tooltip: "Open items · mid-year performance review awaiting approval." },
+      { iconName: "KeyRound",    label: "Standard",  tooltip: "Access role · Standard, Operations scope. Unchanged since Aug 14." },
+      { iconName: "Calendar",    label: "4y 8m",     tooltip: "Tenure · started Jan 12, 2022." },
+      { iconName: "Bot",         label: "Tier 2",    tooltip: "Assigned agent · People Concierge, tier 2." },
+    ],
     agent: { id: "AGT-03", name: "People Concierge" },
-    signal: { severity: "alert", label: "1 performance review pending your approval", dueContext: "Due in 3 days" },
+    nba: {
+      title: "Escalate the overdue performance review",
+      timestamp: "6h ago",
+      rationale: "The mid-year review has sat with Lisa Park for 12 days and blocks his promotion cycle, which closes at the end of the month.",
+    },
     aiSummary: {
       headline: "Consistent operator, overdue on one approval.",
       detail: "James has closed every quarterly governance check on time for six quarters. The one open item is his mid-year review, waiting on Lisa Park since Aug 20. Nothing else on this record needs attention.",
@@ -208,8 +272,24 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Healthcare · 5,100 employees · Phoenix, AZ",
     email: "partnerships@northwindhealth.org", phone: "+1 (602) 555-0177", company: "Northwind Health",
     owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 30, 2026",
+    source: { label: "Salesforce", iconName: "Cloud" },
+    tags: [
+      { label: "Sync pending", role: "signal", tone: "alert", severity: 2, tooltip: "2 of 5 new clinic sites have not completed network sync" },
+      { label: "Customer",     role: "classification" },
+      { label: "Enterprise",   role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "11 facts",  tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
+      { iconName: "MapPin",      label: "5 sites",   tooltip: "Locations · 5 clinics added under the Aug 30 expansion." },
+      { iconName: "HardDrive",   label: "6 drives",  tooltip: "Source Drives · 6 attached, all syncing." },
+      { iconName: "Bot",         label: "Tier 1",    tooltip: "Assigned agent · Northwind Concierge, tier 1." },
+    ],
     agent: { id: "AGT-04", name: "Northwind Concierge" },
-    signal: { severity: "success", label: "Expansion signed — 5 clinics added to the network", dueContext: "Confirmed Aug 30" },
+    nba: {
+      title: "Finish network sync for two clinic sites",
+      timestamp: "1d ago",
+      rationale: "Two of the five clinics added on Aug 30 are still unsynced, so their staff cannot reach the platform and the expansion is not fully live.",
+    },
     aiSummary: {
       headline: "Healthy account, expanding on its own initiative.",
       detail: "Northwind added five clinic sites without a discount request. Two of the five have not completed network sync, which is an onboarding task rather than a commercial risk.",
@@ -222,8 +302,25 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "VP of Operations · Meridian Corp",
     email: "sandra.torres@meridian.com", phone: "+1 (212) 555-0155", company: "Meridian Corp",
     owner: "Priya Nair", status: "Active", lastInteraction: "Sep 2, 2026",
+    source: { label: "Salesforce", iconName: "Cloud" },
+    tags: [
+      { label: "Awaiting us", role: "signal", tone: "error", severity: 4, tooltip: "Migration timeline asked twice · still unanswered since Aug 18" },
+      { label: "Person",      role: "classification" },
+      { label: "Buyer",       role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "10 facts",  tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
+      { iconName: "Inbox",       label: "1 open",    tooltip: "Open items · migration timeline request, unanswered for 15 days." },
+      { iconName: "Briefcase",   label: "$480K",     tooltip: "Deal value · Enterprise Renewal 2026, closes Sep 5." },
+      { iconName: "Bot",         label: "Tier 1",    tooltip: "Assigned agent · Deal Concierge, tier 1." },
+    ],
     agent: { id: "AGT-02", name: "Deal Concierge" },
-    signal: { severity: "alert", label: "Asked for the migration timeline twice — still unanswered", dueContext: "Last asked Sep 2", actionLabel: "Send timeline" },
+    nba: {
+      title: "Send the migration timeline she asked for",
+      timestamp: "30m ago",
+      rationale: "She has raised it on the last two calls without a written answer, and she owns the budget line on a renewal that closes in 12 days.",
+      variant: "accept",
+    },
     aiSummary: {
       headline: "Economic buyer on the Meridian renewal.",
       detail: "Sandra owns the budget line and has raised the migration timeline in the last two calls without getting a written answer. That single open question is the strongest predictor of how the renewal lands.",
@@ -236,8 +333,24 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Director of Operations · Operations · Phoenix, AZ",
     email: "lisa.park@acme.com", phone: "+1 (602) 555-0121", company: "Acme Corp",
     owner: "Marcus Webb", status: "Active", lastInteraction: "Sep 1, 2026",
+    source: { label: "Workday", iconName: "Building" },
+    tags: [
+      { label: "3 approvals due", role: "signal", tone: "alert", severity: 3, tooltip: "Oldest has been queued for 12 days" },
+      { label: "Employee",        role: "classification" },
+      { label: "Manager",         role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "9 facts",  tooltip: "Verified facts · 5 on the Truth plane, 4 across Sandbox and Sources." },
+      { iconName: "Inbox",       label: "3 open",   tooltip: "Open items · 3 reviews queued for her approval." },
+      { iconName: "Users",       label: "9 reports", tooltip: "Direct reports · 9 across Operations." },
+      { iconName: "KeyRound",    label: "Manager",  tooltip: "Access role · Manager, Operations scope." },
+    ],
     agent: { id: "AGT-03", name: "People Concierge" },
-    signal: { severity: "alert", label: "3 reviews waiting on her approval", dueContext: "Oldest is 12 days old" },
+    nba: {
+      title: "Clear the three reviews in her queue",
+      timestamp: "4h ago",
+      rationale: "Three reviews are waiting on her approval and the oldest has been open 12 days, which is holding up two promotion cycles.",
+    },
     aiSummary: {
       headline: "Approval queue is the bottleneck, not her workload.",
       detail: "Lisa manages nine reports and has three reviews queued, the oldest open 12 days. Her own governance and policy items are all current.",
@@ -250,8 +363,18 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "IT Director · Meridian Corp",
     email: "david.park@meridian.com", phone: "+1 (212) 555-0163", company: "Meridian Corp",
     owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 19, 2026",
+    source: { label: "Salesforce", iconName: "Cloud" },
+    tags: [
+      { label: "Person",    role: "classification" },
+      { label: "Technical", role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
+      { iconName: "CheckCheck",  label: "Cleared",  tooltip: "Reviews · signed off SSO and data residency in July. Nothing open." },
+      { iconName: "Bot",         label: "Tier 1",   tooltip: "Assigned agent · Deal Concierge, tier 1." },
+    ],
     agent: { id: "AGT-02", name: "Deal Concierge" },
-    signal: { severity: "neutral", label: "No open items on this record", dueContext: "Last reviewed Aug 19", dismissible: true },
+    nba: null,
     aiSummary: {
       headline: "Technical gatekeeper, currently unblocked.",
       detail: "David signed off on the SSO and data-residency reviews in July. No open questions since. He is the right contact if the migration timeline turns into an implementation plan.",
@@ -264,8 +387,24 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Transportation · 890 employees · Dallas, TX",
     email: "hello@kestrellogistics.com", phone: "+1 (214) 555-0190", company: "Kestrel Logistics",
     owner: "Daniel Ruiz", status: "Inactive", lastInteraction: "Jun 14, 2026",
+    stateBadge: { label: "Dormant", variant: "alert" },
+    source: { label: "NetSuite", iconName: "Cloud" },
+    tags: [
+      { label: "80d no contact", role: "signal", tone: "error", severity: 4, tooltip: "Last interaction Jun 14, when the pilot closed" },
+      { label: "Inactive",       role: "signal", tone: "neutral", severity: 1, tooltip: "Lifecycle · moved to inactive Jul 1" },
+      { label: "Customer",       role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "11 facts", tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
+      { iconName: "CircleCheck", label: "Pilot ok", tooltip: "Pilot outcome · completed Jun 14 with all success criteria met." },
+      { iconName: "Bot",         label: "Tier 3",   tooltip: "Assigned agent · Kestrel Concierge, tier 3 since the account went dormant." },
+    ],
     agent: { id: "AGT-05", name: "Kestrel Concierge" },
-    signal: { severity: "error", label: "No contact in 80 days — account went dormant after the pilot", dueContext: "Pilot ended Jun 14", actionLabel: "Open re-engagement" },
+    nba: {
+      title: "Open a re-engagement on the closed pilot",
+      timestamp: "3d ago",
+      rationale: "The pilot met every success criterion and then contact stopped without a churn signal, which usually means a sponsor change rather than a loss.",
+    },
     aiSummary: {
       headline: "Dormant since the pilot closed, no stated reason.",
       detail: "The pilot completed with all success criteria met, then contact stopped. No churn signal was ever recorded, which usually means a sponsor change rather than a lost deal.",
@@ -278,8 +417,19 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "VP of Operations · Operations · Remote",
     email: "marcus.webb@acme.com", phone: "+1 (602) 555-0134", company: "Acme Corp",
     owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 27, 2026",
+    source: { label: "Workday", iconName: "Building" },
+    tags: [
+      { label: "Employee", role: "classification" },
+      { label: "Manager",  role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "9 facts",  tooltip: "Verified facts · 5 on the Truth plane, 4 across Sandbox and Sources." },
+      { iconName: "CheckCheck",  label: "Cleared",  tooltip: "Approval queue · cleared Aug 27, nothing pending." },
+      { iconName: "FileCheck2",  label: "12 of 12", tooltip: "Policies signed · all 12, latest Data Handling v2.1." },
+      { iconName: "KeyRound",    label: "Exec",     tooltip: "Access role · Executive, Operations scope." },
+    ],
     agent: { id: "AGT-03", name: "People Concierge" },
-    signal: { severity: "neutral", label: "No pending approvals", dueContext: "Queue cleared Aug 27", dismissible: true },
+    nba: null,
     aiSummary: {
       headline: "Clear queue, current on every policy.",
       detail: "Marcus cleared his approval queue on Aug 27 and has all twelve policies signed. Nothing on this record needs a decision this week.",
@@ -292,8 +442,19 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "CFO · Meridian Corp",
     email: "amy.chen@meridian.com", phone: "+1 (212) 555-0171", company: "Meridian Corp",
     owner: "Priya Nair", status: "Inactive", lastInteraction: "Apr 3, 2026",
+    stateBadge: { label: "Superseded", variant: "neutral" },
+    source: { label: "Salesforce", iconName: "Cloud" },
+    tags: [
+      { label: "Inactive", role: "signal", tone: "neutral", severity: 1, tooltip: "Lifecycle · marked inactive Apr 3" },
+      { label: "Person",   role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "10 facts",  tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
+      { iconName: "FileText",    label: "2024 MSA",  tooltip: "Contract history · approved the original Meridian agreement in 2024." },
+      { iconName: "UserRound",   label: "S. Torres", tooltip: "Superseded by · Sandra Torres, finance approvals since April." },
+    ],
     agent: { id: "AGT-02", name: "Deal Concierge" },
-    signal: { severity: "neutral", label: "Marked inactive — no longer the finance contact", dueContext: "Updated Apr 3" },
+    nba: null,
     aiSummary: {
       headline: "Superseded as the finance contact.",
       detail: "Amy approved the original Meridian contract in 2024. Finance approvals have routed through Sandra Torres since April. Keep the record for contract history.",
@@ -306,8 +467,24 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Industrial · 1,600 employees · Cleveland, OH",
     email: "ops@halden-mfg.com", phone: "+1 (216) 555-0118", company: "Halden Manufacturing",
     owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 25, 2026",
+    stateBadge: { label: "Under review", variant: "informative" },
+    source: { label: "NetSuite", iconName: "Cloud" },
+    tags: [
+      { label: "2 checks open", role: "signal", tone: "alert", severity: 2, tooltip: "Network segmentation evidence and sub-processor list · target Sep 12" },
+      { label: "Customer",      role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "11 facts", tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
+      { iconName: "ClipboardList", label: "4 of 6", tooltip: "Security review · 4 of 6 checks cleared, target Sep 12." },
+      { iconName: "HardDrive",   label: "6 drives", tooltip: "Source Drives · 6 attached, 1 failing to sync." },
+      { iconName: "Bot",         label: "Tier 2",   tooltip: "Assigned agent · Halden Concierge, tier 2." },
+    ],
     agent: { id: "AGT-06", name: "Halden Concierge" },
-    signal: { severity: "informative", label: "Security review in progress — 4 of 6 checks cleared", dueContext: "Target Sep 12" },
+    nba: {
+      title: "Send the two open security-review items",
+      timestamp: "1d ago",
+      rationale: "Four of six checks have cleared and the remaining two sit with Halden, who have answered every prior request within two business days.",
+    },
     aiSummary: {
       headline: "Mid-review, on schedule.",
       detail: "Four of six security checks have cleared. The two open items are network segmentation evidence and the sub-processor list, both assigned to Halden's side.",
@@ -320,8 +497,25 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Head of Data Platform · Halden Manufacturing",
     email: "tomas.ferreira@halden-mfg.com", phone: "+1 (216) 555-0126", company: "Halden Manufacturing",
     owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 25, 2026",
+    source: { label: "NetSuite", iconName: "Cloud" },
+    tags: [
+      { label: "Owns 2 blockers", role: "signal", tone: "alert", severity: 3, tooltip: "Network segmentation evidence and sub-processor list · target Sep 12" },
+      { label: "Person",         role: "classification" },
+      { label: "Technical",      role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
+      { iconName: "Inbox",       label: "2 open",   tooltip: "Open items · both remaining security-review checks." },
+      { iconName: "Clock",       label: "2d reply", tooltip: "Responsiveness · has answered every prior request within two business days." },
+      { iconName: "Bot",         label: "Tier 2",   tooltip: "Assigned agent · Halden Concierge, tier 2." },
+    ],
     agent: { id: "AGT-06", name: "Halden Concierge" },
-    signal: { severity: "informative", label: "Owns the two open security-review items", dueContext: "Target Sep 12", actionLabel: "Send checklist" },
+    nba: {
+      title: "Send Tomás the remaining checklist items",
+      timestamp: "1d ago",
+      rationale: "He owns both open checks and replies within two business days, so a checklist is likely enough to close the review before Sep 12.",
+      variant: "accept",
+    },
     aiSummary: {
       headline: "Single owner of both blockers.",
       detail: "Tomás owns network segmentation evidence and the sub-processor list. He has answered every prior request within two business days, so a checklist is likely enough.",
@@ -334,8 +528,19 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Account Director · Revenue · Chicago, IL",
     email: "elena.fischer@acme.com", phone: "+1 (312) 555-0149", company: "Acme Corp",
     owner: "Marcus Webb", status: "Active", lastInteraction: "Sep 2, 2026",
+    source: { label: "Workday", iconName: "Building" },
+    tags: [
+      { label: "Employee", role: "classification" },
+      { label: "Revenue",  role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "9 facts",  tooltip: "Verified facts · 5 on the Truth plane, 4 across Sandbox and Sources." },
+      { iconName: "Briefcase",   label: "2 accts",  tooltip: "Owned accounts · Halden Manufacturing and Kestrel Logistics." },
+      { iconName: "KeyRound",    label: "Standard", tooltip: "Access role · Standard, Revenue scope." },
+      { iconName: "Calendar",    label: "4y 8m",    tooltip: "Tenure · started Jan 12, 2022." },
+    ],
     agent: { id: "AGT-03", name: "People Concierge" },
-    signal: { severity: "neutral", label: "No open items on this record", dueContext: "Last reviewed Sep 2", dismissible: true },
+    nba: null,
     aiSummary: {
       headline: "Owns two accounts mid-review, no personnel items open.",
       detail: "Elena carries Halden and Kestrel. Both have open account-side work, but nothing on her own employee record requires a decision.",
@@ -348,8 +553,18 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Chief Nursing Officer · Northwind Health",
     email: "grace.okafor@northwindhealth.org", phone: "+1 (602) 555-0182", company: "Northwind Health",
     owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 30, 2026",
+    source: { label: "Salesforce", iconName: "Cloud" },
+    tags: [
+      { label: "Sponsor",  role: "classification" },
+      { label: "Person",   role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
+      { iconName: "MapPin",      label: "5 sites",  tooltip: "Sponsored expansion · 5 clinic sites signed Aug 30." },
+      { iconName: "Bot",         label: "Tier 1",   tooltip: "Assigned agent · Northwind Concierge, tier 1." },
+    ],
     agent: { id: "AGT-04", name: "Northwind Concierge" },
-    signal: { severity: "success", label: "Sponsored the 5-clinic expansion", dueContext: "Signed Aug 30" },
+    nba: null,
     aiSummary: {
       headline: "Executive sponsor of the expansion.",
       detail: "Grace drove the five-clinic expansion internally and signed without a discount request. Two clinics still need network sync — an onboarding task her team can close.",
@@ -358,7 +573,6 @@ export const CONTACTS: UcpContact[] = [
     governance: "loaded", risk: "empty", connections: "loaded",
   },
 ]
-
 // ── Per-record collections ────────────────────────────────────────────────────
 // Built from the contact itself so every profile reads as that record's own
 // data rather than one shared fixture repeated 14 times.
@@ -576,56 +790,6 @@ export function getRisk(_c: UcpContact): { label: string; value: string; icon: s
     { label: "Trend",       value: "24 → 18",      icon: "ArrowDownRight", variant: "success"     },
   ]
 }
-
-// ── RecordHeader payloads ─────────────────────────────────────────────────────
-
-export function buildRecord(c: UcpContact): EmployeeRecord | CustomerRecord | ClientRecord {
-  if (c.type === "company") {
-    const record: CustomerRecord = {
-      accountName:    c.name,
-      segment:        "Enterprise",
-      owner:          c.owner,
-      tier:           "Tier 1",
-      industry:       FIRST_FIELD(c),
-      renewalDate:    "Sep 5, 2026",
-      mrr:            "$480K ARR",
-      lastContact:    c.lastInteraction,
-      openTickets:    3,
-      adoptionLevel:  "High",
-      primaryContact: "Sandra Torres",
-    }
-    return record
-  }
-  if (c.type === "employee") {
-    const record: EmployeeRecord = {
-      name:       c.name,
-      role:       FIRST_FIELD(c),
-      department: c.subtitle.split(" · ")[1] ?? "—",
-      manager:    c.owner,
-      location:   c.subtitle.split(" · ")[2] ?? "—",
-      email:      c.email,
-      phone:      c.phone,
-      startDate:  "Jan 12, 2022",
-      team:       c.subtitle.split(" · ")[1] ?? "—",
-      accessRole: "Standard",
-    }
-    return record
-  }
-  const record: ClientRecord = {
-    name:              c.name,
-    company:           c.company,
-    dealStage:         "Evaluation",
-    dealValue:         "$480K",
-    owner:             c.owner,
-    email:             c.email,
-    phone:             c.phone,
-    leadSource:        "Account expansion",
-    lastInteraction:   c.lastInteraction,
-    expectedCloseDate: "Sep 5, 2026",
-  }
-  return record
-}
-
 // ── Concierge chat ────────────────────────────────────────────────────────────
 
 export interface ConciergeTurn {

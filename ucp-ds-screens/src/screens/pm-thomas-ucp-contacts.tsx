@@ -42,7 +42,7 @@ import { Sparkle, Send, Contact as ContactIcon, LayoutList, Table2 } from "lucid
 import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
 import {
   CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
-  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG,
+  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG, entityState,
   getActivity, getDrives, getFacts,
 } from "./ucpShared"
 import type { UcpContact, UcpEntityType, UcpStatus } from "./ucpShared"
@@ -182,7 +182,7 @@ const CONTACT_COLUMNS: TableColumn<UcpContact>[] = [
   { key: "subtitle", header: "Context",           render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.subtitle}</span> },
   { key: "owner",  header: "Owner",  width: "13%", render: r => <span style={{ fontSize: 12, color: "var(--foreground)" }}>{r.owner}</span> },
   { key: "lastInteraction", header: "Last interaction", width: "14%", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.lastInteraction}</span> },
-  { key: "status", header: "Status", width: "10%", render: r => <Tag variant={STATUS_TAG[r.status]} size="sm">{r.status}</Tag> },
+  { key: "status", header: "Status", width: "10%", render: r => { const s = entityState(r); return <Tag variant={s.variant} size="sm">{s.label}</Tag> } },
 ]
 
 // ── Screen ────────────────────────────────────────────────────────────────────
@@ -291,7 +291,7 @@ export default function PMThomasUcpContactsScreen() {
       viewMore: false,
     },
     tags:  [{ label: TYPE_LABEL[c.type] }],
-    state: { label: c.status, variant: STATUS_TAG[c.status] },
+    state: entityState(c),
     showMenu:    true,
     onMenuClick: () => {},
     actions: [{ label: "Preview", variant: "tertiary", icon: "Eye", onClick: () => setPreview(c) }],
