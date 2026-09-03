@@ -1,0 +1,1967 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index faf5f4f..783d4f5 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -8,6 +8,8 @@ import PMHomeCanvasScreen         from "./screens/pm-home-canvas"
+ import PMMichaelAttentionRoomScreen from "./screens/pm-michael-attention-room"
+ import PMMichaelLoginScreen         from "./screens/pm-michael-login"
+ import PMThomasUniversalProfileScreen  from "./screens/pm-thomas-universal-profile"
++import PMThomasUcpContactsScreen      from "./screens/pm-thomas-ucp-contacts"
++import PMThomasUcpProfileScreen       from "./screens/pm-thomas-ucp-profile"
+ import PMThomasDashboardListScreen     from "./screens/pm-thomas-dashboard-list"
+ import PMThomasWidgetLibraryScreen     from "./screens/pm-thomas-widget-library"
+ import PMThomasWidgetMarketplaceScreen from "./screens/pm-thomas-widget-marketplace"
+@@ -160,6 +162,8 @@ const PROTOTYPE_PAGES: { id: string; label: string; description: string; author:
+   { id: "proto-thomas-new-dashboard",     label: "New Dashboard — Thomas",       description: "Two-step wizard for creating a dashboard: Step 0 placement form (kind, profile type, surface, audience, name) + destination summary; Step 1 start-point picker (blank canvas or pre-built template). DS-GAP components: StepIndicator, SectionChip, OptionCard, FormSection, FieldLabel.", author: "Thomas", component: PMThomasNewDashboardScreen },
+   { id: "proto-thomas-widget-builder",    label: "Widget Builder — Thomas",      description: "Three-tab builder (Data → Widget → Appearance) with sticky live preview. Data tab: entity source picker (8 sources), operation chips (Aggregate / Record set), calc + column or exposed columns. Widget tab: 12-type gallery, name/description/freshness/filter settings. Appearance tab: accent color swatches + style variants. DS-GAP: AccentColorPalette, BuilderTabNav, EntitySourceCard, TypeTile, SkeletonShape, WidgetPreviewPanel.", author: "Thomas", component: PMThomasWidgetBuilderScreen },
+   { id: "proto-thomas-universal-profile", label: "Universal Profile — Thomas",   description: "Unified entity profile (Person, Employee, Company) aggregating Governance, Risk, and Connections studies — Overview canvas with adaptive study widgets (hidden when empty, error+retry when failed), Activity feed (last 20), paginated Logs, Edit + Export for all types, Archive for Person/Employee only", author: "Thomas", component: PMThomasUniversalProfileScreen },
++  { id: "proto-thomas-ucp-contacts",      label: "UCP — Contacts",               description: "Unified Contact Profile roster — People / Employees / Companies tabs, Cards\u2194Table SwitchTab, Status + Owner filters with All-filters slideout, Eye preview with the agent read, Archive confirm, and a Contacts concierge that answers across the roster", author: "Thomas", component: PMThomasUcpContactsScreen },
++  { id: "proto-thomas-ucp-profile",       label: "UCP — Profile",                description: "Unified Contact Profile detail — RecordHeader with Next Best Action and the record's assigned concierge, Overview widget canvas (agent read, Governance, Risk, Connections, recent activity), Snapshot of facts by knowledge plane (Truth / Sandbox / Sources), paginated Activity timeline, and attached Source Drives", author: "Thomas", component: PMThomasUcpProfileScreen },
+   { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
+   { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
+   { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
+diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
+new file mode 100644
+index 0000000..67b7045
+--- /dev/null
++++ b/src/screens/pm-thomas-ucp-contacts.tsx
+@@ -0,0 +1,541 @@
++/**
++ * UCP — Contacts list.
++ *
++ * The entry point into the Unified Contact Profile. One roster for the three
++ * record types AIMS OS keeps profiles for — People, Employees and Companies —
++ * because the profile behind them is the same surface either way.
++ *
++ * Read-only: contacts arrive through ingestion and account sync, not through a
++ * create form, so the Header's one main CTA is the concierge — ask it about the
++ * roster instead of typing a record in.
++ *
++ * Navigation: Tabs (record type) → SwitchTab (cards vs. table) → Filters.
++ * Row click opens the profile; the Eye opens a preview without leaving the list.
++ */
++
++import { useMemo, useState } from "react"
++import { ScreenLayout }      from "@/components/layouts/screen-layout"
++import { Header }            from "@/components/ui/header"
++import { Tabs }              from "@/components/ui/tabs"
++import { SwitchTab }         from "@/components/ui/switch-tab"
++import { Filters }           from "@/components/ui/filters"
++import { FiltersSlideout }   from "@/components/ui/filters-slideout"
++import { Menu, MenuItem }    from "@/components/ui/menu-item"
++import { Tag }               from "@/components/ui/tag"
++import { Button }            from "@/components/ui/button"
++import { CardContainer }     from "@/components/ui/card-container"
++import { EntityList }        from "@/components/ui/entity-list"
++import type { EntityListItemData } from "@/components/ui/entity-list"
++import { Table }             from "@/components/ui/table"
++import type { TableColumn }  from "@/components/ui/table"
++import { TableCellAvatar, TableCellLink } from "@/components/ui/table"
++import { EmptyState }        from "@/components/ui/empty-state"
++import { Pagination }        from "@/components/ui/pagination"
++import { SlideOut }          from "@/components/ui/slide-out"
++import { ModalDialog }       from "@/components/ui/modal-dialog"
++import { HighlightIcon }     from "@/components/ui/highlight-icon"
++import { Input }             from "@/components/ui/input"
++import { Chip }              from "@/components/ui/chip"
++import { anchorFromEvent, useDropdownPosition } from "@/lib/dropdown-anchor"
++import type { DropdownAnchor } from "@/lib/dropdown-anchor"
++import { Sparkle, Send, Contact as ContactIcon, LayoutList, Table2 } from "lucide-react"
++import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
++import {
++  CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
++  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG,
++  getActivity, getDrives, getFacts,
++} from "./ucpShared"
++import type { UcpContact, UcpEntityType, UcpStatus } from "./ucpShared"
++
++const PAGE_SIZE = 10
++
++const TYPE_TABS: { id: string; label: string; type: UcpEntityType | "all" }[] = [
++  { id: "all",       label: "All",       type: "all"      },
++  { id: "people",    label: "People",    type: "person"   },
++  { id: "employees", label: "Employees", type: "employee" },
++  { id: "companies", label: "Companies", type: "company"  },
++]
++
++type SortKey = "recent" | "name" | "owner"
++
++const SORT_OPTIONS: { key: SortKey; label: string }[] = [
++  { key: "recent", label: "Last interaction" },
++  { key: "name",   label: "Name A\u2192Z"     },
++  { key: "owner",  label: "Owner"             },
++]
++
++const STATUS_OPTIONS: UcpStatus[] = ["Active", "Inactive", "Archived"]
++const OWNER_OPTIONS = Array.from(new Set(CONTACTS.map(c => c.owner))).sort()
++
++// ── Roster concierge ──────────────────────────────────────────────────────────
++// DS-GAP: agent chat panel — no chat component exists in src/components/ui/.
++// Composed from SlideOut + Tag + Chip + Input + Button; the bubbles only
++// rearrange existing tokens.
++
++type RosterTurn = { id: string; from: "agent" | "user"; text: string; planes?: ("truth" | "sandbox" | "sources")[] }
++
++function RosterConcierge({ open, onClose, total }: { open: boolean; onClose: () => void; total: number }) {
++  const [turns, setTurns] = useState<RosterTurn[]>([
++    {
++      id: "t1", from: "agent",
++      text: `I'm the Contacts concierge. I can read across all ${total} records in this roster and tell you which ones need a decision — I answer from each record's own planes, never from outside them.`,
++    },
++  ])
++  const [draft, setDraft] = useState("")
++
++  const ask = (question: string) => {
++    if (!question.trim()) return
++    setTurns(prev => [
++      ...prev,
++      { id: `u-${prev.length}`, from: "user", text: question },
++      {
++        id: `a-${prev.length + 1}`, from: "agent",
++        text: "Three records carry an open commitment right now: Meridian Corp (renewal in 12 days), Sandra Torres (migration timeline asked twice, unanswered) and Kestrel Logistics (dormant 80 days since the pilot closed). Open any of them and I'll carry the context over.",
++        planes: ["truth", "sandbox"],
++      },
++    ])
++    setDraft("")
++  }
++
++  return (
++    <SlideOut
++      open={open}
++      onClose={onClose}
++      type="with-variants"
++      size="m"
++      title="Concierge"
++      subtitle={`Contacts · ${total} records`}
++      showIcon
++      iconContent={<Sparkle size={14} />}
++      showStatus
++      statusLabel="Online"
++      showTopButton={false}
++      showTabs={false}
++      showSearchBar={false}
++      showChips={false}
++      showCta={false}
++    >
++      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
++        <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 8px", display: "flex", flexDirection: "column", gap: 12 }}>
++          {turns.map(turn => (
++            <div
++              key={turn.id}
++              style={{
++                alignSelf: turn.from === "user" ? "flex-end" : "flex-start",
++                maxWidth: "90%", display: "flex", flexDirection: "column", gap: 6,
++              }}
++            >
++              <div
++                style={{
++                  background: turn.from === "user" ? "var(--field-bg)" : "var(--tag-purple-bg)",
++                  border: `1px solid ${turn.from === "user" ? "var(--field-border)" : "var(--tag-purple-bd)"}`,
++                  borderRadius: 10, padding: "10px 12px", fontSize: 12, lineHeight: 1.6,
++                  color: turn.from === "user" ? "var(--foreground)" : "var(--tag-purple-fg)",
++                }}
++              >
++                {turn.text}
++              </div>
++              {turn.planes && (
++                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
++                  {turn.planes.map(p => (
++                    <Tag key={p} variant={PLANE_META[p].tag} size="sm">{PLANE_META[p].label} plane</Tag>
++                  ))}
++                </div>
++              )}
++            </div>
++          ))}
++        </div>
++        <div style={{ padding: "8px 20px 20px", display: "flex", flexDirection: "column", gap: 10, borderTop: "1px solid var(--field-border)" }}>
++          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, paddingTop: 10 }}>
++            {CONCIERGE_PROMPTS.map(p => (
++              <Chip key={p} size="s" variant="secondary" onClick={() => ask(p)}>{p}</Chip>
++            ))}
++          </div>
++          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
++            <Input
++              placeholder="Ask about the roster…"
++              value={draft}
++              onChange={e => setDraft(e.target.value)}
++              onKeyDown={e => { if (e.key === "Enter") ask(draft) }}
++            />
++            <Button variant="primary" size="default" icon={<Send size={14} />} iconPosition="alone" aria-label="Send" onClick={() => ask(draft)} />
++          </div>
++        </div>
++      </div>
++    </SlideOut>
++  )
++}
++
++// ── Table columns ─────────────────────────────────────────────────────────────
++
++const CONTACT_COLUMNS: TableColumn<UcpContact>[] = [
++  {
++    key: "name", header: "Name", width: "24%",
++    render: r => (
++      <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
++        <TableCellAvatar name={r.name} size="sm" />
++        <TableCellLink>{r.name}</TableCellLink>
++      </div>
++    ),
++  },
++  { key: "type",   header: "Type",   width: "11%", render: r => <Tag variant={TYPE_TAG[r.type]} size="sm">{TYPE_LABEL[r.type]}</Tag> },
++  { key: "subtitle", header: "Context",           render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.subtitle}</span> },
++  { key: "owner",  header: "Owner",  width: "13%", render: r => <span style={{ fontSize: 12, color: "var(--foreground)" }}>{r.owner}</span> },
++  { key: "lastInteraction", header: "Last interaction", width: "14%", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.lastInteraction}</span> },
++  { key: "status", header: "Status", width: "10%", render: r => <Tag variant={STATUS_TAG[r.status]} size="sm">{r.status}</Tag> },
++]
++
++// ── Screen ────────────────────────────────────────────────────────────────────
++
++export default function PMThomasUcpContactsScreen() {
++  const [openId,     setOpenId]     = useState<string | null>(null)
++  const [tab,        setTab]        = useState("all")
++  const [view,       setView]       = useState("cards")
++  const [page,       setPage]       = useState(1)
++  const [pageSize,   setPageSize]   = useState(PAGE_SIZE)
++  const [search,     setSearch]     = useState("")
++
++  // Draft vs. applied — a chip never appears before Apply.
++  const [status,     setStatus]     = useState<string | undefined>()
++  const [owner,      setOwner]      = useState<string | undefined>()
++  const [slideOpen,  setSlideOpen]  = useState(false)
++
++  const [sortKey,    setSortKey]    = useState<SortKey>("recent")
++  const [openSlot,   setOpenSlot]   = useState<"status" | "owner" | "sort" | null>(null)
++  const [anchor,     setAnchor]     = useState<DropdownAnchor | null>(null)
++  const dropdown = useDropdownPosition(anchor)
++
++  const [preview,    setPreview]    = useState<UcpContact | null>(null)
++  const [kebab,      setKebab]      = useState<UcpContact | null>(null)
++  const [kebabAnchor, setKebabAnchor] = useState<DropdownAnchor | null>(null)
++  const kebabDropdown = useDropdownPosition(kebabAnchor)
++  const [archiving,  setArchiving]  = useState<UcpContact | null>(null)
++  const [chatOpen,   setChatOpen]   = useState(false)
++
++  const activeType = TYPE_TABS.find(t => t.id === tab)?.type ?? "all"
++
++  const filtered = useMemo(() => CONTACTS.filter(c => {
++    if (activeType !== "all" && c.type !== activeType) return false
++    if (status && c.status !== status) return false
++    if (owner  && c.owner  !== owner)  return false
++    if (search) {
++      const q = search.toLowerCase()
++      if (![c.name, c.subtitle, c.email, c.company, c.owner, c.id].some(f => f.toLowerCase().includes(q))) return false
++    }
++    return true
++  }), [activeType, status, owner, search])
++
++  const sorted = useMemo(() => {
++    const rows = [...filtered]
++    if (sortKey === "name")   return rows.sort((a, b) => a.name.localeCompare(b.name))
++    if (sortKey === "owner")  return rows.sort((a, b) => a.owner.localeCompare(b.owner) || a.name.localeCompare(b.name))
++    return rows.sort((a, b) => Date.parse(b.lastInteraction) - Date.parse(a.lastInteraction))
++  }, [filtered, sortKey])
++
++  const paged = sorted.slice((page - 1) * pageSize, page * pageSize)
++
++  const resetPage = () => setPage(1)
++  const hasFilters = Boolean(status || owner || search)
++
++  const clearAll = () => {
++    setStatus(undefined)
++    setOwner(undefined)
++    setSearch("")
++    resetPage()
++  }
++
++  const closeSlot = () => { setOpenSlot(null); setAnchor(null) }
++
++  const pickSlot = (slot: "status" | "owner", value: string) => {
++    if (slot === "status") setStatus(value)
++    else setOwner(value)
++    resetPage()
++    closeSlot()
++  }
++
++  const pickSort = (key: SortKey) => {
++    setSortKey(key)
++    resetPage()
++    closeSlot()
++  }
++
++  // ── Profile view takes over the whole screen ──
++  const open = CONTACTS.find(c => c.id === openId)
++  if (open) {
++    return (
++      <UcpProfileView
++        contact={open}
++        onBack={() => setOpenId(null)}
++        onSidebarItemClick={id => { if (id === "contacts") setOpenId(null) }}
++      />
++    )
++  }
++
++  const toItem = (c: UcpContact): EntityListItemData => ({
++    id:          c.id,
++    title:       c.name,
++    iconName:    TYPE_ICON[c.type],
++    iconVariant: c.type === "company" ? "light-blue" : c.type === "employee" ? "purple" : "info",
++    primaryMeta: [
++      { iconName: "Info",  label: c.subtitle },
++      { iconName: "Hash",  label: c.id       },
++    ],
++    secondaryMeta: [
++      { iconName: "UserRound", label: `Owner · ${c.owner}` },
++      { iconName: "Clock",     label: `Last interaction · ${c.lastInteraction}` },
++      { iconName: "Mail",      label: c.email },
++    ],
++    aiInsight: {
++      action:   "read",
++      detail:   c.aiSummary.headline,
++      viewMore: false,
++    },
++    tags:  [{ label: TYPE_LABEL[c.type] }],
++    state: { label: c.status, variant: STATUS_TAG[c.status] },
++    showMenu:    true,
++    onMenuClick: () => {},
++    actions: [{ label: "Preview", variant: "tertiary", icon: "Eye", onClick: () => setPreview(c) }],
++    onClick: () => setOpenId(c.id),
++  })
++
++  return (
++    <ScreenLayout
++      workspaceName="Acme Corp"
++      userName="Thomas González"
++      userEmail="thomas.gonzalez@aimsos.ai"
++      sidebarItems={UCP_SIDEBAR_ITEMS}
++      activeSidebarId="contacts"
++      header={isScrolled => (
++        <Header
++          size={isScrolled ? "compress" : "size-l"}
++          title="Contacts"
++          description="Every person, employee and company AIMS OS keeps a unified profile for."
++          primaryAction={
++            <Button variant="main" size="sm" icon={<Sparkle size={13} />} onClick={() => setChatOpen(true)}>
++              Ask the concierge
++            </Button>
++          }
++        />
++      )}
++      pagination={
++        filtered.length > pageSize
++          ? (
++              <Pagination
++                currentPage={page}
++                totalItems={filtered.length}
++                itemsPerPage={pageSize}
++                onPageChange={setPage}
++                onItemsPerPageChange={n => { setPageSize(n); resetPage() }}
++                rowsPerPageOptions={[10, 25, 50]}
++              />
++            )
++          : undefined
++      }
++    >
++      <Tabs
++        className="mb-[24px]"
++        activeId={tab}
++        onChange={id => { setTab(id); resetPage() }}
++        items={TYPE_TABS.map(t => ({ id: t.id, label: t.label }))}
++      />
++
++      <div className="mb-[24px]">
++        <SwitchTab
++          value={view}
++          onChange={id => { setView(id); resetPage() }}
++          aria-label="Result layout"
++          items={[
++            { id: "cards", label: "Cards", icon: <LayoutList size={14} /> },
++            { id: "table", label: "Table", icon: <Table2 size={14} />     },
++          ]}
++        />
++      </div>
++
++      <div className="mb-[24px]" onClickCapture={e => setAnchor(anchorFromEvent(e))}>
++        <Filters
++          showSearch
++          searchPlaceholder="Search by name, company, owner or ID…"
++          searchValue={search}
++          onSearchChange={v => { setSearch(v); resetPage() }}
++          slots={[
++            { placeholder: "Status", value: status, onOpen: () => setOpenSlot("status"), onRemove: () => { setStatus(undefined); resetPage() } },
++            { placeholder: "Owner",  value: owner,  onOpen: () => setOpenSlot("owner"),  onRemove: () => { setOwner(undefined);  resetPage() } },
++          ]}
++          showAllFilters
++          onAllFiltersClick={() => setSlideOpen(true)}
++          showClearFilters={hasFilters}
++          onClearFilters={clearAll}
++          showSort
++          sortLabel={SORT_OPTIONS.find(o => o.key === sortKey)?.label}
++          onSortClick={() => setOpenSlot("sort")}
++          showViewToggle={false}
++        />
++      </div>
++
++      {filtered.length === 0 ? (
++        <EmptyState
++          icon={ContactIcon}
++          title={hasFilters ? "No contacts found" : "No contacts yet"}
++          description={hasFilters
++            ? "Try adjusting your filters or search term."
++            : "Contacts arrive through account sync and ingestion. They'll appear here once the first one lands."
++          }
++          ctaLabel={hasFilters ? "Clear filters" : undefined}
++          onCta={hasFilters ? clearAll : undefined}
++        />
++      ) : view === "cards" ? (
++        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++          {paged.map(c => (
++            <div key={c.id} onClickCapture={e => { setKebabAnchor(anchorFromEvent(e)) }}>
++              <CardContainer size="sm" className="!p-0 overflow-hidden">
++                <EntityList items={[{ ...toItem(c), onMenuClick: () => setKebab(c) }]} />
++              </CardContainer>
++            </div>
++          ))}
++        </div>
++      ) : (
++        <Table
++          columns={CONTACT_COLUMNS}
++          data={paged}
++          size="sm"
++          rowKey={r => r.id}
++          onRowClick={r => setOpenId(r.id)}
++        />
++      )}
++
++      {/* ── Filter slot dropdowns ── */}
++      {openSlot && anchor && (
++        <>
++          <div className="fixed inset-0 z-[10000]" onClick={closeSlot} />
++          <div ref={dropdown.ref} style={{ position: "fixed", zIndex: 10001, ...dropdown.style }}>
++            <Menu>
++              {openSlot === "sort"
++                ? SORT_OPTIONS.map(option => (
++                    <MenuItem
++                      key={option.key}
++                      size="sm"
++                      label={option.label}
++                      state={sortKey === option.key ? "focus" : "default"}
++                      onClick={() => pickSort(option.key)}
++                    />
++                  ))
++                : (openSlot === "status" ? STATUS_OPTIONS : OWNER_OPTIONS).map(option => (
++                    <MenuItem
++                      key={option}
++                      size="sm"
++                      label={option}
++                      onClick={() => pickSlot(openSlot, option)}
++                    />
++                  ))
++              }
++            </Menu>
++          </div>
++        </>
++      )}
++
++      {/* ── Row kebab — Archive + Duplicate are the DS defaults ── */}
++      {kebab && kebabAnchor && (
++        <>
++          <div className="fixed inset-0 z-[10000]" onClick={() => setKebab(null)} />
++          <div ref={kebabDropdown.ref} style={{ position: "fixed", zIndex: 10001, ...kebabDropdown.style }}>
++            <Menu>
++              <MenuItem size="sm" label="Archive"   leadingIcon={<HighlightIcon size="sm" variant="neutral" iconName="Archive" />}  onClick={() => { setArchiving(kebab); setKebab(null) }} />
++              <MenuItem size="sm" label="Duplicate" leadingIcon={<HighlightIcon size="sm" variant="neutral" iconName="Copy" />}     onClick={() => setKebab(null)} />
++            </Menu>
++          </div>
++        </>
++      )}
++
++      {/* ── All filters ── */}
++      <FiltersSlideout
++        isOpen={slideOpen}
++        onClose={() => setSlideOpen(false)}
++        onApply={() => { resetPage(); setSlideOpen(false) }}
++        onClearAll={clearAll}
++        activeFilters={[
++          ...(status ? [{ label: "Status", value: status, onRemove: () => { setStatus(undefined); resetPage() } }] : []),
++          ...(owner  ? [{ label: "Owner",  value: owner,  onRemove: () => { setOwner(undefined);  resetPage() } }] : []),
++        ]}
++      />
++
++      {/* ── Row preview — the profile without leaving the list ── */}
++      <SlideOut
++        open={preview !== null}
++        onClose={() => setPreview(null)}
++        type="with-variants"
++        size="m"
++        title={preview?.name ?? ""}
++        subtitle={preview ? `${TYPE_LABEL[preview.type]} · ${preview.company}` : ""}
++        showIcon
++        iconContent={<Sparkle size={14} />}
++        showStatus={false}
++        showTopButton={false}
++      showTabs={false}
++      showSearchBar={false}
++      showChips={false}
++      showCta={false}
++      >
++        {preview && (
++          <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
++            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
++              <Tag variant={STATUS_TAG[preview.status]} size="sm">{preview.status}</Tag>
++              <Tag variant={TYPE_TAG[preview.type]} size="sm">{TYPE_LABEL[preview.type]}</Tag>
++            </div>
++            <div
++              style={{
++                background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)",
++                borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
++              }}
++            >
++              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-fg)" }}>
++                {preview.agent.name} · {preview.aiSummary.confidence}% confidence
++              </span>
++              <span style={{ fontSize: 12, color: "var(--tag-purple-fg)", lineHeight: 1.6 }}>
++                {preview.aiSummary.detail}
++              </span>
++            </div>
++
++            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
++              {[
++                { label: "Record ID",        value: preview.id                                       },
++                { label: "Owner",            value: preview.owner                                    },
++                { label: "Email",            value: preview.email                                    },
++                { label: "Last interaction", value: preview.lastInteraction                          },
++                { label: "Verified facts",   value: `${getFacts(preview).filter(f => f.plane === "truth").length} on the Truth plane` },
++                { label: "Activity",         value: `${getActivity(preview).length} events`          },
++                { label: "Drives attached",  value: `${getDrives(preview).length} sources`           },
++              ].map(row => (
++                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
++                  <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{row.label}</span>
++                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{row.value}</span>
++                </div>
++              ))}
++            </div>
++
++            <Button
++              variant="primary"
++              size="sm"
++              className="self-start"
++              onClick={() => { setOpenId(preview.id); setPreview(null) }}
++            >
++              Open full profile
++            </Button>
++          </div>
++        )}
++      </SlideOut>
++
++      <ModalDialog
++        isOpen={archiving !== null}
++        onClose={() => setArchiving(null)}
++        tone="warning"
++        iconName="Archive"
++        title={`Archive ${archiving?.name ?? "this contact"}?`}
++        description="The record moves out of active views and its assigned agent stops acting on it. Facts and drives are kept, and you can restore it later."
++        ctaPrimary={{ label: "Archive", onClick: () => setArchiving(null) }}
++        ctaSecondary={{ label: "Cancel", onClick: () => setArchiving(null) }}
++      />
++
++      <RosterConcierge open={chatOpen} onClose={() => setChatOpen(false)} total={CONTACTS.length} />
++    </ScreenLayout>
++  )
++}
+diff --git a/src/screens/pm-thomas-ucp-profile.tsx b/src/screens/pm-thomas-ucp-profile.tsx
+new file mode 100644
+index 0000000..9aa249a
+--- /dev/null
++++ b/src/screens/pm-thomas-ucp-profile.tsx
+@@ -0,0 +1,725 @@
++/**
++ * UCP — Unified Contact Profile (detail view).
++ *
++ * Read-only by design: the record is assembled by ingestion and agents, not
++ * typed in here, so there is no create/edit CTA in the Header. The one
++ * always-present entry point is the record's assigned concierge — RecordHeader's
++ * agent button — which opens a chat scoped to this record.
++ *
++ * Tabs: Overview · Snapshot · Activity · Drives
++ *   Overview  → WidgetCanvasView (DS rule: any tab named Overview is a canvas)
++ *   Snapshot  → this record's facts by knowledge plane (Truth / Sandbox / Sources)
++ *   Activity  → interaction timeline, paginated
++ *   Drives    → the Source Drives attached to this record
++ */
++
++import { useMemo, useState } from "react"
++import { ScreenLayout }      from "@/components/layouts/screen-layout"
++import { WidgetCanvasView }  from "@/components/layouts/widget-canvas-view"
++import type { CanvasSlot }   from "@/components/layouts/widget-canvas-view"
++import { useWidgetSize }     from "@/components/layouts/widget-canvas-view"
++import type { SidebarItem }  from "@/components/ui/sidebar"
++import { Header }            from "@/components/ui/header"
++import { Breadcrumb }        from "@/components/ui/breadcrumb"
++import { Tabs }              from "@/components/ui/tabs"
++import { Tag }               from "@/components/ui/tag"
++import { Chip }              from "@/components/ui/chip"
++import { Button }            from "@/components/ui/button"
++import { Input }             from "@/components/ui/input"
++import { Table }             from "@/components/ui/table"
++import type { TableColumn }  from "@/components/ui/table"
++import { CardContainer }     from "@/components/ui/card-container"
++import { EntityList }        from "@/components/ui/entity-list"
++import type { EntityListItemData } from "@/components/ui/entity-list"
++import { EmptyState }        from "@/components/ui/empty-state"
++import { HighlightIcon }     from "@/components/ui/highlight-icon"
++import { Pagination }        from "@/components/ui/pagination"
++import { SlideOut }          from "@/components/ui/slide-out"
++import { RecordHeader, RECORD_HEADER_RECOMMENDED_ACTIONS } from "@/components/ui/record-header"
++import { Sparkle, Send, ScanLine, Inbox, HardDrive } from "lucide-react"
++import {
++  CONTACTS, PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
++  RECORD_VARIANT, STATUS_TAG,
++  buildRecord, getActivity, getConciergeOpening, getConnections, getDrives,
++  getFacts, getGovernance, getRisk,
++} from "./ucpShared"
++import type {
++  ActivityChannel, ConciergeTurn, KnowledgePlane, StudyState, UcpContact, UcpDrive, UcpFact,
++} from "./ucpShared"
++
++export const UCP_SIDEBAR_ITEMS: SidebarItem[] = [
++  { id: "home",       label: "Home",       icon: "Home"      },
++  { id: "work",       label: "My Work",    icon: "Inbox"     },
++  { id: "contacts",   label: "Contacts",   icon: "Contact"   },
++  { id: "agents",     label: "Agents",     icon: "Bot"       },
++  { id: "workflows",  label: "Workflows",  icon: "Zap"       },
++  { id: "knowledge",  label: "Knowledge",  icon: "BookOpen"  },
++  { id: "governance", label: "Governance", icon: "Shield"    },
++  { id: "admin",      label: "Admin",      icon: "Settings"  },
++]
++
++const ACTIVITY_PAGE_SIZE = 8
++
++// ── Study widget — hidden when the study returned nothing, retry when it failed ─
++
++function StudyWidget({ title, state, children }: { title: string; state: StudyState; children: React.ReactNode }) {
++  if (state === "empty") return null
++  if (state === "error") {
++    return (
++      <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
++        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
++          <HighlightIcon size="sm" variant="error" iconName="AlertCircle" />
++          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>Failed to load</span>
++        </div>
++        <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>
++          {title} data couldn&apos;t be retrieved for this record.
++        </span>
++        <Button variant="tertiary" size="sm" className="self-start !px-0" onClick={() => {}}>
++          Retry
++        </Button>
++      </div>
++    )
++  }
++  return <>{children}</>
++}
++
++/** Metric rows shared by the Governance and Risk study widgets. */
++function MetricRows({ rows }: { rows: { label: string; value: string; icon: string; variant: "success" | "alert" | "informative" | "neutral" }[] }) {
++  const { availableHeight } = useWidgetSize()
++  // 34px pitch per single-line metric row, 70px for the widget's title chrome + padding.
++  const maxRows = availableHeight ? Math.max(2, Math.floor((availableHeight - 70) / 34)) : rows.length
++  return (
++    <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
++      {rows.slice(0, maxRows).map(row => (
++        <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
++          <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{row.label}</span>
++          <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
++            <HighlightIcon size="sm" variant={row.variant} iconName={row.icon} />
++            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)", whiteSpace: "nowrap" }}>{row.value}</span>
++          </div>
++        </div>
++      ))}
++    </div>
++  )
++}
++
++function ConnectionsContent({ contact }: { contact: UcpContact }) {
++  const { availableHeight } = useWidgetSize()
++  const connections  = getConnections(contact)
++  // 44px pitch per icon + two-line row, 70px for the widget's title chrome +
++  // padding. At the default 4-row slot height that lands on 3 without clipping.
++  const maxRows      = availableHeight ? Math.max(2, Math.floor((availableHeight - 70) / 44)) : 3
++  const visible      = connections.slice(0, maxRows)
++  const hidden       = connections.length - visible.length
++  return (
++    <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
++      {visible.map(c => (
++        <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
++          <HighlightIcon size="sm" variant="neutral" iconName={c.icon} />
++          <div style={{ display: "flex", flexDirection: "column", gap: 1, minWidth: 0 }}>
++            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
++            <span style={{ fontSize: 11, color: "var(--field-supporting)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.relation}</span>
++          </div>
++        </div>
++      ))}
++      {hidden > 0 && (
++        <Button variant="tertiary" size="sm" className="self-start !px-0" onClick={() => {}}>
++          {`View ${hidden} more`}
++        </Button>
++      )}
++    </div>
++  )
++}
++
++/** The assigned agent's read on this record. Purple = "AI produced this",
++ *  the same treatment EntityList's own aiInsight block uses. */
++function AiSummaryContent({ contact, onAsk }: { contact: UcpContact; onAsk: () => void }) {
++  const { isNarrow } = useWidgetSize()
++  return (
++    <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
++      <div
++        style={{
++          background: "var(--tag-purple-bg)",
++          border: "1px solid var(--tag-purple-bd)",
++          borderRadius: 8,
++          padding: "12px 14px",
++          display: "flex", flexDirection: "column", gap: 8,
++        }}
++      >
++        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
++          <Sparkle size={13} style={{ color: "var(--tag-purple-bd)" }} />
++          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-fg)" }}>
++            {contact.agent.name}
++          </span>
++          <span style={{ fontSize: 11, color: "var(--tag-purple-fg)", opacity: 0.75, marginLeft: "auto" }}>
++            {contact.aiSummary.confidence}% confidence
++          </span>
++        </div>
++        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--tag-purple-fg)", lineHeight: 1.4 }}>
++          {contact.aiSummary.headline}
++        </span>
++        {!isNarrow && (
++          <span style={{ fontSize: 12, color: "var(--tag-purple-fg)", opacity: 0.9, lineHeight: 1.55 }}>
++            {contact.aiSummary.detail}
++          </span>
++        )}
++      </div>
++      {!isNarrow && (
++        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
++          <span style={{ fontSize: 11, color: "var(--field-supporting)" }}>Drawn from</span>
++          {PLANE_ORDER.map(plane => (
++            <Tag key={plane} variant={PLANE_META[plane].tag} size="sm">
++              {PLANE_META[plane].label} · {getFacts(contact).filter(f => f.plane === plane).length}
++            </Tag>
++          ))}
++        </div>
++      )}
++      <Button variant="primary" size="sm" className="self-start" icon={<Sparkle size={13} />} onClick={onAsk}>
++        Ask the concierge
++      </Button>
++    </div>
++  )
++}
++
++// ── Snapshot (Truth Facts) ────────────────────────────────────────────────────
++
++const FACT_COLUMNS: TableColumn<UcpFact>[] = [
++  {
++    key: "label", header: "Fact", width: "22%",
++    render: r => <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{r.label}</span>,
++  },
++  {
++    key: "value", header: "Value",
++    render: r => <span style={{ fontSize: 12, color: "var(--foreground)" }}>{r.value}</span>,
++  },
++  {
++    key: "plane", header: "Plane", width: "14%",
++    render: r => <Tag variant={PLANE_META[r.plane].tag} size="sm">{PLANE_META[r.plane].label}</Tag>,
++  },
++  {
++    key: "confidence", header: "Confidence", width: "11%", align: "right",
++    render: r => <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{PLANE_META[r.plane].confidence}</span>,
++  },
++  {
++    key: "source", header: "Source", width: "22%",
++    render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.source}</span>,
++  },
++  {
++    key: "verifiedAt", header: "Last verified", width: "14%",
++    render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.verifiedAt}</span>,
++  },
++]
++
++function SnapshotTab({ contact }: { contact: UcpContact }) {
++  const [plane, setPlane] = useState<KnowledgePlane | "all">("all")
++  const facts   = useMemo(() => getFacts(contact), [contact])
++  const visible = plane === "all" ? facts : facts.filter(f => f.plane === plane)
++
++  return (
++    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
++      {/* Plane summary — what the system holds as true about this record, and how sure it is */}
++      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12 }}>
++        {PLANE_ORDER.map(p => {
++          const meta  = PLANE_META[p]
++          const count = facts.filter(f => f.plane === p).length
++          return (
++            <CardContainer key={p} variant="default" size="sm">
++              <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
++                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
++                  <Tag variant={meta.tag} size="sm">{meta.label} plane</Tag>
++                  <span style={{ fontSize: 18, fontWeight: 700, lineHeight: 1, color: "var(--color-text-title)" }}>{count}</span>
++                </div>
++                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>{meta.blurb}</span>
++                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--foreground)" }}>Confidence {meta.confidence}</span>
++              </div>
++            </CardContainer>
++          )
++        })}
++      </div>
++
++      {/* Plane filter — a selection toggle, so primary/secondary, not a semantic color */}
++      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
++        <Chip size="s" variant={plane === "all" ? "primary" : "secondary"} onClick={() => setPlane("all")}>
++          All facts ({facts.length})
++        </Chip>
++        {PLANE_ORDER.map(p => (
++          <Chip
++            key={p}
++            size="s"
++            variant={plane === p ? "primary" : "secondary"}
++            onClick={() => setPlane(p)}
++          >
++            {PLANE_META[p].label} ({facts.filter(f => f.plane === p).length})
++          </Chip>
++        ))}
++      </div>
++
++      {visible.length === 0 ? (
++        <EmptyState
++          icon={ScanLine}
++          title="No facts on this plane"
++          description="Nothing has been recorded on this plane for this contact yet."
++          ctaLabel="Show all facts"
++          onCta={() => setPlane("all")}
++        />
++      ) : (
++        <Table columns={FACT_COLUMNS} data={visible} size="sm" rowKey={r => r.id} />
++      )}
++    </div>
++  )
++}
++
++// ── Activity ──────────────────────────────────────────────────────────────────
++
++function ActivityTab({
++  contact, channel, onChannelChange, page, pageSize,
++}: {
++  contact:  UcpContact
++  channel:  ActivityChannel | "all"
++  onChannelChange: (c: ActivityChannel | "all") => void
++  page:     number
++  pageSize: number
++}) {
++  const all      = useMemo(() => getActivity(contact), [contact])
++  const filtered = channel === "all" ? all : all.filter(a => a.channel === channel)
++  const paged    = filtered.slice((page - 1) * pageSize, page * pageSize)
++
++  const items: EntityListItemData[] = paged.map(a => ({
++    id:          a.id,
++    title:       a.title,
++    iconName:    CHANNEL_META[a.channel].icon,
++    iconVariant: a.channel === "agent" ? "purple" : a.channel === "system" ? "neutral" : "info",
++    primaryMeta: [{ iconName: "Clock", label: a.timestamp }],
++    secondaryMeta: [{ iconName: "Info", label: a.meta }],
++    state:       { label: a.state.label, variant: a.state.variant },
++    aiInsight:   a.aiSummary
++      ? { action: "summary", detail: a.aiSummary, viewMore: a.aiSummary.length > 160 }
++      : undefined,
++  }))
++
++  return (
++    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
++      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
++        <Chip size="s" variant={channel === "all" ? "primary" : "secondary"} onClick={() => onChannelChange("all")}>
++          All ({all.length})
++        </Chip>
++        {(Object.keys(CHANNEL_META) as ActivityChannel[]).map(c => (
++          <Chip
++            key={c}
++            size="s"
++            variant={channel === c ? "primary" : "secondary"}
++            onClick={() => onChannelChange(c)}
++          >
++            {CHANNEL_META[c].label} ({all.filter(a => a.channel === c).length})
++          </Chip>
++        ))}
++      </div>
++
++      {filtered.length === 0 ? (
++        <EmptyState
++          icon={Inbox}
++          title="No activity on this channel"
++          description="Try another channel, or clear the filter to see the full timeline."
++          ctaLabel="Clear filter"
++          onCta={() => onChannelChange("all")}
++        />
++      ) : (
++        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++          {items.map(item => (
++            <CardContainer key={item.id} size="sm" className="!p-0 overflow-hidden">
++              <EntityList items={[item]} />
++            </CardContainer>
++          ))}
++        </div>
++      )}
++    </div>
++  )
++}
++
++// ── Drives ────────────────────────────────────────────────────────────────────
++
++function DrivesTab({ contact, onPreview }: { contact: UcpContact; onPreview: (d: UcpDrive) => void }) {
++  const drives = useMemo(() => getDrives(contact), [contact])
++
++  if (drives.length === 0) {
++    return (
++      <EmptyState
++        icon={HardDrive}
++        title="No drives attached"
++        description="Source Drives connected to this contact will appear here."
++      />
++    )
++  }
++
++  return (
++    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++      {drives.map(d => (
++        <CardContainer key={d.id} size="sm" className="!p-0 overflow-hidden">
++          <EntityList
++            items={[{
++              id:          d.id,
++              title:       d.name,
++              iconName:    d.kind === "Document" ? "FileText" : d.kind === "Drive" ? "HardDrive" : "Folder",
++              iconVariant: d.state.variant === "error" ? "error" : d.state.variant === "alert" ? "yellow" : "light-blue",
++              primaryMeta: [
++                { iconName: "Cloud",  label: d.provider },
++                { iconName: "Files",  label: d.items    },
++              ],
++              secondaryMeta: [
++                { iconName: "User",         label: `Owner · ${d.owner}` },
++                { iconName: "RefreshCw",    label: `Last sync · ${d.lastSync}` },
++                { iconName: "Share2",       label: d.scope },
++              ],
++              tags:    [{ label: d.kind }],
++              state:   { label: d.state.label, variant: d.state.variant },
++              actions: [{ label: "Preview", variant: "tertiary", icon: "Eye", onClick: () => onPreview(d) }],
++            }]}
++          />
++        </CardContainer>
++      ))}
++    </div>
++  )
++}
++
++// ── Concierge chat ────────────────────────────────────────────────────────────
++// DS-GAP: agent chat panel — there is no chat component in src/components/ui/.
++// Composed here from SlideOut + CardContainer + Tag + Input + Button per the
++// "compose before you build" rule; the message bubbles are the only bespoke
++// arrangement, and they only rearrange existing tokens.
++
++function ConciergeChat({
++  contact, open, onClose,
++}: {
++  contact: UcpContact
++  open:    boolean
++  onClose: () => void
++}) {
++  const [turns, setTurns] = useState<ConciergeTurn[]>(() => getConciergeOpening(contact))
++  const [draft, setDraft] = useState("")
++
++  const ask = (question: string) => {
++    if (!question.trim()) return
++    setTurns(prev => [
++      ...prev,
++      { id: `u-${prev.length}`, from: "user", text: question },
++      {
++        id: `a-${prev.length + 1}`, from: "agent",
++        text: `Here's what this record supports for that. Everything below is drawn from ${contact.name}'s own planes — nothing inferred from outside this profile.`,
++        sources: [
++          { label: "Interaction history", plane: "truth"   },
++          { label: "Call notes — Aug 28", plane: "sandbox" },
++        ],
++      },
++    ])
++    setDraft("")
++  }
++
++  return (
++    <SlideOut
++      open={open}
++      onClose={onClose}
++      type="with-variants"
++      size="m"
++      title="Concierge"
++      subtitle={`${contact.agent.name} · ${contact.name}`}
++      showIcon
++      iconContent={<Sparkle size={14} />}
++      showStatus
++      statusLabel="Online"
++      showTopButton={false}
++      showTabs={false}
++      showSearchBar={false}
++      showChips={false}
++      showCta={false}
++    >
++      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
++        <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 8px", display: "flex", flexDirection: "column", gap: 12 }}>
++          {turns.map(turn => (
++            <div
++              key={turn.id}
++              style={{
++                alignSelf: turn.from === "user" ? "flex-end" : "flex-start",
++                maxWidth: "90%",
++                display: "flex", flexDirection: "column", gap: 6,
++              }}
++            >
++              <div
++                style={{
++                  background: turn.from === "user" ? "var(--field-bg)" : "var(--tag-purple-bg)",
++                  border: `1px solid ${turn.from === "user" ? "var(--field-border)" : "var(--tag-purple-bd)"}`,
++                  borderRadius: 10,
++                  padding: "10px 12px",
++                  fontSize: 12,
++                  lineHeight: 1.6,
++                  color: turn.from === "user" ? "var(--foreground)" : "var(--tag-purple-fg)",
++                }}
++              >
++                {turn.text}
++              </div>
++              {turn.sources && (
++                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
++                  {turn.sources.map(s => (
++                    <Tag key={s.label} variant={PLANE_META[s.plane].tag} size="sm">
++                      {PLANE_META[s.plane].label} · {s.label}
++                    </Tag>
++                  ))}
++                </div>
++              )}
++            </div>
++          ))}
++        </div>
++
++        <div style={{ padding: "8px 20px 20px", display: "flex", flexDirection: "column", gap: 10, borderTop: "1px solid var(--field-border)" }}>
++          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, paddingTop: 10 }}>
++            {CONCIERGE_PROMPTS.map(p => (
++              <Chip key={p} size="s" variant="secondary" onClick={() => ask(p)}>{p}</Chip>
++            ))}
++          </div>
++          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
++            <Input
++              placeholder={`Ask about ${contact.name}…`}
++              value={draft}
++              onChange={e => setDraft(e.target.value)}
++              onKeyDown={e => { if (e.key === "Enter") ask(draft) }}
++            />
++            <Button
++              variant="primary"
++              size="default"
++              icon={<Send size={14} />}
++              iconPosition="alone"
++              aria-label="Send"
++              onClick={() => ask(draft)}
++            />
++          </div>
++        </div>
++      </div>
++    </SlideOut>
++  )
++}
++
++// ── Profile view ──────────────────────────────────────────────────────────────
++
++export function UcpProfileView({
++  contact, onBack, onSidebarItemClick,
++}: {
++  contact: UcpContact
++  onBack?: () => void
++  onSidebarItemClick?: (id: string) => void
++}) {
++  const [tab,        setTab]        = useState("overview")
++  const [channel,    setChannel]    = useState<ActivityChannel | "all">("all")
++  const [actPage,    setActPage]    = useState(1)
++  const [actSize,    setActSize]    = useState(ACTIVITY_PAGE_SIZE)
++  const [chatOpen,   setChatOpen]   = useState(false)
++  const [drivePeek,  setDrivePeek]  = useState<UcpDrive | null>(null)
++
++  const variant = RECORD_VARIANT[contact.type]
++  const record  = useMemo(() => buildRecord(contact), [contact])
++
++  const activityCount = useMemo(() => {
++    const all = getActivity(contact)
++    return channel === "all" ? all.length : all.filter(a => a.channel === channel).length
++  }, [contact, channel])
++
++  const overviewSlots = useMemo<CanvasSlot[]>(() => {
++    const slots: CanvasSlot[] = [
++      {
++        uid: "ai-summary", title: `${contact.agent.name} — read on this record`,
++        colSpan: 3, widthClass: "full", rowSpan: 5,
++        content: <AiSummaryContent contact={contact} onAsk={() => setChatOpen(true)} />,
++      },
++    ]
++    if (contact.governance !== "empty") {
++      slots.push({
++        uid: "governance", title: "Governance", colSpan: 1, rowSpan: 4,
++        content: (
++          <StudyWidget title="Governance" state={contact.governance}>
++            <MetricRows rows={getGovernance(contact)} />
++          </StudyWidget>
++        ),
++      })
++    }
++    if (contact.risk !== "empty") {
++      slots.push({
++        uid: "risk", title: "Risk", colSpan: 1, rowSpan: 4,
++        content: (
++          <StudyWidget title="Risk" state={contact.risk}>
++            <MetricRows rows={getRisk(contact)} />
++          </StudyWidget>
++        ),
++      })
++    }
++    if (contact.connections !== "empty") {
++      slots.push({
++        uid: "connections", title: "Connections", colSpan: 1, rowSpan: 4,
++        content: (
++          <StudyWidget title="Connections" state={contact.connections}>
++            <ConnectionsContent contact={contact} />
++          </StudyWidget>
++        ),
++      })
++    }
++    slots.push({
++      uid: "recent-activity", title: "Recent activity", colSpan: 3, widthClass: "full",
++      content: (
++        <div style={{ padding: "0 16px 16px" }}>
++          <Table
++            size="sm"
++            rowKey={r => r.id}
++            data={getActivity(contact).slice(0, 5)}
++            columns={[
++              { key: "timestamp", header: "When",    width: "18%", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.timestamp}</span> },
++              { key: "channel",   header: "Channel", width: "12%", render: r => <Tag variant="neutral" size="sm">{CHANNEL_META[r.channel].label}</Tag> },
++              { key: "title",     header: "Event",                 render: r => <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{r.title}</span> },
++              { key: "meta",      header: "Detail",  width: "30%", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.meta}</span> },
++              { key: "state",     header: "Status",  width: "14%", render: r => <Tag variant={r.state.variant} size="sm">{r.state.label}</Tag> },
++            ]}
++          />
++          <Button
++            variant="tertiary"
++            size="sm"
++            className="!px-0 mt-[8px]"
++            onClick={() => { setTab("activity"); setActPage(1) }}
++          >
++            View full timeline
++          </Button>
++        </div>
++      ),
++    })
++    return slots
++  }, [contact])
++
++  const goTab = (id: string) => {
++    setTab(id)
++    setActPage(1)
++  }
++
++  return (
++    <ScreenLayout
++      workspaceName="Acme Corp"
++      userName="Thomas González"
++      userEmail="thomas.gonzalez@aimsos.ai"
++      sidebarItems={UCP_SIDEBAR_ITEMS}
++      activeSidebarId="contacts"
++      onSidebarItemClick={onSidebarItemClick}
++      header={isScrolled => (
++        <Header
++          size={isScrolled ? "compress" : "size-l"}
++          title={contact.name}
++          description={contact.subtitle}
++          tag={<Tag variant={STATUS_TAG[contact.status]} size="sm">{contact.status}</Tag>}
++          breadcrumb={
++            <Breadcrumb
++              depth={2}
++              items={[{ label: "Contacts", href: "contacts" }, { label: contact.name }]}
++              onNavigate={() => onBack?.()}
++            />
++          }
++        />
++      )}
++      pagination={
++        tab === "activity" && activityCount > actSize
++          ? (
++              <Pagination
++                currentPage={actPage}
++                totalItems={activityCount}
++                itemsPerPage={actSize}
++                onPageChange={setActPage}
++                onItemsPerPageChange={n => { setActSize(n); setActPage(1) }}
++                rowsPerPageOptions={[8, 25, 50]}
++              />
++            )
++          : undefined
++      }
++    >
++      <RecordHeader
++        variant={variant}
++        data={record}
++        signal={contact.signal}
++        assignedAgent={{
++          id:         contact.agent.id,
++          name:       contact.agent.name,
++          onOpenChat: () => setChatOpen(true),
++        }}
++        actions={RECORD_HEADER_RECOMMENDED_ACTIONS[variant]}
++      />
++
++      <Tabs
++        className="mt-[24px] mb-[24px]"
++        activeId={tab}
++        onChange={goTab}
++        items={[
++          { id: "overview", label: "Overview" },
++          { id: "snapshot", label: "Snapshot" },
++          { id: "activity", label: "Activity" },
++          { id: "drives",   label: "Drives"   },
++        ]}
++      />
++
++      {tab === "overview" && <WidgetCanvasView initialSlots={overviewSlots} />}
++      {tab === "snapshot" && <SnapshotTab contact={contact} />}
++      {tab === "activity" && (
++        <ActivityTab
++          contact={contact}
++          channel={channel}
++          onChannelChange={c => { setChannel(c); setActPage(1) }}
++          page={actPage}
++          pageSize={actSize}
++        />
++      )}
++      {tab === "drives" && <DrivesTab contact={contact} onPreview={setDrivePeek} />}
++
++      <ConciergeChat contact={contact} open={chatOpen} onClose={() => setChatOpen(false)} />
++
++      <SlideOut
++        open={drivePeek !== null}
++        onClose={() => setDrivePeek(null)}
++        type="with-variants"
++        size="m"
++        title={drivePeek?.name ?? ""}
++        subtitle={drivePeek ? `${drivePeek.kind} · ${drivePeek.provider}` : ""}
++        showIcon
++        iconContent={<HardDrive size={14} />}
++        showStatus={false}
++        showTopButton={false}
++      showTabs={false}
++      showSearchBar={false}
++      showChips={false}
++      showCta={false}
++      >
++        {drivePeek && (
++          <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
++            <Tag variant={drivePeek.state.variant} size="sm">{drivePeek.state.label}</Tag>
++            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
++              {[
++                { label: "Provider",  value: drivePeek.provider },
++                { label: "Contents",  value: drivePeek.items    },
++                { label: "Owner",     value: drivePeek.owner    },
++                { label: "Last sync", value: drivePeek.lastSync },
++                { label: "Scope",     value: drivePeek.scope    },
++              ].map(row => (
++                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
++                  <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{row.label}</span>
++                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{row.value}</span>
++                </div>
++              ))}
++            </div>
++            <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
++              Drives feed the Sources plane. Anything here can be cited by {contact.agent.name}, but never
++              promoted to Truth without a verification step.
++            </span>
++          </div>
++        )}
++      </SlideOut>
++    </ScreenLayout>
++  )
++}
++
++// ── Standalone registration ───────────────────────────────────────────────────
++// Deep link lands on the flagship record; the Contacts list renders this same
++// component when a row is opened.
++
++export default function PMThomasUcpProfileScreen() {
++  const contact = CONTACTS.find(c => c.id === "ORG-0023") ?? CONTACTS[0]
++  return <UcpProfileView contact={contact} />
++}
+diff --git a/src/screens/ucpShared.ts b/src/screens/ucpShared.ts
+new file mode 100644
+index 0000000..a3878b4
+--- /dev/null
++++ b/src/screens/ucpShared.ts
+@@ -0,0 +1,661 @@
++/**
++ * UCP — Unified Contact Profile: shared types + mock data.
++ *
++ * Same role `adminShared.ts` plays for the Admin Console screens: one place
++ * for the record shapes and the fixtures, so the list screen and the profile
++ * screen can't drift apart on what a contact is.
++ *
++ * Two AIMS OS concepts are modelled here rather than invented:
++ *   - Knowledge planes (Truth 100% / Sandbox ~80% / Sources ~60%) — the same
++ *     three planes a TruthPack is built from. The Snapshot tab is this record's
++ *     facts organised by plane, so "how sure are we" is readable at a glance.
++ *   - Source Drives — drives, folders or documents attached from the company
++ *     catalog. This is what the profile's Drives tab lists (it replaces the
++ *     generic "Documents" tab a CRM would have).
++ */
++
++import type {
++  ClientRecord,
++  CustomerRecord,
++  EmployeeRecord,
++  NextBestAction,
++} from "@/components/ui/record-header"
++
++// ── Entity ────────────────────────────────────────────────────────────────────
++
++export type UcpEntityType = "person" | "employee" | "company"
++export type UcpStatus     = "Active" | "Inactive" | "Archived"
++
++/** A study either returned data, returned nothing, or failed. */
++export type StudyState = "loaded" | "empty" | "error"
++
++export type TagVariantLite = "success" | "error" | "alert" | "informative" | "neutral"
++
++export interface UcpContact {
++  id:              string
++  type:            UcpEntityType
++  name:            string
++  /** One line of "who is this" — role · department, or industry · size · HQ. */
++  subtitle:        string
++  email:           string
++  phone:           string
++  company:         string
++  owner:           string
++  status:          UcpStatus
++  lastInteraction: string
++  /** AIMS OS is agent-first — every record has one assigned concierge. */
++  agent:           { id: string; name: string }
++  /** Drives the RecordHeader Signal. Not every record has something urgent. */
++  signal:          NextBestAction
++  /** The agent's read on this record, shown as the Overview AI widget. */
++  aiSummary:       { headline: string; detail: string; confidence: number }
++  governance:      StudyState
++  risk:            StudyState
++  connections:     StudyState
++}
++
++/** person → client · employee → employee · company → customer.
++ *  Picked by which fields the record actually has, per the RecordHeader rule. */
++export const RECORD_VARIANT: Record<UcpEntityType, "client" | "employee" | "customer"> = {
++  person:   "client",
++  employee: "employee",
++  company:  "customer",
++}
++
++export const TYPE_LABEL: Record<UcpEntityType, string> = {
++  person:   "Person",
++  employee: "Employee",
++  company:  "Company",
++}
++
++export const TYPE_ICON: Record<UcpEntityType, string> = {
++  person:   "UserRound",
++  employee: "IdCard",
++  company:  "Building2",
++}
++
++export const TYPE_TAG: Record<UcpEntityType, "informative" | "purple" | "lightBlue"> = {
++  person:   "informative",
++  employee: "purple",
++  company:  "lightBlue",
++}
++
++export const STATUS_TAG: Record<UcpStatus, TagVariantLite> = {
++  Active:   "success",
++  Inactive: "neutral",
++  Archived: "error",
++}
++
++// ── Knowledge planes ──────────────────────────────────────────────────────────
++
++export type KnowledgePlane = "truth" | "sandbox" | "sources"
++
++export const PLANE_META: Record<KnowledgePlane, {
++  label:      string
++  confidence: string
++  tag:        TagVariantLite
++  blurb:      string
++}> = {
++  truth:   { label: "Truth",   confidence: "100%", tag: "success",     blurb: "Verified facts. Agents treat these as absolute truth." },
++  sandbox: { label: "Sandbox", confidence: "~80%", tag: "alert",       blurb: "Unverified claims and drafts. Likely true, not guaranteed." },
++  sources: { label: "Sources", confidence: "~60%", tag: "informative", blurb: "Raw documents and reference material, used for lookup and citation." },
++}
++
++export const PLANE_ORDER: KnowledgePlane[] = ["truth", "sandbox", "sources"]
++
++export interface UcpFact {
++  id:         string
++  label:      string
++  value:      string
++  plane:      KnowledgePlane
++  source:     string
++  verifiedAt: string
++}
++
++// ── Activity ──────────────────────────────────────────────────────────────────
++
++export type ActivityChannel = "call" | "email" | "meeting" | "agent" | "system"
++
++export const CHANNEL_META: Record<ActivityChannel, { label: string; icon: string }> = {
++  call:    { label: "Calls",    icon: "Phone"    },
++  email:   { label: "Email",    icon: "Mail"     },
++  meeting: { label: "Meetings", icon: "Users"    },
++  agent:   { label: "Agent",    icon: "Bot"      },
++  system:  { label: "System",   icon: "Settings" },
++}
++
++export interface UcpActivity {
++  id:        string
++  channel:   ActivityChannel
++  title:     string
++  meta:      string
++  timestamp: string
++  state:     { label: string; variant: TagVariantLite }
++  /** Written by the record's assigned agent — rendered as EntityList's aiInsight. */
++  aiSummary?: string
++}
++
++// ── Source Drives ─────────────────────────────────────────────────────────────
++
++export interface UcpDrive {
++  id:       string
++  name:     string
++  kind:     "Drive" | "Folder" | "Document"
++  provider: string
++  items:    string
++  owner:    string
++  lastSync: string
++  scope:    string
++  state:    { label: string; variant: TagVariantLite }
++}
++
++// ── Connections ───────────────────────────────────────────────────────────────
++
++export interface UcpConnection {
++  id:       string
++  name:     string
++  relation: string
++  icon:     string
++}
++
++// ── Contacts ──────────────────────────────────────────────────────────────────
++
++export const CONTACTS: UcpContact[] = [
++  {
++    id: "ORG-0023", type: "company", name: "Meridian Corp",
++    subtitle: "Financial Services · 2,400 employees · New York",
++    email: "accounts@meridian.com", phone: "+1 (212) 555-0142", company: "Meridian Corp",
++    owner: "Priya Nair", status: "Active", lastInteraction: "Aug 22, 2026",
++    agent: { id: "AGT-01", name: "Meridian Concierge" },
++    signal: { severity: "alert", label: "Renewal in 12 days — account health dropped to 61", dueContext: "Renews Sep 5", actionLabel: "Schedule renewal call" },
++    aiSummary: {
++      headline: "Renewal at risk — usage is up, sentiment is down.",
++      detail: "Seat usage grew 18% this quarter but three support escalations opened since July, all routing through the same integration. Sandra Torres has asked twice about the migration timeline without a written answer. The renewal call is the place to close that gap.",
++      confidence: 82,
++    },
++    governance: "loaded", risk: "loaded", connections: "loaded",
++  },
++  {
++    id: "PER-0091", type: "person", name: "Sarah Chen",
++    subtitle: "Head of Compliance · Legal · Meridian Corp",
++    email: "sarah.chen@meridian.com", phone: "+1 (212) 555-0188", company: "Meridian Corp",
++    owner: "Priya Nair", status: "Active", lastInteraction: "Aug 28, 2026",
++    agent: { id: "AGT-02", name: "Deal Concierge" },
++    signal: { severity: "informative", label: "Reviewing the governance addendum — no response due yet", dueContext: "Sent Aug 28" },
++    aiSummary: {
++      headline: "Technical evaluator, not the economic buyer.",
++      detail: "Sarah has driven every compliance question on the Meridian expansion and cleared the data-residency review herself. She has never discussed price. Route commercial terms to Sandra Torres and keep Sarah on audit evidence.",
++      confidence: 76,
++    },
++    governance: "loaded", risk: "empty", connections: "loaded",
++  },
++  {
++    id: "EMP-00412", type: "employee", name: "James Ortega",
++    subtitle: "Senior Operations Lead · Operations · Phoenix, AZ",
++    email: "james.ortega@acme.com", phone: "+1 (602) 555-0100", company: "Acme Corp",
++    owner: "Lisa Park", status: "Active", lastInteraction: "Sep 1, 2026",
++    agent: { id: "AGT-03", name: "People Concierge" },
++    signal: { severity: "alert", label: "1 performance review pending your approval", dueContext: "Due in 3 days" },
++    aiSummary: {
++      headline: "Consistent operator, overdue on one approval.",
++      detail: "James has closed every quarterly governance check on time for six quarters. The one open item is his mid-year review, waiting on Lisa Park since Aug 20. Nothing else on this record needs attention.",
++      confidence: 91,
++    },
++    governance: "loaded", risk: "loaded", connections: "error",
++  },
++  {
++    id: "ORG-0031", type: "company", name: "Northwind Health",
++    subtitle: "Healthcare · 5,100 employees · Phoenix, AZ",
++    email: "partnerships@northwindhealth.org", phone: "+1 (602) 555-0177", company: "Northwind Health",
++    owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 30, 2026",
++    agent: { id: "AGT-04", name: "Northwind Concierge" },
++    signal: { severity: "success", label: "Expansion signed — 5 clinics added to the network", dueContext: "Confirmed Aug 30" },
++    aiSummary: {
++      headline: "Healthy account, expanding on its own initiative.",
++      detail: "Northwind added five clinic sites without a discount request. Two of the five have not completed network sync, which is an onboarding task rather than a commercial risk.",
++      confidence: 88,
++    },
++    governance: "loaded", risk: "loaded", connections: "loaded",
++  },
++  {
++    id: "PER-0104", type: "person", name: "Sandra Torres",
++    subtitle: "VP of Operations · Meridian Corp",
++    email: "sandra.torres@meridian.com", phone: "+1 (212) 555-0155", company: "Meridian Corp",
++    owner: "Priya Nair", status: "Active", lastInteraction: "Sep 2, 2026",
++    agent: { id: "AGT-02", name: "Deal Concierge" },
++    signal: { severity: "alert", label: "Asked for the migration timeline twice — still unanswered", dueContext: "Last asked Sep 2", actionLabel: "Send timeline" },
++    aiSummary: {
++      headline: "Economic buyer on the Meridian renewal.",
++      detail: "Sandra owns the budget line and has raised the migration timeline in the last two calls without getting a written answer. That single open question is the strongest predictor of how the renewal lands.",
++      confidence: 84,
++    },
++    governance: "empty", risk: "loaded", connections: "loaded",
++  },
++  {
++    id: "EMP-00518", type: "employee", name: "Lisa Park",
++    subtitle: "Director of Operations · Operations · Phoenix, AZ",
++    email: "lisa.park@acme.com", phone: "+1 (602) 555-0121", company: "Acme Corp",
++    owner: "Marcus Webb", status: "Active", lastInteraction: "Sep 1, 2026",
++    agent: { id: "AGT-03", name: "People Concierge" },
++    signal: { severity: "alert", label: "3 reviews waiting on her approval", dueContext: "Oldest is 12 days old" },
++    aiSummary: {
++      headline: "Approval queue is the bottleneck, not her workload.",
++      detail: "Lisa manages nine reports and has three reviews queued, the oldest open 12 days. Her own governance and policy items are all current.",
++      confidence: 79,
++    },
++    governance: "loaded", risk: "empty", connections: "loaded",
++  },
++  {
++    id: "PER-0112", type: "person", name: "David Park",
++    subtitle: "IT Director · Meridian Corp",
++    email: "david.park@meridian.com", phone: "+1 (212) 555-0163", company: "Meridian Corp",
++    owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 19, 2026",
++    agent: { id: "AGT-02", name: "Deal Concierge" },
++    signal: { severity: "neutral", label: "No open items on this record", dueContext: "Last reviewed Aug 19", dismissible: true },
++    aiSummary: {
++      headline: "Technical gatekeeper, currently unblocked.",
++      detail: "David signed off on the SSO and data-residency reviews in July. No open questions since. He is the right contact if the migration timeline turns into an implementation plan.",
++      confidence: 71,
++    },
++    governance: "loaded", risk: "empty", connections: "loaded",
++  },
++  {
++    id: "ORG-0044", type: "company", name: "Kestrel Logistics",
++    subtitle: "Transportation · 890 employees · Dallas, TX",
++    email: "hello@kestrellogistics.com", phone: "+1 (214) 555-0190", company: "Kestrel Logistics",
++    owner: "Daniel Ruiz", status: "Inactive", lastInteraction: "Jun 14, 2026",
++    agent: { id: "AGT-05", name: "Kestrel Concierge" },
++    signal: { severity: "error", label: "No contact in 80 days — account went dormant after the pilot", dueContext: "Pilot ended Jun 14", actionLabel: "Open re-engagement" },
++    aiSummary: {
++      headline: "Dormant since the pilot closed, no stated reason.",
++      detail: "The pilot completed with all success criteria met, then contact stopped. No churn signal was ever recorded, which usually means a sponsor change rather than a lost deal.",
++      confidence: 64,
++    },
++    governance: "empty", risk: "loaded", connections: "empty",
++  },
++  {
++    id: "EMP-00623", type: "employee", name: "Marcus Webb",
++    subtitle: "VP of Operations · Operations · Remote",
++    email: "marcus.webb@acme.com", phone: "+1 (602) 555-0134", company: "Acme Corp",
++    owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 27, 2026",
++    agent: { id: "AGT-03", name: "People Concierge" },
++    signal: { severity: "neutral", label: "No pending approvals", dueContext: "Queue cleared Aug 27", dismissible: true },
++    aiSummary: {
++      headline: "Clear queue, current on every policy.",
++      detail: "Marcus cleared his approval queue on Aug 27 and has all twelve policies signed. Nothing on this record needs a decision this week.",
++      confidence: 86,
++    },
++    governance: "loaded", risk: "loaded", connections: "loaded",
++  },
++  {
++    id: "PER-0128", type: "person", name: "Amy Chen",
++    subtitle: "CFO · Meridian Corp",
++    email: "amy.chen@meridian.com", phone: "+1 (212) 555-0171", company: "Meridian Corp",
++    owner: "Priya Nair", status: "Inactive", lastInteraction: "Apr 3, 2026",
++    agent: { id: "AGT-02", name: "Deal Concierge" },
++    signal: { severity: "neutral", label: "Marked inactive — no longer the finance contact", dueContext: "Updated Apr 3" },
++    aiSummary: {
++      headline: "Superseded as the finance contact.",
++      detail: "Amy approved the original Meridian contract in 2024. Finance approvals have routed through Sandra Torres since April. Keep the record for contract history.",
++      confidence: 69,
++    },
++    governance: "empty", risk: "empty", connections: "loaded",
++  },
++  {
++    id: "ORG-0052", type: "company", name: "Halden Manufacturing",
++    subtitle: "Industrial · 1,600 employees · Cleveland, OH",
++    email: "ops@halden-mfg.com", phone: "+1 (216) 555-0118", company: "Halden Manufacturing",
++    owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 25, 2026",
++    agent: { id: "AGT-06", name: "Halden Concierge" },
++    signal: { severity: "informative", label: "Security review in progress — 4 of 6 checks cleared", dueContext: "Target Sep 12" },
++    aiSummary: {
++      headline: "Mid-review, on schedule.",
++      detail: "Four of six security checks have cleared. The two open items are network segmentation evidence and the sub-processor list, both assigned to Halden's side.",
++      confidence: 74,
++    },
++    governance: "loaded", risk: "loaded", connections: "empty",
++  },
++  {
++    id: "PER-0133", type: "person", name: "Tomás Ferreira",
++    subtitle: "Head of Data Platform · Halden Manufacturing",
++    email: "tomas.ferreira@halden-mfg.com", phone: "+1 (216) 555-0126", company: "Halden Manufacturing",
++    owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 25, 2026",
++    agent: { id: "AGT-06", name: "Halden Concierge" },
++    signal: { severity: "informative", label: "Owns the two open security-review items", dueContext: "Target Sep 12", actionLabel: "Send checklist" },
++    aiSummary: {
++      headline: "Single owner of both blockers.",
++      detail: "Tomás owns network segmentation evidence and the sub-processor list. He has answered every prior request within two business days, so a checklist is likely enough.",
++      confidence: 80,
++    },
++    governance: "loaded", risk: "empty", connections: "loaded",
++  },
++  {
++    id: "EMP-00701", type: "employee", name: "Elena Fischer",
++    subtitle: "Account Director · Revenue · Chicago, IL",
++    email: "elena.fischer@acme.com", phone: "+1 (312) 555-0149", company: "Acme Corp",
++    owner: "Marcus Webb", status: "Active", lastInteraction: "Sep 2, 2026",
++    agent: { id: "AGT-03", name: "People Concierge" },
++    signal: { severity: "neutral", label: "No open items on this record", dueContext: "Last reviewed Sep 2", dismissible: true },
++    aiSummary: {
++      headline: "Owns two accounts mid-review, no personnel items open.",
++      detail: "Elena carries Halden and Kestrel. Both have open account-side work, but nothing on her own employee record requires a decision.",
++      confidence: 83,
++    },
++    governance: "loaded", risk: "empty", connections: "loaded",
++  },
++  {
++    id: "PER-0147", type: "person", name: "Grace Okafor",
++    subtitle: "Chief Nursing Officer · Northwind Health",
++    email: "grace.okafor@northwindhealth.org", phone: "+1 (602) 555-0182", company: "Northwind Health",
++    owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 30, 2026",
++    agent: { id: "AGT-04", name: "Northwind Concierge" },
++    signal: { severity: "success", label: "Sponsored the 5-clinic expansion", dueContext: "Signed Aug 30" },
++    aiSummary: {
++      headline: "Executive sponsor of the expansion.",
++      detail: "Grace drove the five-clinic expansion internally and signed without a discount request. Two clinics still need network sync — an onboarding task her team can close.",
++      confidence: 87,
++    },
++    governance: "loaded", risk: "empty", connections: "loaded",
++  },
++]
++
++// ── Per-record collections ────────────────────────────────────────────────────
++// Built from the contact itself so every profile reads as that record's own
++// data rather than one shared fixture repeated 14 times.
++
++const COMPANY_SIZE = (c: UcpContact) => c.subtitle.split(" · ")[1] ?? "—"
++const FIRST_FIELD  = (c: UcpContact) => c.subtitle.split(" · ")[0] ?? "—"
++
++export function getFacts(c: UcpContact): UcpFact[] {
++  if (c.type === "company") {
++    return [
++      { id: "f1", label: "Legal entity",        value: `${c.name}, Inc.`,           plane: "truth",   source: "Contract · countersigned",            verifiedAt: "Aug 4, 2026"  },
++      { id: "f2", label: "Industry",            value: FIRST_FIELD(c),              plane: "truth",   source: "Account record · CRM sync",           verifiedAt: "Aug 4, 2026"  },
++      { id: "f3", label: "Headcount",           value: COMPANY_SIZE(c),             plane: "truth",   source: "Account record · CRM sync",           verifiedAt: "Aug 4, 2026"  },
++      { id: "f4", label: "Account owner",       value: c.owner,                     plane: "truth",   source: "Territory assignment",                verifiedAt: "Jul 1, 2026"  },
++      { id: "f5", label: "Billing contact",     value: c.email,                     plane: "truth",   source: "Billing system",                      verifiedAt: "Aug 4, 2026"  },
++      { id: "f6", label: "Budget cycle",        value: "Calendar year, locked in Q4", plane: "sandbox", source: "Call notes — Aug 22",               verifiedAt: "Aug 22, 2026" },
++      { id: "f7", label: "Competing evaluation", value: "Evaluated one other vendor in 2024", plane: "sandbox", source: "Discovery notes",          verifiedAt: "Jun 9, 2026"  },
++      { id: "f8", label: "Expansion appetite",  value: "Open to adding sites without a new RFP", plane: "sandbox", source: "Email thread — Aug 18", verifiedAt: "Aug 18, 2026" },
++      { id: "f9", label: "Master agreement",    value: `MSA_${c.name.split(" ")[0]}_2026.pdf`, plane: "sources", source: "Shared Drive · Legal",     verifiedAt: "Aug 4, 2026"  },
++      { id: "f10", label: "Security questionnaire", value: "SIG Lite, 214 responses", plane: "sources", source: "Shared Drive · Security",           verifiedAt: "Jul 28, 2026" },
++      { id: "f11", label: "Org chart",          value: "Slide deck, 3 levels deep",  plane: "sources", source: "Shared Drive · Accounts",            verifiedAt: "May 12, 2026" },
++    ]
++  }
++  if (c.type === "employee") {
++    return [
++      { id: "f1", label: "Full name",       value: c.name,                    plane: "truth",   source: "Workday · HRIS sync",        verifiedAt: "Sep 1, 2026"  },
++      { id: "f2", label: "Role",            value: FIRST_FIELD(c),            plane: "truth",   source: "Workday · HRIS sync",        verifiedAt: "Sep 1, 2026"  },
++      { id: "f3", label: "Work email",      value: c.email,                   plane: "truth",   source: "Identity provider · SSO",    verifiedAt: "Sep 1, 2026"  },
++      { id: "f4", label: "Manager",         value: c.owner,                   plane: "truth",   source: "Workday · HRIS sync",        verifiedAt: "Sep 1, 2026"  },
++      { id: "f5", label: "Access role",     value: "Standard · Operations",   plane: "truth",   source: "Identity provider · SSO",    verifiedAt: "Aug 14, 2026" },
++      { id: "f6", label: "Career interest", value: "Mentioned interest in a platform role", plane: "sandbox", source: "1:1 notes — Aug 5", verifiedAt: "Aug 5, 2026"  },
++      { id: "f7", label: "Working pattern", value: "Prefers async review over live meetings", plane: "sandbox", source: "Team retro — Jul 22", verifiedAt: "Jul 22, 2026" },
++      { id: "f8", label: "Signed policies", value: "12 of 12, latest Data Handling v2.1", plane: "sources", source: "Governance Studio",  verifiedAt: "Aug 6, 2026"  },
++      { id: "f9", label: "Review history",  value: "6 quarters, all completed on time",  plane: "sources", source: "Shared Drive · People", verifiedAt: "Jul 20, 2026" },
++    ]
++  }
++  return [
++    { id: "f1", label: "Full name",        value: c.name,                     plane: "truth",   source: "Account record · CRM sync",   verifiedAt: "Aug 28, 2026" },
++    { id: "f2", label: "Title",            value: FIRST_FIELD(c),             plane: "truth",   source: "Account record · CRM sync",   verifiedAt: "Aug 28, 2026" },
++    { id: "f3", label: "Company",          value: c.company,                  plane: "truth",   source: "Account record · CRM sync",   verifiedAt: "Aug 28, 2026" },
++    { id: "f4", label: "Email",            value: c.email,                    plane: "truth",   source: "Verified reply — inbound",    verifiedAt: "Aug 28, 2026" },
++    { id: "f5", label: "Direct line",      value: c.phone,                    plane: "truth",   source: "Email signature",             verifiedAt: "Aug 19, 2026" },
++    { id: "f6", label: "Decision role",    value: "Evaluator, not budget owner", plane: "sandbox", source: "Call notes — Aug 28",      verifiedAt: "Aug 28, 2026" },
++    { id: "f7", label: "Stated priority",  value: "Auditability ahead of speed", plane: "sandbox", source: "Call notes — Aug 12",      verifiedAt: "Aug 12, 2026" },
++    { id: "f8", label: "Channel preference", value: "Responds fastest to email before 9am ET", plane: "sandbox", source: "Interaction history", verifiedAt: "Aug 28, 2026" },
++    { id: "f9", label: "Governance addendum", value: "Addendum_v3_redlined.pdf", plane: "sources", source: "Shared Drive · Legal",     verifiedAt: "Aug 28, 2026" },
++    { id: "f10", label: "Meeting transcripts", value: "4 calls, Jun–Aug 2026",  plane: "sources", source: "Communication Hub",        verifiedAt: "Aug 28, 2026" },
++  ]
++}
++
++export function getActivity(c: UcpContact): UcpActivity[] {
++  const who   = c.name.split(" ")[0]
++  const agent = c.agent.name
++  return [
++    {
++      id: "a1", channel: "agent", title: `${agent} refreshed the record snapshot`,
++      meta: "4 facts promoted to Truth plane · 1 claim expired", timestamp: "Today, 08:12",
++      state: { label: "Completed", variant: "success" },
++      aiSummary: `Re-verified ${who}'s contact fields against the CRM sync and promoted four Sandbox claims after a matching source appeared. One claim about budget timing expired without corroboration and was dropped back to Sandbox.`,
++    },
++    {
++      id: "a2", channel: "call", title: `Outbound call · ${c.phone}`,
++      meta: `${c.owner} · 18:24 · Discovery follow-up`, timestamp: "Sep 2, 2026 · 14:05",
++      state: { label: "Positive", variant: "success" },
++      aiSummary: `${who} confirmed the evaluation is still funded and asked for a written migration timeline. No pricing objection was raised. The timeline is the one open commitment from this call.`,
++    },
++    {
++      id: "a3", channel: "email", title: "Governance addendum sent for review",
++      meta: `${c.owner} → ${c.email} · 1 attachment`, timestamp: "Aug 28, 2026 · 09:40",
++      state: { label: "Opened", variant: "informative" },
++    },
++    {
++      id: "a4", channel: "meeting", title: "Quarterly business review",
++      meta: `${c.owner}, ${who} · 52 min · 6 attendees`, timestamp: "Aug 22, 2026 · 11:00",
++      state: { label: "Completed", variant: "success" },
++      aiSummary: `Usage and roadmap were covered in full. Two escalations from July were raised again without a resolution date, which is the thread most likely to carry into the next conversation.`,
++    },
++    {
++      id: "a5", channel: "system", title: "Record merged from duplicate",
++      meta: `${c.id} absorbed a duplicate created by the inbound form`, timestamp: "Aug 19, 2026 · 16:20",
++      state: { label: "Completed", variant: "success" },
++    },
++    {
++      id: "a6", channel: "email", title: "Migration timeline requested",
++      meta: `${c.email} → ${c.owner}`, timestamp: "Aug 18, 2026 · 07:55",
++      state: { label: "Awaiting reply", variant: "alert" },
++    },
++    {
++      id: "a7", channel: "agent", title: `${agent} drafted a follow-up`,
++      meta: "Draft held for review · not sent", timestamp: "Aug 18, 2026 · 08:02",
++      state: { label: "Needs review", variant: "alert" },
++      aiSummary: `A reply to the timeline request was drafted but held, because the delivery date it referenced was not confirmed anywhere in the Truth plane.`,
++    },
++    {
++      id: "a8", channel: "call", title: `Inbound call · ${c.phone}`,
++      meta: `${agent} · 6:41 · Routed to ${c.owner}`, timestamp: "Aug 12, 2026 · 10:42",
++      state: { label: "Resolved", variant: "success" },
++      aiSummary: `${who} called about audit evidence and was routed after the agent confirmed identity. The requested evidence pack was sent the same day.`,
++    },
++    {
++      id: "a9", channel: "meeting", title: "Security review working session",
++      meta: `${who} · 45 min · 4 attendees`, timestamp: "Jul 28, 2026 · 15:30",
++      state: { label: "Completed", variant: "success" },
++    },
++    {
++      id: "a10", channel: "system", title: "Source Drive attached",
++      meta: "Legal · shared folder connected to this record", timestamp: "Jul 28, 2026 · 15:58",
++      state: { label: "Completed", variant: "success" },
++    },
++    {
++      id: "a11", channel: "email", title: "Evidence pack delivered",
++      meta: `${c.owner} → ${c.email} · 3 attachments`, timestamp: "Jul 22, 2026 · 12:10",
++      state: { label: "Opened", variant: "informative" },
++    },
++    {
++      id: "a12", channel: "agent", title: `${agent} flagged a stale fact`,
++      meta: "Budget cycle claim older than 90 days", timestamp: "Jul 20, 2026 · 06:00",
++      state: { label: "Resolved", variant: "success" },
++      aiSummary: `The budget-cycle claim passed its freshness window. It was re-confirmed on the Aug 22 review call and returned to the Sandbox plane with a new timestamp.`,
++    },
++    {
++      id: "a13", channel: "call", title: `Outbound call · ${c.phone}`,
++      meta: `${c.owner} · 9:03 · No answer, voicemail left`, timestamp: "Jul 14, 2026 · 09:15",
++      state: { label: "No answer", variant: "neutral" },
++    },
++    {
++      id: "a14", channel: "system", title: "Record created",
++      meta: `${c.id} · ingested from the account sync`, timestamp: "Jun 9, 2026 · 08:00",
++      state: { label: "Completed", variant: "success" },
++    },
++  ]
++}
++
++export function getDrives(c: UcpContact): UcpDrive[] {
++  const slug = c.company.split(" ")[0]
++  return [
++    {
++      id: "d1", name: `${slug} — Legal`, kind: "Folder", provider: "Google Drive",
++      items: "24 documents", owner: "Legal Ops", lastSync: "Today, 06:00",
++      scope: "Shared with 3 networks", state: { label: "Synced", variant: "success" },
++    },
++    {
++      id: "d2", name: `${slug} — Security & Compliance`, kind: "Folder", provider: "SharePoint",
++      items: "61 documents", owner: "Security", lastSync: "Today, 06:00",
++      scope: "Shared with 2 networks", state: { label: "Synced", variant: "success" },
++    },
++    {
++      id: "d3", name: `MSA_${slug}_2026.pdf`, kind: "Document", provider: "Google Drive",
++      items: "1 document", owner: "Legal Ops", lastSync: "Aug 4, 2026",
++      scope: "Attached to this record only", state: { label: "Synced", variant: "success" },
++    },
++    {
++      id: "d4", name: `${slug} — Meeting transcripts`, kind: "Folder", provider: "Communication Hub",
++      items: "18 transcripts", owner: c.owner, lastSync: "Sep 2, 2026",
++      scope: "Attached to this record only", state: { label: "Synced", variant: "success" },
++    },
++    {
++      id: "d5", name: "Revenue — Account plans", kind: "Drive", provider: "Box",
++      items: "412 documents", owner: "Revenue Ops", lastSync: "Aug 30, 2026",
++      scope: "Shared with 6 networks", state: { label: "Partial access", variant: "alert" },
++    },
++    {
++      id: "d6", name: `${slug} — Archive 2024`, kind: "Folder", provider: "SharePoint",
++      items: "137 documents", owner: "Legal Ops", lastSync: "Failed Aug 26, 2026",
++      scope: "Shared with 1 network", state: { label: "Sync failed", variant: "error" },
++    },
++  ]
++}
++
++export function getConnections(c: UcpContact): UcpConnection[] {
++  if (c.type === "company") {
++    return [
++      { id: "c1", name: "Sandra Torres",   relation: "VP of Operations · primary contact", icon: "UserRound" },
++      { id: "c2", name: "Sarah Chen",      relation: "Head of Compliance · evaluator",     icon: "UserRound" },
++      { id: "c3", name: "Enterprise Renewal 2026", relation: "Deal · $480K · closes Sep 5", icon: "Briefcase" },
++      { id: "c4", name: "Phoenix Medical Center",  relation: "Location · 127 staff",        icon: "MapPin"    },
++    ]
++  }
++  if (c.type === "employee") {
++    return [
++      { id: "c1", name: c.owner,        relation: "Manager",              icon: "UserRound" },
++      { id: "c2", name: "Operations",   relation: "Team · 9 members",     icon: "Users"     },
++      { id: "c3", name: c.company,      relation: "Organization",         icon: "Building2" },
++    ]
++  }
++  return [
++    { id: "c1", name: c.company, relation: "Organization · employer",             icon: "Building2" },
++    { id: "c2", name: c.owner,   relation: "Account owner",                       icon: "UserRound" },
++    { id: "c3", name: "Enterprise Renewal 2026", relation: "Deal · participant",  icon: "Briefcase" },
++  ]
++}
++
++/** Governance study — one row per metric, same shape for every record type. */
++export function getGovernance(c: UcpContact): { label: string; value: string; icon: string; variant: "success" | "alert" | "informative" | "neutral" }[] {
++  return c.type === "employee"
++    ? [
++        { label: "Policies signed",  value: "12 of 12",     icon: "FileCheck2",    variant: "success"     },
++        { label: "Open reviews",     value: "1",            icon: "ClipboardList", variant: "alert"       },
++        { label: "Training current", value: "Yes",          icon: "GraduationCap", variant: "success"     },
++        { label: "Last audit",       value: "Aug 10, 2026", icon: "CalendarCheck", variant: "informative" },
++      ]
++    : [
++        { label: "Compliance score", value: "94 / 100",     icon: "ShieldCheck",   variant: "success"     },
++        { label: "Open reviews",     value: c.status === "Active" ? "1" : "0", icon: "ClipboardList", variant: c.status === "Active" ? "alert" : "neutral" },
++        { label: "DPA signed",       value: "Yes · v3",     icon: "FileCheck2",    variant: "success"     },
++        { label: "Last audit",       value: "Aug 10, 2026", icon: "CalendarCheck", variant: "informative" },
++      ]
++}
++
++export function getRisk(_c: UcpContact): { label: string; value: string; icon: string; variant: "success" | "alert" | "informative" | "neutral" }[] {
++  return [
++    { label: "Risk score",  value: "18 / 100",     icon: "TrendingDown",   variant: "success"     },
++    { label: "Open flags",  value: "0",            icon: "Flag",           variant: "neutral"     },
++    { label: "Last scan",   value: "Aug 27, 2026", icon: "ScanLine",       variant: "informative" },
++    { label: "Trend",       value: "24 → 18",      icon: "ArrowDownRight", variant: "success"     },
++  ]
++}
++
++// ── RecordHeader payloads ─────────────────────────────────────────────────────
++
++export function buildRecord(c: UcpContact): EmployeeRecord | CustomerRecord | ClientRecord {
++  if (c.type === "company") {
++    const record: CustomerRecord = {
++      accountName:    c.name,
++      segment:        "Enterprise",
++      owner:          c.owner,
++      tier:           "Tier 1",
++      industry:       FIRST_FIELD(c),
++      renewalDate:    "Sep 5, 2026",
++      mrr:            "$480K ARR",
++      lastContact:    c.lastInteraction,
++      openTickets:    3,
++      adoptionLevel:  "High",
++      primaryContact: "Sandra Torres",
++    }
++    return record
++  }
++  if (c.type === "employee") {
++    const record: EmployeeRecord = {
++      name:       c.name,
++      role:       FIRST_FIELD(c),
++      department: c.subtitle.split(" · ")[1] ?? "—",
++      manager:    c.owner,
++      location:   c.subtitle.split(" · ")[2] ?? "—",
++      email:      c.email,
++      phone:      c.phone,
++      startDate:  "Jan 12, 2022",
++      team:       c.subtitle.split(" · ")[1] ?? "—",
++      accessRole: "Standard",
++    }
++    return record
++  }
++  const record: ClientRecord = {
++    name:              c.name,
++    company:           c.company,
++    dealStage:         "Evaluation",
++    dealValue:         "$480K",
++    owner:             c.owner,
++    email:             c.email,
++    phone:             c.phone,
++    leadSource:        "Account expansion",
++    lastInteraction:   c.lastInteraction,
++    expectedCloseDate: "Sep 5, 2026",
++  }
++  return record
++}
++
++// ── Concierge chat ────────────────────────────────────────────────────────────
++
++export interface ConciergeTurn {
++  id:      string
++  from:    "agent" | "user"
++  text:    string
++  /** Which facts the answer leaned on — the plane is what makes it auditable. */
++  sources?: { label: string; plane: KnowledgePlane }[]
++}
++
++export function getConciergeOpening(c: UcpContact): ConciergeTurn[] {
++  return [
++    {
++      id: "t1", from: "agent",
++      text: `I'm the concierge for ${c.name}. I answer from this record's Truth, Sandbox and Sources planes, and I show you which one each answer came from.`,
++    },
++    {
++      id: "t2", from: "agent",
++      text: c.aiSummary.detail,
++      sources: [
++        { label: "Interaction history",    plane: "truth"   },
++        { label: "Call notes — Aug 22",    plane: "sandbox" },
++        { label: "Shared Drive · Legal",   plane: "sources" },
++      ],
++    },
++  ]
++}
++
++export const CONCIERGE_PROMPTS = [
++  "What changed on this record this week?",
++  "What do we still owe them?",
++  "Which facts are unverified?",
++]
