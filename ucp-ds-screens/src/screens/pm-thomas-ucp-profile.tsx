@@ -2,9 +2,20 @@
  * UCP — Unified Contact Profile (detail view).
  *
  * Read-only by design: the record is assembled by ingestion and agents, not
- * typed in here, so there is no create/edit CTA in the Header. The one
- * always-present entry point is the record's assigned concierge — RecordHeader's
- * agent button — which opens a chat scoped to this record.
+ * typed in here, so there is no create CTA. The one always-present entry point
+ * is Ask — the Entity Header's gradient button — which opens the record's
+ * assigned concierge in a side panel.
+ *
+ * The identity card is EntityHeader (Figma 19815-101547), not RecordHeader:
+ * nothing in that spec's structure is specific to a record shape, and it puts
+ * the Next Best Action in its own card BELOW the header rather than inside it.
+ *
+ * One deviation from CLAUDE.md's generic detail-page rule, and it is deliberate:
+ * the page Header does NOT repeat the entity name, status tag and breadcrumb.
+ * The Entity Header spec makes its own title the page subject ("the title
+ * carries the profile heading level"), and the Figma view for this surface
+ * shows only the parent list above the card. Printing the name and state twice,
+ * 40px apart, is the thing that spec is avoiding.
  *
  * Tabs: Overview · Snapshot · Activity · Drives
  *   Overview  → WidgetCanvasView (DS rule: any tab named Overview is a canvas)
@@ -20,7 +31,6 @@ import type { CanvasSlot }   from "@/components/layouts/widget-canvas-view"
 import { useWidgetSize }     from "@/components/layouts/widget-canvas-view"
 import type { SidebarItem }  from "@/components/ui/sidebar"
 import { Header }            from "@/components/ui/header"
-import { Breadcrumb }        from "@/components/ui/breadcrumb"
 import { Tabs }              from "@/components/ui/tabs"
 import { Tag }               from "@/components/ui/tag"
 import { Chip }              from "@/components/ui/chip"
@@ -35,12 +45,13 @@ import { EmptyState }        from "@/components/ui/empty-state"
 import { HighlightIcon }     from "@/components/ui/highlight-icon"
 import { Pagination }        from "@/components/ui/pagination"
 import { SlideOut }          from "@/components/ui/slide-out"
-import { RecordHeader, RECORD_HEADER_RECOMMENDED_ACTIONS } from "@/components/ui/record-header"
-import { Sparkle, Send, ScanLine, Inbox, HardDrive } from "lucide-react"
+import { EntityHeader }        from "@/components/experimental/entity-header"
+import { NextBestActionCard }  from "@/components/experimental/next-best-action-card"
+import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch } from "lucide-react"
 import {
   CONTACTS, PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
-  RECORD_VARIANT, STATUS_TAG,
-  buildRecord, getActivity, getConciergeOpening, getConnections, getDrives,
+  TYPE_LABEL, entityState,
+  getActivity, getConciergeOpening, getConnections, getDrives,
   getFacts, getGovernance, getRisk,
 } from "./ucpShared"
 import type {
@@ -511,10 +522,18 @@ export function UcpProfileView({
   const [actPage,    setActPage]    = useState(1)
   const [actSize,    setActSize]    = useState(ACTIVITY_PAGE_SIZE)
   const [chatOpen,   setChatOpen]   = useState(false)
+  const [infoOpen,   setInfoOpen]   = useState(false)
   const [drivePeek,  setDrivePeek]  = useState<UcpDrive | null>(null)
+  // Session-only, per the card's own rule: nothing is stored and nothing is fed
+  // back to the engine. Resets when the record changes.
+  const [nbaDismissed, setNbaDismissed] = useState<string | null>(null)
 
-  const variant = RECORD_VARIANT[contact.type]
-  const record  = useMemo(() => buildRecord(contact), [contact])
+  // Ask and Information both open on the side — opening one closes the other,
+  // and the panel requested last wins.
+  const openChat = () => { setInfoOpen(false); setDrivePeek(null); setChatOpen(true) }
+  const openInfo = () => { setChatOpen(false); setDrivePeek(null); setInfoOpen(true) }
+
+  const state = entityState(contact)
 
   const activityCount = useMemo(() => {
     const all = getActivity(contact)
@@ -526,7 +545,7 @@ export function UcpProfileView({
       {
         uid: "ai-summary", title: `${contact.agent.name} — read on this record`,
         colSpan: 3, widthClass: "full", rowSpan: 5,
-        content: <AiSummaryContent contact={contact} onAsk={() => setChatOpen(true)} />,
+        content: <AiSummaryContent contact={contact} onAsk={openChat} />,
       },
     ]
     if (contact.governance !== "empty") {
@@ -604,17 +623,11 @@ export function UcpProfileView({
       onSidebarItemClick={onSidebarItemClick}
       header={isScrolled => (
         <Header
-          size={isScrolled ? "compress" : "size-l"}
-          title={contact.name}
-          description={contact.subtitle}
-          tag={<Tag variant={STATUS_TAG[contact.status]} size="sm">{contact.status}</Tag>}
-          breadcrumb={
-            <Breadcrumb
-              depth={2}
-              items={[{ label: "Contacts", href: "contacts" }, { label: contact.name }]}
-              onNavigate={() => onBack?.()}
-            />
-          }
+          size={isScrolled ? "compress" : "size-m"}
+          title="Contacts"
+          backButton
+          showBackInCompress
+          onBack={() => onBack?.()}
         />
       )}
       pagination={
@@ -632,17 +645,36 @@ export function UcpProfileView({
           : undefined
       }
     >
-      <RecordHeader
-        variant={variant}
-        data={record}
-        signal={contact.signal}
-        assignedAgent={{
-          id:         contact.agent.id,
-          name:       contact.agent.name,
-          onOpenChat: () => setChatOpen(true),
-        }}
-        actions={RECORD_HEADER_RECOMMENDED_ACTIONS[variant]}
-      />
+      {/* The header has no container of its own — the card is the caller's. */}
+      <CardContainer size="lg" variant="default" className="w-full">
+        <EntityHeader
+          visual={{ kind: "avatar" }}
+          title={contact.name}
+          source={contact.source}
+          state={state}
+          tags={contact.tags}
+          meta={contact.meta}
+          onAsk={openChat}
+          onInformation={openInfo}
+          menuActions={[
+            { label: "Archive",       onClick: () => {} },
+            { label: "Duplicate",     onClick: () => {} },
+            { label: "Export record", onClick: () => {} },
+          ]}
+        />
+      </CardContainer>
+
+      {/* Under the header, never inside it. No action, no card. */}
+      {nbaDismissed !== contact.id && (
+        <div className="mt-[16px]">
+          <NextBestActionCard
+            action={contact.nba}
+            onAccept={() => {}}
+            onViewDetails={openChat}
+            onDismiss={() => setNbaDismissed(contact.id)}
+          />
+        </div>
+      )}
 
       <Tabs
         className="mt-[24px] mb-[24px]"
@@ -670,6 +702,52 @@ export function UcpProfileView({
       {tab === "drives" && <DrivesTab contact={contact} onPreview={setDrivePeek} />}
 
       <ConciergeChat contact={contact} open={chatOpen} onClose={() => setChatOpen(false)} />
+
+      {/* Information — where the fields in the header came from. Not the
+          Overview and not the Knowledge tab: it explains what is on screen
+          right now, nothing more. */}
+      <SlideOut
+        open={infoOpen}
+        onClose={() => setInfoOpen(false)}
+        type="with-variants"
+        size="m"
+        title="Field sources"
+        subtitle={`Entity header · ${contact.name}`}
+        showIcon
+        iconContent={<FileSearch size={14} />}
+        showStatus={false}
+        showTopButton={false}
+        showTabs={false}
+        showSearchBar={false}
+        showChips={false}
+        showCta={false}
+      >
+        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
+          <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
+            Every value in the header above, and where it came from.
+          </span>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {[
+              { field: "Title",  value: contact.name,      from: `${contact.source.label} · written exactly as the source system stores it` },
+              { field: "Source", value: contact.source.label, from: "Ingestion · the system this record was pulled from" },
+              { field: "State",  value: state.label,       from: "Lifecycle · the most blocking status on the record" },
+              { field: "Type",   value: TYPE_LABEL[contact.type], from: "Classification · assigned in Helix Data Studio" },
+              ...contact.tags.filter(t => t.role === "signal").map(t => ({
+                field: "Signal", value: t.label, from: t.tooltip ?? "Signal engine",
+              })),
+              ...contact.meta.map(m => ({ field: "Metadata", value: m.label, from: m.tooltip })),
+            ].map((row, i) => (
+              <div key={`${row.field}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
+                  {row.field}
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{row.value}</span>
+                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>{row.from}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </SlideOut>
 
       <SlideOut
         open={drivePeek !== null}
