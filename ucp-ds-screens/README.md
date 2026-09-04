@@ -303,9 +303,24 @@ un campo real en el modelo antes de poder ir en la fila.
 ### La fila lleva el Next Best Action, no el resumen del agente
 
 El bloque púrpura de la fila decía "AI read" y mostraba el titular del agente.
-Ahora dice **AI Next Best Action** y lleva la recomendación del registro: título,
+Ahora dice **Next Best Action** y lleva la recomendación del registro: título,
 cuándo, y por qué. Sin el rationale sería una orden, no una propuesta — misma
 regla que la card del perfil.
+
+**El nombre exacto costó un rodeo.** `EntityList` renderiza la etiqueta como
+`AI {action}` — el `AI ` está hardcodeado en `entity-list.tsx:426` — así que
+pasar "Next Best Action" imprimía **"AI Next Best Action"**. El Next Best Action
+es un concepto de producto con nombre propio, no una categoría de output de IA,
+y tiene que leerse en la fila igual que en la card. Así que la etiqueta va
+apagada (`showLabel: false`) y el nombre encabeza la primera línea. `action`
+queda pasado igual, para cuando `entity-list.tsx` deje de prefijar y la etiqueta
+con estilo pueda volver: es un carácter en un archivo bajo `CODEOWNERS`.
+
+Y el `detail` pasó a ser un array en vez de una sola cadena corrida. La primera
+línea es para lo que existe la fila — el nombre, la propuesta y el cuándo — y el
+rationale se vuelve su propio bullet al expandir, que es donde el lector va a
+decidir. Las diez recomendaciones traen uno, así que el bloque siempre tiene algo
+en qué expandirse.
 
 Un roster se escanea para decidir qué abrir a continuación, y la recomendación es
 lo que responde eso. El resumen del agente no se perdió: sigue en el widget del
@@ -469,6 +484,13 @@ ucp-ds-screens/
   (Restricted gobierna valores, no identidad, y las prioridades 1–3 no se
   debilitan). Si Design quiere el título atenuado, es la línea `color` de
   `Title`.
+- **El `AI ` hardcodeado en `entity-list.tsx:426`.** La etiqueta del bloque de
+  insight es `AI {action}`, sin forma de apagar solo el prefijo. Lo rodeé con
+  `showLabel: false` y el nombre al inicio de la línea, que da el texto correcto
+  pero pierde el peso tipográfico de la etiqueta (13px semibold `--foreground`
+  → 12px medium `--muted-foreground`). Si Michael hace el prefijo opcional
+  — `{ai.aiPrefix !== false && "AI "}` o similar — se recupera el estilo y se
+  vuelve a `showLabel` por defecto.
 - **El umbral de 760px.** Lo derivé midiendo dónde deja de caber la fila única
   con este contenido. El spec no da un número. Si Design fija uno, es la
   constante `HEADER_STACK_THRESHOLD`.

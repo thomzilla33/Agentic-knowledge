@@ -439,10 +439,29 @@ export default function PMThomasUcpContactsScreen() {
     // No action, no block: "there is nothing to say when there is nothing to
     // do." The absence is the signal — a reader scans for purple to find the
     // records that want a decision.
+    //
+    // `showLabel: false` on purpose. EntityList renders the label as
+    // `AI {action}` — the "AI " is hardcoded in entity-list.tsx — so passing
+    // "Next Best Action" through it printed "AI Next Best Action". The Next
+    // Best Action is a named product concept, not a category of AI output, and
+    // it has to read on the row exactly as it reads on the card. So the label
+    // is turned off and the name leads the first line instead. `action` is kept
+    // for when entity-list.tsx stops prefixing and the styled label can come
+    // back — it is one character in a CODEOWNERS-gated file.
+    //
+    // The detail is an array rather than one run-on string: the first line is
+    // what the row is for — the name, the proposal and when — and the rationale
+    // becomes its own bullet when expanded, which is where a reader goes to
+    // decide. All ten recommendations carry one, so the block always has
+    // something to expand into.
     aiInsight: c.nba
       ? {
-          action:   "Next Best Action",
-          detail:   `${c.nba.title} · ${c.nba.timestamp}${c.nba.rationale ? ` — ${c.nba.rationale}` : ""}`,
+          action:    "Next Best Action",
+          showLabel: false,
+          detail: [
+            `Next Best Action · ${c.nba.title} · ${c.nba.timestamp}`,
+            ...(c.nba.rationale ? [c.nba.rationale] : []),
+          ],
           viewMore: true,
           onViewMore: () => setOpenId(c.id),
         }
