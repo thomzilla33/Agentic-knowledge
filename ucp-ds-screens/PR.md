@@ -1,19 +1,20 @@
-# UCP — Unified Contact Profile, built on the DS
+# UCP — Unified Contact Profile, built on RecordHeader
 
-**Repo:** `cachilupis/aims-os-design-system` · **Base:** `main` · **Head:** `claude/ucp-unified-contact-profile`
-**Reviewer:** @cachilupis (required — two files under CODEOWNERS)
+**Base:** `main` (`9d8bea2`) · **Reviewer:** @cachilupis (required — two files under CODEOWNERS)
 
 ---
 
 ## What this adds
 
 One prototype card, `UCP - Contacts Last version`, covering the whole flow: the
-contacts roster, the profile, and Overview as a tab inside it.
+contacts roster, the record profile, and Overview as a tab inside it.
 
 - **Roster** — Tabs by type (All · Customers · Employees · Companies) → Filters.
-  Cards only. `Create New {type}` follows the active tab.
-- **Profile** — Entity Header + Next Best Action + four tabs: Overview ·
-  Snapshot · Activity · Drives. The whole record chrome pins on scroll.
+  Cards only. `Create New {type}` follows the active tab, and each row carries
+  its Next Best Action when the engine has one.
+- **Profile** — `RecordHeader` + four tabs: Overview · Snapshot · Activity ·
+  Drives. The identity card and the tabs pin in `ScreenLayout`'s header zone,
+  so the record stays identified while its content scrolls.
 - **Overview** — `WidgetCanvasView`, per the DS rule that any tab named Overview
   is a canvas.
 - **Snapshot** — the record's facts by knowledge plane (Truth / Sandbox /
@@ -21,92 +22,107 @@ contacts roster, the profile, and Overview as a tab inside it.
 - **Drives** — Source Drives from the company catalog, replacing a generic
   Documents tab.
 
-## Two new components in `experimental/`
+Five files. Three new screens, one additive line pair in `App.tsx`, and one prop
+on `entity-list.tsx`. **No new components, and nothing deleted.**
 
-Both from Figma node `19815-101547` ("Entity Header - WIP"). They carry
-`// DS-GAP:` on line 1 and stay in `experimental/` until the frame stops being
-WIP.
+## This started as a second header component. That was wrong.
 
-- **`entity-header.tsx`** — identity card for a Unified Entity Profile.
-  Deliberately not a variant of `RecordHeader`: nothing in the spec's structure
-  branches on record shape, and the spec puts the Next Best Action in its own
-  card *below* the header rather than inside it as a Signal bar.
-- **`next-best-action-card.tsx`** — the card that proposal lives in. Accept
-  assigns to the agent; it never executes.
+The first build of this prototype shipped its own `EntityHeader` in
+`experimental/`, built from Figma `19815-101547`, on three arguments:
+`RecordHeader` branched on three closed record shapes; it carried the Next Best
+Action inside itself where that spec wanted a separate card below; and it had no
+state coverage.
 
-All five states the component owns are exercised by a screen, not just
-implemented: Default, Minimum (on scroll), Loading (first paint of a fetch),
-Restricted (a scope the viewer lacks), and the Responsive reflow (driven by a
-ResizeObserver on the header's **card**, because the spec says the breakpoint is
-the card's, not the viewport's).
+All three stopped being true while this was in flight:
 
-## Changes to `src/components/` — this is what needs your review
+- **#46's agnosticism pass** dropped the closed `uep`/`ucp`/`uvp` variants —
+  *"This card now serves ANY entity type on the platform."*
+- **#46's redesign** reintroduced the Next Best Action deliberately, as a
+  protagonist block visible collapsed and expanded alike. The design system took
+  the opposite position from the one that justified a separate card, and shipped
+  it.
+- `RecordHeader` now carries per-zone loading and per-field masking.
+
+So the prototype was rebuilt on `RecordHeader`, and both experimental components
+were deleted rather than proposed. Two things that used to be this screen's
+belong to the component now, and both are better there: the Next Best Action,
+which no longer needs placing, and the card-width reflow, which `RecordHeader`
+measures on its own box.
+
+This also means the PR no longer deletes `pm-thomas-universal-profile.tsx`. An
+earlier revision did, on the reading that it was an orphan superseded by this
+work. It is not — four commits have been developing it, and it is registered in
+`App.tsx` as a live prototype.
+
+## What the profile wires that nothing wired before
+
+`pm-thomas-universal-profile.tsx` notes that `recordFields` is deliberately left
+unset there, because that screen has no provenance panel and no real source
+systems to name — *"The panel gets wired with real provenance during the UCP
+header redesign."* This is that.
+
+- **`recordFields` carries provenance per field, not per record.** A contact's
+  role comes from the CRM; their verified-fact count comes from the knowledge
+  system. One `source` on the whole record was a simplification that stopped
+  being true the moment two fields disagreed.
+- **`onProvenanceOpen` opens a real panel** listing every field with its source
+  system, model version and last sync.
+- **Masking is driven by entitlement** (`VIEWER_SCOPES` against the record's
+  `requiredScope`), never by a flag on the record. The signed-in PM holds
+  contacts, HR and drives — deliberately not finance — so Amy Chen, the CFO,
+  renders `locked` with her governed fields `masked`. A masked field keeps its
+  label, its provenance badge and its sync time, and withholds only the value.
+
+## The two files that need your review
+
+`.github/CODEOWNERS` gates `src/components/` and `src/App.tsx`.
 
 ### `entity-list.tsx`
 
-1. **`showAiPrefix?: boolean`, default `true`.** The insight label was
-   hardcoded as `AI {action}`. That reads correctly when `action` names a
-   category of output — the three existing consumers pass "Summary", "Impact"
-   and "Escalated". It reads wrong when `action` is a product concept with a
-   name of its own: "AI Next Best Action" renames the thing, and the row stops
-   saying what the card on the profile says.
-
-   Opt-out, not opt-in, so every existing caller renders identically. Verified
-   in the playground rather than by reading the diff: default still prints "AI
-   Escalated", toggle off prints "Escalated".
-
+1. **`showAiPrefix?: boolean`, default `true`.** The insight label was hardcoded
+   as `AI {action}`. That is right when `action` names a category of output —
+   the three existing consumers pass "Summary", "Impact" and "Escalated". It is
+   wrong when `action` is a product concept with a name of its own: "AI Next
+   Best Action" renames the thing, and the row stops saying what the header
+   says. Opt-out, so every existing caller renders identically — verified in the
+   playground, not by reading the diff.
 2. **A dangling separator.** The `·` divides the label from the inline detail,
-   but on expand the inline detail moves down into the bullets and the
-   separator stayed behind at the end of the label with nothing after it. It now
-   renders only when there is something to separate. Pre-existing; restoring the
-   label is what made it visible.
+   but on expand the detail moves down into the bullets and the separator stayed
+   behind with nothing after it. Pre-existing; restoring the label made it
+   visible.
+
+The prop ships with a toggle on the entity-list playground page and a row in the
+prop table.
 
 ### `App.tsx`
 
-- The `showAiPrefix` toggle on the entity-list playground page and its row in
-  the prop table. A DS prop that cannot be exercised on its own component page
-  is the same problem as a component state no screen renders.
-- Registers the prototype (import + one `PROTOTYPE_PAGES` entry).
-- Removes the `proto-thomas-universal-profile` import and entry.
-
-## One deletion
-
-`src/screens/pm-thomas-universal-profile.tsx` (932 lines) is deleted. It was
-superseded by this prototype, and leaving it would have added an orphan to the
-audit's Check 4 — the `--counts` ratchet fails a PR when any category goes up.
-Confirmed with before/after counts.
-
-## One deliberate deviation from CLAUDE.md
-
-The profile's page `Header` does **not** repeat the entity name, status tag and
-breadcrumb. The Entity Header spec makes its own title the page subject ("the
-title carries the profile heading level"), and the Figma view for this surface
-shows only the parent list above the card. Printing the name and state twice,
-40px apart, is the thing that spec is avoiding.
+Two added lines: the import and the `PROTOTYPE_PAGES` entry. Nothing removed.
 
 ## Verification
 
-- `npx tsc -b --noEmit` — clean
 - `npm run build` — clean
+- `node scripts/audit-ratchet.cjs` — **no new DS warnings** against `9d8bea2`
 - `node scripts/audit-tokens.cjs --counts` — `errors=0 orphan=0 shadow=0
-  main_overuse=0 card_reimpl=0`, unchanged from the base. The ratchet fails on
-  any category going up; none goes up.
-- Zero raw colours (`rgba` / hex) in every touched file
-- Browser at 1440×1000 with no console errors, plus 1024 and 820 for the
-  header's reflow
+  main_overuse=0 card_reimpl=0`
+- Zero raw colours in every touched file
+- Browser at 1440×1000, no console errors: roster, profile, all four tabs, the
+  governed record, and the loading beat
 
-## Open questions for you
+Asserted rather than screenshotted: on a locked record `Export record` reports
+`disabled=true` and on a normal one `false`.
 
-- **Restricted with tags.** The spec text says *"No signals — the tag group is
-  removed, not left empty"*, but the `Property 1=Restricted` variant in Figma
-  shows the tags on the right, dimmed. I implemented the text. If the mock is
-  the intent, it is a one-line change.
-- **Restricted with a dimmed title.** Related: the mock dims the whole identity
-  block. I kept the title at full strength — Restricted governs values, not
-  identity, and the name is already visible in the list the viewer came from.
-  If you want it dimmed, it is the `color` line in `Title`.
-- **The 760px threshold.** Derived by measuring where the single row stops
-  fitting; the spec gives no number. If you set one, it is the
-  `HEADER_STACK_THRESHOLD` constant.
-- **Promotion.** When `19815-101547` stops being WIP, both experimental
-  components are ready to move to `ui/` via `/aims-ds-component`.
+## Two things for you
+
+- **`StudyWidget` and `ConnectionsContent` are duplicated** between this profile
+  and `pm-thomas-universal-profile.tsx` — the duplicate-component check from #97
+  flags both. They drifted already: #95 fixed the sibling's error state to use
+  `EmptyState` and this screen still had the hand-rolled div, which is adopted
+  here. Extracting one canonical copy means editing a file under active
+  development, so I left it — say where you want them and I will move them.
+- **`Request access`** on the governed EmptyState is a stub. There is no
+  scope-request flow in AIMS OS yet.
+
+---
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+https://claude.ai/code/session_01UCXhb1RHXHL6NFqB3eSYLa

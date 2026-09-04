@@ -18,8 +18,33 @@
  *     convenience field invented for this screen.
  */
 
-import type { EntityMetaItem, EntityTag } from "@/components/experimental/entity-header"
-import type { NextBestAction } from "@/components/experimental/next-best-action-card"
+/**
+ * These three shapes used to be imported from a pair of components in
+ * `experimental/`. Those components are gone — RecordHeader absorbed both jobs —
+ * so the fixtures own their shapes now. They are fixture vocabulary, not design
+ * system types: the screens map them onto whatever the components ask for.
+ */
+export interface UcpTag {
+  label:     string
+  role:      "signal" | "classification"
+  tone?:     "error" | "alert" | "neutral"
+  severity?: number
+  tooltip?:  string
+}
+
+export interface UcpMetaItem {
+  iconName: string
+  label:    string
+  tooltip:  string
+}
+
+/** What the engine proposes for a record. `null` on a record with nothing to do. */
+export interface UcpNextBestAction {
+  title:     string
+  timestamp: string
+  rationale?: string
+  variant?:  "view-details" | "accept"
+}
 
 // ── Entity ────────────────────────────────────────────────────────────────────
 
@@ -64,9 +89,9 @@ export interface UcpContact {
    */
   requiredScope?:  string
   /** Signals first (by severity), then classification. Max 6 including overflow. */
-  tags:            EntityTag[]
+  tags:            UcpTag[]
   /** Max 6, aim for four. Every item carries a tooltip naming its field. */
-  meta:            EntityMetaItem[]
+  meta:            UcpMetaItem[]
   lastInteraction: string
   /** AIMS OS is agent-first — every record has one assigned concierge. */
   agent:           { id: string; name: string }
@@ -74,7 +99,7 @@ export interface UcpContact {
    * The engine's proposal, rendered as its own card BELOW the header — never
    * inside it. null when there is nothing to do: no action, no card.
    */
-  nba:             NextBestAction | null
+  nba:             UcpNextBestAction | null
   /** The agent's read on this record, shown as the Overview AI widget. */
   aiSummary:       { headline: string; detail: string; confidence: number }
   governance:      StudyState
@@ -152,6 +177,87 @@ export function restrictionFor(c: UcpContact): { scope: string; note: string } |
     note: `These values are governed by ${c.requiredScope}, which your role does not hold. The record exists and is intact — request the scope to read it.`,
   }
 }
+/**
+ * Short badge label for a source system — "Salesforce" → "SF". RecordHeader
+ * renders the abbreviation inline and keeps the full name for the Tooltip, so
+ * both have to be real; a badge that says "SAL" helps nobody.
+ */
+const SYSTEM_ABBR: Record<string, string> = {
+  Salesforce:  "SF",
+  Workday:     "WD",
+  NetSuite:    "NS",
+  HubSpot:     "HS",
+  "CDK Global": "CDK",
+  Epic:        "EP",
+}
+
+/**
+ * The record's fields in the shape RecordHeader's RECORD zone wants.
+ *
+ * Two things this shape gets right that the flat metadata row did not:
+ *
+ *   1 · Provenance is per FIELD, not per record. A contact's role comes from
+ *       the CRM and their verified-fact count comes from the knowledge system;
+ *       one `source` on the whole record was a simplification that stopped
+ *       being true the moment two fields disagreed about where they came from.
+ *
+ *   2 · Masking is a STATE of a field, not the absence of one. A viewer without
+ *       the scope sees the same field list, the same labels and the same
+ *       provenance badges — only the values are withheld. That is the honest
+ *       rendering of "the fields exist and are governed", and it is what the
+ *       component means by `state: "masked"`: the same field in a different
+ *       entitlement state, never a different field.
+ *
+ * `masked` is decided by the caller against the viewer, per the component's own
+ * rule — RecordHeader never resolves entitlements itself.
+ */
+export interface UcpRecordField {
+  label:        string
+  iconName:     string
+  value:        string
+  system:       string
+  systemAbbr:   string
+  modelVersion: string
+  syncedAgo:    string
+  masked:       boolean
+}
+
+export function getRecordFields(c: UcpContact): UcpRecordField[] {
+  const restricted = restrictionFor(c) !== null
+  const abbr = SYSTEM_ABBR[c.source.label] ?? c.source.label.slice(0, 2).toUpperCase()
+
+  // The system of record for identity-shaped fields is the one the record was
+  // ingested from; anything the platform derived carries the platform instead.
+  const fromSource = (label: string, iconName: string, value: string) => ({
+    label, iconName, value,
+    system: c.source.label, systemAbbr: abbr,
+    modelVersion: c.type === "employee" ? "UEP v2.3" : "UCP v2.1",
+    syncedAgo: "2h ago",
+    masked: restricted,
+  })
+  const fromPlatform = (label: string, iconName: string, value: string) => ({
+    label, iconName, value,
+    system: "Helix Data Studio", systemAbbr: "HX",
+    modelVersion: "Knowledge v1.4",
+    syncedAgo: "18m ago",
+    // Counts are structural, not personal: how many facts exist is not a
+    // governed value, and hiding it would misrepresent what the tenant holds.
+    masked: false,
+  })
+
+  return [
+    fromSource(c.type === "company" ? "Profile" : "Role", "Info", c.subtitle),
+    fromSource("Account owner", "UserRound", c.owner),
+    fromSource("Last interaction", "Clock", c.lastInteraction),
+    fromPlatform(
+      "Verified facts",
+      "ShieldCheck",
+      `${getFacts(c).filter(f => f.plane === "truth").length} on the Truth plane`,
+    ),
+    fromPlatform("Source Drives", "HardDrive", `${getDrives(c).length} attached`),
+  ]
+}
+
 // ── Knowledge planes ──────────────────────────────────────────────────────────
 
 export type KnowledgePlane = "truth" | "sandbox" | "sources"

@@ -3,27 +3,26 @@
  *
  * Read-only by design: the record is assembled by ingestion and agents, not
  * typed in here, so there is no create CTA. The one always-present entry point
- * is Ask — the Entity Header's gradient button — which opens the record's
+ * is Ask — RecordHeader's own agent trigger — which opens the record's
  * assigned concierge in a side panel.
  *
- * The identity card is EntityHeader (Figma 19815-101547), not RecordHeader:
- * nothing in that spec's structure is specific to a record shape, and it puts
- * the Next Best Action in its own card BELOW the header rather than inside it.
+ * The identity card is the DS's own RecordHeader. An earlier build of this
+ * screen used a purpose-built EntityHeader instead, on three arguments: that
+ * RecordHeader branched on three closed record shapes, that it carried the Next
+ * Best Action inside itself where the Figma spec wanted a separate card below,
+ * and that it had no state coverage. All three stopped being true. RecordHeader's
+ * agnosticism pass dropped the closed variants, its redesign reintroduced the
+ * Next Best Action deliberately as a protagonist block, and it now carries
+ * per-zone loading and per-field masking. So this screen was rebuilt around what
+ * the design system has rather than beside it, and the second component is gone.
  *
- * The whole record chrome is pinned — identity card, Next Best Action, tabs —
- * in ScreenLayout's header zone, which sits outside the scroll container. On
- * scroll the header collapses to the spec's Minimum state: visual, title and
- * state badge, the three priorities never dropped at any width, plus the action
- * row, which is fixed and never compressed.
+ * Two things that used to be ours belong to the component now, and both are
+ * better there: the Next Best Action, which no longer needs placing, and the
+ * card-width reflow, which RecordHeader measures on its own box.
  *
- * The order inside the pinned zone is the spec's, not a preference. The Next
- * Best Action has to sit directly below the header and never under a nav layer,
- * so pinning the tabs meant pinning the card above them too — a card rendered
- * under the tabs reads as belonging to the active tab rather than to the record.
- * The cost is height: on a record that has a recommendation the pinned chrome is
- * about a third of a 1000px viewport at rest, and the spec's own escape valve is
- * the card's dismiss (session-only). Records with nothing to do carry no card
- * and no gap where one would have been.
+ * What stays ours is the chrome around it. The identity card and the tabs pin in
+ * ScreenLayout's header zone, outside the scroll container, so the record stays
+ * identified while its content scrolls.
  *
  * One deviation from CLAUDE.md's generic detail-page rule, and it is deliberate:
  * the page Header does NOT repeat the entity name, status tag and breadcrumb.
@@ -32,16 +31,14 @@
  * shows only the parent list above the card. Printing the name and state twice,
  * 40px apart, is the thing that spec is avoiding.
  *
- * The header's own state set is exercised here rather than described:
+ * The states are exercised here rather than described:
  *   Loading     → the first paint of a record fetch, re-armed per record id.
  *   Restricted  → a record whose values sit behind a scope the viewer does not
  *                 hold. Decided by the session against the record, never by a
- *                 flag on the record. The body follows the header — leaving the
- *                 facts on screen under a "these are governed" header would be
- *                 the page contradicting the header.
- *   Minimum     → on scroll, per above.
- *   Responsive  → driven by a ResizeObserver on the header's CARD, because that
- *                 is what the spec says the breakpoint belongs to.
+ *                 flag on the record: `locked` on the header, `masked` on each
+ *                 governed field, and a body that follows. Leaving the facts on
+ *                 screen under a header that says the values are governed would
+ *                 be the page contradicting the header.
  *
  * Tabs: Overview · Snapshot · Activity · Drives
  *   Overview  → WidgetCanvasView (DS rule: any tab named Overview is a canvas)
@@ -50,7 +47,7 @@
  *   Drives    → the Source Drives attached to this record
  */
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { ScreenLayout }      from "@/components/layouts/screen-layout"
 import { WidgetCanvasView }  from "@/components/layouts/widget-canvas-view"
 import type { CanvasSlot }   from "@/components/layouts/widget-canvas-view"
@@ -72,12 +69,14 @@ import { HighlightIcon }     from "@/components/ui/highlight-icon"
 import { Pagination }        from "@/components/ui/pagination"
 import { SlideOut }          from "@/components/ui/slide-out"
 import { Skeleton }          from "@/components/ui/skeleton"
-import { EntityHeader }        from "@/components/experimental/entity-header"
-import { NextBestActionCard }  from "@/components/experimental/next-best-action-card"
+import { RecordHeader }        from "@/components/ui/record-header"
+import type { NextBestAction, RecordField } from "@/components/ui/record-header"
+import * as LucideIcons from "lucide-react"
 import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch, Lock } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import {
   PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
-  TYPE_LABEL, entityState, restrictionFor,
+  TYPE_LABEL, TYPE_ICON, entityState, restrictionFor, getRecordFields,
   getActivity, getConciergeOpening, getConnections, getDrives,
   getFacts, getGovernance, getRisk,
 } from "./ucpShared"
@@ -103,19 +102,20 @@ const ACTIVITY_PAGE_SIZE = 8
 function StudyWidget({ title, state, children }: { title: string; state: StudyState; children: React.ReactNode }) {
   if (state === "empty") return null
   if (state === "error") {
+    // EmptyState, not a hand-rolled div. This screen shipped the hand-rolled
+    // version; the design system fixed the same mistake in the sibling profile
+    // (#95) before this one was rebased onto it, so the correction is adopted
+    // here rather than rediscovered. CLAUDE.md is explicit that any section with
+    // no content to show uses EmptyState — a failed load is exactly that.
     return (
-      <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <HighlightIcon size="sm" variant="error" iconName="AlertCircle" />
-          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>Failed to load</span>
-        </div>
-        <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>
-          {title} data couldn&apos;t be retrieved for this record.
-        </span>
-        <Button variant="tertiary" size="sm" className="self-start !px-0" onClick={() => {}}>
-          Retry
-        </Button>
-      </div>
+      <EmptyState
+        compact
+        icon={LucideIcons.AlertCircle}
+        title="Failed to load"
+        description={`${title} data couldn't be retrieved for this record.`}
+        ctaLabel="Retry"
+        onCta={() => {}} // DS-GAP: wire to a real retry handler
+      />
     )
   }
   return <>{children}</>
@@ -596,36 +596,6 @@ function RestrictedBody({ name, scope }: { name: string; scope: string }) {
   )
 }
 
-/**
- * The Entity Header's size axis is driven by the width of the card it sits in,
- * not the viewport: "the breakpoint it responds to is the card's, not the
- * viewport's". Same reason the header takes `size` as a prop instead of using a
- * media query — a header inside a 640px side panel on a 1920px monitor has to
- * reflow, and a media query would never fire.
- *
- * The threshold is where the default single row stops fitting: visual, title,
- * source, two collapsed tags and the fixed action group. Below it the header
- * stacks; it never shrinks the title to keep the row.
- */
-const HEADER_STACK_THRESHOLD = 760
-
-function useCardSize(): [React.RefObject<HTMLDivElement | null>, "default" | "responsive"] {
-  const ref = useRef<HTMLDivElement>(null)
-  const [width, setWidth] = useState(9999)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const ro = new ResizeObserver(entries => {
-      for (const entry of entries) setWidth(entry.contentRect.width)
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
-  return [ref, width < HEADER_STACK_THRESHOLD ? "responsive" : "default"]
-}
-
 // ── Profile view ──────────────────────────────────────────────────────────────
 
 export function UcpProfileView({
@@ -642,9 +612,6 @@ export function UcpProfileView({
   const [chatOpen,   setChatOpen]   = useState(false)
   const [infoOpen,   setInfoOpen]   = useState(false)
   const [drivePeek,  setDrivePeek]  = useState<UcpDrive | null>(null)
-  // Session-only, per the card's own rule: nothing is stored and nothing is fed
-  // back to the engine. Resets when the record changes.
-  const [nbaDismissed, setNbaDismissed] = useState<string | null>(null)
 
   // Ask and Information both open on the side — opening one closes the other,
   // and the panel requested last wins.
@@ -652,12 +619,6 @@ export function UcpProfileView({
   const openInfo = () => { setChatOpen(false); setDrivePeek(null); setInfoOpen(true) }
 
   const state = entityState(contact)
-
-  // The header stacks on the width of its own card, so the card is what gets
-  // measured. On a 1440 desktop it is ~1100px and the header stays on one row;
-  // in a narrow window or a collapsed layout the same card crosses the
-  // threshold and the header reflows without the viewport being consulted.
-  const [headerCardRef, headerSize] = useCardSize()
 
   // A record is fetched, so there is a first paint where it does not exist yet,
   // and the header's Loading state is what belongs there. Re-armed per record:
@@ -674,7 +635,47 @@ export function UcpProfileView({
   // needs — never by a flag on the record itself. null when nothing is gated.
   const restriction = restrictionFor(contact)
 
-  const headerVariant = loading ? "loading" : restriction ? "restricted" : "default"
+  // The entity type is host-defined now — RecordHeader enumerates nothing.
+  const entityIcon = (LucideIcons[TYPE_ICON[contact.type] as keyof typeof LucideIcons] ??
+    LucideIcons.CircleDot) as LucideIcon
+
+  // Masking is a state of a field, not the absence of one: the viewer sees the
+  // same labels and the same provenance badges either way, and only the values
+  // are withheld. The component never resolves entitlements itself, so the
+  // caller hands it the state each field is in.
+  const recordFields = useMemo<RecordField[]>(
+    () => getRecordFields(contact).map(f => ({
+      label: f.label,
+      icon: (LucideIcons[f.iconName as keyof typeof LucideIcons] ?? LucideIcons.CircleDot) as LucideIcon,
+      provenance: {
+        system:       f.system,
+        systemAbbr:   f.systemAbbr,
+        modelVersion: f.modelVersion,
+        syncedAgo:    f.syncedAgo,
+      },
+      state:       f.masked ? "masked" : "hydrated",
+      value:       f.value,
+      maskedValue: f.masked ? "•••• (restricted)" : undefined,
+    })),
+    [contact],
+  )
+
+  // The record's one recommendation, in the shape the component owns. Records
+  // with nothing to recommend pass an empty array and the block disappears —
+  // the same "never fake a state" rule the component applies to every zone,
+  // and the same edge case the roster row handles by rendering no block.
+  const nextBestActions = useMemo<NextBestAction[]>(
+    () => (contact.nba && !restriction
+      ? [{
+          id:          `nba-${contact.id}`,
+          title:       contact.nba.title,
+          description: contact.nba.rationale ?? contact.nba.timestamp,
+          contextTag:  TYPE_LABEL[contact.type],
+          onOpen:      openChat,
+        }]
+      : []),
+    [contact, restriction],
+  )
 
   const activityCount = useMemo(() => {
     const all = getActivity(contact)
@@ -775,52 +776,45 @@ export function UcpProfileView({
               container. 32px sides so the edges line up with the content
               scrolling underneath.
 
-              The whole record chrome pins, in the spec's own order — header,
-              then the Next Best Action, then the tabs. The order is not a
-              preference: the card has to sit directly below the header and
-              never under a nav layer, or it reads as belonging to the active
-              tab instead of to the record. */}
-          <div ref={headerCardRef} style={{ padding: "0 32px 8px" }}>
-            <CardContainer size="lg" variant="default" className="w-full">
-              <EntityHeader
-                visual={{ kind: "avatar" }}
-                title={contact.name}
-                source={contact.source}
-                state={state}
-                tags={contact.tags}
-                meta={contact.meta}
-                minimum={isScrolled}
-                variant={headerVariant}
-                size={headerSize}
-                restrictedNote={restriction?.note}
-                onAsk={openChat}
-                onInformation={openInfo}
-                menuActions={[
-                  { label: "Archive",       onClick: () => {} },
-                  { label: "Duplicate",     onClick: () => {} },
-                  { label: "Export record", onClick: () => {} },
-                ]}
-              />
-            </CardContainer>
-          </div>
+              RecordHeader brings its own CardContainer, so this wrapper only
+              supplies the 32px sides that line the card up with the content
+              scrolling underneath.
 
-          {/* No action, no card — and no gap where it would have been.
-              It also steps aside once you start reading: pinning a full-height
-              proposal forever is the thing the card's own rule 2 objects to
-              ("stacked cards push the real content below the fold"). At rest it
-              holds its position directly below the header; on scroll the
-              identity and the tabs stay and the proposal yields, and it comes
-              back at the top of the page. */}
-          {!isScrolled && !loading && !restriction && nbaDismissed !== contact.id && contact.nba && (
-            <div style={{ padding: "0 32px 8px" }}>
-              <NextBestActionCard
-                action={contact.nba}
-                onAccept={() => {}}
-                onViewDetails={openChat}
-                onDismiss={() => setNbaDismissed(contact.id)}
-              />
-            </div>
-          )}
+              The Next Best Action is NOT a card of ours below the header any
+              more: the component carries it as a protagonist block, visible
+              collapsed and expanded alike. That was a real reversal — the
+              earlier build put it in a separate card underneath, on the reading
+              that a header identifies and a card proposes. The design system
+              decided the opposite and shipped it, so the proposal lives inside
+              the header and there is nothing left for us to place. */}
+          <div style={{ padding: "0 32px 8px" }}>
+            <RecordHeader
+              name={contact.name}
+              entityType={{ icon: entityIcon, label: TYPE_LABEL[contact.type] }}
+              statusTag={{ label: state.label }}
+              recordFields={recordFields}
+              onProvenanceOpen={openInfo}
+              assignedAgent={{
+                id: contact.agent.id,
+                name: contact.agent.name,
+                onOpenChat: openChat,
+              }}
+              nextBestActions={nextBestActions}
+              locked={restriction !== null}
+              // Both disable when the record is locked, which is the prop's
+              // default and the right answer here. Export is the one worth
+              // saying out loud: it is a read, so the component's "locked means
+              // you cannot act on it, not that you cannot consult it" reasoning
+              // would let it through — but an export writes the governed values
+              // into a file the viewer keeps. Consulting a masked field on
+              // screen and extracting it are not the same act.
+              actions={[
+                { label: "Export record", variant: "secondary", onClick: () => {},
+                  disabledTooltip: "This record's values are governed — request the scope to export it" },
+                { label: "Archive", variant: "tertiary", onClick: () => {} },
+              ]}
+            />
+          </div>
 
           {/* 16px here plus ScreenLayout's own 8px of content padding is the
               24px the DS wants between the last nav layer and the content. */}
@@ -897,27 +891,32 @@ export function UcpProfileView({
         showChips={false}
         showCta={false}
       >
+        {/* Law 2 — every governed answer carries provenance reachable without
+            leaving the record. This is what RecordHeader's onProvenanceOpen is
+            for, and it now prints the real thing: the system each field came
+            from, the model version it was shaped by, and when it last synced.
+            A masked field keeps its whole row — label, system, version, sync —
+            and withholds only the value. That is the point of masking: the
+            viewer can see that the field exists and is governed, which is a
+            different statement from the field not being there. */}
         <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
           <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
-            Every value in the header above, and where it came from.
+            {restriction
+              ? `Every field on this record, and where it came from. ${restriction.note}`
+              : "Every field on this record, and where it came from."}
           </span>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {[
-              { field: "Title",  value: contact.name,      from: `${contact.source.label} · written exactly as the source system stores it` },
-              { field: "Source", value: contact.source.label, from: "Ingestion · the system this record was pulled from" },
-              { field: "State",  value: state.label,       from: "Lifecycle · the most blocking status on the record" },
-              { field: "Type",   value: TYPE_LABEL[contact.type], from: "Classification · assigned in Helix Data Studio" },
-              ...contact.tags.filter(t => t.role === "signal").map(t => ({
-                field: "Signal", value: t.label, from: t.tooltip ?? "Signal engine",
-              })),
-              ...contact.meta.map(m => ({ field: "Metadata", value: m.label, from: m.tooltip })),
-            ].map((row, i) => (
-              <div key={`${row.field}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {getRecordFields(contact).map((f, i) => (
+              <div key={`${f.label}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
-                  {row.field}
+                  {f.label}
                 </span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{row.value}</span>
-                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>{row.from}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: f.masked ? "var(--field-supporting)" : "var(--foreground)" }}>
+                  {f.masked ? "•••• (restricted)" : f.value}
+                </span>
+                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>
+                  {f.system} · {f.modelVersion} · synced {f.syncedAgo}
+                </span>
               </div>
             ))}
           </div>
