@@ -464,21 +464,23 @@ export default function PMThomasUcpContactsScreen() {
     // from what the card below the profile header calls itself. The prefix is
     // opted out; the label keeps its own styling.
     //
-    // The detail is an array rather than one run-on string: the first line is
-    // what the row is for — the proposal and when — and the rationale becomes
-    // its own bullet when expanded, which is where a reader goes to decide. All
-    // ten recommendations carry one, so the block always has something to expand
-    // into.
+    // One short line, so the block neither collapses nor stretches. EntityList
+    // sizes this container from its own content: past `detailThreshold` (80 by
+    // default) it treats the text as long, goes full width and grows a chevron
+    // to expand; under it, the block takes `self-start` and hugs. Every
+    // recommendation here fits in 54 characters or fewer, so the row gets the
+    // hugging card and no disclosure — matching the block inside RecordHeader
+    // on the profile, which carries no chevron either.
+    //
+    // The rationale is deliberately not here. A roster is scanned to decide what
+    // to open next, and the proposal plus its timestamp answers that; the "why"
+    // is a paragraph, and it belongs on the record, where the same
+    // recommendation renders with its full description.
     aiInsight: c.nba
       ? {
           action:       "Next Best Action",
           showAiPrefix: false,
-          detail: [
-            `${c.nba.title} · ${c.nba.timestamp}`,
-            ...(c.nba.rationale ? [c.nba.rationale] : []),
-          ],
-          viewMore: true,
-          onViewMore: () => setOpenId(c.id),
+          detail:       `${c.nba.title} · ${c.nba.timestamp}`,
         }
       : undefined,
     tags:  [{ label: TYPE_LABEL[c.type] }],

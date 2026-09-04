@@ -19,7 +19,7 @@ index 5f0dc8a..19dcea5 100644
    { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
 diff --git a/src/components/ui/entity-list.tsx b/src/components/ui/entity-list.tsx
-index 7be3bdd..516ed03 100644
+index 7be3bdd..4794f81 100644
 --- a/src/components/ui/entity-list.tsx
 +++ b/src/components/ui/entity-list.tsx
 @@ -50,11 +50,19 @@ export type EntityListItemData = {
@@ -42,7 +42,22 @@ index 7be3bdd..516ed03 100644
      viewMore?:        boolean
      onViewMore?:      () => void  // called when "View more" is clicked — pair with ModalDialog
      defaultExpanded?: boolean
-@@ -423,9 +431,15 @@ function EntityListRow({ item }: { item: EntityListItemData }) {
+@@ -414,7 +422,13 @@ function EntityListRow({ item }: { item: EntityListItemData }) {
+               "flex flex-col gap-[6px] px-[8px] py-[8px] rounded-[8px]",
+               !isLong && "self-start"  // adapt to text width when short; full-width when long
+             )}
+-            style={{ background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)" }}
++            // Card tokens, not tag tokens. The background is the same value in
++            // both families, but --tag-purple-bd is a full-strength #a855f7
++            // meant to outline a Tag, and at card size it reads as a loud box
++            // rather than a surface. --card-purple-border is the 20% border the
++            // same block uses inside RecordHeader, so the row and the profile
++            // now render the recommendation as the same object.
++            style={{ background: "var(--card-purple-bg)", border: "1px solid var(--card-purple-border)" }}
+             onClick={e => e.stopPropagation()}
+           >
+             {/* Header row: sparkle · label · inline-text (short/collapsed) · [view more] · chevron */}
+@@ -423,9 +437,15 @@ function EntityListRow({ item }: { item: EntityListItemData }) {
                {ai.showLabel !== false && (
                  <>
                    <span className="text-[13px] font-semibold whitespace-nowrap" style={{ color: "var(--foreground)" }}>
@@ -89,10 +104,10 @@ index 578261c..d1f028a 100644
            {/* One context Tag per NBA — what area this action is about, at a
 diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
 new file mode 100755
-index 0000000..810fd03
+index 0000000..9af5613
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-contacts.tsx
-@@ -0,0 +1,756 @@
+@@ -0,0 +1,758 @@
 +/**
 + * UCP — Contacts list.
 + *
@@ -559,21 +574,23 @@ index 0000000..810fd03
 +    // from what the card below the profile header calls itself. The prefix is
 +    // opted out; the label keeps its own styling.
 +    //
-+    // The detail is an array rather than one run-on string: the first line is
-+    // what the row is for — the proposal and when — and the rationale becomes
-+    // its own bullet when expanded, which is where a reader goes to decide. All
-+    // ten recommendations carry one, so the block always has something to expand
-+    // into.
++    // One short line, so the block neither collapses nor stretches. EntityList
++    // sizes this container from its own content: past `detailThreshold` (80 by
++    // default) it treats the text as long, goes full width and grows a chevron
++    // to expand; under it, the block takes `self-start` and hugs. Every
++    // recommendation here fits in 54 characters or fewer, so the row gets the
++    // hugging card and no disclosure — matching the block inside RecordHeader
++    // on the profile, which carries no chevron either.
++    //
++    // The rationale is deliberately not here. A roster is scanned to decide what
++    // to open next, and the proposal plus its timestamp answers that; the "why"
++    // is a paragraph, and it belongs on the record, where the same
++    // recommendation renders with its full description.
 +    aiInsight: c.nba
 +      ? {
 +          action:       "Next Best Action",
 +          showAiPrefix: false,
-+          detail: [
-+            `${c.nba.title} · ${c.nba.timestamp}`,
-+            ...(c.nba.rationale ? [c.nba.rationale] : []),
-+          ],
-+          viewMore: true,
-+          onViewMore: () => setOpenId(c.id),
++          detail:       `${c.nba.title} · ${c.nba.timestamp}`,
 +        }
 +      : undefined,
 +    tags:  [{ label: TYPE_LABEL[c.type] }],
