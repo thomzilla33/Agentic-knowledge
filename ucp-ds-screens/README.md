@@ -48,9 +48,8 @@ gh pr create --base main --title "UCP — Unified Contact Profile, built on the 
 
 El cuerpo del PR está escrito y listo en **`PR.md`**, en esta misma carpeta.
 
-El patch toca 8 archivos: 2 componentes nuevos en `experimental/`, 3 en
-`src/screens/`, `entity-list.tsx`, `App.tsx`, y **borra**
-`src/screens/pm-thomas-universal-profile.tsx`. `entity-list.tsx` y `App.tsx`
+El patch toca 5 archivos: 3 pantallas nuevas en `src/screens/`,
+`entity-list.tsx`, y **dos líneas** en `App.tsx`. No borra nada. `entity-list.tsx` y `App.tsx`
 están bajo CODEOWNERS, así que el PR necesita review de **@cachilupis** — es el
 comportamiento esperado, no un bloqueo.
 
@@ -74,201 +73,59 @@ Header. Su historial queda en git si alguien lo necesita.
 
 ---
 
-## El Entity Header
+## Se construyó dos veces, y la segunda es la que va
 
-El header de la entidad es `src/components/experimental/entity-header.tsx`, no
-`RecordHeader`. Va en `experimental/` con su comentario `// DS-GAP:` porque el
-frame de Figma sigue marcado **WIP** y la regla del repo es que nada entra a
-`ui/` sin que Michael lo promueva.
+La primera versión traía su propio `EntityHeader` en `experimental/`, hecho
+desde el Figma `19815-101547`, con tres argumentos: que `RecordHeader`
+ramificaba en tres formas cerradas de registro, que cargaba el Next Best Action
+adentro donde el spec quería una card aparte debajo, y que no cubría estados.
 
-Es un componente distinto, no una variante de `RecordHeader`, por dos razones que
-el spec deja explícitas:
+Los tres dejaron de ser ciertos mientras esto estaba en vuelo:
 
-- **Nada en la estructura es específico de una forma de registro.** El mismo
-  esqueleto tiene que sostener un contacto, una orden de reparación y una tienda,
-  así que la única bifurcación es avatar-vs-highlight-icon — y la decide si la
-  entidad tiene identidad visual real (una cara o una marca), no su tipo.
-  `RecordHeader` bifurca en `employee | customer | client`, que es justo lo que
-  este spec evita.
-- **El Next Best Action sale del header.** *"Under the header, never inside it…
-  The header identifies the entity; the card proposes."* `RecordHeader` lo lleva
-  dentro como Signal bar. Aquí es `next-best-action-card.tsx`, su propia Card.
+- **El agnosticism pass del #46** eliminó las variantes cerradas `uep`/`ucp`/`uvp`
+  — *"This card now serves ANY entity type on the platform."*
+- **El redesign del #46** reintrodujo el Next Best Action a propósito, como
+  bloque protagonista visible colapsado y expandido. El design system tomó la
+  posición contraria a la que justificaba una card aparte, y la shippeó.
+- `RecordHeader` ahora lleva loading por zona y masking por campo.
 
-### Las cuatro preguntas, en orden
+Así que el prototipo se reconstruyó sobre `RecordHeader` y los dos componentes
+de `experimental/` se borraron en vez de proponerse. **De 8 archivos tocados
+pasó a 5, sin componentes nuevos y sin borrar nada.**
 
-El header responde cuatro cosas y no responde el *por qué* — eso es trabajo del
-Overview:
+Dos cosas que eran de esta pantalla ahora son del componente, y están mejor ahí:
+el Next Best Action, que ya no hay que ubicar, y el reflow por ancho de card,
+que `RecordHeader` mide sobre su propia caja.
 
-| # | Pregunta | Slot |
-|---|---|---|
-| 1 | ¿Qué es esto? | visual + título |
-| 2 | ¿Dónde se ubica? | source |
-| 3 | ¿Cuál es su estado? | state badge |
-| 4 | ¿Qué necesita atención? | tags |
+### Lo que esto conecta y nadie había conectado
 
-### Reglas que quedaron implementadas, no solo leídas
+`pm-thomas-universal-profile.tsx` dice que deja `recordFields` sin pasar a
+propósito, porque esa pantalla no tiene panel de procedencia ni sistemas fuente
+reales que nombrar — *"The panel gets wired with real provenance during the UCP
+header redesign."* Esto es eso.
 
-- **No tiene contenedor propio.** El header nunca se coloca directo sobre la
-  página y nunca se crea su propio fondo — *"a header with its own background
-  inside a card produces a box within a box"*. Quien lo usa lo envuelve en
-  `<CardContainer size="lg">`.
-- **Source es un ítem, nunca dos.** Es el sistema del que se extrajo el registro
-  — Salesforce, Workday, NetSuite. Un cargo, una ubicación, una región o una
-  categoría **no** son source. Si la entidad nació en la plataforma, el slot se
-  quita; no se rellena con otra cosa.
-- **State badge: exactamente uno, gana el más bloqueante.** El resto de estados
-  concurrentes bajan a tags. Por eso Kestrel muestra `Dormant` y no `Inactive`,
-  y `Inactive` aparece como tag.
-- **Los tags de la izquierda tienen dos colores, no once.** `error` si algo está
-  roto o vencido, `alert` si necesita revisión, neutral todo lo demás. La prueba
-  no es señal-vs-clasificación, es si alguien tiene que hacer algo al respecto.
-  **La clasificación nunca lleva color** — eso es lo que deja que un tenant
-  defina cien clasificaciones sin romper el sistema visual.
-- **Metadata: máximo 6, apuntar a 4.** Siempre icono + texto, nunca icono solo, y
-  cada ítem lleva tooltip que nombra el campo. Más de seis deja de ser una fila y
-  se vuelve una sección — y eso va al Overview, no detrás de un chip `+N`.
-- **La descripción está apagada por defecto.** Solo se enciende cuando el título
-  es un código opaco (`RO-48291`). Ninguna de las 14 entidades del prototipo lo
-  es, así que ninguna la lleva — que es exactamente lo que el spec predice.
-- **Nada envuelve, nada se abrevia.** Título, tags, source y metadata truncan con
-  elipsis y entregan el valor completo al tooltip. El título cede al final: los
-  tags colapsan en `+N` antes de que el identificador pierda un carácter.
-- **El chrome del registro queda pineado al hacer scroll** — header, Next Best
-  Action y tabs — en la zona de header de `ScreenLayout`, que está fuera del
-  contenedor con scroll. Al bajar, el header colapsa al **estado Minimum** que
-  el propio spec define: *"Only visual, title and state. No description, no
-  tags, no metadata. The header stays valid."* Más la fila de acciones, que es
-  fija y nunca se comprime.
+- **La procedencia es por campo, no por registro.** El rol del contacto viene
+  del CRM; el conteo de hechos verificados viene del sistema de conocimiento. Un
+  `source` único por registro era una simplificación que dejó de ser cierta en
+  cuanto dos campos discreparon sobre de dónde venían.
+- **`onProvenanceOpen` abre un panel real** con cada campo, su sistema, la
+  versión del modelo y el último sync.
+- **El masking lo decide el entitlement** (`VIEWER_SCOPES` contra el
+  `requiredScope` del registro), nunca un flag en el registro. El PM tiene
+  contacts, HR y drives — finanzas no, a propósito — así que Amy Chen, la CFO,
+  renderiza `locked` con sus campos gobernados `masked`. Un campo enmascarado
+  conserva su etiqueta, su badge de procedencia y su hora de sync, y solo retiene
+  el valor. Ese es el punto: el viewer ve que el campo existe y está gobernado,
+  que es distinto de que el campo no esté.
 
-  **El orden dentro del bloque pineado es el del spec, no una preferencia.** La
-  card del Next Best Action tiene que ir directamente debajo del header y nunca
-  bajo una capa de navegación: renderizada debajo de los tabs se lee como si
-  perteneciera al tab activo en vez de al registro. Por eso pinear los tabs
-  obligó a pinear la card por encima de ellos.
+### Un bug que encontré al probarlo
 
-  **Y la card se aparta al hacer scroll.** Medido en navegador a 1440×1000: con
-  los tres elementos fijos el bloque ocupaba 429px al descansar y solo bajaba a
-  389 al hacer scroll, porque el colapso Minimum encoge el header pero la card
-  seguía a tamaño completo. Eso es exactamente lo que la regla 2 de la propia
-  card objeta — *"stacked cards push the real content below the fold"* — solo que
-  de forma permanente. La card ahora sale del bloque pineado al hacer scroll:
-  429 → **221px**, el mismo valor que un registro sin recomendación. Al
-  descansar mantiene su posición correcta debajo del header, y vuelve al subir.
-- **Las tres acciones no son tres botones.** `Ask` es el botón con gradiente que
-  abre el Personal Assistant — habla, no ejecuta, y por eso no puede compartir la
-  marca visual del Next Best Action, que sí pide una decisión. `(i)` abre el
-  panel de procedencia de los campos en pantalla. El `⋮` es solo destructivas y
-  secundarias, nunca un botón visible. Un panel lateral a la vez.
-
-### El Next Best Action
-
-`next-best-action-card.tsx`, `CardContainer variant="purple" size="lg"`, debajo
-del header y a ancho completo.
-
-- **Nunca apila.** El motor ya priorizó, unificó y descartó. Si hay más, un
-  contador lleva a la lista.
-- **Sin acción, sin card.** No es un empty state: no hay nada que decir cuando no
-  hay nada que hacer. En el prototipo, Marcus Webb, David Park, Elena Fischer,
-  Sarah Chen, Amy Chen y Grace Okafor no tienen card — y el tab queda pegado al
-  header.
-- **Siempre declara cuándo y por qué.** Timestamp más rationale; sin rationale es
-  una orden, no una propuesta. El rationale va en una línea y trunca al tooltip.
-- **Aceptar asigna al agente, no ejecuta.** El agente ejecuta, el humano
-  gobierna. Nunca "Call now". La variante por defecto es solo `View details`;
-  `Accept` está reservada y aquí se usa en dos registros para mostrarla.
-
----
-
-## Los estados del header
-
-El component set de Figma es `Property 1 = Default | Loading | Restricted` ×
-`Size = Default | Responsive`, más los cinco estados que el componente declara
-como propios. Estaban todos implementados en `entity-header.tsx`, pero el
-prototipo solo renderizaba dos de ellos — Default y Minimum. Un estado que
-existe en el archivo y no se ve corriendo no está revisado: nadie puede aprobar
-lo que no se puede abrir. Los tres que faltaban ahora se llegan navegando.
-
-### Restricted — una regla de entitlement, no un flag
-
-Restricted lo decide **lo que tiene el viewer contra lo que pide el registro**,
-nunca una propiedad del registro. En `ucpShared.ts`:
-
-```ts
-export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
-
-export function restrictionFor(c: UcpContact): { scope: string; note: string } | null
-```
-
-Thomas es PM: lee contactos y RRHH, y **no** lee finanzas. Esa omisión es el
-punto — es lo que hace el estado alcanzable desde una regla real. El único
-registro con scope es **Amy Chen**, la CFO de Meridian: `requiredScope:
-"finance.read"`. El mismo registro se renderiza completo para alguien que sí
-tenga el scope; no hay nada especial en la fila.
-
-Lo que cambia, y por qué:
-
-- **El header baja a identidad + estado.** Se retira el grupo de tags y la
-  metadata; sobreviven visual, título, source y state badge. `(i)`, `Ask` y `⋮`
-  quedan deshabilitados: los tres leen valores.
-- **El título va a fuerza completa, no atenuado.** Esto lo cambié: antes iba en
-  `--field-supporting`. Restricted gobierna los **valores** de la entidad, no su
-  identidad — el nombre ya está visible en el listado del que vino el viewer, y
-  atenuarlo dice que el nombre mismo es incierto. Las prioridades 1 a 3 no se
-  bajan **ni se debilitan**.
-- **El cuerpo sigue al header.** Los tabs quedan montados y siguen cambiando —
-  son parte de la forma del registro, y esconderlos falsearía lo que el tenant
-  tiene. Pero el contenido se reemplaza por un `EmptyState` que nombra el scope.
-  Dejar los hechos, el timeline y los drives en pantalla bajo un header que dice
-  *"estos valores están gobernados"* sería la página contradiciendo al header.
-- **El panel de Preview del listado tiene la misma puerta.** Imprimía el read del
-  agente, el email y los conteos de hechos. Un preview que filtra lo que el
-  perfil protege deja la restricción como decoración — el panel es la puerta más
-  fácil, así que tiene que ser la misma puerta. Sobrevive lo de nivel directorio:
-  Record ID, Owner, Source.
-- **La fila del listado lo marca.** Un ítem `🔒 Restricted` en la metadata
-  superior, con el scope en el tooltip. Enterarse de que un registro está
-  gobernado **después** de abrirlo es la versión de esto que desperdicia un clic.
-
-El texto no culpa al viewer ni sugiere que el registro esté roto: *"The record
-exists and is intact — request the scope to read it."* Es un estado, no un fallo.
-
-### Loading — el primer paint de un fetch
-
-El registro se busca, así que existe un instante en el que no está. El skeleton
-del header es lo que va ahí, con la disposición que le corresponde a su `size`.
-Se re-arma por `contact.id`: navegar de un contacto a otro es un fetch nuevo, no
-un re-render del anterior.
-
-Y el cuerpo acompaña. Un `LoadingBody` de skeletons reemplaza el contenido del
-tab, porque una pantalla que dice "cargando" en un lugar y muestra valores
-terminados en otro está afirmando dos cosas distintas del mismo registro. No es
-un `EmptyState`: *"nothing here"* es falso mientras el dato viene en camino.
-
-La card del Next Best Action tampoco aparece mientras carga — es una propuesta
-derivada de valores que todavía no llegaron.
-
-### Responsive — el breakpoint es el de la card, no el del viewport
-
-El spec es explícito: *"the breakpoint it responds to is the card's, not the
-viewport's"*, y es la razón por la que `size` es una prop y no un media query —
-un header dentro de un panel lateral de 640px en un monitor de 1920 tiene que
-reflowear, y un media query nunca dispararía.
-
-Así que se mide la card, con `ResizeObserver`, siguiendo el patrón que el propio
-DS ya usa en `adaptive-metric-grid.tsx`. Umbral: **760px** de ancho de card, que
-es donde la fila única deja de caber.
-
-**REFLOW = stack before you shrink.** Medido en navegador:
-
-| Viewport | Ancho de card | Estado | Resultado |
-|---|---|---|---|
-| 1440 | ~1100px | `default` | Fila única, tags colapsados a `+1` |
-| 1024 | ~912px | `default` | Fila única, `+1`, título entero |
-| 820 | ~708px | `responsive` | Fila 1 identidad + acciones · fila 2 source + los 3 tags · fila 3 metadata |
-
-El título no se encoge para salvar la fila: los tags colapsan en `+N` primero, y
-cuando eso ya no alcanza, source y tags se van a su propia fila. Y `responsive` +
-`minimum` vuelve a una sola fila — un minimum apilado serían tres filas de nada.
+Dejé `Export record` habilitado en un registro bloqueado. El componente razona
+que *locked* significa "no puedes actuar sobre el registro, no que no puedas
+consultarlo", y por eso deja vivas las superficies de solo lectura — pero un
+export escribe los valores gobernados en un archivo que el viewer se queda.
+Consultar un campo enmascarado en pantalla y extraerlo no son el mismo acto.
+Verificado en ambos sentidos: bloqueado `disabled=true`, normal `disabled=false`.
 
 ---
 
@@ -471,15 +328,12 @@ ucp-ds-screens/
 ├── src/
 │   ├── components/ui/
 │   │   └── entity-list.tsx                      # showAiPrefix + separador · CODEOWNERS
-│   ├── components/experimental/
-│   │   ├── entity-header.tsx                    # DS-GAP · Figma 19815-101547
-│   │   └── next-best-action-card.tsx            # DS-GAP · misma frame
 │   └── screens/
 │       ├── ucpShared.ts                         # tipos + fixtures (16 entidades) + entitlements
 │       ├── pm-thomas-ucp-contacts.tsx           # listado + navegación al perfil
-│       └── pm-thomas-ucp-profile.tsx            # UCP: header + NBA + 4 tabs + concierge
-├── figma/                                       # el spec del que salió esto
-│   ├── anatomy.png · variants.png
+│       └── pm-thomas-ucp-profile.tsx            # UCP: RecordHeader + 4 tabs + concierge
+├── figma/                                       # el spec del EntityHeader retirado,
+│   ├── anatomy.png · variants.png               #   conservado por el razonamiento
 │   ├── nba-anatomy.png · view1.png
 └── screenshots/                                 # cada vista y cada estado, 1440×1000
 ```
@@ -521,20 +375,15 @@ aditivos:
   arreglo del separador colgado. Ningún caller existente cambia de render.
 - **`App.tsx`** — el toggle del playground, el wiring en las dos ramas del demo
   item, la fila en la tabla de props, y las dos líneas del registro del
-  prototipo (import + entrada en `PROTOTYPE_PAGES`, más el retiro del Universal
-  Profile).
+  prototipo (import + entrada en `PROTOTYPE_PAGES`). No se quita nada.
 
-Todo lo demás vive en `/src/screens/` y `/src/components/experimental/`, que no
-tienen owner.
+Todo lo demás vive en `/src/screens/`, que no tiene owner.
 
 ---
 
 ## `// DS-GAP:` marcados
 
-1. **`entity-header.tsx`** — el frame de Figma sigue WIP. Cuando Michael lo cierre
-   y le dé nodo definitivo, esto se promueve a `ui/` con `/aims-ds-component`.
-2. **`next-best-action-card.tsx`** — misma frame, misma condición.
-3. **`agent chat panel`** (dentro de las dos pantallas) — no existe componente de
+1. **`agent chat panel`** (dentro de las dos pantallas) — no existe componente de
    chat en `src/components/ui/`; `record-header.tsx` lo dice en su propio
    encabezado. Compuesto con `SlideOut` + `Tag` + `Chip` + `Input` + `Button`.
 

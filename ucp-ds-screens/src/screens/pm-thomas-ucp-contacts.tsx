@@ -484,16 +484,16 @@ export default function PMThomasUcpContactsScreen() {
           size={isScrolled ? "compress" : "size-l"}
           title="Contacts"
           description="Every person, employee and company AIMS OS keeps a unified profile for."
-          primaryAction={
-            <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={() => setCreateOpen(true)}>
-              {CREATE_LABEL[tab] ?? CREATE_LABEL.all}
-            </Button>
-          }
-          secondaryAction={
-            <Button variant="secondary" size="sm" icon={<Sparkle size={13} />} onClick={() => setChatOpen(true)}>
-              Ask
-            </Button>
-          }
+          primaryAction={{
+            label:   CREATE_LABEL[tab] ?? CREATE_LABEL.all,
+            icon:    Plus,
+            onClick: () => setCreateOpen(true),
+          }}
+          secondaryAction={{
+            label:   "Ask",
+            icon:    Sparkle,
+            onClick: () => setChatOpen(true),
+          }}
         />
       )}
       pagination={

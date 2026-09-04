@@ -1,809 +1,23 @@
 diff --git a/src/App.tsx b/src/App.tsx
-index faf5f4f..7335702 100644
+index 5f0dc8a..19dcea5 100644
 --- a/src/App.tsx
 +++ b/src/App.tsx
-@@ -7,7 +7,7 @@ import PMLexHTLWorkQueueScreen    from "./screens/pm-lex-htl-work-queue"
- import PMHomeCanvasScreen         from "./screens/pm-home-canvas"
+@@ -8,6 +8,7 @@ import PMHomeCanvasScreen         from "./screens/pm-home-canvas"
  import PMMichaelAttentionRoomScreen from "./screens/pm-michael-attention-room"
  import PMMichaelLoginScreen         from "./screens/pm-michael-login"
--import PMThomasUniversalProfileScreen  from "./screens/pm-thomas-universal-profile"
-+import PMThomasUcpContactsScreen      from "./screens/pm-thomas-ucp-contacts"
+ import PMThomasUniversalProfileScreen  from "./screens/pm-thomas-universal-profile"
++import PMThomasUcpContactsScreen       from "./screens/pm-thomas-ucp-contacts"
  import PMThomasDashboardListScreen     from "./screens/pm-thomas-dashboard-list"
  import PMThomasWidgetLibraryScreen     from "./screens/pm-thomas-widget-library"
  import PMThomasWidgetMarketplaceScreen from "./screens/pm-thomas-widget-marketplace"
-@@ -159,7 +159,7 @@ const PROTOTYPE_PAGES: { id: string; label: string; description: string; author:
-   { id: "proto-thomas-widget-marketplace",label: "Widget Marketplace — Thomas",  description: "Two-panel marketplace: left CategoryRail with business-function color dots, right FilterToolbar + widget card grid with category stripe, MiniPreview, View/Use actions, detail SlideOut, and Add-to-dashboard modal.", author: "Thomas", component: PMThomasWidgetMarketplaceScreen },
+@@ -160,6 +161,7 @@ const PROTOTYPE_PAGES: { id: string; label: string; description: string; author:
    { id: "proto-thomas-new-dashboard",     label: "New Dashboard — Thomas",       description: "Two-step wizard for creating a dashboard: Step 0 placement form (kind, profile type, surface, audience, name) + destination summary; Step 1 start-point picker (blank canvas or pre-built template). DS-GAP components: StepIndicator, SectionChip, OptionCard, FormSection, FieldLabel.", author: "Thomas", component: PMThomasNewDashboardScreen },
    { id: "proto-thomas-widget-builder",    label: "Widget Builder — Thomas",      description: "Three-tab builder (Data → Widget → Appearance) with sticky live preview. Data tab: entity source picker (8 sources), operation chips (Aggregate / Record set), calc + column or exposed columns. Widget tab: 12-type gallery, name/description/freshness/filter settings. Appearance tab: accent color swatches + style variants. DS-GAP: AccentColorPalette, BuilderTabNav, EntitySourceCard, TypeTile, SkeletonShape, WidgetPreviewPanel.", author: "Thomas", component: PMThomasWidgetBuilderScreen },
--  { id: "proto-thomas-universal-profile", label: "Universal Profile — Thomas",   description: "Unified entity profile (Person, Employee, Company) aggregating Governance, Risk, and Connections studies — Overview canvas with adaptive study widgets (hidden when empty, error+retry when failed), Activity feed (last 20), paginated Logs, Edit + Export for all types, Archive for Person/Employee only", author: "Thomas", component: PMThomasUniversalProfileScreen },
-+  { id: "proto-thomas-ucp-contacts",      label: "UCP - Contacts Last version",  description: "The whole UCP flow in one prototype. Roster: People / Employees / Companies tabs, Cards\u2194Table SwitchTab, Status + Owner filters with All-filters slideout, per-tab Create CTA, Eye preview, Archive confirm, roster concierge. Open a row for the profile: Entity Header (Figma 19815-101547) pinned on scroll with source, state badge, signal and classification tags and secondary metadata; Next Best Action as its own card below it; Overview widget canvas; Snapshot of facts by knowledge plane; paginated Activity; attached Source Drives.", author: "Thomas", component: PMThomasUcpContactsScreen },
+   { id: "proto-thomas-universal-profile", label: "Universal Profile — Thomas",   description: "Unified entity profile (Person, Employee, Company) aggregating Governance, Risk, and Connections studies — Overview canvas with adaptive study widgets (hidden when empty, error+retry when failed), Activity feed (last 20), paginated Logs, Edit + Export for all types, Archive for Person/Employee only", author: "Thomas", component: PMThomasUniversalProfileScreen },
++  { id: "proto-thomas-ucp-contacts",   label: "UCP - Contacts Last version", description: "The whole UCP flow in one prototype: contacts roster (tabs by type, filters, create per type) → record profile with RecordHeader, Overview canvas, Snapshot by knowledge plane, Activity and Drives. Exercises the header's loading and governed/masked states.", author: "Thomas", component: PMThomasUcpContactsScreen },
    { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
    { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
-@@ -2246,7 +2246,7 @@ const ENTITY_LIST_SPEC = {
-     { name: "primaryMeta",     type: "Array",   values: ["ELMetaItem[]"],                 default: "undefined", note: "{ iconName?, label?, tooltip?, tag? }" },
-     { name: "secondaryMeta",   type: "Array",   values: ["ELMetaItem[]"],                 default: "undefined", note: "Bottom-left row of icon+label pairs" },
-     { name: "description",     type: "string",  values: ["any string"],                   default: "undefined", note: "Collapsible body text" },
--    { name: "aiInsight",       type: "object",  values: ["{ action, detail, showLabel?, viewMore? }"], default: "undefined", note: "Purple AI callout with Sparkle icon" },
-+    { name: "aiInsight",       type: "object",  values: ["{ action, detail, showLabel?, showAiPrefix?, viewMore? }"], default: "undefined", note: "Purple AI callout with Sparkle icon. showAiPrefix: false renders `action` verbatim — for named concepts like Next Best Action" },
-     { name: "tags",            type: "Array",   values: ["{ label }[]"],                  default: "undefined" },
-     { name: "actions",         type: "Array",   values: ["ELAction[]"],                   default: "undefined", note: "{ label, variant: primary|secondary|tertiary }" },
-     { name: "state",           type: "object",  values: ["{ label, variant }"],           default: "undefined", note: "Semantic Tag shown right-side" },
-@@ -29632,6 +29632,7 @@ function EntityListPage({ openSpec }: { openSpec: (s: SpecModal) => void }) {
-   const [pgDescLong,        setPgDescLong]        = useState(true)
-   const [pgShowAI,          setPgShowAI]          = useState(true)
-   const [pgAiShowLabel,     setPgAiShowLabel]     = useState(true)
-+  const [pgAiPrefix,        setPgAiPrefix]        = useState(true)
-   const [pgAiViewMore,      setPgAiViewMore]      = useState(false)
-   const [pgAiLong,          setPgAiLong]          = useState(true)
-   const [pgViewMoreOpen,    setPgViewMoreOpen]    = useState(false)
-@@ -29669,14 +29670,16 @@ function EntityListPage({ openSpec }: { openSpec: (s: SpecModal) => void }) {
-       ? {
-           ...demoEntityItems[0].aiInsight!,
-           showLabel:      pgAiShowLabel,
-+          showAiPrefix:   pgAiPrefix,
-           viewMore:       pgAiViewMore,
-           onViewMore:     pgAiViewMore ? () => setPgViewMoreOpen(true) : undefined,
-           defaultExpanded: false,
-         }
-       : {
--          action:    demoEntityItems[0].aiInsight!.action,
--          detail:    "Billing dispute routed to finance team — review in progress.",
--          showLabel: pgAiShowLabel,
-+          action:       demoEntityItems[0].aiInsight!.action,
-+          detail:       "Billing dispute routed to finance team — review in progress.",
-+          showLabel:    pgAiShowLabel,
-+          showAiPrefix: pgAiPrefix,
-         }
-     ) : undefined,
-     tags:                pgShowTags ? allTags.slice(0, pgTagsCount)  : undefined,
-@@ -30453,6 +30456,7 @@ export function MyList() {
-                         <Tog label="Show"                  val={pgShowAI}       set={setPgShowAI}       />
-                         <Tog label="Long text (chevron)"   val={pgAiLong}       set={setPgAiLong}       />
-                         <Tog label="«AI …» label"          val={pgAiShowLabel}  set={setPgAiShowLabel}  />
-+                        <Tog label="Prefijo «AI »"         val={pgAiPrefix}     set={setPgAiPrefix}     />
-                         <Tog label="View more → Modal"     val={pgAiViewMore}   set={setPgAiViewMore}   />
-                       </div>
-                       {!pgAiLong && (
-diff --git a/src/components/experimental/entity-header.tsx b/src/components/experimental/entity-header.tsx
-new file mode 100644
-index 0000000..c256c41
---- /dev/null
-+++ b/src/components/experimental/entity-header.tsx
-@@ -0,0 +1,550 @@
-+// DS-GAP: EntityHeader — identity card for a Unified Entity Profile. Built from
-+// Figma node 19815-101547 ("Entity Header - WIP"). Closest DS component:
-+// RecordHeader (src/components/ui/record-header.tsx), which this supersedes on
-+// UEP surfaces — see "Why not RecordHeader" below. Not promoted: the Figma
-+// frame is still marked WIP, so this stays in experimental/ until Michael
-+// signs it off and it gets a non-WIP node.
-+
-+/**
-+ * Entity Header — AIMS OS
-+ *
-+ * Identity card for a Unified Entity Profile. It identifies the entity you are
-+ * looking at and surfaces what needs attention. It carries no detail — detail
-+ * lives in the tabs below. It answers four questions, in this order:
-+ *
-+ *   1 · What is this?             → visual + title
-+ *   2 · Where does it sit?        → source
-+ *   3 · What is its status?       → state badge
-+ *   4 · What needs attention?     → tags
-+ *
-+ * It does not answer *why*. That is the Overview's job.
-+ *
-+ * ── Why not RecordHeader ──────────────────────────────────────────────────
-+ * RecordHeader branches on three record shapes (employee / customer / client)
-+ * and carries the Next Best Action inside itself as a Signal bar. The Figma
-+ * spec for this component does neither:
-+ *   - Nothing in the structure is specific to a record shape. The same skeleton
-+ *     has to hold a contact, a repair order and a store, so the only branch is
-+ *     avatar-vs-highlight-icon, decided by whether the entity has a real-world
-+ *     visual identity.
-+ *   - The Next Best Action is a separate Card below the header, not a slot
-+ *     inside it ("Under the header, never inside it… The header identifies the
-+ *     entity; the card proposes"). See next-best-action-card.tsx.
-+ * Both are load-bearing, so this is a different component rather than a
-+ * variant of that one.
-+ *
-+ * ── It has no container of its own ────────────────────────────────────────
-+ * Per the spec, the header is never placed directly on a page and never grows
-+ * its own background — "a header with its own background inside a card
-+ * produces a box within a box". The caller wraps it:
-+ *
-+ *     <CardContainer size="lg"><EntityHeader … /></CardContainer>
-+ *
-+ * It is FILL width inside that slot and never sets its own width. The
-+ * breakpoint it responds to is the card's, not the viewport's — which is why
-+ * `size` is a prop here rather than a media query.
-+ *
-+ * ── Composition ───────────────────────────────────────────────────────────
-+ * AvatarCircle (sizeKey="lg" — its own doc names entity headers as the use
-+ * case) · HighlightIcon · Tag · Button (variant="main" for Ask, which is the
-+ * DS's Main Action Gradient) · Menu/MenuItem · Tooltip · Skeleton. No new
-+ * colour semantics — every value is an existing token.
-+ */
-+
-+import { useState } from "react"
-+import { Info, MoreVertical, Sparkle } from "lucide-react"
-+import { cn } from "@/lib/utils"
-+import { AvatarCircle }  from "@/components/ui/avatar"
-+import { HighlightIcon } from "@/components/ui/highlight-icon"
-+import type { HighlightIconVariant } from "@/components/ui/highlight-icon"
-+import { Tag }           from "@/components/ui/tag"
-+import type { TagVariant } from "@/components/ui/tag"
-+import { Button }        from "@/components/ui/button"
-+import { Tooltip }       from "@/components/ui/tooltip"
-+import { Skeleton }      from "@/components/ui/skeleton"
-+import { Menu, MenuItem } from "@/components/ui/menu-item"
-+
-+// ── Types ─────────────────────────────────────────────────────────────────────
-+
-+export type EntityHeaderVariant = "default" | "loading" | "restricted"
-+export type EntityHeaderSize    = "default" | "responsive"
-+
-+/**
-+ * One question decides this: does the entity have a real-world visual identity
-+ * — a face or a brand? Natural persons and branded entities (companies, sites,
-+ * tenants, suppliers) get an avatar. Everything else — objects, assets,
-+ * processes, transactions, documents — gets a highlight icon. Exactly one
-+ * renders; never both, never neither.
-+ *
-+ * The rule is about the entity, not about whether the asset exists: a company
-+ * with no logo still uses an avatar, falling back to initials. And initials are
-+ * never derived from a code — RO-48291 has no initials, so it is an icon by
-+ * definition.
-+ */
-+export type EntityVisual =
-+  | { kind: "avatar"; src?: string; initials?: string }
-+  | { kind: "icon"; iconName: string; iconVariant?: HighlightIconVariant }
-+
-+/**
-+ * Three kinds of tag, one component. The vocabulary belongs to the tenant; the
-+ * colour belongs to the platform.
-+ *
-+ * `signal` — something that needs attention, bounded in time or condition.
-+ * `classification` — what kind of thing this is, and only when the visual is an
-+ * avatar (a highlight icon already says the type).
-+ *
-+ * Left tags carry two colours only: `error` when something is broken or
-+ * overdue, `alert` when it needs review, `neutral` for everything else. The
-+ * test is not signal-vs-classification, it is whether someone has to do
-+ * something about it. Classification is never coloured — that is what keeps the
-+ * vocabulary scalable when a tenant defines a hundred of them.
-+ */
-+export interface EntityTag {
-+  label:    string
-+  role:     "signal" | "classification"
-+  tone?:    "error" | "alert" | "neutral"
-+  /** Sorts signals among themselves — higher is more severe. Ignored for classification. */
-+  severity?: number
-+  tooltip?: string
-+}
-+
-+/**
-+ * Icon says what kind of information this is, text says the value, tooltip
-+ * names the field and adds context. The tooltip is not optional: it opens on
-+ * hover AND on focus, always, even when the text is not truncated.
-+ */
-+export interface EntityMetaItem {
-+  iconName: string
-+  /** The value. Short form ≤ 8 chars, long form ≤ 24. */
-+  label:    string
-+  /** Field label + context, e.g. "Assigned agent · Manager Agent. Handling this account since Mar 3." */
-+  tooltip:  string
-+}
-+
-+export interface EntityMenuAction {
-+  label:        string
-+  destructive?: boolean
-+  onClick?:     () => void
-+}
-+
-+export interface EntityHeaderProps {
-+  visual: EntityVisual
-+  /** The entity's name or ID, exactly as the source system stores it. Never rewritten or reformatted. */
-+  title: string
-+  /**
-+   * The system the record was pulled from — Workday, Salesforce, NetSuite, DMS,
-+   * Helix Data Studio. One item, never two: a job title, a location, a region,
-+   * a category or a parent company is not a source. When the entity was created
-+   * in the platform itself the slot is removed, never filled with something else.
-+   */
-+  source?: { label: string; iconName?: string }
-+  /** Exactly one. If several statuses are concurrent, the most blocking wins and the rest become signals. */
-+  state?: { label: string; variant: TagVariant }
-+  /** Max 6 plus overflow. Signals first (by severity), then classification. */
-+  tags?: EntityTag[]
-+  /**
-+   * How many tags stay on the row before the rest collapse into +N. Tags are the
-+   * flexible element: show fewer tags and a larger +N rather than truncating the
-+   * title further — the identifier is what the user came to read.
-+   */
-+  maxVisibleTags?: number
-+  /**
-+   * Off by default. Most headers do not carry one. Turn it on only when the
-+   * title is an opaque code — RO-48291 alone means nothing. One line, plain
-+   * language, no status words: it says what the entity IS, never what is
-+   * happening to it. The durability test: if the sentence could change next
-+   * week, it is an activity note and belongs in the Overview.
-+   */
-+  description?: string
-+  /** Max 6 — six is the maximum, not the goal. Aim for four. Beyond six it belongs in the Overview, not behind a +N chip. */
-+  meta?: EntityMetaItem[]
-+  /** Ask — opens a context-aware Personal Assistant in a side panel. It talks, it does not execute. */
-+  onAsk?: () => void
-+  askLabel?: string
-+  /** Information — opens a side panel with the provenance of the fields in this header. One side panel at a time. */
-+  onInformation?: () => void
-+  /** Optional, off by default. Icon-only in Figma; a short label reads better in code, so the label is required when used. */
-+  secondaryAction?: { label: string; onClick?: () => void }
-+  /** Destructive and secondary actions only. Never a visible button. */
-+  menuActions?: EntityMenuAction[]
-+  /**
-+   * State 5 of the five this component owns: "Only visual, title and state. No
-+   * description, no tags, no metadata. The header stays valid. This is what
-+   * priorities 1 to 3 guarantee."
-+   *
-+   * It is the arrangement to use when the header is pinned and the content
-+   * scrolls behind it — the spec's own answer to "what survives when there is
-+   * no room", applied to vertical space instead of horizontal. Actions stay:
-+   * the right side is fixed and never compressed, and affordances are always
-+   * visible with no hover reveal.
-+   */
-+  minimum?: boolean
-+  variant?: EntityHeaderVariant
-+  size?: EntityHeaderSize
-+  /** Shown in place of the governed values when variant="restricted". Calm and explanatory — this is a state, not a failure. */
-+  restrictedNote?: string
-+  className?: string
-+}
-+
-+// ── Helpers ───────────────────────────────────────────────────────────────────
-+
-+const TONE_TAG: Record<NonNullable<EntityTag["tone"]>, TagVariant> = {
-+  error:   "error",
-+  alert:   "alert",
-+  neutral: "neutral",
-+}
-+
-+/** Signals first, sorted by severity; classification after. The state badge keeps its own slot. */
-+function orderTags(tags: EntityTag[]): EntityTag[] {
-+  const signals = tags.filter(t => t.role === "signal").sort((a, b) => (b.severity ?? 0) - (a.severity ?? 0))
-+  const classes = tags.filter(t => t.role === "classification")
-+  return [...signals, ...classes]
-+}
-+
-+/** Classification is never coloured, whatever tone the caller passed. */
-+function tagVariant(tag: EntityTag): TagVariant {
-+  if (tag.role === "classification") return "neutral"
-+  return TONE_TAG[tag.tone ?? "neutral"]
-+}
-+
-+const DOT = (
-+  <span aria-hidden style={{ color: "var(--border-neutral-lighter, var(--field-border))", fontSize: 10, lineHeight: 1 }}>
-+    ●
-+  </span>
-+)
-+
-+function Visual({ visual, title }: { visual: EntityVisual; title: string }) {
-+  // The avatar exposes the entity's name as its accessible name, whether it
-+  // renders a photo, a logo or initials. The highlight icon names the entity
-+  // type — it is not decorative.
-+  if (visual.kind === "avatar") {
-+    return (
-+      <span style={{ flexShrink: 0, display: "inline-flex" }} role="img" aria-label={title}>
-+        <AvatarCircle
-+          name={title}
-+          sizeKey="lg"
-+          avatarStyle={visual.src ? "photo" : "text"}
-+          src={visual.src}
-+          initials={visual.initials}
-+        />
-+      </span>
-+    )
-+  }
-+  return (
-+    <span style={{ flexShrink: 0, display: "inline-flex" }}>
-+      <HighlightIcon size="lg" variant={visual.iconVariant ?? "informative"} iconName={visual.iconName} />
-+    </span>
-+  )
-+}
-+
-+/**
-+ * Title truncates last: flex 0 1 auto with min-width 0, ellipsis, full value in
-+ * a tooltip. Never wraps.
-+ *
-+ * It renders at full strength in every state, Restricted included. Restricted
-+ * governs the entity's VALUES, not its identity — the name is already visible
-+ * in the list the viewer came from, and dimming it would say the name itself is
-+ * uncertain. Priorities 1 to 3 are never dropped and never weakened.
-+ */
-+function Title({ title }: { title: string }) {
-+  return (
-+    <Tooltip content={title} side="cursor" triggerClassName="block min-w-0">
-+      <h1
-+        style={{
-+          fontSize: 20, fontWeight: 600, lineHeight: 1.2, margin: 0,
-+          color: "var(--color-text-title)",
-+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-+        }}
-+      >
-+        {title}
-+      </h1>
-+    </Tooltip>
-+  )
-+}
-+
-+function Source({ source }: { source: NonNullable<EntityHeaderProps["source"]> }) {
-+  return (
-+    <Tooltip content={`Source · ${source.label}`} side="cursor">
-+      <span
-+        style={{
-+          display: "inline-flex", alignItems: "center", gap: 4, flexShrink: 0,
-+          maxWidth: 160, fontSize: 12, fontWeight: 500, color: "var(--field-supporting)",
-+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-+        }}
-+      >
-+        {source.iconName && <HighlightIcon size="sm" variant="neutral" iconName={source.iconName} />}
-+        {source.label}
-+      </span>
-+    </Tooltip>
-+  )
-+}
-+
-+/** Tags hug and collapse into +N one at a time — never a fixed width, so growth
-+ *  in the title or source makes them collapse rather than overlap. The overflow
-+ *  chip exposes the hidden tags to keyboard and screen reader, not only hover. */
-+function TagGroup({ tags, maxVisible }: { tags: EntityTag[]; maxVisible: number }) {
-+  const ordered = orderTags(tags).slice(0, 6)
-+  const visible = ordered.slice(0, maxVisible)
-+  const hidden  = ordered.slice(maxVisible)
-+  return (
-+    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, flexShrink: 1, minWidth: 0, flexWrap: "nowrap" }}>
-+      {visible.map(tag => (
-+        <Tooltip key={tag.label} content={tag.tooltip ?? tag.label} side="cursor">
-+          <Tag variant={tagVariant(tag)} size="sm">{tag.label}</Tag>
-+        </Tooltip>
-+      ))}
-+      {hidden.length > 0 && (
-+        <Tooltip content={hidden.map(t => t.label).join(" · ")} side="cursor">
-+          <span tabIndex={0} style={{ display: "inline-flex", borderRadius: 999, outlineOffset: 2 }}>
-+            <Tag variant="neutral" size="sm">{`+${hidden.length}`}</Tag>
-+          </span>
-+        </Tooltip>
-+      )}
-+    </span>
-+  )
-+}
-+
-+/** Icon + text, always — the header has the width, and a bare icon forces the
-+ *  user to interpret a symbol. Hidden entirely before it is stripped of text. */
-+function MetaRow({ meta }: { meta: EntityMetaItem[] }) {
-+  return (
-+    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minWidth: 0 }}>
-+      {meta.slice(0, 6).map((item, i) => (
-+        <span key={item.label + i} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-+          {i > 0 && DOT}
-+          <Tooltip content={item.tooltip} side="cursor">
-+            <span
-+              style={{
-+                display: "inline-flex", alignItems: "center", gap: 4,
-+                fontSize: 12, fontWeight: 500, color: "var(--field-supporting)",
-+                maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-+              }}
-+            >
-+              <HighlightIcon size="sm" variant="neutral" iconName={item.iconName} />
-+              {item.label}
-+            </span>
-+          </Tooltip>
-+        </span>
-+      ))}
-+    </div>
-+  )
-+}
-+
-+/**
-+ * The three actions sit in one row and look like one group, but they are three
-+ * different kinds of thing — reading them as a row of buttons is the most
-+ * common misreading of this component.
-+ *
-+ *   Ask         — the gradient button. Opens a context-aware Personal
-+ *                 Assistant. It never resolves a task and never commits the
-+ *                 user to anything, which is why it must not share the visual
-+ *                 mark a Next Best Action uses: that one asks to be accepted.
-+ *   Information — icon button. Explains where the fields on screen came from.
-+ *   Menu        — destructive and secondary actions only, never a visible button.
-+ *
-+ * Actions are always visible. There is no hover reveal.
-+ */
-+function InformationButton({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) {
-+  return (
-+    <Tooltip content="Where these fields came from" side="cursor">
-+      <Button
-+        variant="tertiary" size="sm" disabled={disabled}
-+        icon={<Info size={16} />} iconPosition="alone"
-+        aria-label="Field information"
-+        onClick={onClick}
-+      />
-+    </Tooltip>
-+  )
-+}
-+
-+function Actions({
-+  onAsk, askLabel, secondaryAction, menuActions, disabled,
-+}: Pick<EntityHeaderProps, "onAsk" | "askLabel" | "secondaryAction" | "menuActions"> & { disabled?: boolean }) {
-+  const [menuOpen, setMenuOpen] = useState(false)
-+  return (
-+    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, position: "relative" }}>
-+      {secondaryAction && (
-+        <Button variant="secondary" size="sm" disabled={disabled} onClick={secondaryAction.onClick}>
-+          {secondaryAction.label}
-+        </Button>
-+      )}
-+      {onAsk && (
-+        <Tooltip content="Ask about this entity" side="cursor">
-+          <Button
-+            variant="main" size="sm" disabled={disabled}
-+            icon={<Sparkle size={13} />}
-+            onClick={onAsk}
-+          >
-+            {askLabel ?? "Ask"}
-+          </Button>
-+        </Tooltip>
-+      )}
-+      {menuActions && menuActions.length > 0 && (
-+        <>
-+          <Button
-+            variant="tertiary" size="sm" disabled={disabled}
-+            icon={<MoreVertical size={16} />} iconPosition="alone"
-+            aria-label="More actions"
-+            aria-expanded={menuOpen}
-+            onClick={() => setMenuOpen(v => !v)}
-+          />
-+          {menuOpen && (
-+            <>
-+              <div className="fixed inset-0 z-[10000]" onClick={() => setMenuOpen(false)} />
-+              <div style={{ position: "absolute", top: "calc(100% + 4px)", right: 0, zIndex: 10001 }}>
-+                <Menu>
-+                  {menuActions.map(action => (
-+                    <MenuItem
-+                      key={action.label}
-+                      size="sm"
-+                      label={action.label}
-+                      onClick={() => { setMenuOpen(false); action.onClick?.() }}
-+                    />
-+                  ))}
-+                </Menu>
-+              </div>
-+            </>
-+          )}
-+        </>
-+      )}
-+    </div>
-+  )
-+}
-+
-+/** Skeleton matching the arrangement of its size. Never an empty state — saying
-+ *  "nothing here" while data is in flight states something untrue. */
-+function LoadingHeader({ size }: { size: EntityHeaderSize }) {
-+  const stacked = size === "responsive"
-+  return (
-+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }} aria-busy="true">
-+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-+        <Skeleton shape="circle" width={32} height={32} />
-+        <Skeleton shape="text" width={stacked ? 160 : 200} height={18} />
-+        <Skeleton shape="text" width={110} height={14} />
-+        <span style={{ flex: 1 }} />
-+        <Skeleton shape="text" width={80} height={24} />
-+        <Skeleton shape="text" width={120} height={24} />
-+      </div>
-+      {stacked && <Skeleton shape="text" width="60%" height={14} />}
-+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-+        {[72, 88, 64, 96, 56].map((w, i) => <Skeleton key={i} shape="text" width={w} height={14} />)}
-+      </div>
-+    </div>
-+  )
-+}
-+
-+// ── Component ─────────────────────────────────────────────────────────────────
-+
-+export function EntityHeader({
-+  visual,
-+  title,
-+  source,
-+  state,
-+  tags,
-+  maxVisibleTags = 2,
-+  description,
-+  meta,
-+  onAsk,
-+  askLabel,
-+  onInformation,
-+  secondaryAction,
-+  menuActions,
-+  minimum = false,
-+  variant = "default",
-+  size = "default",
-+  restrictedNote = "You don't have access to these values. The fields exist and are governed.",
-+  className,
-+}: EntityHeaderProps) {
-+  if (variant === "loading") {
-+    return (
-+      <header className={cn("w-full", className)}>
-+        <LoadingHeader size={size} />
-+      </header>
-+    )
-+  }
-+
-+  const restricted = variant === "restricted"
-+  // Minimum keeps the desktop single row whatever the size axis says — a
-+  // stacked minimum would be three rows of nothing.
-+  const stacked    = size === "responsive" && !minimum
-+  // Restricted removes the tag group rather than leaving it empty; minimum
-+  // drops everything below priority 3.
-+  const shownTags  = restricted || minimum ? [] : (tags ?? [])
-+  const shownMeta  = restricted || minimum ? [] : (meta ?? [])
-+  const shownSource      = minimum ? undefined : source
-+  const shownDescription = minimum ? undefined : description
-+
-+  const identityLeft = (
-+    <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: "1 1 auto" }}>
-+      <Visual visual={visual} title={title} />
-+      {/* flex 0 1 auto + min-width 0: the title takes what remains after visual,
-+          source, collapsed tags and actions, and truncates only there. */}
-+      <div style={{ flex: "0 1 auto", minWidth: 0, marginLeft: 4 }}>
-+        <Title title={title} />
-+      </div>
-+      {shownSource && !stacked && (
-+        <>
-+          {DOT}
-+          <Source source={shownSource} />
-+        </>
-+      )}
-+      {shownTags.length > 0 && !stacked && <TagGroup tags={shownTags} maxVisible={maxVisibleTags} />}
-+    </div>
-+  )
-+
-+  const identityRight = (
-+    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-+      {onInformation && <InformationButton onClick={onInformation} disabled={restricted} />}
-+      {state && <Tag variant={state.variant} size="sm">{state.label}</Tag>}
-+      <Actions
-+        onAsk={onAsk}
-+        askLabel={askLabel}
-+        secondaryAction={secondaryAction}
-+        menuActions={menuActions}
-+        disabled={restricted}
-+      />
-+    </div>
-+  )
-+
-+  return (
-+    <header className={cn("w-full", className)} style={{ display: "flex", flexDirection: "column", gap: minimum ? 0 : 12 }}>
-+      {/* Row 1 — identity. The right side is fixed and never compressed. */}
-+      <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-+        {identityLeft}
-+        {identityRight}
-+      </div>
-+
-+      {/* Responsive reflow: stack before you shrink. Source and tags get their
-+          own rows rather than competing with the title. */}
-+      {stacked && (shownSource || shownTags.length > 0) && (
-+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minWidth: 0 }}>
-+          {shownSource && <Source source={shownSource} />}
-+          {shownTags.length > 0 && <TagGroup tags={shownTags} maxVisible={maxVisibleTags + 2} />}
-+        </div>
-+      )}
-+
-+      {shownDescription && !restricted && (
-+        <Tooltip content={shownDescription} side="cursor" triggerClassName="block min-w-0 w-full">
-+          <p
-+            style={{
-+              margin: 0, fontSize: 13, lineHeight: 1.5, color: "var(--field-supporting)",
-+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-+            }}
-+          >
-+            {shownDescription}
-+          </p>
-+        </Tooltip>
-+      )}
-+
-+      {restricted && !minimum && (
-+        <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "var(--field-supporting)" }}>
-+          {restrictedNote}
-+        </p>
-+      )}
-+
-+      {shownMeta.length > 0 && <MetaRow meta={shownMeta} />}
-+    </header>
-+  )
-+}
-+
-+export default EntityHeader
-diff --git a/src/components/experimental/next-best-action-card.tsx b/src/components/experimental/next-best-action-card.tsx
-new file mode 100644
-index 0000000..b9b89b8
---- /dev/null
-+++ b/src/components/experimental/next-best-action-card.tsx
-@@ -0,0 +1,177 @@
-+// DS-GAP: NextBestActionCard — the Next Best Action proposal that sits under
-+// the Entity Header. Built from Figma node 19815-101547 ("Entity Header - WIP"
-+// → Next Best Action Card). Closest DS component: CardContainer variant="purple"
-+// size="lg", which this composes rather than replaces. Not promoted: same WIP
-+// frame as entity-header.tsx.
-+
-+/**
-+ * Next Best Action Card — AIMS OS
-+ *
-+ * The engine proposes; the human governs. This card is where a Next Best Action
-+ * reaches a Unified Entity Profile.
-+ *
-+ * ── Placement ─────────────────────────────────────────────────────────────
-+ * Under the Entity Header, never inside it. Full width, directly below, in its
-+ * own Card Component — two records, two containers. Sixteen products were
-+ * reviewed when this was specified and none puts the recommendation inside the
-+ * record header: the header identifies the entity, the card proposes.
-+ *
-+ * ── It never stacks ───────────────────────────────────────────────────────
-+ * One at a time. The engine has already prioritised, unified and discarded, so
-+ * showing five is not trusting the engine — and stacked cards push the real
-+ * content below the fold. If more exist, `moreCount` renders a counter that
-+ * leads to the list.
-+ *
-+ * ── No action, no card ────────────────────────────────────────────────────
-+ * When there is nothing to do the container does not render. This is not an
-+ * empty state: there is nothing to say when there is nothing to do. Callers
-+ * pass `null` for `action` and get nothing back.
-+ *
-+ * ── Why it must not look like Ask ─────────────────────────────────────────
-+ * The Ask button produces summaries and commits the user to nothing. This card
-+ * asks for a decision. They must not share a glyph or a colour, or the user
-+ * cannot tell which one commits them to something — so this uses the Tag purple
-+ * family and its own Sparkle label, never the Main Action Gradient.
-+ */
-+
-+import { X } from "lucide-react"
-+import { cn } from "@/lib/utils"
-+import { CardContainer } from "@/components/ui/card-container"
-+import { Button }        from "@/components/ui/button"
-+import { Tooltip }       from "@/components/ui/tooltip"
-+import { Sparkle }       from "lucide-react"
-+
-+export interface NextBestAction {
-+  /**
-+   * The action, not the engine name — "Assign a renewal check-in call", never
-+   * "Next Best Action". Min 20 chars: under that it stops being an instruction
-+   * and becomes a label. Target 40, max 60.
-+   */
-+  title: string
-+  /** When the engine produced it. Without a timestamp and a rationale it is an order, not a proposal. */
-+  timestamp: string
-+  /**
-+   * A fact and its consequence — "Their certificate expires in 45 days" is the
-+   * fact, "requesting it now avoids a compliance gap" is why it matters. With
-+   * only the fact the user cannot decide. Min 60, target 90, max 150: the card
-+   * is full width so a single line could hold ~180 characters, but comprehension
-+   * drops past 90 and long lines get skipped.
-+   *
-+   * It renders on one line and truncates — the full text lives in the tooltip.
-+   */
-+  rationale?: string
-+  /**
-+   * "view-details" is the default and should be used unless there is a reason
-+   * not to: the card cannot guarantee it showed everything, so the safe path is
-+   * always the one that opens the record. "accept" is reserved for actions that
-+   * are neither destructive nor complex; which ones qualify is not yet decided.
-+   */
-+  variant?: "view-details" | "accept"
-+}
-+
-+export interface NextBestActionCardProps {
-+  /** Pass null when the engine returned nothing — the card does not render. */
-+  action: NextBestAction | null
-+  /** Accepting assigns to the agent, it never executes, and it always routes to the detail. Never "Call now". */
-+  onAccept?: () => void
-+  onViewDetails?: () => void
-+  /** Session-only. Nothing is stored and nothing is fed back to the engine. */
-+  onDismiss?: () => void
-+  /** When the engine has more queued. Renders a counter that leads to the list — the card still never stacks. */
-+  moreCount?: number
-+  onViewAll?: () => void
-+  label?: string
-+  className?: string
-+}
-+
-+export function NextBestActionCard({
-+  action,
-+  onAccept,
-+  onViewDetails,
-+  onDismiss,
-+  moreCount,
-+  onViewAll,
-+  label = "Next Best Action",
-+  className,
-+}: NextBestActionCardProps) {
-+  if (!action) return null
-+
-+  const offersAccept = action.variant === "accept" && Boolean(onAccept)
-+
-+  return (
-+    <CardContainer variant="purple" size="lg" className={cn("w-full relative", className)}>
-+      <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
-+        {/* AI context — names the engine, so the title never has to. */}
-+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-+          <Sparkle size={13} style={{ color: "var(--tag-purple-bd)", flexShrink: 0 }} />
-+          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-bd)" }}>{label}</span>
-+          {typeof moreCount === "number" && moreCount > 0 && (
-+            <Button variant="tertiary" size="sm" className="!px-0 ml-[8px]" onClick={onViewAll}>
-+              {`+${moreCount} more`}
-+            </Button>
-+          )}
-+        </div>
-+
-+        {/* The action, and when it was produced. */}
-+        <div style={{ display: "flex", alignItems: "baseline", gap: 6, minWidth: 0 }}>
-+          <Tooltip content={action.title} side="cursor" triggerClassName="block min-w-0">
-+            <span
-+              style={{
-+                fontSize: 14, fontWeight: 600, lineHeight: 1.4, color: "var(--tag-purple-fg)",
-+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block",
-+              }}
-+            >
-+              {action.title}
-+            </span>
-+          </Tooltip>
-+          <span style={{ fontSize: 12, color: "var(--tag-purple-fg)", opacity: 0.7, flexShrink: 0, whiteSpace: "nowrap" }}>
-+            {`· ${action.timestamp}`}
-+          </span>
-+        </div>
-+
-+        {/* One line, always. The card shows what fits; the tooltip carries the rest. */}
-+        {action.rationale && (
-+          <Tooltip content={action.rationale} side="cursor" triggerClassName="block min-w-0 w-full">
-+            <span
-+              style={{
-+                fontSize: 13, lineHeight: 1.5, color: "var(--tag-purple-fg)", opacity: 0.9,
-+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block",
-+              }}
-+            >
-+              {action.rationale}
-+            </span>
-+          </Tooltip>
-+        )}
-+
-+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
-+          {offersAccept && (
-+            <Button variant="primary" size="sm" onClick={onAccept}>
-+              Accept
-+            </Button>
-+          )}
-+          <Button variant="tertiary" size="sm" className={offersAccept ? undefined : "!px-0"} onClick={onViewDetails}>
-+            View details
-+          </Button>
-+        </div>
-+      </div>
-+
-+      {onDismiss && (
-+        <button
-+          type="button"
-+          aria-label="Dismiss this recommendation"
-+          onClick={onDismiss}
-+          style={{
-+            position: "absolute", top: 20, right: 20,
-+            display: "inline-flex", alignItems: "center", justifyContent: "center",
-+            width: 20, height: 20, borderRadius: 4, border: "none",
-+            background: "transparent", color: "var(--tag-purple-fg)", cursor: "pointer",
-+          }}
-+        >
-+          <X size={14} />
-+        </button>
-+      )}
-+    </CardContainer>
-+  )
-+}
-+
-+export default NextBestActionCard
 diff --git a/src/components/ui/entity-list.tsx b/src/components/ui/entity-list.tsx
 index 7be3bdd..516ed03 100644
 --- a/src/components/ui/entity-list.tsx
@@ -847,8 +61,8 @@ index 7be3bdd..516ed03 100644
                )}
                {/* Inline detail: always shown when short; truncated when long+collapsed */}
 diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
-new file mode 100644
-index 0000000..72549a8
+new file mode 100755
+index 0000000..bbb35fc
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-contacts.tsx
 @@ -0,0 +1,737 @@
@@ -1338,16 +552,16 @@ index 0000000..72549a8
 +          size={isScrolled ? "compress" : "size-l"}
 +          title="Contacts"
 +          description="Every person, employee and company AIMS OS keeps a unified profile for."
-+          primaryAction={
-+            <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={() => setCreateOpen(true)}>
-+              {CREATE_LABEL[tab] ?? CREATE_LABEL.all}
-+            </Button>
-+          }
-+          secondaryAction={
-+            <Button variant="secondary" size="sm" icon={<Sparkle size={13} />} onClick={() => setChatOpen(true)}>
-+              Ask
-+            </Button>
-+          }
++          primaryAction={{
++            label:   CREATE_LABEL[tab] ?? CREATE_LABEL.all,
++            icon:    Plus,
++            onClick: () => setCreateOpen(true),
++          }}
++          secondaryAction={{
++            label:   "Ask",
++            icon:    Sparkle,
++            onClick: () => setChatOpen(true),
++          }}
 +        />
 +      )}
 +      pagination={
@@ -1590,37 +804,36 @@ index 0000000..72549a8
 +  )
 +}
 diff --git a/src/screens/pm-thomas-ucp-profile.tsx b/src/screens/pm-thomas-ucp-profile.tsx
-new file mode 100644
-index 0000000..2ea43a2
+new file mode 100755
+index 0000000..2dceb63
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-profile.tsx
-@@ -0,0 +1,973 @@
+@@ -0,0 +1,972 @@
 +/**
 + * UCP — Unified Contact Profile (detail view).
 + *
 + * Read-only by design: the record is assembled by ingestion and agents, not
 + * typed in here, so there is no create CTA. The one always-present entry point
-+ * is Ask — the Entity Header's gradient button — which opens the record's
++ * is Ask — RecordHeader's own agent trigger — which opens the record's
 + * assigned concierge in a side panel.
 + *
-+ * The identity card is EntityHeader (Figma 19815-101547), not RecordHeader:
-+ * nothing in that spec's structure is specific to a record shape, and it puts
-+ * the Next Best Action in its own card BELOW the header rather than inside it.
++ * The identity card is the DS's own RecordHeader. An earlier build of this
++ * screen used a purpose-built EntityHeader instead, on three arguments: that
++ * RecordHeader branched on three closed record shapes, that it carried the Next
++ * Best Action inside itself where the Figma spec wanted a separate card below,
++ * and that it had no state coverage. All three stopped being true. RecordHeader's
++ * agnosticism pass dropped the closed variants, its redesign reintroduced the
++ * Next Best Action deliberately as a protagonist block, and it now carries
++ * per-zone loading and per-field masking. So this screen was rebuilt around what
++ * the design system has rather than beside it, and the second component is gone.
 + *
-+ * The whole record chrome is pinned — identity card, Next Best Action, tabs —
-+ * in ScreenLayout's header zone, which sits outside the scroll container. On
-+ * scroll the header collapses to the spec's Minimum state: visual, title and
-+ * state badge, the three priorities never dropped at any width, plus the action
-+ * row, which is fixed and never compressed.
++ * Two things that used to be ours belong to the component now, and both are
++ * better there: the Next Best Action, which no longer needs placing, and the
++ * card-width reflow, which RecordHeader measures on its own box.
 + *
-+ * The order inside the pinned zone is the spec's, not a preference. The Next
-+ * Best Action has to sit directly below the header and never under a nav layer,
-+ * so pinning the tabs meant pinning the card above them too — a card rendered
-+ * under the tabs reads as belonging to the active tab rather than to the record.
-+ * The cost is height: on a record that has a recommendation the pinned chrome is
-+ * about a third of a 1000px viewport at rest, and the spec's own escape valve is
-+ * the card's dismiss (session-only). Records with nothing to do carry no card
-+ * and no gap where one would have been.
++ * What stays ours is the chrome around it. The identity card and the tabs pin in
++ * ScreenLayout's header zone, outside the scroll container, so the record stays
++ * identified while its content scrolls.
 + *
 + * One deviation from CLAUDE.md's generic detail-page rule, and it is deliberate:
 + * the page Header does NOT repeat the entity name, status tag and breadcrumb.
@@ -1629,16 +842,14 @@ index 0000000..2ea43a2
 + * shows only the parent list above the card. Printing the name and state twice,
 + * 40px apart, is the thing that spec is avoiding.
 + *
-+ * The header's own state set is exercised here rather than described:
++ * The states are exercised here rather than described:
 + *   Loading     → the first paint of a record fetch, re-armed per record id.
 + *   Restricted  → a record whose values sit behind a scope the viewer does not
 + *                 hold. Decided by the session against the record, never by a
-+ *                 flag on the record. The body follows the header — leaving the
-+ *                 facts on screen under a "these are governed" header would be
-+ *                 the page contradicting the header.
-+ *   Minimum     → on scroll, per above.
-+ *   Responsive  → driven by a ResizeObserver on the header's CARD, because that
-+ *                 is what the spec says the breakpoint belongs to.
++ *                 flag on the record: `locked` on the header, `masked` on each
++ *                 governed field, and a body that follows. Leaving the facts on
++ *                 screen under a header that says the values are governed would
++ *                 be the page contradicting the header.
 + *
 + * Tabs: Overview · Snapshot · Activity · Drives
 + *   Overview  → WidgetCanvasView (DS rule: any tab named Overview is a canvas)
@@ -1647,7 +858,7 @@ index 0000000..2ea43a2
 + *   Drives    → the Source Drives attached to this record
 + */
 +
-+import { useEffect, useMemo, useRef, useState } from "react"
++import { useEffect, useMemo, useState } from "react"
 +import { ScreenLayout }      from "@/components/layouts/screen-layout"
 +import { WidgetCanvasView }  from "@/components/layouts/widget-canvas-view"
 +import type { CanvasSlot }   from "@/components/layouts/widget-canvas-view"
@@ -1669,12 +880,14 @@ index 0000000..2ea43a2
 +import { Pagination }        from "@/components/ui/pagination"
 +import { SlideOut }          from "@/components/ui/slide-out"
 +import { Skeleton }          from "@/components/ui/skeleton"
-+import { EntityHeader }        from "@/components/experimental/entity-header"
-+import { NextBestActionCard }  from "@/components/experimental/next-best-action-card"
++import { RecordHeader }        from "@/components/ui/record-header"
++import type { NextBestAction, RecordField } from "@/components/ui/record-header"
++import * as LucideIcons from "lucide-react"
 +import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch, Lock } from "lucide-react"
++import type { LucideIcon } from "lucide-react"
 +import {
 +  PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
-+  TYPE_LABEL, entityState, restrictionFor,
++  TYPE_LABEL, TYPE_ICON, entityState, restrictionFor, getRecordFields,
 +  getActivity, getConciergeOpening, getConnections, getDrives,
 +  getFacts, getGovernance, getRisk,
 +} from "./ucpShared"
@@ -1700,19 +913,20 @@ index 0000000..2ea43a2
 +function StudyWidget({ title, state, children }: { title: string; state: StudyState; children: React.ReactNode }) {
 +  if (state === "empty") return null
 +  if (state === "error") {
++    // EmptyState, not a hand-rolled div. This screen shipped the hand-rolled
++    // version; the design system fixed the same mistake in the sibling profile
++    // (#95) before this one was rebased onto it, so the correction is adopted
++    // here rather than rediscovered. CLAUDE.md is explicit that any section with
++    // no content to show uses EmptyState — a failed load is exactly that.
 +    return (
-+      <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-+          <HighlightIcon size="sm" variant="error" iconName="AlertCircle" />
-+          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>Failed to load</span>
-+        </div>
-+        <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>
-+          {title} data couldn&apos;t be retrieved for this record.
-+        </span>
-+        <Button variant="tertiary" size="sm" className="self-start !px-0" onClick={() => {}}>
-+          Retry
-+        </Button>
-+      </div>
++      <EmptyState
++        compact
++        icon={LucideIcons.AlertCircle}
++        title="Failed to load"
++        description={`${title} data couldn't be retrieved for this record.`}
++        ctaLabel="Retry"
++        onCta={() => {}} // DS-GAP: wire to a real retry handler
++      />
 +    )
 +  }
 +  return <>{children}</>
@@ -2193,36 +1407,6 @@ index 0000000..2ea43a2
 +  )
 +}
 +
-+/**
-+ * The Entity Header's size axis is driven by the width of the card it sits in,
-+ * not the viewport: "the breakpoint it responds to is the card's, not the
-+ * viewport's". Same reason the header takes `size` as a prop instead of using a
-+ * media query — a header inside a 640px side panel on a 1920px monitor has to
-+ * reflow, and a media query would never fire.
-+ *
-+ * The threshold is where the default single row stops fitting: visual, title,
-+ * source, two collapsed tags and the fixed action group. Below it the header
-+ * stacks; it never shrinks the title to keep the row.
-+ */
-+const HEADER_STACK_THRESHOLD = 760
-+
-+function useCardSize(): [React.RefObject<HTMLDivElement | null>, "default" | "responsive"] {
-+  const ref = useRef<HTMLDivElement>(null)
-+  const [width, setWidth] = useState(9999)
-+
-+  useEffect(() => {
-+    const el = ref.current
-+    if (!el) return
-+    const ro = new ResizeObserver(entries => {
-+      for (const entry of entries) setWidth(entry.contentRect.width)
-+    })
-+    ro.observe(el)
-+    return () => ro.disconnect()
-+  }, [])
-+
-+  return [ref, width < HEADER_STACK_THRESHOLD ? "responsive" : "default"]
-+}
-+
 +// ── Profile view ──────────────────────────────────────────────────────────────
 +
 +export function UcpProfileView({
@@ -2239,9 +1423,6 @@ index 0000000..2ea43a2
 +  const [chatOpen,   setChatOpen]   = useState(false)
 +  const [infoOpen,   setInfoOpen]   = useState(false)
 +  const [drivePeek,  setDrivePeek]  = useState<UcpDrive | null>(null)
-+  // Session-only, per the card's own rule: nothing is stored and nothing is fed
-+  // back to the engine. Resets when the record changes.
-+  const [nbaDismissed, setNbaDismissed] = useState<string | null>(null)
 +
 +  // Ask and Information both open on the side — opening one closes the other,
 +  // and the panel requested last wins.
@@ -2249,12 +1430,6 @@ index 0000000..2ea43a2
 +  const openInfo = () => { setChatOpen(false); setDrivePeek(null); setInfoOpen(true) }
 +
 +  const state = entityState(contact)
-+
-+  // The header stacks on the width of its own card, so the card is what gets
-+  // measured. On a 1440 desktop it is ~1100px and the header stays on one row;
-+  // in a narrow window or a collapsed layout the same card crosses the
-+  // threshold and the header reflows without the viewport being consulted.
-+  const [headerCardRef, headerSize] = useCardSize()
 +
 +  // A record is fetched, so there is a first paint where it does not exist yet,
 +  // and the header's Loading state is what belongs there. Re-armed per record:
@@ -2271,7 +1446,47 @@ index 0000000..2ea43a2
 +  // needs — never by a flag on the record itself. null when nothing is gated.
 +  const restriction = restrictionFor(contact)
 +
-+  const headerVariant = loading ? "loading" : restriction ? "restricted" : "default"
++  // The entity type is host-defined now — RecordHeader enumerates nothing.
++  const entityIcon = (LucideIcons[TYPE_ICON[contact.type] as keyof typeof LucideIcons] ??
++    LucideIcons.CircleDot) as LucideIcon
++
++  // Masking is a state of a field, not the absence of one: the viewer sees the
++  // same labels and the same provenance badges either way, and only the values
++  // are withheld. The component never resolves entitlements itself, so the
++  // caller hands it the state each field is in.
++  const recordFields = useMemo<RecordField[]>(
++    () => getRecordFields(contact).map(f => ({
++      label: f.label,
++      icon: (LucideIcons[f.iconName as keyof typeof LucideIcons] ?? LucideIcons.CircleDot) as LucideIcon,
++      provenance: {
++        system:       f.system,
++        systemAbbr:   f.systemAbbr,
++        modelVersion: f.modelVersion,
++        syncedAgo:    f.syncedAgo,
++      },
++      state:       f.masked ? "masked" : "hydrated",
++      value:       f.value,
++      maskedValue: f.masked ? "•••• (restricted)" : undefined,
++    })),
++    [contact],
++  )
++
++  // The record's one recommendation, in the shape the component owns. Records
++  // with nothing to recommend pass an empty array and the block disappears —
++  // the same "never fake a state" rule the component applies to every zone,
++  // and the same edge case the roster row handles by rendering no block.
++  const nextBestActions = useMemo<NextBestAction[]>(
++    () => (contact.nba && !restriction
++      ? [{
++          id:          `nba-${contact.id}`,
++          title:       contact.nba.title,
++          description: contact.nba.rationale ?? contact.nba.timestamp,
++          contextTag:  TYPE_LABEL[contact.type],
++          onOpen:      openChat,
++        }]
++      : []),
++    [contact, restriction],
++  )
 +
 +  const activityCount = useMemo(() => {
 +    const all = getActivity(contact)
@@ -2372,52 +1587,45 @@ index 0000000..2ea43a2
 +              container. 32px sides so the edges line up with the content
 +              scrolling underneath.
 +
-+              The whole record chrome pins, in the spec's own order — header,
-+              then the Next Best Action, then the tabs. The order is not a
-+              preference: the card has to sit directly below the header and
-+              never under a nav layer, or it reads as belonging to the active
-+              tab instead of to the record. */}
-+          <div ref={headerCardRef} style={{ padding: "0 32px 8px" }}>
-+            <CardContainer size="lg" variant="default" className="w-full">
-+              <EntityHeader
-+                visual={{ kind: "avatar" }}
-+                title={contact.name}
-+                source={contact.source}
-+                state={state}
-+                tags={contact.tags}
-+                meta={contact.meta}
-+                minimum={isScrolled}
-+                variant={headerVariant}
-+                size={headerSize}
-+                restrictedNote={restriction?.note}
-+                onAsk={openChat}
-+                onInformation={openInfo}
-+                menuActions={[
-+                  { label: "Archive",       onClick: () => {} },
-+                  { label: "Duplicate",     onClick: () => {} },
-+                  { label: "Export record", onClick: () => {} },
-+                ]}
-+              />
-+            </CardContainer>
-+          </div>
++              RecordHeader brings its own CardContainer, so this wrapper only
++              supplies the 32px sides that line the card up with the content
++              scrolling underneath.
 +
-+          {/* No action, no card — and no gap where it would have been.
-+              It also steps aside once you start reading: pinning a full-height
-+              proposal forever is the thing the card's own rule 2 objects to
-+              ("stacked cards push the real content below the fold"). At rest it
-+              holds its position directly below the header; on scroll the
-+              identity and the tabs stay and the proposal yields, and it comes
-+              back at the top of the page. */}
-+          {!isScrolled && !loading && !restriction && nbaDismissed !== contact.id && contact.nba && (
-+            <div style={{ padding: "0 32px 8px" }}>
-+              <NextBestActionCard
-+                action={contact.nba}
-+                onAccept={() => {}}
-+                onViewDetails={openChat}
-+                onDismiss={() => setNbaDismissed(contact.id)}
-+              />
-+            </div>
-+          )}
++              The Next Best Action is NOT a card of ours below the header any
++              more: the component carries it as a protagonist block, visible
++              collapsed and expanded alike. That was a real reversal — the
++              earlier build put it in a separate card underneath, on the reading
++              that a header identifies and a card proposes. The design system
++              decided the opposite and shipped it, so the proposal lives inside
++              the header and there is nothing left for us to place. */}
++          <div style={{ padding: "0 32px 8px" }}>
++            <RecordHeader
++              name={contact.name}
++              entityType={{ icon: entityIcon, label: TYPE_LABEL[contact.type] }}
++              statusTag={{ label: state.label }}
++              recordFields={recordFields}
++              onProvenanceOpen={openInfo}
++              assignedAgent={{
++                id: contact.agent.id,
++                name: contact.agent.name,
++                onOpenChat: openChat,
++              }}
++              nextBestActions={nextBestActions}
++              locked={restriction !== null}
++              // Both disable when the record is locked, which is the prop's
++              // default and the right answer here. Export is the one worth
++              // saying out loud: it is a read, so the component's "locked means
++              // you cannot act on it, not that you cannot consult it" reasoning
++              // would let it through — but an export writes the governed values
++              // into a file the viewer keeps. Consulting a masked field on
++              // screen and extracting it are not the same act.
++              actions={[
++                { label: "Export record", variant: "secondary", onClick: () => {},
++                  disabledTooltip: "This record's values are governed — request the scope to export it" },
++                { label: "Archive", variant: "tertiary", onClick: () => {} },
++              ]}
++            />
++          </div>
 +
 +          {/* 16px here plus ScreenLayout's own 8px of content padding is the
 +              24px the DS wants between the last nav layer and the content. */}
@@ -2494,27 +1702,32 @@ index 0000000..2ea43a2
 +        showChips={false}
 +        showCta={false}
 +      >
++        {/* Law 2 — every governed answer carries provenance reachable without
++            leaving the record. This is what RecordHeader's onProvenanceOpen is
++            for, and it now prints the real thing: the system each field came
++            from, the model version it was shaped by, and when it last synced.
++            A masked field keeps its whole row — label, system, version, sync —
++            and withholds only the value. That is the point of masking: the
++            viewer can see that the field exists and is governed, which is a
++            different statement from the field not being there. */}
 +        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
 +          <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
-+            Every value in the header above, and where it came from.
++            {restriction
++              ? `Every field on this record, and where it came from. ${restriction.note}`
++              : "Every field on this record, and where it came from."}
 +          </span>
 +          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-+            {[
-+              { field: "Title",  value: contact.name,      from: `${contact.source.label} · written exactly as the source system stores it` },
-+              { field: "Source", value: contact.source.label, from: "Ingestion · the system this record was pulled from" },
-+              { field: "State",  value: state.label,       from: "Lifecycle · the most blocking status on the record" },
-+              { field: "Type",   value: TYPE_LABEL[contact.type], from: "Classification · assigned in Helix Data Studio" },
-+              ...contact.tags.filter(t => t.role === "signal").map(t => ({
-+                field: "Signal", value: t.label, from: t.tooltip ?? "Signal engine",
-+              })),
-+              ...contact.meta.map(m => ({ field: "Metadata", value: m.label, from: m.tooltip })),
-+            ].map((row, i) => (
-+              <div key={`${row.field}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
++            {getRecordFields(contact).map((f, i) => (
++              <div key={`${f.label}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
 +                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
-+                  {row.field}
++                  {f.label}
 +                </span>
-+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{row.value}</span>
-+                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>{row.from}</span>
++                <span style={{ fontSize: 13, fontWeight: 600, color: f.masked ? "var(--field-supporting)" : "var(--foreground)" }}>
++                  {f.masked ? "•••• (restricted)" : f.value}
++                </span>
++                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>
++                  {f.system} · {f.modelVersion} · synced {f.syncedAgo}
++                </span>
 +              </div>
 +            ))}
 +          </div>
@@ -2568,950 +1781,12 @@ index 0000000..2ea43a2
 +// No default export on purpose: the profile is not its own prototype card. It
 +// is reached by opening a row in the Contacts roster, which is the real flow —
 +// one card, one entry point.
-diff --git a/src/screens/pm-thomas-universal-profile.tsx b/src/screens/pm-thomas-universal-profile.tsx
-deleted file mode 100644
-index 3ffff9f..0000000
---- a/src/screens/pm-thomas-universal-profile.tsx
-+++ /dev/null
-@@ -1,932 +0,0 @@
--import { useState, useMemo, useRef, useEffect } from "react"
--import * as LucideIcons from "lucide-react"
--import { ScreenLayout }     from "@/components/layouts/screen-layout"
--import { WidgetCanvasView } from "@/components/layouts/widget-canvas-view"
--import type { CanvasSlot }  from "@/components/layouts/widget-canvas-view"
--import type { SidebarItem } from "@/components/ui/sidebar"
--import { Header }           from "@/components/ui/header"
--import { Button }           from "@/components/ui/button"
--import { Tag }              from "@/components/ui/tag"
--import { Tabs }             from "@/components/ui/tabs"
--import { Table }            from "@/components/ui/table"
--import type { TableColumn } from "@/components/ui/table"
--import { Pagination }       from "@/components/ui/pagination"
--import { EmptyState }       from "@/components/ui/empty-state"
--import { HighlightIcon }    from "@/components/ui/highlight-icon"
--import { CardContainer }    from "@/components/ui/card-container"
--import { ModalDialog }      from "@/components/ui/modal-dialog"
--import { Menu, MenuItem }   from "@/components/ui/menu-item"
--import { RecordHeader }     from "@/components/ui/record-header"
--import type { CustomerRecord, EmployeeRecord, NextBestAction } from "@/components/ui/record-header"
--import { SlideOut }         from "@/components/ui/slide-out"
--import { Input }            from "@/components/ui/input"
--import type { LucideIcon }  from "lucide-react"
--
--// ── Sidebar ───────────────────────────────────────────────────────────────────
--
--const SIDEBAR_ITEMS: SidebarItem[] = [
--  { id: "home",       label: "Home",       icon: "Home"      },
--  { id: "work",       label: "My Work",    icon: "Inbox"     },
--  { id: "agents",     label: "Agents",     icon: "Bot"       },
--  { id: "workflows",  label: "Workflows",  icon: "Zap"       },
--  { id: "data",       label: "Data",       icon: "Database"  },
--  { id: "governance", label: "Governance", icon: "Shield"    },
--  { id: "reports",    label: "Reports",    icon: "BarChart2" },
--  { id: "settings",   label: "Settings",   icon: "Settings"  },
--]
--
--// ── Types ─────────────────────────────────────────────────────────────────────
--
--type EntityType = "person" | "employee" | "company"
--
--type StudyStatus = "loaded" | "empty" | "error"
--
--type UniversalProfile = {
--  id:         string
--  type:       EntityType
--  name:       string
--  subtitle:   string
--  status:     "Active" | "Inactive" | "Archived"
--  avatarIcon: string
--  // Study data — null means no data (widget hidden), "error" means failed load
--  governance:  StudyStatus
--  risk:        StudyStatus
--  connections: StudyStatus
--}
--
--type ActivityEvent = {
--  id:        string
--  timestamp: string
--  actor:     string
--  action:    string
--  target:    string
--}
--
--type LogEntry = {
--  id:        string
--  timestamp: string
--  module:    string
--  event:     string
--  status:    "Success" | "Warning" | "Error" | "Info"
--  details:   string
--}
--
--// ── Mock data ─────────────────────────────────────────────────────────────────
--
--const PROFILES: UniversalProfile[] = [
--  {
--    id: "EMP-00412",
--    type: "employee",
--    name: "James Ortega",
--    subtitle: "Operations · Manager: Lisa Park · EMP-00412",
--    status: "Active",
--    avatarIcon: "User",
--    governance: "loaded",
--    risk: "loaded",
--    connections: "error",
--  },
--  {
--    id: "PER-0091",
--    type: "person",
--    name: "Sarah Chen",
--    subtitle: "Head of Compliance · Legal · sarah.chen@acme.com",
--    status: "Active",
--    avatarIcon: "User",
--    governance: "loaded",
--    risk: "empty",
--    connections: "loaded",
--  },
--  {
--    id: "ORG-0023",
--    type: "company",
--    name: "Meridian Corp",
--    subtitle: "Financial Services · 2,400 employees · New York",
--    status: "Active",
--    avatarIcon: "Building2",
--    governance: "loaded",
--    risk: "loaded",
--    connections: "empty",
--  },
--]
--
--const ACTIVITY_EVENTS: ActivityEvent[] = [
--  { id: "a1",  timestamp: "Today, 10:42 AM",      actor: "Lisa Park",        action: "updated role",         target: "Senior Operations Lead"      },
--  { id: "a2",  timestamp: "Today, 09:15 AM",       actor: "Governance Agent", action: "completed review",     target: "Q3 Compliance Check"          },
--  { id: "a3",  timestamp: "Yesterday, 4:30 PM",    actor: "James Ortega",     action: "exported profile",     target: "PDF · Full export"            },
--  { id: "a4",  timestamp: "Yesterday, 2:11 PM",    actor: "Risk Engine",      action: "flagged item",         target: "Missing document — Contract B" },
--  { id: "a5",  timestamp: "Aug 12, 11:00 AM",      actor: "Lisa Park",        action: "added connection",     target: "Meridian Corp"                },
--  { id: "a6",  timestamp: "Aug 11, 3:45 PM",       actor: "Admin",            action: "changed status",       target: "Active → Inactive → Active"   },
--  { id: "a7",  timestamp: "Aug 10, 10:00 AM",      actor: "Governance Agent", action: "opened review",        target: "Annual Compliance Review"      },
--  { id: "a8",  timestamp: "Aug 9, 9:20 AM",        actor: "Sarah Chen",       action: "linked profile",       target: "James Ortega"                 },
--  { id: "a9",  timestamp: "Aug 8, 2:00 PM",        actor: "Risk Engine",      action: "cleared flag",         target: "Document uploaded successfully" },
--  { id: "a10", timestamp: "Aug 7, 11:55 AM",       actor: "Admin",            action: "created profile",      target: "EMP-00412 · Operations"       },
--  { id: "a11", timestamp: "Aug 6, 3:30 PM",        actor: "Governance Agent", action: "assigned policy",      target: "Data Handling Policy v2.1"    },
--  { id: "a12", timestamp: "Aug 5, 9:00 AM",        actor: "Lisa Park",        action: "added note",           target: "Strong candidate for L8"      },
--  { id: "a13", timestamp: "Aug 4, 4:15 PM",        actor: "Risk Engine",      action: "recalculated score",   target: "Risk score: 24 → 18"          },
--  { id: "a14", timestamp: "Aug 3, 1:40 PM",        actor: "James Ortega",     action: "updated contact info", target: "Phone + emergency contact"    },
--  { id: "a15", timestamp: "Aug 2, 10:30 AM",       actor: "Admin",            action: "merged duplicate",     target: "PER-0088 → EMP-00412"         },
--  { id: "a16", timestamp: "Aug 1, 8:00 AM",        actor: "Governance Agent", action: "completed audit",      target: "Onboarding Audit 2026"        },
--  { id: "a17", timestamp: "Jul 31, 5:00 PM",       actor: "Sarah Chen",       action: "approved request",     target: "Data access · Analytics team" },
--  { id: "a18", timestamp: "Jul 30, 3:20 PM",       actor: "Risk Engine",      action: "created alert",        target: "Unusual login location"       },
--  { id: "a19", timestamp: "Jul 29, 11:10 AM",      actor: "Admin",            action: "reset credentials",    target: "SSO + API key"                },
--  { id: "a20", timestamp: "Jul 28, 2:45 PM",       actor: "Lisa Park",        action: "submitted review",     target: "Mid-year performance review"  },
--]
--
--const LOG_ENTRIES: LogEntry[] = [
--  { id: "L001", timestamp: "2026-08-14 10:42", module: "Governance",  event: "Role updated",               status: "Success", details: "Senior Operations Lead"       },
--  { id: "L002", timestamp: "2026-08-14 09:15", module: "Governance",  event: "Compliance review passed",   status: "Success", details: "Q3 Compliance Check"          },
--  { id: "L003", timestamp: "2026-08-13 16:30", module: "System",      event: "Profile exported",           status: "Info",    details: "PDF · Full export"            },
--  { id: "L004", timestamp: "2026-08-13 14:11", module: "Risk",        event: "Document flag raised",       status: "Warning", details: "Contract B missing"           },
--  { id: "L005", timestamp: "2026-08-12 11:00", module: "Connections", event: "Entity linked",              status: "Success", details: "Linked to Meridian Corp"      },
--  { id: "L006", timestamp: "2026-08-11 15:45", module: "System",      event: "Status changed",             status: "Info",    details: "Active → Inactive → Active"   },
--  { id: "L007", timestamp: "2026-08-10 10:00", module: "Governance",  event: "Annual review opened",       status: "Info",    details: "Assigned to Governance Agent" },
--  { id: "L008", timestamp: "2026-08-09 09:20", module: "Connections", event: "Profile linked",             status: "Success", details: "Linked to Sarah Chen"         },
--  { id: "L009", timestamp: "2026-08-08 14:00", module: "Risk",        event: "Flag cleared",               status: "Success", details: "Document uploaded"            },
--  { id: "L010", timestamp: "2026-08-07 11:55", module: "System",      event: "Profile created",            status: "Info",    details: "EMP-00412 · Operations"       },
--  { id: "L011", timestamp: "2026-08-06 15:30", module: "Governance",  event: "Policy assigned",            status: "Success", details: "Data Handling Policy v2.1"    },
--  { id: "L012", timestamp: "2026-08-05 09:00", module: "System",      event: "Note added",                 status: "Info",    details: "Strong candidate for L8"      },
--  { id: "L013", timestamp: "2026-08-04 16:15", module: "Risk",        event: "Risk score recalculated",    status: "Info",    details: "24 → 18"                      },
--  { id: "L014", timestamp: "2026-08-03 13:40", module: "System",      event: "Contact info updated",       status: "Info",    details: "Phone + emergency contact"    },
--  { id: "L015", timestamp: "2026-08-02 10:30", module: "System",      event: "Duplicate merged",           status: "Success", details: "PER-0088 → EMP-00412"         },
--  { id: "L016", timestamp: "2026-08-01 08:00", module: "Governance",  event: "Onboarding audit completed", status: "Success", details: "All checks passed"            },
--  { id: "L017", timestamp: "2026-07-31 17:00", module: "System",      event: "Access request approved",    status: "Success", details: "Analytics team · Data access"  },
--  { id: "L018", timestamp: "2026-07-30 15:20", module: "Risk",        event: "Alert created",              status: "Warning", details: "Unusual login location"        },
--  { id: "L019", timestamp: "2026-07-29 11:10", module: "System",      event: "Credentials reset",          status: "Info",    details: "SSO + API key"                },
--  { id: "L020", timestamp: "2026-07-28 14:45", module: "Governance",  event: "Performance review submitted", status: "Info", details: "Mid-year review"              },
--  { id: "L021", timestamp: "2026-07-27 10:00", module: "Risk",        event: "Periodic scan completed",    status: "Success", details: "No new flags"                 },
--  { id: "L022", timestamp: "2026-07-26 09:30", module: "Governance",  event: "Training completed",         status: "Success", details: "Data Privacy 2026"            },
--  { id: "L023", timestamp: "2026-07-25 14:00", module: "Connections", event: "Organization linked",        status: "Success", details: "Linked to Acme Corp HQ"       },
--  { id: "L024", timestamp: "2026-07-24 11:20", module: "Risk",        event: "Document uploaded",          status: "Info",    details: "Contract A · signed"          },
--  { id: "L025", timestamp: "2026-07-23 16:45", module: "System",      event: "Profile viewed",             status: "Info",    details: "Viewed by Lisa Park"          },
--  { id: "L026", timestamp: "2026-07-22 13:30", module: "Governance",  event: "Policy acknowledged",        status: "Success", details: "Acceptable Use Policy"        },
--  { id: "L027", timestamp: "2026-07-21 10:15", module: "Risk",        event: "Score threshold met",        status: "Success", details: "Risk score below 25"          },
--  { id: "L028", timestamp: "2026-07-20 09:00", module: "System",      event: "Access granted",             status: "Info",    details: "Operations dashboard"         },
--  { id: "L029", timestamp: "2026-07-19 15:00", module: "Governance",  event: "Review reminder sent",       status: "Info",    details: "Annual review due Aug 10"     },
--  { id: "L030", timestamp: "2026-07-18 11:40", module: "Connections", event: "Connection request accepted", status: "Success", details: "From: Sarah Chen"            },
--]
--
--// ── Secondary entity types ────────────────────────────────────────────────────
--
--interface SecondaryEntity {
--  id: string
--  name: string
--  meta: string
--  statusLabel: string
--  statusVariant: "success" | "alert" | "error" | "informative" | "neutral"
--}
--
--const SECONDARY_ENTITIES: Record<string, SecondaryEntity[]> = {
--  Locations: [
--    { id: "loc-1", name: "Phoenix Medical Center",     meta: "Phoenix, AZ · 127 staff",    statusLabel: "Network sync interrupted",   statusVariant: "error"       },
--    { id: "loc-2", name: "Tempe Outpatient Clinic",    meta: "Tempe, AZ · 62 staff",       statusLabel: "Network connection pending", statusVariant: "alert"       },
--    { id: "loc-3", name: "Scottsdale North Clinic",    meta: "Scottsdale, AZ · 94 staff",  statusLabel: "Fully synced",              statusVariant: "success"     },
--    { id: "loc-4", name: "Mesa Rehabilitation Center", meta: "Mesa, AZ · 211 staff",       statusLabel: "Fully synced",              statusVariant: "success"     },
--    { id: "loc-5", name: "Chandler Specialty Clinic",  meta: "Chandler, AZ · 45 staff",    statusLabel: "Fully synced",              statusVariant: "success"     },
--  ],
--  Contacts: [
--    { id: "con-1", name: "Sandra Torres", meta: "VP of Operations · sandra.torres@meridian.com", statusLabel: "Active",   statusVariant: "success" },
--    { id: "con-2", name: "David Park",    meta: "IT Director · david.park@meridian.com",         statusLabel: "Active",   statusVariant: "success" },
--    { id: "con-3", name: "Amy Chen",      meta: "CFO · amy.chen@meridian.com",                   statusLabel: "Inactive", statusVariant: "neutral" },
--  ],
--  Deals: [
--    { id: "deal-1", name: "Meridian Enterprise Renewal 2026",  meta: "$480K · Renewal · Closes Sep 2026",      statusLabel: "In negotiation", statusVariant: "alert"       },
--    { id: "deal-2", name: "Platform Expansion — West Coast",   meta: "$220K · New business · Closes Nov 2026", statusLabel: "Proposal sent",  statusVariant: "informative" },
--  ],
--  AI:        [],
--  Documents: [],
--}
--
--const ENTITY_TYPE_OPTIONS: Record<EntityType, { label: string; iconName: string; description: string }[]> = {
--  company: [
--    { label: "Locations",  iconName: "MapPin",    description: "Physical sites and facilities"        },
--    { label: "Contacts",   iconName: "UserRound", description: "People at this account"              },
--    { label: "Deals",      iconName: "Briefcase", description: "Active and past deals"               },
--    { label: "AI",         iconName: "Brain",     description: "Sessions, insights, and summaries"   },
--    { label: "Documents",  iconName: "FileText",  description: "Uploaded files and attachments"      },
--  ],
--  person: [
--    { label: "Deals",      iconName: "Briefcase", description: "Deals this contact is part of"       },
--    { label: "AI",         iconName: "Brain",     description: "Sessions, insights, and summaries"   },
--    { label: "Documents",  iconName: "FileText",  description: "Uploaded files and attachments"      },
--  ],
--  employee: [
--    { label: "AI",         iconName: "Brain",     description: "Sessions, insights, and summaries"   },
--    { label: "Documents",  iconName: "FileText",  description: "Uploaded files and attachments"      },
--  ],
--}
--
--const PROFILE_SIGNALS: Record<string, NextBestAction> = {
--  "EMP-00412": { severity: "alert",       label: "1 performance review pending approval",     dueContext: "Due in 3 days" },
--  "PER-0091":  { severity: "informative", label: "Compliance certification expiring soon",    dueContext: "Expires Sep 15" },
--  "ORG-0023":  { severity: "alert",       label: "Renewal in 12 days — health dropped to 61", dueContext: "Closes Sep 5"  },
--}
--
--function buildRecordHeaderData(profile: UniversalProfile): {
--  variant: "employee" | "customer" | "client"
--  data: CustomerRecord | EmployeeRecord
--} {
--  if (profile.type === "company") {
--    const data: CustomerRecord = {
--      accountName:    profile.name,
--      segment:        profile.subtitle.split(" · ")[0] ?? "—",
--      owner:          "Priya Nair",
--      tier:           "Enterprise",
--      renewalDate:    "Sep 5, 2026",
--      mrr:            "$480K",
--      lastContact:    "Aug 22, 2026",
--      openTickets:    3,
--      adoptionLevel:  "High",
--      industry:       "Financial Services",
--      primaryContact: "Sandra Torres",
--    }
--    return { variant: "customer", data }
--  }
--  // employee or person
--  const data: EmployeeRecord = {
--    name:       profile.name,
--    role:       profile.subtitle.split(" · ")[0] ?? "—",
--    department: profile.subtitle.split(" · ")[1] ?? "—",
--    manager:    "Lisa Park",
--    location:   "Remote",
--    email:      profile.name.toLowerCase().replace(" ", ".") + "@acme.com",
--    phone:      "+1 (602) 555-0100",
--    startDate:  "Jan 12, 2022",
--    team:       "Operations",
--    accessRole: "Standard",
--  }
--  return { variant: "employee", data }
--}
--
--// ── Helpers ───────────────────────────────────────────────────────────────────
--
--const STATUS_TAG: Record<UniversalProfile["status"], "success" | "neutral" | "error"> = {
--  Active:   "success",
--  Inactive: "neutral",
--  Archived: "error",
--}
--
--const TYPE_LABEL: Record<EntityType, string> = {
--  person:   "Person",
--  employee: "Employee",
--  company:  "Company",
--}
--
--const TYPE_TAG_VARIANT: Record<EntityType, "informative" | "purple" | "neutral"> = {
--  person:   "informative",
--  employee: "purple",
--  company:  "neutral",
--}
--
--// Study widget wrapper — shows error state, hidden when no data (empty)
--function StudyWidget({ title, status, children }: { title: string; status: StudyStatus; children: React.ReactNode }) {
--  if (status === "empty") return null
--
--  if (status === "error") {
--    return (
--      <div style={{ padding: "12px 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
--        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--color-text-error-default)" }}>
--          <LucideIcons.AlertCircle size={14} />
--          <span style={{ fontSize: 12, fontWeight: 500 }}>Failed to load</span>
--        </div>
--        <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{title} data couldn't be retrieved.</span>
--        <button
--          style={{
--            alignSelf: "flex-start", fontSize: 12, fontWeight: 500,
--            color: "var(--primary)", border: "none", background: "none",
--            cursor: "pointer", padding: 0,
--          }}
--          onClick={() => {}} // DS-GAP: wire to retry handler
--        >
--          Retry
--        </button>
--      </div>
--    )
--  }
--
--  return <>{children}</>
--}
--
--// ── Governance study widget content ──────────────────────────────────────────
--
--function GovernanceContent() {
--  const items = [
--    { label: "Compliance Score",  value: "94 / 100",     icon: "ShieldCheck",   variant: "success"     as const },
--    { label: "Open Reviews",      value: "1",            icon: "ClipboardList", variant: "alert"       as const },
--    { label: "Policies Signed",   value: "12 of 12",     icon: "FileCheck2",    variant: "success"     as const },
--    { label: "Last Audit",        value: "Aug 10, 2026", icon: "CalendarCheck", variant: "informative" as const },
--  ]
--  return (
--    <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
--      {items.map(item => (
--        <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
--          <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{item.label}</span>
--          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
--            <HighlightIcon size="sm" variant={item.variant} iconName={item.icon} />
--            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{item.value}</span>
--          </div>
--        </div>
--      ))}
--    </div>
--  )
--}
--
--// ── Risk study widget content ─────────────────────────────────────────────────
--
--function RiskContent() {
--  return (
--    <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
--      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
--        <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>Risk Score</span>
--        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
--          <HighlightIcon size="sm" variant="success" iconName="TrendingDown" />
--          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>18 / 100</span>
--        </div>
--      </div>
--      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
--        <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>Open Flags</span>
--        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
--          <HighlightIcon size="sm" variant="neutral" iconName="Flag" />
--          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>0</span>
--        </div>
--      </div>
--      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
--        <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>Last Scan</span>
--        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
--          <HighlightIcon size="sm" variant="informative" iconName="ScanLine" />
--          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>Jul 27, 2026</span>
--        </div>
--      </div>
--      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
--        <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>Trend</span>
--        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
--          <HighlightIcon size="sm" variant="success" iconName="ArrowDownRight" />
--          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>↓ 24 → 18</span>
--        </div>
--      </div>
--    </div>
--  )
--}
--
--// ── Connections study widget content ──────────────────────────────────────────
--
--function ConnectionsContent() {
--  const connections = [
--    { name: "Meridian Corp",   type: "Organization", icon: "Building2" },
--    { name: "Sarah Chen",      type: "Person",       icon: "User"      },
--    { name: "Operations Team", type: "Team",         icon: "Users"     },
--  ]
--  return (
--    <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
--      {connections.map(c => (
--        <div key={c.name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
--          <HighlightIcon size="sm" variant="neutral" iconName={c.icon} />
--          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
--            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{c.name}</span>
--            <span style={{ fontSize: 11, color: "var(--field-supporting)" }}>{c.type}</span>
--          </div>
--        </div>
--      ))}
--      <button style={{ alignSelf: "flex-start", fontSize: 12, fontWeight: 500, color: "var(--primary)", border: "none", background: "none", cursor: "pointer", padding: 0, marginTop: 2 }}>
--        View all connections
--      </button>
--    </div>
--  )
--}
--
--// ── Table columns ─────────────────────────────────────────────────────────────
--
--const ACTIVITY_COLS: TableColumn<ActivityEvent>[] = [
--  { key: "timestamp", header: "When",   render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.timestamp}</span> },
--  { key: "actor",     header: "By",     render: r => <span style={{ fontSize: 12, fontWeight: 500, color: "var(--foreground)" }}>{r.actor}</span> },
--  { key: "action",    header: "Action", render: r => <span style={{ fontSize: 12, color: "var(--foreground)" }}>{r.action}</span> },
--  { key: "target",    header: "Target", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.target}</span> },
--]
--
--const LOGS_COLS: TableColumn<LogEntry>[] = [
--  { key: "timestamp", header: "Timestamp", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.timestamp}</span> },
--  { key: "module",    header: "Module",    render: r => <Tag variant="neutral" size="sm">{r.module}</Tag> },
--  { key: "event",     header: "Event",     render: r => <span style={{ fontSize: 12, fontWeight: 500, color: "var(--foreground)" }}>{r.event}</span> },
--  {
--    key: "status", header: "Status",
--    render: r => {
--      const map: Record<LogEntry["status"], "success" | "alert" | "error" | "informative"> = {
--        Success: "success", Warning: "alert", Error: "error", Info: "informative",
--      }
--      return <Tag variant={map[r.status]} size="sm">{r.status}</Tag>
--    },
--  },
--  { key: "details", header: "Details", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.details}</span> },
--]
--
--// ── Profile detail view ───────────────────────────────────────────────────────
--
--function ProfileDetailView({ profile, onBack }: { profile: UniversalProfile; onBack: () => void }) {
--  const [tab,          setTab]          = useState<string>("overview")
--  const [logsPage,     setLogsPage]     = useState(1)
--  const [logsPageSize, setLogsPageSize] = useState(10)
--  const [showArchive,  setShowArchive]  = useState(false)
--  const [menuOpen,     setMenuOpen]     = useState(false)
--  const [userTabs,     setUserTabs]     = useState<string[]>([])
--  const [tabPickerOpen, setTabPickerOpen] = useState(false)
--  const [entityPreview, setEntityPreview] = useState<SecondaryEntity | null>(null)
--  const [entitySearch,  setEntitySearch]  = useState("")
--
--  const tabPickerRef = useRef<HTMLDivElement>(null)
--
--  // Close tab picker on outside click
--  useEffect(() => {
--    if (!tabPickerOpen) return
--    const handler = (e: MouseEvent) => {
--      if (tabPickerRef.current && !tabPickerRef.current.contains(e.target as Node)) {
--        setTabPickerOpen(false)
--      }
--    }
--    document.addEventListener("mousedown", handler)
--    return () => document.removeEventListener("mousedown", handler)
--  }, [tabPickerOpen])
--
--  const pagedLogs = useMemo(
--    () => LOG_ENTRIES.slice((logsPage - 1) * logsPageSize, logsPage * logsPageSize),
--    [logsPage, logsPageSize],
--  )
--
--  // Build Overview canvas slots — only include studies with data (hide empty)
--  const overviewSlots = useMemo<CanvasSlot[]>(() => {
--    const slots: CanvasSlot[] = [
--      // Summary KPI — always shown
--      {
--        uid: "entity-summary", title: "Profile Summary", colSpan: 1,
--        content: (
--          <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
--            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
--              <HighlightIcon size="lg" variant="informative" iconName={profile.avatarIcon} />
--              <div>
--                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{profile.name}</div>
--                <div style={{ fontSize: 11, color: "var(--field-supporting)", marginTop: 2 }}>{profile.subtitle}</div>
--              </div>
--            </div>
--            <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
--              <Tag variant={STATUS_TAG[profile.status]} size="sm">{profile.status}</Tag>
--              <Tag variant={TYPE_TAG_VARIANT[profile.type]} size="sm">{TYPE_LABEL[profile.type]}</Tag>
--            </div>
--          </div>
--        ),
--      },
--    ]
--
--    // Governance — hide if empty, show error if failed
--    if (profile.governance !== "empty") {
--      slots.push({
--        uid: "governance", title: "Governance", colSpan: 1,
--        content: (
--          <StudyWidget title="Governance" status={profile.governance}>
--            <GovernanceContent />
--          </StudyWidget>
--        ),
--      })
--    }
--
--    // Risk — hide if empty, show error if failed
--    if (profile.risk !== "empty") {
--      slots.push({
--        uid: "risk", title: "Risk", colSpan: 1,
--        content: (
--          <StudyWidget title="Risk" status={profile.risk}>
--            <RiskContent />
--          </StudyWidget>
--        ),
--      })
--    }
--
--    // Connections — hide if empty, show error if failed
--    if (profile.connections !== "empty") {
--      slots.push({
--        uid: "connections", title: "Connections", colSpan: 1,
--        content: (
--          <StudyWidget title="Connections" status={profile.connections}>
--            <ConnectionsContent />
--          </StudyWidget>
--        ),
--      })
--    }
--
--    return slots
--  }, [profile])
--
--  // RecordHeader data
--  const { variant: rhVariant, data: rhData } = buildRecordHeaderData(profile)
--  const signal = PROFILE_SIGNALS[profile.id] ?? { severity: "neutral" as const, label: "No active recommendations" }
--
--  // Available entity type options for the "+" picker (filter already-added tabs)
--  const availableOptions = (ENTITY_TYPE_OPTIONS[profile.type] ?? []).filter(
--    opt => !userTabs.includes(opt.label),
--  )
--
--  // Full tab list: base + user-added
--  const allTabItems = [
--    { id: "overview",  label: "Overview"  },
--    { id: "activity",  label: "Activity"  },
--    { id: "logs",      label: "Logs"      },
--    ...userTabs.map(t => ({ id: t, label: t })),
--  ]
--
--  return (
--    <ScreenLayout
--      workspaceName="Acme Corp"
--      userName="Thomas González"
--      userEmail="thomas.gonzalez@aimsos.ai"
--      sidebarItems={SIDEBAR_ITEMS}
--      activeSidebarId="data"
--      header={(isScrolled) => (
--        <div>
--          {!isScrolled && (
--            <button
--              onClick={onBack}
--              style={{
--                display: "flex", alignItems: "center", gap: 4,
--                border: "none", background: "none", cursor: "pointer",
--                padding: "0 0 6px 0", color: "var(--primary)",
--              }}
--            >
--              <LucideIcons.ChevronLeft size={13} />
--              <span style={{ fontSize: 12, fontWeight: 500 }}>Profiles</span>
--            </button>
--          )}
--          <Header
--            size={isScrolled ? "compress" : "size-l"}
--            title={profile.name}
--            description={profile.subtitle}
--            tag={<Tag variant={STATUS_TAG[profile.status]} size="sm">{profile.status}</Tag>}
--            primaryAction={
--              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
--                <Button variant="secondary" size="sm" onClick={() => {}}>
--                  <LucideIcons.Download size={13} /> Export
--                </Button>
--                <Button variant="main" size="sm" onClick={() => {}}>
--                  <LucideIcons.Pencil size={13} /> Edit Profile
--                </Button>
--                {/* Kebab — Archive only for person + employee, not company */}
--                {/* DS-GAP: RBAC — archive visibility should depend on user role */}
--                {profile.type !== "company" && (
--                  <div style={{ position: "relative" }}>
--                    <Button
--                      variant="secondary"
--                      size="sm"
--                      onClick={() => setMenuOpen(o => !o)}
--                    >
--                      <LucideIcons.MoreHorizontal size={14} />
--                    </Button>
--                    {menuOpen && (
--                      <div
--                        style={{
--                          position: "fixed",
--                          zIndex: 10001,
--                          minWidth: 180,
--                          background: "var(--surface)",
--                          border: "0.5px solid var(--field-border)",
--                          boxShadow: "var(--shadow-elevation-3)",
--                          borderRadius: 8,
--                          padding: "4px 0",
--                        }}
--                        onClick={() => setMenuOpen(false)}
--                      >
--                        <Menu>
--                          <MenuItem
--                            leadingIcon={<LucideIcons.Archive size={14} />}
--                            label="Archive"
--                            size="sm"
--                            onClick={() => { setMenuOpen(false); setShowArchive(true) }}
--                          />
--                        </Menu>
--                      </div>
--                    )}
--                  </div>
--                )}
--              </div>
--            }
--          />
--        </div>
--      )}
--      pagination={
--        tab === "logs" && LOG_ENTRIES.length > logsPageSize
--          ? (
--              <Pagination
--                currentPage={logsPage}
--                totalItems={LOG_ENTRIES.length}
--                itemsPerPage={logsPageSize}
--                onPageChange={setLogsPage}
--                onItemsPerPageChange={n => { setLogsPageSize(n); setLogsPage(1) }}
--                rowsPerPageOptions={[10, 25, 50]}
--              />
--            )
--          : undefined
--      }
--    >
--      {/* ── RecordHeader — lean identity card with NBA signal ── */}
--      <RecordHeader
--        variant={rhVariant}
--        data={rhData}
--        signal={signal}
--        actions={[
--          { label: "Export",  variant: "secondary", onClick: () => {} },
--          { label: profile.type === "company" ? "Contact account" : "Message", variant: "primary", onClick: () => {} },
--        ]}
--        assignedAgent={{ id: "agent-1", name: "AIMS Assistant", onOpenChat: () => {} }}
--        className="mb-[16px]"
--      />
--
--      {/* ── Tabs row + "+" entity-type picker ── */}
--      <div className="flex items-center gap-[8px] mb-[24px]">
--        <Tabs
--          items={allTabItems}
--          activeId={tab}
--          onChange={(id) => { setTab(id); setLogsPage(1); setEntitySearch("") }}
--        />
--        {availableOptions.length > 0 && (
--          <div ref={tabPickerRef} style={{ position: "relative" }}>
--            <Button
--              variant="tertiary"
--              size="sm"
--              iconPosition="alone"
--              icon={<LucideIcons.Plus size={14} />}
--              onClick={() => setTabPickerOpen(o => !o)}
--              aria-label="Add tab"
--            />
--            {tabPickerOpen && (
--              <div
--                style={{
--                  position: "absolute",
--                  top: "100%",
--                  left: 0,
--                  zIndex: 200,
--                  minWidth: 240,
--                  background: "var(--surface)",
--                  border: "0.5px solid var(--field-border)",
--                  borderRadius: 10,
--                  boxShadow: "var(--shadow-elevation-3)",
--                  padding: "6px 0",
--                  marginTop: 4,
--                }}
--              >
--                <div style={{ padding: "6px 12px 4px", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--field-supporting)" }}>
--                  Add tab
--                </div>
--                {availableOptions.map(opt => {
--                  const Icon = (LucideIcons as Record<string, unknown>)[opt.iconName] as LucideIcon | undefined
--                  return (
--                    <button
--                      key={opt.label}
--                      style={{
--                        display: "flex", alignItems: "center", gap: 10,
--                        width: "100%", padding: "8px 12px",
--                        background: "none", border: "none", cursor: "pointer",
--                        textAlign: "left",
--                      }}
--                      onClick={() => {
--                        setUserTabs(t => [...t, opt.label])
--                        setTab(opt.label)
--                        setTabPickerOpen(false)
--                      }}
--                      onMouseEnter={e => (e.currentTarget.style.background = "var(--hover)")}
--                      onMouseLeave={e => (e.currentTarget.style.background = "none")}
--                    >
--                      {Icon && <Icon size={14} strokeWidth={1.75} style={{ color: "var(--field-supporting)" }} />}
--                      <div>
--                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{opt.label}</div>
--                        <div style={{ fontSize: 11, color: "var(--field-supporting)" }}>{opt.description}</div>
--                      </div>
--                    </button>
--                  )
--                })}
--              </div>
--            )}
--          </div>
--        )}
--      </div>
--
--      {/* ── Overview — Widget Canvas with study widgets (or context cards when no study data) ── */}
--      {tab === "overview" && (
--        overviewSlots.length > 1
--          ? <WidgetCanvasView initialSlots={overviewSlots} />
--          : (
--              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
--                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--field-supporting)", marginBottom: 4 }}>
--                  Context — What needs attention
--                </div>
--                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
--                  {[
--                    { label: "Next Best Action",  value: "Schedule renewal call",   meta: "Renewal in 12 days",        iconName: "Zap",       variant: "alert"       as const },
--                    { label: "Active Workflow",   value: "Q3 Compliance Review",    meta: "Step 3 of 5 · In progress", iconName: "GitBranch", variant: "informative" as const },
--                    { label: "Last Agent Run",    value: "Risk Score Agent",        meta: "Completed · Aug 24, 2026",  iconName: "Bot",       variant: "success"     as const },
--                    { label: "Pending Review",    value: "Data Access Request",     meta: "Waiting for approval",      iconName: "Clock",     variant: "neutral"     as const },
--                  ].map(card => (
--                    <CardContainer key={card.label} variant="default">
--                      <div style={{ padding: "12px 16px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
--                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
--                          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--field-supporting)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{card.label}</span>
--                          <HighlightIcon size="sm" variant={card.variant} iconName={card.iconName} />
--                        </div>
--                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", lineHeight: 1.3 }}>{card.value}</div>
--                        <div style={{ fontSize: 11, color: "var(--field-supporting)" }}>{card.meta}</div>
--                      </div>
--                    </CardContainer>
--                  ))}
--                </div>
--                <EmptyState
--                  icon={LucideIcons.LayoutDashboard}
--                  title="No study data yet"
--                  description="Data from Governance, Risk, and Connections will appear here once available."
--                />
--              </div>
--            )
--      )}
--
--      {/* ── Activity — last 20 events, no pagination per spec ── */}
--      {tab === "activity" && (
--        ACTIVITY_EVENTS.length > 0
--          ? (
--              <Table
--                columns={ACTIVITY_COLS}
--                data={ACTIVITY_EVENTS}
--                size="sm"
--                emptyTitle="No activity yet"
--                emptyDescription="Events from Governance, Risk, and Connections will appear here."
--              />
--            )
--          : (
--              <EmptyState
--                icon={LucideIcons.Activity}
--                title="No activity yet"
--                description="Events from Governance, Risk, and Connections will appear here once the profile has data."
--              />
--            )
--      )}
--
--      {/* ── Logs — paginated, page size 10 ── */}
--      {tab === "logs" && (
--        LOG_ENTRIES.length > 0
--          ? (
--              <Table
--                columns={LOGS_COLS}
--                data={pagedLogs}
--                size="sm"
--                emptyTitle="No logs yet"
--                emptyDescription="System and module events will appear here."
--              />
--            )
--          : (
--              <EmptyState
--                icon={LucideIcons.ScrollText}
--                title="No logs yet"
--                description="System events and module changes will be logged here."
--              />
--            )
--      )}
--
--      {/* ── Secondary entity tabs ── */}
--      {userTabs.includes(tab) && (() => {
--        const entities = (SECONDARY_ENTITIES[tab] ?? []).filter(e =>
--          entitySearch === "" ||
--          e.name.toLowerCase().includes(entitySearch.toLowerCase()) ||
--          e.meta.toLowerCase().includes(entitySearch.toLowerCase()),
--        )
--        return (
--          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
--            <Input
--              placeholder={`Search ${tab.toLowerCase()}...`}
--              value={entitySearch}
--              onChange={e => setEntitySearch(e.target.value)}
--            />
--            {entities.length === 0 ? (
--              <EmptyState
--                icon={LucideIcons.Search}
--                title={entitySearch ? "No results" : `No ${tab.toLowerCase()} yet`}
--                description={entitySearch
--                  ? `No ${tab.toLowerCase()} match "${entitySearch}".`
--                  : `${tab} associated with this profile will appear here.`
--                }
--              />
--            ) : (
--              entities.map(entity => (
--                <CardContainer
--                  key={entity.id}
--                  variant="default"
--                  className="cursor-pointer hover:border-[var(--card-primary-hover-bd)] transition-colors"
--                  onClick={() => setEntityPreview(entity)}
--                >
--                  <div style={{ padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
--                    <div>
--                      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{entity.name}</div>
--                      <div style={{ fontSize: 12, color: "var(--field-supporting)", marginTop: 2 }}>{entity.meta}</div>
--                    </div>
--                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
--                      <Tag variant={entity.statusVariant} size="sm">{entity.statusLabel}</Tag>
--                      <LucideIcons.Eye size={14} style={{ color: "var(--field-supporting)" }} />
--                    </div>
--                  </div>
--                </CardContainer>
--              ))
--            )}
--          </div>
--        )
--      })()}
--
--      {/* ── Secondary entity slide-out ── */}
--      <SlideOut
--        open={entityPreview !== null}
--        onClose={() => setEntityPreview(null)}
--        type="full-slot"
--        title={entityPreview?.name ?? ""}
--        subtitle={entityPreview?.meta}
--        showTopButton={true}
--        topButtonIcon={<LucideIcons.ExternalLink size={14} />}
--        onTopButtonClick={() => setEntityPreview(null)}
--      >
--        {entityPreview && (
--          <div style={{ padding: "24px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
--            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
--              <HighlightIcon size="lg" variant="informative" iconName="Building2" />
--              <div>
--                <div style={{ fontSize: 15, fontWeight: 600, color: "var(--foreground)" }}>{entityPreview.name}</div>
--                <div style={{ fontSize: 12, color: "var(--field-supporting)", marginTop: 2 }}>{entityPreview.meta}</div>
--              </div>
--            </div>
--            <Tag variant={entityPreview.statusVariant} size="sm">{entityPreview.statusLabel}</Tag>
--            <div style={{ marginTop: 8 }}>
--              <Button variant="primary" size="sm" onClick={() => setEntityPreview(null)}>
--                View full profile
--              </Button>
--            </div>
--          </div>
--        )}
--      </SlideOut>
--
--      {/* ── Archive confirmation modal — person + employee only ── */}
--      <ModalDialog
--        isOpen={showArchive}
--        onClose={() => setShowArchive(false)}
--        tone="warning"
--        iconName="Archive"
--        title={`Archive ${profile.name}?`}
--        description="This profile will be archived and removed from active views. You can restore it later from the archived profiles list."
--        ctaPrimary={{ label: "Archive", onClick: () => setShowArchive(false) }}
--        ctaSecondary={{ label: "Cancel", onClick: () => setShowArchive(false) }}
--      />
--    </ScreenLayout>
--  )
--}
--
--// ── Main screen — profile selector ───────────────────────────────────────────
--
--export default function PMThomasUniversalProfileScreen() {
--  const [selectedId, setSelectedId] = useState<string | null>(null)
--
--  const selected = PROFILES.find(p => p.id === selectedId)
--
--  if (selected) {
--    return <ProfileDetailView profile={selected} onBack={() => setSelectedId(null)} />
--  }
--
--  return (
--    <ScreenLayout
--      workspaceName="Acme Corp"
--      userName="Thomas González"
--      userEmail="thomas.gonzalez@aimsos.ai"
--      sidebarItems={SIDEBAR_ITEMS}
--      activeSidebarId="data"
--      header={() => (
--        <Header
--          size="size-l"
--          title="Universal Profiles"
--          description="Unified view of people, employees, and companies across AIMS OS studies."
--        />
--      )}
--    >
--      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
--        {PROFILES.map(profile => (
--          <CardContainer
--            key={profile.id}
--            variant="default"
--            className="cursor-pointer hover:border-[var(--card-primary-hover-bd)] transition-colors"
--            onClick={() => setSelectedId(profile.id)}
--          >
--            <div style={{ padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
--              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
--                <HighlightIcon size="lg" variant="informative" iconName={profile.avatarIcon} />
--                <div>
--                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)" }}>{profile.name}</div>
--                  <div style={{ fontSize: 12, color: "var(--field-supporting)", marginTop: 2 }}>{profile.subtitle}</div>
--                </div>
--              </div>
--              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
--                <Tag variant={TYPE_TAG_VARIANT[profile.type]} size="sm">{TYPE_LABEL[profile.type]}</Tag>
--                <Tag variant={STATUS_TAG[profile.status]} size="sm">{profile.status}</Tag>
--                <LucideIcons.ChevronRight size={14} style={{ color: "var(--field-supporting)" }} />
--              </div>
--            </div>
--          </CardContainer>
--        ))}
--      </div>
--    </ScreenLayout>
--  )
--}
 diff --git a/src/screens/ucpShared.ts b/src/screens/ucpShared.ts
-new file mode 100644
-index 0000000..a60f2ed
+new file mode 100755
+index 0000000..ad9875b
 --- /dev/null
 +++ b/src/screens/ucpShared.ts
-@@ -0,0 +1,934 @@
+@@ -0,0 +1,1040 @@
 +/**
 + * UCP — Unified Contact Profile: shared types + mock data.
 + *
@@ -3532,8 +1807,33 @@ index 0000000..a60f2ed
 + *     convenience field invented for this screen.
 + */
 +
-+import type { EntityMetaItem, EntityTag } from "@/components/experimental/entity-header"
-+import type { NextBestAction } from "@/components/experimental/next-best-action-card"
++/**
++ * These three shapes used to be imported from a pair of components in
++ * `experimental/`. Those components are gone — RecordHeader absorbed both jobs —
++ * so the fixtures own their shapes now. They are fixture vocabulary, not design
++ * system types: the screens map them onto whatever the components ask for.
++ */
++export interface UcpTag {
++  label:     string
++  role:      "signal" | "classification"
++  tone?:     "error" | "alert" | "neutral"
++  severity?: number
++  tooltip?:  string
++}
++
++export interface UcpMetaItem {
++  iconName: string
++  label:    string
++  tooltip:  string
++}
++
++/** What the engine proposes for a record. `null` on a record with nothing to do. */
++export interface UcpNextBestAction {
++  title:     string
++  timestamp: string
++  rationale?: string
++  variant?:  "view-details" | "accept"
++}
 +
 +// ── Entity ────────────────────────────────────────────────────────────────────
 +
@@ -3578,9 +1878,9 @@ index 0000000..a60f2ed
 +   */
 +  requiredScope?:  string
 +  /** Signals first (by severity), then classification. Max 6 including overflow. */
-+  tags:            EntityTag[]
++  tags:            UcpTag[]
 +  /** Max 6, aim for four. Every item carries a tooltip naming its field. */
-+  meta:            EntityMetaItem[]
++  meta:            UcpMetaItem[]
 +  lastInteraction: string
 +  /** AIMS OS is agent-first — every record has one assigned concierge. */
 +  agent:           { id: string; name: string }
@@ -3588,7 +1888,7 @@ index 0000000..a60f2ed
 +   * The engine's proposal, rendered as its own card BELOW the header — never
 +   * inside it. null when there is nothing to do: no action, no card.
 +   */
-+  nba:             NextBestAction | null
++  nba:             UcpNextBestAction | null
 +  /** The agent's read on this record, shown as the Overview AI widget. */
 +  aiSummary:       { headline: string; detail: string; confidence: number }
 +  governance:      StudyState
@@ -3666,6 +1966,87 @@ index 0000000..a60f2ed
 +    note: `These values are governed by ${c.requiredScope}, which your role does not hold. The record exists and is intact — request the scope to read it.`,
 +  }
 +}
++/**
++ * Short badge label for a source system — "Salesforce" → "SF". RecordHeader
++ * renders the abbreviation inline and keeps the full name for the Tooltip, so
++ * both have to be real; a badge that says "SAL" helps nobody.
++ */
++const SYSTEM_ABBR: Record<string, string> = {
++  Salesforce:  "SF",
++  Workday:     "WD",
++  NetSuite:    "NS",
++  HubSpot:     "HS",
++  "CDK Global": "CDK",
++  Epic:        "EP",
++}
++
++/**
++ * The record's fields in the shape RecordHeader's RECORD zone wants.
++ *
++ * Two things this shape gets right that the flat metadata row did not:
++ *
++ *   1 · Provenance is per FIELD, not per record. A contact's role comes from
++ *       the CRM and their verified-fact count comes from the knowledge system;
++ *       one `source` on the whole record was a simplification that stopped
++ *       being true the moment two fields disagreed about where they came from.
++ *
++ *   2 · Masking is a STATE of a field, not the absence of one. A viewer without
++ *       the scope sees the same field list, the same labels and the same
++ *       provenance badges — only the values are withheld. That is the honest
++ *       rendering of "the fields exist and are governed", and it is what the
++ *       component means by `state: "masked"`: the same field in a different
++ *       entitlement state, never a different field.
++ *
++ * `masked` is decided by the caller against the viewer, per the component's own
++ * rule — RecordHeader never resolves entitlements itself.
++ */
++export interface UcpRecordField {
++  label:        string
++  iconName:     string
++  value:        string
++  system:       string
++  systemAbbr:   string
++  modelVersion: string
++  syncedAgo:    string
++  masked:       boolean
++}
++
++export function getRecordFields(c: UcpContact): UcpRecordField[] {
++  const restricted = restrictionFor(c) !== null
++  const abbr = SYSTEM_ABBR[c.source.label] ?? c.source.label.slice(0, 2).toUpperCase()
++
++  // The system of record for identity-shaped fields is the one the record was
++  // ingested from; anything the platform derived carries the platform instead.
++  const fromSource = (label: string, iconName: string, value: string) => ({
++    label, iconName, value,
++    system: c.source.label, systemAbbr: abbr,
++    modelVersion: c.type === "employee" ? "UEP v2.3" : "UCP v2.1",
++    syncedAgo: "2h ago",
++    masked: restricted,
++  })
++  const fromPlatform = (label: string, iconName: string, value: string) => ({
++    label, iconName, value,
++    system: "Helix Data Studio", systemAbbr: "HX",
++    modelVersion: "Knowledge v1.4",
++    syncedAgo: "18m ago",
++    // Counts are structural, not personal: how many facts exist is not a
++    // governed value, and hiding it would misrepresent what the tenant holds.
++    masked: false,
++  })
++
++  return [
++    fromSource(c.type === "company" ? "Profile" : "Role", "Info", c.subtitle),
++    fromSource("Account owner", "UserRound", c.owner),
++    fromSource("Last interaction", "Clock", c.lastInteraction),
++    fromPlatform(
++      "Verified facts",
++      "ShieldCheck",
++      `${getFacts(c).filter(f => f.plane === "truth").length} on the Truth plane`,
++    ),
++    fromPlatform("Source Drives", "HardDrive", `${getDrives(c).length} attached`),
++  ]
++}
++
 +// ── Knowledge planes ──────────────────────────────────────────────────────────
 +
 +export type KnowledgePlane = "truth" | "sandbox" | "sources"
