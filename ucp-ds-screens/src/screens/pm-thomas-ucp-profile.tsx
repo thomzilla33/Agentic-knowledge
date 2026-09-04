@@ -32,6 +32,17 @@
  * shows only the parent list above the card. Printing the name and state twice,
  * 40px apart, is the thing that spec is avoiding.
  *
+ * The header's own state set is exercised here rather than described:
+ *   Loading     → the first paint of a record fetch, re-armed per record id.
+ *   Restricted  → a record whose values sit behind a scope the viewer does not
+ *                 hold. Decided by the session against the record, never by a
+ *                 flag on the record. The body follows the header — leaving the
+ *                 facts on screen under a "these are governed" header would be
+ *                 the page contradicting the header.
+ *   Minimum     → on scroll, per above.
+ *   Responsive  → driven by a ResizeObserver on the header's CARD, because that
+ *                 is what the spec says the breakpoint belongs to.
+ *
  * Tabs: Overview · Snapshot · Activity · Drives
  *   Overview  → WidgetCanvasView (DS rule: any tab named Overview is a canvas)
  *   Snapshot  → this record's facts by knowledge plane (Truth / Sandbox / Sources)
@@ -39,7 +50,7 @@
  *   Drives    → the Source Drives attached to this record
  */
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { ScreenLayout }      from "@/components/layouts/screen-layout"
 import { WidgetCanvasView }  from "@/components/layouts/widget-canvas-view"
 import type { CanvasSlot }   from "@/components/layouts/widget-canvas-view"
@@ -60,12 +71,13 @@ import { EmptyState }        from "@/components/ui/empty-state"
 import { HighlightIcon }     from "@/components/ui/highlight-icon"
 import { Pagination }        from "@/components/ui/pagination"
 import { SlideOut }          from "@/components/ui/slide-out"
+import { Skeleton }          from "@/components/ui/skeleton"
 import { EntityHeader }        from "@/components/experimental/entity-header"
 import { NextBestActionCard }  from "@/components/experimental/next-best-action-card"
-import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch } from "lucide-react"
+import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch, Lock } from "lucide-react"
 import {
   PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
-  TYPE_LABEL, entityState,
+  TYPE_LABEL, entityState, restrictionFor,
   getActivity, getConciergeOpening, getConnections, getDrives,
   getFacts, getGovernance, getRisk,
 } from "./ucpShared"
@@ -523,6 +535,97 @@ function ConciergeChat({
   )
 }
 
+// ── Body states ───────────────────────────────────────────────────────────────
+
+/**
+ * The body while the record is in flight. It exists so the loading header is
+ * not a skeleton sitting on top of finished content — a screen that says
+ * "loading" in one place and shows real values in another is stating two
+ * different things about the same record.
+ *
+ * Not an EmptyState: "nothing here" is untrue while data is on the wire.
+ */
+function LoadingBody() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }} aria-busy="true">
+      <CardContainer size="lg" variant="default" className="w-full">
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <Skeleton shape="text" width={220} height={16} />
+          <Skeleton shape="text" width="100%" height={12} />
+          <Skeleton shape="text" width="82%"  height={12} />
+        </div>
+      </CardContainer>
+      <div style={{ display: "flex", gap: 12 }}>
+        {[0, 1, 2].map(i => (
+          <CardContainer key={i} size="lg" variant="default" className="flex-1">
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <Skeleton shape="text" width={120} height={14} />
+              {[0, 1, 2].map(r => (
+                <div key={r} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <Skeleton shape="text" width={96} height={12} />
+                  <Skeleton shape="text" width={48} height={12} />
+                </div>
+              ))}
+            </div>
+          </CardContainer>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * The body for a record the viewer cannot read. It replaces the tab content
+ * rather than sitting beside it: leaving the facts, timeline and drives on
+ * screen under a header that says the values are governed would be the header
+ * telling the truth and the page contradicting it.
+ *
+ * The tabs stay mounted and switchable. They are part of the record's shape,
+ * and hiding them would misrepresent what the tenant holds — the restriction is
+ * on the values, not on the structure.
+ */
+function RestrictedBody({ name, scope }: { name: string; scope: string }) {
+  return (
+    <EmptyState
+      icon={Lock}
+      title={`Governed by ${scope}`}
+      description={`${name}'s record is intact and indexed. Reading its values needs the ${scope} scope, which your role does not hold — nothing here is missing or broken.`}
+      ctaLabel="Request access"
+      onCta={() => {}}
+    />
+  )
+}
+
+/**
+ * The Entity Header's size axis is driven by the width of the card it sits in,
+ * not the viewport: "the breakpoint it responds to is the card's, not the
+ * viewport's". Same reason the header takes `size` as a prop instead of using a
+ * media query — a header inside a 640px side panel on a 1920px monitor has to
+ * reflow, and a media query would never fire.
+ *
+ * The threshold is where the default single row stops fitting: visual, title,
+ * source, two collapsed tags and the fixed action group. Below it the header
+ * stacks; it never shrinks the title to keep the row.
+ */
+const HEADER_STACK_THRESHOLD = 760
+
+function useCardSize(): [React.RefObject<HTMLDivElement | null>, "default" | "responsive"] {
+  const ref = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(9999)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) setWidth(entry.contentRect.width)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  return [ref, width < HEADER_STACK_THRESHOLD ? "responsive" : "default"]
+}
+
 // ── Profile view ──────────────────────────────────────────────────────────────
 
 export function UcpProfileView({
@@ -549,6 +652,29 @@ export function UcpProfileView({
   const openInfo = () => { setChatOpen(false); setDrivePeek(null); setInfoOpen(true) }
 
   const state = entityState(contact)
+
+  // The header stacks on the width of its own card, so the card is what gets
+  // measured. On a 1440 desktop it is ~1100px and the header stays on one row;
+  // in a narrow window or a collapsed layout the same card crosses the
+  // threshold and the header reflows without the viewport being consulted.
+  const [headerCardRef, headerSize] = useCardSize()
+
+  // A record is fetched, so there is a first paint where it does not exist yet,
+  // and the header's Loading state is what belongs there. Re-armed per record:
+  // navigating from one contact to another is a new fetch, not a re-render of
+  // the old one.
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    setLoading(true)
+    const timer = setTimeout(() => setLoading(false), 700)
+    return () => clearTimeout(timer)
+  }, [contact.id])
+
+  // Restricted is decided by what the viewer holds against what the record
+  // needs — never by a flag on the record itself. null when nothing is gated.
+  const restriction = restrictionFor(contact)
+
+  const headerVariant = loading ? "loading" : restriction ? "restricted" : "default"
 
   const activityCount = useMemo(() => {
     const all = getActivity(contact)
@@ -654,7 +780,7 @@ export function UcpProfileView({
               preference: the card has to sit directly below the header and
               never under a nav layer, or it reads as belonging to the active
               tab instead of to the record. */}
-          <div style={{ padding: "0 32px 8px" }}>
+          <div ref={headerCardRef} style={{ padding: "0 32px 8px" }}>
             <CardContainer size="lg" variant="default" className="w-full">
               <EntityHeader
                 visual={{ kind: "avatar" }}
@@ -664,6 +790,9 @@ export function UcpProfileView({
                 tags={contact.tags}
                 meta={contact.meta}
                 minimum={isScrolled}
+                variant={headerVariant}
+                size={headerSize}
+                restrictedNote={restriction?.note}
                 onAsk={openChat}
                 onInformation={openInfo}
                 menuActions={[
@@ -682,7 +811,7 @@ export function UcpProfileView({
               holds its position directly below the header; on scroll the
               identity and the tabs stay and the proposal yields, and it comes
               back at the top of the page. */}
-          {!isScrolled && nbaDismissed !== contact.id && contact.nba && (
+          {!isScrolled && !loading && !restriction && nbaDismissed !== contact.id && contact.nba && (
             <div style={{ padding: "0 32px 8px" }}>
               <NextBestActionCard
                 action={contact.nba}
@@ -710,7 +839,7 @@ export function UcpProfileView({
         </>
       )}
       pagination={
-        tab === "activity" && activityCount > actSize
+        tab === "activity" && !loading && !restriction && activityCount > actSize
           ? (
               <Pagination
                 currentPage={actPage}
@@ -724,18 +853,28 @@ export function UcpProfileView({
           : undefined
       }
     >
-      {tab === "overview" && <WidgetCanvasView initialSlots={overviewSlots} />}
-      {tab === "snapshot" && <SnapshotTab contact={contact} />}
-      {tab === "activity" && (
-        <ActivityTab
-          contact={contact}
-          channel={channel}
-          onChannelChange={c => { setChannel(c); setActPage(1) }}
-          page={actPage}
-          pageSize={actSize}
-        />
+      {/* The body follows the header's state. Three mutually exclusive cases,
+          in the order the header resolves them: in flight, governed, readable. */}
+      {loading ? (
+        <LoadingBody />
+      ) : restriction ? (
+        <RestrictedBody name={contact.name} scope={restriction.scope} />
+      ) : (
+        <>
+          {tab === "overview" && <WidgetCanvasView initialSlots={overviewSlots} />}
+          {tab === "snapshot" && <SnapshotTab contact={contact} />}
+          {tab === "activity" && (
+            <ActivityTab
+              contact={contact}
+              channel={channel}
+              onChannelChange={c => { setChannel(c); setActPage(1) }}
+              page={actPage}
+              pageSize={actSize}
+            />
+          )}
+          {tab === "drives" && <DrivesTab contact={contact} onPreview={setDrivePeek} />}
+        </>
       )}
-      {tab === "drives" && <DrivesTab contact={contact} onPreview={setDrivePeek} />}
 
       <ConciergeChat contact={contact} open={chatOpen} onClose={() => setChatOpen(false)} />
 

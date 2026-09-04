@@ -41,11 +41,11 @@ import { Input }             from "@/components/ui/input"
 import { Chip }              from "@/components/ui/chip"
 import { anchorFromEvent, useDropdownPosition } from "@/lib/dropdown-anchor"
 import type { DropdownAnchor } from "@/lib/dropdown-anchor"
-import { Sparkle, Send, Plus, Contact as ContactIcon } from "lucide-react"
+import { Sparkle, Send, Plus, Lock, Contact as ContactIcon } from "lucide-react"
 import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
 import {
   CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
-  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG, entityState,
+  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG, entityState, restrictionFor,
   getActivity, getDrives, getFacts,
 } from "./ucpShared"
 import type { UcpContact, UcpEntityType, UcpStatus } from "./ucpShared"
@@ -382,6 +382,16 @@ export default function PMThomasUcpContactsScreen() {
         tooltip:  `Source · ${c.source.label}. The system this record was pulled from.`,
       },
       { iconName: "Hash", label: c.id, tooltip: `Record ID · ${c.id}` },
+      // Only on a record the viewer cannot read through. It belongs on the row
+      // rather than only inside the profile: finding out that a record is
+      // governed after opening it is the version of this that wastes a click.
+      ...(restrictionFor(c)
+        ? [{
+            iconName: "Lock",
+            label:    "Restricted",
+            tooltip:  `Restricted · needs the ${restrictionFor(c)!.scope} scope, which your role does not hold.`,
+          }]
+        : []),
     ],
     // Secondary metadata. Four items, values only — no field labels on the row,
     // because the tooltip is what names the field. The spec puts a job title and
@@ -613,22 +623,52 @@ export default function PMThomasUcpContactsScreen() {
               <Tag variant={STATUS_TAG[preview.status]} size="sm">{preview.status}</Tag>
               <Tag variant={TYPE_TAG[preview.type]} size="sm">{TYPE_LABEL[preview.type]}</Tag>
             </div>
-            <div
-              style={{
-                background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)",
-                borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
-              }}
-            >
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-fg)" }}>
-                {preview.agent.name} · {preview.aiSummary.confidence}% confidence
-              </span>
-              <span style={{ fontSize: 12, color: "var(--tag-purple-fg)", lineHeight: 1.6 }}>
-                {preview.aiSummary.detail}
-              </span>
-            </div>
+
+            {/* The same gate as the profile, applied here too. A preview that
+                prints the agent's read, the email and the fact counts of a
+                record whose profile says the values are governed would make the
+                restriction decorative — the panel is the easier door, so it has
+                to be the same door. What survives is directory-level: who owns
+                the record and where it came from. */}
+            {restrictionFor(preview) ? (
+              <div
+                style={{
+                  background: "var(--card-primary-bg)", border: "1px solid var(--field-border)",
+                  borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
+                }}
+              >
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>
+                  <Lock size={13} />
+                  Governed by {restrictionFor(preview)!.scope}
+                </span>
+                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
+                  {restrictionFor(preview)!.note}
+                </span>
+              </div>
+            ) : (
+              <div
+                style={{
+                  background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)",
+                  borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
+                }}
+              >
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-fg)" }}>
+                  {preview.agent.name} · {preview.aiSummary.confidence}% confidence
+                </span>
+                <span style={{ fontSize: 12, color: "var(--tag-purple-fg)", lineHeight: 1.6 }}>
+                  {preview.aiSummary.detail}
+                </span>
+              </div>
+            )}
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
+              {(restrictionFor(preview)
+                ? [
+                    { label: "Record ID", value: preview.id            },
+                    { label: "Owner",     value: preview.owner         },
+                    { label: "Source",    value: preview.source.label  },
+                  ]
+                : [
                 { label: "Record ID",        value: preview.id                                       },
                 { label: "Owner",            value: preview.owner                                    },
                 { label: "Email",            value: preview.email                                    },
@@ -636,7 +676,7 @@ export default function PMThomasUcpContactsScreen() {
                 { label: "Verified facts",   value: `${getFacts(preview).filter(f => f.plane === "truth").length} on the Truth plane` },
                 { label: "Activity",         value: `${getActivity(preview).length} events`          },
                 { label: "Drives attached",  value: `${getDrives(preview).length} sources`           },
-              ].map(row => (
+              ]).map(row => (
                 <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                   <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{row.label}</span>
                   <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{row.value}</span>

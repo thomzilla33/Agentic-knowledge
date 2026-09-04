@@ -22,10 +22,10 @@ index faf5f4f..5f28ec1 100644
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
 diff --git a/src/components/experimental/entity-header.tsx b/src/components/experimental/entity-header.tsx
 new file mode 100644
-index 0000000..05a32a8
+index 0000000..c256c41
 --- /dev/null
 +++ b/src/components/experimental/entity-header.tsx
-@@ -0,0 +1,542 @@
+@@ -0,0 +1,550 @@
 +// DS-GAP: EntityHeader — identity card for a Unified Entity Profile. Built from
 +// Figma node 19815-101547 ("Entity Header - WIP"). Closest DS component:
 +// RecordHeader (src/components/ui/record-header.tsx), which this supersedes on
@@ -265,14 +265,22 @@ index 0000000..05a32a8
 +  )
 +}
 +
-+/** Title truncates last: flex 0 1 auto with min-width 0, ellipsis, full value in a tooltip. Never wraps. */
-+function Title({ title, muted }: { title: string; muted?: boolean }) {
++/**
++ * Title truncates last: flex 0 1 auto with min-width 0, ellipsis, full value in
++ * a tooltip. Never wraps.
++ *
++ * It renders at full strength in every state, Restricted included. Restricted
++ * governs the entity's VALUES, not its identity — the name is already visible
++ * in the list the viewer came from, and dimming it would say the name itself is
++ * uncertain. Priorities 1 to 3 are never dropped and never weakened.
++ */
++function Title({ title }: { title: string }) {
 +  return (
 +    <Tooltip content={title} side="cursor" triggerClassName="block min-w-0">
 +      <h1
 +        style={{
 +          fontSize: 20, fontWeight: 600, lineHeight: 1.2, margin: 0,
-+          color: muted ? "var(--field-supporting)" : "var(--color-text-title)",
++          color: "var(--color-text-title)",
 +          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
 +        }}
 +      >
@@ -500,7 +508,7 @@ index 0000000..05a32a8
 +      {/* flex 0 1 auto + min-width 0: the title takes what remains after visual,
 +          source, collapsed tags and actions, and truncates only there. */}
 +      <div style={{ flex: "0 1 auto", minWidth: 0, marginLeft: 4 }}>
-+        <Title title={title} muted={restricted} />
++        <Title title={title} />
 +      </div>
 +      {shownSource && !stacked && (
 +        <>
@@ -753,10 +761,10 @@ index 0000000..b9b89b8
 +export default NextBestActionCard
 diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
 new file mode 100644
-index 0000000..e8bd4ad
+index 0000000..54d63eb
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-contacts.tsx
-@@ -0,0 +1,680 @@
+@@ -0,0 +1,720 @@
 +/**
 + * UCP — Contacts list.
 + *
@@ -800,11 +808,11 @@ index 0000000..e8bd4ad
 +import { Chip }              from "@/components/ui/chip"
 +import { anchorFromEvent, useDropdownPosition } from "@/lib/dropdown-anchor"
 +import type { DropdownAnchor } from "@/lib/dropdown-anchor"
-+import { Sparkle, Send, Plus, Contact as ContactIcon } from "lucide-react"
++import { Sparkle, Send, Plus, Lock, Contact as ContactIcon } from "lucide-react"
 +import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
 +import {
 +  CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
-+  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG, entityState,
++  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG, entityState, restrictionFor,
 +  getActivity, getDrives, getFacts,
 +} from "./ucpShared"
 +import type { UcpContact, UcpEntityType, UcpStatus } from "./ucpShared"
@@ -1141,6 +1149,16 @@ index 0000000..e8bd4ad
 +        tooltip:  `Source · ${c.source.label}. The system this record was pulled from.`,
 +      },
 +      { iconName: "Hash", label: c.id, tooltip: `Record ID · ${c.id}` },
++      // Only on a record the viewer cannot read through. It belongs on the row
++      // rather than only inside the profile: finding out that a record is
++      // governed after opening it is the version of this that wastes a click.
++      ...(restrictionFor(c)
++        ? [{
++            iconName: "Lock",
++            label:    "Restricted",
++            tooltip:  `Restricted · needs the ${restrictionFor(c)!.scope} scope, which your role does not hold.`,
++          }]
++        : []),
 +    ],
 +    // Secondary metadata. Four items, values only — no field labels on the row,
 +    // because the tooltip is what names the field. The spec puts a job title and
@@ -1372,22 +1390,52 @@ index 0000000..e8bd4ad
 +              <Tag variant={STATUS_TAG[preview.status]} size="sm">{preview.status}</Tag>
 +              <Tag variant={TYPE_TAG[preview.type]} size="sm">{TYPE_LABEL[preview.type]}</Tag>
 +            </div>
-+            <div
-+              style={{
-+                background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)",
-+                borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
-+              }}
-+            >
-+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-fg)" }}>
-+                {preview.agent.name} · {preview.aiSummary.confidence}% confidence
-+              </span>
-+              <span style={{ fontSize: 12, color: "var(--tag-purple-fg)", lineHeight: 1.6 }}>
-+                {preview.aiSummary.detail}
-+              </span>
-+            </div>
++
++            {/* The same gate as the profile, applied here too. A preview that
++                prints the agent's read, the email and the fact counts of a
++                record whose profile says the values are governed would make the
++                restriction decorative — the panel is the easier door, so it has
++                to be the same door. What survives is directory-level: who owns
++                the record and where it came from. */}
++            {restrictionFor(preview) ? (
++              <div
++                style={{
++                  background: "var(--card-primary-bg)", border: "1px solid var(--field-border)",
++                  borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
++                }}
++              >
++                <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>
++                  <Lock size={13} />
++                  Governed by {restrictionFor(preview)!.scope}
++                </span>
++                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
++                  {restrictionFor(preview)!.note}
++                </span>
++              </div>
++            ) : (
++              <div
++                style={{
++                  background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)",
++                  borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
++                }}
++              >
++                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-fg)" }}>
++                  {preview.agent.name} · {preview.aiSummary.confidence}% confidence
++                </span>
++                <span style={{ fontSize: 12, color: "var(--tag-purple-fg)", lineHeight: 1.6 }}>
++                  {preview.aiSummary.detail}
++                </span>
++              </div>
++            )}
 +
 +            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-+              {[
++              {(restrictionFor(preview)
++                ? [
++                    { label: "Record ID", value: preview.id            },
++                    { label: "Owner",     value: preview.owner         },
++                    { label: "Source",    value: preview.source.label  },
++                  ]
++                : [
 +                { label: "Record ID",        value: preview.id                                       },
 +                { label: "Owner",            value: preview.owner                                    },
 +                { label: "Email",            value: preview.email                                    },
@@ -1395,7 +1443,7 @@ index 0000000..e8bd4ad
 +                { label: "Verified facts",   value: `${getFacts(preview).filter(f => f.plane === "truth").length} on the Truth plane` },
 +                { label: "Activity",         value: `${getActivity(preview).length} events`          },
 +                { label: "Drives attached",  value: `${getDrives(preview).length} sources`           },
-+              ].map(row => (
++              ]).map(row => (
 +                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
 +                  <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{row.label}</span>
 +                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{row.value}</span>
@@ -1439,10 +1487,10 @@ index 0000000..e8bd4ad
 +}
 diff --git a/src/screens/pm-thomas-ucp-profile.tsx b/src/screens/pm-thomas-ucp-profile.tsx
 new file mode 100644
-index 0000000..e67d8c1
+index 0000000..2ea43a2
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-profile.tsx
-@@ -0,0 +1,834 @@
+@@ -0,0 +1,973 @@
 +/**
 + * UCP — Unified Contact Profile (detail view).
 + *
@@ -1477,6 +1525,17 @@ index 0000000..e67d8c1
 + * shows only the parent list above the card. Printing the name and state twice,
 + * 40px apart, is the thing that spec is avoiding.
 + *
++ * The header's own state set is exercised here rather than described:
++ *   Loading     → the first paint of a record fetch, re-armed per record id.
++ *   Restricted  → a record whose values sit behind a scope the viewer does not
++ *                 hold. Decided by the session against the record, never by a
++ *                 flag on the record. The body follows the header — leaving the
++ *                 facts on screen under a "these are governed" header would be
++ *                 the page contradicting the header.
++ *   Minimum     → on scroll, per above.
++ *   Responsive  → driven by a ResizeObserver on the header's CARD, because that
++ *                 is what the spec says the breakpoint belongs to.
++ *
 + * Tabs: Overview · Snapshot · Activity · Drives
 + *   Overview  → WidgetCanvasView (DS rule: any tab named Overview is a canvas)
 + *   Snapshot  → this record's facts by knowledge plane (Truth / Sandbox / Sources)
@@ -1484,7 +1543,7 @@ index 0000000..e67d8c1
 + *   Drives    → the Source Drives attached to this record
 + */
 +
-+import { useMemo, useState } from "react"
++import { useEffect, useMemo, useRef, useState } from "react"
 +import { ScreenLayout }      from "@/components/layouts/screen-layout"
 +import { WidgetCanvasView }  from "@/components/layouts/widget-canvas-view"
 +import type { CanvasSlot }   from "@/components/layouts/widget-canvas-view"
@@ -1505,12 +1564,13 @@ index 0000000..e67d8c1
 +import { HighlightIcon }     from "@/components/ui/highlight-icon"
 +import { Pagination }        from "@/components/ui/pagination"
 +import { SlideOut }          from "@/components/ui/slide-out"
++import { Skeleton }          from "@/components/ui/skeleton"
 +import { EntityHeader }        from "@/components/experimental/entity-header"
 +import { NextBestActionCard }  from "@/components/experimental/next-best-action-card"
-+import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch } from "lucide-react"
++import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch, Lock } from "lucide-react"
 +import {
 +  PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
-+  TYPE_LABEL, entityState,
++  TYPE_LABEL, entityState, restrictionFor,
 +  getActivity, getConciergeOpening, getConnections, getDrives,
 +  getFacts, getGovernance, getRisk,
 +} from "./ucpShared"
@@ -1968,6 +2028,97 @@ index 0000000..e67d8c1
 +  )
 +}
 +
++// ── Body states ───────────────────────────────────────────────────────────────
++
++/**
++ * The body while the record is in flight. It exists so the loading header is
++ * not a skeleton sitting on top of finished content — a screen that says
++ * "loading" in one place and shows real values in another is stating two
++ * different things about the same record.
++ *
++ * Not an EmptyState: "nothing here" is untrue while data is on the wire.
++ */
++function LoadingBody() {
++  return (
++    <div style={{ display: "flex", flexDirection: "column", gap: 12 }} aria-busy="true">
++      <CardContainer size="lg" variant="default" className="w-full">
++        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++          <Skeleton shape="text" width={220} height={16} />
++          <Skeleton shape="text" width="100%" height={12} />
++          <Skeleton shape="text" width="82%"  height={12} />
++        </div>
++      </CardContainer>
++      <div style={{ display: "flex", gap: 12 }}>
++        {[0, 1, 2].map(i => (
++          <CardContainer key={i} size="lg" variant="default" className="flex-1">
++            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++              <Skeleton shape="text" width={120} height={14} />
++              {[0, 1, 2].map(r => (
++                <div key={r} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
++                  <Skeleton shape="text" width={96} height={12} />
++                  <Skeleton shape="text" width={48} height={12} />
++                </div>
++              ))}
++            </div>
++          </CardContainer>
++        ))}
++      </div>
++    </div>
++  )
++}
++
++/**
++ * The body for a record the viewer cannot read. It replaces the tab content
++ * rather than sitting beside it: leaving the facts, timeline and drives on
++ * screen under a header that says the values are governed would be the header
++ * telling the truth and the page contradicting it.
++ *
++ * The tabs stay mounted and switchable. They are part of the record's shape,
++ * and hiding them would misrepresent what the tenant holds — the restriction is
++ * on the values, not on the structure.
++ */
++function RestrictedBody({ name, scope }: { name: string; scope: string }) {
++  return (
++    <EmptyState
++      icon={Lock}
++      title={`Governed by ${scope}`}
++      description={`${name}'s record is intact and indexed. Reading its values needs the ${scope} scope, which your role does not hold — nothing here is missing or broken.`}
++      ctaLabel="Request access"
++      onCta={() => {}}
++    />
++  )
++}
++
++/**
++ * The Entity Header's size axis is driven by the width of the card it sits in,
++ * not the viewport: "the breakpoint it responds to is the card's, not the
++ * viewport's". Same reason the header takes `size` as a prop instead of using a
++ * media query — a header inside a 640px side panel on a 1920px monitor has to
++ * reflow, and a media query would never fire.
++ *
++ * The threshold is where the default single row stops fitting: visual, title,
++ * source, two collapsed tags and the fixed action group. Below it the header
++ * stacks; it never shrinks the title to keep the row.
++ */
++const HEADER_STACK_THRESHOLD = 760
++
++function useCardSize(): [React.RefObject<HTMLDivElement | null>, "default" | "responsive"] {
++  const ref = useRef<HTMLDivElement>(null)
++  const [width, setWidth] = useState(9999)
++
++  useEffect(() => {
++    const el = ref.current
++    if (!el) return
++    const ro = new ResizeObserver(entries => {
++      for (const entry of entries) setWidth(entry.contentRect.width)
++    })
++    ro.observe(el)
++    return () => ro.disconnect()
++  }, [])
++
++  return [ref, width < HEADER_STACK_THRESHOLD ? "responsive" : "default"]
++}
++
 +// ── Profile view ──────────────────────────────────────────────────────────────
 +
 +export function UcpProfileView({
@@ -1994,6 +2145,29 @@ index 0000000..e67d8c1
 +  const openInfo = () => { setChatOpen(false); setDrivePeek(null); setInfoOpen(true) }
 +
 +  const state = entityState(contact)
++
++  // The header stacks on the width of its own card, so the card is what gets
++  // measured. On a 1440 desktop it is ~1100px and the header stays on one row;
++  // in a narrow window or a collapsed layout the same card crosses the
++  // threshold and the header reflows without the viewport being consulted.
++  const [headerCardRef, headerSize] = useCardSize()
++
++  // A record is fetched, so there is a first paint where it does not exist yet,
++  // and the header's Loading state is what belongs there. Re-armed per record:
++  // navigating from one contact to another is a new fetch, not a re-render of
++  // the old one.
++  const [loading, setLoading] = useState(true)
++  useEffect(() => {
++    setLoading(true)
++    const timer = setTimeout(() => setLoading(false), 700)
++    return () => clearTimeout(timer)
++  }, [contact.id])
++
++  // Restricted is decided by what the viewer holds against what the record
++  // needs — never by a flag on the record itself. null when nothing is gated.
++  const restriction = restrictionFor(contact)
++
++  const headerVariant = loading ? "loading" : restriction ? "restricted" : "default"
 +
 +  const activityCount = useMemo(() => {
 +    const all = getActivity(contact)
@@ -2099,7 +2273,7 @@ index 0000000..e67d8c1
 +              preference: the card has to sit directly below the header and
 +              never under a nav layer, or it reads as belonging to the active
 +              tab instead of to the record. */}
-+          <div style={{ padding: "0 32px 8px" }}>
++          <div ref={headerCardRef} style={{ padding: "0 32px 8px" }}>
 +            <CardContainer size="lg" variant="default" className="w-full">
 +              <EntityHeader
 +                visual={{ kind: "avatar" }}
@@ -2109,6 +2283,9 @@ index 0000000..e67d8c1
 +                tags={contact.tags}
 +                meta={contact.meta}
 +                minimum={isScrolled}
++                variant={headerVariant}
++                size={headerSize}
++                restrictedNote={restriction?.note}
 +                onAsk={openChat}
 +                onInformation={openInfo}
 +                menuActions={[
@@ -2127,7 +2304,7 @@ index 0000000..e67d8c1
 +              holds its position directly below the header; on scroll the
 +              identity and the tabs stay and the proposal yields, and it comes
 +              back at the top of the page. */}
-+          {!isScrolled && nbaDismissed !== contact.id && contact.nba && (
++          {!isScrolled && !loading && !restriction && nbaDismissed !== contact.id && contact.nba && (
 +            <div style={{ padding: "0 32px 8px" }}>
 +              <NextBestActionCard
 +                action={contact.nba}
@@ -2155,7 +2332,7 @@ index 0000000..e67d8c1
 +        </>
 +      )}
 +      pagination={
-+        tab === "activity" && activityCount > actSize
++        tab === "activity" && !loading && !restriction && activityCount > actSize
 +          ? (
 +              <Pagination
 +                currentPage={actPage}
@@ -2169,18 +2346,28 @@ index 0000000..e67d8c1
 +          : undefined
 +      }
 +    >
-+      {tab === "overview" && <WidgetCanvasView initialSlots={overviewSlots} />}
-+      {tab === "snapshot" && <SnapshotTab contact={contact} />}
-+      {tab === "activity" && (
-+        <ActivityTab
-+          contact={contact}
-+          channel={channel}
-+          onChannelChange={c => { setChannel(c); setActPage(1) }}
-+          page={actPage}
-+          pageSize={actSize}
-+        />
++      {/* The body follows the header's state. Three mutually exclusive cases,
++          in the order the header resolves them: in flight, governed, readable. */}
++      {loading ? (
++        <LoadingBody />
++      ) : restriction ? (
++        <RestrictedBody name={contact.name} scope={restriction.scope} />
++      ) : (
++        <>
++          {tab === "overview" && <WidgetCanvasView initialSlots={overviewSlots} />}
++          {tab === "snapshot" && <SnapshotTab contact={contact} />}
++          {tab === "activity" && (
++            <ActivityTab
++              contact={contact}
++              channel={channel}
++              onChannelChange={c => { setChannel(c); setActPage(1) }}
++              page={actPage}
++              pageSize={actSize}
++            />
++          )}
++          {tab === "drives" && <DrivesTab contact={contact} onPreview={setDrivePeek} />}
++        </>
 +      )}
-+      {tab === "drives" && <DrivesTab contact={contact} onPreview={setDrivePeek} />}
 +
 +      <ConciergeChat contact={contact} open={chatOpen} onClose={() => setChatOpen(false)} />
 +
@@ -3217,10 +3404,10 @@ index 3ffff9f..0000000
 -}
 diff --git a/src/screens/ucpShared.ts b/src/screens/ucpShared.ts
 new file mode 100644
-index 0000000..ebe0751
+index 0000000..a60f2ed
 --- /dev/null
 +++ b/src/screens/ucpShared.ts
-@@ -0,0 +1,892 @@
+@@ -0,0 +1,934 @@
 +/**
 + * UCP — Unified Contact Profile: shared types + mock data.
 + *
@@ -3278,6 +3465,14 @@ index 0000000..ebe0751
 +   * created in the platform itself; the slot is removed, never refilled.
 +   */
 +  source:          { label: string; iconName: string }
++  /**
++   * The entitlement scope a viewer must hold to read this record's governed
++   * values. Undefined means the record carries nothing scope-gated beyond the
++   * access that got the viewer to the list. This is a property of the VIEWER's
++   * relationship to the record, not of the record: the same row renders in full
++   * for someone who holds the scope.
++   */
++  requiredScope?:  string
 +  /** Signals first (by severity), then classification. Max 6 including overflow. */
 +  tags:            EntityTag[]
 +  /** Max 6, aim for four. Every item carries a tooltip naming its field. */
@@ -3335,6 +3530,37 @@ index 0000000..ebe0751
 + */
 +export function entityState(c: UcpContact): { label: string; variant: TagVariantLite } {
 +  return c.stateBadge ?? { label: c.status, variant: STATUS_TAG[c.status] }
++}
++
++// ── Entitlements ──────────────────────────────────────────────────────────────
++
++/**
++ * The scopes the signed-in viewer holds. Hardcoded here because the prototype
++ * has no identity provider — in the product this comes from the session, and
++ * nothing else about the code below changes.
++ *
++ * Thomas is a PM: he can read contacts and HR records, and he cannot read
++ * finance. That last omission is the point — it is what makes the Entity
++ * Header's Restricted state reachable from a real rule instead of a mock flag.
++ */
++export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
++
++/**
++ * Restricted is a state, not a failure, and the copy has to say so. It never
++ * suggests the viewer did something wrong and never implies the record is
++ * broken: the fields exist, they are governed, and here is the scope that opens
++ * them. The record itself stays visible — hiding it would tell the viewer
++ * something untrue about what the tenant holds.
++ *
++ * Returns null when the viewer holds what the record needs.
++ */
++export function restrictionFor(c: UcpContact): { scope: string; note: string } | null {
++  if (!c.requiredScope) return null
++  if (VIEWER_SCOPES.includes(c.requiredScope)) return null
++  return {
++    scope: c.requiredScope,
++    note: `These values are governed by ${c.requiredScope}, which your role does not hold. The record exists and is intact — request the scope to read it.`,
++  }
 +}
 +// ── Knowledge planes ──────────────────────────────────────────────────────────
 +
@@ -3673,6 +3899,9 @@ index 0000000..ebe0751
 +    owner: "Priya Nair", status: "Inactive", lastInteraction: "Apr 3, 2026",
 +    stateBadge: { label: "Superseded", variant: "neutral" },
 +    source: { label: "Salesforce", iconName: "Cloud" },
++    // The only scope-gated record in the set: she is the CFO, so her values sit
++    // behind finance.read, which the PM viewing this prototype does not hold.
++    requiredScope: "finance.read",
 +    tags: [
 +      { label: "Inactive", role: "signal", tone: "neutral", severity: 1, tooltip: "Lifecycle · marked inactive Apr 3" },
 +      { label: "Person",   role: "classification" },
