@@ -207,6 +207,33 @@ imprimir "None open" sería falso en varios — Halden tiene dos checks de segur
 abiertos, Riverbend tiene 41 órdenes de reparación vencidas. Ese número necesita
 un campo real en el modelo antes de poder ir en la fila.
 
+### La fila lleva el Next Best Action, no el resumen del agente
+
+El bloque púrpura de la fila decía "AI read" y mostraba el titular del agente.
+Ahora dice **AI Next Best Action** y lleva la recomendación del registro: título,
+cuándo, y por qué. Sin el rationale sería una orden, no una propuesta — misma
+regla que la card del perfil.
+
+Un roster se escanea para decidir qué abrir a continuación, y la recomendación es
+lo que responde eso. El resumen del agente no se perdió: sigue en el widget del
+Overview y en el preview del ojo, donde hay espacio para él.
+
+El bloque usa la misma familia púrpura que la card del Next Best Action en el
+perfil, así que la fila y la card hablan el mismo idioma. Colapsa pasando los 80
+caracteres y **View more** abre el registro, que es la ruta por defecto de la
+propia card (*"the safe path is always the one that opens the record"*).
+
+**El caso borde: sin acción, sin bloque.** Diez de los dieciséis registros
+tienen una recomendación; los otros seis no llevan bloque en absoluto. Es la
+regla 3 de la card aplicada a la fila — *"No Next Best Action, no card. The
+container does not render. This is not an empty state: there is nothing to say
+when there is nothing to do."*
+
+La ausencia es la señal, y en un listado eso funciona mejor que un texto: se
+escanea buscando púrpura para encontrar los registros que quieren una decisión.
+Grace Okafor, Sarah Chen, David Park, Amy Chen, Marcus Webb y Elena Fischer son
+las filas tranquilas.
+
 ### Fuera el SwitchTab de tarjetas/tabla
 
 No va en esta versión. Se fue el `SwitchTab`, la vista de tabla y sus columnas.
