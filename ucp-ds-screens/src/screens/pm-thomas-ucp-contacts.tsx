@@ -20,7 +20,7 @@
  * leaving the list.
  */
 
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { ScreenLayout }      from "@/components/layouts/screen-layout"
 import { Header }            from "@/components/ui/header"
 import { Tabs }              from "@/components/ui/tabs"
@@ -302,9 +302,16 @@ export default function PMThomasUcpContactsScreen() {
   const dropdown = useDropdownPosition(anchor)
 
   const [preview,    setPreview]    = useState<UcpContact | null>(null)
-  const [kebab,      setKebab]      = useState<UcpContact | null>(null)
-  const [kebabAnchor, setKebabAnchor] = useState<DropdownAnchor | null>(null)
-  const kebabDropdown = useDropdownPosition(kebabAnchor)
+  // El anchor y el "abrir" tienen que cambiar en el MISMO commit. useDropdownPosition
+  // mide el panel en useLayoutEffect y sale temprano si todavía no está montado;
+  // si el anchor se fija en la fase de captura y el panel recién aparece cuando
+  // el onMenuClick burbujea, el efecto ya corrió contra un ref nulo y el flip
+  // nunca se recalcula — el menú se sale por la derecha en vez de alinearse por
+  // el otro borde. Por eso un solo estado lleva las dos cosas, que además es el
+  // uso que documenta el propio helper: el panel se gatea SOLO por el anchor.
+  const pendingAnchor = useRef<DropdownAnchor | null>(null)
+  const [kebab, setKebab] = useState<{ contact: UcpContact; anchor: DropdownAnchor } | null>(null)
+  const kebabDropdown = useDropdownPosition(kebab?.anchor ?? null)
   const [archiving,  setArchiving]  = useState<UcpContact | null>(null)
   const [chatOpen,   setChatOpen]   = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
@@ -369,10 +376,20 @@ export default function PMThomasUcpContactsScreen() {
   }
 
   const toItem = (c: UcpContact): EntityListItemData => ({
-    id:          c.id,
-    title:       c.name,
-    iconName:    TYPE_ICON[c.type],
-    iconVariant: c.type === "company" ? "light-blue" : c.type === "employee" ? "purple" : "info",
+    id:    c.id,
+    title: c.name,
+    // Una persona lleva avatar; una compañía lleva icono. La pregunta es si la
+    // entidad tiene identidad visual propia — una cara o una marca. Customers y
+    // employees son personas con nombre, y sus iniciales dicen más que un
+    // glifo repetido en diez filas iguales: el icono de tipo era el mismo para
+    // todos los employees, así que no distinguía nada. La clasificación sigue
+    // visible en el tag de la derecha, que es donde vive.
+    //
+    // Las compañías se quedan con el HighlightIcon: no hay logo en el modelo,
+    // y unas iniciales derivadas de una razón social se leen como una persona.
+    ...(c.type === "company"
+      ? { iconName: TYPE_ICON[c.type], iconVariant: "light-blue" as const }
+      : { avatarName: c.name }),
     // Top row is context plus identifier: the source (one item, always visible,
     // per the shared content model) and the record ID.
     primaryMeta: [
@@ -553,9 +570,11 @@ export default function PMThomasUcpContactsScreen() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {paged.map(c => (
-            <div key={c.id} onClickCapture={e => { setKebabAnchor(anchorFromEvent(e)) }}>
+            <div key={c.id} onClickCapture={e => { pendingAnchor.current = anchorFromEvent(e) }}>
               <CardContainer size="sm" className="!p-0 overflow-hidden">
-                <EntityList items={[{ ...toItem(c), onMenuClick: () => setKebab(c) }]} />
+                <EntityList items={[{ ...toItem(c), onMenuClick: () => {
+                  if (pendingAnchor.current) setKebab({ contact: c, anchor: pendingAnchor.current })
+                } }]} />
               </CardContainer>
             </div>
           ))}
@@ -593,12 +612,12 @@ export default function PMThomasUcpContactsScreen() {
       )}
 
       {/* ── Row kebab — Archive + Duplicate are the DS defaults ── */}
-      {kebab && kebabAnchor && (
+      {kebab && (
         <>
           <div className="fixed inset-0 z-[10000]" onClick={() => setKebab(null)} />
           <div ref={kebabDropdown.ref} style={{ position: "fixed", zIndex: 10001, ...kebabDropdown.style }}>
             <Menu>
-              <MenuItem size="sm" label="Archive"   leadingIcon={<HighlightIcon size="sm" variant="neutral" iconName="Archive" />}  onClick={() => { setArchiving(kebab); setKebab(null) }} />
+              <MenuItem size="sm" label="Archive"   leadingIcon={<HighlightIcon size="sm" variant="neutral" iconName="Archive" />}  onClick={() => { setArchiving(kebab.contact); setKebab(null) }} />
               <MenuItem size="sm" label="Duplicate" leadingIcon={<HighlightIcon size="sm" variant="neutral" iconName="Copy" />}     onClick={() => setKebab(null)} />
             </Menu>
           </div>
