@@ -81,37 +81,92 @@ export function isReadable(t: EntityTypeDef): boolean {
 }
 
 /**
- * A saved view: a filter over the workspace, given a name.
+ * Order the viewer has actually touched these types, most recent first. Types
+ * absent from the list have never been opened.
  *
- * This is the load-bearing idea. "Customers" was a tab because there were three
- * types and tabs were cheap; at twelve it stops being navigation and becomes an
- * arbitrary eight-of-twelve. A view answers "where am I?" honestly — I am in MY
- * view — and it is bounded by a person's attention rather than by the tenant's
- * schema.
+ * Research-driven. No documented platform groups entity types by their schema
+ * namespace for end users: Dataverse orders its result tabs by relevance of the
+ * results rather than by any fixed taxonomy, Salesforce puts a flat searchable
+ * "All Items" above its per-app grouping, and HubSpot does not group at all.
+ * Grouping by model was inventing a pattern. Usage and a searchable name are the
+ * two axes with support.
  *
- * `types: []` means every readable type: a genuinely cross-type view, which a
- * tab strip cannot express at all.
+ * Menu BREADTH also turned out to matter more than label quality: broad,
+ * well-labelled menus dropped fallback-to-search to under 10%, narrow ones
+ * pushed it to about 40%. So the catalog is one flat list, not five collapsed
+ * groups — and the model stays on the row as metadata, where it is still
+ * findable by search without becoming the structure.
  */
-export interface SavedView {
-  id:      string
-  label:   string
-  types:   string[]
-  /** Set when the platform generated it from a type rather than a person saving it. */
-  derived?: boolean
-  hint?:   string
+export const RECENTLY_USED: string[] = ["customer", "vehicle", "dealership", "employee", "company"]
+
+export function byUsage(a: EntityTypeDef, b: EntityTypeDef): number {
+  const ia = RECENTLY_USED.indexOf(a.id)
+  const ib = RECENTLY_USED.indexOf(b.id)
+  if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib)
+  return b.records - a.records
 }
 
 /**
- * What a viewer lands on. The first three are pinned by this person; the rest
- * are generated one-per-readable-type, so a tenant that has published only
- * three types sees exactly what the tab strip showed before — no migration, no
- * regression, and the change only becomes visible once it is needed.
+ * Saved views, scoped to ONE type.
+ *
+ * This is the correction. The earlier draft put cross-type views on the primary
+ * tab strip; prior art does not support that. HubSpot's saved views ARE the
+ * index-page tabs — configurable per object — but always within a type, never as
+ * the top level. Carbon sanctions user-curated tabs "to focus a specific data
+ * set or search results" and in the same breath says "Do not use as navigation"
+ * and "Do not use when tabs contain frequently used or critical information".
+ * Both halves land: views-as-tabs is right, views-as-the-way-you-change-type is
+ * not.
+ *
+ * `type: null` means the view belongs to the Inbox instead — see INBOX_VIEWS.
  */
-export const SAVED_VIEWS: SavedView[] = [
-  { id: "my-open",     label: "My open work",     types: [],                        hint: "Everything assigned to me, any type" },
-  { id: "riverbend",   label: "Riverbend",        types: ["vehicle", "dealership", "customer"], hint: "One account, across three types" },
-  { id: "needs-nba",   label: "Needs a decision", types: [],                        hint: "Records with a Next Best Action" },
-  ...ENTITY_TYPES.filter(isReadable).map(t => ({
-    id: `type-${t.id}`, label: t.label, types: [t.id], derived: true,
-  })),
+export interface SavedView {
+  id:    string
+  label: string
+  type:  string | null
+  hint?: string
+}
+
+/** Every type gets a default view, so a type is never a blank tab strip. */
+export function viewsForType(typeId: string): SavedView[] {
+  const base: SavedView = { id: `${typeId}-all`, label: "All", type: typeId }
+  const extra: Record<string, SavedView[]> = {
+    customer:   [{ id: "cust-mine", label: "Mine",          type: "customer",   hint: "Accounts I own" },
+                 { id: "cust-nba",  label: "Needs a decision", type: "customer" }],
+    vehicle:    [{ id: "veh-service", label: "In service",  type: "vehicle" },
+                 { id: "veh-mine",    label: "My stores",   type: "vehicle" }],
+    employee:   [{ id: "emp-mine",  label: "My team",       type: "employee" }],
+    dealership: [{ id: "dlr-review", label: "Under review", type: "dealership" }],
+  }
+  return [base, ...(extra[typeId] ?? [])]
+}
+
+/**
+ * The Inbox — the one place a mixed-type list is defensible.
+ *
+ * Prior art puts every heterogeneous surface behind SEARCH, deliberately
+ * degraded: Dataverse caps the mixed grid at six columns, drops sort, and offers
+ * only the three facets that exist on every type (Owner, Modified On, Created
+ * On). A mixed surface is for FINDING, not for working — which is why the roster
+ * went back to one type at a time.
+ *
+ * What prior art could not weigh is that this platform has a Next Best Action.
+ * "What needs a decision" is cross-type by nature and is an inbox by nature, so
+ * it gets the one role the evidence does concede to a mixed list — and it lives
+ * under My Work in the sidebar, away from the roster, rather than pretending to
+ * be the door to it.
+ *
+ * The columns it can show are declared, not discovered. See INBOX_COLUMNS.
+ */
+export const INBOX_VIEWS: SavedView[] = [
+  { id: "inbox-nba",  label: "Needs a decision", type: null, hint: "Records where an agent has proposed something" },
+  { id: "inbox-mine", label: "Assigned to me",   type: null, hint: "Everything I own, any type" },
 ]
+
+/**
+ * The fields every published type is guaranteed to carry, and therefore the only
+ * ones a mixed list may show. Declared here rather than derived per query, so
+ * that adding a type cannot silently empty a column — which is the failure mode
+ * behind Dataverse's three-facet floor.
+ */
+export const INBOX_COLUMNS = ["Type", "Record", "Owner", "State", "Last activity"] as const
