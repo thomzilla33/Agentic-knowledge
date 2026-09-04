@@ -10,12 +10,20 @@
  * nothing in that spec's structure is specific to a record shape, and it puts
  * the Next Best Action in its own card BELOW the header rather than inside it.
  *
- * The identity card is pinned: it lives in ScreenLayout's header zone, which
- * sits outside the scroll container. On scroll it collapses to the spec's
- * Minimum state — visual, title and state badge, the three priorities that are
- * never dropped at any width — plus the action row, which is fixed and never
- * compressed. The Next Best Action card is NOT pinned: it is a separate record
- * below the header, so it scrolls with the content.
+ * The whole record chrome is pinned — identity card, Next Best Action, tabs —
+ * in ScreenLayout's header zone, which sits outside the scroll container. On
+ * scroll the header collapses to the spec's Minimum state: visual, title and
+ * state badge, the three priorities never dropped at any width, plus the action
+ * row, which is fixed and never compressed.
+ *
+ * The order inside the pinned zone is the spec's, not a preference. The Next
+ * Best Action has to sit directly below the header and never under a nav layer,
+ * so pinning the tabs meant pinning the card above them too — a card rendered
+ * under the tabs reads as belonging to the active tab rather than to the record.
+ * The cost is height: on a record that has a recommendation the pinned chrome is
+ * about a third of a 1000px viewport at rest, and the spec's own escape valve is
+ * the card's dismiss (session-only). Records with nothing to do carry no card
+ * and no gap where one would have been.
  *
  * One deviation from CLAUDE.md's generic detail-page rule, and it is deliberate:
  * the page Header does NOT repeat the entity name, status tag and breadcrumb.
@@ -638,8 +646,14 @@ export function UcpProfileView({
             onBack={() => onBack?.()}
           />
           {/* Pinned: ScreenLayout's header zone is outside the scroll
-              container. 32px sides so the card's edges line up with the
-              content scrolling underneath it. */}
+              container. 32px sides so the edges line up with the content
+              scrolling underneath.
+
+              The whole record chrome pins, in the spec's own order — header,
+              then the Next Best Action, then the tabs. The order is not a
+              preference: the card has to sit directly below the header and
+              never under a nav layer, or it reads as belonging to the active
+              tab instead of to the record. */}
           <div style={{ padding: "0 32px 8px" }}>
             <CardContainer size="lg" variant="default" className="w-full">
               <EntityHeader
@@ -660,6 +674,39 @@ export function UcpProfileView({
               />
             </CardContainer>
           </div>
+
+          {/* No action, no card — and no gap where it would have been.
+              It also steps aside once you start reading: pinning a full-height
+              proposal forever is the thing the card's own rule 2 objects to
+              ("stacked cards push the real content below the fold"). At rest it
+              holds its position directly below the header; on scroll the
+              identity and the tabs stay and the proposal yields, and it comes
+              back at the top of the page. */}
+          {!isScrolled && nbaDismissed !== contact.id && contact.nba && (
+            <div style={{ padding: "0 32px 8px" }}>
+              <NextBestActionCard
+                action={contact.nba}
+                onAccept={() => {}}
+                onViewDetails={openChat}
+                onDismiss={() => setNbaDismissed(contact.id)}
+              />
+            </div>
+          )}
+
+          {/* 16px here plus ScreenLayout's own 8px of content padding is the
+              24px the DS wants between the last nav layer and the content. */}
+          <div style={{ padding: "0 32px 16px" }}>
+            <Tabs
+              activeId={tab}
+              onChange={goTab}
+              items={[
+                { id: "overview", label: "Overview" },
+                { id: "snapshot", label: "Snapshot" },
+                { id: "activity", label: "Activity" },
+                { id: "drives",   label: "Drives"   },
+              ]}
+            />
+          </div>
         </>
       )}
       pagination={
@@ -677,31 +724,6 @@ export function UcpProfileView({
           : undefined
       }
     >
-      {/* Under the header, never inside it — and it scrolls: the card is a
-          separate record, not part of the identity the header pins. */}
-      {nbaDismissed !== contact.id && (
-        <div>
-          <NextBestActionCard
-            action={contact.nba}
-            onAccept={() => {}}
-            onViewDetails={openChat}
-            onDismiss={() => setNbaDismissed(contact.id)}
-          />
-        </div>
-      )}
-
-      <Tabs
-        className="mt-[24px] mb-[24px]"
-        activeId={tab}
-        onChange={goTab}
-        items={[
-          { id: "overview", label: "Overview" },
-          { id: "snapshot", label: "Snapshot" },
-          { id: "activity", label: "Activity" },
-          { id: "drives",   label: "Drives"   },
-        ]}
-      />
-
       {tab === "overview" && <WidgetCanvasView initialSlots={overviewSlots} />}
       {tab === "snapshot" && <SnapshotTab contact={contact} />}
       {tab === "activity" && (
