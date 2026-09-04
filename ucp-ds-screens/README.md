@@ -91,6 +91,12 @@ Overview:
 - **Nada envuelve, nada se abrevia.** Título, tags, source y metadata truncan con
   elipsis y entregan el valor completo al tooltip. El título cede al final: los
   tags colapsan en `+N` antes de que el identificador pierda un carácter.
+- **El header queda pineado al hacer scroll.** Vive en la zona de header de
+  `ScreenLayout`, que está fuera del contenedor con scroll. Al bajar colapsa al
+  **estado Minimum** que el propio spec define — *"Only visual, title and state.
+  No description, no tags, no metadata. The header stays valid."* — más la fila
+  de acciones, que es fija y nunca se comprime. La card del Next Best Action
+  **no** se pinea: es un registro aparte y baja con el contenido.
 - **Las tres acciones no son tres botones.** `Ask` es el botón con gradiente que
   abre el Personal Assistant — habla, no ejecuta, y por eso no puede compartir la
   marca visual del Next Best Action, que sí pide una decisión. `(i)` abre el

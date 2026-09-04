@@ -10,6 +10,13 @@
  * nothing in that spec's structure is specific to a record shape, and it puts
  * the Next Best Action in its own card BELOW the header rather than inside it.
  *
+ * The identity card is pinned: it lives in ScreenLayout's header zone, which
+ * sits outside the scroll container. On scroll it collapses to the spec's
+ * Minimum state — visual, title and state badge, the three priorities that are
+ * never dropped at any width — plus the action row, which is fixed and never
+ * compressed. The Next Best Action card is NOT pinned: it is a separate record
+ * below the header, so it scrolls with the content.
+ *
  * One deviation from CLAUDE.md's generic detail-page rule, and it is deliberate:
  * the page Header does NOT repeat the entity name, status tag and breadcrumb.
  * The Entity Header spec makes its own title the page subject ("the title
@@ -622,13 +629,38 @@ export function UcpProfileView({
       activeSidebarId="contacts"
       onSidebarItemClick={onSidebarItemClick}
       header={isScrolled => (
-        <Header
-          size={isScrolled ? "compress" : "size-m"}
-          title="Contacts"
-          backButton
-          showBackInCompress
-          onBack={() => onBack?.()}
-        />
+        <>
+          <Header
+            size={isScrolled ? "compress" : "size-m"}
+            title="Contacts"
+            backButton
+            showBackInCompress
+            onBack={() => onBack?.()}
+          />
+          {/* Pinned: ScreenLayout's header zone is outside the scroll
+              container. 32px sides so the card's edges line up with the
+              content scrolling underneath it. */}
+          <div style={{ padding: "0 32px 8px" }}>
+            <CardContainer size="lg" variant="default" className="w-full">
+              <EntityHeader
+                visual={{ kind: "avatar" }}
+                title={contact.name}
+                source={contact.source}
+                state={state}
+                tags={contact.tags}
+                meta={contact.meta}
+                minimum={isScrolled}
+                onAsk={openChat}
+                onInformation={openInfo}
+                menuActions={[
+                  { label: "Archive",       onClick: () => {} },
+                  { label: "Duplicate",     onClick: () => {} },
+                  { label: "Export record", onClick: () => {} },
+                ]}
+              />
+            </CardContainer>
+          </div>
+        </>
       )}
       pagination={
         tab === "activity" && activityCount > actSize
@@ -645,28 +677,10 @@ export function UcpProfileView({
           : undefined
       }
     >
-      {/* The header has no container of its own — the card is the caller's. */}
-      <CardContainer size="lg" variant="default" className="w-full">
-        <EntityHeader
-          visual={{ kind: "avatar" }}
-          title={contact.name}
-          source={contact.source}
-          state={state}
-          tags={contact.tags}
-          meta={contact.meta}
-          onAsk={openChat}
-          onInformation={openInfo}
-          menuActions={[
-            { label: "Archive",       onClick: () => {} },
-            { label: "Duplicate",     onClick: () => {} },
-            { label: "Export record", onClick: () => {} },
-          ]}
-        />
-      </CardContainer>
-
-      {/* Under the header, never inside it. No action, no card. */}
+      {/* Under the header, never inside it — and it scrolls: the card is a
+          separate record, not part of the identity the header pins. */}
       {nbaDismissed !== contact.id && (
-        <div className="mt-[16px]">
+        <div>
           <NextBestActionCard
             action={contact.nba}
             onAccept={() => {}}
