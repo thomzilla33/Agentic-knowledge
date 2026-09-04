@@ -170,30 +170,48 @@ del header y a ancho completo.
 | Documents | Reemplazado por **Drives** (Source Drives del catálogo de la compañía) |
 | Snapshot | Nuevo tab: los hechos del registro por plano de conocimiento |
 
-### La fila del listado muestra el source, no los campos de referencia
+### Qué muestra la fila del listado
 
-`Owner` y `Last interaction` salieron de la metadata de la fila. Son hechos de
-referencia, no algo que la fila necesite mostrar: viajan en el tooltip de la fila
-superior, donde ya vive el contexto de identidad (`VP of Operations · Meridian
-Corp · Owner Priya Nair · Last interaction Sep 2, 2026 · email`). El email se fue
-con ellos.
-
-Lo que queda en la fila es **el source** — el sistema del que se extrajo el
-registro, un ítem y nunca dos. Los valores cubren cinco industrias y seis
-sistemas: Salesforce (servicios financieros), Epic (salud), NetSuite
-(industrial), HubSpot (un piloto que entró por marketing), CDK Global
-(automotriz) y Workday (los empleados).
+**Fila superior — contexto e identificador.** El `source` y el ID del registro.
+El spec mantiene el source siempre visible como el ítem de contexto, un ítem y
+nunca dos: los valores cubren cinco industrias y seis sistemas — Salesforce
+(servicios financieros), Epic (salud), NetSuite (industrial), HubSpot (un piloto
+que entró por marketing), CDK Global (automotriz) y Workday (los empleados).
 
 **El source es consistente dentro de una cuenta.** Los contactos de Meridian
 comparten Salesforce porque salen del mismo sistema; inventar variedad dentro de
-una sola cuenta sería mentir sobre la procedencia. La variedad va entre cuentas,
-que es donde existe de verdad.
+una sola cuenta sería mentir sobre la procedencia, que es justo lo que ese slot
+existe para declarar. La variedad va entre cuentas, donde existe de verdad.
 
 Para que el DMS fuera honesto y no decorativo hubo que agregar una cuenta
 automotriz: **Riverbend Auto Group** y su director de fixed operations, ambos
 desde CDK Global. Ninguno de los 14 registros anteriores era automotriz, y
 colgarle un DMS a una empresa de logística habría sido falso. El roster pasa a
 16.
+
+**Fila inferior — metadata secundaria, cuatro ítems, solo valores.** Sin
+etiquetas de campo en la fila: el tooltip es lo que nombra el campo, que es
+exactamente la regla del spec (*"Icon — what kind of information this is · Text —
+the value · Tooltip — the field label + context"*).
+
+| Ítem | Ejemplo | Por qué está |
+|---|---|---|
+| Rol · Compañía | `VP of Operations · Meridian Corp` | El spec lo pone aquí explícitamente: un cargo y una compañía madre están bajo **NOT A SOURCE** — *"they belong in tags or in secondary metadata"* |
+| Owner | `Priya Nair` | Solo el nombre. Para un customer, la persona a quien preguntar. El tooltip nombra el campo y agrega la última interacción |
+| Hechos verificados | `5 verified` | Cuánto del registro está atestiguado — gobernanza lo requiere visible |
+| Agente asignado | `Deal Concierge` | El spec lo nombra como metadata que califica, y AIMS OS es agent-first: todo registro tiene uno |
+
+**Por qué no va un conteo de ítems abiertos**, que sería mejor que el agente en
+ese cuarto lugar: solo está modelado en 7 de los 16 registros, y para los otros 9
+imprimir "None open" sería falso en varios — Halden tiene dos checks de seguridad
+abiertos, Riverbend tiene 41 órdenes de reparación vencidas. Ese número necesita
+un campo real en el modelo antes de poder ir en la fila.
+
+### Fuera el SwitchTab de tarjetas/tabla
+
+No va en esta versión. Se fue el `SwitchTab`, la vista de tabla y sus columnas.
+Las tarjetas son el único layout, que además es el default del DS: *"The
+SwitchTab component is not shown by default."*
 
 ### El tag de `person` dice Customer
 
@@ -205,12 +223,6 @@ que el union de tipos no cambie.
 Eso arrastró dos cosas por coherencia, y son las que conviene que revises: el tab
 **"People" pasó a "Customers"** y el CTA a **"Create New Customer"**. Si preferías
 que solo cambiara el tag y el tab siguiera diciendo People, son dos líneas.
-
-### Fuera el SwitchTab de tarjetas/tabla
-
-No va en esta versión. Se fue el `SwitchTab`, la vista de tabla y sus columnas.
-Las tarjetas son el único layout, que además es el default del DS: *"The
-SwitchTab component is not shown by default."*
 
 ### El CTA de creación nombra lo que va a crear
 
