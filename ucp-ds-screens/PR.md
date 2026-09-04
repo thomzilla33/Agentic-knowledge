@@ -22,8 +22,9 @@ contacts roster, the record profile, and Overview as a tab inside it.
 - **Drives** — Source Drives from the company catalog, replacing a generic
   Documents tab.
 
-Five files. Three new screens, one additive line pair in `App.tsx`, and one prop
-on `entity-list.tsx`. **No new components, and nothing deleted.**
+Six files. Three new screens, one additive line pair in `App.tsx`, one prop on
+`entity-list.tsx`, and a three-line width fix on `record-header.tsx`. **No new
+components, and nothing deleted.**
 
 ## This started as a second header component. That was wrong.
 
@@ -75,7 +76,8 @@ header redesign."* This is that.
 
 ## The two files that need your review
 
-`.github/CODEOWNERS` gates `src/components/` and `src/App.tsx`.
+`.github/CODEOWNERS` gates `src/components/` and `src/App.tsx`. Three files fall
+under it.
 
 ### `entity-list.tsx`
 
@@ -93,6 +95,26 @@ header redesign."* This is that.
 
 The prop ships with a toggle on the entity-list playground page and a row in the
 prop table.
+
+### `record-header.tsx` — the Next Best Action block hugs its text
+
+`NextBestActionBlock` was `w-full`. A block stretched across the whole card
+makes a one-line recommendation read as a section, and leaves the chevron
+marooned an inch from the sentence it belongs to. It now sizes to its content:
+`max-w-full self-start`, with `flex-1` dropped from the inner column and the
+title, so a long one still stays inside the card and truncates as before.
+
+Three lines. The same idiom already exists in `entity-list.tsx`, which sets
+`self-start` on its insight block when the text is short.
+
+Checked against both consumers, not just this one: on this profile the block
+goes from full width to 835–865px; on `pm-thomas-universal-profile.tsx`, whose
+descriptions are much shorter ("Due in 3 days"), it lands at 376px and reads
+better than the full-width version did.
+
+**Heads-up on conflict risk:** there are four active `ds/record-header-*`
+branches. This is three lines in one component and should rebase trivially, but
+it is worth knowing before it sits in review.
 
 ### `App.tsx`
 

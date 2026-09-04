@@ -60,6 +60,33 @@ index 7be3bdd..516ed03 100644
                  </>
                )}
                {/* Inline detail: always shown when short; truncated when long+collapsed */}
+diff --git a/src/components/ui/record-header.tsx b/src/components/ui/record-header.tsx
+index 578261c..d1f028a 100644
+--- a/src/components/ui/record-header.tsx
++++ b/src/components/ui/record-header.tsx
+@@ -1057,13 +1057,19 @@ function NextBestActionBlock({ nba }: { nba: NextBestAction }) {
+     <button
+       type="button"
+       onClick={nba.onOpen}
+-      className="w-full flex items-center gap-[8px] rounded-[8px] p-[12px] text-left transition-opacity hover:opacity-90"
++      // Hugs its text instead of filling the card. A block stretched to full
++      // width makes a one-line recommendation look like a section, and the
++      // chevron ends up marooned an inch from the sentence it belongs to. The
++      // same idiom is already in entity-list.tsx, which sets `self-start` on
++      // its insight block when the text is short. `max-w-full` keeps a long
++      // one inside the card, where the title truncates as before.
++      className="max-w-full self-start flex items-center gap-[8px] rounded-[8px] p-[12px] text-left transition-opacity hover:opacity-90"
+       style={{ background: "var(--card-purple-bg)", border: "0.5px solid var(--card-purple-border)" }}
+     >
+       <HighlightIcon size="sm" variant="purple" icon={<Sparkle size={16} strokeWidth={1.75} />} className="shrink-0" />
+-      <div className="flex-1 flex flex-col gap-[2px] min-w-0">
++      <div className="flex flex-col gap-[2px] min-w-0">
+         <div className="flex items-center gap-[6px] min-w-0">
+-          <span className="flex-1 truncate text-[13px] font-semibold" style={{ color: "var(--foreground)" }}>
++          <span className="truncate text-[13px] font-semibold" style={{ color: "var(--foreground)" }}>
+             {nba.title}
+           </span>
+           {/* One context Tag per NBA — what area this action is about, at a
 diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
 new file mode 100755
 index 0000000..bbb35fc
