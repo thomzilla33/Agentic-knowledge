@@ -440,26 +440,24 @@ export default function PMThomasUcpContactsScreen() {
     // do." The absence is the signal — a reader scans for purple to find the
     // records that want a decision.
     //
-    // `showLabel: false` on purpose. EntityList renders the label as
-    // `AI {action}` — the "AI " is hardcoded in entity-list.tsx — so passing
-    // "Next Best Action" through it printed "AI Next Best Action". The Next
-    // Best Action is a named product concept, not a category of AI output, and
-    // it has to read on the row exactly as it reads on the card. So the label
-    // is turned off and the name leads the first line instead. `action` is kept
-    // for when entity-list.tsx stops prefixing and the styled label can come
-    // back — it is one character in a CODEOWNERS-gated file.
+    // `showAiPrefix: false` — EntityList's label is `AI {action}` by default,
+    // which is right when `action` names a category of output ("AI Summary",
+    // "AI Impact"). The Next Best Action is a product concept with a name of its
+    // own, so the prefix renames it: "AI Next Best Action" is a different thing
+    // from what the card below the profile header calls itself. The prefix is
+    // opted out; the label keeps its own styling.
     //
     // The detail is an array rather than one run-on string: the first line is
-    // what the row is for — the name, the proposal and when — and the rationale
-    // becomes its own bullet when expanded, which is where a reader goes to
-    // decide. All ten recommendations carry one, so the block always has
-    // something to expand into.
+    // what the row is for — the proposal and when — and the rationale becomes
+    // its own bullet when expanded, which is where a reader goes to decide. All
+    // ten recommendations carry one, so the block always has something to expand
+    // into.
     aiInsight: c.nba
       ? {
-          action:    "Next Best Action",
-          showLabel: false,
+          action:       "Next Best Action",
+          showAiPrefix: false,
           detail: [
-            `Next Best Action · ${c.nba.title} · ${c.nba.timestamp}`,
+            `${c.nba.title} · ${c.nba.timestamp}`,
             ...(c.nba.rationale ? [c.nba.rationale] : []),
           ],
           viewMore: true,

@@ -1,5 +1,5 @@
 diff --git a/src/App.tsx b/src/App.tsx
-index faf5f4f..5f28ec1 100644
+index faf5f4f..7335702 100644
 --- a/src/App.tsx
 +++ b/src/App.tsx
 @@ -7,7 +7,7 @@ import PMLexHTLWorkQueueScreen    from "./screens/pm-lex-htl-work-queue"
@@ -20,6 +20,51 @@ index faf5f4f..5f28ec1 100644
    { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
    { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
+@@ -2246,7 +2246,7 @@ const ENTITY_LIST_SPEC = {
+     { name: "primaryMeta",     type: "Array",   values: ["ELMetaItem[]"],                 default: "undefined", note: "{ iconName?, label?, tooltip?, tag? }" },
+     { name: "secondaryMeta",   type: "Array",   values: ["ELMetaItem[]"],                 default: "undefined", note: "Bottom-left row of icon+label pairs" },
+     { name: "description",     type: "string",  values: ["any string"],                   default: "undefined", note: "Collapsible body text" },
+-    { name: "aiInsight",       type: "object",  values: ["{ action, detail, showLabel?, viewMore? }"], default: "undefined", note: "Purple AI callout with Sparkle icon" },
++    { name: "aiInsight",       type: "object",  values: ["{ action, detail, showLabel?, showAiPrefix?, viewMore? }"], default: "undefined", note: "Purple AI callout with Sparkle icon. showAiPrefix: false renders `action` verbatim — for named concepts like Next Best Action" },
+     { name: "tags",            type: "Array",   values: ["{ label }[]"],                  default: "undefined" },
+     { name: "actions",         type: "Array",   values: ["ELAction[]"],                   default: "undefined", note: "{ label, variant: primary|secondary|tertiary }" },
+     { name: "state",           type: "object",  values: ["{ label, variant }"],           default: "undefined", note: "Semantic Tag shown right-side" },
+@@ -29632,6 +29632,7 @@ function EntityListPage({ openSpec }: { openSpec: (s: SpecModal) => void }) {
+   const [pgDescLong,        setPgDescLong]        = useState(true)
+   const [pgShowAI,          setPgShowAI]          = useState(true)
+   const [pgAiShowLabel,     setPgAiShowLabel]     = useState(true)
++  const [pgAiPrefix,        setPgAiPrefix]        = useState(true)
+   const [pgAiViewMore,      setPgAiViewMore]      = useState(false)
+   const [pgAiLong,          setPgAiLong]          = useState(true)
+   const [pgViewMoreOpen,    setPgViewMoreOpen]    = useState(false)
+@@ -29669,14 +29670,16 @@ function EntityListPage({ openSpec }: { openSpec: (s: SpecModal) => void }) {
+       ? {
+           ...demoEntityItems[0].aiInsight!,
+           showLabel:      pgAiShowLabel,
++          showAiPrefix:   pgAiPrefix,
+           viewMore:       pgAiViewMore,
+           onViewMore:     pgAiViewMore ? () => setPgViewMoreOpen(true) : undefined,
+           defaultExpanded: false,
+         }
+       : {
+-          action:    demoEntityItems[0].aiInsight!.action,
+-          detail:    "Billing dispute routed to finance team — review in progress.",
+-          showLabel: pgAiShowLabel,
++          action:       demoEntityItems[0].aiInsight!.action,
++          detail:       "Billing dispute routed to finance team — review in progress.",
++          showLabel:    pgAiShowLabel,
++          showAiPrefix: pgAiPrefix,
+         }
+     ) : undefined,
+     tags:                pgShowTags ? allTags.slice(0, pgTagsCount)  : undefined,
+@@ -30453,6 +30456,7 @@ export function MyList() {
+                         <Tog label="Show"                  val={pgShowAI}       set={setPgShowAI}       />
+                         <Tog label="Long text (chevron)"   val={pgAiLong}       set={setPgAiLong}       />
+                         <Tog label="«AI …» label"          val={pgAiShowLabel}  set={setPgAiShowLabel}  />
++                        <Tog label="Prefijo «AI »"         val={pgAiPrefix}     set={setPgAiPrefix}     />
+                         <Tog label="View more → Modal"     val={pgAiViewMore}   set={setPgAiViewMore}   />
+                       </div>
+                       {!pgAiLong && (
 diff --git a/src/components/experimental/entity-header.tsx b/src/components/experimental/entity-header.tsx
 new file mode 100644
 index 0000000..c256c41
@@ -759,12 +804,54 @@ index 0000000..b9b89b8
 +}
 +
 +export default NextBestActionCard
+diff --git a/src/components/ui/entity-list.tsx b/src/components/ui/entity-list.tsx
+index 7be3bdd..516ed03 100644
+--- a/src/components/ui/entity-list.tsx
++++ b/src/components/ui/entity-list.tsx
+@@ -50,11 +50,19 @@ export type EntityListItemData = {
+   // detail: string = single-line (collapses when > detailThreshold chars)
+   // detail: string[] = bullet list (always collapsible when > 1 item)
+   // showLabel: false = icon + detail only, no "AI {action}" label
++  // showAiPrefix: false = render `action` verbatim, without the "AI " prefix.
++  //   The default label is "AI {action}", which reads correctly when `action` is
++  //   a generic category of output — "AI Summary", "AI Impact", "AI Escalated".
++  //   It reads wrong when `action` is a product concept with a name of its own:
++  //   "AI Next Best Action" renames the thing. Those callers turn the prefix off
++  //   and keep the label's styling, instead of turning the whole label off and
++  //   losing it. Defaults to true — every existing caller is unchanged.
+   // viewMore: shows "View more →" button in expanded state
+   aiInsight?: {
+     action:           string
+     detail:           string | string[]
+     showLabel?:       boolean
++    showAiPrefix?:    boolean
+     viewMore?:        boolean
+     onViewMore?:      () => void  // called when "View more" is clicked — pair with ModalDialog
+     defaultExpanded?: boolean
+@@ -423,9 +431,15 @@ function EntityListRow({ item }: { item: EntityListItemData }) {
+               {ai.showLabel !== false && (
+                 <>
+                   <span className="text-[13px] font-semibold whitespace-nowrap" style={{ color: "var(--foreground)" }}>
+-                    AI {ai.action}
++                    {ai.showAiPrefix === false ? ai.action : `AI ${ai.action}`}
+                   </span>
+-                  <span className="text-[13px]" style={{ color: "var(--tag-purple-fg)" }}>·</span>
++                  {/* The separator only exists to divide the label from the
++                      inline detail. When the block is expanded the inline
++                      detail moves out of this row, so the separator was left
++                      dangling at the end of the label with nothing after it. */}
++                  {(!isLong || !aiExpanded) && (
++                    <span className="text-[13px]" style={{ color: "var(--tag-purple-fg)" }}>·</span>
++                  )}
+                 </>
+               )}
+               {/* Inline detail: always shown when short; truncated when long+collapsed */}
 diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
 new file mode 100644
-index 0000000..89e0c61
+index 0000000..72549a8
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-contacts.tsx
-@@ -0,0 +1,739 @@
+@@ -0,0 +1,737 @@
 +/**
 + * UCP — Contacts list.
 + *
@@ -1207,26 +1294,24 @@ index 0000000..89e0c61
 +    // do." The absence is the signal — a reader scans for purple to find the
 +    // records that want a decision.
 +    //
-+    // `showLabel: false` on purpose. EntityList renders the label as
-+    // `AI {action}` — the "AI " is hardcoded in entity-list.tsx — so passing
-+    // "Next Best Action" through it printed "AI Next Best Action". The Next
-+    // Best Action is a named product concept, not a category of AI output, and
-+    // it has to read on the row exactly as it reads on the card. So the label
-+    // is turned off and the name leads the first line instead. `action` is kept
-+    // for when entity-list.tsx stops prefixing and the styled label can come
-+    // back — it is one character in a CODEOWNERS-gated file.
++    // `showAiPrefix: false` — EntityList's label is `AI {action}` by default,
++    // which is right when `action` names a category of output ("AI Summary",
++    // "AI Impact"). The Next Best Action is a product concept with a name of its
++    // own, so the prefix renames it: "AI Next Best Action" is a different thing
++    // from what the card below the profile header calls itself. The prefix is
++    // opted out; the label keeps its own styling.
 +    //
 +    // The detail is an array rather than one run-on string: the first line is
-+    // what the row is for — the name, the proposal and when — and the rationale
-+    // becomes its own bullet when expanded, which is where a reader goes to
-+    // decide. All ten recommendations carry one, so the block always has
-+    // something to expand into.
++    // what the row is for — the proposal and when — and the rationale becomes
++    // its own bullet when expanded, which is where a reader goes to decide. All
++    // ten recommendations carry one, so the block always has something to expand
++    // into.
 +    aiInsight: c.nba
 +      ? {
-+          action:    "Next Best Action",
-+          showLabel: false,
++          action:       "Next Best Action",
++          showAiPrefix: false,
 +          detail: [
-+            `Next Best Action · ${c.nba.title} · ${c.nba.timestamp}`,
++            `${c.nba.title} · ${c.nba.timestamp}`,
 +            ...(c.nba.rationale ? [c.nba.rationale] : []),
 +          ],
 +          viewMore: true,
