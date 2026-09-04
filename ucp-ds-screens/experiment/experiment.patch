@@ -1,0 +1,512 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 19dcea5..72919a6 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -9,6 +9,7 @@ import PMMichaelAttentionRoomScreen from "./screens/pm-michael-attention-room"
+ import PMMichaelLoginScreen         from "./screens/pm-michael-login"
+ import PMThomasUniversalProfileScreen  from "./screens/pm-thomas-universal-profile"
+ import PMThomasUcpContactsScreen       from "./screens/pm-thomas-ucp-contacts"
++import PMThomasEntityWorkspaceScreen   from "./screens/pm-thomas-entity-workspace"
+ import PMThomasDashboardListScreen     from "./screens/pm-thomas-dashboard-list"
+ import PMThomasWidgetLibraryScreen     from "./screens/pm-thomas-widget-library"
+ import PMThomasWidgetMarketplaceScreen from "./screens/pm-thomas-widget-marketplace"
+@@ -162,6 +163,7 @@ const PROTOTYPE_PAGES: { id: string; label: string; description: string; author:
+   { id: "proto-thomas-widget-builder",    label: "Widget Builder — Thomas",      description: "Three-tab builder (Data → Widget → Appearance) with sticky live preview. Data tab: entity source picker (8 sources), operation chips (Aggregate / Record set), calc + column or exposed columns. Widget tab: 12-type gallery, name/description/freshness/filter settings. Appearance tab: accent color swatches + style variants. DS-GAP: AccentColorPalette, BuilderTabNav, EntitySourceCard, TypeTile, SkeletonShape, WidgetPreviewPanel.", author: "Thomas", component: PMThomasWidgetBuilderScreen },
+   { id: "proto-thomas-universal-profile", label: "Universal Profile — Thomas",   description: "Unified entity profile (Person, Employee, Company) aggregating Governance, Risk, and Connections studies — Overview canvas with adaptive study widgets (hidden when empty, error+retry when failed), Activity feed (last 20), paginated Logs, Edit + Export for all types, Archive for Person/Employee only", author: "Thomas", component: PMThomasUniversalProfileScreen },
+   { id: "proto-thomas-ucp-contacts",   label: "UCP - Contacts Last version", description: "The whole UCP flow in one prototype: contacts roster (tabs by type, filters, create per type) → record profile with RecordHeader, Overview canvas, Snapshot by knowledge plane, Activity and Drives. Exercises the header's loading and governed/masked states.", author: "Thomas", component: PMThomasUcpContactsScreen },
++  { id: "proto-thomas-entity-workspace", label: "UCP - Entity workspace (experimento)", description: "EXPERIMENTO, lado a lado con la card de arriba. Responde qué pasa cuando el tenant publica 12 tipos de entidad y no 3: los tabs llevan vistas guardadas en vez de tipos, y el catálogo completo — agrupado por modelo de Data Studio, con governance y tipos bloqueados por scope — vive detrás de All entities. El tipo pasa a ser un filtro.", author: "Thomas", component: PMThomasEntityWorkspaceScreen },
+   { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
+   { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
+   { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
+diff --git a/src/screens/entityRegistry.ts b/src/screens/entityRegistry.ts
+new file mode 100644
+index 0000000..1a3e6a2
+--- /dev/null
++++ b/src/screens/entityRegistry.ts
+@@ -0,0 +1,117 @@
++/**
++ * Entity type registry — the experiment behind `pm-thomas-entity-workspace.tsx`.
++ *
++ * This file exists to answer one question: what happens to the roster when a
++ * tenant publishes not three entity types but forty.
++ *
++ * ── Where these come from ─────────────────────────────────────────────────
++ * Nothing here is invented. Data Studio → Models is the source of truth for
++ * entity types: a model (`crm_core`) holds entities (`account`), each with a
++ * field count, a governance status, permissions and a physical table, authored
++ * through AI Assist and then PUBLISHED. So the shape below is the shape the
++ * platform already has — this registry is the read-only projection of it that a
++ * record surface needs, not a second definition of it.
++ *
++ * `model` is kept as the grouping because it is the schema's own grouping, and
++ * it already carries governance. OPEN QUESTION for Michael: whether Model is
++ * allowed to surface here at all, or whether it stays a Data Studio concept and
++ * the record surface groups by the model's Category instead.
++ *
++ * ── Why a registry rather than a union type ───────────────────────────────
++ * The moment types are tenant-defined, any `type: "person" | "employee"` in the
++ * UI is a lie with a compile step. RecordHeader already made this call in its
++ * agnosticism pass — "this file never enumerates entity types" — and a roster
++ * that enumerates them contradicts the component it renders.
++ */
++
++export interface EntityTypeDef {
++  id:        string
++  /** Plural, as it appears in navigation. The tenant's word, not ours. */
++  label:     string
++  singular:  string
++  iconName:  string
++  /** Data Studio model this entity belongs to — the schema's own grouping. */
++  model:     string
++  /** Straight from the entity card in Data Studio. */
++  governance: "governed" | "in review" | "draft"
++  fields:    number
++  records:   number
++  /**
++   * Scope the viewer needs. Undefined = readable by anyone with record access.
++   * Same mechanism as the record-level gate: decided by the session against the
++   * type, never a flag meaning "hidden".
++   */
++  requiredScope?: string
++}
++
++export const MODEL_LABEL: Record<string, string> = {
++  crm_core:        "CRM Core",
++  people_ops:      "People Ops",
++  dealership_ops:  "Dealership Ops",
++  finance_core:    "Finance Core",
++  compliance:      "Compliance",
++}
++
++/**
++ * Twelve published types across five models. Deliberately more than fits in a
++ * tab strip, and deliberately uneven: some carry thousands of records, some
++ * carry none yet, one is still in draft, and two are governed by a scope this
++ * viewer does not hold. A registry that is uniform proves nothing.
++ */
++export const ENTITY_TYPES: EntityTypeDef[] = [
++  { id: "customer",    label: "Customers",     singular: "Customer",     iconName: "UserRound",     model: "crm_core",       governance: "governed",  fields: 34, records: 1284 },
++  { id: "company",     label: "Companies",     singular: "Company",      iconName: "Building2",     model: "crm_core",       governance: "governed",  fields: 28, records: 312 },
++  { id: "deal",        label: "Deals",         singular: "Deal",         iconName: "Handshake",     model: "crm_core",       governance: "governed",  fields: 22, records: 96 },
++  { id: "employee",    label: "Employees",     singular: "Employee",     iconName: "IdCard",        model: "people_ops",     governance: "governed",  fields: 41, records: 1600 },
++  { id: "team",        label: "Teams",         singular: "Team",         iconName: "Users",         model: "people_ops",     governance: "governed",  fields: 12, records: 88 },
++  { id: "vehicle",     label: "Vehicles",      singular: "Vehicle",      iconName: "Car",           model: "dealership_ops", governance: "governed",  fields: 47, records: 3810 },
++  { id: "dealership",  label: "Dealerships",   singular: "Dealership",   iconName: "Store",         model: "dealership_ops", governance: "governed",  fields: 31, records: 24 },
++  { id: "test-drive",  label: "Test drives",   singular: "Test drive",   iconName: "Route",         model: "dealership_ops", governance: "in review", fields: 15, records: 210 },
++  { id: "trade-in",    label: "Trade-ins",     singular: "Trade-in",     iconName: "Repeat",        model: "dealership_ops", governance: "draft",     fields: 9,  records: 0   },
++  { id: "invoice",     label: "Invoices",      singular: "Invoice",      iconName: "Receipt",       model: "finance_core",   governance: "governed",  fields: 26, records: 4402, requiredScope: "finance.read" },
++  { id: "payout",      label: "Payouts",       singular: "Payout",       iconName: "Banknote",      model: "finance_core",   governance: "governed",  fields: 18, records: 970,  requiredScope: "finance.read" },
++  { id: "policy",      label: "Policies",      singular: "Policy",       iconName: "ShieldCheck",   model: "compliance",     governance: "governed",  fields: 14, records: 57  },
++]
++
++/** The scopes the signed-in viewer holds — same set the record surface uses. */
++export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
++
++export function isReadable(t: EntityTypeDef): boolean {
++  return !t.requiredScope || VIEWER_SCOPES.includes(t.requiredScope)
++}
++
++/**
++ * A saved view: a filter over the workspace, given a name.
++ *
++ * This is the load-bearing idea. "Customers" was a tab because there were three
++ * types and tabs were cheap; at twelve it stops being navigation and becomes an
++ * arbitrary eight-of-twelve. A view answers "where am I?" honestly — I am in MY
++ * view — and it is bounded by a person's attention rather than by the tenant's
++ * schema.
++ *
++ * `types: []` means every readable type: a genuinely cross-type view, which a
++ * tab strip cannot express at all.
++ */
++export interface SavedView {
++  id:      string
++  label:   string
++  types:   string[]
++  /** Set when the platform generated it from a type rather than a person saving it. */
++  derived?: boolean
++  hint?:   string
++}
++
++/**
++ * What a viewer lands on. The first three are pinned by this person; the rest
++ * are generated one-per-readable-type, so a tenant that has published only
++ * three types sees exactly what the tab strip showed before — no migration, no
++ * regression, and the change only becomes visible once it is needed.
++ */
++export const SAVED_VIEWS: SavedView[] = [
++  { id: "my-open",     label: "My open work",     types: [],                        hint: "Everything assigned to me, any type" },
++  { id: "riverbend",   label: "Riverbend",        types: ["vehicle", "dealership", "customer"], hint: "One account, across three types" },
++  { id: "needs-nba",   label: "Needs a decision", types: [],                        hint: "Records with a Next Best Action" },
++  ...ENTITY_TYPES.filter(isReadable).map(t => ({
++    id: `type-${t.id}`, label: t.label, types: [t.id], derived: true,
++  })),
++]
+diff --git a/src/screens/pm-thomas-entity-workspace.tsx b/src/screens/pm-thomas-entity-workspace.tsx
+new file mode 100644
+index 0000000..be0d923
+--- /dev/null
++++ b/src/screens/pm-thomas-entity-workspace.tsx
+@@ -0,0 +1,363 @@
++/**
++ * Entity Workspace — the scaling experiment for the record roster.
++ *
++ * SIDE-BY-SIDE WITH THE APPROVED VERSION. This screen does not replace
++ * `pm-thomas-ucp-contacts.tsx`; both are registered, so the two doors can be
++ * opened one after the other and compared. Reverting is deleting this file,
++ * `entityRegistry.ts`, and the two lines that register them — nothing else in
++ * the prototype is touched.
++ *
++ * ── The problem ───────────────────────────────────────────────────────────
++ * The approved roster navigates by type: All · Customers · Employees ·
++ * Companies. That works at three types and stops working the moment a tenant
++ * publishes forty — vehicles, dealerships, invoices, policies. Not because they
++ * do not fit: because a tab strip ASSERTS that what it shows is the set. Eight
++ * tabs out of forty types are not a summary of forty, they are an arbitrary
++ * eight, in an order that is the same for every tenant when the set is not.
++ *
++ * ── The actual bug is older than the scale ────────────────────────────────
++ * `Tabs` is documented as "Where am I?" — primary navigation. The List View
++ * pattern is documented as "Filters as the single source of truth for the
++ * dataset". The type tabs change which rows are listed without changing where
++ * you are, so they are a second source of truth for the dataset. That is
++ * already wrong at three types; forty only makes it visible.
++ *
++ * ── What this tries ───────────────────────────────────────────────────────
++ * Two questions were being answered by one control, and they have different
++ * shapes:
++ *
++ *   "Take me to what I work with"  — constant, personal, a handful → TABS,
++ *      carrying saved VIEWS rather than types. Bounded by a person's attention
++ *      instead of by the tenant's schema, and it answers "where am I?" truly:
++ *      in my view.
++ *
++ *   "What does this tenant even hold?" — rare, needs completeness → a CATALOG,
++ *      one permanent door away, grouped by the Data Studio model each type
++ *      belongs to, showing governance and record counts.
++ *
++ * Type stops being a place and becomes a filter, which is where the DS already
++ * said the dataset is decided. The payoff is not only that it scales: once type
++ * is an attribute, "everything about Riverbend" is expressible across vehicles,
++ * dealerships and customers at once — which a tab strip can never say.
++ *
++ * At three published types the derived views make this render exactly like the
++ * approved roster, so nothing regresses on a small tenant.
++ */
++
++import { useMemo, useState } from "react"
++import { ScreenLayout }      from "@/components/layouts/screen-layout"
++import { Header }            from "@/components/ui/header"
++import { Tabs }              from "@/components/ui/tabs"
++import { Tag }               from "@/components/ui/tag"
++import { Chip }              from "@/components/ui/chip"
++import { Button }            from "@/components/ui/button"
++import { CardContainer }     from "@/components/ui/card-container"
++import { EntityList }        from "@/components/ui/entity-list"
++import type { EntityListItemData } from "@/components/ui/entity-list"
++import { EmptyState }        from "@/components/ui/empty-state"
++import { HighlightIcon }     from "@/components/ui/highlight-icon"
++import { Filters }           from "@/components/ui/filters"
++import { Pagination }        from "@/components/ui/pagination"
++import { SlideOut }          from "@/components/ui/slide-out"
++import { LayoutGrid, Plus, Lock, Search } from "lucide-react"
++import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
++import {
++  ENTITY_TYPES, MODEL_LABEL, SAVED_VIEWS, isReadable,
++} from "./entityRegistry"
++import type { EntityTypeDef } from "./entityRegistry"
++import { CONTACTS } from "./ucpShared"
++
++// ── Records ───────────────────────────────────────────────────────────────────
++// The sixteen contacts from the approved prototype keep their data and gain a
++// registry type id; vehicles and dealerships are added so the cross-type view
++// has something to cross. Deliberately NOT repair orders — that was declined.
++
++interface WorkspaceRecord {
++  id:       string
++  typeId:   string
++  title:    string
++  subtitle: string
++  owner:    string
++  source:   string
++  state:    { label: string; variant: "success" | "error" | "alert" | "informative" | "neutral" }
++  nba?:     string
++  mine?:    boolean
++}
++
++const EXTRA: WorkspaceRecord[] = [
++  { id: "VEH-88214", typeId: "vehicle",    title: "2024 Ford F-150 Lariat",  subtitle: "VIN 1FTFW1E5•••4821 · Riverbend Tampa",  owner: "Daniel Ruiz",  source: "CDK Global", state: { label: "In service",  variant: "alert" },        nba: "Approve the extended warranty quote · 2h ago", mine: true },
++  { id: "VEH-88250", typeId: "vehicle",    title: "2023 Toyota RAV4 XLE",    subtitle: "VIN 2T3P1RFV•••0913 · Riverbend Brandon", owner: "Daniel Ruiz",  source: "CDK Global", state: { label: "Available",   variant: "success" } },
++  { id: "VEH-88301", typeId: "vehicle",    title: "2025 Honda CR-V Sport",   subtitle: "VIN 7FARW2H5•••1177 · Riverbend Tampa",   owner: "Marcus Delgado", source: "CDK Global", state: { label: "Reserved",  variant: "informative" } },
++  { id: "DLR-0004",  typeId: "dealership", title: "Riverbend Tampa",         subtitle: "Automotive Retail · 240 employees · Tampa, FL", owner: "Daniel Ruiz", source: "CDK Global", state: { label: "Active", variant: "success" }, nba: "Rebalance the service load across four stores · 5h ago", mine: true },
++  { id: "DLR-0007",  typeId: "dealership", title: "Riverbend Brandon",       subtitle: "Automotive Retail · 96 employees · Brandon, FL", owner: "Marcus Delgado", source: "CDK Global", state: { label: "Under review", variant: "informative" } },
++  { id: "TEA-0012",  typeId: "team",       title: "Service Operations",      subtitle: "People Ops · 34 members · Tampa, FL",       owner: "Elena Fischer", source: "Workday",  state: { label: "Active", variant: "success" } },
++  { id: "POL-0031",  typeId: "policy",     title: "Sub-processor disclosure", subtitle: "Compliance · reviewed quarterly",          owner: "Sarah Chen",   source: "Helix",     state: { label: "Active", variant: "success" } },
++]
++
++const RECORDS: WorkspaceRecord[] = [
++  ...CONTACTS.map(c => ({
++    id: c.id,
++    typeId: c.type === "person" ? "customer" : c.type === "employee" ? "employee" : "company",
++    title: c.name,
++    subtitle: c.subtitle,
++    owner: c.owner,
++    source: c.source.label,
++    state: { label: c.status, variant: (c.status === "Active" ? "success" : "neutral") as WorkspaceRecord["state"]["variant"] },
++    nba: c.nba ? `${c.nba.title} · ${c.nba.timestamp}` : undefined,
++    mine: c.owner === "Priya Nair",
++  })),
++  ...EXTRA,
++]
++
++const TYPE_BY_ID = new Map(ENTITY_TYPES.map(t => [t.id, t]))
++
++// ── Catalog ───────────────────────────────────────────────────────────────────
++
++const GOV_TAG: Record<EntityTypeDef["governance"], "success" | "alert" | "neutral"> = {
++  governed:    "success",
++  "in review": "alert",
++  draft:       "neutral",
++}
++
++/**
++ * The rare door, and the honest one. Grouped by the Data Studio model each type
++ * belongs to, because that is the schema's own grouping and it already carries
++ * governance — not a grouping invented for this screen.
++ *
++ * Types the viewer cannot read are SHOWN, locked. Hiding them would misstate
++ * what the tenant holds, which is the same call the record surface already
++ * makes for a governed record: the thing exists, and the scope is named.
++ */
++function EntityCatalog({
++  open, onClose, onPick,
++}: { open: boolean; onClose: () => void; onPick: (t: EntityTypeDef) => void }) {
++  const [q, setQ] = useState("")
++  const models = useMemo(() => {
++    const hit = ENTITY_TYPES.filter(t =>
++      !q || t.label.toLowerCase().includes(q.toLowerCase()) || MODEL_LABEL[t.model].toLowerCase().includes(q.toLowerCase()))
++    const by = new Map<string, EntityTypeDef[]>()
++    hit.forEach(t => by.set(t.model, [...(by.get(t.model) ?? []), t]))
++    return [...by.entries()]
++  }, [q])
++
++  return (
++    <SlideOut
++      open={open} onClose={onClose} type="with-variants" size="m"
++      title="All entities"
++      subtitle={`${ENTITY_TYPES.length} published types · ${new Set(ENTITY_TYPES.map(t => t.model)).size} models`}
++      showIcon iconContent={<LayoutGrid size={14} />}
++      showStatus={false} showTopButton={false} showTabs={false} showSearchBar={false} showChips={false} showCta={false}
++    >
++      <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
++        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
++          <HighlightIcon size="sm" variant="neutral" iconName="Search" />
++          <input
++            value={q}
++            onChange={e => setQ(e.target.value)}
++            placeholder="Search types or models…"
++            style={{
++              flex: 1, background: "var(--field-bg)", border: "1px solid var(--field-border)",
++              borderRadius: 8, padding: "8px 10px", fontSize: 12, color: "var(--foreground)", outline: "none",
++            }}
++          />
++        </div>
++
++        {models.length === 0 ? (
++          <EmptyState compact icon={Search} title="No types match" description="Try the model name instead." />
++        ) : models.map(([model, types]) => (
++          <div key={model} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
++            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
++              {MODEL_LABEL[model]}
++            </span>
++            {types.map(t => {
++              const readable = isReadable(t)
++              return (
++                <CardContainer key={t.id} size="sm" className="w-full">
++                  <button
++                    type="button"
++                    disabled={!readable}
++                    onClick={() => { onPick(t); onClose() }}
++                    style={{
++                      width: "100%", display: "flex", alignItems: "center", gap: 10, textAlign: "left",
++                      background: "transparent", border: "none", padding: 0,
++                      cursor: readable ? "pointer" : "not-allowed", opacity: readable ? 1 : 0.55,
++                    }}
++                  >
++                    <HighlightIcon size="sm" variant={readable ? "informative" : "neutral"} iconName={t.iconName} />
++                    <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
++                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{t.label}</span>
++                      <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>
++                        {t.records.toLocaleString()} records · {t.fields} fields
++                      </span>
++                    </div>
++                    {!readable && (
++                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--field-supporting)" }}>
++                        <Lock size={12} /> {t.requiredScope}
++                      </span>
++                    )}
++                    <Tag variant={GOV_TAG[t.governance]} size="sm">{t.governance}</Tag>
++                  </button>
++                </CardContainer>
++              )
++            })}
++          </div>
++        ))}
++      </div>
++    </SlideOut>
++  )
++}
++
++// ── Screen ────────────────────────────────────────────────────────────────────
++
++const PAGE = 8
++
++export default function PMThomasEntityWorkspaceScreen() {
++  const [viewId,      setViewId]      = useState(SAVED_VIEWS[0].id)
++  const [catalogOpen, setCatalogOpen] = useState(false)
++  const [search,      setSearch]      = useState("")
++  const [page,        setPage]        = useState(1)
++
++  const view = SAVED_VIEWS.find(v => v.id === viewId) ?? SAVED_VIEWS[0]
++
++  // A person keeps a handful of views on the strip; the rest of the published
++  // types live one click away in the catalog. Bounded by attention, not schema.
++  const tabViews = SAVED_VIEWS.slice(0, 6)
++  const onStrip  = tabViews.some(v => v.id === viewId)
++
++  const rows = useMemo(() => {
++    let r = RECORDS.filter(x => {
++      const t = TYPE_BY_ID.get(x.typeId)
++      if (!t || !isReadable(t)) return false
++      if (view.id === "my-open")   return x.mine
++      if (view.id === "needs-nba") return Boolean(x.nba)
++      if (view.types.length)       return view.types.includes(x.typeId)
++      return true
++    })
++    if (search) {
++      const q = search.toLowerCase()
++      r = r.filter(x => [x.title, x.subtitle, x.owner, x.id].some(f => f.toLowerCase().includes(q)))
++    }
++    return r
++  }, [view, search])
++
++  const shown = rows.slice((page - 1) * PAGE, page * PAGE)
++
++  const toItem = (r: WorkspaceRecord): EntityListItemData => {
++    const t = TYPE_BY_ID.get(r.typeId)!
++    return {
++      id: r.id,
++      title: r.title,
++      // Type is no longer the row's identity — it is one of its attributes, and
++      // it earns a tag like any other. The icon says what kind of thing it is
++      // because a mixed list genuinely needs that; in a single-type view it is
++      // redundant but harmless, and dropping it per-view would make the same
++      // record render differently depending on how you arrived.
++      iconName:    t.iconName,
++      iconVariant: "info",
++      primaryMeta: [
++        { iconName: "Hash",  label: r.id,     tooltip: `Record ID · ${r.id}` },
++        { iconName: "Cloud", label: r.source, tooltip: `Source · ${r.source}` },
++      ],
++      secondaryMeta: [
++        { iconName: "Info",      label: r.subtitle, tooltip: r.subtitle },
++        { iconName: "UserRound", label: r.owner,    tooltip: `Owner · ${r.owner}` },
++      ],
++      aiInsight: r.nba
++        ? { action: "Next Best Action", showAiPrefix: false, detail: r.nba }
++        : undefined,
++      tags:  [{ label: t.singular }],
++      state: r.state,
++      showMenu: true,
++      onMenuClick: () => {},
++    }
++  }
++
++  return (
++    <ScreenLayout
++      workspaceName="Riverbend Group"
++      userName="Thomas González"
++      userEmail="thomas.gonzalez@aimsos.ai"
++      sidebarItems={UCP_SIDEBAR_ITEMS}
++      activeSidebarId="contacts"
++      header={isScrolled => (
++        <Header
++          size={isScrolled ? "compress" : "size-l"}
++          title="Records"
++          description="Every entity type this workspace publishes, in one place."
++          primaryAction={{ label: `New ${view.types.length === 1 ? TYPE_BY_ID.get(view.types[0])!.singular : "record"}`, icon: Plus, onClick: () => {} }}
++          secondaryAction={{ label: "All entities", icon: LayoutGrid, onClick: () => setCatalogOpen(true) }}
++        />
++      )}
++      pagination={
++        rows.length > PAGE
++          ? <Pagination currentPage={page} totalItems={rows.length} itemsPerPage={PAGE} onPageChange={setPage} rowsPerPageOptions={[8, 25, 50]} />
++          : undefined
++      }
++    >
++      {/* Views, not types. The strip is bounded by what this person keeps, and
++          the catalog holds the rest — so the tab strip stops claiming to be the
++          complete set of what the tenant has. */}
++      <div className="mb-[24px]" style={{ display: "flex", alignItems: "center", gap: 8 }}>
++        <Tabs
++          activeId={onStrip ? viewId : tabViews[0].id}
++          onChange={id => { setViewId(id); setPage(1) }}
++          items={tabViews.map(v => ({ id: v.id, label: v.label }))}
++        />
++        <Button variant="tertiary" size="sm" icon={<LayoutGrid size={14} />} onClick={() => setCatalogOpen(true)}>
++          {`All entities (${ENTITY_TYPES.length})`}
++        </Button>
++      </div>
++
++      {/* A view reached from the catalog is not on the strip, so it says so
++          rather than leaving the strip lying about where you are. */}
++      {!onStrip && (
++        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
++          <Chip size="s" variant="primary" onClick={() => setViewId(tabViews[0].id)}>
++            {`${view.label}  ✕`}
++          </Chip>
++          <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>
++            Opened from the catalog — not one of your saved views.
++          </span>
++        </div>
++      )}
++
++      {view.hint && onStrip && (
++        <div style={{ marginBottom: 16, fontSize: 12, color: "var(--field-supporting)" }}>{view.hint}</div>
++      )}
++
++      <div className="mb-[24px]">
++        <Filters
++          searchPlaceholder="Search across every readable type…"
++          searchValue={search}
++          onSearchChange={v => { setSearch(v); setPage(1) }}
++          showViewToggle={false}
++          showSort={false}
++        />
++      </div>
++
++      {shown.length === 0 ? (
++        <EmptyState
++          icon={Search}
++          title="Nothing in this view"
++          description="No record matches this view and search. Clear the search, or open another view from All entities."
++          ctaLabel="Open the catalog"
++          onCta={() => setCatalogOpen(true)}
++        />
++      ) : (
++        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++          {shown.map(r => (
++            <CardContainer key={r.id} size="sm" className="!p-0 overflow-hidden">
++              <EntityList items={[toItem(r)]} />
++            </CardContainer>
++          ))}
++        </div>
++      )}
++
++      <EntityCatalog
++        open={catalogOpen}
++        onClose={() => setCatalogOpen(false)}
++        onPick={t => { setViewId(`type-${t.id}`); setPage(1) }}
++      />
++    </ScreenLayout>
++  )
++}
