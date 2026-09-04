@@ -167,6 +167,18 @@ export interface EntityHeaderProps {
   secondaryAction?: { label: string; onClick?: () => void }
   /** Destructive and secondary actions only. Never a visible button. */
   menuActions?: EntityMenuAction[]
+  /**
+   * State 5 of the five this component owns: "Only visual, title and state. No
+   * description, no tags, no metadata. The header stays valid. This is what
+   * priorities 1 to 3 guarantee."
+   *
+   * It is the arrangement to use when the header is pinned and the content
+   * scrolls behind it — the spec's own answer to "what survives when there is
+   * no room", applied to vertical space instead of horizontal. Actions stay:
+   * the right side is fixed and never compressed, and affordances are always
+   * visible with no hover reveal.
+   */
+  minimum?: boolean
   variant?: EntityHeaderVariant
   size?: EntityHeaderSize
   /** Shown in place of the governed values when variant="restricted". Calm and explanatory — this is a state, not a failure. */
@@ -429,6 +441,7 @@ export function EntityHeader({
   onInformation,
   secondaryAction,
   menuActions,
+  minimum = false,
   variant = "default",
   size = "default",
   restrictedNote = "You don't have access to these values. The fields exist and are governed.",
@@ -443,10 +456,15 @@ export function EntityHeader({
   }
 
   const restricted = variant === "restricted"
-  const stacked    = size === "responsive"
-  // Restricted removes the tag group rather than leaving it empty.
-  const shownTags  = restricted ? [] : (tags ?? [])
-  const shownMeta  = restricted ? [] : (meta ?? [])
+  // Minimum keeps the desktop single row whatever the size axis says — a
+  // stacked minimum would be three rows of nothing.
+  const stacked    = size === "responsive" && !minimum
+  // Restricted removes the tag group rather than leaving it empty; minimum
+  // drops everything below priority 3.
+  const shownTags  = restricted || minimum ? [] : (tags ?? [])
+  const shownMeta  = restricted || minimum ? [] : (meta ?? [])
+  const shownSource      = minimum ? undefined : source
+  const shownDescription = minimum ? undefined : description
 
   const identityLeft = (
     <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: "1 1 auto" }}>
@@ -456,10 +474,10 @@ export function EntityHeader({
       <div style={{ flex: "0 1 auto", minWidth: 0, marginLeft: 4 }}>
         <Title title={title} muted={restricted} />
       </div>
-      {source && !stacked && (
+      {shownSource && !stacked && (
         <>
           {DOT}
-          <Source source={source} />
+          <Source source={shownSource} />
         </>
       )}
       {shownTags.length > 0 && !stacked && <TagGroup tags={shownTags} maxVisible={maxVisibleTags} />}
@@ -481,7 +499,7 @@ export function EntityHeader({
   )
 
   return (
-    <header className={cn("w-full", className)} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <header className={cn("w-full", className)} style={{ display: "flex", flexDirection: "column", gap: minimum ? 0 : 12 }}>
       {/* Row 1 — identity. The right side is fixed and never compressed. */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
         {identityLeft}
@@ -490,27 +508,27 @@ export function EntityHeader({
 
       {/* Responsive reflow: stack before you shrink. Source and tags get their
           own rows rather than competing with the title. */}
-      {stacked && (source || shownTags.length > 0) && (
+      {stacked && (shownSource || shownTags.length > 0) && (
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minWidth: 0 }}>
-          {source && <Source source={source} />}
+          {shownSource && <Source source={shownSource} />}
           {shownTags.length > 0 && <TagGroup tags={shownTags} maxVisible={maxVisibleTags + 2} />}
         </div>
       )}
 
-      {description && !restricted && (
-        <Tooltip content={description} side="cursor" triggerClassName="block min-w-0 w-full">
+      {shownDescription && !restricted && (
+        <Tooltip content={shownDescription} side="cursor" triggerClassName="block min-w-0 w-full">
           <p
             style={{
               margin: 0, fontSize: 13, lineHeight: 1.5, color: "var(--field-supporting)",
               overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
             }}
           >
-            {description}
+            {shownDescription}
           </p>
         </Tooltip>
       )}
 
-      {restricted && (
+      {restricted && !minimum && (
         <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "var(--field-supporting)" }}>
           {restrictedNote}
         </p>
