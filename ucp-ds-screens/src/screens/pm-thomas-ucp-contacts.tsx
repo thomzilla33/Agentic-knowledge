@@ -14,15 +14,16 @@
  * pulled FROM, and per the Entity Header spec the slot is removed rather than
  * refilled when the entity was created in the platform itself.
  *
- * Navigation: Tabs (record type) → SwitchTab (cards vs. table) → Filters.
- * Row click opens the profile; the Eye opens a preview without leaving the list.
+ * Navigation: Tabs (record type) → Filters. Cards are the only layout in this
+ * version — the DS's SwitchTab is not shown by default and a table view is not
+ * in scope yet. Row click opens the profile; the Eye opens a preview without
+ * leaving the list.
  */
 
 import { useMemo, useState } from "react"
 import { ScreenLayout }      from "@/components/layouts/screen-layout"
 import { Header }            from "@/components/ui/header"
 import { Tabs }              from "@/components/ui/tabs"
-import { SwitchTab }         from "@/components/ui/switch-tab"
 import { Filters }           from "@/components/ui/filters"
 import { FiltersSlideout }   from "@/components/ui/filters-slideout"
 import { Menu, MenuItem }    from "@/components/ui/menu-item"
@@ -31,9 +32,6 @@ import { Button }            from "@/components/ui/button"
 import { CardContainer }     from "@/components/ui/card-container"
 import { EntityList }        from "@/components/ui/entity-list"
 import type { EntityListItemData } from "@/components/ui/entity-list"
-import { Table }             from "@/components/ui/table"
-import type { TableColumn }  from "@/components/ui/table"
-import { TableCellAvatar, TableCellLink } from "@/components/ui/table"
 import { EmptyState }        from "@/components/ui/empty-state"
 import { Pagination }        from "@/components/ui/pagination"
 import { SlideOut }          from "@/components/ui/slide-out"
@@ -43,7 +41,7 @@ import { Input }             from "@/components/ui/input"
 import { Chip }              from "@/components/ui/chip"
 import { anchorFromEvent, useDropdownPosition } from "@/lib/dropdown-anchor"
 import type { DropdownAnchor } from "@/lib/dropdown-anchor"
-import { Sparkle, Send, Plus, Contact as ContactIcon, LayoutList, Table2 } from "lucide-react"
+import { Sparkle, Send, Plus, Contact as ContactIcon } from "lucide-react"
 import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
 import {
   CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
@@ -56,7 +54,7 @@ const PAGE_SIZE = 10
 
 const TYPE_TABS: { id: string; label: string; type: UcpEntityType | "all" }[] = [
   { id: "all",       label: "All",       type: "all"      },
-  { id: "people",    label: "People",    type: "person"   },
+  { id: "customers", label: "Customers", type: "person"   },
   { id: "employees", label: "Employees", type: "employee" },
   { id: "companies", label: "Companies", type: "company"  },
 ]
@@ -68,7 +66,7 @@ const TYPE_TABS: { id: string; label: string; type: UcpEntityType | "all" }[] = 
  */
 const CREATE_LABEL: Record<string, string> = {
   all:       "Create New Contact",
-  people:    "Create New Person",
+  customers: "Create New Customer",
   employees: "Create New Employee",
   companies: "Create New Company",
 }
@@ -284,31 +282,11 @@ function CreatePanel({
   )
 }
 
-// ── Table columns ─────────────────────────────────────────────────────────────
-
-const CONTACT_COLUMNS: TableColumn<UcpContact>[] = [
-  {
-    key: "name", header: "Name", width: "24%",
-    render: r => (
-      <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-        <TableCellAvatar name={r.name} size="sm" />
-        <TableCellLink>{r.name}</TableCellLink>
-      </div>
-    ),
-  },
-  { key: "type",   header: "Type",   width: "11%", render: r => <Tag variant={TYPE_TAG[r.type]} size="sm">{TYPE_LABEL[r.type]}</Tag> },
-  { key: "subtitle", header: "Context",           render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.subtitle}</span> },
-  { key: "owner",  header: "Owner",  width: "13%", render: r => <span style={{ fontSize: 12, color: "var(--foreground)" }}>{r.owner}</span> },
-  { key: "lastInteraction", header: "Last interaction", width: "14%", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.lastInteraction}</span> },
-  { key: "status", header: "Status", width: "10%", render: r => { const s = entityState(r); return <Tag variant={s.variant} size="sm">{s.label}</Tag> } },
-]
-
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function PMThomasUcpContactsScreen() {
   const [openId,     setOpenId]     = useState<string | null>(null)
   const [tab,        setTab]        = useState("all")
-  const [view,       setView]       = useState("cards")
   const [page,       setPage]       = useState(1)
   const [pageSize,   setPageSize]   = useState(PAGE_SIZE)
   const [search,     setSearch]     = useState("")
@@ -395,14 +373,25 @@ export default function PMThomasUcpContactsScreen() {
     title:       c.name,
     iconName:    TYPE_ICON[c.type],
     iconVariant: c.type === "company" ? "light-blue" : c.type === "employee" ? "purple" : "info",
+    // Owner, last interaction and email are not values the row needs to show —
+    // they are reference facts. They ride the top row's tooltip instead, where
+    // the identity context already lives, and the row itself keeps only what
+    // says where this record came from.
     primaryMeta: [
-      { iconName: "Info",  label: c.subtitle },
-      { iconName: "Hash",  label: c.id       },
+      {
+        iconName: "Info",
+        label:    c.subtitle,
+        tooltip:  `${c.subtitle} · Owner ${c.owner} · Last interaction ${c.lastInteraction} · ${c.email}`,
+      },
+      { iconName: "Hash", label: c.id, tooltip: `Record ID · ${c.id}` },
     ],
+    // The source: the system this record was pulled from. One item, never two.
     secondaryMeta: [
-      { iconName: "UserRound", label: `Owner · ${c.owner}` },
-      { iconName: "Clock",     label: `Last interaction · ${c.lastInteraction}` },
-      { iconName: "Mail",      label: c.email },
+      {
+        iconName: c.source.iconName,
+        label:    c.source.label,
+        tooltip:  `Source · ${c.source.label}. The system this record was pulled from.`,
+      },
     ],
     aiInsight: {
       action:   "read",
@@ -463,18 +452,6 @@ export default function PMThomasUcpContactsScreen() {
         items={TYPE_TABS.map(t => ({ id: t.id, label: t.label }))}
       />
 
-      <div className="mb-[24px]">
-        <SwitchTab
-          value={view}
-          onChange={id => { setView(id); resetPage() }}
-          aria-label="Result layout"
-          items={[
-            { id: "cards", label: "Cards", icon: <LayoutList size={14} /> },
-            { id: "table", label: "Table", icon: <Table2 size={14} />     },
-          ]}
-        />
-      </div>
-
       <div className="mb-[24px]" onClickCapture={e => setAnchor(anchorFromEvent(e))}>
         <Filters
           showSearch
@@ -507,7 +484,7 @@ export default function PMThomasUcpContactsScreen() {
           ctaLabel={hasFilters ? "Clear filters" : (CREATE_LABEL[tab] ?? CREATE_LABEL.all)}
           onCta={hasFilters ? clearAll : () => setCreateOpen(true)}
         />
-      ) : view === "cards" ? (
+      ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {paged.map(c => (
             <div key={c.id} onClickCapture={e => { setKebabAnchor(anchorFromEvent(e)) }}>
@@ -517,14 +494,6 @@ export default function PMThomasUcpContactsScreen() {
             </div>
           ))}
         </div>
-      ) : (
-        <Table
-          columns={CONTACT_COLUMNS}
-          data={paged}
-          size="sm"
-          rowKey={r => r.id}
-          onRowClick={r => setOpenId(r.id)}
-        />
       )}
 
       {/* ── Filter slot dropdowns ── */}

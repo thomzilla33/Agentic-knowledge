@@ -162,18 +162,60 @@ del header y a ancho completo.
 
 | Decisión | Resultado |
 |---|---|
-| Dominio | Genérico AIMS OS — Person · Employee · Company, un solo perfil detrás de los tres |
+| Dominio | Genérico AIMS OS — Customer · Employee · Company, un solo perfil detrás de los tres |
 | Overview | Tab dentro del UCP, y es un `WidgetCanvasView` porque la regla del DS lo exige |
 | Layout del UCP | Híbrido: tabs fijos + canvas de widgets configurable en Overview |
-| Navegación del listado | Tabs por tipo → `SwitchTab` tarjetas/tabla → `Filters` |
+| Navegación del listado | Tabs por tipo → `Filters`. Solo tarjetas en esta versión |
 | Acción principal | `Create New {tipo}` como `primary`, siguiendo la pestaña activa; `Ask` baja a secondary |
 | Documents | Reemplazado por **Drives** (Source Drives del catálogo de la compañía) |
 | Snapshot | Nuevo tab: los hechos del registro por plano de conocimiento |
 
+### La fila del listado muestra el source, no los campos de referencia
+
+`Owner` y `Last interaction` salieron de la metadata de la fila. Son hechos de
+referencia, no algo que la fila necesite mostrar: viajan en el tooltip de la fila
+superior, donde ya vive el contexto de identidad (`VP of Operations · Meridian
+Corp · Owner Priya Nair · Last interaction Sep 2, 2026 · email`). El email se fue
+con ellos.
+
+Lo que queda en la fila es **el source** — el sistema del que se extrajo el
+registro, un ítem y nunca dos. Los valores cubren cinco industrias y seis
+sistemas: Salesforce (servicios financieros), Epic (salud), NetSuite
+(industrial), HubSpot (un piloto que entró por marketing), CDK Global
+(automotriz) y Workday (los empleados).
+
+**El source es consistente dentro de una cuenta.** Los contactos de Meridian
+comparten Salesforce porque salen del mismo sistema; inventar variedad dentro de
+una sola cuenta sería mentir sobre la procedencia. La variedad va entre cuentas,
+que es donde existe de verdad.
+
+Para que el DMS fuera honesto y no decorativo hubo que agregar una cuenta
+automotriz: **Riverbend Auto Group** y su director de fixed operations, ambos
+desde CDK Global. Ninguno de los 14 registros anteriores era automotriz, y
+colgarle un DMS a una empresa de logística habría sido falso. El roster pasa a
+16.
+
+### El tag de `person` dice Customer
+
+`TYPE_LABEL.person` pasa de "Person" a **"Customer"**: estos registros son
+contactos en cuentas de cliente y prospecto, y "Person" decía qué era la fila en
+vez de qué es el registro. El discriminador interno sigue siendo `person` para
+que el union de tipos no cambie.
+
+Eso arrastró dos cosas por coherencia, y son las que conviene que revises: el tab
+**"People" pasó a "Customers"** y el CTA a **"Create New Customer"**. Si preferías
+que solo cambiara el tag y el tab siguiera diciendo People, son dos líneas.
+
+### Fuera el SwitchTab de tarjetas/tabla
+
+No va en esta versión. Se fue el `SwitchTab`, la vista de tabla y sus columnas.
+Las tarjetas son el único layout, que además es el default del DS: *"The
+SwitchTab component is not shown by default."*
+
 ### El CTA de creación nombra lo que va a crear
 
 El botón principal del listado sigue la pestaña activa: **Create New Contact**
-en All, y **Create New Person / Employee / Company** en cada tipo. Un "Create"
+en All, y **Create New Customer / Employee / Company** en cada tipo. Un "Create"
 genérico sobre un roster de tres tipos no dice qué va a construir, y el tipo ya
 está decidido por la pestaña en la que estás.
 

@@ -74,8 +74,14 @@ export interface UcpContact {
   connections:     StudyState
 }
 
+/**
+ * The display label for each type. `person` reads as "Customer": these records
+ * are contacts at customer and prospect accounts, and "Person" said what the
+ * row was rather than what the record is. The internal discriminator stays
+ * `person` so the type union does not churn.
+ */
 export const TYPE_LABEL: Record<UcpEntityType, string> = {
-  person:   "Person",
+  person:   "Customer",
   employee: "Employee",
   company:  "Company",
 }
@@ -272,7 +278,7 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Healthcare · 5,100 employees · Phoenix, AZ",
     email: "partnerships@northwindhealth.org", phone: "+1 (602) 555-0177", company: "Northwind Health",
     owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 30, 2026",
-    source: { label: "Salesforce", iconName: "Cloud" },
+    source: { label: "Epic", iconName: "Cross" },
     tags: [
       { label: "Sync pending", role: "signal", tone: "alert", severity: 2, tooltip: "2 of 5 new clinic sites have not completed network sync" },
       { label: "Customer",     role: "classification" },
@@ -388,7 +394,7 @@ export const CONTACTS: UcpContact[] = [
     email: "hello@kestrellogistics.com", phone: "+1 (214) 555-0190", company: "Kestrel Logistics",
     owner: "Daniel Ruiz", status: "Inactive", lastInteraction: "Jun 14, 2026",
     stateBadge: { label: "Dormant", variant: "alert" },
-    source: { label: "NetSuite", iconName: "Cloud" },
+    source: { label: "HubSpot", iconName: "Magnet" },
     tags: [
       { label: "80d no contact", role: "signal", tone: "error", severity: 4, tooltip: "Last interaction Jun 14, when the pilot closed" },
       { label: "Inactive",       role: "signal", tone: "neutral", severity: 1, tooltip: "Lifecycle · moved to inactive Jul 1" },
@@ -468,7 +474,7 @@ export const CONTACTS: UcpContact[] = [
     email: "ops@halden-mfg.com", phone: "+1 (216) 555-0118", company: "Halden Manufacturing",
     owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 25, 2026",
     stateBadge: { label: "Under review", variant: "informative" },
-    source: { label: "NetSuite", iconName: "Cloud" },
+    source: { label: "NetSuite", iconName: "Boxes" },
     tags: [
       { label: "2 checks open", role: "signal", tone: "alert", severity: 2, tooltip: "Network segmentation evidence and sub-processor list · target Sep 12" },
       { label: "Customer",      role: "classification" },
@@ -497,7 +503,7 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Head of Data Platform · Halden Manufacturing",
     email: "tomas.ferreira@halden-mfg.com", phone: "+1 (216) 555-0126", company: "Halden Manufacturing",
     owner: "Elena Fischer", status: "Active", lastInteraction: "Aug 25, 2026",
-    source: { label: "NetSuite", iconName: "Cloud" },
+    source: { label: "NetSuite", iconName: "Boxes" },
     tags: [
       { label: "Owns 2 blockers", role: "signal", tone: "alert", severity: 3, tooltip: "Network segmentation evidence and sub-processor list · target Sep 12" },
       { label: "Person",         role: "classification" },
@@ -553,7 +559,7 @@ export const CONTACTS: UcpContact[] = [
     subtitle: "Chief Nursing Officer · Northwind Health",
     email: "grace.okafor@northwindhealth.org", phone: "+1 (602) 555-0182", company: "Northwind Health",
     owner: "Daniel Ruiz", status: "Active", lastInteraction: "Aug 30, 2026",
-    source: { label: "Salesforce", iconName: "Cloud" },
+    source: { label: "Epic", iconName: "Cross" },
     tags: [
       { label: "Sponsor",  role: "classification" },
       { label: "Person",   role: "classification" },
@@ -569,6 +575,67 @@ export const CONTACTS: UcpContact[] = [
       headline: "Executive sponsor of the expansion.",
       detail: "Grace drove the five-clinic expansion internally and signed without a discount request. Two clinics still need network sync — an onboarding task her team can close.",
       confidence: 87,
+    },
+    governance: "loaded", risk: "empty", connections: "loaded",
+  },
+  {
+    id: "ORG-0067", type: "company", name: "Riverbend Auto Group",
+    subtitle: "Automotive Retail · 640 employees · Tampa, FL",
+    email: "ops@riverbendauto.com", phone: "+1 (813) 555-0164", company: "Riverbend Auto Group",
+    owner: "Daniel Ruiz", status: "Active", lastInteraction: "Sep 1, 2026",
+    source: { label: "CDK Global", iconName: "Car" },
+    tags: [
+      { label: "Service backlog", role: "signal", tone: "alert", severity: 2, tooltip: "41 repair orders open past their promised date across 4 stores" },
+      { label: "Customer",        role: "classification" },
+      { label: "Multi-site",     role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "11 facts",  tooltip: "Verified facts · 5 on the Truth plane, 6 across Sandbox and Sources." },
+      { iconName: "Store",       label: "4 stores",  tooltip: "Locations · 4 dealerships under one master agreement." },
+      { iconName: "Wrench",      label: "41 open",   tooltip: "Open repair orders · 41 past their promised date, oldest 9 days." },
+      { iconName: "Bot",         label: "Tier 1",    tooltip: "Assigned agent · Riverbend Concierge, tier 1." },
+    ],
+    agent: { id: "AGT-07", name: "Riverbend Concierge" },
+    nba: {
+      title: "Rebalance the service load across four stores",
+      timestamp: "5h ago",
+      rationale: "Tampa North holds 26 of the 41 late repair orders while Brandon runs at 60% bay capacity, so the backlog is routing, not headcount.",
+    },
+    aiSummary: {
+      headline: "Healthy group, one store carrying the backlog.",
+      detail: "Riverbend runs four dealerships on one master agreement. Tampa North holds 26 of the 41 late repair orders while Brandon sits at 60% bay capacity — the backlog is a routing problem, not a staffing one, and it is the only thing hurting CSI scores this quarter.",
+      confidence: 79,
+    },
+    governance: "loaded", risk: "loaded", connections: "loaded",
+  },
+  {
+    id: "PER-0158", type: "person", name: "Marcus Delgado",
+    subtitle: "Fixed Operations Director · Riverbend Auto Group",
+    email: "marcus.delgado@riverbendauto.com", phone: "+1 (813) 555-0171", company: "Riverbend Auto Group",
+    owner: "Daniel Ruiz", status: "Active", lastInteraction: "Sep 1, 2026",
+    source: { label: "CDK Global", iconName: "Car" },
+    tags: [
+      { label: "Owns the backlog", role: "signal", tone: "alert", severity: 3, tooltip: "Accountable for service throughput across all four stores" },
+      { label: "Customer",         role: "classification" },
+      { label: "Operator",        role: "classification" },
+    ],
+    meta: [
+      { iconName: "ShieldCheck", label: "10 facts", tooltip: "Verified facts · 5 on the Truth plane, 5 across Sandbox and Sources." },
+      { iconName: "Wrench",      label: "41 open",  tooltip: "Open repair orders · every one of them rolls up to him." },
+      { iconName: "Clock",       label: "Same day", tooltip: "Responsiveness · replies same day, and prefers a phone call to email." },
+      { iconName: "Bot",         label: "Tier 1",   tooltip: "Assigned agent · Riverbend Concierge, tier 1." },
+    ],
+    agent: { id: "AGT-07", name: "Riverbend Concierge" },
+    nba: {
+      title: "Walk Marcus through the routing proposal",
+      timestamp: "5h ago",
+      rationale: "He owns service throughput for all four stores and replies same day, so the rebalance needs his sign-off before it reaches store managers.",
+      variant: "accept",
+    },
+    aiSummary: {
+      headline: "Accountable for the one metric that is slipping.",
+      detail: "Marcus owns service throughput across all four Riverbend stores, which makes him the decision point on the backlog. He replies same day and prefers a call to email — the routing proposal should reach him by phone, not in writing.",
+      confidence: 81,
     },
     governance: "loaded", risk: "empty", connections: "loaded",
   },
