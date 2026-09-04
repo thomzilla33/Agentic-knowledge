@@ -295,16 +295,20 @@ function AiSummaryContent({ contact, onAsk }: { contact: UcpContact; onAsk: () =
   return (
     <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
       <div
+        // El mismo read del agente que muestra el preview del listado, así que
+        // la misma superficie: tokens de card, no de tag.
         style={{
-          background: "var(--tag-purple-bg)",
-          border: "1px solid var(--tag-purple-bd)",
+          background: "var(--card-purple-bg)",
+          border: "1px solid var(--card-purple-border)",
           borderRadius: 8,
           padding: "12px 14px",
           display: "flex", flexDirection: "column", gap: 8,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <Sparkle size={13} style={{ color: "var(--tag-purple-bd)" }} />
+          {/* Un token de borde no es un color de texto. El acento va con el
+              mismo foreground que la etiqueta que tiene al lado. */}
+          <Sparkle size={13} style={{ color: "var(--tag-purple-fg)" }} />
           <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-fg)" }}>
             {contact.agent.name}
           </span>

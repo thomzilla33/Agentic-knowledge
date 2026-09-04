@@ -104,10 +104,10 @@ index 578261c..d1f028a 100644
            {/* One context Tag per NBA — what area this action is about, at a
 diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
 new file mode 100755
-index 0000000..9af5613
+index 0000000..0b68dee
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-contacts.tsx
-@@ -0,0 +1,758 @@
+@@ -0,0 +1,763 @@
 +/**
 + * UCP — Contacts list.
 + *
@@ -795,8 +795,13 @@ index 0000000..9af5613
 +              </div>
 +            ) : (
 +              <div
++                // Tokens de card, no de tag — mismo criterio que el bloque de
++                // Next Best Action: --tag-purple-bd es un #a855f7 a full pensado
++                // para delinear un Tag, y a tamaño de superficie se lee como una
++                // caja gritona. El fondo es el mismo valor en ambas familias, así
++                // que el borde era toda la diferencia.
 +                style={{
-+                  background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)",
++                  background: "var(--card-purple-bg)", border: "1px solid var(--card-purple-border)",
 +                  borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
 +                }}
 +              >
@@ -868,10 +873,10 @@ index 0000000..9af5613
 +}
 diff --git a/src/screens/pm-thomas-ucp-profile.tsx b/src/screens/pm-thomas-ucp-profile.tsx
 new file mode 100755
-index 0000000..d619a74
+index 0000000..028c0c8
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-profile.tsx
-@@ -0,0 +1,1073 @@
+@@ -0,0 +1,1077 @@
 +/**
 + * UCP — Unified Contact Profile (detail view).
 + *
@@ -1169,16 +1174,20 @@ index 0000000..d619a74
 +  return (
 +    <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
 +      <div
++        // El mismo read del agente que muestra el preview del listado, así que
++        // la misma superficie: tokens de card, no de tag.
 +        style={{
-+          background: "var(--tag-purple-bg)",
-+          border: "1px solid var(--tag-purple-bd)",
++          background: "var(--card-purple-bg)",
++          border: "1px solid var(--card-purple-border)",
 +          borderRadius: 8,
 +          padding: "12px 14px",
 +          display: "flex", flexDirection: "column", gap: 8,
 +        }}
 +      >
 +        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-+          <Sparkle size={13} style={{ color: "var(--tag-purple-bd)" }} />
++          {/* Un token de borde no es un color de texto. El acento va con el
++              mismo foreground que la etiqueta que tiene al lado. */}
++          <Sparkle size={13} style={{ color: "var(--tag-purple-fg)" }} />
 +          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tag-purple-fg)" }}>
 +            {contact.agent.name}
 +          </span>

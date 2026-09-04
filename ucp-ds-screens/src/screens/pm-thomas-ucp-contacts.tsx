@@ -685,8 +685,13 @@ export default function PMThomasUcpContactsScreen() {
               </div>
             ) : (
               <div
+                // Tokens de card, no de tag — mismo criterio que el bloque de
+                // Next Best Action: --tag-purple-bd es un #a855f7 a full pensado
+                // para delinear un Tag, y a tamaño de superficie se lee como una
+                // caja gritona. El fondo es el mismo valor en ambas familias, así
+                // que el borde era toda la diferencia.
                 style={{
-                  background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)",
+                  background: "var(--card-purple-bg)", border: "1px solid var(--card-purple-border)",
                   borderRadius: 8, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6,
                 }}
               >
