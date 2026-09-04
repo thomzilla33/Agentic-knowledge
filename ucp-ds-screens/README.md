@@ -8,10 +8,15 @@ Viven aquí porque esta sesión no tiene permiso de push sobre el repo del DS
 (`add_repo` rechaza adjuntar repos de otro owner). El código ya está escrito,
 tipado y verificado **dentro de un clon real del DS** — solo falta abrir el PR allá.
 
-| Prototipo | `id` | Link una vez desplegado |
+**Una sola card** en la galería de prototipos, y el flujo completo detrás:
+
+| Card | `id` | Link una vez desplegado |
 |---|---|---|
-| UCP — Contacts | `proto-thomas-ucp-contacts` | `aims-os-design-system.vercel.app/?proto=proto-thomas-ucp-contacts` |
-| UCP — Profile | `proto-thomas-ucp-profile` | `aims-os-design-system.vercel.app/?proto=proto-thomas-ucp-profile` |
+| UCP - Contacts Last version | `proto-thomas-ucp-contacts` | `aims-os-design-system.vercel.app/?proto=proto-thomas-ucp-contacts` |
+
+El perfil no tiene card propia: se llega abriendo una fila del roster, que es el
+flujo real. Un solo punto de entrada, y `pm-thomas-ucp-profile.tsx` a propósito
+no exporta un default — exporta `UcpProfileView`, que el roster monta.
 
 ---
 
@@ -26,7 +31,7 @@ npm run dev                     # localhost:5173 → sidebar → Prototypes
 ```
 
 El patch toca 6 archivos: 2 componentes en `experimental/`, 3 en `src/screens/`,
-y **4 líneas** en `src/App.tsx` (2 imports + 2 entradas en `PROTOTYPE_PAGES`).
+y **2 líneas** en `src/App.tsx` (1 import + 1 entrada en `PROTOTYPE_PAGES`).
 Ese archivo está protegido por CODEOWNERS, así que el PR necesita review de
 **@cachilupis** — es el comportamiento esperado, no un bloqueo.
 

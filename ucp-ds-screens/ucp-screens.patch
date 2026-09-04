@@ -1,22 +1,20 @@
 diff --git a/src/App.tsx b/src/App.tsx
-index faf5f4f..058a78e 100644
+index faf5f4f..3592551 100644
 --- a/src/App.tsx
 +++ b/src/App.tsx
-@@ -8,6 +8,8 @@ import PMHomeCanvasScreen         from "./screens/pm-home-canvas"
+@@ -8,6 +8,7 @@ import PMHomeCanvasScreen         from "./screens/pm-home-canvas"
  import PMMichaelAttentionRoomScreen from "./screens/pm-michael-attention-room"
  import PMMichaelLoginScreen         from "./screens/pm-michael-login"
  import PMThomasUniversalProfileScreen  from "./screens/pm-thomas-universal-profile"
 +import PMThomasUcpContactsScreen      from "./screens/pm-thomas-ucp-contacts"
-+import PMThomasUcpProfileScreen       from "./screens/pm-thomas-ucp-profile"
  import PMThomasDashboardListScreen     from "./screens/pm-thomas-dashboard-list"
  import PMThomasWidgetLibraryScreen     from "./screens/pm-thomas-widget-library"
  import PMThomasWidgetMarketplaceScreen from "./screens/pm-thomas-widget-marketplace"
-@@ -160,6 +162,8 @@ const PROTOTYPE_PAGES: { id: string; label: string; description: string; author:
+@@ -160,6 +161,7 @@ const PROTOTYPE_PAGES: { id: string; label: string; description: string; author:
    { id: "proto-thomas-new-dashboard",     label: "New Dashboard — Thomas",       description: "Two-step wizard for creating a dashboard: Step 0 placement form (kind, profile type, surface, audience, name) + destination summary; Step 1 start-point picker (blank canvas or pre-built template). DS-GAP components: StepIndicator, SectionChip, OptionCard, FormSection, FieldLabel.", author: "Thomas", component: PMThomasNewDashboardScreen },
    { id: "proto-thomas-widget-builder",    label: "Widget Builder — Thomas",      description: "Three-tab builder (Data → Widget → Appearance) with sticky live preview. Data tab: entity source picker (8 sources), operation chips (Aggregate / Record set), calc + column or exposed columns. Widget tab: 12-type gallery, name/description/freshness/filter settings. Appearance tab: accent color swatches + style variants. DS-GAP: AccentColorPalette, BuilderTabNav, EntitySourceCard, TypeTile, SkeletonShape, WidgetPreviewPanel.", author: "Thomas", component: PMThomasWidgetBuilderScreen },
    { id: "proto-thomas-universal-profile", label: "Universal Profile — Thomas",   description: "Unified entity profile (Person, Employee, Company) aggregating Governance, Risk, and Connections studies — Overview canvas with adaptive study widgets (hidden when empty, error+retry when failed), Activity feed (last 20), paginated Logs, Edit + Export for all types, Archive for Person/Employee only", author: "Thomas", component: PMThomasUniversalProfileScreen },
-+  { id: "proto-thomas-ucp-contacts",      label: "UCP — Contacts",               description: "Unified Contact Profile roster — People / Employees / Companies tabs, Cards\u2194Table SwitchTab, Status + Owner filters with All-filters slideout, Eye preview with the agent read, Archive confirm, and a Contacts concierge that answers across the roster", author: "Thomas", component: PMThomasUcpContactsScreen },
-+  { id: "proto-thomas-ucp-profile",       label: "UCP — Profile",                description: "Unified Contact Profile detail — Entity Header (Figma 19815-101547) with source, state badge, signal and classification tags, secondary metadata and Ask; Next Best Action as its own card below it; Overview widget canvas (agent read, Governance, Risk, Connections, recent activity); Snapshot of facts by knowledge plane (Truth / Sandbox / Sources); paginated Activity timeline; attached Source Drives", author: "Thomas", component: PMThomasUcpProfileScreen },
++  { id: "proto-thomas-ucp-contacts",      label: "UCP - Contacts Last version",  description: "The whole UCP flow in one prototype. Roster: People / Employees / Companies tabs, Cards\u2194Table SwitchTab, Status + Owner filters with All-filters slideout, per-tab Create CTA, Eye preview, Archive confirm, roster concierge. Open a row for the profile: Entity Header (Figma 19815-101547) pinned on scroll with source, state badge, signal and classification tags and secondary metadata; Next Best Action as its own card below it; Overview widget canvas; Snapshot of facts by knowledge plane; paginated Activity; attached Source Drives.", author: "Thomas", component: PMThomasUcpContactsScreen },
    { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
    { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
@@ -1431,10 +1429,10 @@ index 0000000..0ed9955
 +}
 diff --git a/src/screens/pm-thomas-ucp-profile.tsx b/src/screens/pm-thomas-ucp-profile.tsx
 new file mode 100644
-index 0000000..12e442f
+index 0000000..a6c7ff4
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-profile.tsx
-@@ -0,0 +1,817 @@
+@@ -0,0 +1,812 @@
 +/**
 + * UCP — Unified Contact Profile (detail view).
 + *
@@ -1493,7 +1491,7 @@ index 0000000..12e442f
 +import { NextBestActionCard }  from "@/components/experimental/next-best-action-card"
 +import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch } from "lucide-react"
 +import {
-+  CONTACTS, PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
++  PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
 +  TYPE_LABEL, entityState,
 +  getActivity, getConciergeOpening, getConnections, getDrives,
 +  getFacts, getGovernance, getRisk,
@@ -2244,14 +2242,9 @@ index 0000000..12e442f
 +  )
 +}
 +
-+// ── Standalone registration ───────────────────────────────────────────────────
-+// Deep link lands on the flagship record; the Contacts list renders this same
-+// component when a row is opened.
-+
-+export default function PMThomasUcpProfileScreen() {
-+  const contact = CONTACTS.find(c => c.id === "ORG-0023") ?? CONTACTS[0]
-+  return <UcpProfileView contact={contact} />
-+}
++// No default export on purpose: the profile is not its own prototype card. It
++// is reached by opening a row in the Contacts roster, which is the real flow —
++// one card, one entry point.
 diff --git a/src/screens/ucpShared.ts b/src/screens/ucpShared.ts
 new file mode 100644
 index 0000000..30a34b0
