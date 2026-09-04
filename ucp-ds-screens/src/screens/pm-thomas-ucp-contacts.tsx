@@ -415,11 +415,28 @@ export default function PMThomasUcpContactsScreen() {
         tooltip:  `Assigned agent · ${c.agent.name}. Opens a chat scoped to this record.`,
       },
     ],
-    aiInsight: {
-      action:   "read",
-      detail:   c.aiSummary.headline,
-      viewMore: false,
-    },
+    // The row carries the record's Next Best Action, not the agent's summary.
+    // A roster is scanned to decide what to open next, and the recommendation is
+    // what answers that; the agent's read still lives in the Overview widget and
+    // in the Eye preview, where there is room for it.
+    //
+    // The block renders the same purple family the Next Best Action card uses on
+    // the profile, so the row and the card speak the same language. Title,
+    // when, and why — without the rationale it would be an order, not a
+    // proposal. It collapses past 80 characters and View more opens the record,
+    // which is the card's own default path.
+    //
+    // No action, no block: "there is nothing to say when there is nothing to
+    // do." The absence is the signal — a reader scans for purple to find the
+    // records that want a decision.
+    aiInsight: c.nba
+      ? {
+          action:   "Next Best Action",
+          detail:   `${c.nba.title} · ${c.nba.timestamp}${c.nba.rationale ? ` — ${c.nba.rationale}` : ""}`,
+          viewMore: true,
+          onViewMore: () => setOpenId(c.id),
+        }
+      : undefined,
     tags:  [{ label: TYPE_LABEL[c.type] }],
     state: entityState(c),
     showMenu:    true,
