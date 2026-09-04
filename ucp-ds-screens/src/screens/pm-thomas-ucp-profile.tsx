@@ -56,7 +56,7 @@ import { EntityHeader }        from "@/components/experimental/entity-header"
 import { NextBestActionCard }  from "@/components/experimental/next-best-action-card"
 import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch } from "lucide-react"
 import {
-  CONTACTS, PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
+  PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
   TYPE_LABEL, entityState,
   getActivity, getConciergeOpening, getConnections, getDrives,
   getFacts, getGovernance, getRisk,
@@ -807,11 +807,6 @@ export function UcpProfileView({
   )
 }
 
-// ── Standalone registration ───────────────────────────────────────────────────
-// Deep link lands on the flagship record; the Contacts list renders this same
-// component when a row is opened.
-
-export default function PMThomasUcpProfileScreen() {
-  const contact = CONTACTS.find(c => c.id === "ORG-0023") ?? CONTACTS[0]
-  return <UcpProfileView contact={contact} />
-}
+// No default export on purpose: the profile is not its own prototype card. It
+// is reached by opening a row in the Contacts roster, which is the real flow —
+// one card, one entry point.
