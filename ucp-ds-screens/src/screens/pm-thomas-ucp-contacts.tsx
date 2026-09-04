@@ -5,9 +5,14 @@
  * record types AIMS OS keeps profiles for — People, Employees and Companies —
  * because the profile behind them is the same surface either way.
  *
- * Read-only: contacts arrive through ingestion and account sync, not through a
- * create form, so the Header's one main CTA is the concierge — ask it about the
- * roster instead of typing a record in.
+ * Records arrive through ingestion and account sync, and can also be created
+ * here. The Header's primary CTA names the entity type of the active tab —
+ * Create New Contact on All, then Person / Employee / Company — because a
+ * generic "Create" on a roster of three types does not say what it will make.
+ *
+ * A record created here has no `source`: source is the system a record was
+ * pulled FROM, and per the Entity Header spec the slot is removed rather than
+ * refilled when the entity was created in the platform itself.
  *
  * Navigation: Tabs (record type) → SwitchTab (cards vs. table) → Filters.
  * Row click opens the profile; the Eye opens a preview without leaving the list.
@@ -38,7 +43,7 @@ import { Input }             from "@/components/ui/input"
 import { Chip }              from "@/components/ui/chip"
 import { anchorFromEvent, useDropdownPosition } from "@/lib/dropdown-anchor"
 import type { DropdownAnchor } from "@/lib/dropdown-anchor"
-import { Sparkle, Send, Contact as ContactIcon, LayoutList, Table2 } from "lucide-react"
+import { Sparkle, Send, Plus, Contact as ContactIcon, LayoutList, Table2 } from "lucide-react"
 import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
 import {
   CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
@@ -55,6 +60,26 @@ const TYPE_TABS: { id: string; label: string; type: UcpEntityType | "all" }[] = 
   { id: "employees", label: "Employees", type: "employee" },
   { id: "companies", label: "Companies", type: "company"  },
 ]
+
+/**
+ * The create CTA names what it will make, so it tracks the active tab. On All
+ * the roster is mixed, so the label falls back to the module's own noun and the
+ * form asks for the type.
+ */
+const CREATE_LABEL: Record<string, string> = {
+  all:       "Create New Contact",
+  people:    "Create New Person",
+  employees: "Create New Employee",
+  companies: "Create New Company",
+}
+
+/** Which fields the create form asks for, per type. Six at most — past that it
+ *  stops being a panel and becomes a page. */
+const CREATE_FIELDS: Record<UcpEntityType, string[]> = {
+  person:   ["Full name", "Title", "Company", "Email", "Phone", "Account owner"],
+  employee: ["Full name", "Role", "Department", "Work email", "Manager", "Access role"],
+  company:  ["Legal name", "Industry", "Headcount", "Account email", "Account owner", "Primary contact"],
+}
 
 type SortKey = "recent" | "name" | "owner"
 
@@ -166,6 +191,99 @@ function RosterConcierge({ open, onClose, total }: { open: boolean; onClose: () 
   )
 }
 
+// ── Create panel ──────────────────────────────────────────────────────────────
+// A create form is non-destructive, so it is a SlideOut and not a ModalDialog.
+// No `label` prop on Input — placeholder is the only field hint on desktop.
+
+function CreatePanel({
+  open, onClose, lockedType, onCreate,
+}: {
+  open:        boolean
+  onClose:     () => void
+  /** Set when a type tab is active; null on All, where the user picks. */
+  lockedType:  UcpEntityType | null
+  onCreate:    (type: UcpEntityType) => void
+}) {
+  const [type, setType]     = useState<UcpEntityType>(lockedType ?? "person")
+  const [values, setValues] = useState<Record<string, string>>({})
+  const [tried, setTried]   = useState(false)
+
+  // Reopening on a different tab should follow the tab, not the last pick.
+  const activeType = lockedType ?? type
+  const fields     = CREATE_FIELDS[activeType]
+  const complete   = fields.every(f => (values[f] ?? "").trim().length > 0)
+
+  return (
+    <SlideOut
+      open={open}
+      onClose={onClose}
+      type="with-variants"
+      size="m"
+      title={`New ${TYPE_LABEL[activeType]}`}
+      subtitle={`Contacts · ${fields.length} fields`}
+      showIcon
+      iconContent={<Plus size={14} />}
+      showStatus={false}
+      showTopButton={false}
+      showTabs={false}
+      showSearchBar={false}
+      showChips={false}
+      showCta
+      ctaPrimaryLabel={`Create ${TYPE_LABEL[activeType]}`}
+      ctaSecondaryLabel="Cancel"
+      onCtaPrimary={() => {
+        if (!complete) { setTried(true); return }
+        onCreate(activeType)
+        setValues({})
+        setTried(false)
+      }}
+      onCtaSecondary={onClose}
+    >
+      <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 24 }}>
+        {!lockedType && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>What are you creating?</span>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {(Object.keys(CREATE_FIELDS) as UcpEntityType[]).map(t => (
+                <Chip
+                  key={t}
+                  size="s"
+                  variant={activeType === t ? "primary" : "secondary"}
+                  onClick={() => { setType(t); setValues({}) }}
+                >
+                  {TYPE_LABEL[t]}
+                </Chip>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {fields.map(field => (
+            <Input
+              key={field}
+              placeholder={field}
+              value={values[field] ?? ""}
+              onChange={e => setValues(v => ({ ...v, [field]: e.target.value }))}
+            />
+          ))}
+        </div>
+
+        <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
+          A record created here has no source system — its facts start on the Sandbox
+          plane and get promoted as they are verified.
+        </span>
+
+        {tried && !complete && (
+          <span style={{ fontSize: 12, color: "var(--field-text-error)" }}>
+            {`Every field is required. ${fields.filter(f => !(values[f] ?? "").trim()).length} still empty.`}
+          </span>
+        )}
+      </div>
+    </SlideOut>
+  )
+}
+
 // ── Table columns ─────────────────────────────────────────────────────────────
 
 const CONTACT_COLUMNS: TableColumn<UcpContact>[] = [
@@ -211,6 +329,7 @@ export default function PMThomasUcpContactsScreen() {
   const kebabDropdown = useDropdownPosition(kebabAnchor)
   const [archiving,  setArchiving]  = useState<UcpContact | null>(null)
   const [chatOpen,   setChatOpen]   = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
 
   const activeType = TYPE_TABS.find(t => t.id === tab)?.type ?? "all"
 
@@ -311,8 +430,13 @@ export default function PMThomasUcpContactsScreen() {
           title="Contacts"
           description="Every person, employee and company AIMS OS keeps a unified profile for."
           primaryAction={
-            <Button variant="main" size="sm" icon={<Sparkle size={13} />} onClick={() => setChatOpen(true)}>
-              Ask the concierge
+            <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={() => setCreateOpen(true)}>
+              {CREATE_LABEL[tab] ?? CREATE_LABEL.all}
+            </Button>
+          }
+          secondaryAction={
+            <Button variant="secondary" size="sm" icon={<Sparkle size={13} />} onClick={() => setChatOpen(true)}>
+              Ask
             </Button>
           }
         />
@@ -378,10 +502,10 @@ export default function PMThomasUcpContactsScreen() {
           title={hasFilters ? "No contacts found" : "No contacts yet"}
           description={hasFilters
             ? "Try adjusting your filters or search term."
-            : "Contacts arrive through account sync and ingestion. They'll appear here once the first one lands."
+            : "Records arrive through account sync and ingestion, or you can create the first one here."
           }
-          ctaLabel={hasFilters ? "Clear filters" : undefined}
-          onCta={hasFilters ? clearAll : undefined}
+          ctaLabel={hasFilters ? "Clear filters" : (CREATE_LABEL[tab] ?? CREATE_LABEL.all)}
+          onCta={hasFilters ? clearAll : () => setCreateOpen(true)}
         />
       ) : view === "cards" ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -533,6 +657,13 @@ export default function PMThomasUcpContactsScreen() {
         description="The record moves out of active views and its assigned agent stops acting on it. Facts and drives are kept, and you can restore it later."
         ctaPrimary={{ label: "Archive", onClick: () => setArchiving(null) }}
         ctaSecondary={{ label: "Cancel", onClick: () => setArchiving(null) }}
+      />
+
+      <CreatePanel
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        lockedType={activeType === "all" ? null : activeType}
+        onCreate={() => setCreateOpen(false)}
       />
 
       <RosterConcierge open={chatOpen} onClose={() => setChatOpen(false)} total={CONTACTS.length} />
