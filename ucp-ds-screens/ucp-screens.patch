@@ -851,10 +851,10 @@ index 0000000..810fd03
 +}
 diff --git a/src/screens/pm-thomas-ucp-profile.tsx b/src/screens/pm-thomas-ucp-profile.tsx
 new file mode 100755
-index 0000000..2dceb63
+index 0000000..d619a74
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-profile.tsx
-@@ -0,0 +1,972 @@
+@@ -0,0 +1,1073 @@
 +/**
 + * UCP — Unified Contact Profile (detail view).
 + *
@@ -981,19 +981,138 @@ index 0000000..2dceb63
 +/** Metric rows shared by the Governance and Risk study widgets. */
 +function MetricRows({ rows }: { rows: { label: string; value: string; icon: string; variant: "success" | "alert" | "informative" | "neutral" }[] }) {
 +  const { availableHeight } = useWidgetSize()
-+  // 34px pitch per single-line metric row, 70px for the widget's title chrome + padding.
-+  const maxRows = availableHeight ? Math.max(2, Math.floor((availableHeight - 70) / 34)) : rows.length
++  // 37px pitch per row now that each carries its own divider, 70px for the
++  // widget's title chrome + padding.
++  const maxRows = availableHeight ? Math.max(2, Math.floor((availableHeight - 70) / 37)) : rows.length
++  const visible = rows.slice(0, maxRows)
 +  return (
-+    <div style={{ padding: "4px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-+      {rows.slice(0, maxRows).map(row => (
-+        <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-+          <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{row.label}</span>
-+          <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
-+            <HighlightIcon size="sm" variant={row.variant} iconName={row.icon} />
-+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)", whiteSpace: "nowrap" }}>{row.value}</span>
++    <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column" }}>
++      {visible.map((row, i) => (
++        // Icon, then label, then value — left to right, in the order the eye
++        // scans. The icon used to sit beside the value on the right, which meant
++        // reading across the whole row to find out what kind of thing the number
++        // was. Same arrangement the sibling profile settled on.
++        //
++        // The divider is --color-border-neutral-subtle, the same token the
++        // SlideOut and Side Panel use for their internal separators. The last
++        // row drops it: a rule under the final item draws a line to nothing.
++        <div
++          key={row.label}
++          style={{
++            display: "flex", alignItems: "center", gap: 10, padding: "8px 0",
++            borderBottom: i === visible.length - 1 ? "none" : "1px solid var(--color-border-neutral-subtle)",
++          }}
++        >
++          <HighlightIcon size="sm" variant={row.variant} iconName={row.icon} />
++          {/* One line, always. A wrapped label turns a 37px row into 55px, and
++              the widget's fixed height then swallows the rows below it. */}
++          <span
++            title={row.label}
++            style={{
++              fontSize: 12, color: "var(--field-supporting)", flex: 1, minWidth: 0,
++              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
++            }}
++          >
++            {row.label}
++          </span>
++          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)", whiteSpace: "nowrap" }}>
++            {row.value}
++          </span>
++        </div>
++      ))}
++    </div>
++  )
++}
++
++/**
++ * Last Activity Widget (catalog id `activity`, class 3 — Heavy, 9 GU).
++ *
++ * The Overview used to render this slot as a Table with five columns. A Table
++ * is its own widget in the catalog, with its own use cases, and column headers
++ * on five recent touchpoints are chrome nobody reads. The catalog's Last
++ * Activity Widget is the one that fits: *"Chronological feed of customer
++ * interaction events — calls, emails, and SMS. Each item shows a channel icon,
++ * event metadata, timestamp, and optional alert tags… Internal scroll for
++ * overflow."*
++ *
++ * Communication channels only, which is the widget's own rule — *"Don't mix
++ * non-communication activity types in this widget: use Timeline for lifecycle
++ * events."* Agent and system events are lifecycle, so they stay on the Activity
++ * tab, where the full trace lives. That split is also the honest product
++ * answer: this widget says when we last touched the person, the tab says
++ * everything that happened to the record.
++ *
++ * Empty is a real state here. A record whose only events are agent and system
++ * ones has genuinely never been contacted, and saying so is more useful than a
++ * feed that quietly includes the robot's own work to look busy.
++ */
++const COMMS: ActivityChannel[] = ["call", "email", "meeting"]
++
++function LastActivityContent({ contact, onViewAll }: { contact: UcpContact; onViewAll: () => void }) {
++  const { availableHeight } = useWidgetSize()
++  const items = useMemo(
++    () => getActivity(contact).filter(a => COMMS.includes(a.channel)),
++    [contact],
++  )
++
++  if (items.length === 0) {
++    return (
++      <EmptyState
++        compact
++        icon={Inbox}
++        title="No interactions yet"
++        description="Calls, emails and meetings with this contact will appear here."
++      />
++    )
++  }
++
++  // 56px pitch per two-line item, 86px for the widget's title chrome, padding
++  // and the footer button.
++  const maxItems = availableHeight ? Math.max(1, Math.floor((availableHeight - 86) / 56)) : items.length
++
++  return (
++    <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column" }}>
++      {items.slice(0, maxItems).map((a, i, shown) => (
++        <div
++          key={a.id}
++          style={{
++            display: "flex", alignItems: "flex-start", gap: 10, padding: "8px 0",
++            borderBottom: i === shown.length - 1 ? "none" : "1px solid var(--color-border-neutral-subtle)",
++          }}
++        >
++          <HighlightIcon size="sm" variant="neutral" iconName={CHANNEL_META[a.channel].icon} />
++          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
++            <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
++              <span
++                title={a.title}
++                style={{
++                  fontSize: 12, fontWeight: 600, color: "var(--foreground)",
++                  flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
++                }}
++              >
++                {a.title}
++              </span>
++              {/* The alert tag the spec calls for — only when the event carries
++                  something worth flagging, never a status badge on every row. */}
++              {a.state.variant !== "success" && (
++                <Tag variant={a.state.variant} size="sm">{a.state.label}</Tag>
++              )}
++            </div>
++            <span
++              title={a.meta}
++              style={{
++                fontSize: 12, color: "var(--field-supporting)",
++                whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
++              }}
++            >
++              {a.timestamp} · {a.meta}
++            </span>
 +          </div>
 +        </div>
 +      ))}
++      <Button variant="tertiary" size="sm" className="self-start !px-0 mt-[4px]" onClick={onViewAll}>
++        View full timeline
++      </Button>
 +    </div>
 +  )
 +}
@@ -1578,30 +1697,12 @@ index 0000000..2dceb63
 +      })
 +    }
 +    slots.push({
-+      uid: "recent-activity", title: "Recent activity", colSpan: 3, widthClass: "full",
++      uid: "recent-activity", title: "Recent activity", colSpan: 3, widthClass: "full", rowSpan: 5,
 +      content: (
-+        <div style={{ padding: "0 16px 16px" }}>
-+          <Table
-+            size="sm"
-+            rowKey={r => r.id}
-+            data={getActivity(contact).slice(0, 5)}
-+            columns={[
-+              { key: "timestamp", header: "When",    width: "18%", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)", whiteSpace: "nowrap" }}>{r.timestamp}</span> },
-+              { key: "channel",   header: "Channel", width: "12%", render: r => <Tag variant="neutral" size="sm">{CHANNEL_META[r.channel].label}</Tag> },
-+              { key: "title",     header: "Event",                 render: r => <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{r.title}</span> },
-+              { key: "meta",      header: "Detail",  width: "30%", render: r => <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>{r.meta}</span> },
-+              { key: "state",     header: "Status",  width: "14%", render: r => <Tag variant={r.state.variant} size="sm">{r.state.label}</Tag> },
-+            ]}
-+          />
-+          <Button
-+            variant="tertiary"
-+            size="sm"
-+            className="!px-0 mt-[8px]"
-+            onClick={() => { setTab("activity"); setActPage(1) }}
-+          >
-+            View full timeline
-+          </Button>
-+        </div>
++        <LastActivityContent
++          contact={contact}
++          onViewAll={() => { setTab("activity"); setActPage(1) }}
++        />
 +      ),
 +    })
 +    return slots
