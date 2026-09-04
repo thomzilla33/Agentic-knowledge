@@ -30,10 +30,26 @@ npm run build                   # debe pasar con 0 errores
 npm run dev                     # localhost:5173 → sidebar → Prototypes
 ```
 
-El patch toca 6 archivos: 2 componentes en `experimental/`, 3 en `src/screens/`,
-y **2 líneas** en `src/App.tsx` (1 import + 1 entrada en `PROTOTYPE_PAGES`).
-Ese archivo está protegido por CODEOWNERS, así que el PR necesita review de
+El patch toca 7 archivos: 2 componentes nuevos en `experimental/`, 3 en
+`src/screens/`, **2 líneas** en `src/App.tsx` (1 import + 1 entrada en
+`PROTOTYPE_PAGES`), y **borra** `src/screens/pm-thomas-universal-profile.tsx`.
+`App.tsx` está protegido por CODEOWNERS, así que el PR necesita review de
 **@cachilupis** — es el comportamiento esperado, no un bloqueo.
+
+### Se retira el prototipo Universal Profile
+
+`pm-thomas-universal-profile.tsx` y su card salen del repo: este trabajo lo
+reemplaza, y era la card vieja del mismo concepto. El archivo se borra en vez de
+quedar sin registrar porque el `audit-tokens.cjs` cuenta huérfanos sobre
+`src/screens/**` y su ratchet de CI falla el PR si cualquier categoría sube —
+dejarlo habría llevado `orphan` de 0 a 1. Contadores antes y después del cambio:
+`errors=0 orphan=0 shadow=0 main_overuse=0 card_reimpl=0`.
+
+Qué se pierde y qué no: el screen viejo no aportaba nada que el nuevo no tenga,
+y varias cosas que ya violaban las reglas vigentes — la lista hecha con
+`CardContainer` + divs a mano en vez de `EntityList`, sin `Filters`, sin
+`Pagination`, sin `EmptyState`, y `RecordHeader` donde ahora va el Entity
+Header. Su historial queda en git si alguien lo necesita.
 
 ---
 
