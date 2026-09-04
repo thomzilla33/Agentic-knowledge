@@ -307,20 +307,45 @@ Ahora dice **Next Best Action** y lleva la recomendación del registro: título,
 cuándo, y por qué. Sin el rationale sería una orden, no una propuesta — misma
 regla que la card del perfil.
 
-**El nombre exacto costó un rodeo.** `EntityList` renderiza la etiqueta como
-`AI {action}` — el `AI ` está hardcodeado en `entity-list.tsx:426` — así que
-pasar "Next Best Action" imprimía **"AI Next Best Action"**. El Next Best Action
-es un concepto de producto con nombre propio, no una categoría de output de IA,
-y tiene que leerse en la fila igual que en la card. Así que la etiqueta va
-apagada (`showLabel: false`) y el nombre encabeza la primera línea. `action`
-queda pasado igual, para cuando `entity-list.tsx` deje de prefijar y la etiqueta
-con estilo pueda volver: es un carácter en un archivo bajo `CODEOWNERS`.
+**El nombre exacto necesitó una prop nueva en el DS.** `EntityList` renderizaba
+la etiqueta como `AI {action}`, con el `AI ` hardcodeado, así que pasar "Next
+Best Action" imprimía **"AI Next Best Action"**. El prefijo está bien cuando
+`action` nombra una *categoría* de output — "AI Summary", "AI Impact", "AI
+Escalated", que es como lo usan las otras tres pantallas. Está mal cuando
+`action` es un concepto de producto con nombre propio: "AI Next Best Action"
+renombra la cosa, y la fila deja de decir lo mismo que la card del perfil.
+
+Primero lo rodeé con `showLabel: false` y el nombre al inicio del texto. Daba la
+palabra correcta pero perdía el peso de la etiqueta — 13px semibold
+`--foreground` bajaba a 12px medium `--muted-foreground`. Así que la solución
+quedó en el componente:
+
+```ts
+showAiPrefix?: boolean   // default true — ningún caller existente cambia
+```
+
+`showAiPrefix: false` imprime `action` tal cual y **conserva el estilo de la
+etiqueta**. Es opt-out, no opt-in, así que las tres pantallas que ya usaban
+`aiInsight` renderizan byte por byte lo mismo — verificado corriendo el
+playground del DS: con el default sigue diciendo "AI Escalated", con el toggle
+apagado dice "Escalated".
+
+Va con su toggle en el playground de `entity-list` (**Prefijo «AI »**) y su fila
+en la tabla de props. Una prop del DS que no se puede ejercitar en la página del
+propio componente es el mismo problema que los estados del header: existe en el
+archivo y nadie la puede revisar.
+
+**De paso, un separador colgado.** Con la etiqueta encendida y el bloque
+expandido, el `·` que divide etiqueta de detalle quedaba solo al final de la
+línea — el detalle inline se va a los bullets al expandir, pero el separador se
+quedaba. Ahora solo se renderiza cuando hay algo que separar. Es un bug
+preexistente del componente; se hizo visible al recuperar la etiqueta.
 
 Y el `detail` pasó a ser un array en vez de una sola cadena corrida. La primera
-línea es para lo que existe la fila — el nombre, la propuesta y el cuándo — y el
-rationale se vuelve su propio bullet al expandir, que es donde el lector va a
-decidir. Las diez recomendaciones traen uno, así que el bloque siempre tiene algo
-en qué expandirse.
+línea es para lo que existe la fila — la propuesta y el cuándo — y el rationale
+se vuelve su propio bullet al expandir, que es donde el lector va a decidir. Las
+diez recomendaciones traen uno, así que el bloque siempre tiene algo en qué
+expandirse.
 
 Un roster se escanea para decidir qué abrir a continuación, y la recomendación es
 lo que responde eso. El resumen del agente no se perdió: sigue en el widget del
@@ -422,6 +447,8 @@ concierge responde, etiqueta de qué plano salió cada parte.
 ucp-ds-screens/
 ├── ucp-screens.patch                            # el diff completo, listo para git apply
 ├── src/
+│   ├── components/ui/
+│   │   └── entity-list.tsx                      # showAiPrefix + separador · CODEOWNERS
 │   ├── components/experimental/
 │   │   ├── entity-header.tsx                    # DS-GAP · Figma 19815-101547
 │   │   └── next-best-action-card.tsx            # DS-GAP · misma frame
@@ -462,6 +489,24 @@ ucp-ds-screens/
 
 ---
 
+## Lo que toca `src/components/` — necesita review de Michael
+
+`.github/CODEOWNERS` marca `/src/components/` y `/src/App.tsx` con
+`@cachilupis`, así que el PR no mergea sin su review. Dos archivos, ambos
+aditivos:
+
+- **`entity-list.tsx`** — la prop `showAiPrefix?: boolean` (default `true`) y el
+  arreglo del separador colgado. Ningún caller existente cambia de render.
+- **`App.tsx`** — el toggle del playground, el wiring en las dos ramas del demo
+  item, la fila en la tabla de props, y las dos líneas del registro del
+  prototipo (import + entrada en `PROTOTYPE_PAGES`, más el retiro del Universal
+  Profile).
+
+Todo lo demás vive en `/src/screens/` y `/src/components/experimental/`, que no
+tienen owner.
+
+---
+
 ## `// DS-GAP:` marcados
 
 1. **`entity-header.tsx`** — el frame de Figma sigue WIP. Cuando Michael lo cierre
@@ -484,13 +529,6 @@ ucp-ds-screens/
   (Restricted gobierna valores, no identidad, y las prioridades 1–3 no se
   debilitan). Si Design quiere el título atenuado, es la línea `color` de
   `Title`.
-- **El `AI ` hardcodeado en `entity-list.tsx:426`.** La etiqueta del bloque de
-  insight es `AI {action}`, sin forma de apagar solo el prefijo. Lo rodeé con
-  `showLabel: false` y el nombre al inicio de la línea, que da el texto correcto
-  pero pierde el peso tipográfico de la etiqueta (13px semibold `--foreground`
-  → 12px medium `--muted-foreground`). Si Michael hace el prefijo opcional
-  — `{ai.aiPrefix !== false && "AI "}` o similar — se recupera el estilo y se
-  vuelve a `showLabel` por defecto.
 - **El umbral de 760px.** Lo derivé midiendo dónde deja de caber la fila única
   con este contenido. El spec no da un número. Si Design fija uno, es la
   constante `HEADER_STACK_THRESHOLD`.
