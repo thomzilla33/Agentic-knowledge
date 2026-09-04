@@ -373,24 +373,46 @@ export default function PMThomasUcpContactsScreen() {
     title:       c.name,
     iconName:    TYPE_ICON[c.type],
     iconVariant: c.type === "company" ? "light-blue" : c.type === "employee" ? "purple" : "info",
-    // Owner, last interaction and email are not values the row needs to show —
-    // they are reference facts. They ride the top row's tooltip instead, where
-    // the identity context already lives, and the row itself keeps only what
-    // says where this record came from.
+    // Top row is context plus identifier: the source (one item, always visible,
+    // per the shared content model) and the record ID.
     primaryMeta: [
-      {
-        iconName: "Info",
-        label:    c.subtitle,
-        tooltip:  `${c.subtitle} · Owner ${c.owner} · Last interaction ${c.lastInteraction} · ${c.email}`,
-      },
-      { iconName: "Hash", label: c.id, tooltip: `Record ID · ${c.id}` },
-    ],
-    // The source: the system this record was pulled from. One item, never two.
-    secondaryMeta: [
       {
         iconName: c.source.iconName,
         label:    c.source.label,
         tooltip:  `Source · ${c.source.label}. The system this record was pulled from.`,
+      },
+      { iconName: "Hash", label: c.id, tooltip: `Record ID · ${c.id}` },
+    ],
+    // Secondary metadata. Four items, values only — no field labels on the row,
+    // because the tooltip is what names the field. The spec puts a job title and
+    // a parent company here explicitly ("NOT A SOURCE… they belong in tags or in
+    // secondary metadata"), and qualifies the rest by whether someone could act
+    // on it or governance needs it visible.
+    secondaryMeta: [
+      {
+        iconName: "Info",
+        label:    c.subtitle,
+        tooltip:  `${c.type === "company" ? "Profile" : "Role"} · ${c.subtitle}`,
+      },
+      {
+        iconName: "UserRound",
+        label:    c.owner,
+        tooltip:  `Account owner · ${c.owner}. Last interaction ${c.lastInteraction}.`,
+      },
+      {
+        iconName: "ShieldCheck",
+        label:    `${getFacts(c).filter(f => f.plane === "truth").length} verified`,
+        tooltip:  `Verified facts · ${getFacts(c).filter(f => f.plane === "truth").length} on the Truth plane of ${getFacts(c).length} total.`,
+      },
+      // The spec names the assigned agent as qualifying metadata, and AIMS OS
+      // is agent-first, so every record has one. An open-items count would sit
+      // better here, but it is only modelled on 7 of the 16 records — printing
+      // "None open" for the other 9 would be false on several of them, so that
+      // number needs a real field before it can go on the row.
+      {
+        iconName: "Bot",
+        label:    c.agent.name,
+        tooltip:  `Assigned agent · ${c.agent.name}. Opens a chat scoped to this record.`,
       },
     ],
     aiInsight: {
