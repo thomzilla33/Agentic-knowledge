@@ -20,21 +20,42 @@ no exporta un default — exporta `UcpProfileView`, que el roster monta.
 
 ---
 
-## Cómo aplicarlo en el repo del DS
+## Cómo abrir el PR en el repo del DS
+
+Esta sesión de Claude Code **no puede** pushear a `cachilupis/aims-os-design-system`.
+No es permisos de la cuenta — `list_repos` reporta `can_push: true` — es que la
+sesión está atada al owner `thomzilla33` y las tres vías están cerradas:
+`add_repo` responde `cross-tier adds are not supported in v1`, el proxy de git
+devuelve 403 sin inyectar credencial, y la API de GitHub responde
+`not configured for this session`.
+
+Así que va a mano, o desde una sesión nueva que arranque con el repo del DS como
+source inicial:
 
 ```bash
 cd ~/aims-os-ds                 # tu clon de cachilupis/aims-os-design-system
-git checkout -b pm-thomas/ucp-vista-actualizada
+git checkout main && git pull
+git checkout -b claude/ucp-unified-contact-profile
 git apply /ruta/a/ucp-ds-screens/ucp-screens.patch
-npm run build                   # debe pasar con 0 errores
-npm run dev                     # localhost:5173 → sidebar → Prototypes
+npm run build                                  # 0 errores
+node scripts/audit-tokens.cjs --counts         # ninguna categoría sube
+npm run dev                                    # localhost:5173 → Prototypes
+git add -A && git commit                       # el mensaje sale del historial de esta rama
+git push -u origin claude/ucp-unified-contact-profile
+gh pr create --base main --title "UCP — Unified Contact Profile, built on the DS" \
+             --body-file /ruta/a/ucp-ds-screens/PR.md --reviewer cachilupis
 ```
 
-El patch toca 7 archivos: 2 componentes nuevos en `experimental/`, 3 en
-`src/screens/`, **2 líneas** en `src/App.tsx` (1 import + 1 entrada en
-`PROTOTYPE_PAGES`), y **borra** `src/screens/pm-thomas-universal-profile.tsx`.
-`App.tsx` está protegido por CODEOWNERS, así que el PR necesita review de
-**@cachilupis** — es el comportamiento esperado, no un bloqueo.
+El cuerpo del PR está escrito y listo en **`PR.md`**, en esta misma carpeta.
+
+El patch toca 8 archivos: 2 componentes nuevos en `experimental/`, 3 en
+`src/screens/`, `entity-list.tsx`, `App.tsx`, y **borra**
+`src/screens/pm-thomas-universal-profile.tsx`. `entity-list.tsx` y `App.tsx`
+están bajo CODEOWNERS, así que el PR necesita review de **@cachilupis** — es el
+comportamiento esperado, no un bloqueo.
+
+CI corre `.github/workflows/design-system-checks.yml` en todo PR: `npm run build`
+y el token audit con su ratchet. Ambos ya pasan en local.
 
 ### Se retira el prototipo Universal Profile
 
@@ -446,6 +467,7 @@ concierge responde, etiqueta de qué plano salió cada parte.
 ```
 ucp-ds-screens/
 ├── ucp-screens.patch                            # el diff completo, listo para git apply
+├── PR.md                                        # el cuerpo del PR, listo para --body-file
 ├── src/
 │   ├── components/ui/
 │   │   └── entity-list.tsx                      # showAiPrefix + separador · CODEOWNERS
