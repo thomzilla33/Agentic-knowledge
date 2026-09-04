@@ -422,7 +422,13 @@ function EntityListRow({ item }: { item: EntityListItemData }) {
               "flex flex-col gap-[6px] px-[8px] py-[8px] rounded-[8px]",
               !isLong && "self-start"  // adapt to text width when short; full-width when long
             )}
-            style={{ background: "var(--tag-purple-bg)", border: "1px solid var(--tag-purple-bd)" }}
+            // Card tokens, not tag tokens. The background is the same value in
+            // both families, but --tag-purple-bd is a full-strength #a855f7
+            // meant to outline a Tag, and at card size it reads as a loud box
+            // rather than a surface. --card-purple-border is the 20% border the
+            // same block uses inside RecordHeader, so the row and the profile
+            // now render the recommendation as the same object.
+            style={{ background: "var(--card-purple-bg)", border: "1px solid var(--card-purple-border)" }}
             onClick={e => e.stopPropagation()}
           >
             {/* Header row: sparkle · label · inline-text (short/collapsed) · [view more] · chevron */}
