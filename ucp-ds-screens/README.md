@@ -112,12 +112,27 @@ Overview:
 - **Nada envuelve, nada se abrevia.** Título, tags, source y metadata truncan con
   elipsis y entregan el valor completo al tooltip. El título cede al final: los
   tags colapsan en `+N` antes de que el identificador pierda un carácter.
-- **El header queda pineado al hacer scroll.** Vive en la zona de header de
-  `ScreenLayout`, que está fuera del contenedor con scroll. Al bajar colapsa al
-  **estado Minimum** que el propio spec define — *"Only visual, title and state.
-  No description, no tags, no metadata. The header stays valid."* — más la fila
-  de acciones, que es fija y nunca se comprime. La card del Next Best Action
-  **no** se pinea: es un registro aparte y baja con el contenido.
+- **El chrome del registro queda pineado al hacer scroll** — header, Next Best
+  Action y tabs — en la zona de header de `ScreenLayout`, que está fuera del
+  contenedor con scroll. Al bajar, el header colapsa al **estado Minimum** que
+  el propio spec define: *"Only visual, title and state. No description, no
+  tags, no metadata. The header stays valid."* Más la fila de acciones, que es
+  fija y nunca se comprime.
+
+  **El orden dentro del bloque pineado es el del spec, no una preferencia.** La
+  card del Next Best Action tiene que ir directamente debajo del header y nunca
+  bajo una capa de navegación: renderizada debajo de los tabs se lee como si
+  perteneciera al tab activo en vez de al registro. Por eso pinear los tabs
+  obligó a pinear la card por encima de ellos.
+
+  **Y la card se aparta al hacer scroll.** Medido en navegador a 1440×1000: con
+  los tres elementos fijos el bloque ocupaba 429px al descansar y solo bajaba a
+  389 al hacer scroll, porque el colapso Minimum encoge el header pero la card
+  seguía a tamaño completo. Eso es exactamente lo que la regla 2 de la propia
+  card objeta — *"stacked cards push the real content below the fold"* — solo que
+  de forma permanente. La card ahora sale del bloque pineado al hacer scroll:
+  429 → **221px**, el mismo valor que un registro sin recomendación. Al
+  descansar mantiene su posición correcta debajo del header, y vuelve al subir.
 - **Las tres acciones no son tres botones.** `Ask` es el botón con gradiente que
   abre el Personal Assistant — habla, no ejecuta, y por eso no puede compartir la
   marca visual del Next Best Action, que sí pide una decisión. `(i)` abre el
