@@ -237,14 +237,22 @@ function Visual({ visual, title }: { visual: EntityVisual; title: string }) {
   )
 }
 
-/** Title truncates last: flex 0 1 auto with min-width 0, ellipsis, full value in a tooltip. Never wraps. */
-function Title({ title, muted }: { title: string; muted?: boolean }) {
+/**
+ * Title truncates last: flex 0 1 auto with min-width 0, ellipsis, full value in
+ * a tooltip. Never wraps.
+ *
+ * It renders at full strength in every state, Restricted included. Restricted
+ * governs the entity's VALUES, not its identity — the name is already visible
+ * in the list the viewer came from, and dimming it would say the name itself is
+ * uncertain. Priorities 1 to 3 are never dropped and never weakened.
+ */
+function Title({ title }: { title: string }) {
   return (
     <Tooltip content={title} side="cursor" triggerClassName="block min-w-0">
       <h1
         style={{
           fontSize: 20, fontWeight: 600, lineHeight: 1.2, margin: 0,
-          color: muted ? "var(--field-supporting)" : "var(--color-text-title)",
+          color: "var(--color-text-title)",
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}
       >
@@ -472,7 +480,7 @@ export function EntityHeader({
       {/* flex 0 1 auto + min-width 0: the title takes what remains after visual,
           source, collapsed tags and actions, and truncates only there. */}
       <div style={{ flex: "0 1 auto", minWidth: 0, marginLeft: 4 }}>
-        <Title title={title} muted={restricted} />
+        <Title title={title} />
       </div>
       {shownSource && !stacked && (
         <>

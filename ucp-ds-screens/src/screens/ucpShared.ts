@@ -55,6 +55,14 @@ export interface UcpContact {
    * created in the platform itself; the slot is removed, never refilled.
    */
   source:          { label: string; iconName: string }
+  /**
+   * The entitlement scope a viewer must hold to read this record's governed
+   * values. Undefined means the record carries nothing scope-gated beyond the
+   * access that got the viewer to the list. This is a property of the VIEWER's
+   * relationship to the record, not of the record: the same row renders in full
+   * for someone who holds the scope.
+   */
+  requiredScope?:  string
   /** Signals first (by severity), then classification. Max 6 including overflow. */
   tags:            EntityTag[]
   /** Max 6, aim for four. Every item carries a tooltip naming its field. */
@@ -112,6 +120,37 @@ export const STATUS_TAG: Record<UcpStatus, TagVariantLite> = {
  */
 export function entityState(c: UcpContact): { label: string; variant: TagVariantLite } {
   return c.stateBadge ?? { label: c.status, variant: STATUS_TAG[c.status] }
+}
+
+// ── Entitlements ──────────────────────────────────────────────────────────────
+
+/**
+ * The scopes the signed-in viewer holds. Hardcoded here because the prototype
+ * has no identity provider — in the product this comes from the session, and
+ * nothing else about the code below changes.
+ *
+ * Thomas is a PM: he can read contacts and HR records, and he cannot read
+ * finance. That last omission is the point — it is what makes the Entity
+ * Header's Restricted state reachable from a real rule instead of a mock flag.
+ */
+export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
+
+/**
+ * Restricted is a state, not a failure, and the copy has to say so. It never
+ * suggests the viewer did something wrong and never implies the record is
+ * broken: the fields exist, they are governed, and here is the scope that opens
+ * them. The record itself stays visible — hiding it would tell the viewer
+ * something untrue about what the tenant holds.
+ *
+ * Returns null when the viewer holds what the record needs.
+ */
+export function restrictionFor(c: UcpContact): { scope: string; note: string } | null {
+  if (!c.requiredScope) return null
+  if (VIEWER_SCOPES.includes(c.requiredScope)) return null
+  return {
+    scope: c.requiredScope,
+    note: `These values are governed by ${c.requiredScope}, which your role does not hold. The record exists and is intact — request the scope to read it.`,
+  }
 }
 // ── Knowledge planes ──────────────────────────────────────────────────────────
 
@@ -450,6 +489,9 @@ export const CONTACTS: UcpContact[] = [
     owner: "Priya Nair", status: "Inactive", lastInteraction: "Apr 3, 2026",
     stateBadge: { label: "Superseded", variant: "neutral" },
     source: { label: "Salesforce", iconName: "Cloud" },
+    // The only scope-gated record in the set: she is the CFO, so her values sit
+    // behind finance.read, which the PM viewing this prototype does not hold.
+    requiredScope: "finance.read",
     tags: [
       { label: "Inactive", role: "signal", tone: "neutral", severity: 1, tooltip: "Lifecycle · marked inactive Apr 3" },
       { label: "Person",   role: "classification" },

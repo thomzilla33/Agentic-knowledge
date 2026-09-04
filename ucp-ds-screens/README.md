@@ -158,6 +158,99 @@ del header y a ancho completo.
 
 ---
 
+## Los estados del header
+
+El component set de Figma es `Property 1 = Default | Loading | Restricted` ×
+`Size = Default | Responsive`, más los cinco estados que el componente declara
+como propios. Estaban todos implementados en `entity-header.tsx`, pero el
+prototipo solo renderizaba dos de ellos — Default y Minimum. Un estado que
+existe en el archivo y no se ve corriendo no está revisado: nadie puede aprobar
+lo que no se puede abrir. Los tres que faltaban ahora se llegan navegando.
+
+### Restricted — una regla de entitlement, no un flag
+
+Restricted lo decide **lo que tiene el viewer contra lo que pide el registro**,
+nunca una propiedad del registro. En `ucpShared.ts`:
+
+```ts
+export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
+
+export function restrictionFor(c: UcpContact): { scope: string; note: string } | null
+```
+
+Thomas es PM: lee contactos y RRHH, y **no** lee finanzas. Esa omisión es el
+punto — es lo que hace el estado alcanzable desde una regla real. El único
+registro con scope es **Amy Chen**, la CFO de Meridian: `requiredScope:
+"finance.read"`. El mismo registro se renderiza completo para alguien que sí
+tenga el scope; no hay nada especial en la fila.
+
+Lo que cambia, y por qué:
+
+- **El header baja a identidad + estado.** Se retira el grupo de tags y la
+  metadata; sobreviven visual, título, source y state badge. `(i)`, `Ask` y `⋮`
+  quedan deshabilitados: los tres leen valores.
+- **El título va a fuerza completa, no atenuado.** Esto lo cambié: antes iba en
+  `--field-supporting`. Restricted gobierna los **valores** de la entidad, no su
+  identidad — el nombre ya está visible en el listado del que vino el viewer, y
+  atenuarlo dice que el nombre mismo es incierto. Las prioridades 1 a 3 no se
+  bajan **ni se debilitan**.
+- **El cuerpo sigue al header.** Los tabs quedan montados y siguen cambiando —
+  son parte de la forma del registro, y esconderlos falsearía lo que el tenant
+  tiene. Pero el contenido se reemplaza por un `EmptyState` que nombra el scope.
+  Dejar los hechos, el timeline y los drives en pantalla bajo un header que dice
+  *"estos valores están gobernados"* sería la página contradiciendo al header.
+- **El panel de Preview del listado tiene la misma puerta.** Imprimía el read del
+  agente, el email y los conteos de hechos. Un preview que filtra lo que el
+  perfil protege deja la restricción como decoración — el panel es la puerta más
+  fácil, así que tiene que ser la misma puerta. Sobrevive lo de nivel directorio:
+  Record ID, Owner, Source.
+- **La fila del listado lo marca.** Un ítem `🔒 Restricted` en la metadata
+  superior, con el scope en el tooltip. Enterarse de que un registro está
+  gobernado **después** de abrirlo es la versión de esto que desperdicia un clic.
+
+El texto no culpa al viewer ni sugiere que el registro esté roto: *"The record
+exists and is intact — request the scope to read it."* Es un estado, no un fallo.
+
+### Loading — el primer paint de un fetch
+
+El registro se busca, así que existe un instante en el que no está. El skeleton
+del header es lo que va ahí, con la disposición que le corresponde a su `size`.
+Se re-arma por `contact.id`: navegar de un contacto a otro es un fetch nuevo, no
+un re-render del anterior.
+
+Y el cuerpo acompaña. Un `LoadingBody` de skeletons reemplaza el contenido del
+tab, porque una pantalla que dice "cargando" en un lugar y muestra valores
+terminados en otro está afirmando dos cosas distintas del mismo registro. No es
+un `EmptyState`: *"nothing here"* es falso mientras el dato viene en camino.
+
+La card del Next Best Action tampoco aparece mientras carga — es una propuesta
+derivada de valores que todavía no llegaron.
+
+### Responsive — el breakpoint es el de la card, no el del viewport
+
+El spec es explícito: *"the breakpoint it responds to is the card's, not the
+viewport's"*, y es la razón por la que `size` es una prop y no un media query —
+un header dentro de un panel lateral de 640px en un monitor de 1920 tiene que
+reflowear, y un media query nunca dispararía.
+
+Así que se mide la card, con `ResizeObserver`, siguiendo el patrón que el propio
+DS ya usa en `adaptive-metric-grid.tsx`. Umbral: **760px** de ancho de card, que
+es donde la fila única deja de caber.
+
+**REFLOW = stack before you shrink.** Medido en navegador:
+
+| Viewport | Ancho de card | Estado | Resultado |
+|---|---|---|---|
+| 1440 | ~1100px | `default` | Fila única, tags colapsados a `+1` |
+| 1024 | ~912px | `default` | Fila única, `+1`, título entero |
+| 820 | ~708px | `responsive` | Fila 1 identidad + acciones · fila 2 source + los 3 tags · fila 3 metadata |
+
+El título no se encoge para salvar la fila: los tags colapsan en `+N` primero, y
+cuando eso ya no alcanza, source y tags se van a su propia fila. Y `responsive` +
+`minimum` vuelve a una sola fila — un minimum apilado serían tres filas de nada.
+
+---
+
 ## Decisiones de producto
 
 | Decisión | Resultado |
@@ -318,7 +411,7 @@ ucp-ds-screens/
 │   │   ├── entity-header.tsx                    # DS-GAP · Figma 19815-101547
 │   │   └── next-best-action-card.tsx            # DS-GAP · misma frame
 │   └── screens/
-│       ├── ucpShared.ts                         # tipos + fixtures (14 entidades)
+│       ├── ucpShared.ts                         # tipos + fixtures (16 entidades) + entitlements
 │       ├── pm-thomas-ucp-contacts.tsx           # listado + navegación al perfil
 │       └── pm-thomas-ucp-profile.tsx            # UCP: header + NBA + 4 tabs + concierge
 ├── figma/                                       # el spec del que salió esto
@@ -333,13 +426,24 @@ ucp-ds-screens/
 
 - `npx tsc -b --noEmit` → 0 errores
 - `npm run build` → limpio
-- `npm run audit:tokens` → 0 hallazgos sobre estos 5 archivos (los 39 warnings de
-  spacing que reporta son preexistentes de otras pantallas)
+- `node scripts/audit-tokens.cjs --counts` → `errors=0 orphan=0 shadow=0
+  main_overuse=0 card_reimpl=0`, igual que la base (los 39 warnings de spacing
+  que reporta son preexistentes de otras pantallas). El ratchet de CI falla si
+  alguna categoría sube; ninguna sube.
 - `grep 'rgba\|#hex'` sobre los 5 archivos → 0 resultados
 - Navegador en `localhost:5173`, 1440×1000, sin errores de consola: header con y
   sin NBA, variante `accept`, panel de Information, cada tab, cada panel, el
   empty state filtrado, y la paginación reseteando en cada cambio de tab /
   filtro / orden
+- **Los estados, corriendo** (`screenshots/E*.png`): Loading en el primer paint
+  (`E0`), Restricted en el perfil y cambiando de tab (`E1`, `E2`), la fila del
+  listado marcándolo (`E3`), el Preview gobernado contra el normal (`E4`, `E5`),
+  el reflow responsive a 820 y su Minimum (`E6`, `E7`), la fila única a 1024
+  (`E8`), y Restricted a través del bundle compilado, no solo del dev server
+  (`E9`)
+- Verificado por asserts, no solo por captura: el Preview restringido no imprime
+  el email ni el read del agente (`0` coincidencias de cada uno), `Ask` reporta
+  `disabled=true`, y el Preview sin restricción sigue mostrando ambos
 
 ---
 
@@ -360,6 +464,17 @@ ucp-ds-screens/
   removed, not left empty"*, pero la variante `Property 1=Restricted` en Figma
   muestra los tags a la derecha, atenuados. Implementé lo que dice el texto (se
   quitan). Si el mock es la intención, es un cambio de una línea.
+- **Restricted y el título atenuado.** Relacionado: el mock atenúa el bloque de
+  identidad completo. Dejé el título a fuerza completa por el argumento de arriba
+  (Restricted gobierna valores, no identidad, y las prioridades 1–3 no se
+  debilitan). Si Design quiere el título atenuado, es la línea `color` de
+  `Title`.
+- **El umbral de 760px.** Lo derivé midiendo dónde deja de caber la fila única
+  con este contenido. El spec no da un número. Si Design fija uno, es la
+  constante `HEADER_STACK_THRESHOLD`.
+- **`Request access` no hace nada.** El `EmptyState` de Restricted ofrece el CTA
+  correcto, pero no hay flujo de solicitud de scope en AIMS OS todavía. Queda
+  como stub, igual que el resto de handlers del prototipo.
 - **NBA por debajo del mínimo.** El spec deja abierto qué hacer si el motor
   devuelve menos del mínimo de rationale ("Open question with Engineering").
   Aquí `rationale` es opcional y la card renderiza sin él antes que perderse.
