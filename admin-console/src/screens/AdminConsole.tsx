@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { SectionId, Scope, OriginStudio } from '../types';
 import { useApp } from '../context/AppContext';
 import { store } from '../mockApi/store';
@@ -169,9 +169,9 @@ export function AdminConsole({ sectionId, scopeId, origin }: AdminConsoleProps) 
 // ── Topbar ─────────────────────────────────────────────────────────────────
 
 function Topbar({
-  origin, scope, principal, isMultiScope, accessibleScopes,
+  origin, scope: _scope, principal, isMultiScope, accessibleScopes,
   activeScopeId, onScopeChange, searchQuery, onSearchChange,
-  sectionAccess, onSearchNavigate,
+  sectionAccess: _sectionAccess, onSearchNavigate: _onSearchNavigate,
 }: {
   origin: OriginStudio;
   scope: Scope;
