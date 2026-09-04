@@ -130,9 +130,40 @@ del header y a ancho completo.
 | Overview | Tab dentro del UCP, y es un `WidgetCanvasView` porque la regla del DS lo exige |
 | Layout del UCP | Híbrido: tabs fijos + canvas de widgets configurable en Overview |
 | Navegación del listado | Tabs por tipo → `SwitchTab` tarjetas/tabla → `Filters` |
-| Acción principal | Ninguna de creación. El registro llega por ingesta; el CTA es `Ask` |
+| Acción principal | `Create New {tipo}` como `primary`, siguiendo la pestaña activa; `Ask` baja a secondary |
 | Documents | Reemplazado por **Drives** (Source Drives del catálogo de la compañía) |
 | Snapshot | Nuevo tab: los hechos del registro por plano de conocimiento |
+
+### El CTA de creación nombra lo que va a crear
+
+El botón principal del listado sigue la pestaña activa: **Create New Contact**
+en All, y **Create New Person / Employee / Company** en cada tipo. Un "Create"
+genérico sobre un roster de tres tipos no dice qué va a construir, y el tipo ya
+está decidido por la pestaña en la que estás.
+
+Abre un `SlideOut` — un formulario de creación no es destructivo ni bloqueante,
+así que no es `ModalDialog`. Seis campos por tipo, sin prop `label` en los
+`Input` (en desktop el placeholder es la única pista de campo). En la pestaña
+All el panel pide el tipo con Chips; en las otras el tipo viene fijo y el picker
+no se renderiza.
+
+**Un detalle que sale del spec del Entity Header:** un registro creado aquí
+**no tiene source**. Source es el sistema del que se extrajo un registro, y el
+spec dice que si la entidad nació en la plataforma el slot se quita en vez de
+rellenarse. El panel lo dice explícitamente: sus hechos arrancan en el plano
+Sandbox y se promueven al verificarse.
+
+Dos notas sobre las decisiones que tomé aquí:
+
+- **Usa `variant="primary"`, no `main`.** `main` es el gradiente que el spec del
+  Entity Header reserva para `Ask` — el Personal Assistant, que *habla y no
+  ejecuta*. Un botón de creación ejecuta, así que ponerle esa marca es la
+  confusión exacta que el spec previene. La contra: `CLAUDE.md` dice que el CTA
+  del `Header` va en `main`. Si prefieres seguir esa regla, es un prop.
+- **`Ask` no desapareció, bajó a `secondaryAction`.** Quitar del todo el punto
+  de entrada del asistente de una superficie es un cambio de producto más grande
+  que cambiar una etiqueta, y el `Header` tiene el slot. Si lo quieres fuera,
+  se borra.
 
 ### Una desviación deliberada de CLAUDE.md
 
