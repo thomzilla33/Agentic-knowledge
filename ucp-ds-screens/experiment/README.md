@@ -145,17 +145,43 @@ es peor que uno deshabilitado. Ahora el panel está conectado, y de paso es dond
 la diferencia por tipo se vuelve visible: el vehicle muestra VIN, odómetro y su
 precio **enmascarado** por `finance.read`.
 
-**Un bug del DS, para Michael:** el trigger del agente dice **"Ask about 2024"** en
-el Ford F-150. `RecordHeader` toma el primer token del nombre (`Ask about
+**Un bug del DS, ahora arreglado:** el trigger del agente decía **"Ask about 2024"**
+en el Ford F-150. `RecordHeader` toma el primer token del nombre (`Ask about
 {firstName}`), que es correcto para una persona y absurdo para un vehículo. Es una
 consecuencia del agnosticism pass que quedó a medias: el componente ya dice servir
 *"Patient, Citizen, Student, anything the host platform defines tomorrow"*, pero
 esa etiqueta sigue con forma de persona.
 
-No lo arreglé. El componente no puede saber qué es una persona, y meter una
-heurística en un archivo bajo CODEOWNERS no me corresponde. El arreglo limpio sería
-una prop opcional `assistantLabel` para que el host decida — aditiva, igual que
-`showAiPrefix`. Queda propuesto, no hecho.
+**Arreglado con una prop nueva:** `assistantLabel?: string` en `RecordHeader`.
+Aditiva, default sin cambios.
+
+```ts
+assistantLabel?: string   // undefined → "Ask about {primer nombre}"
+```
+
+No puse una heurística en el componente a propósito. Desde el agnosticism pass
+`RecordHeader` no sabe qué tipos existen, y adivinar por la forma del string
+(¿empieza con dígito? ¿es un nombre de pila conocido?) sería meter ese
+conocimiento de vuelta por la ventana, y estaría mal para el naming de algún
+tenant desde el primer día. **Decide el host**, y solo en los tipos donde el
+default se rompe — vehicle, deal, invoice, payout, policy, test drive, trade-in.
+Customer, employee, company y dealership no la pasan: sus nombres son de persona
+o de marca, y "Ask about Sandra" / "Ask about Riverbend" ya funcionan.
+
+Un detalle que decidí: **el fallback por ancho sigue ganando.** Si la card es
+angosta, la etiqueta baja a "Ask AI" pase lo que pase, porque ese colapso es por
+espacio y no por naming. Y una etiqueta larga del host recibe la misma guarda de
+longitud que un nombre largo — si no, un host bienintencionado podría romper la
+fila de acciones.
+
+Va con el ejemplo 11 en el playground de `record-header`, que muestra el default
+roto y el override uno debajo del otro. Una prop del DS que no se puede ejercitar
+en la página de su componente es el mismo problema que un estado que nadie
+renderiza.
+
+Verificado: el vehicle dice "Ask about this vehicle" y ya no "Ask about 2024"; el
+customer sigue diciendo "Ask about Sandra"; y el universal-profile —el otro
+consumidor— sigue en "Ask about James", sin cambios.
 
 Vale decir que este bug **solo aparece en tipos que no son personas**. Es evidencia
 de que construir los UP por tipo valía la pena.

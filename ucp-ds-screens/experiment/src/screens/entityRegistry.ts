@@ -42,6 +42,18 @@ export interface EntityTypeDef {
    * type, never a flag meaning "hidden".
    */
   requiredScope?: string
+  /**
+   * Pasado a RecordHeader cuando el default se rompe. El default lee el primer
+   * token del nombre, que identifica al registro cuando es una persona ("Ask
+   * about Sandra") o una marca ("Ask about Riverbend") — y no dice nada cuando el
+   * nombre es un código o una especificación ("Ask about 2024" en un F-150).
+   *
+   * Se define acá, por tipo, y no con una heurística en el componente: el
+   * componente no sabe qué tipos existen, y adivinar por la forma del string
+   * estaría mal para el naming de algún tenant desde el primer día. Solo los
+   * tipos cuyo nombre no es de una persona ni de una marca lo necesitan.
+   */
+  assistantLabel?: string
 }
 
 export const MODEL_LABEL: Record<string, string> = {
@@ -61,16 +73,16 @@ export const MODEL_LABEL: Record<string, string> = {
 export const ENTITY_TYPES: EntityTypeDef[] = [
   { id: "customer",    label: "Customers",     singular: "Customer",     iconName: "UserRound",     model: "crm_core",       governance: "governed",  fields: 34, records: 1284 },
   { id: "company",     label: "Companies",     singular: "Company",      iconName: "Building2",     model: "crm_core",       governance: "governed",  fields: 28, records: 312 },
-  { id: "deal",        label: "Deals",         singular: "Deal",         iconName: "Handshake",     model: "crm_core",       governance: "governed",  fields: 22, records: 96 },
+  { id: "deal",        label: "Deals",         singular: "Deal",         iconName: "Handshake",     model: "crm_core",       governance: "governed",  fields: 22, records: 96 , assistantLabel: "Ask about this deal"},
   { id: "employee",    label: "Employees",     singular: "Employee",     iconName: "IdCard",        model: "people_ops",     governance: "governed",  fields: 41, records: 1600 },
   { id: "team",        label: "Teams",         singular: "Team",         iconName: "Users",         model: "people_ops",     governance: "governed",  fields: 12, records: 88 },
-  { id: "vehicle",     label: "Vehicles",      singular: "Vehicle",      iconName: "Car",           model: "dealership_ops", governance: "governed",  fields: 47, records: 3810 },
+  { id: "vehicle",     label: "Vehicles",      singular: "Vehicle",      iconName: "Car",           model: "dealership_ops", governance: "governed",  fields: 47, records: 3810 , assistantLabel: "Ask about this vehicle"},
   { id: "dealership",  label: "Dealerships",   singular: "Dealership",   iconName: "Store",         model: "dealership_ops", governance: "governed",  fields: 31, records: 24 },
-  { id: "test-drive",  label: "Test drives",   singular: "Test drive",   iconName: "Route",         model: "dealership_ops", governance: "in review", fields: 15, records: 210 },
-  { id: "trade-in",    label: "Trade-ins",     singular: "Trade-in",     iconName: "Repeat",        model: "dealership_ops", governance: "draft",     fields: 9,  records: 0   },
-  { id: "invoice",     label: "Invoices",      singular: "Invoice",      iconName: "Receipt",       model: "finance_core",   governance: "governed",  fields: 26, records: 4402, requiredScope: "finance.read" },
-  { id: "payout",      label: "Payouts",       singular: "Payout",       iconName: "Banknote",      model: "finance_core",   governance: "governed",  fields: 18, records: 970,  requiredScope: "finance.read" },
-  { id: "policy",      label: "Policies",      singular: "Policy",       iconName: "ShieldCheck",   model: "compliance",     governance: "governed",  fields: 14, records: 57  },
+  { id: "test-drive",  label: "Test drives",   singular: "Test drive",   iconName: "Route",         model: "dealership_ops", governance: "in review", fields: 15, records: 210 , assistantLabel: "Ask about this test drive"},
+  { id: "trade-in",    label: "Trade-ins",     singular: "Trade-in",     iconName: "Repeat",        model: "dealership_ops", governance: "draft",     fields: 9,  records: 0   , assistantLabel: "Ask about this trade-in"},
+  { id: "invoice",     label: "Invoices",      singular: "Invoice",      iconName: "Receipt",       model: "finance_core",   governance: "governed",  fields: 26, records: 4402, requiredScope: "finance.read" , assistantLabel: "Ask about this invoice"},
+  { id: "payout",      label: "Payouts",       singular: "Payout",       iconName: "Banknote",      model: "finance_core",   governance: "governed",  fields: 18, records: 970,  requiredScope: "finance.read" , assistantLabel: "Ask about this payout"},
+  { id: "policy",      label: "Policies",      singular: "Policy",       iconName: "ShieldCheck",   model: "compliance",     governance: "governed",  fields: 14, records: 57  , assistantLabel: "Ask about this policy"},
 ]
 
 /** The scopes the signed-in viewer holds — same set the record surface uses. */

@@ -1,5 +1,5 @@
 diff --git a/src/App.tsx b/src/App.tsx
-index 19dcea5..72919a6 100644
+index 19dcea5..89ad90e 100644
 --- a/src/App.tsx
 +++ b/src/App.tsx
 @@ -9,6 +9,7 @@ import PMMichaelAttentionRoomScreen from "./screens/pm-michael-attention-room"
@@ -18,12 +18,111 @@ index 19dcea5..72919a6 100644
    { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
    { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
+@@ -2157,6 +2159,7 @@ const RECORD_HEADER_SPEC = {
+     { name: "onProvenanceOpen", type: "Function", values: ["() => void"], default: "undefined", note: "Opens \"About this record\" (renamed from \"Data Provenance\" this redesign pass) for the RECORD zone — reached through the icon-only Button beside the name (moved there this redesign pass; used to be a labeled Button down in a RECORD zone that no longer exists). Fields never render inline." },
+     { name: "defaultExpanded", type: "Boolean", values: ["true","false"], default: "false", note: "Uncontrolled initial state for the zones disclosure. Predictable header height when collapsed." },
+     { name: "locked",         type: "Boolean",  values: ["true","false"], default: "false", note: "Read-only record. Shows a \"Locked\" Tag next to the type label; disables any contact/write actions passed via `actions` (Tooltip explains why); the agent trigger and RECORD's provenance button stay fully interactive." },
++    { name: "assistantLabel", type: "String",   values: ["e.g. \"Ask about this vehicle\""], default: "undefined", note: "Overrides the agent trigger's label. The default reads the first token of `name` — right when that token identifies the record (a person, \"Ask about Sandra\"; a brand, \"Ask about Riverbend\"), wrong when the name is a code or a spec (a vehicle named \"2024 Ford F-150 Lariat\" produced \"Ask about 2024\"). This component cannot tell those apart since the agnosticism pass, and a heuristic here would smuggle entity-type knowledge back in, so the host names it — only for the types where the default breaks. The narrow-card fallback still wins: below the collapse threshold it becomes \"Ask AI\" regardless, because that collapse is about space, not naming. A long override gets the same length guard as a long first name." },
+   ],
+   sizes: [
+     { size: "Card",     dimensions: "100% width, auto height", padding: "16px H / 24px V (CardContainer default)", gap: "16px between rows" },
+@@ -33273,6 +33276,30 @@ function RecordHeaderStatesGallery({
+             agenticSystem={rhAgenticSystem("claim")} />
+         </div>
+ 
++        {/* 11 — the two halves of assistantLabel side by side, because the prop
++            only makes sense once you have seen the default fail. The default
++            reads the first token of the name: that identifies a person or a
++            brand, and says nothing about a vehicle. */}
++        <div>
++          <p className="text-[11px] font-semibold text-[var(--field-supporting)] mb-[8px]">11 · assistantLabel — default vs override on a record whose name is a spec</p>
++          <div className="flex flex-col gap-[12px]">
++            <RecordHeader
++              name="2024 Ford F-150 Lariat"
++              entityType={{ icon: LucideIcons.Car, label: "Vehicle" }}
++              recordFields={[]}
++              assignedAgent={{ id: "agt-veh", name: "Vehicle Concierge", onOpenChat: () => {} }} />
++            <RecordHeader
++              name="2024 Ford F-150 Lariat"
++              entityType={{ icon: LucideIcons.Car, label: "Vehicle" }}
++              recordFields={[]}
++              assistantLabel="Ask about this vehicle"
++              assignedAgent={{ id: "agt-veh", name: "Vehicle Concierge", onOpenChat: () => {} }} />
++          </div>
++          <p className="text-[11px] text-[var(--field-supporting)] mt-[8px]">
++            Top: the default, reading "Ask about 2024". Bottom: the host naming it. Narrow the window and both collapse to "Ask AI" — that fallback is about space, not naming.
++          </p>
++        </div>
++
+       </div>
+     </section>
+   )
+diff --git a/src/components/ui/record-header.tsx b/src/components/ui/record-header.tsx
+index d1f028a..6e252ba 100644
+--- a/src/components/ui/record-header.tsx
++++ b/src/components/ui/record-header.tsx
+@@ -475,6 +475,26 @@ export interface RecordHeaderProps {
+    * never a silently missing button and never a broken one.
+    */
+   assignedAgent: AssignedAgent | null
++  /**
++   * Overrides the agent trigger's label. Omit and it stays "Ask about
++   * {firstName}", which is what every existing caller gets.
++   *
++   * The default takes the first token of `name`, and that is right exactly when
++   * the first token identifies the record — a person ("Ask about Sandra") or a
++   * brand ("Ask about Riverbend"). It is wrong when the name is a code or a
++   * spec: a vehicle called "2024 Ford F-150 Lariat" produced "Ask about 2024".
++   *
++   * This component cannot tell those apart — it deliberately knows nothing about
++   * entity types since the agnosticism pass, and a heuristic here (does the
++   * token start with a digit? is it a known given name?) would be that knowledge
++   * smuggled back in, wrong for some tenant's naming on day one. So the host
++   * decides, and only for the types where the default breaks.
++   *
++   * The narrow-card fallback still wins: below the collapse threshold the label
++   * becomes "Ask AI" regardless, because that collapse is about space, not about
++   * naming. The Tooltip keeps the record's full context either way.
++   */
++  assistantLabel?: string
+   /** actions[0] = an optional primary CTA (e.g. contact); actions[1+] = overflow menu items. Omit entirely for no CTA/overflow. */
+   actions?: RecordAction[]
+   /** Zone: AGENTIC SYSTEM. Omit entirely to skip the zone for this entity type. */
+@@ -560,6 +580,7 @@ function RecordHeader({
+   onProvenanceOpen,
+   defaultExpanded = false,
+   locked = false,
++  assistantLabel: assistantLabelOverride,
+   className,
+ }: RecordHeaderProps) {
+   const [expanded, setExpanded] = useState(defaultExpanded)
+@@ -673,8 +694,18 @@ function RecordHeader({
+   // narrow OR the first name itself is long enough to risk breaking the
+   // action row — either condition alone is enough to trigger the fallback.
+   const assistantFirstName = name.trim().split(/\s+/)[0] ?? ""
+-  const assistantUseFallback = assistantShortened || assistantFirstName.length > ASSISTANT_LABEL_MAX_NAME_LENGTH
+-  const assistantLabel = assistantUseFallback ? "Ask AI" : `Ask about ${assistantFirstName}`
++  // The host override is consulted only for the full-width label. `assistantShortened`
++  // is the card being too narrow, which no amount of naming fixes, so "Ask AI"
++  // still wins there. A long override gets the same length guard as a long first
++  // name — otherwise a helpful host could break the action row.
++  const assistantDefault = `Ask about ${assistantFirstName}`
++  const assistantFull = assistantLabelOverride?.trim() || assistantDefault
++  const assistantUseFallback =
++    assistantShortened ||
++    (assistantLabelOverride
++      ? assistantFull.length > ASSISTANT_LABEL_MAX_NAME_LENGTH + "Ask about ".length
++      : assistantFirstName.length > ASSISTANT_LABEL_MAX_NAME_LENGTH)
++  const assistantLabel = assistantUseFallback ? "Ask AI" : assistantFull
+   const assistantTooltip = `Ask the assistant with ${name}'s context`
+ 
+   return (
 diff --git a/src/screens/entityProfileView.tsx b/src/screens/entityProfileView.tsx
 new file mode 100644
-index 0000000..0e6e8c3
+index 0000000..9a34c1a
 --- /dev/null
 +++ b/src/screens/entityProfileView.tsx
-@@ -0,0 +1,232 @@
+@@ -0,0 +1,236 @@
 +/**
 + * Entity Profile — ONE screen, N types.
 + *
@@ -167,6 +266,10 @@ index 0000000..0e6e8c3
 +              // The panel is also where the per-type difference becomes visible:
 +              // a vehicle shows VIN and odometer, a customer shows a role.
 +              onProvenanceOpen={() => setProv(true)}
++              // Solo llega definida en los tipos cuyo nombre no es de una
++              // persona ni de una marca; en el resto queda undefined y
++              // RecordHeader mantiene su "Ask about {primer nombre}".
++              assistantLabel={type.assistantLabel}
 +              assignedAgent={{ id: record.agent.id, name: record.agent.name, onOpenChat: () => {} }}
 +              nextBestActions={nba}
 +              actions={[{ label: "Export record", variant: "secondary", onClick: () => {} }]}
@@ -418,10 +521,10 @@ index 0000000..bc8e312
 +}
 diff --git a/src/screens/entityRegistry.ts b/src/screens/entityRegistry.ts
 new file mode 100644
-index 0000000..7f2d41a
+index 0000000..1a16515
 --- /dev/null
 +++ b/src/screens/entityRegistry.ts
-@@ -0,0 +1,172 @@
+@@ -0,0 +1,184 @@
 +/**
 + * Entity type registry — the experiment behind `pm-thomas-entity-workspace.tsx`.
 + *
@@ -466,6 +569,18 @@ index 0000000..7f2d41a
 +   * type, never a flag meaning "hidden".
 +   */
 +  requiredScope?: string
++  /**
++   * Pasado a RecordHeader cuando el default se rompe. El default lee el primer
++   * token del nombre, que identifica al registro cuando es una persona ("Ask
++   * about Sandra") o una marca ("Ask about Riverbend") — y no dice nada cuando el
++   * nombre es un código o una especificación ("Ask about 2024" en un F-150).
++   *
++   * Se define acá, por tipo, y no con una heurística en el componente: el
++   * componente no sabe qué tipos existen, y adivinar por la forma del string
++   * estaría mal para el naming de algún tenant desde el primer día. Solo los
++   * tipos cuyo nombre no es de una persona ni de una marca lo necesitan.
++   */
++  assistantLabel?: string
 +}
 +
 +export const MODEL_LABEL: Record<string, string> = {
@@ -485,16 +600,16 @@ index 0000000..7f2d41a
 +export const ENTITY_TYPES: EntityTypeDef[] = [
 +  { id: "customer",    label: "Customers",     singular: "Customer",     iconName: "UserRound",     model: "crm_core",       governance: "governed",  fields: 34, records: 1284 },
 +  { id: "company",     label: "Companies",     singular: "Company",      iconName: "Building2",     model: "crm_core",       governance: "governed",  fields: 28, records: 312 },
-+  { id: "deal",        label: "Deals",         singular: "Deal",         iconName: "Handshake",     model: "crm_core",       governance: "governed",  fields: 22, records: 96 },
++  { id: "deal",        label: "Deals",         singular: "Deal",         iconName: "Handshake",     model: "crm_core",       governance: "governed",  fields: 22, records: 96 , assistantLabel: "Ask about this deal"},
 +  { id: "employee",    label: "Employees",     singular: "Employee",     iconName: "IdCard",        model: "people_ops",     governance: "governed",  fields: 41, records: 1600 },
 +  { id: "team",        label: "Teams",         singular: "Team",         iconName: "Users",         model: "people_ops",     governance: "governed",  fields: 12, records: 88 },
-+  { id: "vehicle",     label: "Vehicles",      singular: "Vehicle",      iconName: "Car",           model: "dealership_ops", governance: "governed",  fields: 47, records: 3810 },
++  { id: "vehicle",     label: "Vehicles",      singular: "Vehicle",      iconName: "Car",           model: "dealership_ops", governance: "governed",  fields: 47, records: 3810 , assistantLabel: "Ask about this vehicle"},
 +  { id: "dealership",  label: "Dealerships",   singular: "Dealership",   iconName: "Store",         model: "dealership_ops", governance: "governed",  fields: 31, records: 24 },
-+  { id: "test-drive",  label: "Test drives",   singular: "Test drive",   iconName: "Route",         model: "dealership_ops", governance: "in review", fields: 15, records: 210 },
-+  { id: "trade-in",    label: "Trade-ins",     singular: "Trade-in",     iconName: "Repeat",        model: "dealership_ops", governance: "draft",     fields: 9,  records: 0   },
-+  { id: "invoice",     label: "Invoices",      singular: "Invoice",      iconName: "Receipt",       model: "finance_core",   governance: "governed",  fields: 26, records: 4402, requiredScope: "finance.read" },
-+  { id: "payout",      label: "Payouts",       singular: "Payout",       iconName: "Banknote",      model: "finance_core",   governance: "governed",  fields: 18, records: 970,  requiredScope: "finance.read" },
-+  { id: "policy",      label: "Policies",      singular: "Policy",       iconName: "ShieldCheck",   model: "compliance",     governance: "governed",  fields: 14, records: 57  },
++  { id: "test-drive",  label: "Test drives",   singular: "Test drive",   iconName: "Route",         model: "dealership_ops", governance: "in review", fields: 15, records: 210 , assistantLabel: "Ask about this test drive"},
++  { id: "trade-in",    label: "Trade-ins",     singular: "Trade-in",     iconName: "Repeat",        model: "dealership_ops", governance: "draft",     fields: 9,  records: 0   , assistantLabel: "Ask about this trade-in"},
++  { id: "invoice",     label: "Invoices",      singular: "Invoice",      iconName: "Receipt",       model: "finance_core",   governance: "governed",  fields: 26, records: 4402, requiredScope: "finance.read" , assistantLabel: "Ask about this invoice"},
++  { id: "payout",      label: "Payouts",       singular: "Payout",       iconName: "Banknote",      model: "finance_core",   governance: "governed",  fields: 18, records: 970,  requiredScope: "finance.read" , assistantLabel: "Ask about this payout"},
++  { id: "policy",      label: "Policies",      singular: "Policy",       iconName: "ShieldCheck",   model: "compliance",     governance: "governed",  fields: 14, records: 57  , assistantLabel: "Ask about this policy"},
 +]
 +
 +/** The scopes the signed-in viewer holds — same set the record surface uses. */

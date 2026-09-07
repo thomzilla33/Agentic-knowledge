@@ -141,6 +141,10 @@ export function EntityProfileView({
               // The panel is also where the per-type difference becomes visible:
               // a vehicle shows VIN and odometer, a customer shows a role.
               onProvenanceOpen={() => setProv(true)}
+              // Solo llega definida en los tipos cuyo nombre no es de una
+              // persona ni de una marca; en el resto queda undefined y
+              // RecordHeader mantiene su "Ask about {primer nombre}".
+              assistantLabel={type.assistantLabel}
               assignedAgent={{ id: record.agent.id, name: record.agent.name, onOpenChat: () => {} }}
               nextBestActions={nba}
               actions={[{ label: "Export record", variant: "secondary", onClick: () => {} }]}
