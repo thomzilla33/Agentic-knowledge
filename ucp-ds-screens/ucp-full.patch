@@ -1541,10 +1541,10 @@ index 0000000..8e30d2a
 +}
 diff --git a/src/screens/pm-thomas-ucp-contacts.tsx b/src/screens/pm-thomas-ucp-contacts.tsx
 new file mode 100755
-index 0000000..0b68dee
+index 0000000..a4b55ff
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-contacts.tsx
-@@ -0,0 +1,763 @@
+@@ -0,0 +1,828 @@
 +/**
 + * UCP — Contacts list.
 + *
@@ -1590,12 +1590,13 @@ index 0000000..0b68dee
 +import type { DropdownAnchor } from "@/lib/dropdown-anchor"
 +import { Sparkle, Send, Plus, Lock, Contact as ContactIcon } from "lucide-react"
 +import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
++import { facetsForType, facetValue, facetOptions } from "./ucpTypeModel"
 +import {
 +  CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
 +  STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG, entityState, restrictionFor,
 +  getActivity, getDrives, getFacts,
 +} from "./ucpShared"
-+import type { UcpContact, UcpEntityType, UcpStatus } from "./ucpShared"
++import type { UcpContact, UcpEntityType } from "./ucpShared"
 +
 +const PAGE_SIZE = 10
 +
@@ -1634,8 +1635,6 @@ index 0000000..0b68dee
 +  { key: "owner",  label: "Owner"             },
 +]
 +
-+const STATUS_OPTIONS: UcpStatus[] = ["Active", "Inactive", "Archived"]
-+const OWNER_OPTIONS = Array.from(new Set(CONTACTS.map(c => c.owner))).sort()
 +
 +// ── Roster concierge ──────────────────────────────────────────────────────────
 +// DS-GAP: agent chat panel — no chat component exists in src/components/ui/.
@@ -1839,12 +1838,17 @@ index 0000000..0b68dee
 +  const [search,     setSearch]     = useState("")
 +
 +  // Draft vs. applied — a chip never appears before Apply.
-+  const [status,     setStatus]     = useState<string | undefined>()
-+  const [owner,      setOwner]      = useState<string | undefined>()
++  // One bag keyed by facet id, not a named useState per filter. The facets are
++  // published by the type now, so the screen cannot know their names ahead of
++  // time — and a `status`/`owner` pair would have to grow a variable every time
++  // a type publishes a field.
++  const [applied,    setApplied]    = useState<Record<string, string>>({})
++  /** Set when a tab change dropped filters, so the reset is explained. */
++  const [clearedOn,  setClearedOn]  = useState<string | null>(null)
 +  const [slideOpen,  setSlideOpen]  = useState(false)
 +
 +  const [sortKey,    setSortKey]    = useState<SortKey>("recent")
-+  const [openSlot,   setOpenSlot]   = useState<"status" | "owner" | "sort" | null>(null)
++  const [openSlot,   setOpenSlot]   = useState<string | null>(null)
 +  const [anchor,     setAnchor]     = useState<DropdownAnchor | null>(null)
 +  const dropdown = useDropdownPosition(anchor)
 +
@@ -1865,16 +1869,39 @@ index 0000000..0b68dee
 +
 +  const activeType = TYPE_TABS.find(t => t.id === tab)?.type ?? "all"
 +
-+  const filtered = useMemo(() => CONTACTS.filter(c => {
-+    if (activeType !== "all" && c.type !== activeType) return false
-+    if (status && c.status !== status) return false
-+    if (owner  && c.owner  !== owner)  return false
++  const facets = useMemo(() => facetsForType(activeType), [activeType])
++
++  /** The tab's rows before any facet is applied — the pool the counts run on. */
++  const inType = useMemo(
++    () => CONTACTS.filter(c => activeType === "all" || c.type === activeType),
++    [activeType],
++  )
++
++  const filtered = useMemo(() => inType.filter(c => {
++    for (const [fid, val] of Object.entries(applied)) {
++      if (val && facetValue(c, fid) !== val) return false
++    }
 +    if (search) {
 +      const q = search.toLowerCase()
 +      if (![c.name, c.subtitle, c.email, c.company, c.owner, c.id].some(f => f.toLowerCase().includes(q))) return false
 +    }
 +    return true
-+  }), [activeType, status, owner, search])
++  }), [inType, applied, search])
++
++  /**
++   * How many rows an option would leave, with every OTHER facet still applied.
++   * Zero disables the option rather than removing it: if picking "Inactive"
++   * made Owner vanish because no inactive record is Priya's, the viewer would
++   * lose the way back out. The count is the honest version of that — it says
++   * the combination is empty without hiding the road.
++   */
++  const countFor = (facetId: string, option: string): number => {
++    let base = inType
++    for (const [fid, val] of Object.entries(applied)) {
++      if (fid !== facetId && val) base = base.filter(c => facetValue(c, fid) === val)
++    }
++    return base.filter(c => facetValue(c, facetId) === option).length
++  }
 +
 +  const sorted = useMemo(() => {
 +    const rows = [...filtered]
@@ -1886,20 +1913,20 @@ index 0000000..0b68dee
 +  const paged = sorted.slice((page - 1) * pageSize, page * pageSize)
 +
 +  const resetPage = () => setPage(1)
-+  const hasFilters = Boolean(status || owner || search)
++  const hasFilters = Boolean(Object.values(applied).some(Boolean) || search)
 +
 +  const clearAll = () => {
-+    setStatus(undefined)
-+    setOwner(undefined)
++    setApplied({})
 +    setSearch("")
++    setClearedOn(null)
 +    resetPage()
 +  }
 +
 +  const closeSlot = () => { setOpenSlot(null); setAnchor(null) }
 +
-+  const pickSlot = (slot: "status" | "owner", value: string) => {
-+    if (slot === "status") setStatus(value)
-+    else setOwner(value)
++  const pickSlot = (facetId: string, value: string) => {
++    setApplied(a => ({ ...a, [facetId]: value }))
++    setClearedOn(null)
 +    resetPage()
 +    closeSlot()
 +  }
@@ -1918,6 +1945,9 @@ index 0000000..0b68dee
 +        contact={open}
 +        onBack={() => setOpenId(null)}
 +        onSidebarItemClick={id => { if (id === "contacts") setOpenId(null) }}
++        // A company's People tab opens one of its records. Navigation stays
++        // here rather than in the profile: the roster owns which record is open.
++        onOpenRecord={c => setOpenId(c.id)}
 +      />
 +    )
 +  }
@@ -2080,7 +2110,17 @@ index 0000000..0b68dee
 +      <Tabs
 +        className="mb-[24px]"
 +        activeId={tab}
-+        onChange={id => { setTab(id); resetPage() }}
++        onChange={id => {
++          // Facets are published per type, so carrying them across a tab change
++          // would keep a filter the new tab cannot answer. They clear — and the
++          // screen says so, because a list that silently resets reads as broken
++          // rather than reset.
++          const had = Object.values(applied).filter(Boolean).length
++          setTab(id)
++          setApplied({})
++          setClearedOn(had > 0 ? (TYPE_TABS.find(t => t.id === id)?.label ?? null) : null)
++          resetPage()
++        }}
 +        items={TYPE_TABS.map(t => ({ id: t.id, label: t.label }))}
 +      />
 +
@@ -2090,10 +2130,18 @@ index 0000000..0b68dee
 +          searchPlaceholder="Search by name, company, owner or ID…"
 +          searchValue={search}
 +          onSearchChange={v => { setSearch(v); resetPage() }}
-+          slots={[
-+            { placeholder: "Status", value: status, onOpen: () => setOpenSlot("status"), onRemove: () => { setStatus(undefined); resetPage() } },
-+            { placeholder: "Owner",  value: owner,  onOpen: () => setOpenSlot("owner"),  onRemove: () => { setOwner(undefined);  resetPage() } },
-+          ]}
++          // Which facets are visible is the type's call, not the screen's. The
++          // rest live behind All filters, exactly the layering FILTERS_SPEC
++          // describes — visible is for high frequency, not for importance.
++          slots={facets.filter(f => f.inline).map(f => ({
++            placeholder: f.label,
++            value: applied[f.id],
++            onOpen: () => setOpenSlot(f.id),
++            onRemove: () => {
++              setApplied(a => { const n = { ...a }; delete n[f.id]; return n })
++              resetPage()
++            },
++          }))}
 +          showAllFilters
 +          onAllFiltersClick={() => setSlideOpen(true)}
 +          showClearFilters={hasFilters}
@@ -2104,6 +2152,13 @@ index 0000000..0b68dee
 +          showViewToggle={false}
 +        />
 +      </div>
++
++      {clearedOn && (
++        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--field-supporting)" }}>
++          <HighlightIcon size="sm" variant="neutral" iconName="Info" />
++          {`Filters cleared — ${clearedOn} publishes a different set of facets.`}
++        </div>
++      )}
 +
 +      {filtered.length === 0 ? (
 +        <EmptyState
@@ -2146,14 +2201,18 @@ index 0000000..0b68dee
 +                      onClick={() => pickSort(option.key)}
 +                    />
 +                  ))
-+                : (openSlot === "status" ? STATUS_OPTIONS : OWNER_OPTIONS).map(option => (
-+                    <MenuItem
-+                      key={option}
-+                      size="sm"
-+                      label={option}
-+                      onClick={() => pickSlot(openSlot, option)}
-+                    />
-+                  ))
++                : facetOptions(inType, openSlot).map(option => {
++                    const n = countFor(openSlot, option)
++                    return (
++                      <MenuItem
++                        key={option}
++                        size="sm"
++                        label={`${option} · ${n}`}
++                        state={n === 0 ? "disabled" : applied[openSlot] === option ? "focus" : "default"}
++                        onClick={() => { if (n > 0) pickSlot(openSlot, option) }}
++                      />
++                    )
++                  })
 +              }
 +            </Menu>
 +          </div>
@@ -2179,10 +2238,16 @@ index 0000000..0b68dee
 +        onClose={() => setSlideOpen(false)}
 +        onApply={() => { resetPage(); setSlideOpen(false) }}
 +        onClearAll={clearAll}
-+        activeFilters={[
-+          ...(status ? [{ label: "Status", value: status, onRemove: () => { setStatus(undefined); resetPage() } }] : []),
-+          ...(owner  ? [{ label: "Owner",  value: owner,  onRemove: () => { setOwner(undefined);  resetPage() } }] : []),
-+        ]}
++        activeFilters={facets
++          .filter(f => applied[f.id])
++          .map(f => ({
++            label: f.label,
++            value: applied[f.id],
++            onRemove: () => {
++              setApplied(a => { const n = { ...a }; delete n[f.id]; return n })
++              resetPage()
++            },
++          }))}
 +      />
 +
 +      {/* ── Row preview — the profile without leaving the list ── */}
@@ -2310,10 +2375,10 @@ index 0000000..0b68dee
 +}
 diff --git a/src/screens/pm-thomas-ucp-profile.tsx b/src/screens/pm-thomas-ucp-profile.tsx
 new file mode 100755
-index 0000000..028c0c8
+index 0000000..598dcf5
 --- /dev/null
 +++ b/src/screens/pm-thomas-ucp-profile.tsx
-@@ -0,0 +1,1077 @@
+@@ -0,0 +1,1149 @@
 +/**
 + * UCP — Unified Contact Profile (detail view).
 + *
@@ -2390,8 +2455,10 @@ index 0000000..028c0c8
 +import * as LucideIcons from "lucide-react"
 +import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch, Lock } from "lucide-react"
 +import type { LucideIcon } from "lucide-react"
++import { specForContact, tabsForContact, assistantLabelFor } from "./ucpTypeModel"
 +import {
 +  PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
++  CONTACTS,
 +  TYPE_LABEL, TYPE_ICON, entityState, restrictionFor, getRecordFields,
 +  getActivity, getConciergeOpening, getConnections, getDrives,
 +  getFacts, getGovernance, getRisk,
@@ -3014,6 +3081,63 @@ index 0000000..028c0c8
 +}
 +
 +/**
++ * A company's people — the records that name it as their account.
++ *
++ * This is the tab the type publishes, and the reason it is worth having: it is
++ * built from a relationship the fixtures already carry, not from a field
++ * invented so that Company would have a third tab like the others. A Customer
++ * has no equivalent list, so a Customer gets no equivalent tab.
++ */
++function PeopleTab({
++  company, onOpen,
++}: { company: UcpContact; onOpen?: (c: UcpContact) => void }) {
++  const people = useMemo(
++    () => CONTACTS.filter(c => c.type !== "company" && c.company === company.name),
++    [company.name],
++  )
++
++  if (people.length === 0) {
++    return (
++      <EmptyState
++        icon={LucideIcons.Users}
++        title="No people on this account"
++        description={`No contact or employee record names ${company.name} as its account yet. They appear here as soon as one does.`}
++      />
++    )
++  }
++
++  return (
++    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++      {people.map(person => {
++        const state = entityState(person)
++        return (
++          <CardContainer key={person.id} size="sm" className="!p-0 overflow-hidden">
++            <EntityList
++              items={[{
++                id: person.id,
++                title: person.name,
++                avatarName: person.name,
++                primaryMeta: [
++                  { iconName: "Hash", label: person.id },
++                  { iconName: person.source.iconName, label: person.source.label },
++                ],
++                secondaryMeta: [
++                  { iconName: "Info",      label: person.subtitle, tooltip: `Role and account · ${person.subtitle}` },
++                  { iconName: "UserRound", label: person.owner,    tooltip: `Account owner · ${person.owner}` },
++                ],
++                state: { label: state.label, variant: state.variant },
++                tags: [{ label: TYPE_LABEL[person.type] }],
++                onClick: onOpen ? () => onOpen(person) : undefined,
++              }]}
++            />
++          </CardContainer>
++        )
++      })}
++    </div>
++  )
++}
++
++/**
 + * The body for a record the viewer cannot read. It replaces the tab content
 + * rather than sitting beside it: leaving the facts, timeline and drives on
 + * screen under a header that says the values are governed would be the header
@@ -3038,11 +3162,13 @@ index 0000000..028c0c8
 +// ── Profile view ──────────────────────────────────────────────────────────────
 +
 +export function UcpProfileView({
-+  contact, onBack, onSidebarItemClick,
++  contact, onBack, onSidebarItemClick, onOpenRecord,
 +}: {
 +  contact: UcpContact
 +  onBack?: () => void
 +  onSidebarItemClick?: (id: string) => void
++  /** Opening a person from a company's People tab. The roster owns navigation. */
++  onOpenRecord?: (c: UcpContact) => void
 +}) {
 +  const [tab,        setTab]        = useState("overview")
 +  const [channel,    setChannel]    = useState<ActivityChannel | "all">("all")
@@ -3121,6 +3247,8 @@ index 0000000..028c0c8
 +    return channel === "all" ? all.length : all.filter(a => a.channel === channel).length
 +  }, [contact, channel])
 +
++  const spec = useMemo(() => specForContact(contact), [contact])
++
 +  const overviewSlots = useMemo<CanvasSlot[]>(() => {
 +    const slots: CanvasSlot[] = [
 +      {
@@ -3129,6 +3257,15 @@ index 0000000..028c0c8
 +        content: <AiSummaryContent contact={contact} onAsk={openChat} />,
 +      },
 +    ]
++    // The type's own fields, ahead of the studies. It answers "what is this
++    // thing", which is what you read before "how sure are we about it" — and
++    // it is the one widget on this canvas whose CONTENT differs by type rather
++    // than only its values. A Company shows Industry / Headcount / HQ where a
++    // Customer shows Role / Account, because that is what each model published.
++    slots.push({
++      uid: spec.widget.uid, title: spec.widget.title, colSpan: 1, rowSpan: 4,
++      content: <MetricRows rows={spec.widget.rows} />,
++    })
 +    if (contact.governance !== "empty") {
 +      slots.push({
 +        uid: "governance", title: "Governance", colSpan: 1, rowSpan: 4,
@@ -3169,7 +3306,7 @@ index 0000000..028c0c8
 +      ),
 +    })
 +    return slots
-+  }, [contact])
++  }, [contact, spec])
 +
 +  const goTab = (id: string) => {
 +    setTab(id)
@@ -3213,6 +3350,7 @@ index 0000000..028c0c8
 +              name={contact.name}
 +              entityType={{ icon: entityIcon, label: TYPE_LABEL[contact.type] }}
 +              statusTag={{ label: state.label }}
++              assistantLabel={assistantLabelFor(contact)}
 +              recordFields={recordFields}
 +              onProvenanceOpen={openInfo}
 +              assignedAgent={{
@@ -3243,12 +3381,10 @@ index 0000000..028c0c8
 +            <Tabs
 +              activeId={tab}
 +              onChange={goTab}
-+              items={[
-+                { id: "overview", label: "Overview" },
-+                { id: "snapshot", label: "Snapshot" },
-+                { id: "activity", label: "Activity" },
-+                { id: "drives",   label: "Drives"   },
-+              ]}
++              // Published by the type, not by this screen. A Company brings a
++              // People tab; a Customer and an Employee bring none, and render
++              // perfectly well without one.
++              items={tabsForContact(contact)}
 +            />
 +          </div>
 +        </>
@@ -3277,6 +3413,7 @@ index 0000000..028c0c8
 +      ) : (
 +        <>
 +          {tab === "overview" && <WidgetCanvasView initialSlots={overviewSlots} />}
++          {tab === "people"   && <PeopleTab company={contact} onOpen={onOpenRecord} />}
 +          {tab === "snapshot" && <SnapshotTab contact={contact} />}
 +          {tab === "activity" && (
 +            <ActivityTab
@@ -3393,10 +3530,10 @@ index 0000000..028c0c8
 +// one card, one entry point.
 diff --git a/src/screens/ucpShared.ts b/src/screens/ucpShared.ts
 new file mode 100755
-index 0000000..93be374
+index 0000000..eebf2e5
 --- /dev/null
 +++ b/src/screens/ucpShared.ts
-@@ -0,0 +1,1044 @@
+@@ -0,0 +1,1058 @@
 +/**
 + * UCP — Unified Contact Profile: shared types + mock data.
 + *
@@ -4362,12 +4499,26 @@ index 0000000..93be374
 +
 +export function getConnections(c: UcpContact): UcpConnection[] {
 +  if (c.type === "company") {
-+    return [
-+      { id: "c1", name: "Sandra Torres",   relation: "VP of Operations · primary contact", icon: "UserRound" },
-+      { id: "c2", name: "Sarah Chen",      relation: "Head of Compliance · evaluator",     icon: "UserRound" },
-+      { id: "c3", name: "Enterprise Renewal 2026", relation: "Deal · $480K · closes Sep 5", icon: "Briefcase" },
-+      { id: "c4", name: "Phoenix Medical Center",  relation: "Location · 127 staff",        icon: "MapPin"    },
-+    ]
++    /**
++     * Derived from the roster, not written down. This list used to be four
++     * hardcoded rows returned for every company, which put Sandra Torres and
++     * Sarah Chen — both Meridian Corp records — on Riverbend Auto Group's
++     * profile. Nothing contradicted it while Connections was the only place a
++     * company's people appeared; the type's own People tab now sits one tab
++     * away listing the real ones, and a record cannot say two different things
++     * about itself on the same screen.
++     */
++    const people = CONTACTS
++      .filter(x => x.type !== "company" && x.company === c.name)
++      .map(x => ({
++        id: x.id,
++        name: x.name,
++        relation: `${x.subtitle.split("·")[0].trim()} · ${TYPE_LABEL[x.type].toLowerCase()}`,
++        icon: "UserRound",
++      }))
++    return people.length > 0
++      ? people
++      : [{ id: "owner", name: c.owner, relation: "Account owner", icon: "UserRound" }]
 +  }
 +  if (c.type === "employee") {
 +    return [
@@ -4441,6 +4592,236 @@ index 0000000..93be374
 +  "What do we still owe them?",
 +  "Which facts are unverified?",
 +]
+diff --git a/src/screens/ucpTypeModel.ts b/src/screens/ucpTypeModel.ts
+new file mode 100644
+index 0000000..2211348
+--- /dev/null
++++ b/src/screens/ucpTypeModel.ts
+@@ -0,0 +1,224 @@
++/**
++ * The per-type model for the UCP — what a Customer, an Employee and a Company
++ * each publish, read by both surfaces: the profile takes its tabs and its own
++ * Overview widget from here, the roster takes its filter facets.
++ *
++ * One module for both because they are one fact. A type that publishes a
++ * Department field should be filterable by it and should show it on the record;
++ * splitting that across two files is how the list and the profile end up
++ * disagreeing about what a type is.
++ *
++ * ── Ported from the entity-workspace experiment ───────────────────────────
++ * The experiment's central claim was that a profile should be driven by the
++ * MODEL rather than by the screen: the same code renders a vehicle and a
++ * customer, and they differ only in what their type published. That claim does
++ * not need twelve types to be worth having — it is already true of three.
++ *
++ * The evidence was sitting in the fixtures the whole time. `UcpContact.subtitle`
++ * is documented as "role · department, or industry · size · HQ", which is three
++ * different field sets wearing one string:
++ *
++ *   Customer   Head of Compliance · Legal · Meridian Corp
++ *   Employee   Account Director · Revenue · Chicago, IL
++ *   Company    Automotive Retail · 640 employees · Tampa, FL
++ *
++ * Flattening those into one metadata line was the screen deciding that every
++ * type has the same shape. It does not. This gives each type back its own
++ * fields and, where the data supports it, its own tab.
++ *
++ * ── The spine stays universal ─────────────────────────────────────────────
++ * Overview · Snapshot · Activity · Drives are the same on every type, because
++ * they are about KNOWLEDGE rather than about the thing: every record is
++ * ingested, claimed about, interacted with and documented. What the type adds
++ * is the domain.
++ *
++ * ── A type with nothing to add still renders ──────────────────────────────
++ * Customer and Employee get no extra tab, and that asymmetry is the point
++ * rather than an omission: a company's roster of people is real data the
++ * fixtures already carry, and a customer has no equivalent. Inventing one to
++ * make the three types symmetric would be the screen deciding the model's
++ * shape again, in the other direction.
++ */
++
++import type { UcpContact } from "./ucpShared"
++
++export interface ProfileWidgetRow {
++  label:   string
++  value:   string
++  icon:    string
++  variant: "success" | "alert" | "informative" | "neutral"
++}
++
++export interface UcpProfileSpec {
++  /** Beyond the universal four. Empty when the type has nothing to add. */
++  extraTabs: { id: string; label: string }[]
++  /** The type's own Overview widget — the fields only this type carries. */
++  widget:    { uid: string; title: string; rows: ProfileWidgetRow[] }
++}
++
++/**
++ * Split `subtitle` without assuming how many parts it has. Person subtitles
++ * carry two in some fixtures and three in others — "VP of Operations ·
++ * Meridian Corp" against "Head of Compliance · Legal · Meridian Corp" — so a
++ * positional read would silently label a company as a department.
++ */
++function parts(c: UcpContact): string[] {
++  return c.subtitle.split("·").map(s => s.trim()).filter(Boolean)
++}
++
++export function specForContact(c: UcpContact): UcpProfileSpec {
++  const p = parts(c)
++
++  if (c.type === "company") {
++    const [industry, headcount, hq] = p
++    return {
++      extraTabs: [{ id: "people", label: "People" }],
++      widget: {
++        uid: "organization", title: "Organization",
++        rows: [
++          { label: "Industry",     value: industry  ?? "—", icon: "Factory",   variant: "informative" },
++          { label: "Headcount",    value: headcount ?? "—", icon: "Users",     variant: "neutral" },
++          { label: "Headquarters", value: hq        ?? "—", icon: "MapPin",    variant: "neutral" },
++          { label: "Account owner", value: c.owner,         icon: "UserRound", variant: "informative" },
++        ],
++      },
++    }
++  }
++
++  if (c.type === "employee") {
++    const [role, department, location] = p
++    return {
++      extraTabs: [],
++      widget: {
++        uid: "employment", title: "Employment",
++        rows: [
++          { label: "Role",       value: role       ?? "—", icon: "BriefcaseBusiness", variant: "informative" },
++          { label: "Department", value: department ?? "—", icon: "Building2",         variant: "neutral" },
++          { label: "Location",   value: location   ?? "—", icon: "MapPin",            variant: "neutral" },
++          { label: "Manager",    value: c.owner,           icon: "UserRound",         variant: "informative" },
++        ],
++      },
++    }
++  }
++
++  // Customer. The last part is the account; anything between it and the role is
++  // the department, which only some records carry.
++  const role    = p[0] ?? "—"
++  const account = p.length > 1 ? p[p.length - 1] : c.company
++  const dept    = p.length > 2 ? p[1] : undefined
++  const rows: ProfileWidgetRow[] = [
++    { label: "Role",    value: role,    icon: "BriefcaseBusiness", variant: "informative" },
++    { label: "Account", value: account, icon: "Building2",         variant: "neutral" },
++  ]
++  if (dept) rows.push({ label: "Department", value: dept, icon: "Users", variant: "neutral" })
++  rows.push({ label: "Account owner", value: c.owner, icon: "UserRound", variant: "informative" })
++
++  return { extraTabs: [], widget: { uid: "account", title: "Account", rows } }
++}
++
++/**
++ * The full tab strip: the universal spine with the type's own tabs slotted
++ * between Overview and Snapshot. Domain tabs sit next to Overview because they
++ * answer "what is this thing"; the knowledge tabs that follow answer "what do
++ * we know about it", and that order is the same on every type.
++ */
++export function tabsForContact(c: UcpContact): { id: string; label: string }[] {
++  return [
++    { id: "overview", label: "Overview" },
++    ...specForContact(c).extraTabs,
++    { id: "snapshot", label: "Snapshot" },
++    { id: "activity", label: "Activity" },
++    { id: "drives",   label: "Drives"   },
++  ]
++}
++
++/**
++ * What the agent trigger should say. The component's default takes the first
++ * token of the name, which identifies a person and misreads an organisation —
++ * "Ask about Riverbend" for Riverbend Auto Group is close enough to be
++ * confusing, and it is the account's name doing work the record's name should.
++ * Companies get the type instead; people keep their first name, which is what
++ * you would actually say out loud.
++ */
++export function assistantLabelFor(c: UcpContact): string | undefined {
++  return c.type === "company" ? "Ask about this company" : undefined
++}
++
++// ── Filter facets, published by the type ─────────────────────────────────────
++
++/**
++ * A facet the roster can filter on. `inline` earns a slot in the visible filter
++ * line rather than a row behind All filters, and the criterion is frequency —
++ * FILTERS_SPEC's own rule for what stays out of the slideout.
++ */
++export interface UcpFacet {
++  id:      string
++  label:   string
++  inline?: boolean
++}
++
++/**
++ * Facets per tab. The All tab gets the common floor rather than the union,
++ * because a facet that only some rows can answer filters the rest out by
++ * accident: filtering a mixed list by Department would silently drop every
++ * customer and company, which reads as "no results" rather than "not
++ * applicable". Microsoft derives the same restriction for Dataverse's mixed
++ * search, and it is the one place the union is the wrong answer.
++ */
++const FACETS: Record<string, UcpFacet[]> = {
++  all: [
++    { id: "status", label: "Status", inline: true },
++    { id: "owner",  label: "Owner",  inline: true },
++    { id: "source", label: "Source" },
++  ],
++  person: [
++    { id: "status",  label: "Status",  inline: true },
++    { id: "account", label: "Account", inline: true },
++    { id: "owner",   label: "Owner" },
++    { id: "source",  label: "Source" },
++  ],
++  employee: [
++    { id: "status",     label: "Status",     inline: true },
++    { id: "department", label: "Department", inline: true },
++    { id: "location",   label: "Location" },
++    { id: "owner",      label: "Manager" },
++    { id: "source",     label: "Source" },
++  ],
++  company: [
++    { id: "status",   label: "Status",       inline: true },
++    { id: "industry", label: "Industry",     inline: true },
++    { id: "hq",       label: "Headquarters" },
++    { id: "owner",    label: "Account owner" },
++    { id: "source",   label: "Source" },
++  ],
++}
++
++export function facetsForType(type: string): UcpFacet[] {
++  return FACETS[type] ?? FACETS.all
++}
++
++/**
++ * This record's value for a facet, or "" when the type does not carry it.
++ * Reading it off the same `subtitle` split the profile uses is deliberate: one
++ * parser, so a record cannot be filed under a Department the profile never
++ * shows.
++ */
++export function facetValue(c: UcpContact, facetId: string): string {
++  const p = parts(c)
++  switch (facetId) {
++    case "status":  return c.status
++    case "owner":   return c.owner
++    case "source":  return c.source.label
++    case "account": return p.length > 1 ? p[p.length - 1] : c.company
++    case "department": return c.type === "employee" ? (p[1] ?? "") : ""
++    case "location":   return c.type === "employee" ? (p[2] ?? "") : ""
++    case "industry":   return c.type === "company"  ? (p[0] ?? "") : ""
++    case "hq":         return c.type === "company"  ? (p[2] ?? "") : ""
++    default: return ""
++  }
++}
++
++/** Every value a facet actually takes across a set of records, sorted. */
++export function facetOptions(rows: UcpContact[], facetId: string): string[] {
++  return Array.from(new Set(rows.map(c => facetValue(c, facetId)).filter(Boolean))).sort()
++}
 diff --git a/src/screens/viewerScopes.ts b/src/screens/viewerScopes.ts
 new file mode 100644
 index 0000000..96ed20e
