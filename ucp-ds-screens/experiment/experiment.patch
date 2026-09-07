@@ -1,24 +1,26 @@
 diff --git a/src/App.tsx b/src/App.tsx
-index 19dcea5..89ad90e 100644
+index 5f0dc8a..f96afad 100644
 --- a/src/App.tsx
 +++ b/src/App.tsx
-@@ -9,6 +9,7 @@ import PMMichaelAttentionRoomScreen from "./screens/pm-michael-attention-room"
+@@ -8,6 +8,8 @@ import PMHomeCanvasScreen         from "./screens/pm-home-canvas"
+ import PMMichaelAttentionRoomScreen from "./screens/pm-michael-attention-room"
  import PMMichaelLoginScreen         from "./screens/pm-michael-login"
  import PMThomasUniversalProfileScreen  from "./screens/pm-thomas-universal-profile"
- import PMThomasUcpContactsScreen       from "./screens/pm-thomas-ucp-contacts"
++import PMThomasUcpContactsScreen       from "./screens/pm-thomas-ucp-contacts"
 +import PMThomasEntityWorkspaceScreen   from "./screens/pm-thomas-entity-workspace"
  import PMThomasDashboardListScreen     from "./screens/pm-thomas-dashboard-list"
  import PMThomasWidgetLibraryScreen     from "./screens/pm-thomas-widget-library"
  import PMThomasWidgetMarketplaceScreen from "./screens/pm-thomas-widget-marketplace"
-@@ -162,6 +163,7 @@ const PROTOTYPE_PAGES: { id: string; label: string; description: string; author:
+@@ -160,6 +162,8 @@ const PROTOTYPE_PAGES: { id: string; label: string; description: string; author:
+   { id: "proto-thomas-new-dashboard",     label: "New Dashboard — Thomas",       description: "Two-step wizard for creating a dashboard: Step 0 placement form (kind, profile type, surface, audience, name) + destination summary; Step 1 start-point picker (blank canvas or pre-built template). DS-GAP components: StepIndicator, SectionChip, OptionCard, FormSection, FieldLabel.", author: "Thomas", component: PMThomasNewDashboardScreen },
    { id: "proto-thomas-widget-builder",    label: "Widget Builder — Thomas",      description: "Three-tab builder (Data → Widget → Appearance) with sticky live preview. Data tab: entity source picker (8 sources), operation chips (Aggregate / Record set), calc + column or exposed columns. Widget tab: 12-type gallery, name/description/freshness/filter settings. Appearance tab: accent color swatches + style variants. DS-GAP: AccentColorPalette, BuilderTabNav, EntitySourceCard, TypeTile, SkeletonShape, WidgetPreviewPanel.", author: "Thomas", component: PMThomasWidgetBuilderScreen },
    { id: "proto-thomas-universal-profile", label: "Universal Profile — Thomas",   description: "Unified entity profile (Person, Employee, Company) aggregating Governance, Risk, and Connections studies — Overview canvas with adaptive study widgets (hidden when empty, error+retry when failed), Activity feed (last 20), paginated Logs, Edit + Export for all types, Archive for Person/Employee only", author: "Thomas", component: PMThomasUniversalProfileScreen },
-   { id: "proto-thomas-ucp-contacts",   label: "UCP - Contacts Last version", description: "The whole UCP flow in one prototype: contacts roster (tabs by type, filters, create per type) → record profile with RecordHeader, Overview canvas, Snapshot by knowledge plane, Activity and Drives. Exercises the header's loading and governed/masked states.", author: "Thomas", component: PMThomasUcpContactsScreen },
-+  { id: "proto-thomas-entity-workspace", label: "UCP - Entity workspace (experimento)", description: "EXPERIMENTO, lado a lado con la card de arriba. Responde qué pasa cuando el tenant publica 12 tipos de entidad y no 3: los tabs llevan vistas guardadas en vez de tipos, y el catálogo completo — agrupado por modelo de Data Studio, con governance y tipos bloqueados por scope — vive detrás de All entities. El tipo pasa a ser un filtro.", author: "Thomas", component: PMThomasEntityWorkspaceScreen },
++  { id: "proto-thomas-ucp-contacts",   label: "UCP - Contacts Last version", description: "The whole UCP flow in one prototype: contacts roster (tabs by type, filters, create per type) → record profile with RecordHeader, Overview canvas, Snapshot by knowledge plane, Activity and Drives. Exercises the header's loading and governed/masked states.", author: "Thomas", component: PMThomasUcpContactsScreen },
++  { id: "proto-thomas-entity-workspace", label: "UCP - Entity workspace (experimento)", description: "EXPERIMENTO, lado a lado con la card de arriba. Responde qué pasa cuando el tenant publica 12 tipos de entidad y no 3: el roster es un tipo a la vez, los tabs llevan vistas guardadas dentro del tipo, y el catálogo plano ordenado por uso — con governance y tipos bloqueados por scope — vive detrás de All entities. La lista mixta es el Inbox bajo My Work. Perfiles y filtros se leen del modelo publicado, no se ramifican por tipo.", author: "Thomas", component: PMThomasEntityWorkspaceScreen },
    { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
    { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
-@@ -2157,6 +2159,7 @@ const RECORD_HEADER_SPEC = {
+@@ -2155,6 +2159,7 @@ const RECORD_HEADER_SPEC = {
      { name: "onProvenanceOpen", type: "Function", values: ["() => void"], default: "undefined", note: "Opens \"About this record\" (renamed from \"Data Provenance\" this redesign pass) for the RECORD zone — reached through the icon-only Button beside the name (moved there this redesign pass; used to be a labeled Button down in a RECORD zone that no longer exists). Fields never render inline." },
      { name: "defaultExpanded", type: "Boolean", values: ["true","false"], default: "false", note: "Uncontrolled initial state for the zones disclosure. Predictable header height when collapsed." },
      { name: "locked",         type: "Boolean",  values: ["true","false"], default: "false", note: "Read-only record. Shows a \"Locked\" Tag next to the type label; disables any contact/write actions passed via `actions` (Tooltip explains why); the agent trigger and RECORD's provenance button stay fully interactive." },
@@ -26,7 +28,7 @@ index 19dcea5..89ad90e 100644
    ],
    sizes: [
      { size: "Card",     dimensions: "100% width, auto height", padding: "16px H / 24px V (CardContainer default)", gap: "16px between rows" },
-@@ -33273,6 +33276,30 @@ function RecordHeaderStatesGallery({
+@@ -33271,6 +33276,30 @@ function RecordHeaderStatesGallery({
              agenticSystem={rhAgenticSystem("claim")} />
          </div>
  
@@ -58,7 +60,7 @@ index 19dcea5..89ad90e 100644
      </section>
    )
 diff --git a/src/components/ui/record-header.tsx b/src/components/ui/record-header.tsx
-index d1f028a..6e252ba 100644
+index 578261c..6e252ba 100644
 --- a/src/components/ui/record-header.tsx
 +++ b/src/components/ui/record-header.tsx
 @@ -475,6 +475,26 @@ export interface RecordHeaderProps {
@@ -117,12 +119,35 @@ index d1f028a..6e252ba 100644
    const assistantTooltip = `Ask the assistant with ${name}'s context`
  
    return (
+@@ -1057,13 +1088,19 @@ function NextBestActionBlock({ nba }: { nba: NextBestAction }) {
+     <button
+       type="button"
+       onClick={nba.onOpen}
+-      className="w-full flex items-center gap-[8px] rounded-[8px] p-[12px] text-left transition-opacity hover:opacity-90"
++      // Hugs its text instead of filling the card. A block stretched to full
++      // width makes a one-line recommendation look like a section, and the
++      // chevron ends up marooned an inch from the sentence it belongs to. The
++      // same idiom is already in entity-list.tsx, which sets `self-start` on
++      // its insight block when the text is short. `max-w-full` keeps a long
++      // one inside the card, where the title truncates as before.
++      className="max-w-full self-start flex items-center gap-[8px] rounded-[8px] p-[12px] text-left transition-opacity hover:opacity-90"
+       style={{ background: "var(--card-purple-bg)", border: "0.5px solid var(--card-purple-border)" }}
+     >
+       <HighlightIcon size="sm" variant="purple" icon={<Sparkle size={16} strokeWidth={1.75} />} className="shrink-0" />
+-      <div className="flex-1 flex flex-col gap-[2px] min-w-0">
++      <div className="flex flex-col gap-[2px] min-w-0">
+         <div className="flex items-center gap-[6px] min-w-0">
+-          <span className="flex-1 truncate text-[13px] font-semibold" style={{ color: "var(--foreground)" }}>
++          <span className="truncate text-[13px] font-semibold" style={{ color: "var(--foreground)" }}>
+             {nba.title}
+           </span>
+           {/* One context Tag per NBA — what area this action is about, at a
 diff --git a/src/screens/entityProfileView.tsx b/src/screens/entityProfileView.tsx
 new file mode 100644
-index 0000000..9a34c1a
+index 0000000..4ca4bd0
 --- /dev/null
 +++ b/src/screens/entityProfileView.tsx
-@@ -0,0 +1,236 @@
+@@ -0,0 +1,254 @@
 +/**
 + * Entity Profile — ONE screen, N types.
 + *
@@ -167,9 +192,10 @@ index 0000000..9a34c1a
 +import type { LucideIcon }  from "lucide-react"
 +import { Construction, FileSearch } from "lucide-react"
 +import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
-+import { MODEL_LABEL }       from "./entityRegistry"
++import { MODEL_LABEL, VIEWER_SCOPES } from "./entityRegistry"
 +import type { EntityTypeDef } from "./entityRegistry"
-+import { PROFILE_SPECS, tabsForType } from "./entityProfiles"
++import { PROFILE_SPECS, tabsForType, isMasked } from "./entityProfiles"
++import type { ProfileWidgetRow } from "./entityProfiles"
 +import type { ProfileField } from "./entityProfiles"
 +
 +const icon = (name: string): LucideIcon =>
@@ -186,23 +212,37 @@ index 0000000..9a34c1a
 +}
 +
 +/** Rows shared by every domain widget. Same arrangement as the UCP profile:
-+ *  icon left, label, value right, subtle divider, none after the last. */
-+function WidgetRows({ rows }: { rows: NonNullable<ReturnType<typeof Object.values>> extends never ? never : { label: string; value: string; icon: string; variant: "success" | "alert" | "informative" | "neutral" }[] }) {
++ *  icon left, label, value right, subtle divider, none after the last.
++ *
++ *  A row whose `scope` the viewer does not hold is masked exactly as the
++ *  header masks it. The label stays: the viewer should learn the field exists
++ *  and what would unlock it, which is the same reason the catalog shows a
++ *  locked type instead of hiding it. */
++function WidgetRows({ rows }: { rows: ProfileWidgetRow[] }) {
 +  return (
 +    <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column" }}>
-+      {rows.map((r, i) => (
-+        <div key={r.label} style={{
-+          display: "flex", alignItems: "center", gap: 10, padding: "8px 0",
-+          borderBottom: i === rows.length - 1 ? "none" : "1px solid var(--color-border-neutral-subtle)",
-+        }}>
-+          <HighlightIcon size="sm" variant={r.variant} iconName={r.icon} />
-+          <span title={r.label} style={{
-+            fontSize: 12, color: "var(--field-supporting)", flex: 1, minWidth: 0,
-+            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-+          }}>{r.label}</span>
-+          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)", whiteSpace: "nowrap" }}>{r.value}</span>
-+        </div>
-+      ))}
++      {rows.map((r, i) => {
++        const masked = isMasked(r.scope, VIEWER_SCOPES)
++        return (
++          <div key={r.label} style={{
++            display: "flex", alignItems: "center", gap: 10, padding: "8px 0",
++            borderBottom: i === rows.length - 1 ? "none" : "1px solid var(--color-border-neutral-subtle)",
++          }}>
++            <HighlightIcon size="sm" variant={masked ? "neutral" : r.variant} iconName={masked ? "Lock" : r.icon} />
++            <span title={r.label} style={{
++              fontSize: 12, color: "var(--field-supporting)", flex: 1, minWidth: 0,
++              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
++            }}>{r.label}</span>
++            <span
++              title={masked ? `Governed by ${r.scope} — request the scope to read it` : undefined}
++              style={{
++                fontSize: 12, fontWeight: 600, whiteSpace: "nowrap",
++                color: masked ? "var(--field-supporting)" : "var(--foreground)",
++              }}
++            >{masked ? "•••• (restricted)" : r.value}</span>
++          </div>
++        )
++      })}
 +    </div>
 +  )
 +}
@@ -220,9 +260,9 @@ index 0000000..9a34c1a
 +      label: f.label,
 +      icon:  icon(f.iconName),
 +      provenance: { system: f.system, systemAbbr: f.system.slice(0, 2).toUpperCase(), modelVersion: `${MODEL_LABEL[type.model]} v1`, syncedAgo: "2h ago" },
-+      state: f.masked ? "masked" : "hydrated",
++      state: isMasked(f.scope, VIEWER_SCOPES) ? "masked" : "hydrated",
 +      value: f.value,
-+      maskedValue: f.masked ? "•••• (restricted)" : undefined,
++      maskedValue: isMasked(f.scope, VIEWER_SCOPES) ? "•••• (restricted)" : undefined,
 +    })),
 +    [record, type],
 +  )
@@ -314,19 +354,22 @@ index 0000000..9a34c1a
 +            The set is published by {MODEL_LABEL[type.model]} — it is not the same set another type carries.
 +          </span>
 +          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-+            {record.fields.map((f, i) => (
++            {record.fields.map((f, i) => {
++              const masked = isMasked(f.scope, VIEWER_SCOPES)
++              return (
 +              <div key={`${f.label}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
 +                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
 +                  {f.label}
 +                </span>
-+                <span style={{ fontSize: 13, fontWeight: 600, color: f.masked ? "var(--field-supporting)" : "var(--foreground)" }}>
-+                  {f.masked ? "•••• (restricted)" : f.value}
++                <span style={{ fontSize: 13, fontWeight: 600, color: masked ? "var(--field-supporting)" : "var(--foreground)" }}>
++                  {masked ? "•••• (restricted)" : f.value}
 +                </span>
 +                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>
-+                  {f.system}{f.masked ? " · governed by finance.read" : ""}
++                  {f.system}{masked ? ` · governed by ${f.scope}` : ""}
 +                </span>
 +              </div>
-+            ))}
++              )
++            })}
 +          </div>
 +        </div>
 +      </SlideOut>
@@ -361,10 +404,10 @@ index 0000000..9a34c1a
 +}
 diff --git a/src/screens/entityProfiles.ts b/src/screens/entityProfiles.ts
 new file mode 100644
-index 0000000..bc8e312
+index 0000000..081245d
 --- /dev/null
 +++ b/src/screens/entityProfiles.ts
-@@ -0,0 +1,154 @@
+@@ -0,0 +1,182 @@
 +/**
 + * Per-type profile specs — what a Unified Profile looks like for each published
 + * entity type.
@@ -404,13 +447,41 @@ index 0000000..bc8e312
 +  value:    string
 +  /** Source system for this field — provenance is per field, not per record. */
 +  system:   string
-+  masked?:  boolean
++  /**
++   * Scope that governs this field. Whether it reads as masked is derived from
++   * the viewer's scopes rather than declared, so granting the scope unmasks
++   * the header and the Overview widget in the same breath instead of only one.
++   */
++  scope?:   string
++}
++
++/**
++ * The one place that answers "can this viewer read this value?". Header fields
++ * and widget rows both go through it, which is what keeps them from disagreeing
++ * about the same number.
++ */
++export function isMasked(scope: string | undefined, viewerScopes: readonly string[]): boolean {
++  return !!scope && !viewerScopes.includes(scope)
++}
++
++export interface ProfileWidgetRow {
++  label:   string
++  value:   string
++  icon:    string
++  variant: "success" | "alert" | "informative" | "neutral"
++  /**
++   * Scope that governs this value, if any. A widget row is a governed value
++   * like any other: the header masks List price behind finance.read, so the
++   * Overview widget one screen below has to mask it too, or the header's
++   * governance is decoration. Same value, one answer.
++   */
++  scope?:  string
 +}
 +
 +export interface ProfileWidget {
 +  uid:   string
 +  title: string
-+  rows:  { label: string; value: string; icon: string; variant: "success" | "alert" | "informative" | "neutral" }[]
++  rows:  ProfileWidgetRow[]
 +}
 +
 +export interface EntityProfileSpec {
@@ -478,7 +549,7 @@ index 0000000..bc8e312
 +        { label: "Warranty",     value: "Active to 2029", icon: "ShieldCheck", variant: "success" },
 +      ]},
 +      { uid: "commercial", title: "Commercial", rows: [
-+        { label: "List price",   value: "$58,400",    icon: "DollarSign",  variant: "informative" },
++        { label: "List price",   value: "$58,400",    icon: "DollarSign",  variant: "informative", scope: "finance.read" },
 +        { label: "Days on lot",  value: "23",         icon: "Clock",       variant: "alert" },
 +        { label: "Floor plan",   value: "Financed",   icon: "Banknote",    variant: "neutral" },
 +      ]},
@@ -799,7 +870,7 @@ index 0000000..8418a8e
 +export const INBOX_COLUMNS = ["Type", "Record", "Owner", "State", "Last activity"] as const
 diff --git a/src/screens/pm-thomas-entity-workspace.tsx b/src/screens/pm-thomas-entity-workspace.tsx
 new file mode 100644
-index 0000000..326dcc8
+index 0000000..8e30d2a
 --- /dev/null
 +++ b/src/screens/pm-thomas-entity-workspace.tsx
 @@ -0,0 +1,612 @@
@@ -942,7 +1013,7 @@ index 0000000..326dcc8
 +        { label: "VIN",       iconName: "Fingerprint", value: vin.replace("VIN ", ""), system: sys },
 +        { label: "Store",     iconName: "Store",       value: store,        system: sys },
 +        { label: "Odometer",  iconName: "Gauge",       value: "14,208 mi",  system: sys },
-+        { label: "List price", iconName: "DollarSign", value: "$58,400",    system: "Finance Core", masked: true },
++        { label: "List price", iconName: "DollarSign", value: "$58,400",    system: "Finance Core", scope: "finance.read" },
 +        ...common,
 +      ]
 +    }

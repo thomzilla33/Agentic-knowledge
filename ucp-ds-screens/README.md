@@ -13,6 +13,21 @@ tipado y verificado **dentro de un clon real del DS** — solo falta abrir el PR
 | Card | `id` | Link una vez desplegado |
 |---|---|---|
 | UCP - Contacts Last version | `proto-thomas-ucp-contacts` | `aims-os-design-system.vercel.app/?proto=proto-thomas-ucp-contacts` |
+| UCP - Entity workspace (experimento) | `proto-thomas-entity-workspace` | `aims-os-design-system.vercel.app/?proto=proto-thomas-entity-workspace` |
+
+### Publicado ahora mismo
+
+Mientras el PR del DS no exista, las dos cards ya están servidas como builds
+de un solo archivo en GitHub Pages de este repo. Cada página siembra su propio
+`?proto=` antes de que arranque el bundle, así que abre directo en su pantalla:
+
+| | URL |
+|---|---|
+| Aprobado | https://thomzilla33.github.io/Agentic-knowledge/ucp-contacts.html |
+| Experimento | https://thomzilla33.github.io/Agentic-knowledge/ucp-entity-workspace.html |
+
+Son el mismo bundle del DS con distinta semilla, no dos apps: desde cualquiera
+de las dos se llega a la otra card por la galería de prototipos.
 
 El perfil no tiene card propia: se llega abriendo una fila del roster, que es el
 flujo real. Un solo punto de entrada, y `pm-thomas-ucp-profile.tsx` a propósito
@@ -36,7 +51,7 @@ source inicial:
 cd ~/aims-os-ds                 # tu clon de cachilupis/aims-os-design-system
 git checkout main && git pull
 git checkout -b claude/ucp-unified-contact-profile
-git apply /ruta/a/ucp-ds-screens/ucp-screens.patch
+git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 229865 bytes, 10 archivos
 npm run build                                  # 0 errores
 node scripts/audit-tokens.cjs --counts         # ninguna categoría sube
 npm run dev                                    # localhost:5173 → Prototypes
@@ -48,7 +63,14 @@ gh pr create --base main --title "UCP — Unified Contact Profile, built on the 
 
 El cuerpo del PR está escrito y listo en **`PR.md`**, en esta misma carpeta.
 
-El patch toca 5 archivos: 3 pantallas nuevas en `src/screens/`,
+**Cuál de los tres patches.** `ucp-full.patch` es el que va: lleva las dos
+mitades — el UCP aprobado y el experimento — y es el único que aplica limpio y
+solo contra el `main` del DS. `ucp-screens.patch` (solo lo aprobado) y
+`experiment/experiment.patch` siguen ahí para cuando se quiera una mitad sola,
+pero **`experiment.patch` no aplica por sí mismo**: su hunk de `App.tsx` asume
+la línea de import que agrega el aprobado. Se apilan en ese orden o no aplican.
+
+El patch aprobado toca 5 archivos: 3 pantallas nuevas en `src/screens/`,
 `entity-list.tsx`, y **dos líneas** en `App.tsx`. No borra nada. `entity-list.tsx` y `App.tsx`
 están bajo CODEOWNERS, así que el PR necesita review de **@cachilupis** — es el
 comportamiento esperado, no un bloqueo.
