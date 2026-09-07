@@ -963,12 +963,26 @@ export function getDrives(c: UcpContact): UcpDrive[] {
 
 export function getConnections(c: UcpContact): UcpConnection[] {
   if (c.type === "company") {
-    return [
-      { id: "c1", name: "Sandra Torres",   relation: "VP of Operations · primary contact", icon: "UserRound" },
-      { id: "c2", name: "Sarah Chen",      relation: "Head of Compliance · evaluator",     icon: "UserRound" },
-      { id: "c3", name: "Enterprise Renewal 2026", relation: "Deal · $480K · closes Sep 5", icon: "Briefcase" },
-      { id: "c4", name: "Phoenix Medical Center",  relation: "Location · 127 staff",        icon: "MapPin"    },
-    ]
+    /**
+     * Derived from the roster, not written down. This list used to be four
+     * hardcoded rows returned for every company, which put Sandra Torres and
+     * Sarah Chen — both Meridian Corp records — on Riverbend Auto Group's
+     * profile. Nothing contradicted it while Connections was the only place a
+     * company's people appeared; the type's own People tab now sits one tab
+     * away listing the real ones, and a record cannot say two different things
+     * about itself on the same screen.
+     */
+    const people = CONTACTS
+      .filter(x => x.type !== "company" && x.company === c.name)
+      .map(x => ({
+        id: x.id,
+        name: x.name,
+        relation: `${x.subtitle.split("·")[0].trim()} · ${TYPE_LABEL[x.type].toLowerCase()}`,
+        icon: "UserRound",
+      }))
+    return people.length > 0
+      ? people
+      : [{ id: "owner", name: c.owner, relation: "Account owner", icon: "UserRound" }]
   }
   if (c.type === "employee") {
     return [

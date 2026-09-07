@@ -74,8 +74,10 @@ import type { NextBestAction, RecordField } from "@/components/ui/record-header"
 import * as LucideIcons from "lucide-react"
 import { Sparkle, Send, ScanLine, Inbox, HardDrive, FileSearch, Lock } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { specForContact, tabsForContact, assistantLabelFor } from "./ucpTypeModel"
 import {
   PLANE_META, PLANE_ORDER, CHANNEL_META, CONCIERGE_PROMPTS,
+  CONTACTS,
   TYPE_LABEL, TYPE_ICON, entityState, restrictionFor, getRecordFields,
   getActivity, getConciergeOpening, getConnections, getDrives,
   getFacts, getGovernance, getRisk,
@@ -698,6 +700,63 @@ function LoadingBody() {
 }
 
 /**
+ * A company's people — the records that name it as their account.
+ *
+ * This is the tab the type publishes, and the reason it is worth having: it is
+ * built from a relationship the fixtures already carry, not from a field
+ * invented so that Company would have a third tab like the others. A Customer
+ * has no equivalent list, so a Customer gets no equivalent tab.
+ */
+function PeopleTab({
+  company, onOpen,
+}: { company: UcpContact; onOpen?: (c: UcpContact) => void }) {
+  const people = useMemo(
+    () => CONTACTS.filter(c => c.type !== "company" && c.company === company.name),
+    [company.name],
+  )
+
+  if (people.length === 0) {
+    return (
+      <EmptyState
+        icon={LucideIcons.Users}
+        title="No people on this account"
+        description={`No contact or employee record names ${company.name} as its account yet. They appear here as soon as one does.`}
+      />
+    )
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {people.map(person => {
+        const state = entityState(person)
+        return (
+          <CardContainer key={person.id} size="sm" className="!p-0 overflow-hidden">
+            <EntityList
+              items={[{
+                id: person.id,
+                title: person.name,
+                avatarName: person.name,
+                primaryMeta: [
+                  { iconName: "Hash", label: person.id },
+                  { iconName: person.source.iconName, label: person.source.label },
+                ],
+                secondaryMeta: [
+                  { iconName: "Info",      label: person.subtitle, tooltip: `Role and account · ${person.subtitle}` },
+                  { iconName: "UserRound", label: person.owner,    tooltip: `Account owner · ${person.owner}` },
+                ],
+                state: { label: state.label, variant: state.variant },
+                tags: [{ label: TYPE_LABEL[person.type] }],
+                onClick: onOpen ? () => onOpen(person) : undefined,
+              }]}
+            />
+          </CardContainer>
+        )
+      })}
+    </div>
+  )
+}
+
+/**
  * The body for a record the viewer cannot read. It replaces the tab content
  * rather than sitting beside it: leaving the facts, timeline and drives on
  * screen under a header that says the values are governed would be the header
@@ -722,11 +781,13 @@ function RestrictedBody({ name, scope }: { name: string; scope: string }) {
 // ── Profile view ──────────────────────────────────────────────────────────────
 
 export function UcpProfileView({
-  contact, onBack, onSidebarItemClick,
+  contact, onBack, onSidebarItemClick, onOpenRecord,
 }: {
   contact: UcpContact
   onBack?: () => void
   onSidebarItemClick?: (id: string) => void
+  /** Opening a person from a company's People tab. The roster owns navigation. */
+  onOpenRecord?: (c: UcpContact) => void
 }) {
   const [tab,        setTab]        = useState("overview")
   const [channel,    setChannel]    = useState<ActivityChannel | "all">("all")
@@ -805,6 +866,8 @@ export function UcpProfileView({
     return channel === "all" ? all.length : all.filter(a => a.channel === channel).length
   }, [contact, channel])
 
+  const spec = useMemo(() => specForContact(contact), [contact])
+
   const overviewSlots = useMemo<CanvasSlot[]>(() => {
     const slots: CanvasSlot[] = [
       {
@@ -813,6 +876,15 @@ export function UcpProfileView({
         content: <AiSummaryContent contact={contact} onAsk={openChat} />,
       },
     ]
+    // The type's own fields, ahead of the studies. It answers "what is this
+    // thing", which is what you read before "how sure are we about it" — and
+    // it is the one widget on this canvas whose CONTENT differs by type rather
+    // than only its values. A Company shows Industry / Headcount / HQ where a
+    // Customer shows Role / Account, because that is what each model published.
+    slots.push({
+      uid: spec.widget.uid, title: spec.widget.title, colSpan: 1, rowSpan: 4,
+      content: <MetricRows rows={spec.widget.rows} />,
+    })
     if (contact.governance !== "empty") {
       slots.push({
         uid: "governance", title: "Governance", colSpan: 1, rowSpan: 4,
@@ -853,7 +925,7 @@ export function UcpProfileView({
       ),
     })
     return slots
-  }, [contact])
+  }, [contact, spec])
 
   const goTab = (id: string) => {
     setTab(id)
@@ -897,6 +969,7 @@ export function UcpProfileView({
               name={contact.name}
               entityType={{ icon: entityIcon, label: TYPE_LABEL[contact.type] }}
               statusTag={{ label: state.label }}
+              assistantLabel={assistantLabelFor(contact)}
               recordFields={recordFields}
               onProvenanceOpen={openInfo}
               assignedAgent={{
@@ -927,12 +1000,10 @@ export function UcpProfileView({
             <Tabs
               activeId={tab}
               onChange={goTab}
-              items={[
-                { id: "overview", label: "Overview" },
-                { id: "snapshot", label: "Snapshot" },
-                { id: "activity", label: "Activity" },
-                { id: "drives",   label: "Drives"   },
-              ]}
+              // Published by the type, not by this screen. A Company brings a
+              // People tab; a Customer and an Employee bring none, and render
+              // perfectly well without one.
+              items={tabsForContact(contact)}
             />
           </div>
         </>
@@ -961,6 +1032,7 @@ export function UcpProfileView({
       ) : (
         <>
           {tab === "overview" && <WidgetCanvasView initialSlots={overviewSlots} />}
+          {tab === "people"   && <PeopleTab company={contact} onOpen={onOpenRecord} />}
           {tab === "snapshot" && <SnapshotTab contact={contact} />}
           {tab === "activity" && (
             <ActivityTab

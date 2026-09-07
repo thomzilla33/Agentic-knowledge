@@ -51,7 +51,7 @@ source inicial:
 cd ~/aims-os-ds                 # tu clon de cachilupis/aims-os-design-system
 git checkout main && git pull
 git checkout -b claude/ucp-unified-contact-profile
-git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 232783 bytes, 11 archivos
+git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 249495 bytes, 12 archivos
 npm run build                                  # 0 errores
 node scripts/audit-tokens.cjs --counts         # ninguna categoría sube
 npm run dev                                    # localhost:5173 → Prototypes
@@ -69,6 +69,41 @@ solo contra el `main` del DS. `ucp-screens.patch` (solo lo aprobado) y
 `experiment/experiment.patch` siguen ahí para cuando se quiera una mitad sola,
 pero **`experiment.patch` no aplica por sí mismo**: su hunk de `App.tsx` asume
 la línea de import que agrega el aprobado. Se apilan en ese orden o no aplican.
+
+### El experimento portado al original
+
+Las tres cosas que el experimento probó y que no dependían de tener doce tipos
+viven ahora en la pantalla aprobada:
+
+| Del experimento | En el original |
+|---|---|
+| El perfil lo dirige el modelo, no la pantalla | Cada tipo trae su widget de Overview — **Account**, **Employment**, **Organization** — y sus tabs. Company suma **People**; Customer y Employee no suman ninguno |
+| Facetas publicadas por tipo, con conteos | El tab decide qué se filtra: Customers por Account, Employees por Department, Companies por Industry. Cero deshabilita la opción en vez de quitarla, y cambiar de tab limpia y lo dice |
+| `assistantLabel` | Una compañía dice "Ask about this company" en vez de "Ask about Riverbend" |
+
+La evidencia estaba en las fixtures desde el principio. `UcpContact.subtitle`
+está documentado como *"role · department, or industry · size · HQ"* — tres
+conjuntos de campos distintos metidos en una sola cadena. Aplanarlos en una
+línea de metadata era la pantalla decidiendo que todos los tipos tienen la
+misma forma. No la tienen.
+
+**Lo que NO se portó, a propósito:** el switcher de tipos, el catálogo plano y
+el Inbox. Existen para responder qué pasa con doce tipos; acá hay tres y los
+tabs ya hacen ese trabajo. Portarlos habría reemplazado la navegación del
+original por la del experimento, que es justo lo contrario de lo que se pidió.
+
+**Un bug que el port hizo visible.** `getConnections` devolvía cuatro filas
+hardcodeadas para *cualquier* compañía, así que Sandra Torres y Sarah Chen —
+ambas de Meridian Corp — aparecían en el perfil de Riverbend Auto Group. Nada
+lo contradecía mientras Connections era el único lugar donde salía la gente de
+una compañía; el tab People ahora lista la real, a un tab de distancia, y un
+registro no puede decir dos cosas distintas de sí mismo en la misma pantalla.
+Connections se deriva del roster igual que People.
+
+**Y una dependencia que cambió de mitad.** `assistantLabel` era una prop del
+experimento en `record-header.tsx`. El perfil aprobado la usa ahora, así que
+ese archivo pasó al patch aprobado — lo detectó `git apply` + `tsc` sobre un
+worktree limpio, no la lectura del diff.
 
 ### El entitlement del viewer vive en un solo módulo
 
@@ -100,7 +135,7 @@ Un campo declara **el scope que lo gobierna**, nunca si está enmascarado. Esa
 diferencia es la que hace que otorgar un scope destape el header y el widget a
 la vez, en vez de solo uno.
 
-El patch aprobado toca 7 archivos: 4 módulos nuevos en `src/screens/`,
+El patch aprobado toca 8 archivos: 5 módulos en `src/screens/`,
 `entity-list.tsx`, y **dos líneas** en `App.tsx`. No borra nada. `entity-list.tsx` y `App.tsx`
 están bajo CODEOWNERS, así que el PR necesita review de **@cachilupis** — es el
 comportamiento esperado, no un bloqueo.

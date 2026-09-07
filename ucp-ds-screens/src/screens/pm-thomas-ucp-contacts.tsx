@@ -43,12 +43,13 @@ import { anchorFromEvent, useDropdownPosition } from "@/lib/dropdown-anchor"
 import type { DropdownAnchor } from "@/lib/dropdown-anchor"
 import { Sparkle, Send, Plus, Lock, Contact as ContactIcon } from "lucide-react"
 import { UcpProfileView, UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
+import { facetsForType, facetValue, facetOptions } from "./ucpTypeModel"
 import {
   CONTACTS, CONCIERGE_PROMPTS, PLANE_META,
   STATUS_TAG, TYPE_ICON, TYPE_LABEL, TYPE_TAG, entityState, restrictionFor,
   getActivity, getDrives, getFacts,
 } from "./ucpShared"
-import type { UcpContact, UcpEntityType, UcpStatus } from "./ucpShared"
+import type { UcpContact, UcpEntityType } from "./ucpShared"
 
 const PAGE_SIZE = 10
 
@@ -87,8 +88,6 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "owner",  label: "Owner"             },
 ]
 
-const STATUS_OPTIONS: UcpStatus[] = ["Active", "Inactive", "Archived"]
-const OWNER_OPTIONS = Array.from(new Set(CONTACTS.map(c => c.owner))).sort()
 
 // ── Roster concierge ──────────────────────────────────────────────────────────
 // DS-GAP: agent chat panel — no chat component exists in src/components/ui/.
@@ -292,12 +291,17 @@ export default function PMThomasUcpContactsScreen() {
   const [search,     setSearch]     = useState("")
 
   // Draft vs. applied — a chip never appears before Apply.
-  const [status,     setStatus]     = useState<string | undefined>()
-  const [owner,      setOwner]      = useState<string | undefined>()
+  // One bag keyed by facet id, not a named useState per filter. The facets are
+  // published by the type now, so the screen cannot know their names ahead of
+  // time — and a `status`/`owner` pair would have to grow a variable every time
+  // a type publishes a field.
+  const [applied,    setApplied]    = useState<Record<string, string>>({})
+  /** Set when a tab change dropped filters, so the reset is explained. */
+  const [clearedOn,  setClearedOn]  = useState<string | null>(null)
   const [slideOpen,  setSlideOpen]  = useState(false)
 
   const [sortKey,    setSortKey]    = useState<SortKey>("recent")
-  const [openSlot,   setOpenSlot]   = useState<"status" | "owner" | "sort" | null>(null)
+  const [openSlot,   setOpenSlot]   = useState<string | null>(null)
   const [anchor,     setAnchor]     = useState<DropdownAnchor | null>(null)
   const dropdown = useDropdownPosition(anchor)
 
@@ -318,16 +322,39 @@ export default function PMThomasUcpContactsScreen() {
 
   const activeType = TYPE_TABS.find(t => t.id === tab)?.type ?? "all"
 
-  const filtered = useMemo(() => CONTACTS.filter(c => {
-    if (activeType !== "all" && c.type !== activeType) return false
-    if (status && c.status !== status) return false
-    if (owner  && c.owner  !== owner)  return false
+  const facets = useMemo(() => facetsForType(activeType), [activeType])
+
+  /** The tab's rows before any facet is applied — the pool the counts run on. */
+  const inType = useMemo(
+    () => CONTACTS.filter(c => activeType === "all" || c.type === activeType),
+    [activeType],
+  )
+
+  const filtered = useMemo(() => inType.filter(c => {
+    for (const [fid, val] of Object.entries(applied)) {
+      if (val && facetValue(c, fid) !== val) return false
+    }
     if (search) {
       const q = search.toLowerCase()
       if (![c.name, c.subtitle, c.email, c.company, c.owner, c.id].some(f => f.toLowerCase().includes(q))) return false
     }
     return true
-  }), [activeType, status, owner, search])
+  }), [inType, applied, search])
+
+  /**
+   * How many rows an option would leave, with every OTHER facet still applied.
+   * Zero disables the option rather than removing it: if picking "Inactive"
+   * made Owner vanish because no inactive record is Priya's, the viewer would
+   * lose the way back out. The count is the honest version of that — it says
+   * the combination is empty without hiding the road.
+   */
+  const countFor = (facetId: string, option: string): number => {
+    let base = inType
+    for (const [fid, val] of Object.entries(applied)) {
+      if (fid !== facetId && val) base = base.filter(c => facetValue(c, fid) === val)
+    }
+    return base.filter(c => facetValue(c, facetId) === option).length
+  }
 
   const sorted = useMemo(() => {
     const rows = [...filtered]
@@ -339,20 +366,20 @@ export default function PMThomasUcpContactsScreen() {
   const paged = sorted.slice((page - 1) * pageSize, page * pageSize)
 
   const resetPage = () => setPage(1)
-  const hasFilters = Boolean(status || owner || search)
+  const hasFilters = Boolean(Object.values(applied).some(Boolean) || search)
 
   const clearAll = () => {
-    setStatus(undefined)
-    setOwner(undefined)
+    setApplied({})
     setSearch("")
+    setClearedOn(null)
     resetPage()
   }
 
   const closeSlot = () => { setOpenSlot(null); setAnchor(null) }
 
-  const pickSlot = (slot: "status" | "owner", value: string) => {
-    if (slot === "status") setStatus(value)
-    else setOwner(value)
+  const pickSlot = (facetId: string, value: string) => {
+    setApplied(a => ({ ...a, [facetId]: value }))
+    setClearedOn(null)
     resetPage()
     closeSlot()
   }
@@ -371,6 +398,9 @@ export default function PMThomasUcpContactsScreen() {
         contact={open}
         onBack={() => setOpenId(null)}
         onSidebarItemClick={id => { if (id === "contacts") setOpenId(null) }}
+        // A company's People tab opens one of its records. Navigation stays
+        // here rather than in the profile: the roster owns which record is open.
+        onOpenRecord={c => setOpenId(c.id)}
       />
     )
   }
@@ -533,7 +563,17 @@ export default function PMThomasUcpContactsScreen() {
       <Tabs
         className="mb-[24px]"
         activeId={tab}
-        onChange={id => { setTab(id); resetPage() }}
+        onChange={id => {
+          // Facets are published per type, so carrying them across a tab change
+          // would keep a filter the new tab cannot answer. They clear — and the
+          // screen says so, because a list that silently resets reads as broken
+          // rather than reset.
+          const had = Object.values(applied).filter(Boolean).length
+          setTab(id)
+          setApplied({})
+          setClearedOn(had > 0 ? (TYPE_TABS.find(t => t.id === id)?.label ?? null) : null)
+          resetPage()
+        }}
         items={TYPE_TABS.map(t => ({ id: t.id, label: t.label }))}
       />
 
@@ -543,10 +583,18 @@ export default function PMThomasUcpContactsScreen() {
           searchPlaceholder="Search by name, company, owner or ID…"
           searchValue={search}
           onSearchChange={v => { setSearch(v); resetPage() }}
-          slots={[
-            { placeholder: "Status", value: status, onOpen: () => setOpenSlot("status"), onRemove: () => { setStatus(undefined); resetPage() } },
-            { placeholder: "Owner",  value: owner,  onOpen: () => setOpenSlot("owner"),  onRemove: () => { setOwner(undefined);  resetPage() } },
-          ]}
+          // Which facets are visible is the type's call, not the screen's. The
+          // rest live behind All filters, exactly the layering FILTERS_SPEC
+          // describes — visible is for high frequency, not for importance.
+          slots={facets.filter(f => f.inline).map(f => ({
+            placeholder: f.label,
+            value: applied[f.id],
+            onOpen: () => setOpenSlot(f.id),
+            onRemove: () => {
+              setApplied(a => { const n = { ...a }; delete n[f.id]; return n })
+              resetPage()
+            },
+          }))}
           showAllFilters
           onAllFiltersClick={() => setSlideOpen(true)}
           showClearFilters={hasFilters}
@@ -557,6 +605,13 @@ export default function PMThomasUcpContactsScreen() {
           showViewToggle={false}
         />
       </div>
+
+      {clearedOn && (
+        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--field-supporting)" }}>
+          <HighlightIcon size="sm" variant="neutral" iconName="Info" />
+          {`Filters cleared — ${clearedOn} publishes a different set of facets.`}
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <EmptyState
@@ -599,14 +654,18 @@ export default function PMThomasUcpContactsScreen() {
                       onClick={() => pickSort(option.key)}
                     />
                   ))
-                : (openSlot === "status" ? STATUS_OPTIONS : OWNER_OPTIONS).map(option => (
-                    <MenuItem
-                      key={option}
-                      size="sm"
-                      label={option}
-                      onClick={() => pickSlot(openSlot, option)}
-                    />
-                  ))
+                : facetOptions(inType, openSlot).map(option => {
+                    const n = countFor(openSlot, option)
+                    return (
+                      <MenuItem
+                        key={option}
+                        size="sm"
+                        label={`${option} · ${n}`}
+                        state={n === 0 ? "disabled" : applied[openSlot] === option ? "focus" : "default"}
+                        onClick={() => { if (n > 0) pickSlot(openSlot, option) }}
+                      />
+                    )
+                  })
               }
             </Menu>
           </div>
@@ -632,10 +691,16 @@ export default function PMThomasUcpContactsScreen() {
         onClose={() => setSlideOpen(false)}
         onApply={() => { resetPage(); setSlideOpen(false) }}
         onClearAll={clearAll}
-        activeFilters={[
-          ...(status ? [{ label: "Status", value: status, onRemove: () => { setStatus(undefined); resetPage() } }] : []),
-          ...(owner  ? [{ label: "Owner",  value: owner,  onRemove: () => { setOwner(undefined);  resetPage() } }] : []),
-        ]}
+        activeFilters={facets
+          .filter(f => applied[f.id])
+          .map(f => ({
+            label: f.label,
+            value: applied[f.id],
+            onRemove: () => {
+              setApplied(a => { const n = { ...a }; delete n[f.id]; return n })
+              resetPage()
+            },
+          }))}
       />
 
       {/* ── Row preview — the profile without leaving the list ── */}

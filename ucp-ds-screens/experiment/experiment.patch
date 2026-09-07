@@ -57,66 +57,6 @@ index 19dcea5..f96afad 100644
        </div>
      </section>
    )
-diff --git a/src/components/ui/record-header.tsx b/src/components/ui/record-header.tsx
-index d1f028a..6e252ba 100644
---- a/src/components/ui/record-header.tsx
-+++ b/src/components/ui/record-header.tsx
-@@ -475,6 +475,26 @@ export interface RecordHeaderProps {
-    * never a silently missing button and never a broken one.
-    */
-   assignedAgent: AssignedAgent | null
-+  /**
-+   * Overrides the agent trigger's label. Omit and it stays "Ask about
-+   * {firstName}", which is what every existing caller gets.
-+   *
-+   * The default takes the first token of `name`, and that is right exactly when
-+   * the first token identifies the record — a person ("Ask about Sandra") or a
-+   * brand ("Ask about Riverbend"). It is wrong when the name is a code or a
-+   * spec: a vehicle called "2024 Ford F-150 Lariat" produced "Ask about 2024".
-+   *
-+   * This component cannot tell those apart — it deliberately knows nothing about
-+   * entity types since the agnosticism pass, and a heuristic here (does the
-+   * token start with a digit? is it a known given name?) would be that knowledge
-+   * smuggled back in, wrong for some tenant's naming on day one. So the host
-+   * decides, and only for the types where the default breaks.
-+   *
-+   * The narrow-card fallback still wins: below the collapse threshold the label
-+   * becomes "Ask AI" regardless, because that collapse is about space, not about
-+   * naming. The Tooltip keeps the record's full context either way.
-+   */
-+  assistantLabel?: string
-   /** actions[0] = an optional primary CTA (e.g. contact); actions[1+] = overflow menu items. Omit entirely for no CTA/overflow. */
-   actions?: RecordAction[]
-   /** Zone: AGENTIC SYSTEM. Omit entirely to skip the zone for this entity type. */
-@@ -560,6 +580,7 @@ function RecordHeader({
-   onProvenanceOpen,
-   defaultExpanded = false,
-   locked = false,
-+  assistantLabel: assistantLabelOverride,
-   className,
- }: RecordHeaderProps) {
-   const [expanded, setExpanded] = useState(defaultExpanded)
-@@ -673,8 +694,18 @@ function RecordHeader({
-   // narrow OR the first name itself is long enough to risk breaking the
-   // action row — either condition alone is enough to trigger the fallback.
-   const assistantFirstName = name.trim().split(/\s+/)[0] ?? ""
--  const assistantUseFallback = assistantShortened || assistantFirstName.length > ASSISTANT_LABEL_MAX_NAME_LENGTH
--  const assistantLabel = assistantUseFallback ? "Ask AI" : `Ask about ${assistantFirstName}`
-+  // The host override is consulted only for the full-width label. `assistantShortened`
-+  // is the card being too narrow, which no amount of naming fixes, so "Ask AI"
-+  // still wins there. A long override gets the same length guard as a long first
-+  // name — otherwise a helpful host could break the action row.
-+  const assistantDefault = `Ask about ${assistantFirstName}`
-+  const assistantFull = assistantLabelOverride?.trim() || assistantDefault
-+  const assistantUseFallback =
-+    assistantShortened ||
-+    (assistantLabelOverride
-+      ? assistantFull.length > ASSISTANT_LABEL_MAX_NAME_LENGTH + "Ask about ".length
-+      : assistantFirstName.length > ASSISTANT_LABEL_MAX_NAME_LENGTH)
-+  const assistantLabel = assistantUseFallback ? "Ask AI" : assistantFull
-   const assistantTooltip = `Ask the assistant with ${name}'s context`
- 
-   return (
 diff --git a/src/screens/entityProfileView.tsx b/src/screens/entityProfileView.tsx
 new file mode 100644
 index 0000000..4e9511e
