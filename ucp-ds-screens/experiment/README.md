@@ -188,6 +188,57 @@ de que construir los UP por tipo valía la pena.
 
 ---
 
+## Filtros — la línea, y qué tan dinámicos
+
+**Los quickfilters no son algo nuevo.** El patrón del DS ya es de tres capas —
+`Visible Filters → All Filters → Slideout`, más chips — y `Filters` ya recibe
+`slots` para la capa visible. Una fila aparte de quickfilters sería una **cuarta
+capa** y un segundo source of truth del dataset, que el patrón de List View
+prohíbe.
+
+**Cuáles van inline lo decide la frecuencia, no la importancia.**
+`FILTERS_SPEC.md` tiene la regla textual: algo se queda fuera del slideout
+*"because it should always be visible (high-frequency)"*.
+
+### Dinámicos: dos cosas distintas, una segura y una no
+
+**Por tipo — sí, y sale gratis.** Las facetas las publica el modelo, el mismo
+lugar de donde salen los campos. Un vehicle filtra por Condition y Store; un
+customer por Status y Owner. Validado: Dataverse configura facetas por tabla, y
+su vista mixta cae a las tres globales precisamente por esto.
+
+**Por selección — solo conteos, no disponibilidad.** Cada opción muestra cuántos
+quedarían, y **cero deshabilita en vez de remover**. Si al elegir *In service*
+desapareciera la faceta *Store* porque ningún vehículo en taller está en Brandon,
+perderías la salida: no podés ensanchar de vuelta. Es el fallo conocido de
+esconder facetas vacías.
+
+Verificado corriendo (`U3`): con *In service* aplicado, Store muestra
+**Riverbend Tampa · 2** y **Riverbend Brandon · 0** — Brandon sigue ahí,
+deshabilitado, no removido.
+
+### Dos consecuencias que había que decidir
+
+**Al cambiar de tipo los filtros no viajan.** Un filtro por Odometer no significa
+nada en customers. Así que se limpian — y **se avisa**: *"Filters cleared —
+Customers publishes a different set of facets."* Sin ese aviso el usuario cree que
+la lista se rompió.
+
+**El Inbox es estructuralmente más pobre.** Una superficie mixta solo puede
+filtrarse por lo que todos los tipos tienen, así que cae a `COMMON_FACETS` — Type
+y Owner. Declaradas, no derivadas de los resultados del momento: una faceta que
+aparece y desaparece según las filas es una sorpresa. El slideout lo dice en vez
+de esconderlo.
+
+### Lo que ya estaba especificado y solo usé
+
+`FILTERS_SPEC.md` define los chips: arriba de la lista, X por chip para quitarlo
+sin abrir el slideout, "Clear all N". Y el slideout va draft-then-apply — abrir
+toma una foto, los cambios mutan el borrador, Apply lo confirma, Cancel lo
+descarta.
+
+---
+
 ## Preguntas abiertas
 
 1. **~~¿"Model" puede aparecer en la superficie de registros?~~ Respondida por la

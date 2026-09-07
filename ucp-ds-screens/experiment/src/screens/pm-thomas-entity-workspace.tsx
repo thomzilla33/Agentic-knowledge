@@ -52,6 +52,7 @@ import { Header }            from "@/components/ui/header"
 import { Tabs }              from "@/components/ui/tabs"
 import { Tag }               from "@/components/ui/tag"
 import { Button }            from "@/components/ui/button"
+import { Chip }              from "@/components/ui/chip"
 import { CardContainer }     from "@/components/ui/card-container"
 import { EntityList }        from "@/components/ui/entity-list"
 import type { EntityListItemData } from "@/components/ui/entity-list"
@@ -60,16 +61,16 @@ import { HighlightIcon }     from "@/components/ui/highlight-icon"
 import { Filters }           from "@/components/ui/filters"
 import { Pagination }        from "@/components/ui/pagination"
 import { SlideOut }          from "@/components/ui/slide-out"
-import { LayoutGrid, Plus, Lock, Search, ChevronDown, Inbox } from "lucide-react"
+import { LayoutGrid, Plus, Lock, Search, ChevronDown, Inbox, SlidersHorizontal } from "lucide-react"
 import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
 import { EntityProfileView } from "./entityProfileView"
 import type { ProfileRecord } from "./entityProfileView"
 import type { ProfileField } from "./entityProfiles"
 import {
-  ENTITY_TYPES, MODEL_LABEL, INBOX_VIEWS, INBOX_COLUMNS,
-  isReadable, byUsage, viewsForType,
+  ENTITY_TYPES, MODEL_LABEL, INBOX_VIEWS, INBOX_COLUMNS, COMMON_FACETS,
+  isReadable, byUsage, viewsForType, facetsForType,
 } from "./entityRegistry"
-import type { EntityTypeDef } from "./entityRegistry"
+import type { EntityTypeDef, Facet } from "./entityRegistry"
 import { CONTACTS } from "./ucpShared"
 
 // ── Records ───────────────────────────────────────────────────────────────────
@@ -104,6 +105,19 @@ const RECORDS: WorkspaceRecord[] = [
 ]
 
 const TYPE_BY_ID = new Map(ENTITY_TYPES.map(t => [t.id, t]))
+
+/** Cómo cada faceta se lee sobre un registro. Un lugar, no uno por pantalla. */
+function facetValue(r: WorkspaceRecord, facetId: string): string {
+  switch (facetId) {
+    case "status":
+    case "condition": return r.state.label
+    case "owner":     return r.owner
+    case "source":    return r.source
+    case "store":     return r.subtitle.split(" · ").pop() ?? ""
+    case "type":      return TYPE_BY_ID.get(r.typeId)?.singular ?? ""
+    default:          return ""
+  }
+}
 
 /**
  * The fields each type puts in its own header. This is the whole difference
@@ -256,6 +270,15 @@ export default function PMThomasEntityWorkspaceScreen() {
   const [openId,  setOpenId]  = useState<string | null>(null)
   const [search,  setSearch]  = useState("")
   const [page,    setPage]    = useState(1)
+  // Aplicados, por id de faceta. El slideout trabaja sobre un borrador aparte
+  // (draft-then-apply, como manda el patrón de filtros del DS).
+  const [applied, setApplied] = useState<Record<string, string>>({})
+  const [draft,   setDraft]   = useState<Record<string, string>>({})
+  const [allOpen, setAllOpen] = useState(false)
+  // Al cambiar de tipo los filtros no pueden viajar — un filtro por Odometer no
+  // significa nada en customers — así que se limpian. Y hay que DECIRLO, o el
+  // usuario cree que la lista se rompió.
+  const [clearedOn, setClearedOn] = useState<string | null>(null)
 
   const isInbox = nav === "work"
   const type    = TYPE_BY_ID.get(typeId)!
@@ -263,7 +286,10 @@ export default function PMThomasEntityWorkspaceScreen() {
   const view    = views.find(v => v.id === viewId) ?? views[0]
 
   const pickType = (id: string) => {
+    const had = Object.keys(applied).length
     setTypeId(id); setViewId(`${id}-all`); setPage(1); setSearch(""); setNav("contacts")
+    setApplied({}); setDraft({})
+    setClearedOn(had > 0 ? TYPE_BY_ID.get(id)?.label ?? null : null)
   }
 
   const rows = useMemo(() => {
@@ -287,8 +313,45 @@ export default function PMThomasEntityWorkspaceScreen() {
       const q = search.toLowerCase()
       r = r.filter(x => [x.title, x.subtitle, x.owner, x.id].some(f => f.toLowerCase().includes(q)))
     }
+    for (const [fid, val] of Object.entries(applied)) {
+      r = r.filter(x => facetValue(x, fid) === val)
+    }
     return r
-  }, [isInbox, inboxId, typeId, view, search])
+  }, [isInbox, inboxId, typeId, view, search, applied])
+
+  // Las facetas las publica el modelo del tipo; el Inbox cae al piso común,
+  // porque una superficie mixta solo puede ofrecer lo que todos los tipos tienen.
+  const facets: Facet[] = useMemo(() => {
+    if (!isInbox) return facetsForType(typeId)
+    return COMMON_FACETS.map(f => f.id === "type"
+      // Las opciones de Type se derivan de lo que el Inbox realmente puede
+      // mostrar — es la única faceta cuyo dominio ES el conjunto de tipos.
+      ? { ...f, options: [...new Set(RECORDS.filter(x => isReadable(TYPE_BY_ID.get(x.typeId)!)).map(x => TYPE_BY_ID.get(x.typeId)!.singular))].sort() }
+      : f)
+  }, [isInbox, typeId])
+
+  /**
+   * Conteo por opción, calculado sobre el conjunto con las OTRAS facetas
+   * aplicadas — así el número dice cuántos quedarían si eligieras esta.
+   *
+   * Cero deshabilita, nunca remueve. Si "In service" borrara la faceta Store
+   * porque ningún vehículo en taller está en Brandon, perderías la salida: no
+   * podés ensanchar de vuelta. Es el fallo conocido de esconder facetas vacías.
+   */
+  const countFor = (facetId: string, option: string): number => {
+    const others = Object.entries(applied).filter(([k]) => k !== facetId)
+    let base = RECORDS.filter(x => {
+      const t = TYPE_BY_ID.get(x.typeId)
+      if (!t || !isReadable(t)) return false
+      if (isInbox) return inboxId === "inbox-nba" ? Boolean(x.nba) : Boolean(x.mine)
+      return x.typeId === typeId
+    })
+    for (const [k, v] of others) base = base.filter(x => facetValue(x, k) === v)
+    return base.filter(x => facetValue(x, option === "" ? "" : facetId) === option).length
+  }
+
+  const activeCount = Object.keys(applied).length
+  const inline = facets.filter(f => f.inline)
 
   const shown = rows.slice((page - 1) * PAGE, page * PAGE)
 
@@ -407,15 +470,68 @@ export default function PMThomasEntityWorkspaceScreen() {
         </>
       )}
 
+      {/* Una sola línea de filtros. Los "quickfilters" son sus `slots` — la capa
+          visible que el patrón del DS ya define — no una fila aparte, que sería
+          una cuarta capa y un segundo source of truth del dataset.
+
+          Cuáles van inline lo decide la FRECUENCIA, no la importancia:
+          FILTERS_SPEC dice que algo se queda fuera del slideout "because it
+          should always be visible (high-frequency)". */}
       <div className="mb-[24px]">
         <Filters
           searchPlaceholder={isInbox ? "Search across every readable type…" : `Search ${type.label.toLowerCase()}…`}
           searchValue={search}
           onSearchChange={v => { setSearch(v); setPage(1) }}
+          slots={inline.map(f => ({
+            placeholder: f.label,
+            value: applied[f.id],
+            // Cada opción lleva su conteo. Cero se muestra y se deshabilita —
+            // el conteo va en la etiqueta porque FilterSlot toma strings.
+            options: f.options.map(o => {
+              const n = countFor(f.id, o)
+              return n === 0 ? `${o} · 0` : `${o} · ${n}`
+            }),
+            onSelect: label => {
+              const o = label.replace(/ · \d+$/, "")
+              if (countFor(f.id, o) === 0) return   // cero no selecciona
+              setApplied(a => ({ ...a, [f.id]: o })); setPage(1); setClearedOn(null)
+            },
+            onRemove: applied[f.id] ? () => { setApplied(a => { const n = { ...a }; delete n[f.id]; return n }); setPage(1) } : undefined,
+          }))}
+          showAllFilters={facets.length > inline.length}
+          onAllFiltersClick={() => { setDraft(applied); setAllOpen(true) }}
+          showClearFilters={activeCount > 0}
+          onClearFilters={() => { setApplied({}); setPage(1) }}
           showViewToggle={false}
           showSort={false}
         />
       </div>
+
+      {/* Chips de lo aplicado, arriba de la lista, cada uno con su X — para
+          quitar uno sin abrir el slideout. Tal como lo especifica FILTERS_SPEC. */}
+      {activeCount > 0 && (
+        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+          {Object.entries(applied).map(([fid, val]) => (
+            <Chip key={fid} size="s" variant="primary"
+              onClick={() => { setApplied(a => { const n = { ...a }; delete n[fid]; return n }); setPage(1) }}>
+              {`${facets.find(f => f.id === fid)?.label ?? fid}: ${val}  ✕`}
+            </Chip>
+          ))}
+          <Button variant="tertiary" size="sm" className="!px-[8px]"
+            onClick={() => { setApplied({}); setPage(1) }}>
+            {`Clear all ${activeCount}`}
+          </Button>
+        </div>
+      )}
+
+      {/* El aviso que evita que "se rompió la lista" — los filtros no viajan
+          entre tipos porque las facetas no son las mismas. */}
+      {clearedOn && (
+        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--field-supporting)" }}>
+          <HighlightIcon size="sm" variant="neutral" iconName="Info" />
+          {`Filters cleared — ${clearedOn} publishes a different set of facets.`}
+        </div>
+      )}
 
       {shown.length === 0 ? (
         <EmptyState
@@ -436,6 +552,59 @@ export default function PMThomasEntityWorkspaceScreen() {
           ))}
         </div>
       )}
+
+      {/* All filters: borrador, luego Apply. Nunca muta lo aplicado en vivo. */}
+      <SlideOut
+        open={allOpen} onClose={() => setAllOpen(false)} type="with-variants" size="m"
+        title="All filters"
+        subtitle={isInbox
+          ? `Mixed types · only the facets every type carries`
+          : `${type.label} · published by ${MODEL_LABEL[type.model]}`}
+        showIcon iconContent={<SlidersHorizontal size={14} />}
+        showStatus={false} showTopButton={false} showTabs={false} showSearchBar={false} showChips={false}
+        showCta
+        ctaPrimaryLabel={`Apply${Object.keys(draft).length ? ` (${Object.keys(draft).length})` : ""}`}
+        onCtaPrimary={() => { setApplied(draft); setPage(1); setAllOpen(false); setClearedOn(null) }}
+        showCtaSecondary ctaSecondaryLabel="Cancel"
+        onCtaSecondary={() => setAllOpen(false)}
+      >
+        <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
+          {isInbox && (
+            <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
+              A mixed list can only be filtered on what every type has. These two are declared,
+              not derived from the current results — a facet that appears and disappears as the
+              rows change is a surprise.
+            </span>
+          )}
+          {facets.map(f => (
+            <div key={f.id} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
+                {f.label}
+              </span>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {f.options.map(o => {
+                  const n = countFor(f.id, o)
+                  const on = draft[f.id] === o
+                  return (
+                    <Chip key={o} size="s" variant={on ? "primary" : "secondary"}
+                      disabled={n === 0 && !on}
+                      onClick={() => setDraft(d => {
+                        const next = { ...d }
+                        if (next[f.id] === o) delete next[f.id]; else next[f.id] = o
+                        return next
+                      })}>
+                      {`${o} · ${n}`}
+                    </Chip>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+          <Button variant="tertiary" size="sm" className="self-start !px-0" onClick={() => setDraft({})}>
+            Clear all
+          </Button>
+        </div>
+      </SlideOut>
 
       <EntityCatalog open={catalog} onClose={() => setCatalog(false)} current={typeId} onPick={pickType} />
     </ScreenLayout>
