@@ -42,9 +42,10 @@ import * as LucideIcons     from "lucide-react"
 import type { LucideIcon }  from "lucide-react"
 import { Construction, FileSearch } from "lucide-react"
 import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
-import { MODEL_LABEL, VIEWER_SCOPES } from "./entityRegistry"
+import { MODEL_LABEL }      from "./entityRegistry"
 import type { EntityTypeDef } from "./entityRegistry"
-import { PROFILE_SPECS, tabsForType, isMasked } from "./entityProfiles"
+import { PROFILE_SPECS, tabsForType } from "./entityProfiles"
+import { isMasked }         from "./viewerScopes"
 import type { ProfileWidgetRow } from "./entityProfiles"
 import type { ProfileField } from "./entityProfiles"
 
@@ -72,7 +73,7 @@ function WidgetRows({ rows }: { rows: ProfileWidgetRow[] }) {
   return (
     <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column" }}>
       {rows.map((r, i) => {
-        const masked = isMasked(r.scope, VIEWER_SCOPES)
+        const masked = isMasked(r.scope)
         return (
           <div key={r.label} style={{
             display: "flex", alignItems: "center", gap: 10, padding: "8px 0",
@@ -110,9 +111,9 @@ export function EntityProfileView({
       label: f.label,
       icon:  icon(f.iconName),
       provenance: { system: f.system, systemAbbr: f.system.slice(0, 2).toUpperCase(), modelVersion: `${MODEL_LABEL[type.model]} v1`, syncedAgo: "2h ago" },
-      state: isMasked(f.scope, VIEWER_SCOPES) ? "masked" : "hydrated",
+      state: isMasked(f.scope) ? "masked" : "hydrated",
       value: f.value,
-      maskedValue: isMasked(f.scope, VIEWER_SCOPES) ? "•••• (restricted)" : undefined,
+      maskedValue: isMasked(f.scope) ? "•••• (restricted)" : undefined,
     })),
     [record, type],
   )
@@ -205,7 +206,7 @@ export function EntityProfileView({
           </span>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {record.fields.map((f, i) => {
-              const masked = isMasked(f.scope, VIEWER_SCOPES)
+              const masked = isMasked(f.scope)
               return (
               <div key={`${f.label}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>

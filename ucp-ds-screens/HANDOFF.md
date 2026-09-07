@@ -36,10 +36,10 @@ que lo primero que hace el mensaje es decirle que lo descarte.
 >    curl -sSL -o /tmp/ucp.patch $RAW/ucp-screens.patch
 >    curl -sSL -o /tmp/ucp-pr.md $RAW/PR.md
 >    ```
-> 4. Verifica integridad: `wc -c /tmp/ucp.patch` debe dar **142267** y
->    `grep -c '^diff --git' /tmp/ucp.patch` debe dar **5**. Si no, no sigas.
+> 4. Verifica integridad: `wc -c /tmp/ucp.patch` debe dar **154716** y
+>    `grep -c '^diff --git' /tmp/ucp.patch` debe dar **7**. Si no, no sigas.
 > 5. `git apply /tmp/ucp.patch`, y confirma con `git status --short` que hay
->    5 archivos y **cero borrados**. Un archivo borrado = bajaste el patch viejo.
+>    7 archivos y **cero borrados**. Un archivo borrado = bajaste el patch viejo.
 > 6. `npm ci && npm run build` (0 errores) y `node scripts/audit-ratchet.cjs`
 >    (debe decir "No new DS warnings"). `.husky/pre-push` corre ese mismo
 >    ratchet — no lo saltes con `--no-verify`.
@@ -71,9 +71,9 @@ RAW=https://raw.githubusercontent.com/thomzilla33/Agentic-knowledge/$BR/ucp-ds-s
 curl -sSL -o /tmp/ucp.patch $RAW/ucp-screens.patch
 curl -sSL -o /tmp/ucp-pr.md $RAW/PR.md
 
-wc -c /tmp/ucp.patch                        # 142267
+wc -c /tmp/ucp.patch                        # 154716
 git apply /tmp/ucp.patch
-git status --short                          # 5 archivos, 0 borrados
+git status --short                          # 7 archivos, 0 borrados
 
 npm ci
 npm run build                               # 0 errores
@@ -103,7 +103,7 @@ El `PR.md` le explica los dos cambios y le deja dos preguntas concretas.
 
 | Síntoma | Causa | Qué hacer |
 |---|---|---|
-| `wc -c` ≠ 142267 | descarga cortada | vuelve a bajarlo |
+| `wc -c` ≠ 154716 | descarga cortada | vuelve a bajarlo |
 | `git status` muestra un borrado | bajaste el patch viejo | verifica la rama en la URL |
 | `git apply` falla | `main` avanzó otra vez | `git apply --3way`, resuelve leyendo ambos lados |
 | el ratchet sube un contador | `main` cambió | **no** uses `--no-verify`; mándame el output |

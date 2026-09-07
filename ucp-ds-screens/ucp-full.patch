@@ -201,10 +201,10 @@ index 578261c..6e252ba 100644
            {/* One context Tag per NBA — what area this action is about, at a
 diff --git a/src/screens/entityProfileView.tsx b/src/screens/entityProfileView.tsx
 new file mode 100644
-index 0000000..4ca4bd0
+index 0000000..4e9511e
 --- /dev/null
 +++ b/src/screens/entityProfileView.tsx
-@@ -0,0 +1,254 @@
+@@ -0,0 +1,255 @@
 +/**
 + * Entity Profile — ONE screen, N types.
 + *
@@ -249,9 +249,10 @@ index 0000000..4ca4bd0
 +import type { LucideIcon }  from "lucide-react"
 +import { Construction, FileSearch } from "lucide-react"
 +import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
-+import { MODEL_LABEL, VIEWER_SCOPES } from "./entityRegistry"
++import { MODEL_LABEL }      from "./entityRegistry"
 +import type { EntityTypeDef } from "./entityRegistry"
-+import { PROFILE_SPECS, tabsForType, isMasked } from "./entityProfiles"
++import { PROFILE_SPECS, tabsForType } from "./entityProfiles"
++import { isMasked }         from "./viewerScopes"
 +import type { ProfileWidgetRow } from "./entityProfiles"
 +import type { ProfileField } from "./entityProfiles"
 +
@@ -279,7 +280,7 @@ index 0000000..4ca4bd0
 +  return (
 +    <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column" }}>
 +      {rows.map((r, i) => {
-+        const masked = isMasked(r.scope, VIEWER_SCOPES)
++        const masked = isMasked(r.scope)
 +        return (
 +          <div key={r.label} style={{
 +            display: "flex", alignItems: "center", gap: 10, padding: "8px 0",
@@ -317,9 +318,9 @@ index 0000000..4ca4bd0
 +      label: f.label,
 +      icon:  icon(f.iconName),
 +      provenance: { system: f.system, systemAbbr: f.system.slice(0, 2).toUpperCase(), modelVersion: `${MODEL_LABEL[type.model]} v1`, syncedAgo: "2h ago" },
-+      state: isMasked(f.scope, VIEWER_SCOPES) ? "masked" : "hydrated",
++      state: isMasked(f.scope) ? "masked" : "hydrated",
 +      value: f.value,
-+      maskedValue: isMasked(f.scope, VIEWER_SCOPES) ? "•••• (restricted)" : undefined,
++      maskedValue: isMasked(f.scope) ? "•••• (restricted)" : undefined,
 +    })),
 +    [record, type],
 +  )
@@ -412,7 +413,7 @@ index 0000000..4ca4bd0
 +          </span>
 +          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 +            {record.fields.map((f, i) => {
-+              const masked = isMasked(f.scope, VIEWER_SCOPES)
++              const masked = isMasked(f.scope)
 +              return (
 +              <div key={`${f.label}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
 +                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
@@ -461,10 +462,10 @@ index 0000000..4ca4bd0
 +}
 diff --git a/src/screens/entityProfiles.ts b/src/screens/entityProfiles.ts
 new file mode 100644
-index 0000000..081245d
+index 0000000..d2fb6c8
 --- /dev/null
 +++ b/src/screens/entityProfiles.ts
-@@ -0,0 +1,182 @@
+@@ -0,0 +1,173 @@
 +/**
 + * Per-type profile specs — what a Unified Profile looks like for each published
 + * entity type.
@@ -510,15 +511,6 @@ index 0000000..081245d
 +   * the header and the Overview widget in the same breath instead of only one.
 +   */
 +  scope?:   string
-+}
-+
-+/**
-+ * The one place that answers "can this viewer read this value?". Header fields
-+ * and widget rows both go through it, which is what keeps them from disagreeing
-+ * about the same number.
-+ */
-+export function isMasked(scope: string | undefined, viewerScopes: readonly string[]): boolean {
-+  return !!scope && !viewerScopes.includes(scope)
 +}
 +
 +export interface ProfileWidgetRow {
@@ -649,10 +641,10 @@ index 0000000..081245d
 +}
 diff --git a/src/screens/entityRegistry.ts b/src/screens/entityRegistry.ts
 new file mode 100644
-index 0000000..8418a8e
+index 0000000..2091927
 --- /dev/null
 +++ b/src/screens/entityRegistry.ts
-@@ -0,0 +1,272 @@
+@@ -0,0 +1,276 @@
 +/**
 + * Entity type registry — the experiment behind `pm-thomas-entity-workspace.tsx`.
 + *
@@ -678,6 +670,8 @@ index 0000000..8418a8e
 + * agnosticism pass — "this file never enumerates entity types" — and a roster
 + * that enumerates them contradicts the component it renders.
 + */
++
++import { hasScope } from "./viewerScopes"
 +
 +export interface EntityTypeDef {
 +  id:        string
@@ -828,11 +822,13 @@ index 0000000..8418a8e
 +  return FACETS[typeId] ?? []
 +}
 +
-+/** The scopes the signed-in viewer holds — same set the record surface uses. */
-+export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
-+
++/**
++ * Whether the catalog can open this type. The viewer's scopes are not this
++ * module's business — `viewerScopes.ts` owns them, and a governed type is just
++ * one more thing asking it the same question.
++ */
 +export function isReadable(t: EntityTypeDef): boolean {
-+  return !t.requiredScope || VIEWER_SCOPES.includes(t.requiredScope)
++  return hasScope(t.requiredScope)
 +}
 +
 +/**
@@ -3397,10 +3393,10 @@ index 0000000..028c0c8
 +// one card, one entry point.
 diff --git a/src/screens/ucpShared.ts b/src/screens/ucpShared.ts
 new file mode 100755
-index 0000000..ad9875b
+index 0000000..93be374
 --- /dev/null
 +++ b/src/screens/ucpShared.ts
-@@ -0,0 +1,1040 @@
+@@ -0,0 +1,1044 @@
 +/**
 + * UCP — Unified Contact Profile: shared types + mock data.
 + *
@@ -3420,6 +3416,8 @@ index 0000000..ad9875b
 + *     Every field below maps to a named slot in that spec; nothing is a
 + *     convenience field invented for this screen.
 + */
++
++import { hasScope } from "./viewerScopes"
 +
 +/**
 + * These three shapes used to be imported from a pair of components in
@@ -3560,8 +3558,11 @@ index 0000000..ad9875b
 + * Thomas is a PM: he can read contacts and HR records, and he cannot read
 + * finance. That last omission is the point — it is what makes the Entity
 + * Header's Restricted state reachable from a real rule instead of a mock flag.
++ *
++ * The scopes themselves live in `viewerScopes.ts` — one owner, because the
++ * entity registry asks the same question about types and the profile asks it
++ * about individual fields.
 + */
-+export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
 +
 +/**
 + * Restricted is a state, not a failure, and the copy has to say so. It never
@@ -3573,8 +3574,7 @@ index 0000000..ad9875b
 + * Returns null when the viewer holds what the record needs.
 + */
 +export function restrictionFor(c: UcpContact): { scope: string; note: string } | null {
-+  if (!c.requiredScope) return null
-+  if (VIEWER_SCOPES.includes(c.requiredScope)) return null
++  if (!c.requiredScope || hasScope(c.requiredScope)) return null
 +  return {
 +    scope: c.requiredScope,
 +    note: `These values are governed by ${c.requiredScope}, which your role does not hold. The record exists and is intact — request the scope to read it.`,
@@ -4441,3 +4441,67 @@ index 0000000..ad9875b
 +  "What do we still owe them?",
 +  "Which facts are unverified?",
 +]
+diff --git a/src/screens/viewerScopes.ts b/src/screens/viewerScopes.ts
+new file mode 100644
+index 0000000..96ed20e
+--- /dev/null
++++ b/src/screens/viewerScopes.ts
+@@ -0,0 +1,58 @@
++/**
++ * What this viewer is entitled to read.
++ *
++ * ── Why this is its own module ────────────────────────────────────────────
++ * Governance gets asked at three different grains — is this RECORD governed,
++ * is this TYPE readable, is this FIELD masked — and each grain grew its own
++ * predicate next to the data it happened to be about. Two of them grew their
++ * own copy of the scope list with it.
++ *
++ * Copies of one fact are chances to disagree, and they had already taken one: a
++ * vehicle's list price was masked in the record header and printed in full in
++ * the Overview widget a screen below. A governed value with two answers is not
++ * governed, and the header's masking was decoration for as long as the second
++ * answer existed.
++ *
++ * So the entitlement lives here, alone, and it depends on nothing. Every grain
++ * asks the same question of the same set, and the grain-specific helpers stay
++ * with their own data as one-liners over `hasScope`.
++ *
++ * The no-dependencies part is load-bearing, not tidiness: this module is
++ * imported by both the contact fixtures and the entity registry, and neither
++ * imports the other. Reaching back for either one would tie them together and
++ * stop either from standing on its own.
++ *
++ * ── Prototype scope ──────────────────────────────────────────────────────
++ * One viewer, one hardcoded set. A real deployment reads these from the session
++ * and this file becomes a context provider — which is why callers ask the
++ * question through `hasScope`/`isMasked` rather than reading the array. Swapping
++ * the source then touches this file and nothing else.
++ */
++
++/**
++ * The PM's scopes. Finance is absent on purpose: without a scope the viewer
++ * lacks, every governed surface in the prototype renders as if governance did
++ * not exist, and nobody can review it.
++ */
++export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
++
++/**
++ * Whether the viewer may read something governed by `scope`.
++ *
++ * An absent scope means ungoverned, so it passes. That default is what lets a
++ * caller ask about every field uniformly instead of branching on whether the
++ * field happens to declare one.
++ */
++export function hasScope(scope: string | undefined): boolean {
++  return !scope || VIEWER_SCOPES.includes(scope)
++}
++
++/**
++ * The inverse, named for what the UI does with it. Both names exist because the
++ * call sites read as opposites — a type is *readable*, a field is *masked* — and
++ * making one of them say `!hasScope(...)` would put the negation in the reader's
++ * head at exactly the place governance has to be obvious.
++ */
++export function isMasked(scope: string | undefined): boolean {
++  return !hasScope(scope)
++}

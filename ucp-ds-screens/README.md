@@ -51,7 +51,7 @@ source inicial:
 cd ~/aims-os-ds                 # tu clon de cachilupis/aims-os-design-system
 git checkout main && git pull
 git checkout -b claude/ucp-unified-contact-profile
-git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 229865 bytes, 10 archivos
+git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 232783 bytes, 11 archivos
 npm run build                                  # 0 errores
 node scripts/audit-tokens.cjs --counts         # ninguna categoría sube
 npm run dev                                    # localhost:5173 → Prototypes
@@ -70,7 +70,37 @@ solo contra el `main` del DS. `ucp-screens.patch` (solo lo aprobado) y
 pero **`experiment.patch` no aplica por sí mismo**: su hunk de `App.tsx` asume
 la línea de import que agrega el aprobado. Se apilan en ese orden o no aplican.
 
-El patch aprobado toca 5 archivos: 3 pantallas nuevas en `src/screens/`,
+### El entitlement del viewer vive en un solo módulo
+
+`viewerScopes.ts` es nuevo y es la única declaración de qué puede leer este
+viewer. Existe porque la gobernanza se pregunta en tres granos distintos —
+¿está gobernado este **registro**, es legible este **tipo**, va enmascarado
+este **campo**— y cada grano se había hecho su propio predicado al lado del
+dato que le tocaba, dos de ellos con su propia copia de la lista de scopes.
+
+Las copias de un mismo hecho son oportunidades de contradecirse, y ya se habían
+tomado una: el precio de lista de un vehículo salía enmascarado en el header y
+completo en el widget de Overview una pantalla más abajo. Un valor gobernado con
+dos respuestas no está gobernado.
+
+Ahora los tres preguntan lo mismo:
+
+| Grano | Quién | Cómo |
+|---|---|---|
+| Registro | `restrictionFor()` en `ucpShared.ts` | `hasScope(c.requiredScope)` |
+| Tipo | `isReadable()` en `entityRegistry.ts` | `hasScope(t.requiredScope)` |
+| Campo / fila | `isMasked()` en `viewerScopes.ts` | `!hasScope(scope)` |
+
+El módulo **no importa nada**, y eso es estructural, no estética: lo importan
+tanto las fixtures de contactos como el registro de entidades, y ninguno de los
+dos importa al otro. Si alcanzara hacia cualquiera de ellos, ataría la mitad
+aprobada al experimento y ninguna podría aplicarse sola.
+
+Un campo declara **el scope que lo gobierna**, nunca si está enmascarado. Esa
+diferencia es la que hace que otorgar un scope destape el header y el widget a
+la vez, en vez de solo uno.
+
+El patch aprobado toca 7 archivos: 4 módulos nuevos en `src/screens/`,
 `entity-list.tsx`, y **dos líneas** en `App.tsx`. No borra nada. `entity-list.tsx` y `App.tsx`
 están bajo CODEOWNERS, así que el PR necesita review de **@cachilupis** — es el
 comportamiento esperado, no un bloqueo.
