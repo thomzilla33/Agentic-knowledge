@@ -45,15 +45,6 @@ export interface ProfileField {
   scope?:   string
 }
 
-/**
- * The one place that answers "can this viewer read this value?". Header fields
- * and widget rows both go through it, which is what keeps them from disagreeing
- * about the same number.
- */
-export function isMasked(scope: string | undefined, viewerScopes: readonly string[]): boolean {
-  return !!scope && !viewerScopes.includes(scope)
-}
-
 export interface ProfileWidgetRow {
   label:   string
   value:   string

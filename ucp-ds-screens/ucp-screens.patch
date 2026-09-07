@@ -1956,10 +1956,10 @@ index 0000000..028c0c8
 +// one card, one entry point.
 diff --git a/src/screens/ucpShared.ts b/src/screens/ucpShared.ts
 new file mode 100755
-index 0000000..ad9875b
+index 0000000..93be374
 --- /dev/null
 +++ b/src/screens/ucpShared.ts
-@@ -0,0 +1,1040 @@
+@@ -0,0 +1,1044 @@
 +/**
 + * UCP — Unified Contact Profile: shared types + mock data.
 + *
@@ -1979,6 +1979,8 @@ index 0000000..ad9875b
 + *     Every field below maps to a named slot in that spec; nothing is a
 + *     convenience field invented for this screen.
 + */
++
++import { hasScope } from "./viewerScopes"
 +
 +/**
 + * These three shapes used to be imported from a pair of components in
@@ -2119,8 +2121,11 @@ index 0000000..ad9875b
 + * Thomas is a PM: he can read contacts and HR records, and he cannot read
 + * finance. That last omission is the point — it is what makes the Entity
 + * Header's Restricted state reachable from a real rule instead of a mock flag.
++ *
++ * The scopes themselves live in `viewerScopes.ts` — one owner, because the
++ * entity registry asks the same question about types and the profile asks it
++ * about individual fields.
 + */
-+export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
 +
 +/**
 + * Restricted is a state, not a failure, and the copy has to say so. It never
@@ -2132,8 +2137,7 @@ index 0000000..ad9875b
 + * Returns null when the viewer holds what the record needs.
 + */
 +export function restrictionFor(c: UcpContact): { scope: string; note: string } | null {
-+  if (!c.requiredScope) return null
-+  if (VIEWER_SCOPES.includes(c.requiredScope)) return null
++  if (!c.requiredScope || hasScope(c.requiredScope)) return null
 +  return {
 +    scope: c.requiredScope,
 +    note: `These values are governed by ${c.requiredScope}, which your role does not hold. The record exists and is intact — request the scope to read it.`,
@@ -3000,3 +3004,67 @@ index 0000000..ad9875b
 +  "What do we still owe them?",
 +  "Which facts are unverified?",
 +]
+diff --git a/src/screens/viewerScopes.ts b/src/screens/viewerScopes.ts
+new file mode 100644
+index 0000000..96ed20e
+--- /dev/null
++++ b/src/screens/viewerScopes.ts
+@@ -0,0 +1,58 @@
++/**
++ * What this viewer is entitled to read.
++ *
++ * ── Why this is its own module ────────────────────────────────────────────
++ * Governance gets asked at three different grains — is this RECORD governed,
++ * is this TYPE readable, is this FIELD masked — and each grain grew its own
++ * predicate next to the data it happened to be about. Two of them grew their
++ * own copy of the scope list with it.
++ *
++ * Copies of one fact are chances to disagree, and they had already taken one: a
++ * vehicle's list price was masked in the record header and printed in full in
++ * the Overview widget a screen below. A governed value with two answers is not
++ * governed, and the header's masking was decoration for as long as the second
++ * answer existed.
++ *
++ * So the entitlement lives here, alone, and it depends on nothing. Every grain
++ * asks the same question of the same set, and the grain-specific helpers stay
++ * with their own data as one-liners over `hasScope`.
++ *
++ * The no-dependencies part is load-bearing, not tidiness: this module is
++ * imported by both the contact fixtures and the entity registry, and neither
++ * imports the other. Reaching back for either one would tie them together and
++ * stop either from standing on its own.
++ *
++ * ── Prototype scope ──────────────────────────────────────────────────────
++ * One viewer, one hardcoded set. A real deployment reads these from the session
++ * and this file becomes a context provider — which is why callers ask the
++ * question through `hasScope`/`isMasked` rather than reading the array. Swapping
++ * the source then touches this file and nothing else.
++ */
++
++/**
++ * The PM's scopes. Finance is absent on purpose: without a scope the viewer
++ * lacks, every governed surface in the prototype renders as if governance did
++ * not exist, and nobody can review it.
++ */
++export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
++
++/**
++ * Whether the viewer may read something governed by `scope`.
++ *
++ * An absent scope means ungoverned, so it passes. That default is what lets a
++ * caller ask about every field uniformly instead of branching on whether the
++ * field happens to declare one.
++ */
++export function hasScope(scope: string | undefined): boolean {
++  return !scope || VIEWER_SCOPES.includes(scope)
++}
++
++/**
++ * The inverse, named for what the UI does with it. Both names exist because the
++ * call sites read as opposites — a type is *readable*, a field is *masked* — and
++ * making one of them say `!hasScope(...)` would put the negation in the reader's
++ * head at exactly the place governance has to be obvious.
++ */
++export function isMasked(scope: string | undefined): boolean {
++  return !hasScope(scope)
++}

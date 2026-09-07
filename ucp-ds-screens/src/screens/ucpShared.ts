@@ -18,6 +18,8 @@
  *     convenience field invented for this screen.
  */
 
+import { hasScope } from "./viewerScopes"
+
 /**
  * These three shapes used to be imported from a pair of components in
  * `experimental/`. Those components are gone — RecordHeader absorbed both jobs —
@@ -157,8 +159,11 @@ export function entityState(c: UcpContact): { label: string; variant: TagVariant
  * Thomas is a PM: he can read contacts and HR records, and he cannot read
  * finance. That last omission is the point — it is what makes the Entity
  * Header's Restricted state reachable from a real rule instead of a mock flag.
+ *
+ * The scopes themselves live in `viewerScopes.ts` — one owner, because the
+ * entity registry asks the same question about types and the profile asks it
+ * about individual fields.
  */
-export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
 
 /**
  * Restricted is a state, not a failure, and the copy has to say so. It never
@@ -170,8 +175,7 @@ export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "dr
  * Returns null when the viewer holds what the record needs.
  */
 export function restrictionFor(c: UcpContact): { scope: string; note: string } | null {
-  if (!c.requiredScope) return null
-  if (VIEWER_SCOPES.includes(c.requiredScope)) return null
+  if (!c.requiredScope || hasScope(c.requiredScope)) return null
   return {
     scope: c.requiredScope,
     note: `These values are governed by ${c.requiredScope}, which your role does not hold. The record exists and is intact — request the scope to read it.`,

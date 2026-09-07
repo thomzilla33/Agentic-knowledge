@@ -24,6 +24,8 @@
  * that enumerates them contradicts the component it renders.
  */
 
+import { hasScope } from "./viewerScopes"
+
 export interface EntityTypeDef {
   id:        string
   /** Plural, as it appears in navigation. The tenant's word, not ours. */
@@ -173,11 +175,13 @@ export function facetsForType(typeId: string): Facet[] {
   return FACETS[typeId] ?? []
 }
 
-/** The scopes the signed-in viewer holds — same set the record surface uses. */
-export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
-
+/**
+ * Whether the catalog can open this type. The viewer's scopes are not this
+ * module's business — `viewerScopes.ts` owns them, and a governed type is just
+ * one more thing asking it the same question.
+ */
 export function isReadable(t: EntityTypeDef): boolean {
-  return !t.requiredScope || VIEWER_SCOPES.includes(t.requiredScope)
+  return hasScope(t.requiredScope)
 }
 
 /**
