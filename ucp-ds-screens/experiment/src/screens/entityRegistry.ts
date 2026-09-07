@@ -85,6 +85,94 @@ export const ENTITY_TYPES: EntityTypeDef[] = [
   { id: "policy",      label: "Policies",      singular: "Policy",       iconName: "ShieldCheck",   model: "compliance",     governance: "governed",  fields: 14, records: 57  , assistantLabel: "Ask about this policy"},
 ]
 
+/**
+ * Facets, published per type.
+ *
+ * ── Where they come from ──────────────────────────────────────────────────
+ * The same place the fields do. Data Studio owns the entity's columns, so the
+ * facet set is a projection of that — never a second list to keep in sync. A
+ * facet the model does not publish cannot be filtered on, and a column the
+ * model adds is filterable the day it lands.
+ *
+ * ── Why per type and not global ───────────────────────────────────────────
+ * Because the alternative does not work. Dataverse derives it explicitly: a
+ * mixed view can only offer the facets that exist on every type, which for it
+ * means Owner, Modified On and Created On. Type-specific facets require
+ * narrowing to a type first. So the roster gets the model's facets and the Inbox
+ * gets the common floor — see COMMON_FACETS.
+ *
+ * ── `inline` is decided by frequency, not importance ──────────────────────
+ * FILTERS_SPEC.md states the rule for the visible layer: things stay out of the
+ * slideout "because they should always be visible (high-frequency)". Not because
+ * they matter more. Two or three per type; the rest live behind All filters.
+ *
+ * Note there is no "quick filter" concept here. The design system's pattern is
+ * already three layers — Visible Filters → All Filters → Slideout, plus chips —
+ * and a separate quick-filter row would be a fourth, and a second source of
+ * truth for the dataset, which the List View pattern forbids.
+ */
+export interface Facet {
+  id:      string
+  label:   string
+  options: string[]
+  /** Visible in the filter line rather than behind All filters. Frequency. */
+  inline?: boolean
+}
+
+export const FACETS: Record<string, Facet[]> = {
+  customer: [
+    { id: "status", label: "Status", options: ["Active", "Inactive"],                inline: true },
+    { id: "owner",  label: "Owner",  options: ["Priya Nair", "Marcus Webb", "Lisa Park"], inline: true },
+    { id: "source", label: "Source", options: ["Salesforce", "HubSpot", "Epic", "NetSuite", "CDK Global"] },
+  ],
+  employee: [
+    { id: "status", label: "Status", options: ["Active", "Inactive"],                inline: true },
+    { id: "owner",  label: "Manager", options: ["Lisa Park", "Marcus Webb", "Elena Fischer"], inline: true },
+    { id: "source", label: "Source", options: ["Workday"] },
+  ],
+  company: [
+    { id: "status", label: "Status", options: ["Active", "Inactive"], inline: true },
+    { id: "owner",  label: "Owner",  options: ["Priya Nair", "Elena Fischer", "Daniel Ruiz"], inline: true },
+    { id: "source", label: "Source", options: ["Salesforce", "NetSuite", "Epic", "CDK Global"] },
+  ],
+  // Nothing generic produced these. A store and a condition are what someone
+  // filtering vehicles actually reaches for, and neither exists on a customer.
+  vehicle: [
+    { id: "condition", label: "Condition", options: ["Available", "In service", "Reserved"], inline: true },
+    { id: "store",     label: "Store",     options: ["Riverbend Tampa", "Riverbend Brandon"], inline: true },
+    { id: "owner",     label: "Advisor",   options: ["Daniel Ruiz", "Marcus Delgado"] },
+  ],
+  dealership: [
+    { id: "status", label: "Status", options: ["Active", "Under review"], inline: true },
+    { id: "owner",  label: "Owner",  options: ["Daniel Ruiz", "Marcus Delgado"], inline: true },
+  ],
+  team: [
+    { id: "owner", label: "Lead", options: ["Elena Fischer"], inline: true },
+  ],
+  policy: [
+    { id: "status", label: "Status", options: ["Active"], inline: true },
+    { id: "owner",  label: "Owner",  options: ["Sarah Chen"], inline: true },
+  ],
+}
+
+/**
+ * The floor for the Inbox, where types are mixed.
+ *
+ * Declared rather than computed from whatever the current rows happen to share,
+ * for the same reason INBOX_COLUMNS is: a facet that appears and disappears as
+ * the result set changes is a surprise. Declaring it makes the poverty of a
+ * mixed surface a contract instead — and it is genuinely poorer, which the Inbox
+ * says out loud rather than hiding.
+ */
+export const COMMON_FACETS: Facet[] = [
+  { id: "type",   label: "Type",   options: [], inline: true },
+  { id: "owner",  label: "Owner",  options: ["Priya Nair", "Marcus Webb", "Lisa Park", "Daniel Ruiz", "Marcus Delgado", "Elena Fischer", "Sarah Chen"], inline: true },
+]
+
+export function facetsForType(typeId: string): Facet[] {
+  return FACETS[typeId] ?? []
+}
+
 /** The scopes the signed-in viewer holds — same set the record surface uses. */
 export const VIEWER_SCOPES: readonly string[] = ["contacts.read", "hr.read", "drives.read"]
 
