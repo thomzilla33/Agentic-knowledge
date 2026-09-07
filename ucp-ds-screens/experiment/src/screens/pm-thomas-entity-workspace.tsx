@@ -62,6 +62,9 @@ import { Pagination }        from "@/components/ui/pagination"
 import { SlideOut }          from "@/components/ui/slide-out"
 import { LayoutGrid, Plus, Lock, Search, ChevronDown, Inbox } from "lucide-react"
 import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
+import { EntityProfileView } from "./entityProfileView"
+import type { ProfileRecord } from "./entityProfileView"
+import type { ProfileField } from "./entityProfiles"
 import {
   ENTITY_TYPES, MODEL_LABEL, INBOX_VIEWS, INBOX_COLUMNS,
   isReadable, byUsage, viewsForType,
@@ -101,6 +104,51 @@ const RECORDS: WorkspaceRecord[] = [
 ]
 
 const TYPE_BY_ID = new Map(ENTITY_TYPES.map(t => [t.id, t]))
+
+/**
+ * The fields each type puts in its own header. This is the whole difference
+ * between a vehicle's profile and a customer's — no branching in the profile
+ * screen, just a different set of columns published by a different model.
+ */
+function fieldsFor(r: WorkspaceRecord): ProfileField[] {
+  const sys = r.source
+  const common: ProfileField[] = [
+    { label: "Owner",         iconName: "UserRound", value: r.owner,        system: sys },
+    { label: "Last activity", iconName: "Clock",     value: r.lastActivity, system: "Helix Data Studio" },
+  ]
+  switch (r.typeId) {
+    case "vehicle": {
+      const [vin, store] = r.subtitle.split(" · ")
+      return [
+        { label: "VIN",       iconName: "Fingerprint", value: vin.replace("VIN ", ""), system: sys },
+        { label: "Store",     iconName: "Store",       value: store,        system: sys },
+        { label: "Odometer",  iconName: "Gauge",       value: "14,208 mi",  system: sys },
+        { label: "List price", iconName: "DollarSign", value: "$58,400",    system: "Finance Core", masked: true },
+        ...common,
+      ]
+    }
+    case "dealership": {
+      const [industry, staff, city] = r.subtitle.split(" · ")
+      return [
+        { label: "Industry",  iconName: "Factory",   value: industry, system: sys },
+        { label: "Headcount", iconName: "Users",     value: staff,    system: "Workday" },
+        { label: "Location",  iconName: "MapPin",    value: city,     system: sys },
+        ...common,
+      ]
+    }
+    case "employee":
+      return [
+        { label: "Role",   iconName: "Info",        value: r.subtitle, system: sys },
+        { label: "Scopes", iconName: "ShieldCheck", value: "hr.read +2", system: "Helix Data Studio" },
+        ...common,
+      ]
+    default:
+      return [
+        { label: "Profile", iconName: "Info", value: r.subtitle, system: sys },
+        ...common,
+      ]
+  }
+}
 const GOV_TAG: Record<EntityTypeDef["governance"], "success" | "alert" | "neutral"> = {
   governed: "success", "in review": "alert", draft: "neutral",
 }
@@ -205,6 +253,7 @@ export default function PMThomasEntityWorkspaceScreen() {
   const [viewId,  setViewId]  = useState("customer-all")
   const [inboxId, setInboxId] = useState(INBOX_VIEWS[0].id)
   const [catalog, setCatalog] = useState(false)
+  const [openId,  setOpenId]  = useState<string | null>(null)
   const [search,  setSearch]  = useState("")
   const [page,    setPage]    = useState(1)
 
@@ -272,7 +321,25 @@ export default function PMThomasEntityWorkspaceScreen() {
       state: r.state,
       showMenu: true,
       onMenuClick: () => {},
+      onClick: () => setOpenId(r.id),
     }
+  }
+
+  // Cualquier tipo entra por la misma pantalla de perfil. No hay una por tipo.
+  const open = openId ? RECORDS.find(x => x.id === openId) : null
+  if (open) {
+    const t = TYPE_BY_ID.get(open.typeId)!
+    const pr: ProfileRecord = {
+      id: open.id, title: open.title, typeId: open.typeId, state: open.state,
+      fields: fieldsFor(open),
+      agent: { id: "agt-1", name: `${t.singular} Concierge` },
+      // El fixture guarda "título · cuándo" en una cadena; partirla mal repetía
+      // el título como su propia descripción.
+      nba: open.nba
+        ? { title: open.nba.split(" · ")[0], description: open.nba.split(" · ").slice(1).join(" · ") || "Propuesto por el agente" }
+        : undefined,
+    }
+    return <EntityProfileView record={pr} type={t} onBack={() => setOpenId(null)} />
   }
 
   return (

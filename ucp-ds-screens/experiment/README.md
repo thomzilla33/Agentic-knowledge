@@ -91,6 +91,77 @@ overflow de tabs de SLDS es un mecanismo de layout, no de descubrimiento. El
 argumento bueno es **overflow + information scent + que el set no está acotado por
 tenant**.
 
+## UP internos por tipo
+
+Cada tipo abre en un perfil. **Hay una sola pantalla de perfil** —
+`entityProfileView.tsx` — sin un solo `if (type === "vehicle")`. Los campos del
+header, el tab strip y los widgets del Overview se leen del registro.
+
+Eso es la tesis vuelta comprobable: abrí un customer, después un vehicle. El
+chrome es idéntico, el contenido no, y no se escribió una pantalla para ninguno.
+
+### La respuesta a la pregunta 3
+
+`CLAUDE.md` dice que el detalle lleva tabs específicos por tipo. **Los define el
+modelo** — el mismo lugar de donde salen los campos. Un tab strip escrito en otra
+parte sería una segunda definición de la misma entidad, derivando de la primera.
+
+Pero cuatro tabs son universales, y no por convención: son sobre **conocimiento**,
+no sobre la cosa.
+
+| Tab | Por qué aplica a cualquier entidad |
+|---|---|
+| Overview | qué debería mirar |
+| Snapshot | qué sabemos y con cuánta certeza (Truth / Sandbox / Sources) |
+| Activity | qué pasó |
+| Drives | qué documentos lo respaldan |
+
+Todo lo ingerido tiene claims, interacciones y papeles. Un vehicle tiene hechos y
+rastro documental igual que un customer.
+
+Lo que agrega el modelo encima es el dominio:
+
+```
+customer    Overview · Deals                    · Snapshot · Activity · Drives
+employee    Overview · Reviews · Access         · Snapshot · Activity · Drives
+vehicle     Overview · Service history · Ownership · Snapshot · Activity · Drives
+dealership  Overview · Inventory · Staff        · Snapshot · Activity · Drives
+```
+
+Los tabs de dominio van **entre** el canvas y los planos de conocimiento: después
+de "qué debería mirar", antes de "cómo lo sabemos". El historial de servicio de un
+vehículo está más cerca de su overview que de su procedencia.
+
+**Un tipo sin spec igual renderiza** — cuatro tabs, sin widgets de dominio. Por eso
+publicar un tipo no cuesta nada en el perfil: funciona en el momento en que existe,
+y el detalle de dominio llega después sin bloquearlo.
+
+### Dos cosas que encontré construyéndolo
+
+**Un bug mío:** le pasé `recordFields` a `RecordHeader` con un `onProvenanceOpen`
+vacío. El componente no renderiza esos campos inline — su único efecto visible es
+habilitar el botón ⓘ — así que había creado un botón vivo que no hacía nada, que
+es peor que uno deshabilitado. Ahora el panel está conectado, y de paso es donde
+la diferencia por tipo se vuelve visible: el vehicle muestra VIN, odómetro y su
+precio **enmascarado** por `finance.read`.
+
+**Un bug del DS, para Michael:** el trigger del agente dice **"Ask about 2024"** en
+el Ford F-150. `RecordHeader` toma el primer token del nombre (`Ask about
+{firstName}`), que es correcto para una persona y absurdo para un vehículo. Es una
+consecuencia del agnosticism pass que quedó a medias: el componente ya dice servir
+*"Patient, Citizen, Student, anything the host platform defines tomorrow"*, pero
+esa etiqueta sigue con forma de persona.
+
+No lo arreglé. El componente no puede saber qué es una persona, y meter una
+heurística en un archivo bajo CODEOWNERS no me corresponde. El arreglo limpio sería
+una prop opcional `assistantLabel` para que el host decida — aditiva, igual que
+`showAiPrefix`. Queda propuesto, no hecho.
+
+Vale decir que este bug **solo aparece en tipos que no son personas**. Es evidencia
+de que construir los UP por tipo valía la pena.
+
+---
+
 ## Preguntas abiertas
 
 1. **~~¿"Model" puede aparecer en la superficie de registros?~~ Respondida por la

@@ -18,6 +18,404 @@ index 19dcea5..72919a6 100644
    { id: "proto-chat-workflow-config",     label: "Chat Workflow Config",         description: "Conversational governance gates — 4-stage sequence (Intent → Classification → Data Sources → Systems) producing a governed workflow draft with node-vocabulary enforcement, SVG canvas view, and instrumentation panel", author: "Thomas", component: ChatWorkflowConfigScreen },
    { id: "proto-workflows-list",           label: "Workflows List",               description: "Governed workflows list — filterable by status (Active / Draft / Paused), searchable, with classification badges, per-connector system tags, last-run timestamps, and missing-dep warnings", author: "Thomas", component: WorkflowsListScreen },
    { id: "proto-people-access-members",   label: "People & Access — Members",    description: "Unified people management across the workspace: searchable member roster with Active/Invited/Suspended/Bots tabs, inline role picker, invite flow modal, status chip, and member count header", author: "Thomas", component: PeopleAccessMembersScreen },
+diff --git a/src/screens/entityProfileView.tsx b/src/screens/entityProfileView.tsx
+new file mode 100644
+index 0000000..0e6e8c3
+--- /dev/null
++++ b/src/screens/entityProfileView.tsx
+@@ -0,0 +1,232 @@
++/**
++ * Entity Profile — ONE screen, N types.
++ *
++ * This is the thesis made testable. There is no `if (type === "vehicle")` in
++ * this file. The header fields, the tab strip and the Overview widgets are all
++ * read from the registry, so a vehicle and a customer render through the same
++ * code and differ only in what the model published.
++ *
++ * That is the claim to check when reviewing: open a customer, then a vehicle.
++ * The chrome is identical, the content is not, and no screen was written for
++ * either.
++ *
++ * ── What is universal and what is not ─────────────────────────────────────
++ * Universal: RecordHeader, and the four knowledge tabs — Overview, Snapshot,
++ * Activity, Drives. Those hold for any entity because they are about knowledge
++ * rather than about the thing: everything ingested is claimed about, interacted
++ * with and documented.
++ *
++ * Per type: the record fields, the domain tabs (Service history, Inventory,
++ * Deals), and the Overview widgets. All from `entityProfiles.ts`, which is the
++ * projection of what Data Studio already owns.
++ *
++ * A type with no spec still renders — four tabs, no domain widgets. Publishing a
++ * type therefore costs nothing at the profile: it works the moment it exists,
++ * and the domain detail can arrive later without blocking it.
++ */
++
++import { useMemo, useState } from "react"
++import { ScreenLayout }     from "@/components/layouts/screen-layout"
++import { WidgetCanvasView } from "@/components/layouts/widget-canvas-view"
++import type { CanvasSlot }  from "@/components/layouts/widget-canvas-view"
++import { Header }           from "@/components/ui/header"
++import { Tabs }             from "@/components/ui/tabs"
++import { Tag }              from "@/components/ui/tag"
++import { CardContainer }    from "@/components/ui/card-container"
++import { EmptyState }       from "@/components/ui/empty-state"
++import { HighlightIcon }    from "@/components/ui/highlight-icon"
++import { SlideOut }        from "@/components/ui/slide-out"
++import { RecordHeader }     from "@/components/ui/record-header"
++import type { RecordField, NextBestAction } from "@/components/ui/record-header"
++import * as LucideIcons     from "lucide-react"
++import type { LucideIcon }  from "lucide-react"
++import { Construction, FileSearch } from "lucide-react"
++import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
++import { MODEL_LABEL }       from "./entityRegistry"
++import type { EntityTypeDef } from "./entityRegistry"
++import { PROFILE_SPECS, tabsForType } from "./entityProfiles"
++import type { ProfileField } from "./entityProfiles"
++
++const icon = (name: string): LucideIcon =>
++  (LucideIcons[name as keyof typeof LucideIcons] ?? LucideIcons.CircleDot) as LucideIcon
++
++export interface ProfileRecord {
++  id:     string
++  title:  string
++  typeId: string
++  state:  { label: string; variant: "success" | "error" | "alert" | "informative" | "neutral" }
++  fields: ProfileField[]
++  agent:  { id: string; name: string }
++  nba?:   { title: string; description: string }
++}
++
++/** Rows shared by every domain widget. Same arrangement as the UCP profile:
++ *  icon left, label, value right, subtle divider, none after the last. */
++function WidgetRows({ rows }: { rows: NonNullable<ReturnType<typeof Object.values>> extends never ? never : { label: string; value: string; icon: string; variant: "success" | "alert" | "informative" | "neutral" }[] }) {
++  return (
++    <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column" }}>
++      {rows.map((r, i) => (
++        <div key={r.label} style={{
++          display: "flex", alignItems: "center", gap: 10, padding: "8px 0",
++          borderBottom: i === rows.length - 1 ? "none" : "1px solid var(--color-border-neutral-subtle)",
++        }}>
++          <HighlightIcon size="sm" variant={r.variant} iconName={r.icon} />
++          <span title={r.label} style={{
++            fontSize: 12, color: "var(--field-supporting)", flex: 1, minWidth: 0,
++            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
++          }}>{r.label}</span>
++          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)", whiteSpace: "nowrap" }}>{r.value}</span>
++        </div>
++      ))}
++    </div>
++  )
++}
++
++export function EntityProfileView({
++  record, type, onBack,
++}: { record: ProfileRecord; type: EntityTypeDef; onBack: () => void }) {
++  const tabs = tabsForType(record.typeId)
++  const [tab, setTab] = useState(tabs[0].id)
++  const [prov, setProv] = useState(false)
++  const spec = PROFILE_SPECS[record.typeId]
++
++  const recordFields = useMemo<RecordField[]>(
++    () => record.fields.map(f => ({
++      label: f.label,
++      icon:  icon(f.iconName),
++      provenance: { system: f.system, systemAbbr: f.system.slice(0, 2).toUpperCase(), modelVersion: `${MODEL_LABEL[type.model]} v1`, syncedAgo: "2h ago" },
++      state: f.masked ? "masked" : "hydrated",
++      value: f.value,
++      maskedValue: f.masked ? "•••• (restricted)" : undefined,
++    })),
++    [record, type],
++  )
++
++  const nba = useMemo<NextBestAction[]>(
++    () => record.nba ? [{ id: `nba-${record.id}`, title: record.nba.title, description: record.nba.description, contextTag: type.singular, onOpen: () => {} }] : [],
++    [record, type],
++  )
++
++  const slots = useMemo<CanvasSlot[]>(
++    () => (spec?.widgets ?? []).map(w => ({
++      uid: w.uid, title: w.title, colSpan: 1, rowSpan: 4,
++      content: <WidgetRows rows={w.rows} />,
++    })),
++    [spec],
++  )
++
++  const isUniversal = ["overview", "snapshot", "activity", "drives"].includes(tab)
++  const domainTab   = spec?.extraTabs.find(t => t.id === tab)
++
++  return (
++    <ScreenLayout
++      workspaceName="Riverbend Group"
++      userName="Thomas González"
++      userEmail="thomas.gonzalez@aimsos.ai"
++      sidebarItems={UCP_SIDEBAR_ITEMS}
++      activeSidebarId="contacts"
++      header={isScrolled => (
++        <>
++          <Header size={isScrolled ? "compress" : "size-m"} title={type.label} backButton showBackInCompress onBack={onBack} />
++          <div style={{ padding: "0 32px 8px" }}>
++            <RecordHeader
++              name={record.title}
++              entityType={{ icon: icon(type.iconName), label: type.singular }}
++              statusTag={{ label: record.state.label }}
++              recordFields={recordFields}
++              // Wired for real. RecordHeader does not render recordFields
++              // inline — the array's visible effect is enabling this trigger —
++              // so passing the fields with a no-op handler produces a live
++              // button that does nothing, which is worse than a disabled one.
++              // The panel is also where the per-type difference becomes visible:
++              // a vehicle shows VIN and odometer, a customer shows a role.
++              onProvenanceOpen={() => setProv(true)}
++              assignedAgent={{ id: record.agent.id, name: record.agent.name, onOpenChat: () => {} }}
++              nextBestActions={nba}
++              actions={[{ label: "Export record", variant: "secondary", onClick: () => {} }]}
++            />
++          </div>
++          <div style={{ padding: "0 32px 16px" }}>
++            {/* Four universal tabs plus whatever the model published. The strip
++                is generated, never authored here. */}
++            <Tabs activeId={tab} onChange={setTab} items={tabs.map(t => ({ id: t.id, label: t.label }))} />
++          </div>
++        </>
++      )}
++    >
++      {tab === "overview" && (
++        slots.length > 0
++          ? <WidgetCanvasView initialSlots={slots} />
++          : <EmptyState icon={Construction} title="No widgets published yet"
++              description={`${type.label} has no Overview widgets in its model. The four knowledge tabs still work — the domain detail can arrive later.`} />
++      )}
++
++      {domainTab && (
++        // The honest state for a prototype: the tab EXISTS because the model
++        // published it, and saying so is more useful than inventing content that
++        // would then have to be unlearned.
++        <EmptyState
++          icon={Construction}
++          title={`${domainTab.label} — defined by the model, not built yet`}
++          description={`This tab exists because ${MODEL_LABEL[type.model]} publishes it for ${type.label.toLowerCase()}. Its content comes from the entity's own columns and relationships.`}
++        />
++      )}
++
++      <SlideOut
++        open={prov} onClose={() => setProv(false)} type="with-variants" size="m"
++        title="Field sources"
++        subtitle={`${type.singular} · ${record.title}`}
++        showIcon iconContent={<FileSearch size={14} />}
++        showStatus={false} showTopButton={false} showTabs={false} showSearchBar={false} showChips={false} showCta={false}
++      >
++        <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
++          <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
++            Every field this {type.singular.toLowerCase()} carries, and the system it came from.
++            The set is published by {MODEL_LABEL[type.model]} — it is not the same set another type carries.
++          </span>
++          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++            {record.fields.map((f, i) => (
++              <div key={`${f.label}-${i}`} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
++                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "var(--field-supporting)" }}>
++                  {f.label}
++                </span>
++                <span style={{ fontSize: 13, fontWeight: 600, color: f.masked ? "var(--field-supporting)" : "var(--foreground)" }}>
++                  {f.masked ? "•••• (restricted)" : f.value}
++                </span>
++                <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.5 }}>
++                  {f.system}{f.masked ? " · governed by finance.read" : ""}
++                </span>
++              </div>
++            ))}
++          </div>
++        </div>
++      </SlideOut>
++
++      {isUniversal && tab !== "overview" && (
++        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
++          <CardContainer size="lg" variant="default" className="w-full">
++            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
++              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
++                <HighlightIcon size="sm" variant="informative" iconName={tab === "snapshot" ? "ScanLine" : tab === "activity" ? "Inbox" : "HardDrive"} />
++                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>
++                  {tab === "snapshot" ? "Knowledge planes" : tab === "activity" ? "Interaction timeline" : "Source Drives"}
++                </span>
++                <Tag variant="neutral" size="sm">universal</Tag>
++              </div>
++              <span style={{ fontSize: 12, color: "var(--field-supporting)", lineHeight: 1.6 }}>
++                {tab === "snapshot"
++                  ? `Every fact on this ${type.singular.toLowerCase()} by plane — Truth, Sandbox, Sources — with its provenance. Identical on every type, because every ingested entity is claimed about.`
++                  : tab === "activity"
++                  ? `Everything that happened to this ${type.singular.toLowerCase()}, any channel. Identical on every type.`
++                  : `The drives and documents backing this ${type.singular.toLowerCase()}. Identical on every type.`}
++              </span>
++              <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>
++                Fully built on the approved UCP card — reused here rather than rebuilt per type.
++              </span>
++            </div>
++          </CardContainer>
++        </div>
++      )}
++    </ScreenLayout>
++  )
++}
+diff --git a/src/screens/entityProfiles.ts b/src/screens/entityProfiles.ts
+new file mode 100644
+index 0000000..bc8e312
+--- /dev/null
++++ b/src/screens/entityProfiles.ts
+@@ -0,0 +1,154 @@
++/**
++ * Per-type profile specs — what a Unified Profile looks like for each published
++ * entity type.
++ *
++ * ── The question this answers ─────────────────────────────────────────────
++ * CLAUDE.md says an entity detail page carries "[Entity-specific tabs] → vary by
++ * entity type (e.g. Runs, Members, Triggers, Settings)". The UCP prototype has
++ * four generic ones. With one type that was fine; with twelve it becomes the
++ * question of WHO decides a vehicle's tabs.
++ *
++ * The answer that holds is: the MODEL does — the same place the fields come
++ * from. Data Studio already owns the entity's columns, relationships,
++ * permissions and API endpoints. A tab strip authored anywhere else would be a
++ * second definition of the same entity, drifting from the first.
++ *
++ * ── The spine is universal, the extension is not ──────────────────────────
++ * Four tabs are the same on every type, and not by convention — they are about
++ * KNOWLEDGE, not about the thing:
++ *
++ *   Overview   the canvas       — what should I look at
++ *   Snapshot   Truth/Sandbox/Sources — what do we know, and how sure
++ *   Activity   the timeline     — what happened
++ *   Drives     Source Drives    — what documents back it
++ *
++ * Every entity in a knowledge platform has all four, because every entity is
++ * ingested, claimed about, interacted with and documented. A vehicle has facts
++ * and a paper trail exactly like a customer does.
++ *
++ * What the model adds on top is the domain: a vehicle gets Service history, a
++ * dealership gets Inventory and Staff. Those cannot be generic, and they are the
++ * only part of the profile a new type has to bring with it.
++ */
++
++export interface ProfileField {
++  label:    string
++  iconName: string
++  value:    string
++  /** Source system for this field — provenance is per field, not per record. */
++  system:   string
++  masked?:  boolean
++}
++
++export interface ProfileWidget {
++  uid:   string
++  title: string
++  rows:  { label: string; value: string; icon: string; variant: "success" | "alert" | "informative" | "neutral" }[]
++}
++
++export interface EntityProfileSpec {
++  /** Beyond the universal four. Authored by the model, not by the screen. */
++  extraTabs: { id: string; label: string }[]
++  widgets:   ProfileWidget[]
++}
++
++/**
++ * Keyed by registry type id. A type with no entry still gets a valid profile —
++ * the four universal tabs and no domain widgets — which is what makes publishing
++ * a type cost nothing: the profile exists the moment the type does, and the
++ * domain detail arrives later without blocking it.
++ */
++export const PROFILE_SPECS: Record<string, EntityProfileSpec> = {
++  customer: {
++    extraTabs: [{ id: "deals", label: "Deals" }],
++    widgets: [
++      { uid: "risk", title: "Risk", rows: [
++        { label: "Risk score",  value: "18 / 100",   icon: "TrendingDown", variant: "success" },
++        { label: "Open flags",  value: "0",          icon: "Flag",         variant: "neutral" },
++        { label: "Last scan",   value: "Aug 27, 2026", icon: "ScanLine",   variant: "informative" },
++      ]},
++      { uid: "engagement", title: "Engagement", rows: [
++        { label: "Touchpoints, 90d", value: "14",        icon: "MessageSquare", variant: "informative" },
++        { label: "Last contact",     value: "Sep 2, 2026", icon: "Clock",       variant: "success" },
++        { label: "Response time",    value: "4h median",  icon: "Timer",        variant: "success" },
++      ]},
++    ],
++  },
++  employee: {
++    extraTabs: [{ id: "reviews", label: "Reviews" }, { id: "access", label: "Access" }],
++    widgets: [
++      { uid: "governance", title: "Governance", rows: [
++        { label: "Policies signed",  value: "12 of 12",   icon: "FileCheck",    variant: "success" },
++        { label: "Open reviews",     value: "1",          icon: "ClipboardList", variant: "alert" },
++        { label: "Training current", value: "Yes",        icon: "GraduationCap", variant: "success" },
++      ]},
++      { uid: "access", title: "Access", rows: [
++        { label: "Systems", value: "7 granted",    icon: "KeyRound",  variant: "informative" },
++        { label: "Scopes",  value: "hr.read +2",   icon: "ShieldCheck", variant: "neutral" },
++        { label: "Last review", value: "Aug 10, 2026", icon: "Calendar", variant: "success" },
++      ]},
++    ],
++  },
++  company: {
++    extraTabs: [{ id: "contacts", label: "Contacts" }, { id: "contracts", label: "Contracts" }],
++    widgets: [
++      { uid: "risk", title: "Risk", rows: [
++        { label: "Risk score", value: "31 / 100",  icon: "TrendingUp", variant: "alert" },
++        { label: "Open flags", value: "2",         icon: "Flag",       variant: "alert" },
++        { label: "Security review", value: "4 of 6", icon: "ClipboardList", variant: "alert" },
++      ]},
++    ],
++  },
++  vehicle: {
++    // Nothing generic could have produced these. This is the part the model has
++    // to bring, and the reason a type is more than a label.
++    extraTabs: [{ id: "service", label: "Service history" }, { id: "ownership", label: "Ownership" }],
++    widgets: [
++      { uid: "condition", title: "Condition", rows: [
++        { label: "Odometer",     value: "14,208 mi",  icon: "Gauge",       variant: "informative" },
++        { label: "Open work orders", value: "1",      icon: "Wrench",      variant: "alert" },
++        { label: "Last service", value: "Aug 30, 2026", icon: "Calendar",  variant: "success" },
++        { label: "Warranty",     value: "Active to 2029", icon: "ShieldCheck", variant: "success" },
++      ]},
++      { uid: "commercial", title: "Commercial", rows: [
++        { label: "List price",   value: "$58,400",    icon: "DollarSign",  variant: "informative" },
++        { label: "Days on lot",  value: "23",         icon: "Clock",       variant: "alert" },
++        { label: "Floor plan",   value: "Financed",   icon: "Banknote",    variant: "neutral" },
++      ]},
++    ],
++  },
++  dealership: {
++    extraTabs: [{ id: "inventory", label: "Inventory" }, { id: "staff", label: "Staff" }],
++    widgets: [
++      { uid: "operations", title: "Operations", rows: [
++        { label: "Vehicles on lot", value: "412",      icon: "Car",        variant: "informative" },
++        { label: "Bays occupied",   value: "9 of 12",  icon: "Wrench",     variant: "alert" },
++        { label: "Service backlog", value: "2.4 days", icon: "Timer",      variant: "alert" },
++      ]},
++      { uid: "governance", title: "Governance", rows: [
++        { label: "Licenses current", value: "Yes",     icon: "FileCheck",  variant: "success" },
++        { label: "Open audits",      value: "1",       icon: "ClipboardList", variant: "alert" },
++      ]},
++    ],
++  },
++}
++
++/** The four every type carries, in this order. Never authored per type. */
++export const UNIVERSAL_TABS = [
++  { id: "overview", label: "Overview" },
++  { id: "snapshot", label: "Snapshot" },
++  { id: "activity", label: "Activity" },
++  { id: "drives",   label: "Drives"   },
++] as const
++
++export function tabsForType(typeId: string) {
++  // Domain tabs sit between the canvas and the knowledge planes: after "what
++  // should I look at", before "how do we know". A vehicle's service history is
++  // closer to its overview than to its provenance.
++  const spec = PROFILE_SPECS[typeId]
++  return [
++    UNIVERSAL_TABS[0],
++    ...(spec?.extraTabs ?? []),
++    UNIVERSAL_TABS[1], UNIVERSAL_TABS[2], UNIVERSAL_TABS[3],
++  ]
++}
 diff --git a/src/screens/entityRegistry.ts b/src/screens/entityRegistry.ts
 new file mode 100644
 index 0000000..7f2d41a
@@ -198,10 +596,10 @@ index 0000000..7f2d41a
 +export const INBOX_COLUMNS = ["Type", "Record", "Owner", "State", "Last activity"] as const
 diff --git a/src/screens/pm-thomas-entity-workspace.tsx b/src/screens/pm-thomas-entity-workspace.tsx
 new file mode 100644
-index 0000000..dc80e78
+index 0000000..e9d84cc
 --- /dev/null
 +++ b/src/screens/pm-thomas-entity-workspace.tsx
-@@ -0,0 +1,376 @@
+@@ -0,0 +1,443 @@
 +/**
 + * Entity Workspace — the scaling experiment, revised against prior art.
 + *
@@ -266,6 +664,9 @@ index 0000000..dc80e78
 +import { SlideOut }          from "@/components/ui/slide-out"
 +import { LayoutGrid, Plus, Lock, Search, ChevronDown, Inbox } from "lucide-react"
 +import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
++import { EntityProfileView } from "./entityProfileView"
++import type { ProfileRecord } from "./entityProfileView"
++import type { ProfileField } from "./entityProfiles"
 +import {
 +  ENTITY_TYPES, MODEL_LABEL, INBOX_VIEWS, INBOX_COLUMNS,
 +  isReadable, byUsage, viewsForType,
@@ -305,6 +706,51 @@ index 0000000..dc80e78
 +]
 +
 +const TYPE_BY_ID = new Map(ENTITY_TYPES.map(t => [t.id, t]))
++
++/**
++ * The fields each type puts in its own header. This is the whole difference
++ * between a vehicle's profile and a customer's — no branching in the profile
++ * screen, just a different set of columns published by a different model.
++ */
++function fieldsFor(r: WorkspaceRecord): ProfileField[] {
++  const sys = r.source
++  const common: ProfileField[] = [
++    { label: "Owner",         iconName: "UserRound", value: r.owner,        system: sys },
++    { label: "Last activity", iconName: "Clock",     value: r.lastActivity, system: "Helix Data Studio" },
++  ]
++  switch (r.typeId) {
++    case "vehicle": {
++      const [vin, store] = r.subtitle.split(" · ")
++      return [
++        { label: "VIN",       iconName: "Fingerprint", value: vin.replace("VIN ", ""), system: sys },
++        { label: "Store",     iconName: "Store",       value: store,        system: sys },
++        { label: "Odometer",  iconName: "Gauge",       value: "14,208 mi",  system: sys },
++        { label: "List price", iconName: "DollarSign", value: "$58,400",    system: "Finance Core", masked: true },
++        ...common,
++      ]
++    }
++    case "dealership": {
++      const [industry, staff, city] = r.subtitle.split(" · ")
++      return [
++        { label: "Industry",  iconName: "Factory",   value: industry, system: sys },
++        { label: "Headcount", iconName: "Users",     value: staff,    system: "Workday" },
++        { label: "Location",  iconName: "MapPin",    value: city,     system: sys },
++        ...common,
++      ]
++    }
++    case "employee":
++      return [
++        { label: "Role",   iconName: "Info",        value: r.subtitle, system: sys },
++        { label: "Scopes", iconName: "ShieldCheck", value: "hr.read +2", system: "Helix Data Studio" },
++        ...common,
++      ]
++    default:
++      return [
++        { label: "Profile", iconName: "Info", value: r.subtitle, system: sys },
++        ...common,
++      ]
++  }
++}
 +const GOV_TAG: Record<EntityTypeDef["governance"], "success" | "alert" | "neutral"> = {
 +  governed: "success", "in review": "alert", draft: "neutral",
 +}
@@ -409,6 +855,7 @@ index 0000000..dc80e78
 +  const [viewId,  setViewId]  = useState("customer-all")
 +  const [inboxId, setInboxId] = useState(INBOX_VIEWS[0].id)
 +  const [catalog, setCatalog] = useState(false)
++  const [openId,  setOpenId]  = useState<string | null>(null)
 +  const [search,  setSearch]  = useState("")
 +  const [page,    setPage]    = useState(1)
 +
@@ -476,7 +923,25 @@ index 0000000..dc80e78
 +      state: r.state,
 +      showMenu: true,
 +      onMenuClick: () => {},
++      onClick: () => setOpenId(r.id),
 +    }
++  }
++
++  // Cualquier tipo entra por la misma pantalla de perfil. No hay una por tipo.
++  const open = openId ? RECORDS.find(x => x.id === openId) : null
++  if (open) {
++    const t = TYPE_BY_ID.get(open.typeId)!
++    const pr: ProfileRecord = {
++      id: open.id, title: open.title, typeId: open.typeId, state: open.state,
++      fields: fieldsFor(open),
++      agent: { id: "agt-1", name: `${t.singular} Concierge` },
++      // El fixture guarda "título · cuándo" en una cadena; partirla mal repetía
++      // el título como su propia descripción.
++      nba: open.nba
++        ? { title: open.nba.split(" · ")[0], description: open.nba.split(" · ").slice(1).join(" · ") || "Propuesto por el agente" }
++        : undefined,
++    }
++    return <EntityProfileView record={pr} type={t} onBack={() => setOpenId(null)} />
 +  }
 +
 +  return (
