@@ -51,7 +51,7 @@ source inicial:
 cd ~/aims-os-ds                 # tu clon de cachilupis/aims-os-design-system
 git checkout main && git pull
 git checkout -b claude/ucp-unified-contact-profile
-git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 259559 bytes, 12 archivos
+git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 259808 bytes, 12 archivos
 npm run build                                  # 0 errores
 node scripts/audit-tokens.cjs --counts         # ninguna categoría sube
 npm run dev                                    # localhost:5173 → Prototypes
@@ -119,6 +119,14 @@ un lugar al que se va, y encima tapaba el roster que estaba por cambiar.
 **El modal, para elegir.** Comparar qué trae cada tipo — registros, campos,
 gobernanza, si siquiera es legible — necesita espacio que un menú no tiene. La
 última fila del dropdown queda fija abajo y lleva ahí; nunca hay que buscarla.
+
+**La fila de búsqueda es un `MenuItem`, no un campo metido adentro.** Copia su
+geometría exacta — `px-8 py-8 gap-8` y el mismo `HighlightIcon` en el slot
+inicial — así que la lupa cae en la misma columna que los iconos de los tipos.
+Una caja con borde, insertada dentro del menú, dejaba su lupa a ~17px mientras
+cada fila tenía la suya a 8px: un desalineado que no se puede dejar de ver una
+vez que los iconos están apilados en columna. Los divisores usan
+`--menu-divider`, el token que la estructura del Menu ya tiene.
 
 **El rail de modelos es un filtro, no la estructura.** Abre en *All models* y la
 grilla arranca plana y ordenada por uso, que es exactamente lo que encontró la

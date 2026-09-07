@@ -241,31 +241,33 @@ function TypeDropdown({
       <div className="fixed inset-0 z-[10000]" onClick={onClose} />
       <div ref={dropdown.ref} style={{ position: "fixed", zIndex: 10001, ...dropdown.style }}>
         <Menu className="!w-[330px] !max-h-[420px]">
+          {/* Same geometry as a MenuItem size="sm": px-[8px] py-[8px] gap-[8px],
+              and the same HighlightIcon in the leading slot. A bordered field
+              inset inside the menu would have put its magnifier at ~17px while
+              every row icon sits at 8px — a misalignment you cannot unsee once
+              the icons are stacked in a column. The divider is --menu-divider,
+              the token the Menu structure already owns. */}
           <div style={{
-            position: "sticky", top: 0, zIndex: 1, padding: "4px 8px 8px",
+            position: "sticky", top: 0, zIndex: 1,
             background: "var(--menu-bg)",
+            borderBottom: "1px solid var(--menu-divider)",
+            display: "flex", alignItems: "center", gap: 8, padding: 8,
           }}>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 6,
-              background: "var(--field-bg)", border: "1px solid var(--field-border)",
-              borderRadius: 8, padding: "6px 8px",
-            }}>
-              <Search size={13} color="var(--field-placeholder)" />
-              <input
-                autoFocus
-                value={q}
-                onChange={e => setQ(e.target.value)}
-                placeholder="Search types or models…"
-                style={{
-                  flex: 1, minWidth: 0, background: "transparent", border: "none",
-                  outline: "none", fontSize: 12, color: "var(--foreground)",
-                }}
-              />
-            </div>
+            <HighlightIcon size="sm" variant="neutral" iconName="Search" />
+            <input
+              autoFocus
+              value={q}
+              onChange={e => setQ(e.target.value)}
+              placeholder="Search types or models…"
+              style={{
+                flex: 1, minWidth: 0, background: "transparent", border: "none",
+                outline: "none", fontSize: 13, color: "var(--menu-item-text)",
+              }}
+            />
           </div>
 
           {list.length === 0 ? (
-            <div style={{ padding: "4px 8px 8px" }}>
+            <div style={{ padding: 8 }}>
               <EmptyState compact icon={Search} title="No types match" description="Try the model name instead." />
             </div>
           ) : list.map(t => {
@@ -289,8 +291,8 @@ function TypeDropdown({
               else cannot be the row you have to go looking for. */}
           <div style={{
             position: "sticky", bottom: 0, zIndex: 1,
-            borderTop: "1px solid var(--color-border-neutral-subtle)",
-            marginTop: 4, paddingTop: 4, background: "var(--menu-bg)",
+            borderTop: "1px solid var(--menu-divider)",
+            background: "var(--menu-bg)",
           }}>
             <MenuItem
               size="sm"
