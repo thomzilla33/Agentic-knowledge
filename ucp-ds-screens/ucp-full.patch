@@ -923,10 +923,10 @@ index 0000000..2091927
 +export const INBOX_COLUMNS = ["Type", "Record", "Owner", "State", "Last activity"] as const
 diff --git a/src/screens/pm-thomas-entity-workspace.tsx b/src/screens/pm-thomas-entity-workspace.tsx
 new file mode 100644
-index 0000000..8e30d2a
+index 0000000..0213ac5
 --- /dev/null
 +++ b/src/screens/pm-thomas-entity-workspace.tsx
-@@ -0,0 +1,612 @@
+@@ -0,0 +1,850 @@
 +/**
 + * Entity Workspace — the scaling experiment, revised against prior art.
 + *
@@ -990,6 +990,10 @@ index 0000000..8e30d2a
 +import { Filters }           from "@/components/ui/filters"
 +import { Pagination }        from "@/components/ui/pagination"
 +import { SlideOut }          from "@/components/ui/slide-out"
++import { ModalDialog }       from "@/components/ui/modal-dialog"
++import { Menu, MenuItem }    from "@/components/ui/menu-item"
++import { anchorFromEvent, useDropdownPosition } from "@/lib/dropdown-anchor"
++import type { DropdownAnchor } from "@/lib/dropdown-anchor"
 +import { LayoutGrid, Plus, Lock, Search, ChevronDown, Inbox, SlidersHorizontal } from "lucide-react"
 +import { UCP_SIDEBAR_ITEMS } from "./pm-thomas-ucp-profile"
 +import { EntityProfileView } from "./entityProfileView"
@@ -1121,69 +1125,286 @@ index 0000000..8e30d2a
 + * Michael rather than settled — the primary-source basis for hide-vs-lock at the
 + * TYPE level did not survive verification in either direction.
 + */
-+function EntityCatalog({
++/** Shared by both surfaces: search over the type's label and its model. */
++function matchTypes(q: string): EntityTypeDef[] {
++  const needle = q.trim().toLowerCase()
++  return ENTITY_TYPES
++    .filter(t => !needle
++      || t.label.toLowerCase().includes(needle)
++      || MODEL_LABEL[t.model].toLowerCase().includes(needle))
++    .sort(byUsage)
++}
++
++/**
++ * The switcher's dropdown — the fast path.
++ *
++ * It replaced a SlideOut, and the reason is what the two surfaces are FOR. A
++ * SlideOut is a place you go; a dropdown is a thing you flick. Switching type is
++ * the most repeated action on this screen and the viewer usually already knows
++ * the name, so it should cost one click and a couple of keystrokes, not a panel
++ * that covers the roster it is about to change.
++ *
++ * Search is in the menu rather than behind it because with twelve published
++ * types the list already outgrows a glance, and typing is faster than reading
++ * once a viewer knows what they want. It pins while the list scrolls.
++ *
++ * What the dropdown cannot do is let someone DECIDE. Comparing what a type
++ * holds — records, fields, governance, whether it is even readable — needs room
++ * the menu does not have, so the last row opens the full view instead of trying.
++ */
++function TypeDropdown({
++  anchor, current, onPick, onClose, onFullView,
++}: {
++  anchor: DropdownAnchor
++  current: string
++  onPick: (id: string) => void
++  onClose: () => void
++  onFullView: () => void
++}) {
++  const [q, setQ] = useState("")
++  const dropdown = useDropdownPosition(anchor)
++  const list = useMemo(() => matchTypes(q), [q])
++
++  return (
++    <>
++      <div className="fixed inset-0 z-[10000]" onClick={onClose} />
++      <div ref={dropdown.ref} style={{ position: "fixed", zIndex: 10001, ...dropdown.style }}>
++        <Menu className="!w-[330px] !max-h-[420px]">
++          <div style={{
++            position: "sticky", top: 0, zIndex: 1, padding: "4px 8px 8px",
++            background: "var(--menu-bg)",
++          }}>
++            <div style={{
++              display: "flex", alignItems: "center", gap: 6,
++              background: "var(--field-bg)", border: "1px solid var(--field-border)",
++              borderRadius: 8, padding: "6px 8px",
++            }}>
++              <Search size={13} color="var(--field-placeholder)" />
++              <input
++                autoFocus
++                value={q}
++                onChange={e => setQ(e.target.value)}
++                placeholder="Search types or models…"
++                style={{
++                  flex: 1, minWidth: 0, background: "transparent", border: "none",
++                  outline: "none", fontSize: 12, color: "var(--foreground)",
++                }}
++              />
++            </div>
++          </div>
++
++          {list.length === 0 ? (
++            <div style={{ padding: "4px 8px 8px" }}>
++              <EmptyState compact icon={Search} title="No types match" description="Try the model name instead." />
++            </div>
++          ) : list.map(t => {
++            const readable = isReadable(t)
++            return (
++              <MenuItem
++                key={t.id}
++                size="sm"
++                label={t.label}
++                subtext={`${MODEL_LABEL[t.model]} · ${t.records.toLocaleString()} records`}
++                leadingIcon={<HighlightIcon size="sm" variant={t.id === current ? "informative" : "neutral"} iconName={t.iconName} />}
++                trailingElement={readable ? undefined : <Lock size={12} color="var(--field-supporting)" />}
++                state={!readable ? "disabled" : t.id === current ? "focus" : "default"}
++                onClick={() => { if (readable) { onPick(t.id); onClose() } }}
++              />
++            )
++          })}
++
++          {/* Pinned like the search, and for the same reason: with twelve types
++              the list already scrolls, and the one row that leads somewhere
++              else cannot be the row you have to go looking for. */}
++          <div style={{
++            position: "sticky", bottom: 0, zIndex: 1,
++            borderTop: "1px solid var(--color-border-neutral-subtle)",
++            marginTop: 4, paddingTop: 4, background: "var(--menu-bg)",
++          }}>
++            <MenuItem
++              size="sm"
++              label={`Browse all ${ENTITY_TYPES.length} types`}
++              subtext="Compare records, fields and governance"
++              leadingIcon={<HighlightIcon size="sm" variant="informative" iconName="LayoutGrid" />}
++              onClick={() => { onClose(); onFullView() }}
++            />
++          </div>
++        </Menu>
++      </div>
++    </>
++  )
++}
++
++/**
++ * The full view — the deliberate path.
++ *
++ * A modal rather than a panel because choosing a type to work in is a decision
++ * with a before and an after, and the roster behind it is about to be replaced
++ * anyway; there is nothing to keep referring to while you choose.
++ *
++ * The default view is FLAT and ordered by use, which is the finding the
++ * research pass produced: grouping published types by their schema namespace
++ * has no prior art as a user-facing structure. The model rail is a FILTER over
++ * that flat list, not the path to it — "All models" is where it opens, and a
++ * viewer who never touches the rail never meets the grouping.
++ *
++ * Locked types are shown, not filtered, and that call is still contested — see
++ * the note on the catalog it replaced.
++ */
++function EntityMarketplace({
 +  open, onClose, current, onPick,
 +}: { open: boolean; onClose: () => void; current: string; onPick: (id: string) => void }) {
 +  const [q, setQ] = useState("")
++  const [model, setModel] = useState<string | null>(null)
++
++  const matched = useMemo(() => matchTypes(q), [q])
 +  const list = useMemo(
-+    () => ENTITY_TYPES
-+      .filter(t => !q || t.label.toLowerCase().includes(q.toLowerCase()) || MODEL_LABEL[t.model].toLowerCase().includes(q.toLowerCase()))
-+      .sort(byUsage),
-+    [q],
++    () => matched.filter(t => !model || t.model === model),
++    [matched, model],
 +  )
 +
-+  return (
-+    <SlideOut
-+      open={open} onClose={onClose} type="with-variants" size="m"
-+      title="All entities"
-+      subtitle={`${ENTITY_TYPES.length} published types · most used first`}
-+      showIcon iconContent={<LayoutGrid size={14} />}
-+      showStatus={false} showTopButton={false} showTabs={false} showSearchBar={false} showChips={false} showCta={false}
-+    >
-+      <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-+          <HighlightIcon size="sm" variant="neutral" iconName="Search" />
++  /** Counts run over the search result, so the rail says what a click would give. */
++  const models = useMemo(() => {
++    const seen = new Map<string, number>()
++    ENTITY_TYPES.forEach(t => seen.set(t.model, 0))
++    matched.forEach(t => seen.set(t.model, (seen.get(t.model) ?? 0) + 1))
++    return Array.from(seen.entries())
++  }, [matched])
++
++  const body = (
++    <div style={{ display: "flex", gap: 20, minHeight: 380, maxHeight: "60vh" }}>
++      {/* Model rail — a filter, not the structure. */}
++      <div style={{
++        width: 190, flex: "none", display: "flex", flexDirection: "column", gap: 2,
++        borderRight: "1px solid var(--color-border-neutral-subtle)", paddingRight: 16,
++        overflowY: "auto",
++      }}>
++        <button
++          type="button"
++          onClick={() => setModel(null)}
++          style={railStyle(model === null)}
++        >
++          <span>All models</span>
++          <span style={{ fontVariantNumeric: "tabular-nums" }}>{matched.length}</span>
++        </button>
++        {models.map(([m, n]) => (
++          <button
++            key={m}
++            type="button"
++            disabled={n === 0}
++            onClick={() => { if (n > 0) setModel(m) }}
++            style={{ ...railStyle(model === m), opacity: n === 0 ? 0.45 : 1, cursor: n === 0 ? "not-allowed" : "pointer" }}
++          >
++            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{MODEL_LABEL[m]}</span>
++            <span style={{ fontVariantNumeric: "tabular-nums" }}>{n}</span>
++          </button>
++        ))}
++      </div>
++
++      {/* The grid. */}
++      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
++        <div style={{
++          display: "flex", alignItems: "center", gap: 6,
++          background: "var(--field-bg)", border: "1px solid var(--field-border)",
++          borderRadius: 8, padding: "8px 10px",
++        }}>
++          <Search size={14} color="var(--field-placeholder)" />
 +          <input
-+            value={q} onChange={e => setQ(e.target.value)} placeholder="Search types or models…"
-+            style={{ flex: 1, background: "var(--field-bg)", border: "1px solid var(--field-border)", borderRadius: 8, padding: "8px 10px", fontSize: 12, color: "var(--foreground)", outline: "none" }}
++            value={q}
++            onChange={e => setQ(e.target.value)}
++            placeholder="Search every published type…"
++            style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none", fontSize: 13, color: "var(--foreground)" }}
 +          />
 +        </div>
 +
 +        {list.length === 0 ? (
-+          <EmptyState compact icon={Search} title="No types match" description="Try the model name instead." />
-+        ) : list.map(t => {
-+          const readable = isReadable(t)
-+          return (
-+            <CardContainer key={t.id} size="sm" className="w-full">
-+              <button
-+                type="button" disabled={!readable}
-+                onClick={() => { onPick(t.id); onClose() }}
-+                style={{
-+                  width: "100%", display: "flex", alignItems: "center", gap: 10, textAlign: "left",
-+                  background: "transparent", border: "none", padding: 0,
-+                  cursor: readable ? "pointer" : "not-allowed", opacity: readable ? 1 : 0.55,
-+                }}
-+              >
-+                <HighlightIcon size="sm" variant={t.id === current ? "informative" : "neutral"} iconName={t.iconName} />
-+                <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
-+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{t.label}</span>
-+                  <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>
-+                    {MODEL_LABEL[t.model]} · {t.records.toLocaleString()} records · {t.fields} fields
-+                  </span>
-+                </div>
-+                {!readable && (
-+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--field-supporting)" }}>
-+                    <Lock size={12} /> {t.requiredScope}
-+                  </span>
-+                )}
-+                <Tag variant={GOV_TAG[t.governance]} size="sm">{t.governance}</Tag>
-+              </button>
-+            </CardContainer>
-+          )
-+        })}
++          <EmptyState
++            icon={Search}
++            title="No types match"
++            description="Try the model name, or clear the model filter to search every published type."
++            ctaLabel={model ? "Clear model filter" : undefined}
++            onCta={model ? () => setModel(null) : undefined}
++          />
++        ) : (
++          <div style={{
++            display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
++            gap: 12, overflowY: "auto", paddingRight: 4, alignContent: "start",
++          }}>
++            {list.map(t => {
++              const readable = isReadable(t)
++              return (
++                <CardContainer key={t.id} size="sm" className="w-full">
++                  <button
++                    type="button"
++                    disabled={!readable}
++                    onClick={() => { onPick(t.id); onClose() }}
++                    style={{
++                      width: "100%", display: "flex", flexDirection: "column", gap: 8, textAlign: "left",
++                      background: "transparent", border: "none", padding: 0,
++                      cursor: readable ? "pointer" : "not-allowed", opacity: readable ? 1 : 0.6,
++                    }}
++                  >
++                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
++                      <HighlightIcon size="sm" variant={t.id === current ? "informative" : "neutral"} iconName={t.iconName} />
++                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
++                        {t.label}
++                      </span>
++                      {t.id === current && <Tag variant="informative" size="sm">Current</Tag>}
++                    </div>
++
++                    <span style={{ fontSize: 11, color: "var(--field-supporting)" }}>{MODEL_LABEL[t.model]}</span>
++
++                    <div style={{ display: "flex", alignItems: "baseline", gap: 10, fontSize: 11, color: "var(--field-supporting)" }}>
++                      <span style={{ fontVariantNumeric: "tabular-nums" }}>{t.records.toLocaleString()} records</span>
++                      <span style={{ fontVariantNumeric: "tabular-nums" }}>{t.fields} fields</span>
++                    </div>
++
++                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
++                      <Tag variant={GOV_TAG[t.governance]} size="sm">{t.governance}</Tag>
++                      {!readable && (
++                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--field-supporting)" }}>
++                          <Lock size={11} /> {t.requiredScope}
++                        </span>
++                      )}
++                    </div>
++                  </button>
++                </CardContainer>
++              )
++            })}
++          </div>
++        )}
 +      </div>
-+    </SlideOut>
++    </div>
 +  )
++
++  return (
++    <ModalDialog
++      isOpen={open}
++      onClose={onClose}
++      variant="content"
++      showIcon
++      iconName="LayoutGrid"
++      iconVariant="informative"
++      title="Browse entity types"
++      description={`${ENTITY_TYPES.length} types published by Data Studio, most used first. Pick one to list its records.`}
++      slot={body}
++      slotUnstyled
++      showClose
++      ctaSecondary={{ label: "Cancel", onClick: onClose }}
++    />
++  )
++}
++
++/** Rail rows are one object: same padding, same baseline, count on the right. */
++function railStyle(active: boolean): React.CSSProperties {
++  return {
++    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
++    width: "100%", padding: "7px 10px", borderRadius: 8, border: "none", textAlign: "left",
++    fontSize: 12, cursor: "pointer",
++    background: active ? "var(--card-purple-bg)" : "transparent",
++    color: active ? "var(--foreground)" : "var(--field-supporting)",
++    fontWeight: active ? 600 : 400,
++  }
 +}
 +
 +// ── Screen ────────────────────────────────────────────────────────────────────
@@ -1195,6 +1416,11 @@ index 0000000..8e30d2a
 +  const [typeId,  setTypeId]  = useState("customer")
 +  const [viewId,  setViewId]  = useState("customer-all")
 +  const [inboxId, setInboxId] = useState(INBOX_VIEWS[0].id)
++  // Dos superficies, dos estados. El anchor y el "abrir" viven en el MISMO
++  // state a propósito: useDropdownPosition mide en un layout effect, así que si
++  // el anchor llega en un commit y la apertura en otro, el flip se calcula
++  // contra una ref vacía y el panel se sale de la ventana.
++  const [typeMenu, setTypeMenu] = useState<DropdownAnchor | null>(null)
 +  const [catalog, setCatalog] = useState(false)
 +  const [openId,  setOpenId]  = useState<string | null>(null)
 +  const [search,  setSearch]  = useState("")
@@ -1383,7 +1609,10 @@ index 0000000..8e30d2a
 +          {/* The type switcher. Not a tab strip: a tab strip claims its contents
 +              are the set, and the set is unbounded and different per tenant. */}
 +          <div className="mb-[24px]" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-+            <Button variant="secondary" size="sm" icon={<ChevronDown size={14} />} iconPosition="right" onClick={() => setCatalog(true)}>
++            <Button
++              variant="secondary" size="sm" icon={<ChevronDown size={14} />} iconPosition="right"
++              onClick={e => setTypeMenu(anchorFromEvent(e))}
++            >
 +              {type.label}
 +            </Button>
 +            <span style={{ fontSize: 12, color: "var(--field-supporting)" }}>·</span>
@@ -1535,7 +1764,16 @@ index 0000000..8e30d2a
 +        </div>
 +      </SlideOut>
 +
-+      <EntityCatalog open={catalog} onClose={() => setCatalog(false)} current={typeId} onPick={pickType} />
++      {typeMenu && (
++        <TypeDropdown
++          anchor={typeMenu}
++          current={typeId}
++          onPick={pickType}
++          onClose={() => setTypeMenu(null)}
++          onFullView={() => setCatalog(true)}
++        />
++      )}
++      <EntityMarketplace open={catalog} onClose={() => setCatalog(false)} current={typeId} onPick={pickType} />
 +    </ScreenLayout>
 +  )
 +}

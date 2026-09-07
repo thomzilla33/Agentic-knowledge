@@ -51,7 +51,7 @@ source inicial:
 cd ~/aims-os-ds                 # tu clon de cachilupis/aims-os-design-system
 git checkout main && git pull
 git checkout -b claude/ucp-unified-contact-profile
-git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 249495 bytes, 12 archivos
+git apply /ruta/a/ucp-ds-screens/ucp-full.patch   # 259559 bytes, 12 archivos
 npm run build                                  # 0 errores
 node scripts/audit-tokens.cjs --counts         # ninguna categoría sube
 npm run dev                                    # localhost:5173 → Prototypes
@@ -104,6 +104,28 @@ Connections se deriva del roster igual que People.
 experimento en `record-header.tsx`. El perfil aprobado la usa ahora, así que
 ese archivo pasó al patch aprobado — lo detectó `git apply` + `tsc` sobre un
 worktree limpio, no la lectura del diff.
+
+### Dos puertas al catálogo de tipos, no una
+
+El catálogo abría en un `SlideOut`. Ahora son dos superficies, porque son dos
+actos distintos:
+
+**El dropdown, para cambiar de tipo.** Es la acción más repetida de la pantalla
+y el viewer casi siempre ya sabe el nombre, así que cuesta un clic y dos teclas.
+Lleva buscador fijo arriba — con doce tipos la lista ya no se abarca de un
+vistazo — y la lista scrollea debajo. Un `SlideOut` era el gesto equivocado: es
+un lugar al que se va, y encima tapaba el roster que estaba por cambiar.
+
+**El modal, para elegir.** Comparar qué trae cada tipo — registros, campos,
+gobernanza, si siquiera es legible — necesita espacio que un menú no tiene. La
+última fila del dropdown queda fija abajo y lleva ahí; nunca hay que buscarla.
+
+**El rail de modelos es un filtro, no la estructura.** Abre en *All models* y la
+grilla arranca plana y ordenada por uso, que es exactamente lo que encontró la
+investigación: agrupar tipos publicados por su namespace de esquema no tiene
+precedente como estructura de navegación. Quien no toca el rail nunca se topa
+con la agrupación. Los conteos del rail corren sobre el resultado de la
+búsqueda, así que dicen lo que un clic realmente daría.
 
 ### El entitlement del viewer vive en un solo módulo
 
