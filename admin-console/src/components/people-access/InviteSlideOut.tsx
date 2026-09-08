@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { PaRole, PaGroup, StudioId } from '../../types';
 import type { ScopeKind } from '../../types';
 import { PERM_DEFS } from '../../fixtures/people';
@@ -37,8 +38,8 @@ const ROLE_PERM_IDS: Record<string, string[]> = {
   'viewer':       ['ag.agents.view','ag.analytics.view','gov.domains.view','gov.policies.view','hx.models.view','hx.pipelines.view'],
 };
 
-const STEPS = ['Identity', 'Access', 'Studios', 'Groups', 'Review'] as const;
-type Step = 0 | 1 | 2 | 3 | 4;
+const STEPS = ['Identity', 'Access', 'Groups', 'Review'] as const;
+type Step = 0 | 1 | 2 | 3;
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,7 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
   // Step 3 — Studios
   const [enabledStudios, setEnabledStudios] = useState<Set<StudioId>>(new Set());
   const [customPerms, setCustomPerms] = useState<Set<string>>(new Set());
+  const [customScopes, setCustomScopes] = useState<Record<string, string>>({});
 
   // Step 4 — Groups
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
@@ -95,7 +97,7 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
   }
 
   function handleNext() {
-    if (step < 4) setStep(s => (s + 1) as Step);
+    if (step < 3) setStep(s => (s + 1) as Step);
   }
 
   function handleBack() {
@@ -149,6 +151,10 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
     });
   }
 
+  function setPermScope(permId: string, scope: string) {
+    setCustomScopes(prev => ({ ...prev, [permId]: scope }));
+  }
+
   function toggleGroup(gid: string) {
     setSelectedGroups(prev => {
       const next = new Set(prev);
@@ -159,96 +165,101 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
-  return (
-    <div className="fixed inset-0 z-50 flex">
-      {/* Backdrop */}
-      <div className="flex-1 bg-black/40" onClick={onClose} />
+  return createPortal(
+    <div className="fixed inset-0 z-[9000] flex flex-col bg-white">
 
-      {/* Panel */}
-      <div className="w-[520px] max-w-full bg-white flex flex-col shadow-2xl border-l border-[var(--border)]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
-          <div>
-            <div className="text-sm font-semibold text-[var(--field-text)]">Invite member</div>
-            <div className="text-[11px] text-[var(--field-supporting)] mt-0.5">
-              Step {step + 1} of {STEPS.length} — {STEPS[step]}
-            </div>
+      {/* Page header */}
+      <div className="flex items-center gap-3 px-8 py-4 border-b border-[var(--border)] shrink-0">
+        <button
+          onClick={onClose}
+          className="w-7 h-7 rounded-md flex items-center justify-center text-[var(--field-supporting)] hover:bg-[var(--ac-surface2)] hover:text-[var(--field-text)] transition-colors"
+          aria-label="Back"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 1L2 7l7 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <div>
+          <div className="text-sm font-semibold text-[var(--field-text)]">Invite member</div>
+          <div className="text-[11px] text-[var(--field-supporting)] mt-0.5">
+            Step {step + 1} of {STEPS.length} — {STEPS[step]}
           </div>
-          <button
-            onClick={onClose}
-            className="w-7 h-7 rounded-md flex items-center justify-center text-[var(--field-supporting)] hover:bg-[var(--ac-surface2)] hover:text-[var(--field-text)] transition-colors"
-            aria-label="Close"
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
-            </svg>
-          </button>
-        </div>
-
-        {/* Step indicator */}
-        <div className="flex items-center px-6 pt-4 gap-1.5 shrink-0">
-          {STEPS.map((label, i) => (
-            <div key={label} className="flex items-center gap-1.5 flex-1 last:flex-none">
-              <div className={`flex items-center gap-1.5 ${i <= step ? 'opacity-100' : 'opacity-40'}`}>
-                <div className={`w-5 h-5 rounded-full text-[10px] font-semibold flex items-center justify-center shrink-0 ${
-                  i < step ? 'bg-[var(--primary)] text-white' :
-                  i === step ? 'border-2 border-[var(--primary)] text-[var(--primary)]' :
-                  'border border-[var(--border)] text-[var(--field-supporting)]'
-                }`}>
-                  {i < step ? (
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                      <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  ) : i + 1}
-                </div>
-                <span className={`text-[10px] font-medium hidden sm:block ${i === step ? 'text-[var(--primary)]' : 'text-[var(--field-supporting)]'}`}>
-                  {label}
-                </span>
-              </div>
-              {i < STEPS.length - 1 && (
-                <div className={`flex-1 h-px mx-1 ${i < step ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`} />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          {step === 0 && <StepIdentity name={name} email={email} scopeKind={scopeKind} setName={setName} setEmail={setEmail} setScopeKind={setScopeKind} />}
-          {step === 1 && <StepAccess accessMode={accessMode} setAccessMode={setAccessMode} selectedRoleId={selectedRoleId} setSelectedRoleId={setSelectedRoleId} roles={roles} rolePerms={rolePerms} />}
-          {step === 2 && <StepStudios accessMode={accessMode} enabledStudios={enabledStudios} customPerms={customPerms} rolePerms={rolePerms} studioHasAnyRolePerms={studioHasAnyRolePerms} toggleStudio={toggleStudio} togglePerm={togglePerm} />}
-          {step === 3 && <StepGroups groups={groups} selectedGroups={selectedGroups} toggleGroup={toggleGroup} />}
-          {step === 4 && (
-            <StepReview
-              name={name} email={email} scopeKind={scopeKind}
-              accessMode={accessMode}
-              roleName={roles.find(r => r.id === selectedRoleId)?.name}
-              enabledStudios={enabledStudios}
-              customPerms={customPerms}
-              selectedGroups={selectedGroups}
-              groups={groups}
-              rolePerms={rolePerms}
-            />
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-[var(--border)] shrink-0">
-          <Button variant="ghost" size="sm" onClick={step === 0 ? onClose : handleBack}>
-            {step === 0 ? 'Cancel' : '← Back'}
-          </Button>
-          {step < 4 ? (
-            <Button variant="primary" size="sm" onClick={handleNext} disabled={!canProceed()}>
-              Continue →
-            </Button>
-          ) : (
-            <Button variant="primary" size="sm" onClick={handleSend}>
-              Send invite
-            </Button>
-          )}
         </div>
       </div>
-    </div>
+
+      {/* Page-level Stepper */}
+      <div className="flex items-center px-8 pt-5 gap-1.5 shrink-0">
+        {STEPS.map((label, i) => (
+          <div key={label} className="flex items-center gap-1.5 flex-1 last:flex-none">
+            <div className={`flex items-center gap-1.5 ${i <= step ? 'opacity-100' : 'opacity-40'}`}>
+              <div className={`w-5 h-5 rounded-full text-[10px] font-semibold flex items-center justify-center shrink-0 ${
+                i < step ? 'bg-[var(--primary)] text-white' :
+                i === step ? 'border-2 border-[var(--primary)] text-[var(--primary)]' :
+                'border border-[var(--border)] text-[var(--field-supporting)]'
+              }`}>
+                {i < step ? (
+                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : i + 1}
+              </div>
+              <span className={`text-[10px] font-medium hidden sm:block ${i === step ? 'text-[var(--primary)]' : 'text-[var(--field-supporting)]'}`}>
+                {label}
+              </span>
+            </div>
+            {i < STEPS.length - 1 && (
+              <div className={`flex-1 h-px mx-1 ${i < step ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Scrollable step content */}
+      <div className="flex-1 overflow-y-auto px-8 py-6 max-w-2xl w-full mx-auto">
+        {step === 0 && <StepIdentity name={name} email={email} scopeKind={scopeKind} setName={setName} setEmail={setEmail} setScopeKind={setScopeKind} />}
+        {step === 1 && (
+          <StepAccess
+            accessMode={accessMode} setAccessMode={setAccessMode}
+            selectedRoleId={selectedRoleId} setSelectedRoleId={setSelectedRoleId}
+            roles={roles} rolePerms={rolePerms}
+            enabledStudios={enabledStudios} customPerms={customPerms}
+            studioHasAnyRolePerms={studioHasAnyRolePerms}
+            toggleStudio={toggleStudio} togglePerm={togglePerm}
+            customScopes={customScopes} setPermScope={setPermScope}
+          />
+        )}
+        {step === 2 && <StepGroups groups={groups} selectedGroups={selectedGroups} toggleGroup={toggleGroup} />}
+        {step === 3 && (
+          <StepReview
+            name={name} email={email} scopeKind={scopeKind}
+            accessMode={accessMode}
+            roleName={roles.find(r => r.id === selectedRoleId)?.name}
+            enabledStudios={enabledStudios}
+            customPerms={customPerms}
+            selectedGroups={selectedGroups}
+            groups={groups}
+            rolePerms={rolePerms}
+          />
+        )}
+      </div>
+
+      {/* Page-level sticky footer */}
+      <div className="flex items-center justify-between gap-3 px-8 py-4 border-t border-[var(--border)] shrink-0 bg-white">
+        <Button variant="ghost" size="sm" onClick={step === 0 ? onClose : handleBack}>
+          {step === 0 ? 'Cancel' : '← Back'}
+        </Button>
+        {step < 3 ? (
+          <Button variant="primary" size="sm" onClick={handleNext} disabled={!canProceed()}>
+            Continue →
+          </Button>
+        ) : (
+          <Button variant="primary" size="sm" onClick={handleSend}>
+            Send invite
+          </Button>
+        )}
+      </div>
+    </div>,
+    document.body
   );
 }
 
@@ -319,21 +330,27 @@ function StepIdentity({ name, email, scopeKind, setName, setEmail, setScopeKind 
 
 // ── Step 2: Access ────────────────────────────────────────────────────────────
 
-function StepAccess({ accessMode, setAccessMode, selectedRoleId, setSelectedRoleId, roles, rolePerms }: {
+function StepAccess({ accessMode, setAccessMode, selectedRoleId, setSelectedRoleId, roles, rolePerms, enabledStudios, customPerms, studioHasAnyRolePerms, toggleStudio, togglePerm, customScopes, setPermScope }: {
   accessMode: 'role' | 'custom';
   setAccessMode: (v: 'role' | 'custom') => void;
   selectedRoleId: string;
   setSelectedRoleId: (v: string) => void;
   roles: PaRole[];
   rolePerms: Set<string>;
+  enabledStudios: Set<StudioId>;
+  customPerms: Set<string>;
+  studioHasAnyRolePerms: (sid: StudioId) => boolean;
+  toggleStudio: (sid: StudioId) => void;
+  togglePerm: (permId: string) => void;
+  customScopes: Record<string, string>;
+  setPermScope: (permId: string, scope: string) => void;
 }) {
   const selectedRole = roles.find(r => r.id === selectedRoleId);
-  const permCount = PERM_DEFS.filter(p => rolePerms.has(p.id)).length;
 
   return (
     <div className="flex flex-col gap-4">
       <p className="text-xs text-[var(--field-supporting)] leading-relaxed">
-        Assign a preset role to inherit its permissions, or configure custom permissions studio-by-studio in the next step.
+        Assign a preset role to inherit its permissions, or configure custom permissions per studio.
       </p>
 
       {/* Mode selector */}
@@ -370,60 +387,92 @@ function StepAccess({ accessMode, setAccessMode, selectedRoleId, setSelectedRole
         ))}
       </div>
 
-      {/* Role picker (only in role mode) */}
+      {/* Role mode: role list + per-studio permissions preview */}
       {accessMode === 'role' && (
-        <div>
-          <label className="block text-xs font-medium text-[var(--field-text)] mb-2">Select role</label>
-          <div className="flex flex-col gap-1.5">
-            {roles.map(role => (
-              <button
-                key={role.id}
-                type="button"
-                onClick={() => setSelectedRoleId(role.id)}
-                className={`text-left flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-colors ${
-                  selectedRoleId === role.id
-                    ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                    : 'border-[var(--border)] bg-white hover:border-[var(--field-supporting)]'
-                }`}
-              >
-                <span className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${
-                  selectedRoleId === role.id ? 'border-[var(--primary)]' : 'border-[var(--border)]'
-                }`}>
-                  {selectedRoleId === role.id && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] block" />
-                  )}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-[var(--field-text)]">{role.name}</span>
-                    {role.isBuiltIn && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-medium text-[var(--field-supporting)] bg-[var(--ac-surface2)] border border-[var(--border)] rounded">Built-in</span>
-                    )}
-                  </div>
-                  <div className="text-[11px] text-[var(--field-supporting)] mt-0.5 truncate">{role.description}</div>
-                </div>
-              </button>
-            ))}
+        <div className="flex flex-col gap-4">
+          <div>
+            <div className="grid grid-cols-2 gap-2">
+              {roles.map(role => {
+                const sel = selectedRoleId === role.id;
+                const permCount = (ROLE_PERM_IDS[role.id] ?? []).length;
+                return (
+                  <button
+                    key={role.id}
+                    type="button"
+                    onClick={() => setSelectedRoleId(role.id)}
+                    className={`text-left flex flex-col gap-2 p-3 rounded-xl border transition-colors ${
+                      sel
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                        : 'border-[var(--border)] bg-white hover:border-[var(--field-supporting)]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: role.color ?? 'var(--primary)' }} />
+                      <span className={`text-xs font-semibold flex-1 min-w-0 truncate ${sel ? 'text-[var(--primary)]' : 'text-[var(--field-text)]'}`}>{role.name}</span>
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium text-[var(--field-supporting)] bg-[var(--ac-surface2)] border border-[var(--border)] rounded shrink-0">
+                        {role.isBuiltIn ? 'System' : 'Custom'}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-[var(--field-supporting)] leading-snug line-clamp-2">{role.description}</div>
+                    <div className={`text-[11px] font-medium ${sel ? 'text-[var(--primary)]' : 'text-[var(--field-supporting)]'}`}>
+                      {permCount} permissions
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Permission preview */}
+          {/* Per-studio permissions breakdown (read-only) */}
           {selectedRole && (
-            <div className="mt-4 p-3 rounded-lg bg-[var(--ac-surface2)] border border-[var(--border)]">
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--field-supporting)] mb-2">
-                Permissions included · {permCount}
+            <div className="flex flex-col gap-2">
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--field-supporting)]">
+                Permissions included per studio
               </div>
-              <div className="flex flex-wrap gap-1">
-                {PERM_DEFS.filter(p => rolePerms.has(p.id)).map(p => (
-                  <span key={p.id} className="px-1.5 py-0.5 text-[10px] bg-white border border-[var(--border)] rounded text-[var(--field-supporting)]">
-                    {p.name}
-                  </span>
-                ))}
-                {permCount === 0 && (
-                  <span className="text-[11px] text-[var(--field-supporting)] italic">No permissions</span>
-                )}
-              </div>
+              {STUDIO_IDS.map(sid => {
+                const perms = PERMS_BY_STUDIO[sid].filter(p => rolePerms.has(p.id));
+                if (perms.length === 0) return null;
+                const meta = STUDIO_META[sid];
+                return (
+                  <div key={sid} className="rounded-lg border border-[var(--border)] overflow-hidden">
+                    <div className="flex items-center gap-2 px-3 py-2 bg-[var(--ac-surface2)] border-b border-[var(--border)]">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: meta.color }} />
+                      <span className="text-[11px] font-semibold text-[var(--field-text)]">{meta.label}</span>
+                    </div>
+                    <div className="px-3 py-2 flex flex-wrap gap-1.5">
+                      {perms.map(p => (
+                        <span
+                          key={p.id}
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                          style={{ background: `${meta.color}18`, borderColor: `${meta.color}40`, color: meta.color }}
+                        >
+                          {p.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Custom mode: studio toggles */}
+      {accessMode === 'custom' && (
+        <div>
+          <div className="text-xs font-medium text-[var(--field-text)] mb-2">Studio access & permissions</div>
+          <StepStudios
+            accessMode={accessMode}
+            enabledStudios={enabledStudios}
+            customPerms={customPerms}
+            rolePerms={rolePerms}
+            studioHasAnyRolePerms={studioHasAnyRolePerms}
+            toggleStudio={toggleStudio}
+            togglePerm={togglePerm}
+            customScopes={customScopes}
+            setPermScope={setPermScope}
+          />
         </div>
       )}
     </div>
@@ -432,7 +481,9 @@ function StepAccess({ accessMode, setAccessMode, selectedRoleId, setSelectedRole
 
 // ── Step 3: Studios ───────────────────────────────────────────────────────────
 
-function StepStudios({ accessMode, enabledStudios, customPerms, rolePerms, studioHasAnyRolePerms, toggleStudio, togglePerm }: {
+const PERM_SCOPE_OPTS = ['Own', 'Department', 'Tenant'] as const;
+
+function StepStudios({ accessMode, enabledStudios, customPerms, rolePerms, studioHasAnyRolePerms, toggleStudio, togglePerm, customScopes, setPermScope }: {
   accessMode: 'role' | 'custom';
   enabledStudios: Set<StudioId>;
   customPerms: Set<string>;
@@ -440,6 +491,8 @@ function StepStudios({ accessMode, enabledStudios, customPerms, rolePerms, studi
   studioHasAnyRolePerms: (sid: StudioId) => boolean;
   toggleStudio: (sid: StudioId) => void;
   togglePerm: (permId: string) => void;
+  customScopes: Record<string, string>;
+  setPermScope: (permId: string, scope: string) => void;
 }) {
   return (
     <div className="flex flex-col gap-4">
@@ -465,15 +518,26 @@ function StepStudios({ accessMode, enabledStudios, customPerms, rolePerms, studi
                 enabled ? 'bg-[var(--primary)]/5' : 'bg-[var(--ac-surface2)] hover:bg-[var(--ac-surface2)]'
               }`}
             >
-              {/* Toggle */}
-              <span className={`relative w-8 h-4.5 rounded-full transition-colors shrink-0 flex items-center ${
-                enabled ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'
-              }`} style={{ width: 32, height: 18 }}>
-                <span className={`absolute w-3.5 h-3.5 rounded-full bg-white shadow transition-transform ${
-                  enabled ? 'translate-x-3.5' : 'translate-x-0.5'
-                }`} style={{ width: 14, height: 14 }} />
+              {/* Toggle — DS Toggle sm spec */}
+              <span
+                className="relative shrink-0 rounded-full transition-colors"
+                style={{
+                  width: 26, height: 16,
+                  background: enabled ? 'var(--primary)' : 'rgba(242,242,242,1)',
+                  border: enabled ? 'none' : '2px solid rgba(92,92,92,1)',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <span
+                  className="absolute top-1/2 rounded-full transition-all duration-200"
+                  style={{
+                    width: 8, height: 8,
+                    background: enabled ? '#fff' : 'rgba(42,42,42,1)',
+                    left: 4,
+                    transform: `translate(${enabled ? 10 : 0}px, -50%)`,
+                  }}
+                />
               </span>
-              {/* Studio dot + label */}
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: meta.color }} />
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-medium text-[var(--field-text)]">{meta.label}</div>
@@ -489,39 +553,64 @@ function StepStudios({ accessMode, enabledStudios, customPerms, rolePerms, studi
 
             {/* Permissions list (when enabled) */}
             {enabled && (
-              <div className="border-t border-[var(--border)] divide-y divide-[var(--border)]">
+              <div className="border-t border-[var(--border)]">
                 {perms.map(perm => {
                   const fromRole = rolePerms.has(perm.id);
                   const checked = accessMode === 'role' ? fromRole : customPerms.has(perm.id);
                   const isReadOnly = accessMode === 'role';
+                  const scope = customScopes[perm.id] ?? 'Own';
 
                   return (
-                    <div key={perm.id} className="flex items-center gap-3 px-4 py-2.5">
-                      <button
-                        type="button"
-                        disabled={isReadOnly}
-                        onClick={() => !isReadOnly && togglePerm(perm.id)}
-                        className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${
-                          checked
-                            ? 'bg-[var(--primary)] border-[var(--primary)]'
-                            : 'bg-[var(--ac-surface2)] border-[var(--border)]'
-                        } ${isReadOnly ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
-                        aria-label={perm.name}
-                      >
-                        {checked && (
-                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                            <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
+                    <div key={perm.id} className="flex flex-col px-4 py-2.5 gap-2 border-t border-[var(--border)] first:border-0">
+                      <div className="flex items-center gap-3">
+                        {/* Toggle sm (hand-rolled inline spec) */}
+                        {isReadOnly ? (
+                          <span className="relative shrink-0 rounded-full" style={{ width: 26, height: 16, background: checked ? 'var(--primary)' : 'rgba(242,242,242,1)', border: checked ? 'none' : '2px solid rgba(92,92,92,0.5)', boxSizing: 'border-box', flexShrink: 0 }}>
+                            <span className="absolute rounded-full" style={{ width: 8, height: 8, background: checked ? '#fff' : 'rgba(42,42,42,1)', top: '50%', left: 4, transform: `translate(${checked ? 10 : 0}px, -50%)` }} />
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={checked}
+                            onClick={() => togglePerm(perm.id)}
+                            className="relative shrink-0 rounded-full cursor-pointer transition-colors"
+                            style={{ width: 26, height: 16, background: checked ? 'var(--primary)' : 'rgba(242,242,242,1)', border: checked ? 'none' : '2px solid rgba(92,92,92,1)', boxSizing: 'border-box' }}
+                          >
+                            <span className="absolute rounded-full transition-all duration-200" style={{ width: 8, height: 8, background: checked ? '#fff' : 'rgba(42,42,42,1)', top: '50%', left: 4, transform: `translate(${checked ? 10 : 0}px, -50%)` }} />
+                          </button>
                         )}
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-medium text-[var(--field-text)]">{perm.name}</div>
-                        <div className="text-[10px] text-[var(--field-supporting)] truncate">{perm.description}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-medium text-[var(--field-text)]">{perm.name}</div>
+                          <div className="text-[10px] text-[var(--field-supporting)] truncate">{perm.description}</div>
+                        </div>
+                        {isReadOnly && fromRole && (
+                          <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                            Inherited
+                          </span>
+                        )}
                       </div>
-                      {isReadOnly && fromRole && (
-                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
-                          Inherited
-                        </span>
+                      {/* Scope selector — custom mode + enabled */}
+                      {!isReadOnly && checked && (
+                        <div className="flex gap-1.5 pl-9">
+                          {PERM_SCOPE_OPTS.map(opt => {
+                            const sel = scope === opt;
+                            return (
+                              <button
+                                key={opt}
+                                type="button"
+                                onClick={() => setPermScope(perm.id, opt)}
+                                className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
+                                  sel
+                                    ? 'border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)] font-semibold'
+                                    : 'border-[var(--border)] text-[var(--field-supporting)] hover:border-[var(--primary)]/40'
+                                }`}
+                              >
+                                {opt}
+                              </button>
+                            );
+                          })}
+                        </div>
                       )}
                     </div>
                   );
