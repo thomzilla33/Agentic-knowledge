@@ -34,6 +34,42 @@ export const SETTING_REGISTRY: SettingDef[] = [
     editableAtKinds: ['operator', 'corporate', 'region', 'location'],
   },
 
+  // ── Workers Permissions (ARP-612) ─────────────────────────────────────────
+  {
+    id: 'workers-default-owner-role',
+    sectionId: 'workers-permissions',
+    label: 'Default Owner Role',
+    description: 'Role granted to whoever creates a worker, on top of their platform roles.',
+    valueKind: 'enum',
+    options: ['developer', 'tenant-admin', 'data-steward', 'viewer'],
+    defaultValue: 'developer',
+    cascade: 'OVERRIDABLE',
+    requiresProduct: 'agentic-studio',
+    editableAtKinds: ['operator', 'corporate', 'region'],
+  },
+  {
+    id: 'workers-require-review-to-publish',
+    sectionId: 'workers-permissions',
+    label: 'Require Review Before Publish',
+    description: 'A second holder of the Publish permission must approve before a draft goes active.',
+    valueKind: 'toggle',
+    defaultValue: false,
+    cascade: 'ADD_ONLY',
+    requiresProduct: 'agentic-studio',
+    editableAtKinds: ['operator', 'corporate', 'region'],
+  },
+  {
+    id: 'workers-execute-requires-published',
+    sectionId: 'workers-permissions',
+    label: 'Execute Published Workers Only',
+    description: 'Block manual and API execution of drafts outside the Playground sandbox.',
+    valueKind: 'toggle',
+    defaultValue: true,
+    cascade: 'LOCKED',
+    requiresProduct: 'agentic-studio',
+    editableAtKinds: ['operator', 'corporate'],
+  },
+
   // ── People & Access ───────────────────────────────────────────────────────
   {
     id: 'people-max-session-duration',

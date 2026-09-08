@@ -35,3 +35,44 @@ export function removeMemberFromRole(roleId: string, memberId: string): void {
     [memberId]: (memberRoles[memberId] ?? []).filter(id => id !== roleId),
   };
 }
+
+export interface InvitePayload {
+  name: string;
+  email: string;
+  roleId: string | null;
+  studioIds: string[];
+  groupIds: string[];
+}
+
+export function inviteMember(payload: InvitePayload): Member {
+  const initials = payload.name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0].toUpperCase())
+    .join('');
+  const id = `p${String(Date.now()).slice(-6)}`;
+  const newMember: Member = {
+    id,
+    name: payload.name,
+    email: payload.email,
+    initials,
+    status: 'invited',
+    studios: payload.studioIds as import('../types').StudioId[],
+    joinedAt: new Date().toISOString().split('T')[0],
+  };
+  members = [...members, newMember];
+
+  if (payload.roleId) {
+    assignMemberToRole(payload.roleId, id);
+  }
+
+  payload.groupIds.forEach(gid => {
+    const g = groups.find(g => g.id === gid);
+    if (g && !g.memberIds.includes(id)) {
+      g.memberIds.push(id);
+    }
+  });
+
+  return newMember;
+}

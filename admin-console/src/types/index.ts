@@ -118,6 +118,7 @@ export type SectionId =
   | 'data-privacy'
   | 'integrations-credentials'
   | 'notifications'
+  | 'workers-permissions'
   | 'audit-compliance';
 
 export type SectionDef = {

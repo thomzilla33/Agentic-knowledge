@@ -14,6 +14,7 @@ import { OrganizationSection } from '../components/sections/OrganizationSection'
 import { MySettingsSection } from '../components/sections/MySettingsSection';
 import { BillingSection } from '../components/sections/BillingSection';
 import { NotificationsSection } from '../components/sections/NotificationsSection';
+import { WorkersPermissionsSection } from '../components/sections/WorkersPermissionsSection';
 import { PeopleAccessScreen } from './PeopleAccess';
 import { Spinner } from '../components/primitives/Spinner';
 import { InlineMessage } from '../components/primitives/InlineMessage';
@@ -152,6 +153,8 @@ export function AdminConsole({ sectionId, scopeId, origin }: AdminConsoleProps) 
               <BillingSection />
             ) : activeSectionId === 'notifications' ? (
               <NotificationsSection />
+            ) : activeSectionId === 'workers-permissions' ? (
+              <WorkersPermissionsSection canWrite={canWriteSection} />
             ) : (
               <SettingsPanel
                 key={`${activeSectionId}-${activeScopeId}-${dataRevision}`}

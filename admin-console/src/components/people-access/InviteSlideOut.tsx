@@ -1,0 +1,711 @@
+import { useState, useEffect } from 'react';
+import type { PaRole, PaGroup, StudioId } from '../../types';
+import type { ScopeKind } from '../../types';
+import { PERM_DEFS } from '../../fixtures/people';
+import { Button } from '../primitives/Button';
+import type { InvitePayload } from '../../mockApi/people';
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+const SCOPE_OPTIONS: { id: ScopeKind; label: string; description: string }[] = [
+  { id: 'operator',  label: 'Operator',  description: 'Platform-level administrator, manages all tenants' },
+  { id: 'corporate', label: 'Corporate', description: 'Tenant-level administrator for one organization' },
+  { id: 'region',    label: 'Region',    description: 'Manages a geographic or business region' },
+  { id: 'location',  label: 'Location',  description: 'Access limited to a single site or team' },
+];
+
+const STUDIO_META: Record<StudioId, { label: string; color: string }> = {
+  ag:    { label: 'Agentic Studio',    color: '#06b6d4' },
+  gov:   { label: 'Governance Studio', color: '#10b981' },
+  helix: { label: 'Helix DS',          color: '#8b5cf6' },
+};
+
+const STUDIO_IDS: StudioId[] = ['ag', 'gov', 'helix'];
+
+const PERMS_BY_STUDIO: Record<StudioId, typeof PERM_DEFS> = {
+  ag:    PERM_DEFS.filter(p => p.studioId === 'ag'),
+  gov:   PERM_DEFS.filter(p => p.studioId === 'gov'),
+  helix: PERM_DEFS.filter(p => p.studioId === 'helix'),
+};
+
+const ROLE_PERM_IDS: Record<string, string[]> = {
+  'super-admin':  PERM_DEFS.map(p => p.id),
+  'tenant-admin': PERM_DEFS.map(p => p.id),
+  'developer':    ['ag.agents.view','ag.agents.create','ag.agents.edit','ag.workflows.view','ag.workflows.manage','ag.analytics.view','ag.sandbox.use','ag.workers.view','ag.workers.create','ag.workers.edit','ag.workers.execute'],
+  'auditor':      ['gov.audit.view','gov.domains.view','gov.policies.view','hx.models.view','hx.pipelines.view'],
+  'data-steward': ['gov.domains.view','gov.domains.manage','gov.policies.view','gov.policies.manage','gov.promote.approve','gov.audit.view','hx.models.view','hx.models.create','hx.models.publish','hx.pipelines.view','hx.pipelines.run','hx.connections.view'],
+  'viewer':       ['ag.agents.view','ag.analytics.view','gov.domains.view','gov.policies.view','hx.models.view','hx.pipelines.view'],
+};
+
+const STEPS = ['Identity', 'Access', 'Studios', 'Groups', 'Review'] as const;
+type Step = 0 | 1 | 2 | 3 | 4;
+
+// ── Props ─────────────────────────────────────────────────────────────────────
+
+interface InviteSlideOutProps {
+  roles: PaRole[];
+  groups: PaGroup[];
+  onConfirm: (payload: InvitePayload) => void;
+  onClose: () => void;
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
+export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlideOutProps) {
+  // Step 1 — Identity
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [scopeKind, setScopeKind] = useState<ScopeKind>('corporate');
+
+  // Step 2 — Access
+  const [accessMode, setAccessMode] = useState<'role' | 'custom'>('role');
+  const [selectedRoleId, setSelectedRoleId] = useState<string>(roles[2]?.id ?? roles[0]?.id ?? '');
+
+  // Step 3 — Studios
+  const [enabledStudios, setEnabledStudios] = useState<Set<StudioId>>(new Set());
+  const [customPerms, setCustomPerms] = useState<Set<string>>(new Set());
+
+  // Step 4 — Groups
+  const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
+
+  const [step, setStep] = useState<Step>(0);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  // ── Derived ────────────────────────────────────────────────────────────────
+
+  const rolePerms = new Set(ROLE_PERM_IDS[selectedRoleId] ?? []);
+
+  function studioHasAnyRolePerms(sid: StudioId): boolean {
+    return PERMS_BY_STUDIO[sid].some(p => rolePerms.has(p.id));
+  }
+
+  // ── Navigation ─────────────────────────────────────────────────────────────
+
+  function canProceed(): boolean {
+    if (step === 0) return name.trim().length > 0 && email.trim().includes('@');
+    if (step === 1) return accessMode === 'custom' || selectedRoleId.length > 0;
+    return true;
+  }
+
+  function handleNext() {
+    if (step < 4) setStep(s => (s + 1) as Step);
+  }
+
+  function handleBack() {
+    if (step > 0) setStep(s => (s - 1) as Step);
+  }
+
+  function handleSend() {
+    onConfirm({
+      name: name.trim(),
+      email: email.trim(),
+      roleId: accessMode === 'role' ? selectedRoleId : null,
+      studioIds: Array.from(enabledStudios),
+      groupIds: Array.from(selectedGroups),
+    });
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  function toggleStudio(sid: StudioId) {
+    setEnabledStudios(prev => {
+      const next = new Set(prev);
+      if (next.has(sid)) {
+        next.delete(sid);
+        // clear custom perms for this studio
+        const studioPermIds = new Set(PERMS_BY_STUDIO[sid].map(p => p.id));
+        setCustomPerms(cp => {
+          const ncp = new Set(cp);
+          studioPermIds.forEach(id => ncp.delete(id));
+          return ncp;
+        });
+      } else {
+        next.add(sid);
+        // auto-select inherited perms for that studio if role mode
+        if (accessMode === 'role') {
+          setCustomPerms(cp => {
+            const ncp = new Set(cp);
+            PERMS_BY_STUDIO[sid].filter(p => rolePerms.has(p.id)).forEach(p => ncp.add(p.id));
+            return ncp;
+          });
+        }
+      }
+      return next;
+    });
+  }
+
+  function togglePerm(permId: string) {
+    setCustomPerms(prev => {
+      const next = new Set(prev);
+      if (next.has(permId)) next.delete(permId); else next.add(permId);
+      return next;
+    });
+  }
+
+  function toggleGroup(gid: string) {
+    setSelectedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(gid)) next.delete(gid); else next.add(gid);
+      return next;
+    });
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+
+  return (
+    <div className="fixed inset-0 z-50 flex">
+      {/* Backdrop */}
+      <div className="flex-1 bg-black/40" onClick={onClose} />
+
+      {/* Panel */}
+      <div className="w-[520px] max-w-full bg-white flex flex-col shadow-2xl border-l border-[var(--border)]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
+          <div>
+            <div className="text-sm font-semibold text-[var(--field-text)]">Invite member</div>
+            <div className="text-[11px] text-[var(--field-supporting)] mt-0.5">
+              Step {step + 1} of {STEPS.length} — {STEPS[step]}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-md flex items-center justify-center text-[var(--field-supporting)] hover:bg-[var(--ac-surface2)] hover:text-[var(--field-text)] transition-colors"
+            aria-label="Close"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Step indicator */}
+        <div className="flex items-center px-6 pt-4 gap-1.5 shrink-0">
+          {STEPS.map((label, i) => (
+            <div key={label} className="flex items-center gap-1.5 flex-1 last:flex-none">
+              <div className={`flex items-center gap-1.5 ${i <= step ? 'opacity-100' : 'opacity-40'}`}>
+                <div className={`w-5 h-5 rounded-full text-[10px] font-semibold flex items-center justify-center shrink-0 ${
+                  i < step ? 'bg-[var(--primary)] text-white' :
+                  i === step ? 'border-2 border-[var(--primary)] text-[var(--primary)]' :
+                  'border border-[var(--border)] text-[var(--field-supporting)]'
+                }`}>
+                  {i < step ? (
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                      <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : i + 1}
+                </div>
+                <span className={`text-[10px] font-medium hidden sm:block ${i === step ? 'text-[var(--primary)]' : 'text-[var(--field-supporting)]'}`}>
+                  {label}
+                </span>
+              </div>
+              {i < STEPS.length - 1 && (
+                <div className={`flex-1 h-px mx-1 ${i < step ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5">
+          {step === 0 && <StepIdentity name={name} email={email} scopeKind={scopeKind} setName={setName} setEmail={setEmail} setScopeKind={setScopeKind} />}
+          {step === 1 && <StepAccess accessMode={accessMode} setAccessMode={setAccessMode} selectedRoleId={selectedRoleId} setSelectedRoleId={setSelectedRoleId} roles={roles} rolePerms={rolePerms} />}
+          {step === 2 && <StepStudios accessMode={accessMode} enabledStudios={enabledStudios} customPerms={customPerms} rolePerms={rolePerms} studioHasAnyRolePerms={studioHasAnyRolePerms} toggleStudio={toggleStudio} togglePerm={togglePerm} />}
+          {step === 3 && <StepGroups groups={groups} selectedGroups={selectedGroups} toggleGroup={toggleGroup} />}
+          {step === 4 && (
+            <StepReview
+              name={name} email={email} scopeKind={scopeKind}
+              accessMode={accessMode}
+              roleName={roles.find(r => r.id === selectedRoleId)?.name}
+              enabledStudios={enabledStudios}
+              customPerms={customPerms}
+              selectedGroups={selectedGroups}
+              groups={groups}
+              rolePerms={rolePerms}
+            />
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-[var(--border)] shrink-0">
+          <Button variant="ghost" size="sm" onClick={step === 0 ? onClose : handleBack}>
+            {step === 0 ? 'Cancel' : '← Back'}
+          </Button>
+          {step < 4 ? (
+            <Button variant="primary" size="sm" onClick={handleNext} disabled={!canProceed()}>
+              Continue →
+            </Button>
+          ) : (
+            <Button variant="primary" size="sm" onClick={handleSend}>
+              Send invite
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Step 1: Identity ──────────────────────────────────────────────────────────
+
+function StepIdentity({ name, email, scopeKind, setName, setEmail, setScopeKind }: {
+  name: string; email: string; scopeKind: ScopeKind;
+  setName: (v: string) => void; setEmail: (v: string) => void; setScopeKind: (v: ScopeKind) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-5">
+      <div>
+        <label className="block text-xs font-medium text-[var(--field-text)] mb-1.5">Full name</label>
+        <input
+          type="text"
+          placeholder="e.g. Alex Ramirez"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          autoFocus
+          className="w-full px-3 py-2 text-xs border border-[var(--border)] rounded-lg bg-[var(--ac-surface2)] focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors"
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-[var(--field-text)] mb-1.5">Work email</label>
+        <input
+          type="email"
+          placeholder="alex@yourcompany.com"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="w-full px-3 py-2 text-xs border border-[var(--border)] rounded-lg bg-[var(--ac-surface2)] focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors"
+        />
+      </div>
+      <fieldset>
+        <legend className="block text-xs font-medium text-[var(--field-text)] mb-2">User type</legend>
+        <p className="text-[11px] text-[var(--field-supporting)] mb-3 leading-relaxed">
+          Determines which settings cascade to this user and where they can manage the platform.
+        </p>
+        <div className="flex flex-col gap-2">
+          {SCOPE_OPTIONS.map(opt => (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => setScopeKind(opt.id)}
+              className={`text-left flex items-start gap-3 p-3 rounded-lg border transition-colors ${
+                scopeKind === opt.id
+                  ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                  : 'border-[var(--border)] bg-white hover:border-[var(--field-supporting)]'
+              }`}
+            >
+              <span className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
+                scopeKind === opt.id ? 'border-[var(--primary)]' : 'border-[var(--border)]'
+              }`}>
+                {scopeKind === opt.id && (
+                  <span className="w-2 h-2 rounded-full bg-[var(--primary)] block" />
+                )}
+              </span>
+              <div>
+                <div className="text-xs font-medium text-[var(--field-text)]">{opt.label}</div>
+                <div className="text-[11px] text-[var(--field-supporting)] mt-0.5">{opt.description}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+    </div>
+  );
+}
+
+// ── Step 2: Access ────────────────────────────────────────────────────────────
+
+function StepAccess({ accessMode, setAccessMode, selectedRoleId, setSelectedRoleId, roles, rolePerms }: {
+  accessMode: 'role' | 'custom';
+  setAccessMode: (v: 'role' | 'custom') => void;
+  selectedRoleId: string;
+  setSelectedRoleId: (v: string) => void;
+  roles: PaRole[];
+  rolePerms: Set<string>;
+}) {
+  const selectedRole = roles.find(r => r.id === selectedRoleId);
+  const permCount = PERM_DEFS.filter(p => rolePerms.has(p.id)).length;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-xs text-[var(--field-supporting)] leading-relaxed">
+        Assign a preset role to inherit its permissions, or configure custom permissions studio-by-studio in the next step.
+      </p>
+
+      {/* Mode selector */}
+      <div className="flex flex-col gap-2">
+        {(['role', 'custom'] as const).map(mode => (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => setAccessMode(mode)}
+            className={`text-left flex items-start gap-3 p-3 rounded-lg border transition-colors ${
+              accessMode === mode
+                ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                : 'border-[var(--border)] bg-white hover:border-[var(--field-supporting)]'
+            }`}
+          >
+            <span className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
+              accessMode === mode ? 'border-[var(--primary)]' : 'border-[var(--border)]'
+            }`}>
+              {accessMode === mode && (
+                <span className="w-2 h-2 rounded-full bg-[var(--primary)] block" />
+              )}
+            </span>
+            <div>
+              <div className="text-xs font-medium text-[var(--field-text)]">
+                {mode === 'role' ? 'Assign a role' : 'Custom permissions'}
+              </div>
+              <div className="text-[11px] text-[var(--field-supporting)] mt-0.5">
+                {mode === 'role'
+                  ? 'User inherits all permissions from the selected role'
+                  : 'Choose exactly which permissions to grant, per studio'}
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Role picker (only in role mode) */}
+      {accessMode === 'role' && (
+        <div>
+          <label className="block text-xs font-medium text-[var(--field-text)] mb-2">Select role</label>
+          <div className="flex flex-col gap-1.5">
+            {roles.map(role => (
+              <button
+                key={role.id}
+                type="button"
+                onClick={() => setSelectedRoleId(role.id)}
+                className={`text-left flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-colors ${
+                  selectedRoleId === role.id
+                    ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                    : 'border-[var(--border)] bg-white hover:border-[var(--field-supporting)]'
+                }`}
+              >
+                <span className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${
+                  selectedRoleId === role.id ? 'border-[var(--primary)]' : 'border-[var(--border)]'
+                }`}>
+                  {selectedRoleId === role.id && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] block" />
+                  )}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-[var(--field-text)]">{role.name}</span>
+                    {role.isBuiltIn && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium text-[var(--field-supporting)] bg-[var(--ac-surface2)] border border-[var(--border)] rounded">Built-in</span>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-[var(--field-supporting)] mt-0.5 truncate">{role.description}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Permission preview */}
+          {selectedRole && (
+            <div className="mt-4 p-3 rounded-lg bg-[var(--ac-surface2)] border border-[var(--border)]">
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--field-supporting)] mb-2">
+                Permissions included · {permCount}
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {PERM_DEFS.filter(p => rolePerms.has(p.id)).map(p => (
+                  <span key={p.id} className="px-1.5 py-0.5 text-[10px] bg-white border border-[var(--border)] rounded text-[var(--field-supporting)]">
+                    {p.name}
+                  </span>
+                ))}
+                {permCount === 0 && (
+                  <span className="text-[11px] text-[var(--field-supporting)] italic">No permissions</span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Step 3: Studios ───────────────────────────────────────────────────────────
+
+function StepStudios({ accessMode, enabledStudios, customPerms, rolePerms, studioHasAnyRolePerms, toggleStudio, togglePerm }: {
+  accessMode: 'role' | 'custom';
+  enabledStudios: Set<StudioId>;
+  customPerms: Set<string>;
+  rolePerms: Set<string>;
+  studioHasAnyRolePerms: (sid: StudioId) => boolean;
+  toggleStudio: (sid: StudioId) => void;
+  togglePerm: (permId: string) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-xs text-[var(--field-supporting)] leading-relaxed">
+        Select which studios this user can access.
+        {accessMode === 'role'
+          ? ' Permissions are inherited from the selected role and shown for reference.'
+          : ' Then choose exactly which permissions to grant within each studio.'}
+      </p>
+
+      {STUDIO_IDS.map(sid => {
+        const meta = STUDIO_META[sid];
+        const enabled = enabledStudios.has(sid);
+        const perms = PERMS_BY_STUDIO[sid];
+
+        return (
+          <div key={sid} className={`border rounded-xl overflow-hidden transition-colors ${enabled ? 'border-[var(--primary)]/40' : 'border-[var(--border)]'}`}>
+            {/* Studio header / toggle */}
+            <button
+              type="button"
+              onClick={() => toggleStudio(sid)}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
+                enabled ? 'bg-[var(--primary)]/5' : 'bg-[var(--ac-surface2)] hover:bg-[var(--ac-surface2)]'
+              }`}
+            >
+              {/* Toggle */}
+              <span className={`relative w-8 h-4.5 rounded-full transition-colors shrink-0 flex items-center ${
+                enabled ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'
+              }`} style={{ width: 32, height: 18 }}>
+                <span className={`absolute w-3.5 h-3.5 rounded-full bg-white shadow transition-transform ${
+                  enabled ? 'translate-x-3.5' : 'translate-x-0.5'
+                }`} style={{ width: 14, height: 14 }} />
+              </span>
+              {/* Studio dot + label */}
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: meta.color }} />
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-[var(--field-text)]">{meta.label}</div>
+                {accessMode === 'role' && studioHasAnyRolePerms(sid) && (
+                  <div className="text-[10px] text-[var(--field-supporting)] mt-0.5">
+                    {perms.filter(p => rolePerms.has(p.id)).length} of {perms.length} permissions inherited from role
+                  </div>
+                )}
+              </div>
+              {!enabled && <span className="text-[11px] text-[var(--field-supporting)]">Off</span>}
+              {enabled && <span className="text-[11px] font-medium" style={{ color: meta.color }}>Enabled</span>}
+            </button>
+
+            {/* Permissions list (when enabled) */}
+            {enabled && (
+              <div className="border-t border-[var(--border)] divide-y divide-[var(--border)]">
+                {perms.map(perm => {
+                  const fromRole = rolePerms.has(perm.id);
+                  const checked = accessMode === 'role' ? fromRole : customPerms.has(perm.id);
+                  const isReadOnly = accessMode === 'role';
+
+                  return (
+                    <div key={perm.id} className="flex items-center gap-3 px-4 py-2.5">
+                      <button
+                        type="button"
+                        disabled={isReadOnly}
+                        onClick={() => !isReadOnly && togglePerm(perm.id)}
+                        className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${
+                          checked
+                            ? 'bg-[var(--primary)] border-[var(--primary)]'
+                            : 'bg-[var(--ac-surface2)] border-[var(--border)]'
+                        } ${isReadOnly ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
+                        aria-label={perm.name}
+                      >
+                        {checked && (
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                            <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-[var(--field-text)]">{perm.name}</div>
+                        <div className="text-[10px] text-[var(--field-supporting)] truncate">{perm.description}</div>
+                      </div>
+                      {isReadOnly && fromRole && (
+                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                          Inherited
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Step 4: Groups ────────────────────────────────────────────────────────────
+
+function StepGroups({ groups, selectedGroups, toggleGroup }: {
+  groups: PaGroup[];
+  selectedGroups: Set<string>;
+  toggleGroup: (gid: string) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const filtered = groups.filter(g => !search || g.name.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-xs text-[var(--field-supporting)] leading-relaxed">
+        Optionally add this member to one or more groups. Groups can inherit additional permissions and are used for bulk management.
+      </p>
+      <div className="relative">
+        <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--field-supporting)]" width="12" height="12" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5"/>
+          <path d="M10.5 10.5L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+        <input
+          type="search"
+          placeholder="Search groups…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full pl-7 pr-3 py-1.5 text-xs border border-[var(--border)] rounded-lg bg-[var(--ac-surface2)] focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        {filtered.map(group => {
+          const selected = selectedGroups.has(group.id);
+          return (
+            <button
+              key={group.id}
+              type="button"
+              onClick={() => toggleGroup(group.id)}
+              className={`text-left flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-colors ${
+                selected
+                  ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                  : 'border-[var(--border)] bg-white hover:border-[var(--field-supporting)]'
+              }`}
+            >
+              <span className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${
+                selected ? 'bg-[var(--primary)] border-[var(--primary)]' : 'bg-[var(--ac-surface2)] border-[var(--border)]'
+              }`}>
+                {selected && (
+                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </span>
+              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: group.color }} />
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-[var(--field-text)]">{group.name}</div>
+                <div className="text-[11px] text-[var(--field-supporting)] truncate">{group.description}</div>
+              </div>
+              <span className="text-[11px] text-[var(--field-supporting)] shrink-0">
+                {group.memberIds.length} member{group.memberIds.length !== 1 ? 's' : ''}
+              </span>
+            </button>
+          );
+        })}
+        {filtered.length === 0 && (
+          <div className="py-8 text-center text-xs text-[var(--field-supporting)]">No groups match your search.</div>
+        )}
+      </div>
+      {selectedGroups.size === 0 && (
+        <p className="text-[11px] text-[var(--field-supporting)] italic">
+          No groups selected — the member won't belong to any group initially.
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ── Step 5: Review ────────────────────────────────────────────────────────────
+
+function StepReview({ name, email, scopeKind, accessMode, roleName, enabledStudios, customPerms, selectedGroups, groups, rolePerms }: {
+  name: string; email: string; scopeKind: ScopeKind;
+  accessMode: 'role' | 'custom';
+  roleName?: string;
+  enabledStudios: Set<StudioId>;
+  customPerms: Set<string>;
+  selectedGroups: Set<string>;
+  groups: PaGroup[];
+  rolePerms: Set<string>;
+}) {
+  const scopeLabel = SCOPE_OPTIONS.find(s => s.id === scopeKind)?.label ?? scopeKind;
+
+  function Row({ label, children }: { label: string; children: React.ReactNode }) {
+    return (
+      <div className="flex items-start gap-4 py-3 border-b border-[var(--border)] last:border-0">
+        <span className="text-[11px] font-medium text-[var(--field-supporting)] w-28 shrink-0 pt-0.5">{label}</span>
+        <div className="flex-1 min-w-0">{children}</div>
+      </div>
+    );
+  }
+
+  const initials = name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Avatar + name */}
+      <div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--ac-surface2)] border border-[var(--border)]">
+        <div className="w-10 h-10 rounded-full bg-[var(--primary)] text-white text-sm font-semibold flex items-center justify-center shrink-0">
+          {initials || '?'}
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-[var(--field-text)]">{name || '—'}</div>
+          <div className="text-xs text-[var(--field-supporting)]">{email || '—'}</div>
+        </div>
+        <span className="ml-auto px-2 py-0.5 text-[10px] font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-full">
+          Invited
+        </span>
+      </div>
+
+      {/* Summary rows */}
+      <div className="border border-[var(--border)] rounded-xl overflow-hidden">
+        <Row label="User type">
+          <span className="text-xs font-medium text-[var(--field-text)]">{scopeLabel}</span>
+        </Row>
+        <Row label="Access">
+          {accessMode === 'role' ? (
+            <div>
+              <span className="text-xs font-medium text-[var(--field-text)]">{roleName ?? '—'}</span>
+              <span className="ml-2 text-[11px] text-[var(--field-supporting)]">
+                · {PERM_DEFS.filter(p => rolePerms.has(p.id)).length} permissions inherited
+              </span>
+            </div>
+          ) : (
+            <span className="text-xs font-medium text-[var(--field-text)]">
+              Custom · {customPerms.size} permission{customPerms.size !== 1 ? 's' : ''}
+            </span>
+          )}
+        </Row>
+        <Row label="Studios">
+          {enabledStudios.size === 0 ? (
+            <span className="text-xs text-[var(--field-supporting)] italic">No studio access</span>
+          ) : (
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from(enabledStudios).map(sid => (
+                <span key={sid} className="flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium bg-white border border-[var(--border)] rounded-full text-[var(--field-text)]">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: STUDIO_META[sid].color }} />
+                  {STUDIO_META[sid].label}
+                </span>
+              ))}
+            </div>
+          )}
+        </Row>
+        <Row label="Groups">
+          {selectedGroups.size === 0 ? (
+            <span className="text-xs text-[var(--field-supporting)] italic">No groups</span>
+          ) : (
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from(selectedGroups).map(gid => {
+                const g = groups.find(g => g.id === gid);
+                return g ? (
+                  <span key={gid} className="flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium bg-white border border-[var(--border)] rounded-full text-[var(--field-text)]">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: g.color }} />
+                    {g.name}
+                  </span>
+                ) : null;
+              })}
+            </div>
+          )}
+        </Row>
+      </div>
+
+      <p className="text-[11px] text-[var(--field-supporting)] leading-relaxed">
+        An invitation email will be sent to <strong>{email}</strong>. The link expires in 72 hours. Permissions take effect as soon as the member accepts.
+      </p>
+    </div>
+  );
+}
