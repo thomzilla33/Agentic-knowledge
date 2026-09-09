@@ -54,8 +54,8 @@ interface InviteSlideOutProps {
 
 export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlideOutProps) {
   // Step 1 — Identity
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [emails, setEmails] = useState<string[]>([]);
+  const [emailDraft, setEmailDraft] = useState('');
   const [scopeKind, setScopeKind] = useState<ScopeKind>('corporate');
 
   // Step 2 — Access
@@ -91,7 +91,7 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
   // ── Navigation ─────────────────────────────────────────────────────────────
 
   function canProceed(): boolean {
-    if (step === 0) return name.trim().length > 0 && email.trim().includes('@');
+    if (step === 0) return emails.length > 0;
     if (step === 1) return accessMode === 'custom' || selectedRoleId.length > 0;
     return true;
   }
@@ -105,12 +105,17 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
   }
 
   function handleSend() {
-    onConfirm({
-      name: name.trim(),
-      email: email.trim(),
-      roleId: accessMode === 'role' ? selectedRoleId : null,
-      studioIds: Array.from(enabledStudios),
-      groupIds: Array.from(selectedGroups),
+    const list = emailDraft.trim().includes('@')
+      ? [...emails, emailDraft.trim()]
+      : emails;
+    list.forEach(addr => {
+      onConfirm({
+        name: addr.split('@')[0],
+        email: addr,
+        roleId: accessMode === 'role' ? selectedRoleId : null,
+        studioIds: Array.from(enabledStudios),
+        groupIds: Array.from(selectedGroups),
+      });
     });
   }
 
@@ -216,7 +221,7 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
 
       {/* Scrollable step content */}
       <div className="flex-1 overflow-y-auto px-8 py-6 max-w-2xl w-full mx-auto">
-        {step === 0 && <StepIdentity name={name} email={email} scopeKind={scopeKind} setName={setName} setEmail={setEmail} setScopeKind={setScopeKind} />}
+        {step === 0 && <StepIdentity emails={emails} setEmails={setEmails} emailDraft={emailDraft} setEmailDraft={setEmailDraft} scopeKind={scopeKind} setScopeKind={setScopeKind} />}
         {step === 1 && (
           <StepAccess
             accessMode={accessMode} setAccessMode={setAccessMode}
@@ -231,7 +236,8 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
         {step === 2 && <StepGroups groups={groups} selectedGroups={selectedGroups} toggleGroup={toggleGroup} />}
         {step === 3 && (
           <StepReview
-            name={name} email={email} scopeKind={scopeKind}
+            emails={emailDraft.trim().includes('@') ? [...emails, emailDraft.trim()] : emails}
+            scopeKind={scopeKind}
             accessMode={accessMode}
             roleName={roles.find(r => r.id === selectedRoleId)?.name}
             enabledStudios={enabledStudios}
@@ -254,7 +260,7 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
           </Button>
         ) : (
           <Button variant="primary" size="sm" onClick={handleSend}>
-            Send invite
+            {emails.length > 1 ? `Send ${emails.length} invites` : 'Send invite'}
           </Button>
         )}
       </div>
@@ -265,32 +271,81 @@ export function InviteSlideOut({ roles, groups, onConfirm, onClose }: InviteSlid
 
 // ── Step 1: Identity ──────────────────────────────────────────────────────────
 
-function StepIdentity({ name, email, scopeKind, setName, setEmail, setScopeKind }: {
-  name: string; email: string; scopeKind: ScopeKind;
-  setName: (v: string) => void; setEmail: (v: string) => void; setScopeKind: (v: ScopeKind) => void;
+function StepIdentity({ emails, setEmails, emailDraft, setEmailDraft, scopeKind, setScopeKind }: {
+  emails: string[];
+  setEmails: (v: string[]) => void;
+  emailDraft: string;
+  setEmailDraft: (v: string) => void;
+  scopeKind: ScopeKind;
+  setScopeKind: (v: ScopeKind) => void;
 }) {
+  function addEmail(raw: string) {
+    const addr = raw.trim().toLowerCase();
+    if (addr.includes('@') && !emails.includes(addr)) {
+      setEmails([...emails, addr]);
+    }
+    setEmailDraft('');
+  }
+
+  function removeEmail(addr: string) {
+    setEmails(emails.filter(e => e !== addr));
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+      e.preventDefault();
+      addEmail(emailDraft);
+    } else if (e.key === 'Backspace' && emailDraft === '' && emails.length > 0) {
+      setEmails(emails.slice(0, -1));
+    }
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <label className="block text-xs font-medium text-[var(--field-text)] mb-1.5">Full name</label>
-        <input
-          type="text"
-          placeholder="e.g. Alex Ramirez"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          autoFocus
-          className="w-full px-3 py-2 text-xs border border-[var(--border)] rounded-lg bg-[var(--ac-surface2)] focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors"
-        />
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-[var(--field-text)] mb-1.5">Work email</label>
-        <input
-          type="email"
-          placeholder="alex@yourcompany.com"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className="w-full px-3 py-2 text-xs border border-[var(--border)] rounded-lg bg-[var(--ac-surface2)] focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors"
-        />
+        <label className="block text-xs font-medium text-[var(--field-text)] mb-1.5">
+          Work email{emails.length > 1 ? 's' : ''}
+          {emails.length > 0 && (
+            <span className="ml-2 text-[var(--field-supporting)] font-normal">
+              {emails.length} added
+            </span>
+          )}
+        </label>
+        {/* Tag input container */}
+        <div
+          className="min-h-[42px] w-full flex flex-wrap items-center gap-1.5 px-2.5 py-2 border border-[var(--border)] rounded-lg bg-[var(--ac-surface2)] focus-within:border-[var(--primary)] focus-within:bg-white transition-colors cursor-text"
+          onClick={e => (e.currentTarget.querySelector('input') as HTMLInputElement | null)?.focus()}
+        >
+          {emails.map(addr => (
+            <span
+              key={addr}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-[var(--primary)]/10 border border-[var(--primary)]/30 text-[var(--primary)] shrink-0"
+            >
+              {addr}
+              <button
+                type="button"
+                onClick={e => { e.stopPropagation(); removeEmail(addr); }}
+                className="hover:opacity-70 transition-opacity leading-none"
+                aria-label={`Remove ${addr}`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          <input
+            type="email"
+            autoFocus
+            placeholder={emails.length === 0 ? 'name@company.com — press Enter or comma to add more' : 'Add another…'}
+            value={emailDraft}
+            onChange={e => setEmailDraft(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={() => { if (emailDraft.includes('@')) addEmail(emailDraft); }}
+            className="flex-1 min-w-[180px] bg-transparent text-xs outline-none text-[var(--field-text)] placeholder:text-[var(--field-supporting)]"
+          />
+        </div>
+        <p className="mt-1.5 text-[11px] text-[var(--field-supporting)]">
+          Press Enter, comma, or space after each address.
+        </p>
       </div>
       <fieldset>
         <legend className="block text-xs font-medium text-[var(--field-text)] mb-2">User type</legend>
@@ -407,7 +462,7 @@ function StepAccess({ accessMode, setAccessMode, selectedRoleId, setSelectedRole
                     }`}
                   >
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: role.color ?? 'var(--primary)' }} />
+                      <span className="w-2 h-2 rounded-full shrink-0 bg-[var(--primary)]" />
                       <span className={`text-xs font-semibold flex-1 min-w-0 truncate ${sel ? 'text-[var(--primary)]' : 'text-[var(--field-text)]'}`}>{role.name}</span>
                       <span className="px-1.5 py-0.5 text-[10px] font-medium text-[var(--field-supporting)] bg-[var(--ac-surface2)] border border-[var(--border)] rounded shrink-0">
                         {role.isBuiltIn ? 'System' : 'Custom'}
@@ -701,8 +756,9 @@ function StepGroups({ groups, selectedGroups, toggleGroup }: {
 
 // ── Step 5: Review ────────────────────────────────────────────────────────────
 
-function StepReview({ name, email, scopeKind, accessMode, roleName, enabledStudios, customPerms, selectedGroups, groups, rolePerms }: {
-  name: string; email: string; scopeKind: ScopeKind;
+function StepReview({ emails, scopeKind, accessMode, roleName, enabledStudios, customPerms, selectedGroups, groups, rolePerms }: {
+  emails: string[];
+  scopeKind: ScopeKind;
   accessMode: 'role' | 'custom';
   roleName?: string;
   enabledStudios: Set<StudioId>;
@@ -722,25 +778,29 @@ function StepReview({ name, email, scopeKind, accessMode, roleName, enabledStudi
     );
   }
 
-  const initials = name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
-
   return (
     <div className="flex flex-col gap-4">
-      {/* Avatar + name */}
-      <div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--ac-surface2)] border border-[var(--border)]">
-        <div className="w-10 h-10 rounded-full bg-[var(--primary)] text-white text-sm font-semibold flex items-center justify-center shrink-0">
-          {initials || '?'}
+      {/* Recipients */}
+      <div>
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--field-supporting)] mb-2">
+          {emails.length} recipient{emails.length !== 1 ? 's' : ''}
         </div>
-        <div>
-          <div className="text-sm font-semibold text-[var(--field-text)]">{name || '—'}</div>
-          <div className="text-xs text-[var(--field-supporting)]">{email || '—'}</div>
+        <div className="border border-[var(--border)] rounded-xl overflow-hidden divide-y divide-[var(--border)]">
+          {emails.map(addr => (
+            <div key={addr} className="flex items-center gap-3 px-4 py-2.5">
+              <div className="w-7 h-7 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-[10px] font-semibold flex items-center justify-center shrink-0 border border-[var(--primary)]/20">
+                {addr[0].toUpperCase()}
+              </div>
+              <span className="text-xs text-[var(--field-text)] flex-1 min-w-0 truncate">{addr}</span>
+              <span className="px-2 py-0.5 text-[10px] font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-full shrink-0">
+                Invited
+              </span>
+            </div>
+          ))}
         </div>
-        <span className="ml-auto px-2 py-0.5 text-[10px] font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-full">
-          Invited
-        </span>
       </div>
 
-      {/* Summary rows */}
+      {/* Summary rows — same settings apply to all */}
       <div className="border border-[var(--border)] rounded-xl overflow-hidden">
         <Row label="User type">
           <span className="text-xs font-medium text-[var(--field-text)]">{scopeLabel}</span>
@@ -793,7 +853,7 @@ function StepReview({ name, email, scopeKind, accessMode, roleName, enabledStudi
       </div>
 
       <p className="text-[11px] text-[var(--field-supporting)] leading-relaxed">
-        An invitation email will be sent to <strong>{email}</strong>. The link expires in 72 hours. Permissions take effect as soon as the member accepts.
+        Invitation emails will be sent to all {emails.length} recipient{emails.length !== 1 ? 's' : ''}. Links expire in 72 hours. Permissions take effect as soon as each member accepts.
       </p>
     </div>
   );
