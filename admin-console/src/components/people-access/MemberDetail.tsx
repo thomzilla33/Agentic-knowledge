@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Member, PaRole, PaGroup } from '../../types';
 import { Button } from '../primitives/Button';
 import { PERM_DEFS, getMemberPerms, getMemberActivity } from '../../fixtures/people';
@@ -15,7 +15,7 @@ const STUDIO_META: Record<string, { label: string; color: string }> = {
   helix: { label: 'Helix DS',          color: '#8b5cf6' },
 };
 
-type DetailTab = 'overview' | 'permissions' | 'groups' | 'activity';
+type DetailTab = 'overview' | 'permissions' | 'groups' | 'activity' | 'security';
 type StudioTab = 'ag' | 'gov' | 'helix';
 
 interface MemberDetailProps {
@@ -99,23 +99,60 @@ export function MemberDetail({ member, roles, groups, memberRoles, onBack, onAss
     { id: 'permissions',  label: 'Permissions', count: grantedCount },
     { id: 'groups',       label: 'Groups',      count: memberGroups.length },
     { id: 'activity',     label: 'Activity' },
+    { id: 'security',     label: 'Security' },
+  ];
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const away = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', away);
+    return () => document.removeEventListener('mousedown', away);
+  }, [menuOpen]);
+
+  const MEMBER_ACTIONS = [
+    { label: 'Reset password',  danger: false },
+    { label: 'Suspend member',  danger: false },
+    { label: 'Remove member',   danger: true  },
   ];
 
   return (
     <div className="flex flex-col min-h-0">
       {/* ── Header ── */}
       <div className="flex items-start justify-between mb-5">
-        <div className="flex items-center gap-3">
+        <button
+          onClick={onBack}
+          className="text-xs text-[var(--primary)] hover:underline flex items-center gap-1 rounded"
+        >
+          ← Members
+        </button>
+        <div ref={menuRef} className="relative">
           <button
-            onClick={onBack}
-            className="text-xs text-[var(--primary)] hover:underline flex items-center gap-1 focus-ring rounded"
+            onClick={() => setMenuOpen(v => !v)}
+            className="w-7 h-7 rounded flex items-center justify-center text-[var(--field-supporting)] hover:bg-[var(--ac-surface2)] transition-colors"
+            aria-label="More actions"
           >
-            ← Members
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/>
+            </svg>
           </button>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={() => {}}>Reset password</Button>
-          <Button variant="danger" size="sm" onClick={() => {}}>Deactivate</Button>
+          {menuOpen && (
+            <div className="absolute right-0 top-[calc(100%+4px)] z-50 min-w-[168px] bg-white border border-[var(--border)] rounded-lg shadow-lg py-1">
+              {MEMBER_ACTIONS.map(a => (
+                <button
+                  key={a.label}
+                  onClick={() => setMenuOpen(false)}
+                  className={`w-full text-left px-3 py-1.5 text-xs hover:bg-[var(--ac-surface2)] transition-colors ${a.danger ? 'text-red-600' : 'text-[var(--field-text)]'}`}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -369,6 +406,59 @@ export function MemberDetail({ member, roles, groups, memberRoles, onBack, onAss
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Tab: Security ── */}
+      {tab === 'security' && (
+        <div className="flex flex-col gap-4">
+          {/* Password */}
+          <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
+            <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--ac-surface2)]">
+              <span className="text-xs font-semibold text-[var(--field-text)]">Password</span>
+            </div>
+            <div className="px-4 py-4 flex items-center justify-between">
+              <div>
+                <div className="text-xs font-medium text-[var(--field-text)]">Account password</div>
+                <div className="text-[11px] text-[var(--field-supporting)] mt-0.5">
+                  Send a password reset link to <strong>{member.email}</strong>
+                </div>
+              </div>
+              <Button variant="secondary" size="sm" onClick={() => {}}>Reset password</Button>
+            </div>
+          </div>
+
+          {/* Sessions */}
+          <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
+            <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--ac-surface2)]">
+              <span className="text-xs font-semibold text-[var(--field-text)]">Active sessions</span>
+            </div>
+            <div className="px-4 py-4 flex items-center justify-between">
+              <div>
+                <div className="text-xs font-medium text-[var(--field-text)]">Sign out all devices</div>
+                <div className="text-[11px] text-[var(--field-supporting)] mt-0.5">Revoke all active sessions for this user</div>
+              </div>
+              <Button variant="secondary" size="sm" onClick={() => {}}>Sign out all</Button>
+            </div>
+          </div>
+
+          {/* MFA */}
+          <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
+            <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--ac-surface2)]">
+              <span className="text-xs font-semibold text-[var(--field-text)]">Two-factor authentication</span>
+            </div>
+            <div className="px-4 py-4 flex items-center justify-between">
+              <div>
+                <div className="text-xs font-medium text-[var(--field-text)]">MFA status</div>
+                <div className="text-[11px] text-[var(--field-supporting)] mt-0.5">
+                  {member.status === 'active' ? 'Not configured' : 'N/A — user has not signed in yet'}
+                </div>
+              </div>
+              {member.status === 'active' && (
+                <span className="px-2 py-0.5 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full">Not set up</span>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

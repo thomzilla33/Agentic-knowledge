@@ -2,13 +2,15 @@ import { useState, useCallback } from 'react';
 import type { Member, PaRole } from '../types';
 import {
   getMembers, getRoles, getGroups, getMemberRoles,
-  assignMemberToRole, removeMemberFromRole,
+  assignMemberToRole, removeMemberFromRole, inviteMember,
+  type InvitePayload,
 } from '../mockApi/people';
 import { MembersList } from '../components/people-access/MembersList';
 import { RolesList } from '../components/people-access/RolesList';
 import { MemberDetail } from '../components/people-access/MemberDetail';
 import { RoleDetail } from '../components/people-access/RoleDetail';
 import { AssignPicker } from '../components/people-access/AssignPicker';
+import { InviteSlideOut } from '../components/people-access/InviteSlideOut';
 
 type Tab = 'members' | 'roles';
 
@@ -33,11 +35,20 @@ export function PeopleAccessScreen() {
   const { members, roles, groups, memberRoles, bump } = useData();
   const [view, setView] = useState<View>({ kind: 'members-list' });
   const [picker, setPicker] = useState<PickerState | null>(null);
+  const [showInvite, setShowInvite] = useState(false);
 
   const activeTab: Tab = view.kind.startsWith('role') ? 'roles' : 'members';
 
   function selectTab(tab: Tab) {
     setView(tab === 'members' ? { kind: 'members-list' } : { kind: 'roles-list' });
+  }
+
+  // ── Invite ──────────────────────────────────────────────────────────────────
+
+  function handleInviteConfirm(payload: InvitePayload) {
+    inviteMember(payload);
+    setShowInvite(false);
+    bump();
   }
 
   // ── Member actions ──────────────────────────────────────────────────────────
@@ -132,7 +143,7 @@ export function PeopleAccessScreen() {
 
       {/* Content */}
       {view.kind === 'members-list' && (
-        <MembersList members={members} onSelect={handleSelectMember} />
+        <MembersList members={members} onSelect={handleSelectMember} onInvite={() => setShowInvite(true)} />
       )}
 
       {view.kind === 'member-detail' && currentMember && (
@@ -158,6 +169,16 @@ export function PeopleAccessScreen() {
           onBack={() => setView({ kind: 'roles-list' })}
           onAssignMember={() => setPicker({ mode: 'assign-member', contextId: currentRole.id })}
           onRemoveMember={memberId => handleRemoveMemberFromRole(currentRole.id, memberId)}
+        />
+      )}
+
+      {/* Invite slide-out */}
+      {showInvite && (
+        <InviteSlideOut
+          roles={roles}
+          groups={groups}
+          onConfirm={handleInviteConfirm}
+          onClose={() => setShowInvite(false)}
         />
       )}
 

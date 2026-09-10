@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { SectionId, Scope, OriginStudio } from '../types';
 import { useApp } from '../context/AppContext';
 import { store } from '../mockApi/store';
@@ -10,6 +10,11 @@ import { SECTION_MAP } from '../fixtures/sections';
 import { ALL_FIXTURES, PRINCIPALS } from '../fixtures';
 import { SettingsPanel } from '../components/sections/SettingsPanel';
 import { AuditPanel } from '../components/sections/AuditPanel';
+import { OrganizationSection } from '../components/sections/OrganizationSection';
+import { MySettingsSection } from '../components/sections/MySettingsSection';
+import { BillingSection } from '../components/sections/BillingSection';
+import { NotificationsSection } from '../components/sections/NotificationsSection';
+import { WorkersPermissionsSection } from '../components/sections/WorkersPermissionsSection';
 import { PeopleAccessScreen } from './PeopleAccess';
 import { Spinner } from '../components/primitives/Spinner';
 import { InlineMessage } from '../components/primitives/InlineMessage';
@@ -140,6 +145,16 @@ export function AdminConsole({ sectionId, scopeId, origin }: AdminConsoleProps) 
               <AuditPanel />
             ) : activeSectionId === 'people-access' ? (
               <PeopleAccessScreen />
+            ) : activeSectionId === 'organization' ? (
+              <OrganizationSection />
+            ) : activeSectionId === 'my-settings' ? (
+              <MySettingsSection />
+            ) : activeSectionId === 'billing-subscription' ? (
+              <BillingSection />
+            ) : activeSectionId === 'notifications' ? (
+              <NotificationsSection />
+            ) : activeSectionId === 'workers-permissions' ? (
+              <WorkersPermissionsSection canWrite={canWriteSection} />
             ) : (
               <SettingsPanel
                 key={`${activeSectionId}-${activeScopeId}-${dataRevision}`}
@@ -169,9 +184,9 @@ export function AdminConsole({ sectionId, scopeId, origin }: AdminConsoleProps) 
 // ── Topbar ─────────────────────────────────────────────────────────────────
 
 function Topbar({
-  origin, scope, principal, isMultiScope, accessibleScopes,
+  origin, scope: _scope, principal, isMultiScope, accessibleScopes,
   activeScopeId, onScopeChange, searchQuery, onSearchChange,
-  sectionAccess, onSearchNavigate,
+  sectionAccess: _sectionAccess, onSearchNavigate: _onSearchNavigate,
 }: {
   origin: OriginStudio;
   scope: Scope;

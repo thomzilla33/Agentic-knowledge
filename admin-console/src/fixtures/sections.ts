@@ -11,6 +11,7 @@ export const SECTIONS: SectionDef[] = [
   { id: 'data-privacy',           label: 'Data & Privacy',            group: 'platform' },
   { id: 'integrations-credentials', label: 'Integrations & Credentials', group: 'platform' },
   { id: 'notifications',          label: 'Notifications',             group: 'platform' },
+  { id: 'workers-permissions',    label: 'Workers Permissions',       group: 'platform' },
   { id: 'audit-compliance',       label: 'Audit & Compliance',        group: 'platform' },
 ];
 
