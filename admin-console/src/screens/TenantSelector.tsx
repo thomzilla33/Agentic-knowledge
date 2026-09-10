@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Product } from '../types';
 import { useApp } from '../context/AppContext';
+import { consoleHref } from '../router';
+import { store } from '../mockApi/store';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -242,11 +244,35 @@ export function TenantSelectorScreen() {
     setOpenId(null);
     setDropAnchor(null);
     const tenant = TENANTS.find(t => t.id === tenantId)!;
+
+    // Resolve the home scope from the active fixture's corporate scope
+    const fixture = store.getFixture();
+    const corpScope = fixture.scopes.find(s => s.kind === 'corporate') ?? fixture.scopes[0];
+    const scopeId = corpScope?.id ?? 'ml-corp';
+
+    // Map studio → preferred landing section; 'home' goes to my-settings
+    const STUDIO_SECTION: Record<Product, string> = {
+      'agentic-studio':           'studios-entitlements',
+      'helix-governance-studio':  'governance-defaults',
+      'helix-data-studio':        'integrations-credentials',
+      'work-surfaces':            'notifications',
+      'htl':                      'people-access',
+    };
+    const origin = destination === 'home' ? 'agentic-studio' : destination;
+    const sectionId = destination === 'home' ? 'my-settings' : STUDIO_SECTION[destination];
+
     const msg =
       destination === 'home'
         ? `Entering ${tenant.name}`
-        : `Opening ${STUDIO_META[destination].label} in ${tenant.name}`;
+        : `Opening ${STUDIO_META[destination as Product].label} in ${tenant.name}`;
     showToast(msg);
+
+    // Navigate after a brief moment so the toast is visible
+    setTimeout(() => {
+      const href = consoleHref(sectionId as any, scopeId, origin as any);
+      // Use location.href so it always fires hashchange, even if pushState set the same URL before
+      window.location.href = href;
+    }, 600);
   }
 
   function toggleDropdown(tenantId: string, e: React.MouseEvent) {
@@ -595,11 +621,7 @@ function TenantCard({ tenant, featured = false, selectedDest = null, isDropdownO
                 className={`${base} ${szMain} ${rLeft}`}
                 onClick={e => {
                   e.stopPropagation();
-                  if (selectedDest) {
-                    onEnter(tenant.id, selectedDest);
-                  } else {
-                    onToggleDropdown(tenant.id, e);
-                  }
+                  onEnter(tenant.id, selectedDest ?? 'home');
                 }}
               >
                 {btnLabel}
