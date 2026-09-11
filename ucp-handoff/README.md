@@ -4,6 +4,8 @@
 
 This package holds everything needed to pick the Universal Entity Profile up where it was left: what is built, where it lives, why each decision was made the way it was, which tickets exist in Jira, and what is still open.
 
+**To share with the team:** [the complete handover as a single page](https://claude.ai/code/artifact/90c90466-4eed-40ec-88b6-2c1e92370667) - the whole package in one document, no repository access needed. The same content is [`UCP-HANDOVER-COMPLETE.md`](UCP-HANDOVER-COMPLETE.md) in this folder.
+
 ---
 
 ## The first thing to know
