@@ -30,6 +30,7 @@ All 21 Jira tickets point there as their Prototype Link, and each one also embed
 | [`06-OPEN-ITEMS.md`](06-OPEN-ITEMS.md) | What is still open, with the name of whoever can close it. | Whoever takes over |
 | [`07-TICKETS-FOR-DELIVERY.md`](07-TICKETS-FOR-DELIVERY.md) | **The delivery pack.** All 21 tickets in full, in the same template Work Queues uses, each with its prototype link and screenshot. This is the file to hand to JJ and Lex. | Engineering |
 | [`UCP-HANDOVER-COMPLETE.md`](UCP-HANDOVER-COMPLETE.md) | **Everything in one file.** All seven documents merged, with a table of contents. This is the single file to share or to hand to someone who wants the whole thing in one read. | Everyone |
+| [`HANDOVER-MESSAGE.md`](HANDOVER-MESSAGE.md) | **The message to send.** Ready to paste into Slack or email: the links, who owns what, what is blocked and who unblocks it. The Jira tickets are unassigned on purpose, so this note is the only record of ownership. | Thomas, before leaving |
 | `screenshots/` | Seven captures from the live prototype, referenced by every ticket. | Everyone |
 
 ---
