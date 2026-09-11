@@ -1,155 +1,157 @@
-# 03 · Los 15 tickets, y por qué cada uno existe
+# 03 - The 21 tickets, and why each one exists
 
-**21 tickets** bajo el Boulder [ARP-375 · Universal Entity Profile](https://aims-os.atlassian.net/browse/ARP-375), todos en **Backlog** y **sin estimar**. Los 15 originales del 2026-09-11, más 6 creados el mismo día al descubrir que el árbol no cubría lo que alimenta a Intelligence y Knowledge.
+**21 tickets** under the Boulder [ARP-375 - Universal Entity Profile](https://aims-os.atlassian.net/browse/ARP-375), none estimated. The 15 originals from 2026-09-11, plus 6 created the same day on finding that the tree covered nothing that feeds Intelligence and Knowledge.
 
-## Jerarquía de ARP — para no equivocarse al crear más
+The full text of all 21, in the template they now carry, is in [`07-TICKETS-FOR-DELIVERY.md`](07-TICKETS-FOR-DELIVERY.md).
+
+## The ARP hierarchy, so nobody gets it wrong creating more
 
 ```
-Boulder   (nivel 3)  ← ARP-375
-  Feature (nivel 2)  ← ARP-1406, ARP-1407, ARP-1408
-    Version (nivel 1) ← lo que llamamos "Sub Feature". NO es la versión de producto
-      Story / Bug (nivel 0)
+Boulder   (level 3)   <- ARP-375
+  Feature (level 2)   <- ARP-1406, ARP-1407, ARP-1408
+    Version (level 1) <- what we call "Sub Feature". NOT the product version
+      Story / Bug (level 0)
 ```
 
-**Un Feature no puede contener otro Feature.** Sus hijos solo pueden ser `Version`. Esto importa para ARP-468 — ver `06-PENDIENTES.md`.
+**A Feature cannot contain another Feature.** Its children can only be `Version`. When creating one through the API, always pass `Version`; "Sub Feature" is rejected.
 
-## Versiones de producto
+## Product versions
 
-| Versión | Contenido | Estado |
+| Version | Contents | Status |
 |---|---|---|
-| UCP v1 | ARP-376 — Facelift | Done |
-| **UCP v2.0** | ARP-1406 y ARP-1407 con sus hijos — 11 tickets | **Esta entrega** |
-| UCP v2.1 | ARP-1408 con sus hijos — 4 tickets, `[Next Round]` | Backlog |
-| — | ARP-468 — plataforma de tipos, canvas, widgets, packs | Aparte |
+| UCP v1 | ARP-376, facelift | Done |
+| **UCP v2.0** | ARP-1406 and ARP-1407 with their children, 11 tickets | **This delivery** |
+| UCP v2.1 | ARP-1408 with its children, 10 tickets | Active, P2 |
+| - | ARP-468, type platform, canvas, widgets, packs | Separate |
 
-**Labels:** `ucp-v2-0` en los once · `next-round` + `ucp-v2-1` en los cuatro · `access-permissions` en los tres companions.
-
----
-
-# Feature 1 — [ARP-1406](https://aims-os.atlassian.net/browse/ARP-1406) · Listado
-
-> **Por qué existe:** el perfil unificado no tiene puerta de entrada. Sin una lista desde la cual abrir un registro, el perfil es una pantalla a la que nadie llega.
-
-### [ARP-1409](https://aims-os.atlassian.net/browse/ARP-1409) · Lista por tipo
-La lista y el punto desde el que se abre cualquier perfil. **Por qué es su propio ticket:** concentra las reglas de qué se ve en una fila y cómo se marca un registro gobernado, que son decisiones que aplican a todos los tipos.
-
-### [ARP-1410](https://aims-os.atlassian.net/browse/ARP-1410) · Paginación
-**Por qué es su propio ticket:** tiene una regla que se rompe sola si va enterrada en el de la lista — nunca estado vacío y paginación juntos — y un reset que hay que aplicar en cuatro puntos distintos (cambio de tipo, filtro, orden, tamaño de página).
-
-### [ARP-1411](https://aims-os.atlassian.net/browse/ARP-1411) · Creación por stepper
-**Por qué es su propio ticket:** es el único flujo de alta y tiene su propio modelo de error (que no se pierda lo cargado).
-**Corregido en el review:** el criterio decía *"va a la lista **o** al perfil"* — QA no puede decidir cuál. Ahora va al perfil del registro nuevo. Y el botón de crear pasó de oculto a **deshabilitado con tooltip**.
-**TBD abiertos:** frames del stepper · detección de duplicados · confirmación al cancelar.
-
-### [ARP-1412](https://aims-os.atlassian.net/browse/ARP-1412) · Access & Permissions
-**Por qué existe:** ningún Feature entra a sprint sin su companion. Acá viven los **textos canónicos de tooltip** de toda la plataforma.
+**Labels:** `ucp-v2-0` on the eleven, `ucp-v2-1` on the ten, `access-permissions` on the three companions, `decision` on the four decision tickets.
 
 ---
 
-# Feature 2 — [ARP-1407](https://aims-os.atlassian.net/browse/ARP-1407) · Perfil: espinazo, Overview y Activity
+# Feature 1 - [ARP-1406](https://aims-os.atlassian.net/browse/ARP-1406) - List
 
-> **Por qué existe:** fija el contrato de tabs que recibe toda entidad publicada, y entrega las dos pestañas mandatorias.
-> **Bloquea [ARP-468](https://aims-os.atlassian.net/browse/ARP-468)** — no se puede construir el canvas sin saber dónde aterriza.
+> **Why it exists:** the unified profile has no front door. Without a list to open a record from, the profile is a screen nobody reaches.
 
-### [ARP-1413](https://aims-os.atlassian.net/browse/ARP-1413) · Contrato de tabs y extensión
-No es una pantalla: es el componente que toda pantalla de perfil monta. **Por qué es su propio ticket:** es la pieza que bloquea a ARP-468, y mezclarla con Overview escondería esa dependencia.
-**TBD abierto:** qué pasa cuando los módulos de industria desbordan el ancho.
+### [ARP-1409](https://aims-os.atlassian.net/browse/ARP-1409) - List by type
+The list, and the point any profile is opened from. **Why it is its own ticket:** it concentrates the rules for what a row shows and how a governed record is marked, decisions that apply to every type.
 
-### [ARP-1414](https://aims-os.atlassian.net/browse/ARP-1414) · Overview
-El dashboard configurable. **Depende de ARP-468** para el canvas y el runtime de widgets; este ticket define el comportamiento sobre ese canvas.
-**El mejor del lote** según la auditoría — cero TBD. Lo que lo salva es que los estados están especificados por widget, no por pantalla.
+### [ARP-1410](https://aims-os.atlassian.net/browse/ARP-1410) - Pagination
+**Why it is its own ticket:** it carries a rule that breaks on its own if buried inside the list ticket - never an empty state and pagination together - and a reset that has to fire at four different points (type, filter, sort order, page size).
 
-### [ARP-1415](https://aims-os.atlassian.net/browse/ARP-1415) · Activity
-Comunicaciones, notas, eventos y tareas en un hilo.
-**Por qué los criterios se cierran por tipo de actividad:** las cuatro fuentes no van a estar listas a la vez. El ticket admite entrega por fases sin quedar a medias.
-**TBD abierto y con peso de diseño:** las tareas pendientes no son pasado. Mezclarlas en un hilo cronológico son dos modos de lectura. Propuesta: fijarlas arriba. **Es el único TBD que cambia el diseño de una pestaña mandatoria** — cerrarlo primero.
+### [ARP-1411](https://aims-os.atlassian.net/browse/ARP-1411) - Create via stepper
+**Why it is its own ticket:** it is the only creation flow and has its own error model (nothing entered is lost).
+**Corrected in review:** the criterion said "goes to the list **or** to the profile" - QA cannot decide which. It now goes to the new record's profile. And the create button moved from hidden to **disabled with a tooltip**.
+**Open items:** the stepper frames, duplicate detection, confirmation on cancel.
 
-### [ARP-1416](https://aims-os.atlassian.net/browse/ARP-1416) · Notas
-> ⚠️ **El más frágil de la entrega.** Único flujo de escritura del perfil, y el prototipo solo cubre cómo se **leen** las notas, no cómo se **escriben**.
-
-**Corregido en el review:** el criterio 2 dependía de un TBD del propio ticket (¿el campo desaparece o se deshabilita para quien no es owner?). Cerrado: **deshabilitado con tooltip**.
-**Sigue faltando:** el diseño del campo de escritura. Sin eso no se puede estimar.
-
-### [ARP-1417](https://aims-os.atlassian.net/browse/ARP-1417) · Access & Permissions
-Quién ve cada pestaña, quién arma su Overview, quién escribe notas. Con los textos de tooltip del perfil.
+### [ARP-1412](https://aims-os.atlassian.net/browse/ARP-1412) - Access & Permissions
+**Why it exists:** no Feature enters a sprint without its companion. This is where the platform's **canonical tooltip copy** lives.
 
 ---
 
-# Feature 3 — [ARP-1408](https://aims-os.atlassian.net/browse/ARP-1408) · Intelligence y Knowledge
+# Feature 2 - [ARP-1407](https://aims-os.atlassian.net/browse/ARP-1407) - Profile: tab contract, Overview and Activity
 
-> 👥 **Dueños: Lex Paniagua y Julian Johnston.** → **[Brief dedicado](https://claude.ai/code/artifact/f7450401-5cd5-44ba-88b5-8a26a2a7608a)** — leer antes de tomar cualquiera de los hijos.
+> **Why it exists:** it fixes the tab contract every published entity receives, and delivers the two mandatory tabs.
+> **Blocks [ARP-468](https://aims-os.atlassian.net/browse/ARP-468)** - you cannot build the canvas without knowing where it lands.
 
-**Por qué es el trabajo abierto de verdad:** Overview y Activity **leen** fuentes que ya existen. Intelligence y Knowledge necesitan que algo **produzca** su contenido primero, y eso no existe. En el prototipo es texto fijo.
+### [ARP-1413](https://aims-os.atlassian.net/browse/ARP-1413) - Tab contract and industry extension
+Not a screen: it is the component every profile screen mounts. **Why it is its own ticket:** it is the piece that blocks ARP-468, and mixing it into Overview would hide that dependency.
+**Open item:** what happens when industry modules overflow the width.
 
-> **Cambio de alcance del 2026-09-11.** La versión original de este Feature decía *"este Feature los muestra, no los produce"* y dejaba el motor y el pipeline **fuera de todo ticket del árbol**. Eso dejaba las dos pestañas sin forma de existir: cualquiera que tomara ARP-1418 o ARP-1419 construiría una maqueta y no podría cerrarla. Se amplió el alcance y se crearon los dos tickets que faltaban.
+### [ARP-1414](https://aims-os.atlassian.net/browse/ARP-1414) - Overview
+The configurable dashboard. **Depends on ARP-468** for the canvas and widget runtime; this ticket defines the behaviour on top of that canvas.
+**The best of the set** per the audit, with no open items. What saves it is that states are specified per widget, not per screen.
+
+### [ARP-1415](https://aims-os.atlassian.net/browse/ARP-1415) - Activity
+Communications, notes, events and tasks in one thread.
+**Why the criteria close per activity kind:** the four sources will not be ready at once. The ticket allows phased delivery without being left half-done.
+**Open item, and it carries design weight:** pending tasks are not the past. Mixing them into a chronological thread puts two reading modes together. Proposal: pin them above. **It is the only open item that changes the design of a mandatory tab** - close it first.
+
+### [ARP-1416](https://aims-os.atlassian.net/browse/ARP-1416) - Notes
+> **The most fragile piece of the delivery.** It is the profile's only write flow, and the prototype only covers how notes are **read**, not how they are **written**.
+
+**Corrected in review:** criterion 2 depended on an open item inside the same ticket (does the field disappear or is it disabled for a non-owner?). Closed: **disabled with a tooltip**.
+**Still missing:** the design of the composer. It cannot be estimated without that.
+
+### [ARP-1417](https://aims-os.atlassian.net/browse/ARP-1417) - Access & Permissions
+Who sees each tab, who assembles their Overview, who writes notes. With the profile's tooltip copy.
+
+---
+
+# Feature 3 - [ARP-1408](https://aims-os.atlassian.net/browse/ARP-1408) - Intelligence and Knowledge
+
+> **Owners: Lex Paniagua and Julian Johnston.** [Dedicated brief](https://claude.ai/code/artifact/f7450401-5cd5-44ba-88b5-8a26a2a7608a) - read it before picking up any child.
+
+**Why this is the real open work:** Overview and Activity **read** sources that already exist. Intelligence and Knowledge need something to **produce** their content first, and that does not exist. In the prototype it is fixed text.
+
+> **Scope change, 2026-09-11.** The original version of this Feature said "this Feature shows them, it does not produce them" and left the engine and the pipeline **outside every ticket in the tree**. That left the two tabs with no way to exist: anyone picking up ARP-1418 or ARP-1419 would build a mock-up and be unable to close it. Scope was widened and the two missing tickets were created.
 >
-> También salió el tag `[Next Round]` de los cuatro títulos: es trabajo activo, no backlog. La prioridad sigue en P2 para no competir con la entrega de UCP v2.0.
+> The `[Next Round]` tag also came off all four titles: this is active work, not backlog. Priority stays at P2 so it does not compete with the UCP v2.0 delivery.
 
-## Lo que produce el contenido — los dos que faltaban
+## What produces the content - the two that were missing
 
-### [ARP-1421](https://aims-os.atlassian.net/browse/ARP-1421) · 🆕 Motor de inferencia
-Produce los cinco tipos de insight — resumen, señales, tags, next-best actions, deducciones — cada uno con confianza y procedencia. **Dos requisitos que no son obvios:** el motor corre con el alcance del viewer (lo que no puede leer, no puede inferir), y la inferencia es **reproducible** — un insight que cambia sin que cambie el dato es un bug.
+### [ARP-1421](https://aims-os.atlassian.net/browse/ARP-1421) - Inference engine (new)
+Produces the five insight kinds - summary, signals, tags, next-best actions, deductions - each with confidence and provenance. **Two requirements that are not obvious:** the engine runs with the viewer's scope (what it cannot read, it cannot infer), and inference is **reproducible** - an insight that changes without the data changing is a bug.
 
-### [ARP-1422](https://aims-os.atlassian.net/browse/ARP-1422) · 🆕 Pipeline de claims
-Puebla los tres planos y mueve claims entre ellos, en una sola dirección: **Sources → Sandbox → Truth**, dejando rastro en cada paso. **La pregunta central que hoy no tiene respuesta escrita en ninguna parte:** qué hace que un fact sea «verificado» — quién o qué atestigua, y con qué evidencia.
+### [ARP-1422](https://aims-os.atlassian.net/browse/ARP-1422) - Claims pipeline (new)
+Populates the three planes and moves claims between them, one way only: **Sources to Sandbox to Truth**, leaving a trail at each step. **The central question that today has no written answer anywhere:** what makes a fact "verified" - who or what attests, and with what evidence.
 
-## Las pestañas
+## The tabs
 
-### [ARP-1418](https://aims-os.atlassian.net/browse/ARP-1418) · Intelligence
-La presentación. Todo output de IA agrupado en una pestaña en vez de una por tipo de insight. Lleva el estado **`Held`** del prototipo, que retiene una sugerencia mostrando el motivo.
+### [ARP-1418](https://aims-os.atlassian.net/browse/ARP-1418) - Intelligence
+The presentation. All AI output grouped into one tab instead of one per insight kind. Carries the prototype's **`Held`** state, which withholds a suggestion while showing the reason.
 
-### [ARP-1419](https://aims-os.atlassian.net/browse/ARP-1419) · Knowledge
-Los tres planos con su confianza declarada. Lleva escrita la inconsistencia Sources-vs-Drives como bloqueante.
+### [ARP-1419](https://aims-os.atlassian.net/browse/ARP-1419) - Knowledge
+The three planes with their declared confidence. Carries the Sources-vs-Drives inconsistency written in as blocking.
 
-### [ARP-1420](https://aims-os.atlassian.net/browse/ARP-1420) · Access & Permissions
-Quién ve cada insight y cada plano, con los textos de tooltip redactados.
+### [ARP-1420](https://aims-os.atlassian.net/browse/ARP-1420) - Access & Permissions
+Who sees each insight and each plane, with the tooltip copy written out.
 
-## Las cuatro decisiones, ahora con ticket propio
+## The four decisions, now each with its own ticket
 
-Antes vivían enterradas en secciones de *Open questions*, donde nadie las cierra. En orden de lo que condiciona a lo demás:
+They used to live buried in *Open questions* sections, where nobody closes them. In the order that constrains the rest:
 
-| Ticket | Decisión | Por qué importa |
+| Ticket | Decision | Why it matters |
 |---|---|---|
-| [ARP-1424](https://aims-os.atlassian.net/browse/ARP-1424) | **Fuga por inferencia** | La única que, mal resuelta, produce un incidente de seguridad y no un bug de UX. Un resumen puede revelar un campo enmascarado sin mostrarlo nunca. Cambia la arquitectura del motor |
-| [ARP-1423](https://aims-os.atlassian.net/browse/ARP-1423) | ¿`Held` es política o regla del motor? | Determina **qué ticket lo construye**. Sin decidirlo, se construye dos veces o ninguna |
-| [ARP-1426](https://aims-os.atlassian.net/browse/ARP-1426) | ¿Dónde se promueve un claim a Truth? | Define si Knowledge tiene flujo de escritura. Hoy la respuesta es «solo Governance Studio» **por omisión, no por decisión** |
-| [ARP-1425](https://aims-os.atlassian.net/browse/ARP-1425) | Sources vs Drives | El canon ya resuelve; falta confirmar con quien llevó el prototipo adelante |
+| [ARP-1424](https://aims-os.atlassian.net/browse/ARP-1424) | **Inference leakage** | The only one that, resolved badly, produces a security incident rather than a UX bug. A summary can reveal a masked field without ever showing it. It changes the engine's architecture |
+| [ARP-1423](https://aims-os.atlassian.net/browse/ARP-1423) | Is `Held` policy or an engine rule? | Determines **which ticket builds it**. Undecided, it gets built twice or not at all |
+| [ARP-1426](https://aims-os.atlassian.net/browse/ARP-1426) | Where is a claim promoted to Truth? | Defines whether Knowledge has a write flow. Today the answer is "Governance Studio only" **by omission, not by decision** |
+| [ARP-1425](https://aims-os.atlassian.net/browse/ARP-1425) | Sources vs Drives | The canon already resolves it; it remains to confirm with whoever carried the prototype forward |
 
 ---
 
-## Qué se corrigió antes de publicar
+## What was corrected before publishing
 
-La auditoría de tickets encontró tres violaciones **sistémicas** — repetidas en varios tickets, no errores sueltos:
+The ticket audit found violations that were **systemic** - repeated across several tickets, not isolated slips:
 
-| # | Violación | Dónde | Corrección |
+| # | Violation | Where | Correction |
 |---|---|---|---|
-| 1 | `deny by default` como criterio de aceptación | los 3 companions | Reescrito en términos de lo que el usuario ve |
-| 2 | CTA de crear oculto sin permiso | ARP-1411, ARP-1412 | Deshabilitado con tooltip |
-| 3 | Controles deshabilitados sin texto de tooltip | los 3 companions | Textos canónicos escritos en los companions |
-| 4 | Lenguaje de implementación (*store propio*, *no se renderiza*, *stream no conectado*) | 4 lugares | Traducido a lenguaje de usuario |
-| 5 | Criterio con "o" — no testeable | ARP-1411 | Se eligió una sola salida |
-| 6 | Estados de pantalla evadidos (*"no aplica"*, *"ver sub features"*) | ARP-1410, ARP-1408 | Especificados |
-| 7 | Criterio que dependía de un TBD del propio ticket | ARP-1416 | TBD cerrado |
+| 1 | `deny by default` as an acceptance criterion | all 3 companions | Rewritten in terms of what the user sees |
+| 2 | Create CTA hidden without permission | ARP-1411, ARP-1412 | Disabled with a tooltip |
+| 3 | Disabled controls with no tooltip copy | all 3 companions | Canonical copy written into the companions |
+| 4 | Implementation language (*its own store*, *does not render*, *stream not connected*) | 4 places | Translated into user language |
+| 5 | A criterion with "or" - not testable | ARP-1411 | One single outcome chosen |
+| 6 | Screen states dodged (*"not applicable"*, *"see sub features"*) | ARP-1410, ARP-1408 | Specified |
+| 7 | A criterion that depended on an open item in the same ticket | ARP-1416 | The item was closed |
 
-**Lo que queda sin corregir a propósito:** los 15 tickets están **sin estimar**. Es del equipo, no mío.
+**Left uncorrected on purpose:** none of the 21 is estimated. That is the team's call, not mine.
 
 ---
 
-## Dos plantillas canónicas en conflicto
+## The two competing templates, now resolved
 
-Los 15 tickets siguen el formato de 13 secciones de `aims-os-prd-to-tickets`, que es contra el que los auditó `aims-os-ticket-reviewer`.
+Two canonical templates were in circulation, both declared locked:
 
-Pero el skill `jira-arp-ticket-creator` declara una plantilla distinta y también "locked":
-
-| | `jira-arp-ticket-creator` | Lo que tienen los 15 |
+| | `jira-arp-ticket-creator` | `aims-os-prd-to-tickets` |
 |---|---|---|
-| Feature | 6 secciones — Prototype Link · User Story · Description · Scope · Sub Feature Breakdown · Parent Boulder Reference | 13 secciones |
-| Sub Feature | 5 secciones — Prototype Link · User Story · Description · Scope & Acceptance Criteria · Parent Feature Reference | 13 secciones |
+| Feature | 6 sections: Prototype Link, User Story, Description, Scope, Sub Feature Breakdown, Parent Boulder Reference | 13 sections |
+| Version | 5 sections: Prototype Link, User Story, Description, Scope & Acceptance Criteria, Parent Feature Reference | 13 sections |
 
-**No se convirtieron al formato corto** porque eso destruiría información que el review exigió y que ingeniería necesita: los cuatro estados de pantalla por ticket, los textos canónicos de tooltip, los edge cases, los `_To be defined_` marcados y los decisions logs. Nada de eso tiene lugar en la plantilla corta.
+The 21 tickets were first written in the thirteen-section format, because that is what `aims-os-ticket-reviewer` audits against.
 
-**Queda como decisión del equipo:** o los 15 se quedan así, o alguien concilia las dos plantillas. Hoy un ticket creado con un skill y otro creado con el otro no se parecen, que es justo lo que las plantillas "locked" existían para evitar.
+**Work Queues settles it.** ARP-927 and its children, ARP-929 among them, follow the five-section template exactly. That is the house standard, and ours was the outlier.
 
-## Corrección aplicada el 2026-09-11
+**All 21 descriptions were converted on 2026-09-11.** Nothing engineering needs was dropped: the screen states, the canonical tooltip copy, the edge cases, the items still to be defined and the decisions each live inside Description or Scope and Acceptance Criteria rather than in numbered sections of their own. Every ticket also carries its prototype link and the screenshot that shows it.
 
-Tres títulos salieron con el ampersand escapado (`Access &amp; Permissions`, visible como texto literal) por un error al crearlos. Corregidos en ARP-1412, ARP-1417 y ARP-1420.
+## Corrections applied on 2026-09-11
+
+Three titles were created with an escaped ampersand (`Access &amp; Permissions`, visible as literal text). Corrected on ARP-1412, ARP-1417 and ARP-1420.

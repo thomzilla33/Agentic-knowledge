@@ -1,38 +1,40 @@
-# UCP — Traspaso completo
+# UCP - Complete handover
 
-**Autor:** Thomas González · **Fecha:** 2026-09-11 · **Motivo:** vacaciones; el equipo continúa sin mí.
+**Author:** Thomas Gonzalez. **Date:** 2026-09-11. **Reason:** vacation; the team continues without me.
 
-Este paquete contiene todo lo necesario para tomar el Unified Contact Profile donde quedó: qué está construido, dónde vive, por qué cada decisión se tomó como se tomó, qué tickets existen en Jira y qué queda abierto.
+This package holds everything needed to pick the Universal Entity Profile up where it was left: what is built, where it lives, why each decision was made the way it was, which tickets exist in Jira, and what is still open.
 
 ---
 
-## Lo primero que hay que saber
+## The first thing to know
 
-**El prototipo vigente no es nuestro build de GitHub Pages.** Está desplegado en Vercel y alguien lo llevó más adelante que nuestra rama:
+**The live prototype is not our GitHub Pages build.** It is deployed on Vercel and someone carried it further than our branch:
 
 > https://aims-os-design-system.vercel.app/?proto=proto-thomas-ucp-contacts
 
-Los quince tickets de Jira apuntan ahí como **Design Reference**. Nuestro build en Pages queda como registro histórico del origen, no como referencia de construcción. El detalle de qué cambió está en [`01-ESTADO.md`](01-ESTADO.md).
+All 21 Jira tickets point there as their Prototype Link, and each one also embeds the screenshot that shows it. Our Pages build stays as a historical record of where this started, not as a build reference. What changed is detailed in [`01-STATE.md`](01-STATE.md).
 
 ---
 
-## Índice
+## Index
 
-| Documento | Qué contiene | Para quién |
+| Document | What it holds | For whom |
 |---|---|---|
-| [`01-ESTADO.md`](01-ESTADO.md) | Dónde está todo hoy: prototipos, repos, ramas, Jira. Qué es real y qué es mockeado. Las dos inconsistencias sin resolver. | Todos — empezar acá |
-| [`02-DECISIONES.md`](02-DECISIONES.md) | Cada decisión de producto con su razón. Incluye las que se revirtieron y por qué. | PM y diseño |
-| [`03-TICKETS.md`](03-TICKETS.md) | Los 15 tickets creados, con su clave de Jira, su nivel en la jerarquía y por qué cada uno existe. | Ingeniería y PM |
-| [`04-EDGARDO.md`](04-EDGARDO.md) | El review de Edgardo Sierra: 40 observaciones, de las que **una sola** cambió algo del UCP. Incluye por qué tres que parecían aplicar no aplican. | PM |
-| [`05-REPLICA.md`](05-REPLICA.md) | Cómo reconstruir el prototipo desde cero en otra rama: repo, patches, build, deploy, y las reglas del design system con las que vas a chocar. | Ingeniería y diseño |
-| [`06-PENDIENTES.md`](06-PENDIENTES.md) | Lo que queda abierto, con nombre y apellido de quién puede cerrarlo. | Quien quede a cargo |
+| [`01-STATE.md`](01-STATE.md) | Where everything is today: prototypes, repos, branches, Jira. What is real and what is mocked. The two unresolved inconsistencies. | Everyone - start here |
+| [`02-DECISIONS.md`](02-DECISIONS.md) | Every product decision with its reason. Including the ones that were reversed, and why. | PM and design |
+| [`03-TICKETS.md`](03-TICKETS.md) | The 21 tickets, with their Jira key, their level in the hierarchy and why each one exists. | Engineering and PM |
+| [`04-EDGARDO-REVIEW.md`](04-EDGARDO-REVIEW.md) | Edgardo Sierra's review: 40 observations, of which **exactly one** changed anything in the UCP. Includes why three that looked like they applied do not. | PM |
+| [`05-REPLICATION.md`](05-REPLICATION.md) | How to rebuild the prototype from scratch on another branch: repo, patches, build, deploy, the design system rules you will run into, and how to capture fresh screenshots. | Engineering and design |
+| [`06-OPEN-ITEMS.md`](06-OPEN-ITEMS.md) | What is still open, with the name of whoever can close it. | Whoever takes over |
+| [`07-TICKETS-FOR-DELIVERY.md`](07-TICKETS-FOR-DELIVERY.md) | **The delivery pack.** All 21 tickets in full, in the same template Work Queues uses, each with its prototype link and screenshot. This is the file to hand to JJ and Lex. | Engineering |
+| `screenshots/` | Seven captures from the live prototype, referenced by every ticket. | Everyone |
 
 ---
 
-## Resumen en cinco líneas
+## Five-line summary
 
-1. El UCP tiene cuatro pestañas fijas — **Overview · Activity · Intelligence · Knowledge** — más módulos de industria al final. Eso es un contrato de plataforma, no una pantalla.
-2. La entrega de hoy (**UCP v2.0**) cubre Contacts, Employees y Companies: listado, paginación, creación por stepper, y las dos pestañas mandatorias.
-3. **Intelligence y Knowledge son el trabajo abierto de verdad**, y son de **Lex Paniagua y Julian Johnston**. A diferencia de Overview y Activity, no tienen de dónde leer: hacen falta un motor de inferencia y un pipeline de claims que no existían en el árbol. → [brief dedicado](https://claude.ai/code/artifact/f7450401-5cd5-44ba-88b5-8a26a2a7608a)
-4. Son **21 tickets** en Jira bajo el Boulder **ARP-375**, en Backlog y sin estimar.
-5. Queda **una pregunta abierta para el equipo** — cuál de ARP-468 o ARP-520 está vivo — y un rename recomendado. Están en [`06-PENDIENTES.md`](06-PENDIENTES.md).
+1. The UCP has four fixed tabs - **Overview, Activity, Intelligence, Knowledge** - plus industry modules at the end. That is a platform contract, not a screen.
+2. Today's delivery (**UCP v2.0**) covers Contacts, Employees and Companies: the list, pagination, creation via stepper, and the two mandatory tabs.
+3. **Intelligence and Knowledge are the real open work**, and they belong to **Lex Paniagua and Julian Johnston**. Unlike Overview and Activity, they have nothing to read from: they need an inference engine and a claims pipeline that did not exist in the tree. See the [dedicated brief](https://claude.ai/code/artifact/f7450401-5cd5-44ba-88b5-8a26a2a7608a).
+4. There are **21 tickets** in Jira under Boulder **ARP-375**, none estimated. All 21 descriptions follow the same five-section template Work Queues uses.
+5. **One question is open for the team** - which of ARP-468 or ARP-520 is live - along with four decisions that block Intelligence and Knowledge. They are in [`06-OPEN-ITEMS.md`](06-OPEN-ITEMS.md).
