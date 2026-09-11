@@ -1,0 +1,110 @@
+# 03 · Los 15 tickets, y por qué cada uno existe
+
+Todos creados el 2026-09-11 bajo el Boulder [ARP-375](https://aims-os.atlassian.net/browse/ARP-375), en **Backlog** y **sin estimar**.
+
+## Jerarquía de ARP — para no equivocarse al crear más
+
+```
+Boulder   (nivel 3)  ← ARP-375
+  Feature (nivel 2)  ← ARP-1406, ARP-1407, ARP-1408
+    Version (nivel 1) ← lo que llamamos "Sub Feature". NO es la versión de producto
+      Story / Bug (nivel 0)
+```
+
+**Un Feature no puede contener otro Feature.** Sus hijos solo pueden ser `Version`. Esto importa para ARP-468 — ver `06-PENDIENTES.md`.
+
+## Versiones de producto
+
+| Versión | Contenido | Estado |
+|---|---|---|
+| UCP v1 | ARP-376 — Facelift | Done |
+| **UCP v2.0** | ARP-1406 y ARP-1407 con sus hijos — 11 tickets | **Esta entrega** |
+| UCP v2.1 | ARP-1408 con sus hijos — 4 tickets, `[Next Round]` | Backlog |
+| — | ARP-468 — plataforma de tipos, canvas, widgets, packs | Aparte |
+
+**Labels:** `ucp-v2-0` en los once · `next-round` + `ucp-v2-1` en los cuatro · `access-permissions` en los tres companions.
+
+---
+
+# Feature 1 — [ARP-1406](https://aims-os.atlassian.net/browse/ARP-1406) · Listado
+
+> **Por qué existe:** el perfil unificado no tiene puerta de entrada. Sin una lista desde la cual abrir un registro, el perfil es una pantalla a la que nadie llega.
+
+### [ARP-1409](https://aims-os.atlassian.net/browse/ARP-1409) · Lista por tipo
+La lista y el punto desde el que se abre cualquier perfil. **Por qué es su propio ticket:** concentra las reglas de qué se ve en una fila y cómo se marca un registro gobernado, que son decisiones que aplican a todos los tipos.
+
+### [ARP-1410](https://aims-os.atlassian.net/browse/ARP-1410) · Paginación
+**Por qué es su propio ticket:** tiene una regla que se rompe sola si va enterrada en el de la lista — nunca estado vacío y paginación juntos — y un reset que hay que aplicar en cuatro puntos distintos (cambio de tipo, filtro, orden, tamaño de página).
+
+### [ARP-1411](https://aims-os.atlassian.net/browse/ARP-1411) · Creación por stepper
+**Por qué es su propio ticket:** es el único flujo de alta y tiene su propio modelo de error (que no se pierda lo cargado).
+**Corregido en el review:** el criterio decía *"va a la lista **o** al perfil"* — QA no puede decidir cuál. Ahora va al perfil del registro nuevo. Y el botón de crear pasó de oculto a **deshabilitado con tooltip**.
+**TBD abiertos:** frames del stepper · detección de duplicados · confirmación al cancelar.
+
+### [ARP-1412](https://aims-os.atlassian.net/browse/ARP-1412) · Access & Permissions
+**Por qué existe:** ningún Feature entra a sprint sin su companion. Acá viven los **textos canónicos de tooltip** de toda la plataforma.
+
+---
+
+# Feature 2 — [ARP-1407](https://aims-os.atlassian.net/browse/ARP-1407) · Perfil: espinazo, Overview y Activity
+
+> **Por qué existe:** fija el contrato de tabs que recibe toda entidad publicada, y entrega las dos pestañas mandatorias.
+> **Bloquea [ARP-468](https://aims-os.atlassian.net/browse/ARP-468)** — no se puede construir el canvas sin saber dónde aterriza.
+
+### [ARP-1413](https://aims-os.atlassian.net/browse/ARP-1413) · Contrato de tabs y extensión
+No es una pantalla: es el componente que toda pantalla de perfil monta. **Por qué es su propio ticket:** es la pieza que bloquea a ARP-468, y mezclarla con Overview escondería esa dependencia.
+**TBD abierto:** qué pasa cuando los módulos de industria desbordan el ancho.
+
+### [ARP-1414](https://aims-os.atlassian.net/browse/ARP-1414) · Overview
+El dashboard configurable. **Depende de ARP-468** para el canvas y el runtime de widgets; este ticket define el comportamiento sobre ese canvas.
+**El mejor del lote** según la auditoría — cero TBD. Lo que lo salva es que los estados están especificados por widget, no por pantalla.
+
+### [ARP-1415](https://aims-os.atlassian.net/browse/ARP-1415) · Activity
+Comunicaciones, notas, eventos y tareas en un hilo.
+**Por qué los criterios se cierran por tipo de actividad:** las cuatro fuentes no van a estar listas a la vez. El ticket admite entrega por fases sin quedar a medias.
+**TBD abierto y con peso de diseño:** las tareas pendientes no son pasado. Mezclarlas en un hilo cronológico son dos modos de lectura. Propuesta: fijarlas arriba. **Es el único TBD que cambia el diseño de una pestaña mandatoria** — cerrarlo primero.
+
+### [ARP-1416](https://aims-os.atlassian.net/browse/ARP-1416) · Notas
+> ⚠️ **El más frágil de la entrega.** Único flujo de escritura del perfil, y el prototipo solo cubre cómo se **leen** las notas, no cómo se **escriben**.
+
+**Corregido en el review:** el criterio 2 dependía de un TBD del propio ticket (¿el campo desaparece o se deshabilita para quien no es owner?). Cerrado: **deshabilitado con tooltip**.
+**Sigue faltando:** el diseño del campo de escritura. Sin eso no se puede estimar.
+
+### [ARP-1417](https://aims-os.atlassian.net/browse/ARP-1417) · Access & Permissions
+Quién ve cada pestaña, quién arma su Overview, quién escribe notas. Con los textos de tooltip del perfil.
+
+---
+
+# Feature 3 — [ARP-1408](https://aims-os.atlassian.net/browse/ARP-1408) · `[Next Round]` Intelligence y Knowledge
+
+> **Por qué existe ahora y no después:** si solo existen los tickets de Overview y Activity, alguien construye un perfil de dos pestañas y cree que terminó.
+
+### [ARP-1418](https://aims-os.atlassian.net/browse/ARP-1418) · `[Next Round]` Intelligence
+Todo output de IA agrupado en una pestaña, en vez de una pestaña por tipo de insight.
+**Novedad del prototipo vigente:** el estado **`Held`** — una sugerencia retenida por gobernanza que muestra el motivo (*"Held — a migration delivery date is not attested yet"*). Esto **responde la pregunta abierta más importante del ticket**: qué pasa cuando un insight se deriva de un campo gobernado. Falta confirmar que es política y no una demo.
+
+### [ARP-1419](https://aims-os.atlassian.net/browse/ARP-1419) · `[Next Round]` Knowledge
+Los tres planos: Truth / Sandbox / Sources.
+**Lleva la inconsistencia Sources-vs-Drives escrita como bloqueante**, con la resolución del canon. Se construye como `Sources`.
+
+### [ARP-1420](https://aims-os.atlassian.net/browse/ARP-1420) · `[Next Round]` Access & Permissions
+Quién ve los insights y quién ve cada plano.
+**TBD abierto:** si `Held` es una política configurable acá o una regla fija del motor. De eso depende si este ticket la gobierna o solo la refleja.
+
+---
+
+## Qué se corrigió antes de publicar
+
+La auditoría de tickets encontró tres violaciones **sistémicas** — repetidas en varios tickets, no errores sueltos:
+
+| # | Violación | Dónde | Corrección |
+|---|---|---|---|
+| 1 | `deny by default` como criterio de aceptación | los 3 companions | Reescrito en términos de lo que el usuario ve |
+| 2 | CTA de crear oculto sin permiso | ARP-1411, ARP-1412 | Deshabilitado con tooltip |
+| 3 | Controles deshabilitados sin texto de tooltip | los 3 companions | Textos canónicos escritos en los companions |
+| 4 | Lenguaje de implementación (*store propio*, *no se renderiza*, *stream no conectado*) | 4 lugares | Traducido a lenguaje de usuario |
+| 5 | Criterio con "o" — no testeable | ARP-1411 | Se eligió una sola salida |
+| 6 | Estados de pantalla evadidos (*"no aplica"*, *"ver sub features"*) | ARP-1410, ARP-1408 | Especificados |
+| 7 | Criterio que dependía de un TBD del propio ticket | ARP-1416 | TBD cerrado |
+
+**Lo que queda sin corregir a propósito:** los 15 tickets están **sin estimar**. Es del equipo, no mío.
