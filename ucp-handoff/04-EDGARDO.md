@@ -1,62 +1,72 @@
 # 04 · Review de Edgardo Sierra
 
 **Fuente:** transcripción *"Diseño de Administración y Permisos"*, 2026-09-03.
-**Alcance:** el review es del **Admin Console**, no del UCP. Pero cuatro de sus observaciones cambian cómo hay que construir el UCP, y una es la que resolvió el nombre de la pestaña Activity.
+**Alcance:** el review es del **Admin Console**, no del UCP. De sus 40 observaciones, **una sola cambió algo del UCP** — y ya está resuelta. Las demás tocan el UCP de lejos o no lo tocan.
 
 ---
 
-## Lo que toca directamente al UCP
+## Lo único que cambió el UCP
 
-### 1. "Activity siempre déjalo de último" → **no aplica a nuestra pestaña Activity**
+### "Activity siempre déjalo de último" → nos hizo ver que teníamos dos vistas con el mismo nombre
 
 Edgardo habla del **audit log** — el componente de auditoría que quiere idéntico en todas las superficies. Nuestra pestaña Activity es otra cosa: comunicaciones, notas, eventos y tareas de una entidad.
 
-**Consecuencia:** son dos vistas distintas que hoy comparten nombre. Recomendación registrada en ARP-1407 y ARP-1415: **nuestra vista se queda como Activity; la de gobernanza se renombra a Audit.**
-
-### 2. El audit log se diseña una vez y se replica idéntico
-
-> *"Se debe ver exactamente igual en todos lados. Entonces lo diseñas en uno y ya se replica para todos lados."*
-
-**Consecuencia para el UCP:** cuando la entidad tenga su vista de auditoría, **no se diseña de nuevo**. Se monta el mismo componente. Lo único que cambia por contexto son los filtros que no se pueden quitar.
-
-Sus columnas fijas: tiempo · usuario · tipo de acción · recurso · descripción · resultado · **fuente**. La fuente importa porque no todo viene de la UI — puede venir por API.
-
-### 3. Los permisos se entran **por la app**, no directo
-
-> *"Antes de yo poder darle permiso a usted sobre el Data Studio, alguien le tiene que haber dado acceso al Data Studio."*
-
-**Consecuencia para el UCP:** el modelo de roles de nuestros tres companions asume permisos directos sobre pestañas y widgets. Si el modelo real es de dos niveles — acceso a la app, y después permisos dentro — los companions necesitan una pasada. **No está resuelto.**
-
-### 4. Los privilegios no son jerárquicos
-
-> *"Usted puede ser Tester de un agente y no tener permiso de chatear con él en el día a día."*
-
-No heredan como viewer → editor → owner. Son mini-roles que se solapan o no.
-
-**Consecuencia para el UCP:** los Role Templates que escribí (Sales, Service, People Ops, Read-only) están redactados como si fueran acumulativos. Hay que revisarlos contra el modelo real de backend.
-
-### 5. Recursos: *Who has access*
-
-> *"Google tiene eso y se llama Who has access. Y Amazon también lo tiene. Y normalmente son funciones que están muy escondidas, pero son muy importantes para un administrador."*
-
-Marcado por él como lo más urgente — el backend ya viene en camino desde el equipo de data.
-
-**Consecuencia para el UCP:** un registro es un recurso. En algún momento va a necesitar su propio *quién tiene acceso a esto*. **No está en ningún ticket nuestro.**
+**Resultado:** nuestra vista se queda como **Activity**; la de gobernanza se renombra a **Audit**. Registrado en ARP-1407 (open question) y ARP-1415 (decisions log). **Cerrado.**
 
 ---
 
-## Qué ticket absorbe cada cosa
+## Lo que aplica al UCP más adelante
 
-| Observación | Dónde quedó |
+### El audit log se diseña una vez y se replica idéntico
+
+> *"Se debe ver exactamente igual en todos lados. Entonces lo diseñas en uno y ya se replica para todos lados."*
+
+El día que una entidad tenga vista de auditoría, **no se diseña de nuevo** — se monta el mismo componente. Lo único que cambia por contexto son los filtros que no se pueden quitar.
+
+Sus columnas fijas: tiempo · usuario · tipo de acción · recurso · descripción · resultado · **fuente**. La fuente importa porque no todo viene de la UI — puede venir por API.
+
+**El UCP no tiene vista de auditoría en esta entrega.** Esto es información para cuando la tenga, no un pendiente.
+
+---
+
+## Tres cosas que parecían tocar el UCP y no lo hacen
+
+> Las marqué como riesgo alto en una primera pasada. Al contrastarlas contra lo que efectivamente quedó publicado en los tickets, ninguna de las tres sostiene ese peso. Lo dejo escrito para que nadie las vuelva a levantar como bloqueante.
+
+### Permisos que se entran por la app, en dos niveles
+
+> *"Antes de yo poder darle permiso a usted sobre el Data Studio, alguien le tiene que haber dado acceso al Data Studio."*
+
+**Por qué no es un problema:** nuestros companions describen qué ve cada rol **dentro** del UCP. Si además hace falta un permiso previo de acceso al módulo, eso es una línea de prerrequisito en los companions, no un rediseño del modelo de roles.
+
+### Los privilegios no son jerárquicos
+
+> *"Usted puede ser Tester de un agente y no tener permiso de chatear con él en el día a día."*
+
+**Por qué no es un problema:** los Role Templates de ARP-1412 son conjuntos declarados, no una escalera —
+
+> Sales (Customers y Companies) · Service (los tres) · People Ops (Employees) · Read-only (los tres, sin crear)
+
+People Ops no se solapa con Sales. Nada hereda de nada. El punto de Edgardo ya está satisfecho.
+
+### *Who has access* por recurso
+
+> *"Google tiene eso y se llama Who has access… son funciones que están muy escondidas, pero son muy importantes para un administrador."*
+
+**Por qué no es un problema:** los tres companions excluyen permisos a nivel de registro individual de forma explícita, bajo *Not in this release*. Es un no-objetivo decidido, no un olvido. Sigue siendo urgente **para el Admin Console**, que es de lo que él estaba hablando.
+
+---
+
+## Resumen
+
+| Observación | Relación con el UCP |
 |---|---|
-| Activity vs audit log | ARP-1407 (open question) y ARP-1415 (decisions log) |
-| Audit log se diseña una vez | **Sin dueño** — es del Admin Console |
-| Permisos por app, dos niveles | **Sin dueño** — invalida parcialmente ARP-1412, ARP-1417, ARP-1420 |
-| Privilegios no jerárquicos | **Sin dueño** — mismo impacto |
-| Who has access por recurso | **Sin dueño** |
-| Todo lo demás (35 observaciones) | Admin Console. Fuera del alcance del UCP |
-
-> **Lo más importante de esta sección:** tres de las cinco observaciones que tocan el UCP **no tienen ticket**. Y dos de ellas ponen en duda el modelo de roles que escribí en los tres companions. Quien tome esto debería hablar con Edgardo antes de que ingeniería construya los permisos.
+| Activity vs audit log | **Cerrada** — ARP-1407 y ARP-1415 |
+| Audit log se diseña una vez | Aplica cuando el UCP tenga vista de auditoría. No la tiene |
+| Permisos por app | Una línea de prerrequisito, si aplica |
+| Privilegios no jerárquicos | Ya satisfecho |
+| Who has access por recurso | No-objetivo declarado del UCP. Urgente para el Admin Console |
+| Las otras 35 observaciones | Admin Console. Nada que ver con el UCP |
 
 ---
 

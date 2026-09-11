@@ -51,18 +51,15 @@ Es `{Test} UCP v2 — Universal Entity Profile Foundation`, duplicado exacto de 
 
 ### Con Edgardo Sierra
 
-5. **Permisos por app, en dos niveles** — *"antes de darte permiso sobre el Data Studio, alguien te tiene que haber dado acceso al Data Studio"*. Nuestros tres companions asumen permisos directos sobre pestañas y widgets. Si el modelo real es de dos niveles, **los tres necesitan una pasada**.
-6. **Privilegios no jerárquicos.** Los Role Templates que escribí (Sales, Service, People Ops, Read-only) están redactados como acumulativos. Confirmar contra el modelo de backend.
-7. **Who has access por recurso.** Un registro es un recurso. No está en ningún ticket nuestro.
-
-> Los puntos 5 y 6 son los de mayor riesgo del paquete: **ponen en duda el modelo de roles de ARP-1412, ARP-1417 y ARP-1420.** Vale hablarlos antes de que ingeniería construya permisos.
+5. **Nada bloqueante.** Su review es del Admin Console. Lo único que tocaba el UCP era el choque de nombres entre su *audit log* y nuestra pestaña Activity, y ya está resuelto (ARP-1407, ARP-1415). Ver `04-EDGARDO.md` para por qué los otros tres puntos que parecían aplicar no aplican.
+6. **Para cuando el UCP tenga vista de auditoría:** el componente se diseña una vez y se replica idéntico — no se rediseña por superficie. No está en esta entrega.
 
 ### Con Michael
 
-8. **Ocultar vs bloquear para tipos que el rol no puede leer.** La política del tenant existe en los tickets, pero no está decidida cuál es la default.
-9. **`StudyWidget` y `ConnectionsContent` están duplicados** con `pm-thomas-universal-profile.tsx`.
-10. **`record-header.tsx` fue modificado** mientras había cuatro ramas `ds/record-header-*` activas. Posible colisión.
-11. **`Request access` es un stub.** El CTA existe; el flujo no.
+7. **Ocultar vs bloquear para tipos que el rol no puede leer.** La política del tenant existe en los tickets, pero no está decidida cuál es la default.
+8. **`StudyWidget` y `ConnectionsContent` están duplicados** con `pm-thomas-universal-profile.tsx`.
+9. **`record-header.tsx` fue modificado** mientras había cuatro ramas `ds/record-header-*` activas. Posible colisión.
+10. **`Request access` es un stub.** El CTA existe; el flujo no.
 
 ---
 

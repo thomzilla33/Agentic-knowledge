@@ -23,7 +23,7 @@ Los quince tickets de Jira apuntan ahí como **Design Reference**. Nuestro build
 | [`01-ESTADO.md`](01-ESTADO.md) | Dónde está todo hoy: prototipos, repos, ramas, Jira. Qué es real y qué es mockeado. Las dos inconsistencias sin resolver. | Todos — empezar acá |
 | [`02-DECISIONES.md`](02-DECISIONES.md) | Cada decisión de producto con su razón. Incluye las que se revirtieron y por qué. | PM y diseño |
 | [`03-TICKETS.md`](03-TICKETS.md) | Los 15 tickets creados, con su clave de Jira, su nivel en la jerarquía y por qué cada uno existe. | Ingeniería y PM |
-| [`04-EDGARDO.md`](04-EDGARDO.md) | El review de Edgardo Sierra: 40 cambios pedidos, cuáles tocan el UCP, cuál ticket absorbe cada uno y cuáles quedaron sin dueño. | PM |
+| [`04-EDGARDO.md`](04-EDGARDO.md) | El review de Edgardo Sierra: 40 observaciones, de las que **una sola** cambió algo del UCP. Incluye por qué tres que parecían aplicar no aplican. | PM |
 | [`05-REPLICA.md`](05-REPLICA.md) | Cómo reconstruir el prototipo desde cero en otra rama: repo, patches, build, deploy, y las reglas del design system con las que vas a chocar. | Ingeniería y diseño |
 | [`06-PENDIENTES.md`](06-PENDIENTES.md) | Lo que queda abierto, con nombre y apellido de quién puede cerrarlo. | Quien quede a cargo |
 
