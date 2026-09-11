@@ -1,6 +1,6 @@
 # 03 · Los 15 tickets, y por qué cada uno existe
 
-Todos creados el 2026-09-11 bajo el Boulder [ARP-375 · Universal Entity Profile](https://aims-os.atlassian.net/browse/ARP-375), en **Backlog** y **sin estimar**.
+**21 tickets** bajo el Boulder [ARP-375 · Universal Entity Profile](https://aims-os.atlassian.net/browse/ARP-375), todos en **Backlog** y **sin estimar**. Los 15 originales del 2026-09-11, más 6 creados el mismo día al descubrir que el árbol no cubría lo que alimenta a Intelligence y Knowledge.
 
 ## Jerarquía de ARP — para no equivocarse al crear más
 
@@ -75,21 +75,45 @@ Quién ve cada pestaña, quién arma su Overview, quién escribe notas. Con los 
 
 ---
 
-# Feature 3 — [ARP-1408](https://aims-os.atlassian.net/browse/ARP-1408) · `[Next Round]` Intelligence y Knowledge
+# Feature 3 — [ARP-1408](https://aims-os.atlassian.net/browse/ARP-1408) · Intelligence y Knowledge
 
-> **Por qué existe ahora y no después:** si solo existen los tickets de Overview y Activity, alguien construye un perfil de dos pestañas y cree que terminó.
+> 👥 **Dueños: Lex Paniagua y Julian Johnston.** → **[Brief dedicado](https://claude.ai/code/artifact/f7450401-5cd5-44ba-88b5-8a26a2a7608a)** — leer antes de tomar cualquiera de los hijos.
 
-### [ARP-1418](https://aims-os.atlassian.net/browse/ARP-1418) · `[Next Round]` Intelligence
-Todo output de IA agrupado en una pestaña, en vez de una pestaña por tipo de insight.
-**Novedad del prototipo vigente:** el estado **`Held`** — una sugerencia retenida por gobernanza que muestra el motivo (*"Held — a migration delivery date is not attested yet"*). Esto **responde la pregunta abierta más importante del ticket**: qué pasa cuando un insight se deriva de un campo gobernado. Falta confirmar que es política y no una demo.
+**Por qué es el trabajo abierto de verdad:** Overview y Activity **leen** fuentes que ya existen. Intelligence y Knowledge necesitan que algo **produzca** su contenido primero, y eso no existe. En el prototipo es texto fijo.
 
-### [ARP-1419](https://aims-os.atlassian.net/browse/ARP-1419) · `[Next Round]` Knowledge
-Los tres planos: Truth / Sandbox / Sources.
-**Lleva la inconsistencia Sources-vs-Drives escrita como bloqueante**, con la resolución del canon. Se construye como `Sources`.
+> **Cambio de alcance del 2026-09-11.** La versión original de este Feature decía *"este Feature los muestra, no los produce"* y dejaba el motor y el pipeline **fuera de todo ticket del árbol**. Eso dejaba las dos pestañas sin forma de existir: cualquiera que tomara ARP-1418 o ARP-1419 construiría una maqueta y no podría cerrarla. Se amplió el alcance y se crearon los dos tickets que faltaban.
+>
+> También salió el tag `[Next Round]` de los cuatro títulos: es trabajo activo, no backlog. La prioridad sigue en P2 para no competir con la entrega de UCP v2.0.
 
-### [ARP-1420](https://aims-os.atlassian.net/browse/ARP-1420) · `[Next Round]` Access & Permissions
-Quién ve los insights y quién ve cada plano.
-**TBD abierto:** si `Held` es una política configurable acá o una regla fija del motor. De eso depende si este ticket la gobierna o solo la refleja.
+## Lo que produce el contenido — los dos que faltaban
+
+### [ARP-1421](https://aims-os.atlassian.net/browse/ARP-1421) · 🆕 Motor de inferencia
+Produce los cinco tipos de insight — resumen, señales, tags, next-best actions, deducciones — cada uno con confianza y procedencia. **Dos requisitos que no son obvios:** el motor corre con el alcance del viewer (lo que no puede leer, no puede inferir), y la inferencia es **reproducible** — un insight que cambia sin que cambie el dato es un bug.
+
+### [ARP-1422](https://aims-os.atlassian.net/browse/ARP-1422) · 🆕 Pipeline de claims
+Puebla los tres planos y mueve claims entre ellos, en una sola dirección: **Sources → Sandbox → Truth**, dejando rastro en cada paso. **La pregunta central que hoy no tiene respuesta escrita en ninguna parte:** qué hace que un fact sea «verificado» — quién o qué atestigua, y con qué evidencia.
+
+## Las pestañas
+
+### [ARP-1418](https://aims-os.atlassian.net/browse/ARP-1418) · Intelligence
+La presentación. Todo output de IA agrupado en una pestaña en vez de una por tipo de insight. Lleva el estado **`Held`** del prototipo, que retiene una sugerencia mostrando el motivo.
+
+### [ARP-1419](https://aims-os.atlassian.net/browse/ARP-1419) · Knowledge
+Los tres planos con su confianza declarada. Lleva escrita la inconsistencia Sources-vs-Drives como bloqueante.
+
+### [ARP-1420](https://aims-os.atlassian.net/browse/ARP-1420) · Access & Permissions
+Quién ve cada insight y cada plano, con los textos de tooltip redactados.
+
+## Las cuatro decisiones, ahora con ticket propio
+
+Antes vivían enterradas en secciones de *Open questions*, donde nadie las cierra. En orden de lo que condiciona a lo demás:
+
+| Ticket | Decisión | Por qué importa |
+|---|---|---|
+| [ARP-1424](https://aims-os.atlassian.net/browse/ARP-1424) | **Fuga por inferencia** | La única que, mal resuelta, produce un incidente de seguridad y no un bug de UX. Un resumen puede revelar un campo enmascarado sin mostrarlo nunca. Cambia la arquitectura del motor |
+| [ARP-1423](https://aims-os.atlassian.net/browse/ARP-1423) | ¿`Held` es política o regla del motor? | Determina **qué ticket lo construye**. Sin decidirlo, se construye dos veces o ninguna |
+| [ARP-1426](https://aims-os.atlassian.net/browse/ARP-1426) | ¿Dónde se promueve un claim a Truth? | Define si Knowledge tiene flujo de escritura. Hoy la respuesta es «solo Governance Studio» **por omisión, no por decisión** |
+| [ARP-1425](https://aims-os.atlassian.net/browse/ARP-1425) | Sources vs Drives | El canon ya resuelve; falta confirmar con quien llevó el prototipo adelante |
 
 ---
 

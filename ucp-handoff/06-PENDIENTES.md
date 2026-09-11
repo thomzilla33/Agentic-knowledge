@@ -47,7 +47,8 @@ ARP-375 pasó de «Unified Contact Profile» a **«Universal Entity Profile»**,
 |---|---|---|
 | **Diseño del campo de escritura de notas.** El prototipo cubre cómo se leen, no cómo se escriben | [ARP-1416](https://aims-os.atlassian.net/browse/ARP-1416) | Diseño |
 | **Tareas pendientes en el hilo: ¿mezcladas o fijadas arriba?** Único TBD que cambia el diseño de una pestaña mandatoria | [ARP-1415](https://aims-os.atlassian.net/browse/ARP-1415) | PM + diseño |
-| **Los 15 están sin estimar** | todos | El equipo |
+| **Los 21 están sin estimar** | todos | El equipo |
+| **Intelligence y Knowledge** — el motor y el pipeline no existían en el árbol; ahora sí, y las 4 decisiones que bloquean tienen ticket | [ARP-1408](https://aims-os.atlassian.net/browse/ARP-1408) y sus hijos | **Lex y JJ** — ver el [brief](https://claude.ai/code/artifact/f7450401-5cd5-44ba-88b5-8a26a2a7608a) |
 
 ---
 
@@ -55,9 +56,9 @@ ARP-375 pasó de «Unified Contact Profile» a **«Universal Entity Profile»**,
 
 ### Con quien llevó adelante el prototipo en Vercel
 
-1. **Sources vs Drives.** El Overview y la pestaña Knowledge usan dos nombres para el mismo plano. El canon dice que va `Sources`. ¿Fue descuido o hay una razón? *(está escrito como bloqueante en ARP-1419)*
+1. **Sources vs Drives.** El Overview y la pestaña Knowledge usan dos nombres para el mismo plano. El canon dice que va `Sources`. ¿Fue descuido o hay una razón? → ahora es [ARP-1425](https://aims-os.atlassian.net/browse/ARP-1425).
 2. **`Ask about this entity` vs `Ask about this company`.** Nuestra variante por tipo desapareció. ¿Simplificación deliberada?
-3. **El estado `Held`.** ¿Es política de gobernanza o comportamiento de demo? De la respuesta depende ARP-1418 y ARP-1420.
+3. **El estado `Held`.** ¿Es política de gobernanza o comportamiento de demo? → ahora es [ARP-1423](https://aims-os.atlassian.net/browse/ARP-1423).
 4. **Policies y Assets.** Aparecen como tipos en el rail, fuera del alcance que cerramos. ¿De dónde salieron y quién los pidió?
 
 ### Con Edgardo Sierra

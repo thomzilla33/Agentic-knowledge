@@ -33,6 +33,6 @@ Los quince tickets de Jira apuntan ahí como **Design Reference**. Nuestro build
 
 1. El UCP tiene cuatro pestañas fijas — **Overview · Activity · Intelligence · Knowledge** — más módulos de industria al final. Eso es un contrato de plataforma, no una pantalla.
 2. La entrega de hoy (**UCP v2.0**) cubre Contacts, Employees y Companies: listado, paginación, creación por stepper, y las dos pestañas mandatorias.
-3. Intelligence y Knowledge quedan marcados **`[Next Round]`** (UCP v2.1) y ya están creados para que el contrato se vea completo.
-4. Los 15 tickets están en Jira bajo el Boulder **ARP-375**, en estado Backlog y sin estimar.
+3. **Intelligence y Knowledge son el trabajo abierto de verdad**, y son de **Lex Paniagua y Julian Johnston**. A diferencia de Overview y Activity, no tienen de dónde leer: hacen falta un motor de inferencia y un pipeline de claims que no existían en el árbol. → [brief dedicado](https://claude.ai/code/artifact/f7450401-5cd5-44ba-88b5-8a26a2a7608a)
+4. Son **21 tickets** en Jira bajo el Boulder **ARP-375**, en Backlog y sin estimar.
 5. Queda **una pregunta abierta para el equipo** — cuál de ARP-468 o ARP-520 está vivo — y un rename recomendado. Están en [`06-PENDIENTES.md`](06-PENDIENTES.md).

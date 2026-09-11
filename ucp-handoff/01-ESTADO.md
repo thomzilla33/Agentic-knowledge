@@ -9,6 +9,7 @@
 | Build histórico — experimento | https://thomzilla33.github.io/Agentic-knowledge/ucp-entity-workspace.html | Registro del origen. Quedó atrás |
 | Figma | https://www.figma.com/design/ZC49wFfu7IA9orIF6SGKdr/Unified-Customer-Profile?node-id=7292-253451 | Header de entidad y layout base |
 | Transferencia visual | https://claude.ai/code/artifact/06448a5c-ae51-45a4-9f81-cd193dcc44be | Recorrido del prototipo en 6 pasos |
+| **Brief de Intelligence y Knowledge** | https://claude.ai/code/artifact/f7450401-5cd5-44ba-88b5-8a26a2a7608a | **Para Lex y JJ.** Por qué esas dos pestañas son un problema distinto |
 
 ---
 
@@ -84,10 +85,16 @@ Puede ser una decisión deliberada de simplificación. **No está documentada en
 | [ARP-1415](https://aims-os.atlassian.net/browse/ARP-1415) | Activity | Sub Feature | v2.0 |
 | [ARP-1416](https://aims-os.atlassian.net/browse/ARP-1416) | Notas | Sub Feature | v2.0 |
 | [ARP-1417](https://aims-os.atlassian.net/browse/ARP-1417) | Access & Permissions — Perfil | Sub Feature | v2.0 |
-| [ARP-1408](https://aims-os.atlassian.net/browse/ARP-1408) | **[Next Round]** Intelligence y Knowledge | Feature | v2.1 |
-| [ARP-1418](https://aims-os.atlassian.net/browse/ARP-1418) | **[Next Round]** Intelligence | Sub Feature | v2.1 |
-| [ARP-1419](https://aims-os.atlassian.net/browse/ARP-1419) | **[Next Round]** Knowledge | Sub Feature | v2.1 |
-| [ARP-1420](https://aims-os.atlassian.net/browse/ARP-1420) | **[Next Round]** Access & Permissions | Sub Feature | v2.1 |
+| [ARP-1408](https://aims-os.atlassian.net/browse/ARP-1408) | Intelligence y Knowledge — **Lex y JJ** | Feature | v2.1 |
+| [ARP-1418](https://aims-os.atlassian.net/browse/ARP-1418) | Intelligence — la pestaña | Sub Feature | v2.1 |
+| [ARP-1419](https://aims-os.atlassian.net/browse/ARP-1419) | Knowledge — la pestaña | Sub Feature | v2.1 |
+| [ARP-1420](https://aims-os.atlassian.net/browse/ARP-1420) | Access & Permissions | Sub Feature | v2.1 |
+| [ARP-1421](https://aims-os.atlassian.net/browse/ARP-1421) | 🆕 Motor de inferencia | Sub Feature | v2.1 |
+| [ARP-1422](https://aims-os.atlassian.net/browse/ARP-1422) | 🆕 Pipeline de claims | Sub Feature | v2.1 |
+| [ARP-1423](https://aims-os.atlassian.net/browse/ARP-1423) | 🆕 Decisión — el estado `Held` | Sub Feature | v2.1 |
+| [ARP-1424](https://aims-os.atlassian.net/browse/ARP-1424) | 🆕 Decisión — fuga por inferencia | Sub Feature | v2.1 |
+| [ARP-1425](https://aims-os.atlassian.net/browse/ARP-1425) | 🆕 Decisión — Sources vs Drives | Sub Feature | v2.1 |
+| [ARP-1426](https://aims-os.atlassian.net/browse/ARP-1426) | 🆕 Decisión — promoción de claims | Sub Feature | v2.1 |
 
 **Enlaces creados:** ARP-1407 *blocks* ARP-468 · cada companion de A&P *relates to* su Feature.
 
