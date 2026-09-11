@@ -108,3 +108,24 @@ La auditoría de tickets encontró tres violaciones **sistémicas** — repetida
 | 7 | Criterio que dependía de un TBD del propio ticket | ARP-1416 | TBD cerrado |
 
 **Lo que queda sin corregir a propósito:** los 15 tickets están **sin estimar**. Es del equipo, no mío.
+
+---
+
+## Dos plantillas canónicas en conflicto
+
+Los 15 tickets siguen el formato de 13 secciones de `aims-os-prd-to-tickets`, que es contra el que los auditó `aims-os-ticket-reviewer`.
+
+Pero el skill `jira-arp-ticket-creator` declara una plantilla distinta y también "locked":
+
+| | `jira-arp-ticket-creator` | Lo que tienen los 15 |
+|---|---|---|
+| Feature | 6 secciones — Prototype Link · User Story · Description · Scope · Sub Feature Breakdown · Parent Boulder Reference | 13 secciones |
+| Sub Feature | 5 secciones — Prototype Link · User Story · Description · Scope & Acceptance Criteria · Parent Feature Reference | 13 secciones |
+
+**No se convirtieron al formato corto** porque eso destruiría información que el review exigió y que ingeniería necesita: los cuatro estados de pantalla por ticket, los textos canónicos de tooltip, los edge cases, los `_To be defined_` marcados y los decisions logs. Nada de eso tiene lugar en la plantilla corta.
+
+**Queda como decisión del equipo:** o los 15 se quedan así, o alguien concilia las dos plantillas. Hoy un ticket creado con un skill y otro creado con el otro no se parecen, que es justo lo que las plantillas "locked" existían para evitar.
+
+## Corrección aplicada el 2026-09-11
+
+Tres títulos salieron con el ampersand escapado (`Access &amp; Permissions`, visible como texto literal) por un error al crearlos. Corregidos en ARP-1412, ARP-1417 y ARP-1420.

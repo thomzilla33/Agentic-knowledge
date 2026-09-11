@@ -4,29 +4,40 @@ Ordenado por lo que bloquea a más gente.
 
 ---
 
-## A. Tres operaciones sobre Jira que **no ejecuté**
+## A. Una pregunta para el equipo, y un rename
 
-Las tres tocan tickets que ya existían y que otros pueden estar usando. Crear tickets nuevos es aditivo y reversible; cambiarle el tipo o cerrar el de otro, no. Quedan propuestas, no hechas.
+Al describir estas operaciones se descubrió algo que cambia el cuadro: **ARP-520 no es un duplicado vacío de ARP-468. Tiene 7 sub-features propias**, y son un desglose más limpio que las 8 de ARP-468.
 
-### A1. Promover [ARP-468](https://aims-os.atlassian.net/browse/ARP-468) de Feature a Boulder
+### A1. ¿Cuál de los dos está vivo, ARP-468 o ARP-520?
 
-**Por qué:** ARP-468 tiene diez bloques del tamaño de Feature adentro (canvas, catálogo de widgets, registro de tipos, instalador de packs, y seis más). En la jerarquía de ARP un `Feature` solo puede contener `Version`s — **no otros Features**. Como está, esos diez bloques no se pueden representar.
+| ARP-468 — `Selected for Development` | ARP-520 — `{Test}`, Backlog |
+|---|---|
+| ARP-502 Role + Entity Layout Resolution | ARP-521 Entity Profiles & Canvas Standard |
+| ARP-503 Widget Library Drawer | ARP-522 Widget Runtime & Standard Widgets |
+| ARP-505 Layout Versioning, Rollback, Audit | ARP-523 Admin Layout Builder & Guardrails |
+| ARP-506 Industry Pack Framework & Installer | ARP-524 Internal Widget Catalog & Safe Activation |
+| ARP-507 RBAC/ABAC Enforcement | ARP-525 Permissions Enforcement |
+| ARP-508 Drive/Folder & Records Widget | ARP-526 Versioning, Rollback, Auditability |
+| ARP-509 Automotive Pack v1 | ARP-527 Industry Pack Framework v1 + Reference Pack |
+| ARP-510 Contact List facelift | — |
 
-**Qué implica:** cambiar el issue type de ARP-468 a `Boulder`, sacarlo de debajo de ARP-375, y partir su contenido en unos 8 Features.
+Tres pares son casi el mismo ticket con mejor nombre: 507↔525, 505↔526, y 506+509↔527. El resto es inferencia — hay que leerlos para confirmar el mapeo.
 
-**Riesgo:** es un ticket en *Selected for Development*. Alguien puede estar planificando contra él.
+**Uno de los dos sobra, pero no está claro cuál.** Si ARP-520 es la versión buena, lo que corresponde es quitarle el `{Test}` y cerrar ARP-468 — no al revés. **Es de quien los creó.**
 
-### A2. Cerrar [ARP-520](https://aims-os.atlassian.net/browse/ARP-520)
+> ⚠️ **No cerrar ARP-520 sin leer sus 7 hijos.** Una versión anterior de este documento lo recomendaba, tratándolo como un duplicado de prueba. Es incorrecto: cerrarlo cerraría el mejor desglose de los dos.
 
-Es `{Test} UCP v2 — Universal Entity Profile Foundation`, duplicado exacto de ARP-468 con prefijo de prueba. Está en Backlog bajo ARP-375. **Ensucia el árbol del Boulder.**
+### A2. Promover ARP-468 a Boulder — vale discutirlo, no es forzoso
 
-**Riesgo:** bajo, pero es el ticket de alguien. Confirmar de quién antes de cerrarlo.
+El argumento original era que *"un Feature no puede contener Features"*, y por lo tanto ARP-468 no podía representar sus diez bloques. Cierto pero irrelevante: **esos bloques ya existen como `Version`, que es perfectamente legal.** No hay nada roto que arreglar.
 
-### A3. Renombrar ARP-375 de "Unified **Contact** Profile" a "Unified **Entity** Profile"
+La pregunta real es de **tamaño**: si "Widget Runtime", "Admin Layout Builder" y "Permissions Enforcement" son cada uno del porte de un Feature, entonces merecen serlo y el padre debería ser un Boulder. Es un juicio del equipo.
 
-**Por qué:** el módulo dejó de ser de contactos. El prototipo vigente ya lista pólizas y activos. El nombre viejo va a hacer que alguien pregunte por qué hay vehículos en el "perfil de contacto".
+### A3. Renombrar ARP-375 a "Unified Entity Profile"
 
-**Riesgo:** mínimo — es solo el título. Pero es el Boulder del que cuelga todo.
+**La única recomendación limpia de las tres.** El módulo dejó de ser de contactos — el prototipo ya lista pólizas y activos. El nombre viejo va a hacer que alguien pregunte por qué hay vehículos en el «perfil de contacto».
+
+**Riesgo:** mínimo, es solo el título. Pero es el Boulder del que cuelga todo.
 
 ---
 

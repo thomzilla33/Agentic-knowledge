@@ -139,7 +139,7 @@ El comportamiento es el mismo. La diferencia es que el segundo es verificable.
 
 No se creó un Boulder nuevo. **Por qué:** ARP-375 ya es el Boulder del UCP y ya tiene a ARP-376 (v1, Done) colgando. Un Boulder nuevo partiría la historia del módulo en dos.
 
-**Aparte, y sin ejecutar:** ARP-468 debería promoverse a Boulder. Tiene diez bloques del tamaño de Feature adentro, y en la jerarquía de ARP un Feature solo puede contener `Version`s — no otros Features. Ver `06-PENDIENTES.md`.
+**Aparte, y sin resolver:** ARP-468 y ARP-520 son dos desgloses distintos de la misma plataforma, con 8 y 7 sub-features respectivamente. Uno de los dos sobra. Si además sus bloques merecen ser Features, el padre tendría que ser un Boulder — pero eso es un juicio de tamaño, no una corrección obligatoria: hoy están como `Version`, que es legal. Ver `06-PENDIENTES.md`.
 
 ---
 

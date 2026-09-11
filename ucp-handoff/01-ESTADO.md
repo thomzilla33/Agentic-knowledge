@@ -93,4 +93,10 @@ Puede ser una decisión deliberada de simplificación. **No está documentada en
 
 **Todos están en Backlog y sin estimar** — a propósito. No entran a sprint hasta que el equipo los estime y se cierre lo de [`06-PENDIENTES.md`](06-PENDIENTES.md).
 
-**Tickets preexistentes que no toqué:** ARP-468 (Feature, *Selected for Development*), ARP-520 (`{Test}`, duplicado), ARP-376 (UCP v1, Done).
+**Tickets preexistentes que no toqué:**
+
+| Clave | Qué es | Ojo |
+|---|---|---|
+| ARP-376 | UCP v1 — Facelift | Done |
+| ARP-468 | Feature, *Selected for Development* | Tiene **8 sub-features** propias (ARP-502 a ARP-510) |
+| ARP-520 | Feature, `{Test}`, Backlog | Tiene **7 sub-features** propias (ARP-521 a ARP-527). **No es un duplicado vacío** — es un desglose más limpio que el de ARP-468. Ver `06-PENDIENTES.md` |

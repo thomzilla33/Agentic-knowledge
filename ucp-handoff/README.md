@@ -35,4 +35,4 @@ Los quince tickets de Jira apuntan ahí como **Design Reference**. Nuestro build
 2. La entrega de hoy (**UCP v2.0**) cubre Contacts, Employees y Companies: listado, paginación, creación por stepper, y las dos pestañas mandatorias.
 3. Intelligence y Knowledge quedan marcados **`[Next Round]`** (UCP v2.1) y ya están creados para que el contrato se vea completo.
 4. Los 15 tickets están en Jira bajo el Boulder **ARP-375**, en estado Backlog y sin estimar.
-5. Hay **tres operaciones sobre Jira que no ejecuté** porque tocan tickets de otros. Están en [`06-PENDIENTES.md`](06-PENDIENTES.md).
+5. Queda **una pregunta abierta para el equipo** — cuál de ARP-468 o ARP-520 está vivo — y un rename recomendado. Están en [`06-PENDIENTES.md`](06-PENDIENTES.md).
