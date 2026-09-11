@@ -1,6 +1,6 @@
 # 03 · Los 15 tickets, y por qué cada uno existe
 
-Todos creados el 2026-09-11 bajo el Boulder [ARP-375](https://aims-os.atlassian.net/browse/ARP-375), en **Backlog** y **sin estimar**.
+Todos creados el 2026-09-11 bajo el Boulder [ARP-375 · Universal Entity Profile](https://aims-os.atlassian.net/browse/ARP-375), en **Backlog** y **sin estimar**.
 
 ## Jerarquía de ARP — para no equivocarse al crear más
 

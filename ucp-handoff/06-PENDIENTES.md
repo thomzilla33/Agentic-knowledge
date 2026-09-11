@@ -33,11 +33,11 @@ El argumento original era que *"un Feature no puede contener Features"*, y por l
 
 La pregunta real es de **tamaño**: si "Widget Runtime", "Admin Layout Builder" y "Permissions Enforcement" son cada uno del porte de un Feature, entonces merecen serlo y el padre debería ser un Boulder. Es un juicio del equipo.
 
-### A3. Renombrar ARP-375 a "Unified Entity Profile"
+### A3. Renombrar ARP-375 — ✅ hecho el 2026-09-11
 
-**La única recomendación limpia de las tres.** El módulo dejó de ser de contactos — el prototipo ya lista pólizas y activos. El nombre viejo va a hacer que alguien pregunte por qué hay vehículos en el «perfil de contacto».
+ARP-375 pasó de «Unified Contact Profile» a **«Universal Entity Profile»**, igualando el nombre que ARP-468 y ARP-520 ya usaban. Ver la sección de nomenclatura en `02-DECISIONES.md`.
 
-**Riesgo:** mínimo, es solo el título. Pero es el Boulder del que cuelga todo.
+**Lo que queda de esto:** el cuerpo de ARP-375 todavía llama al módulo **«UCIH»**, un acrónimo que no aparece en ningún otro lado. No lo toqué — es texto que escribió alguien más y puede significar algo que desconozco. Vale preguntarlo.
 
 ---
 

@@ -60,6 +60,29 @@ Se llaman distinto porque son cosas distintas, con público distinto.
 
 **Por qué:** describe qué es el registro en el negocio, no qué clase de objeto es en el modelo de datos.
 
+### El módulo se llama **Universal Entity Profile**
+
+ARP-375 se renombró el 2026-09-11, de «Unified Contact Profile» a **«Universal Entity Profile»**.
+
+**Por qué:** el módulo dejó de ser de contactos — el prototipo vigente ya lista pólizas y activos.
+
+**Por qué ese nombre y no otro:** había cuatro variantes en circulación, y la decisión fue converger a la que el equipo ya había elegido, no inventar una quinta.
+
+| Nombre | Dónde vivía |
+|---|---|
+| Unified **Contact** Profile | ARP-375, los docs de este repo |
+| Unified **Customer** Profile | el archivo de Figma, `AUDIT.md` |
+| **Universal Entity** Profile | **ARP-468 y ARP-520** — los tickets de plataforma |
+| **UCIH** | el cuerpo de la descripción de ARP-375 |
+
+ARP-468 se titula literalmente `UCP v2 – Universal Entity Profile Foundation`. Esa es la decisión más reciente del equipo y a ella se converge.
+
+**El acrónimo `UCP` se queda.** Los 15 tickets mantienen su prefijo `UCP v2.0 /`, exactamente como ya lo hace ARP-468. Cambiarlo a `UEP` costaría 16 ediciones, dejaría huérfano a ARP-376 (`UCP v1`) y desalinearía a ARP-468, que no es nuestro. El nombre y el acrónimo pueden divergir sin costo — ya lo hacen.
+
+> **Descartado:** «Unified Entity Profile», que fue la primera propuesta de este paquete. Conservaba la «U» de Unified pero introducía un cuarto nombre distinto del que ya usaban ARP-468 y ARP-520. Converger valía más que conservar el adjetivo.
+
+> **Sin resolver:** el cuerpo de ARP-375 llama al módulo **«UCIH»**, acrónimo que no aparece en ningún otro lado. No se tocó — es texto de otra persona y puede significar algo que desconocemos.
+
 ### Sources es el plano; Source Drives es lo que lo llena
 
 Los tres planos del canon: **Truth** (100%, facts verificados) · **Sandbox** (~80%, claims pendientes) · **Sources** (~60%, documentos crudos).

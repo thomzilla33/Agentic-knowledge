@@ -69,7 +69,7 @@ Puede ser una decisión deliberada de simplificación. **No está documentada en
 
 ## Estado en Jira
 
-**Boulder:** [ARP-375 · Unified Contact Profile](https://aims-os.atlassian.net/browse/ARP-375) — *Selected for Development*
+**Boulder:** [ARP-375 · Universal Entity Profile](https://aims-os.atlassian.net/browse/ARP-375) — *Selected for Development* · renombrado el 2026-09-11, antes «Unified Contact Profile»
 
 | Clave | Ticket | Tipo | Versión |
 |---|---|---|---|
