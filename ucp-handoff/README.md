@@ -27,6 +27,7 @@ All 21 Jira tickets point there as their Prototype Link, and each one also embed
 | [`05-REPLICATION.md`](05-REPLICATION.md) | How to rebuild the prototype from scratch on another branch: repo, patches, build, deploy, the design system rules you will run into, and how to capture fresh screenshots. | Engineering and design |
 | [`06-OPEN-ITEMS.md`](06-OPEN-ITEMS.md) | What is still open, with the name of whoever can close it. | Whoever takes over |
 | [`07-TICKETS-FOR-DELIVERY.md`](07-TICKETS-FOR-DELIVERY.md) | **The delivery pack.** All 21 tickets in full, in the same template Work Queues uses, each with its prototype link and screenshot. This is the file to hand to JJ and Lex. | Engineering |
+| [`UCP-HANDOVER-COMPLETE.md`](UCP-HANDOVER-COMPLETE.md) | **Everything in one file.** All seven documents merged, with a table of contents. This is the single file to share or to hand to someone who wants the whole thing in one read. | Everyone |
 | `screenshots/` | Seven captures from the live prototype, referenced by every ticket. | Everyone |
 
 ---
