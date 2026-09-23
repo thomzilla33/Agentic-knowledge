@@ -16,6 +16,7 @@ export const POLICIES: Policy[] = [
       { sectionId: 'data-privacy',             scopeSelector: 'self+descendants', access: 'write' },
       { sectionId: 'integrations-credentials', scopeSelector: 'self+descendants', access: 'write' },
       { sectionId: 'notifications',            scopeSelector: 'self+descendants', access: 'write' },
+      { sectionId: 'workers-permissions',      scopeSelector: 'self+descendants', access: 'write' },
       { sectionId: 'audit-compliance',         scopeSelector: 'self+descendants', access: 'write' },
     ],
   },
@@ -26,6 +27,7 @@ export const POLICIES: Policy[] = [
       { sectionId: 'audit-compliance',         scopeSelector: 'tree', access: 'read' },
       { sectionId: 'governance-defaults',      scopeSelector: 'tree', access: 'read' },
       { sectionId: 'data-privacy',             scopeSelector: 'tree', access: 'read' },
+      { sectionId: 'workers-permissions',      scopeSelector: 'tree', access: 'read' },
     ],
   },
   {
@@ -52,6 +54,7 @@ export const POLICIES: Policy[] = [
       { sectionId: 'data-privacy',             scopeSelector: 'tree', access: 'write' },
       { sectionId: 'integrations-credentials', scopeSelector: 'tree', access: 'write' },
       { sectionId: 'notifications',            scopeSelector: 'tree', access: 'write' },
+      { sectionId: 'workers-permissions',      scopeSelector: 'tree', access: 'write' },
       { sectionId: 'audit-compliance',         scopeSelector: 'tree', access: 'write' },
     ],
   },

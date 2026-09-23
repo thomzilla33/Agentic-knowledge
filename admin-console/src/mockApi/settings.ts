@@ -22,7 +22,7 @@ export async function getResolvedValue(settingId: string, scopeId: string): Prom
 export async function getSectionSettings(
   sectionId: SectionId,
   scopeId: string,
-  principal: Principal,
+  _principal: Principal,
   scope: Scope
 ): Promise<{ settingId: string; resolved: ResolvedValue; versionToken: string }[]> {
   await delay();
@@ -146,7 +146,7 @@ export async function writeSetting(
   return { ok: true, versionToken: newToken, event };
 }
 
-function computeAffectedScopes(settingId: string, scopeId: string, newValue: unknown, fixture: ReturnType<typeof store.getFixture>): string[] {
+function computeAffectedScopes(settingId: string, scopeId: string, _newValue: unknown, fixture: ReturnType<typeof store.getFixture>): string[] {
   const def = REGISTRY_MAP[settingId];
   if (!def || def.cascade === 'NOT_CASCADABLE') return [scopeId];
   if (def.cascade === 'LOCKED') {

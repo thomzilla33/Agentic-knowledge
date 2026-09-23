@@ -8,7 +8,7 @@ import { resolveValue } from './inheritance';
 export function computeImpact(
   settingId: string,
   scopeId: string,
-  newValue: unknown,
+  _newValue: unknown,
   fixture: Fixture
 ): ImpactResult {
   const def = REGISTRY_MAP[settingId];

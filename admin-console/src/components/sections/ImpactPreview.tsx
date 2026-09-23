@@ -14,7 +14,7 @@ interface Props {
   onCancel: () => void;
 }
 
-export function ImpactPreview({ def, scope, principal, candidateValue, onConfirm, onCancel }: Props) {
+export function ImpactPreview({ def, scope, principal: _principal, candidateValue, onConfirm, onCancel }: Props) {
   const [impact, setImpact] = useState<ImpactResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [staleWarning, setStaleWarning] = useState(false);

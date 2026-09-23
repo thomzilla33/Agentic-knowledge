@@ -17,9 +17,10 @@ const STATUS_STYLE: Record<string, string> = {
 interface MembersListProps {
   members: Member[];
   onSelect: (id: string) => void;
+  onInvite?: () => void;
 }
 
-export function MembersList({ members, onSelect }: MembersListProps) {
+export function MembersList({ members, onSelect, onInvite }: MembersListProps) {
   const [search, setSearch] = useState('');
   const [studio, setStudio] = useState<StudioId | 'all'>('all');
 
@@ -33,7 +34,7 @@ export function MembersList({ members, onSelect }: MembersListProps) {
   return (
     <div>
       {/* Filter bar */}
-      <div className="flex items-center gap-3 mb-4 flex-wrap">
+      <div className="flex items-center gap-3 mb-4 flex-wrap" style={{ justifyContent: 'space-between' }}>
         <div className="relative">
           <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--field-supporting)]" width="12" height="12" viewBox="0 0 16 16" fill="none">
             <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5"/>
@@ -62,9 +63,22 @@ export function MembersList({ members, onSelect }: MembersListProps) {
             </button>
           ))}
         </div>
-        <span className="ml-auto text-xs text-[var(--field-supporting)]">
-          {filtered.length} member{filtered.length !== 1 ? 's' : ''}
-        </span>
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-xs text-[var(--field-supporting)]">
+            {filtered.length} member{filtered.length !== 1 ? 's' : ''}
+          </span>
+          {onInvite && (
+            <button
+              onClick={onInvite}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-transparent bg-[var(--btn-primary-bg)] text-white hover:bg-[var(--btn-primary-hover-bg)] transition-colors"
+            >
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+              </svg>
+              Invite member
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Table */}

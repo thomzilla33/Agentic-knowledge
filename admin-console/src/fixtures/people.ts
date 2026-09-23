@@ -1,4 +1,6 @@
 import type { Member, PaRole, PaGroup, PermDef, MemberPermState } from '../types';
+import { WORKER_ACTIONS, workerPermId } from './workers';
+import { getRoleActions } from '../mockApi/workers';
 
 export const MEMBERS: Member[] = [
   { id: 'p001', name: 'Sofia Reyes',  email: 'sofia.reyes@contoso.com',  initials: 'SR', status: 'active',    studios: ['ag','gov','helix'], joinedAt: '2024-01-10' },
@@ -52,6 +54,14 @@ export const PERM_DEFS: PermDef[] = [
   { id: 'ag.workflows.manage', code: 'ag.workflows.manage', name: 'Manage Workflows',    description: 'Create, edit, and delete workflow definitions',             studioId: 'ag'  },
   { id: 'ag.analytics.view',   code: 'ag.analytics.view',   name: 'View Analytics',      description: 'Access agent performance metrics and usage reports',        studioId: 'ag'  },
   { id: 'ag.sandbox.use',      code: 'ag.sandbox.use',      name: 'Use Sandbox',         description: 'Test and iterate agents in isolated sandbox environment',   studioId: 'ag'  },
+  // Workers (ARP-612) — kept in step with Admin → Workers Permissions
+  ...WORKER_ACTIONS.map(a => ({
+    id: workerPermId(a.id),
+    code: workerPermId(a.id),
+    name: `${a.label} Workers`,
+    description: a.description,
+    studioId: 'ag' as const,
+  })),
   // Governance Studio
   { id: 'gov.domains.view',    code: 'gov.domains.view',    name: 'View Domains',        description: 'Browse knowledge domains and their configurations',         studioId: 'gov' },
   { id: 'gov.domains.manage',  code: 'gov.domains.manage',  name: 'Manage Domains',      description: 'Create and configure knowledge domains',                   studioId: 'gov' },
@@ -78,9 +88,15 @@ const ROLE_PERMS: Record<string, string[]> = {
   'viewer':       ['ag.agents.view','ag.analytics.view','gov.domains.view','gov.policies.view','hx.models.view','hx.pipelines.view'],
 };
 
+// Workers grants are not static — they come from the live Admin permission matrix.
+function rolePermIds(roleId: string): string[] {
+  const workerPerms = getRoleActions(roleId).map(a => workerPermId(a));
+  return [...(ROLE_PERMS[roleId] ?? []), ...workerPerms];
+}
+
 export function getMemberPerms(_memberId: string, memberRoleIds: string[]): MemberPermState[] {
   return PERM_DEFS.map(def => {
-    const grantingRole = memberRoleIds.find(rid => (ROLE_PERMS[rid] ?? []).includes(def.id));
+    const grantingRole = memberRoleIds.find(rid => rolePermIds(rid).includes(def.id));
     if (grantingRole) {
       const roleName = PA_ROLES.find(r => r.id === grantingRole)?.name ?? grantingRole;
       return { permId: def.id, state: 'inherited' as const, sourceRole: roleName };
