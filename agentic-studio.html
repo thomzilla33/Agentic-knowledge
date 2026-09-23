@@ -929,7 +929,130 @@ html.theme-light .tb-search-kbd{background:rgba(15,23,42,0.04);border-color:rgba
 .bn-port{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--bg2);border:2px solid rgba(255,255,255,0.22)}
 .bn-port-out{right:-5px;top:50%;transform:translateY(-50%)}
 .bn-port-in{left:-5px;top:50%;transform:translateY(-50%)}
+.bn-port-e{right:-5px;top:50%;transform:translateY(-50%)}
+.bn-port-w{left:-5px;top:50%;transform:translateY(-50%)}
+.bn-port-n{top:-5px;left:50%;transform:translateX(-50%)}
+.bn-port-s{bottom:-5px;left:50%;transform:translateX(-50%)}
+/* Ports stay quiet until the card is hovered or a cable is being drawn. */
+.bn-port[data-port]{opacity:0;cursor:crosshair;transition:opacity .12s,transform .12s,background .12s,border-color .12s;z-index:4}
+/* A 9px dot is a hard target, more so when the canvas is zoomed out, so the
+   grabbable area extends well past what is drawn. */
+.bn-port[data-port]::after{content:'';position:absolute;inset:-7px;border-radius:50%}
+.bn:hover .bn-port[data-port],.ec-linking .bn-port[data-port]{opacity:1}
+.bn-port[data-port]:hover,.bn-port.hot{background:var(--pri);border-color:var(--pri)}
+.bn-port-e:hover,.bn-port-e.hot,.bn-port-w:hover,.bn-port-w.hot{transform:translateY(-50%) scale(1.45)}
+.bn-port-n:hover,.bn-port-n.hot,.bn-port-s:hover,.bn-port-s.hot{transform:translateX(-50%) scale(1.45)}
+.ec-linking{cursor:crosshair}
+.ec-linking .bn{cursor:crosshair}
 .canvas-svg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible}
+.ec-edge{stroke:rgba(0,194,194,0.3);stroke-width:1.5;transition:stroke .12s}
+.ec-edge-hit{stroke:transparent;stroke-width:14;pointer-events:stroke;cursor:pointer}
+.ec-edge-hit:hover{stroke:rgba(255,100,103,0.14)}
+.ec-edge-draft{stroke:var(--pri);stroke-width:1.8;stroke-dasharray:6 5;animation:ecDash .6s linear infinite}
+@keyframes ecDash{to{stroke-dashoffset:-22}}
+.ec-edge-lbl-bg{fill:rgba(0,0,0,0.7);stroke:rgba(255,255,255,0.08)}
+.ec-edge-lbl{font-size:9px;fill:rgba(255,255,255,0.4);font-family:Inter,sans-serif}
+/* ── Node drag & drop ─────────────────────────────────────────────────── */
+.bn{cursor:grab;user-select:none;touch-action:none}
+.bn:active{cursor:grabbing}
+.bn-dragging{opacity:.85;box-shadow:0 10px 28px rgba(0,0,0,.45);z-index:9!important}
+.nl-item[draggable]{cursor:grab}
+.nl-item.nl-dragging{opacity:.5}
+.bldr-ec.ec-dropping{outline:1.5px dashed rgba(0,194,194,.4);outline-offset:-6px;background:rgba(0,194,194,.03)}
+/* ── Node composition (inspector) ─────────────────────────────────────── */
+.nc-summary{font-size:12px;line-height:1.6;color:var(--t2);margin:0}
+.nc-hint{font-size:11px;color:var(--t4);margin-top:8px;padding:6px 8px;border:1px dashed var(--bd);border-radius:var(--r6)}
+.nc-count{font-size:10px;font-weight:700;color:var(--t3);background:rgba(255,255,255,.07);padding:1px 5px;border-radius:var(--r4)}
+.nc-steps{display:flex;flex-direction:column;gap:4px}
+.nc-step{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--bd);border-radius:var(--r6);background:rgba(255,255,255,.02)}
+.nc-step-i{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.08);color:var(--t3);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nc-step-nm{font-size:12px;font-weight:600;color:var(--t1);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nc-step-t{font-size:9px;font-weight:700;padding:2px 5px;border-radius:var(--r4);text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+.nc-t-trigger{background:rgba(253,199,0,.14);color:var(--warn)}
+.nc-t-agent{background:rgba(167,139,250,.16);color:var(--pur)}
+.nc-t-action{background:rgba(5,223,114,.14);color:var(--ok)}
+.nc-t-condition{background:rgba(43,127,255,.14);color:var(--pri)}
+.nc-t-output{background:rgba(5,223,114,.14);color:var(--ok)}
+.nc-io-lbl{font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.nc-io{display:flex;align-items:center;gap:8px;padding:4px 0}
+.nc-io-n{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--t1);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.nc-io-t{font-size:10px;font-weight:600;color:var(--pri);background:rgba(43,127,255,.12);padding:1px 5px;border-radius:var(--r4);flex-shrink:0}
+.nc-io-t.nc-io-out{color:var(--ok);background:rgba(5,223,114,.12)}
+.nc-kv{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 0;font-size:12px}
+.nc-kv span{color:var(--t3);flex-shrink:0}
+.nc-kv b{color:var(--t1);font-weight:600;text-align:right;flex:1;min-width:0;overflow-wrap:anywhere}
+.nc-kv b.nc-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:500}
+.nc-instr{font-size:12px;line-height:1.6;color:var(--t2);margin:0;padding:8px 10px;border-left:2px solid var(--bd);background:rgba(255,255,255,.02)}
+.nc-tags{display:flex;flex-wrap:wrap;gap:5px}
+.nc-tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:var(--r20);background:rgba(255,255,255,.07);color:var(--t2)}
+.nc-tag-tool{background:rgba(253,199,0,.12);color:var(--warn)}
+.nc-tag-kn{background:rgba(5,223,114,.12);color:var(--ok)}
+.nc-tag-gr{background:rgba(255,100,103,.12);color:var(--err)}
+.nc-tag-off{background:rgba(255,255,255,.05);color:var(--t4)}
+/* ── Editable node configuration ──────────────────────────────────────── */
+.nc-field{margin-bottom:10px}
+.nc-field label{display:block;font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.nc-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:var(--r6);color:var(--t1);font-size:12px;font-weight:500;font-family:inherit;padding:6px 8px;outline:none;transition:border-color .12s}
+.nc-input:focus{border-color:var(--pri);background:rgba(255,255,255,.07)}
+.nc-input:hover:not(:focus){border-color:var(--bds)}
+textarea.nc-input{resize:vertical;line-height:1.5;min-height:46px}
+.nc-mono-input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+select.nc-input{cursor:pointer}
+.nc-owned{display:flex;gap:8px;align-items:flex-start;font-size:11px;line-height:1.55;color:var(--t3);padding:9px 10px;border:1px solid var(--bd);border-radius:var(--r8);background:rgba(255,255,255,.02)}
+.nc-owned svg{flex-shrink:0;margin-top:2px;color:var(--t4)}
+.nc-owned b{color:var(--t2)}
+.nc-open-btn{width:100%;margin-top:8px;height:28px;border:1px solid var(--bd);border-radius:var(--r6);background:transparent;color:var(--t2);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .12s}
+.nc-open-btn:hover{background:rgba(255,255,255,.06);border-color:var(--bds);color:var(--t1)}
+.insp-ft .insp-reset:disabled,.insp-ft .insp-apply:disabled{opacity:.45;cursor:not-allowed}
+/* ── Per-network overrides ────────────────────────────────────────────── */
+.nc-ovr-help{font-size:11px;line-height:1.55;color:var(--t3);margin:0 0 10px}
+.nc-ovr-count{font-size:10px;font-weight:700;color:var(--pur);background:rgba(167,139,250,.16);padding:1px 5px;border-radius:var(--r4)}
+.nc-ovr{position:relative;padding-left:9px}
+.nc-ovr::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:2px;border-radius:2px;background:var(--bd)}
+.nc-ovr.is-on::before{background:var(--pur)}
+.nc-ovr label{display:flex;align-items:center;gap:6px}
+.nc-ovr-inherit{font-size:9px;font-weight:600;color:var(--t4);text-transform:none;letter-spacing:0;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:var(--r4)}
+.nc-ovr-chip{font-size:9px;font-weight:700;color:var(--pur);background:rgba(167,139,250,.16);padding:1px 5px;border-radius:var(--r4);text-transform:none;letter-spacing:0}
+.nc-ovr-revert{margin-left:auto;border:none;background:transparent;color:var(--t4);font-size:10px;font-weight:600;cursor:pointer;padding:0;text-transform:none;letter-spacing:0;font-family:inherit}
+.nc-ovr-revert:hover{color:var(--pri);text-decoration:underline}
+.nc-ovr-base{font-size:10px;color:var(--t4);margin-top:3px}
+.nc-ovr-base code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--t3)}
+.bn-ovr{position:absolute;right:8px;bottom:6px;font-size:9px;font-weight:700;color:var(--pur);background:rgba(167,139,250,.16);padding:1px 5px;border-radius:var(--r4)}
+/* ── Worker node: the card is the contract ────────────────────────────── */
+.bn-worker{padding:0;overflow:visible;display:flex;flex-direction:column;cursor:grab}
+.bnw-hd{display:flex;align-items:center;gap:8px;padding:10px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.bnw-id{flex:1;min-width:0}
+.bnw-nm{font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bnw-meta{font-size:10px;color:var(--t4);margin-top:1px}
+.bnw-ver{font-size:9px;font-weight:700;color:#00C2C2;background:rgba(0,194,194,.14);padding:1px 5px;border-radius:var(--r4);flex-shrink:0}
+.bnw-body{padding:0 0 6px}
+.bnw-row{display:flex;align-items:center;height:20px;padding:0 10px;gap:8px}
+.bnw-in,.bnw-out{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
+.bnw-out{justify-content:flex-end}
+.bnw-f{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bnw-t{font-size:8px;font-weight:700;color:var(--t4);background:rgba(255,255,255,.06);padding:0 3px;border-radius:3px;flex-shrink:0;text-transform:uppercase}
+.bn-port-io{margin-top:0;transform:none!important}
+.bn-port-io.bn-port-w{left:-5px}
+.bn-port-io.bn-port-e{right:-5px}
+.bn-port-io:hover,.bn-port-io.hot{transform:scale(1.45)!important}
+.nl-ver{font-size:9px;font-weight:700;color:#00C2C2;background:rgba(0,194,194,.14);padding:0 4px;border-radius:3px;margin-left:4px}
+/* ── Version pinning ──────────────────────────────────────────────────── */
+.bnw-ver.is-stale{color:var(--warn);background:rgba(253,199,0,.16)}
+.bnw-upd{position:absolute;right:8px;bottom:6px;font-size:9px;font-weight:700;color:var(--warn);background:rgba(253,199,0,.16);padding:1px 5px;border-radius:var(--r4)}
+.nc-pin{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t3);line-height:1.5}
+.nc-pin-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex-shrink:0}
+.nc-pin b{color:var(--t1)}
+.nc-upd{border:1px solid rgba(253,199,0,.32);background:rgba(253,199,0,.07);border-radius:var(--r8);padding:10px}
+.nc-upd.is-breaking{border-color:rgba(255,100,103,.35);background:rgba(255,100,103,.07)}
+.nc-upd-hd{display:flex;flex-direction:column;gap:1px;margin-bottom:8px}
+.nc-upd-hd b{font-size:12px;color:var(--t1)}
+.nc-upd-hd span{font-size:10px;color:var(--t4)}
+.nc-upd-diff{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.nc-chg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t3)}
+.nc-chg code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--t1)}
+.nc-upd-warn{font-size:10px;line-height:1.5;color:var(--err);margin-bottom:8px}
+.nc-upd-btn{width:100%;height:28px;border:none;border-radius:var(--r6);background:var(--pri);color:#fff;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
+.nc-upd-btn:hover{background:#1a6fe8}
 /* Node info side panel (preview mode) */
 .bn-side-panel{width:0;overflow:hidden;border-left:1px solid transparent;background:var(--bg2);display:flex;flex-direction:column;transition:width .2s,border-color .2s;flex-shrink:0}
 .bn-side-panel.open{width:272px;border-color:var(--bd)}
@@ -966,6 +1089,8 @@ body.builder-mode #vBuilder{position:fixed;inset:0;z-index:500;display:flex;flex
 .bldr-mb.mb-kn{background:rgba(5,223,114,0.10);border-color:rgba(5,223,114,0.25);color:var(--ok)}
 .bldr-mb.mb-done{background:rgba(5,223,114,0.15);border-color:rgba(5,223,114,0.35);color:var(--ok)}
 .bldr-tb-sep{width:1px;height:20px;background:var(--bd)}
+.bldr-mb.mb-fit{border-color:var(--bd)}
+.bldr-zoom{font-size:10px;font-weight:700;color:var(--t4);background:rgba(255,255,255,0.07);padding:1px 4px;border-radius:var(--r4);margin-left:2px;min-width:30px;text-align:center}
 .bldr-body{flex:1;display:flex;overflow:hidden}
 /* Node Library */
 .nl{width:252px;flex-shrink:0;border-right:1px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;transition:width .22s cubic-bezier(.4,0,.2,1),border-color .22s}
@@ -4047,6 +4172,11 @@ body.wk-builder-mode .back-to-ws{display:none!important}
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1.5l1.1 2.6L10 5.1 7.4 7 8.5 10 6 8.5 3.5 10l1.1-3L2 5.1l2.9-.9L6 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
             AI Wizard
           </button>
+          <button class="bldr-mb mb-fit" onclick="fitEditView()" title="Fit the whole graph in view">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M1.5 4V1.5H4M8 1.5h2.5V4M10.5 8v2.5H8M4 10.5H1.5V8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Fit
+            <span class="bldr-zoom" id="bldrZoomPct">100%</span>
+          </button>
           <div class="bldr-tb-sep"></div>
           <button class="bldr-mb mb-kn" onclick="openBldrKnPanel()">
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 1.5h7v9h-7V1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 4h3M4.5 6h3M4.5 8h1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
@@ -4099,51 +4229,36 @@ body.wk-builder-mode .back-to-ws{display:none!important}
           </div>
           <div class="nl-body">
             <div class="nl-sechd"><span class="nl-seclbl">Native Nodes</span></div>
-            <div class="nl-item" onclick="toast('Trigger node added','info')">
+            <div class="nl-item" data-lib="trigger" draggable="true" title="Drag onto the canvas, or click to see what is inside">
               <div class="nl-ico" style="background:rgba(253,199,0,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L5.5 7.5H9L5 13" stroke="var(--warn)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Trigger</div><div class="nl-sub">Starts the network</div></div>
             </div>
-            <div class="nl-item" onclick="toast('Condition node added','info')">
+            <div class="nl-item" data-lib="condition" draggable="true" title="Drag onto the canvas, or click to see what is inside">
               <div class="nl-ico" style="background:rgba(43,127,255,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M3 6l4-4 4 4" stroke="var(--pri)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Condition</div><div class="nl-sub">If / else branching</div></div>
             </div>
-            <div class="nl-item" onclick="toast('Action node added','info')">
+            <div class="nl-item" data-lib="action" draggable="true" title="Drag onto the canvas, or click to see what is inside">
               <div class="nl-ico" style="background:rgba(5,223,114,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="var(--ok)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Action</div><div class="nl-sub">HTTP, transform, store</div></div>
             </div>
-            <div class="nl-item" onclick="toast('Wait node added','info')">
+            <div class="nl-item" data-lib="wait" draggable="true" title="Drag onto the canvas, or click to see what is inside">
               <div class="nl-ico" style="background:rgba(253,199,0,0.10)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--warn)" stroke-width="1.3"/><path d="M7 4.5V7l2 1.5" stroke="var(--warn)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Wait for Event</div><div class="nl-sub">Pause until event arrives</div></div>
             </div>
-            <div class="nl-item" onclick="toast('Output node added','info')">
+            <div class="nl-item" data-lib="output" draggable="true" title="Drag onto the canvas, or click to see what is inside">
               <div class="nl-ico" style="background:rgba(5,223,114,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--ok)" stroke-width="1.3"/><path d="M4.5 7L6.5 9L9.5 5" stroke="var(--ok)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Output</div><div class="nl-sub">Declares final result</div></div>
             </div>
-            <div class="nl-sechd" style="margin-top:8px">
-              <span class="nl-seclbl">Agentic Workflows</span>
-              <span class="nl-secbadge">3 active</span>
-            </div>
-            <div class="nl-item" onclick="selectEditNode('wf-lq')">
-              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="#00C2C2" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-              <div class="nl-info"><div class="nl-nm">Lead Qualification<span class="nl-badge bn-bw" style="margin-left:4px">W</span></div><div class="nl-sub">In: customer_data → Out: qualified_lead</div></div>
-            </div>
-            <div class="nl-item" onclick="selectEditNode('wf-de')">
-              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="#00C2C2" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-              <div class="nl-info"><div class="nl-nm">Data Enrichment<span class="nl-badge bn-bw" style="margin-left:4px">W</span></div><div class="nl-sub">In: lead_id → Out: enriched_profile</div></div>
-            </div>
-            <div class="nl-item" onclick="selectEditNode('wf-cs')">
-              <div class="nl-ico" style="background:rgba(0,194,194,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><rect x="9" y="8.5" width="4" height="4" rx="1" stroke="#00C2C2" stroke-width="1.2"/><path d="M5 7h2a1 1 0 001-1V3.5M5 7h2a1 1 0 011 1v2" stroke="#00C2C2" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-              <div class="nl-info"><div class="nl-nm">CRM Sync<span class="nl-badge bn-bw" style="margin-left:4px">W</span></div><div class="nl-sub">In: enriched_profile → Out: crm_record_id</div></div>
-            </div>
+            <div id="nlWorkers"></div>
             <div class="nl-sechd" style="margin-top:8px">
               <span class="nl-seclbl">Agents</span>
               <span class="nl-secbadge">2 active</span>
             </div>
-            <div class="nl-item" onclick="selectEditNode('ag-ca')">
+            <div class="nl-item" data-lib="ag-ca" draggable="true" title="Drag onto the canvas, or click to see what is inside">
               <div class="nl-ico" style="background:rgba(167,139,250,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="var(--pur)" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><path d="M5 10h4" stroke="var(--pur)" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Customer Analyst<span class="nl-badge bn-ba" style="margin-left:4px">A</span></div><div class="nl-sub">Analyzes customer behavior</div></div>
             </div>
-            <div class="nl-item" onclick="selectEditNode('ag-dr')">
+            <div class="nl-item" data-lib="ag-dr" draggable="true" title="Drag onto the canvas, or click to see what is inside">
               <div class="nl-ico" style="background:rgba(167,139,250,0.12)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1.5" stroke="var(--pur)" stroke-width="1.2"/><rect x="5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><rect x="7.5" y="7" width="1.5" height="1.5" rx=".75" fill="var(--pur)"/><path d="M5 10h4" stroke="var(--pur)" stroke-width="1.1" stroke-linecap="round"/><path d="M7 5V3M5 3h4" stroke="var(--pur)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
               <div class="nl-info"><div class="nl-nm">Document Reader<span class="nl-badge bn-ba" style="margin-left:4px">A</span></div><div class="nl-sub">Extracts data from docs</div></div>
             </div>
@@ -4224,9 +4339,9 @@ body.wk-builder-mode .back-to-ws{display:none!important}
               </div>
             </div>
           </div>
-          <div class="insp-ft">
-            <button class="insp-reset" onclick="toast('Reset to defaults','info')">Reset</button>
-            <button class="insp-apply" onclick="toast('Configuration applied','success')">Apply</button>
+          <div class="insp-ft" id="inspFooter" style="display:none">
+            <button class="insp-reset" id="inspResetBtn" onclick="resetNodeConfig()">Reset</button>
+            <button class="insp-apply" id="inspApplyBtn" onclick="applyNodeConfig()">Apply</button>
           </div>
         </div>
       </div>
@@ -4523,6 +4638,7 @@ body.wk-builder-mode .back-to-ws{display:none!important}
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Back
         </button>
+        <span id="wkBldCrumb" style="display:none;font-size:12px;font-weight:600;color:var(--t4)"></span>
         <span style="font-size:14px;font-weight:700;color:var(--t1)" id="wkBldName">–</span>
         <span class="sc" id="wkBldStatus"></span>
         <span class="wk-bt-sep"></span>
@@ -5890,6 +6006,10 @@ function openBuilderView() {
   showView('vBuilder');
   document.body.classList.add('builder-mode');
   renderEditCanvas(bldrNet);
+  renderWorkerLibrary();
+  initNodeLibrary();
+  initEditCanvasDnD();
+  requestAnimationFrame(fitEditView);
   selectEditNode('ag-ca');
 }
 
@@ -7028,76 +7148,1179 @@ function toggleInspPanel() {
 }
 
 // ─ Edit Canvas ─
-const EDIT_FLOW = [
-  {id:'wh',t:'trigger',l:'Webhook Received',sub:'Customer inquiry received'},
-  {id:'ag-ca',t:'agent',l:'Customer Analyst',sub:'Analyzes customer inquiry',badge:'A'},
-  {id:'ks',t:'rag',l:'Knowledge Space',sub:'Truth Only · Sales Playbook 2026',badge:'K'},
-  {id:'rg',t:'agent',l:'Response Generator',sub:'Generates customer response',badge:'Ag'},
-];
-const EDGE_LABELS = {0:'inquiry',1:'context',2:'knowledge'};
+/* ══════════════════════════════════════════════════════════════════════════
+   NETWORK BUILDER — node library, canvas graph and node composition.
+   Every library entry is draggable onto the canvas; clicking any node (in the
+   library or on the canvas) opens its internal composition in the inspector.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Icon keys resolve lazily — the icon factories are declared further down. */
+const NODE_ICO = {
+  trigger:   () => trigIco(),
+  workflow:  () => wfIco(),
+  agent:     () => agIco(),
+  rag:       () => ragIco(),
+  output:    () => outIco(),
+  condition: () => `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M3 6l4-4 4 4" stroke="var(--pri)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  action:    () => `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="var(--ok)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  wait:      () => `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--warn)" stroke-width="1.3"/><path d="M7 4.5V7l2 1.5" stroke="var(--warn)" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+};
+
+/**
+ * The node library. `comp` is the internal composition shown in the inspector —
+ * for a workflow its steps and contract, for an agent its model, tools and
+ * knowledge, for a native node its configuration.
+ */
+const NODE_LIB = {
+  // ── Native nodes ──────────────────────────────────────────────────────────
+  // These belong to the network, so their fields are editable on the canvas.
+  // `k` is the storage key, `kind` drives the control that renders for it.
+  trigger: {
+    t:'trigger', ico:'trigger', icoCls:'bn-icon-trig', cls:'bn-trigger',
+    label:'Trigger', sub:'Starts the network', group:'Native',
+    comp:{ kind:'config', summary:'Listens for an inbound event and starts a run.', fields:[
+      {k:'type',     l:'Trigger type', kind:'select', opts:['Webhook','Schedule','Event','Manual'], v:'Webhook'},
+      {k:'endpoint', l:'Endpoint',     kind:'text',   v:'POST /hooks/customer-inquiry', mono:true},
+      {k:'auth',     l:'Auth',         kind:'select', opts:['HMAC signature','Bearer token','None'], v:'HMAC signature'},
+      {k:'emits',    l:'Emits',        kind:'text',   v:'webhook.payload', mono:true},
+    ]},
+  },
+  condition: {
+    t:'condition', ico:'condition', icoCls:'bn-icon-rag', cls:'',
+    label:'Condition', sub:'If / else branching', group:'Native',
+    comp:{ kind:'config', summary:'Splits the run into two paths based on an expression.', fields:[
+      {k:'expression', l:'Expression',   kind:'textarea', v:'{{ lead.score }} >= 60', mono:true},
+      {k:'true',       l:'True branch',  kind:'text',     v:'qualified'},
+      {k:'false',      l:'False branch', kind:'text',     v:'nurture'},
+      {k:'on_error',   l:'On error',     kind:'select',   opts:['Take the false branch','Stop the run','Retry once'], v:'Take the false branch'},
+    ]},
+  },
+  action: {
+    t:'action', ico:'action', icoCls:'bn-icon-out', cls:'',
+    label:'Action', sub:'HTTP, transform, store', group:'Native',
+    comp:{ kind:'config', summary:'Calls an external system or reshapes the payload.', fields:[
+      {k:'operation', l:'Operation', kind:'select', opts:['HTTP request','Transform','Store record'], v:'HTTP request'},
+      {k:'method',    l:'Method',    kind:'select', opts:['GET','POST','PUT','PATCH','DELETE'], v:'POST'},
+      {k:'url',       l:'URL',       kind:'text',   v:'{{ $GLOBAL.CRM_BASE_URL }}/contacts', mono:true},
+      {k:'timeout',   l:'Timeout (ms)', kind:'number', v:'8000'},
+      {k:'retries',   l:'Retries',   kind:'select', opts:['None','1','2 with backoff','3 with backoff'], v:'2 with backoff'},
+    ]},
+  },
+  wait: {
+    t:'wait', ico:'wait', icoCls:'bn-icon-trig', cls:'',
+    label:'Wait for Event', sub:'Pause until event arrives', group:'Native',
+    comp:{ kind:'config', summary:'Holds the run open until a matching event arrives or the deadline passes.', fields:[
+      {k:'event',      l:'Waits for',  kind:'text',   v:'approval.granted', mono:true},
+      {k:'match_on',   l:'Match on',   kind:'text',   v:'run.correlation_id', mono:true},
+      {k:'timeout',    l:'Timeout',    kind:'text',   v:'48 hours'},
+      {k:'on_timeout', l:'On timeout', kind:'select', opts:['Escalate to the account owner','Fail the run','Continue anyway'], v:'Escalate to the account owner'},
+    ]},
+  },
+  output: {
+    t:'output', ico:'output', icoCls:'bn-icon-out', cls:'bn-output',
+    label:'Output', sub:'Declares final result', group:'Native',
+    comp:{ kind:'config', summary:'Declares what the network returns to its caller.', fields:[
+      {k:'returns',    l:'Returns',    kind:'text',   v:'offer, crm_record_id', mono:true},
+      {k:'shape',      l:'Shape',      kind:'select', opts:['object','array','string'], v:'object'},
+      {k:'on_failure', l:'On failure', kind:'select', opts:['Return the partial result with an error field','Fail the run'], v:'Return the partial result with an error field'},
+    ]},
+  },
+
+  // ── Agents ────────────────────────────────────────────────────────────────
+  'ag-ca': {
+    t:'agent', ico:'agent', icoCls:'bn-icon-ag', cls:'', badge:'A',
+    label:'Customer Analyst', sub:'Analyzes customer behavior', group:'Agents',
+    comp:{ kind:'agent', summary:'Reads the inquiry plus account history and explains what the customer is asking for.',
+      model:'claude-sonnet-5', temperature:'0.2', maxTokens:'1024',
+      instructions:'Summarize the inquiry, name the product area, and flag anything that needs a human.',
+      tools:['CRM lookup','Usage metrics','Ticket history'],
+      knowledge:['Sales Playbook 2026','Customer Policies 2026'],
+      guardrails:['No pricing commitments','Escalate on legal or security topics'],
+      io:{in:'inquiry', out:'context'} },
+  },
+  'ag-dr': {
+    t:'agent', ico:'agent', icoCls:'bn-icon-ag', cls:'', badge:'A',
+    label:'Document Reader', sub:'Extracts data from docs', group:'Agents',
+    comp:{ kind:'agent', summary:'Pulls structured fields out of attached PDFs and returns a typed object.',
+      model:'claude-sonnet-5', temperature:'0.0', maxTokens:'2048',
+      instructions:'Extract only fields present in the document. Never infer a missing value.',
+      tools:['PDF parser','OCR fallback'],
+      knowledge:['Contract Templates 2026'],
+      guardrails:['Return null rather than guessing','Redact payment card numbers'],
+      io:{in:'file_url', out:'extracted_fields'} },
+  },
+  'ag-rg': {
+    t:'agent', ico:'agent', icoCls:'bn-icon-ag', cls:'', badge:'Ag',
+    label:'Response Generator', sub:'Generates customer response', group:'Agents',
+    comp:{ kind:'agent', summary:'Drafts the customer-facing reply from the analyst context and the knowledge plane.',
+      model:'claude-sonnet-5', temperature:'0.4', maxTokens:'1536',
+      instructions:'Answer in the customer\'s language. Cite the playbook section that supports the answer.',
+      tools:['Send email','Create ticket'],
+      knowledge:['Sales Playbook 2026'],
+      guardrails:['Never quote a discount above 15%','Human approval before sending'],
+      io:{in:'context + knowledge', out:'response'} },
+  },
+
+  // ── Knowledge ─────────────────────────────────────────────────────────────
+  'ks': {
+    t:'rag', ico:'rag', icoCls:'bn-icon-rag', cls:'', badge:'K',
+    label:'Knowledge Space', sub:'Truth Only · Sales Playbook 2026', group:'Knowledge',
+    comp:{ kind:'rag', summary:'Retrieves grounded passages from the governed knowledge planes.',
+      plane:'Truth Only', retrieval:'Hybrid (vector + keyword)', topK:'6',
+      packs:[
+        {n:'Sales Playbook 2026',    docs:847, state:'Active'},
+        {n:'Customer Policies 2026', docs:312, state:'Active'},
+      ],
+      planes:[{n:'Truth', on:true},{n:'Sandbox', on:false},{n:'Sources', on:false}] },
+  },
+};
+
+/**
+ * Workers are owned by the Workers module, so the network builder resolves them
+ * at call time rather than copying them into NODE_LIB. A library id of
+ * `wk:<workerId>` means "the Worker with that id", whatever it says today.
+ */
+/** Freezes a Worker's published contract onto the node that binds to it. */
+function pinContract(w) {
+  return {
+    version: w.version,
+    inputs:  w.inputs.map(f => ({ n:f.name, t:f.type, required:f.required })),
+    outputs: w.outputs.map(f => ({ n:f.name, t:f.type, guaranteed:f.guaranteed })),
+  };
+}
+
+/**
+ * A network is wired against the contract it saw when the node was added, so
+ * the card renders from the pin. Identity and internals still come from the
+ * live Worker — only the contract is frozen.
+ */
+function workerLibEntry(workerId, pin) {
+  const all = (typeof wkGetWorkers === 'function') ? wkGetWorkers() : [];
+  const w = all.find(x => x.id === workerId);
+  if (!w) return null;
+  const c = pin || pinContract(w);
+  return {
+    t:'workflow', ico:'workflow', icoCls:'bn-icon-wf', cls:'', badge:'W',
+    label: w.name,
+    sub: `In: ${c.inputs.map(i => i.n).join(', ') || '—'} → Out: ${c.outputs.map(o => o.n).join(', ') || '—'}`,
+    group:'Workers',
+    workerId: w.id,
+    outdated: !!pin && pin.version !== w.version,
+    liveVersion: w.version,
+    comp:{
+      kind:'worker', worker:w, summary:w.desc,
+      version: c.version, owner:w.owner,
+      inputs: c.inputs, outputs: c.outputs,
+      steps:  w.nodes.filter(n => !['start','end','global_vars'].includes(n.type))
+                     .map(n => ({ n:n.name, t:n.type === 'llm' || n.type === 'classifier' ? 'agent' : 'action' })),
+    },
+  };
+}
+
+/** What changed between the pinned contract and what the Worker publishes now. */
+function contractDiff(pin, w) {
+  const live = pinContract(w);
+  const d = { added: [], removed: [], changed: [] };
+  ['inputs', 'outputs'].forEach(side => {
+    const was = pin[side], now = live[side];
+    now.forEach(f => { if (!was.some(x => x.n === f.n)) d.added.push({ side, f }); });
+    was.forEach(f => {
+      const m = now.find(x => x.n === f.n);
+      if (!m) d.removed.push({ side, f });
+      else if (m.t !== f.t) d.changed.push({ side, f, from: f.t, to: m.t });
+    });
+  });
+  return d;
+}
+
+/** Resolves any library id — native, agent, knowledge, or a Worker. */
+function libEntry(libId, pin) {
+  if (typeof libId === 'string' && libId.startsWith('wk:')) return workerLibEntry(libId.slice(3), pin);
+  return NODE_LIB[libId];
+}
+
+/** The library entry for a node on the canvas, resolved against its pin. */
+function nodeLib(node) { return node ? libEntry(node.libId, node.pin) : null; }
+
+/** The Workers a network may call: published and callable. */
+function callableWorkers() {
+  const all = (typeof wkGetWorkers === 'function') ? wkGetWorkers() : [];
+  return all.filter(w => w.status === 'active');
+}
+
+/* ── Canvas state ───────────────────────────────────────────────────────────
+   Nodes carry their own position so they can be dragged and dropped freely. */
+const EC_NW = 192, EC_NH = 92;
+const WK_NW = 246, WK_HEAD_H = 52, WK_ROW_H = 20, WK_PAD_B = 12;
+
+/** A Worker node is as tall as its contract needs; everything else is fixed. */
+function nodeWidth(node)  { const l = nodeLib(node); return l && l.comp.kind === 'worker' ? WK_NW : EC_NW; }
+function nodeHeight(node) {
+  const l = nodeLib(node);
+  if (!l || l.comp.kind !== 'worker') return EC_NH;
+  const rows = Math.max(l.comp.inputs.length, l.comp.outputs.length, 1);
+  return WK_HEAD_H + rows * WK_ROW_H + WK_PAD_B;
+}
+
+/**
+ * Every port a node exposes. Native and agent nodes keep four anonymous sides;
+ * a Worker exposes one port per contract field, so the wiring is typed.
+ */
+function nodePorts(node) {
+  const l = nodeLib(node);
+  if (l && l.comp.kind === 'worker') {
+    const ins  = l.comp.inputs.map((f, i)  => ({ id:'in:'  + f.n, side:'w', idx:i, field:f }));
+    const outs = l.comp.outputs.map((f, i) => ({ id:'out:' + f.n, side:'e', idx:i, field:f }));
+    return ins.concat(outs);
+  }
+  return ['n','e','s','w'].map(side => ({ id:side, side }));
+}
+let ecNodes = [];
+let ecEdges = [];
+let ecSel = null;
+let ecSeq = 0;
+let ecDrag = null;
+let ecLink = null;
+let ecScale = 1;
+let ecDraft = null;   // unsaved edits for the node in the inspector
+
+/** The seed graph — the same four nodes the builder used to render in a fixed row. */
+function seedEditGraph() {
+  const SX = 52, topY = 100, GX = 60;
+  const seed = ['trigger', 'ag-ca', 'ks', 'ag-rg'];
+  const overrides = {
+    trigger: { label:'Webhook Received', sub:'Customer inquiry received' },
+    'ag-ca': { sub:'Analyzes customer inquiry' },
+  };
+  ecNodes = seed.map((libId, i) => ({
+    uid: 'n' + (++ecSeq),
+    libId,
+    x: SX + i * (EC_NW + GX),
+    y: topY,
+    ...(overrides[libId] || {}),
+  }));
+  ecEdges = [
+    { from: ecNodes[0].uid, fromPort:'e', to: ecNodes[1].uid, toPort:'w', label: 'inquiry'   },
+    { from: ecNodes[1].uid, fromPort:'e', to: ecNodes[2].uid, toPort:'w', label: 'context'   },
+    { from: ecNodes[2].uid, fromPort:'e', to: ecNodes[3].uid, toPort:'w', label: 'knowledge' },
+  ];
+}
+
+/** The graph's extent in canvas units, before any zoom is applied. */
+function contentSize() {
+  return {
+    w: Math.max(...ecNodes.map(n => n.x + nodeWidth(n)), 600) + 80,
+    h: Math.max(...ecNodes.map(n => n.y + nodeHeight(n)), 300) + 80,
+  };
+}
+
+/**
+ * Zooms out just enough for the whole graph to sit inside the visible canvas.
+ * Never zooms past 1:1 — a two-node graph should not balloon to fill the pane.
+ */
+function fitEditView() {
+  const canvas = document.getElementById('bldrEditCanvas');
+  if (!canvas || !ecNodes.length) return;
+  const availW = canvas.clientWidth, availH = canvas.clientHeight;
+  if (availW < 80 || availH < 80) return;   // laid out yet?
+  const { w, h } = contentSize();
+  ecScale = Math.max(0.4, Math.min(1, availW / w, availH / h));
+  const pct = document.getElementById('bldrZoomPct');
+  if (pct) pct.textContent = Math.round(ecScale * 100) + '%';
+  renderEditCanvas();
+}
 
 function renderEditCanvas(net) {
   const canvas = document.getElementById('bldrEditCanvas');
-  const flow = EDIT_FLOW;
-  const NW=192, NH=82, GX=60, SX=52, topY=100, canH=280;
-  const totalW = SX + flow.length*(NW+GX) + 60;
-  let svg = `<svg class="canvas-svg" width="${totalW}" height="${canH}" style="z-index:1">`;
-  flow.forEach((_,i)=>{
-    if(i<flow.length-1){
-      const x1=SX+i*(NW+GX)+NW+4, y1=topY+NH/2;
-      const x2=SX+(i+1)*(NW+GX)-4, y2=y1;
-      const mx=(x1+x2)/2;
-      svg+=`<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="rgba(0,194,194,0.3)" stroke-width="1.5" fill="none"/>`;
-      const lx=(x1+x2)/2, ly=y1-12;
-      svg+=`<rect x="${lx-24}" y="${ly-9}" width="48" height="16" rx="4" fill="rgba(0,0,0,0.7)" stroke="rgba(255,255,255,0.08)"/>`;
-      svg+=`<text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Inter,sans-serif">${EDGE_LABELS[i]}</text>`;
-    }
-  });
-  svg+='</svg>';
-  const nodes = flow.map((node,i)=>buildEditNode(node,SX+i*(NW+GX),topY,NW,NH)).join('');
-  canvas.style.cssText=`position:relative;width:${totalW}px;height:${canH}px;`;
-  canvas.innerHTML = svg + nodes;
+  if (!canvas) return;
+  if (!ecNodes.length) seedEditGraph();
+
+  const { w, h } = contentSize();
+  const svg = `<svg class="canvas-svg" width="${w}" height="${h}" style="z-index:1">`
+    + edgesMarkup() + linkPreviewMarkup() + '</svg>';
+
+  // The sizer carries the scaled footprint so scrolling still has the right
+  // extent; the layer inside keeps unscaled coordinates so all the node maths
+  // stays in canvas units.
+  canvas.innerHTML =
+    `<div class="ec-sizer" style="position:relative;width:${Math.round(w * ecScale)}px;height:${Math.round(h * ecScale)}px">
+       <div class="ec-layer" style="position:absolute;top:0;left:0;width:${w}px;height:${h}px;transform:scale(${ecScale});transform-origin:0 0">
+         ${svg}${ecNodes.map(buildEditNode).join('')}
+       </div>
+     </div>`;
 }
 
-function buildEditNode(node,x,y,w,h) {
-  const cfg = {
-    trigger:{cls:'bn-trigger',icoCls:'bn-icon-trig',ico:trigIco(),typeLabel:'Trigger'},
-    workflow:{cls:'',icoCls:'bn-icon-wf',ico:wfIco(),typeLabel:'Workflow'},
-    agent:{cls:'',icoCls:'bn-icon-ag',ico:agIco(),typeLabel:'Agent'},
-    rag:{cls:'',icoCls:'bn-icon-rag',ico:ragIco(),typeLabel:'K'},
-    output:{cls:'bn-output',icoCls:'bn-icon-out',ico:outIco(),typeLabel:'Out'},
+/** The canvas graph in the flat shape the Test-mode trace renders. */
+function editFlowView() {
+  return ecNodes.map(n => {
+    const lib = nodeLib(n) || {};
+    return {
+      id:    n.uid,
+      t:     lib.t,
+      l:     n.label || lib.label || n.libId,
+      sub:   n.sub   || lib.sub   || '',
+      badge: lib.badge || '',
+    };
+  });
+}
+
+/** One line describing how a native node is configured, shown on its card. */
+function configSummary(lib, cfg) {
+  if (lib.t === 'trigger')   return `${cfg.type} · ${cfg.emits}`;
+  if (lib.t === 'condition') return cfg.expression;
+  if (lib.t === 'action')    return `${cfg.method} ${cfg.url}`;
+  if (lib.t === 'wait')      return `${cfg.event} · ${cfg.timeout}`;
+  if (lib.t === 'output')    return cfg.returns;
+  return lib.sub;
+}
+
+/** Where a port sits on the canvas, in canvas coordinates. */
+function portPos(node, portId) {
+  const w = nodeWidth(node), h = nodeHeight(node);
+  const port = nodePorts(node).find(p => p.id === portId);
+  const side = port ? port.side : portId;
+  // Contract ports stack down the card's edge, one per row.
+  if (port && port.idx !== undefined) {
+    const y = node.y + WK_HEAD_H + port.idx * WK_ROW_H + WK_ROW_H / 2;
+    return { x: side === 'w' ? node.x : node.x + w, y };
+  }
+  if (side === 'n') return { x: node.x + w / 2, y: node.y };
+  if (side === 's') return { x: node.x + w / 2, y: node.y + h };
+  if (side === 'w') return { x: node.x,         y: node.y + h / 2 };
+  return              { x: node.x + w,          y: node.y + h / 2 };
+}
+
+/** The direction a cable leaves a port, so curves always exit perpendicular. */
+function portTangent(side, d) {
+  if (side === 'n') return { dx: 0,  dy: -d };
+  if (side === 's') return { dx: 0,  dy:  d };
+  if (side === 'w') return { dx: -d, dy:  0 };
+  return              { dx:  d, dy:  0 };
+}
+
+/** Cubic path between two ports — horizontal, vertical or diagonal alike. */
+function edgeGeometry(p1, s1, p2, s2) {
+  const d = Math.max(42, Math.hypot(p2.x - p1.x, p2.y - p1.y) * 0.42);
+  const t1 = portTangent(s1, d), t2 = portTangent(s2, d);
+  const c1 = { x: p1.x + t1.dx, y: p1.y + t1.dy };
+  const c2 = { x: p2.x + t2.dx, y: p2.y + t2.dy };
+  return {
+    d: `M${p1.x} ${p1.y} C${c1.x} ${c1.y} ${c2.x} ${c2.y} ${p2.x} ${p2.y}`,
+    // Point at t=0.5 on the curve — where the label sits.
+    mid: { x: (p1.x + 3 * c1.x + 3 * c2.x + p2.x) / 8,
+           y: (p1.y + 3 * c1.y + 3 * c2.y + p2.y) / 8 },
   };
-  const t=cfg[node.t]||cfg.workflow;
-  const badgeTxt=node.badge||'';
-  const bdgMap={W:'bn-bw',A:'bn-ba',Ag:'bn-bag',K:'bn-bk',OUT:'bn-bout'};
-  const bdg=badgeTxt?`<span class="bn-badge ${bdgMap[badgeTxt]||''}">${badgeTxt}</span>`:'';
-  const isRag=node.t==='rag';
-  const sub2=isRag?`<div style="display:flex;gap:4px;margin-bottom:4px"><span class="bn-chip bn-chip-nat">Native</span><span class="bn-chip bn-chip-ok">Active</span></div><div class="bn-kn-lbl">Truth Only</div><div class="bn-kn-pack">Sales Playbook 2026</div>`:`<div class="bn-stat">${node.sub}</div>`;
-  return `<div class="bn ${t.cls}" style="left:${x}px;top:${y}px;width:${w}px;z-index:2;cursor:pointer" onclick="selectEditNode('${node.id}')">
-    <div class="bn-hd"><div class="bn-icon ${t.icoCls}">${t.ico}</div>${bdg}</div>
-    <div class="bn-name">${node.l}</div>${sub2}
-    <div class="bn-port bn-port-in"></div>
-    <div class="bn-port bn-port-out"></div>
+}
+
+/** Picks the facing sides for a connection made by dropping on a node body. */
+function bestSides(a, b) {
+  const dx = (b.x + nodeWidth(b) / 2) - (a.x + nodeWidth(a) / 2);
+  const dy = (b.y + nodeHeight(b) / 2) - (a.y + nodeHeight(a) / 2);
+  const pick = (node, side) => {
+    // A Worker has no anonymous sides — fall back to its first matching port.
+    const ports = nodePorts(node);
+    if (ports.some(p => p.id === side)) return side;
+    const want = side === 'w' || side === 'n' ? 'in:' : 'out:';
+    return (ports.find(p => p.id.startsWith(want)) || ports[0]).id;
+  };
+  const sides = Math.abs(dx) >= Math.abs(dy)
+    ? (dx >= 0 ? ['e', 'w'] : ['w', 'e'])
+    : (dy >= 0 ? ['s', 'n'] : ['n', 's']);
+  return [pick(a, sides[0]), pick(b, sides[1])];
+}
+
+/** Repaints just the edge layer — used while a node is being dragged. */
+function edgesMarkup() {
+  return ecEdges.map((e, i) => {
+    const a = ecNodes.find(n => n.uid === e.from);
+    const b = ecNodes.find(n => n.uid === e.to);
+    if (!a || !b) return '';
+    const g = edgeGeometry(portPos(a, e.fromPort), e.fromPort, portPos(b, e.toPort), e.toPort);
+    let out = `<path class="ec-edge" d="${g.d}" fill="none"/>`;
+    // A fat transparent path on top, so the thin cable is still easy to hit.
+    out += `<path class="ec-edge-hit" d="${g.d}" fill="none" onclick="removeEdge(${i})">
+      <title>Click to remove this connection</title></path>`;
+    if (e.label) {
+      out += `<rect class="ec-edge-lbl-bg" x="${g.mid.x - 26}" y="${g.mid.y - 9}" width="52" height="16" rx="4"/>`;
+      out += `<text class="ec-edge-lbl" x="${g.mid.x}" y="${g.mid.y + 3}" text-anchor="middle">${e.label}</text>`;
+    }
+    return out;
+  }).join('');
+}
+
+/** The cable that follows the cursor while a connection is being drawn. */
+function linkPreviewMarkup() {
+  if (!ecLink || !ecLink.cur) return '';
+  const a = ecNodes.find(n => n.uid === ecLink.from);
+  if (!a) return '';
+  const p1 = portPos(a, ecLink.fromPort);
+  const target = ecLink.over
+    ? portPos(ecNodes.find(n => n.uid === ecLink.over.uid), ecLink.over.port)
+    : ecLink.cur;
+  const g = edgeGeometry(p1, ecLink.fromPort, target, ecLink.over ? ecLink.over.port : 'w');
+  return `<path class="ec-edge-draft" d="${g.d}" fill="none"/>`;
+}
+
+function renderEditEdges() {
+  const canvas = document.getElementById('bldrEditCanvas');
+  const svg = canvas && canvas.querySelector('.canvas-svg');
+  if (!svg) return;
+  svg.innerHTML = edgesMarkup() + linkPreviewMarkup();
+}
+
+/** Removes a connection. Called from the cable's own click handler. */
+function removeEdge(i) {
+  const e = ecEdges[i];
+  if (!e) return;
+  ecEdges.splice(i, 1);
+  renderEditCanvas();
+  toast('Connection removed', 'info');
+}
+
+/** A Worker renders as its interface: name, version, and one row per field. */
+function buildWorkerNode(node, lib) {
+  const c = lib.comp, w = c.worker;
+  const rows = Math.max(c.inputs.length, c.outputs.length, 1);
+  const ovr = node.overrides && Object.keys(node.overrides).length;
+  const row = i => {
+    const i_ = c.inputs[i], o_ = c.outputs[i];
+    return `<div class="bnw-row">
+      <span class="bnw-in">${i_ ? `<span class="bnw-f">${i_.n}</span><span class="bnw-t">${i_.t}</span>` : ''}</span>
+      <span class="bnw-out">${o_ ? `<span class="bnw-t">${o_.t}</span><span class="bnw-f">${o_.n}</span>` : ''}</span>
+    </div>`;
+  };
+  const ports = nodePorts(node).map(p => {
+    const top = WK_HEAD_H + p.idx * WK_ROW_H + WK_ROW_H / 2;
+    return `<div class="bn-port bn-port-io bn-port-${p.side}" data-port="${p.id}" data-uid="${node.uid}"
+                 style="top:${top}px" title="${p.field.n} · ${p.field.t}"></div>`;
+  }).join('');
+  return `<div class="bn bn-worker ${ecSel === node.uid ? 'sel' : ''}" data-uid="${node.uid}"
+    style="left:${node.x}px;top:${node.y}px;width:${WK_NW}px;height:${nodeHeight(node)}px;z-index:2">
+    <div class="bnw-hd">
+      <div class="bn-icon bn-icon-wf">${NODE_ICO.workflow()}</div>
+      <div class="bnw-id">
+        <div class="bnw-nm">${node.label || lib.label}</div>
+        <div class="bnw-meta">Worker · ${c.steps.length} nodes</div>
+      </div>
+      <span class="bnw-ver${lib.outdated ? ' is-stale' : ''}">${c.version}</span>
+    </div>
+    <div class="bnw-body">${Array.from({length: rows}, (_, i) => row(i)).join('')}</div>
+    ${lib.outdated ? `<span class="bnw-upd" title="Pinned to ${c.version}; ${lib.liveVersion} is published">↑ ${lib.liveVersion}</span>` : ''}
+    ${ovr ? `<span class="bn-ovr">${ovr} override${ovr === 1 ? '' : 's'}</span>` : ''}
+    ${ports}
   </div>`;
 }
 
-function selectEditNode(nodeId) {
-  const nodeMap = {
-    'wh':{name:'Webhook Received',sub:'Trigger configuration',type:'Trigger'},
-    'ag-ca':{name:'Customer Analyst',sub:'Agent configuration',type:'Agent'},
-    'ks':{name:'Knowledge Space',sub:'RAG node configuration',type:'RAG'},
-    'rg':{name:'Response Generator',sub:'Agent configuration',type:'Agent'},
-    'wf-lq':{name:'Lead Qualification',sub:'Workflow configuration',type:'Workflow'},
-    'wf-de':{name:'Data Enrichment',sub:'Workflow configuration',type:'Workflow'},
-    'wf-cs':{name:'CRM Sync',sub:'Workflow configuration',type:'Workflow'},
-    'ag-dr':{name:'Document Reader',sub:'Agent configuration',type:'Agent'},
+function buildEditNode(node) {
+  const lib = nodeLib(node) || {};
+  if (lib.comp && lib.comp.kind === 'worker') return buildWorkerNode(node, lib);
+  const label = node.label || lib.label || node.libId;
+  const sub   = node.sub   || lib.sub   || '';
+  const bdgMap = { W:'bn-bw', A:'bn-ba', Ag:'bn-bag', K:'bn-bk', OUT:'bn-bout' };
+  const bdg = lib.badge ? `<span class="bn-badge ${bdgMap[lib.badge] || ''}">${lib.badge}</span>` : '';
+  const cfg = node.config;
+  const body = lib.t === 'rag'
+    ? `<div style="display:flex;gap:4px;margin-bottom:4px"><span class="bn-chip bn-chip-nat">Native</span><span class="bn-chip bn-chip-ok">Active</span></div>
+       <div class="bn-kn-lbl">${lib.comp.plane}</div><div class="bn-kn-pack">${lib.comp.packs[0].n}</div>`
+    : `<div class="bn-stat">${cfg ? configSummary(lib, cfg) : sub}</div>`;
+  return `<div class="bn ${lib.cls || ''} ${ecSel === node.uid ? 'sel' : ''}" data-uid="${node.uid}"
+    style="left:${node.x}px;top:${node.y}px;width:${nodeWidth(node)}px;z-index:2">
+    <div class="bn-hd"><div class="bn-icon ${lib.icoCls || ''}">${(NODE_ICO[lib.ico] || NODE_ICO.workflow)()}</div>${bdg}</div>
+    <div class="bn-name">${label}</div>${body}
+    ${node.overrides && Object.keys(node.overrides).length
+      ? `<span class="bn-ovr" title="${Object.keys(node.overrides).length} setting(s) overridden in this network">
+           ${Object.keys(node.overrides).length} override${Object.keys(node.overrides).length === 1 ? '' : 's'}</span>`
+      : ''}
+    ${['n','e','s','w'].map(side =>
+      `<div class="bn-port bn-port-${side}" data-port="${side}" data-uid="${node.uid}"
+            title="Drag to connect"></div>`).join('')}
+  </div>`;
+}
+
+/* ── Selection & composition ────────────────────────────────────────────── */
+
+/** Canvas node click — select it and show its composition. */
+function selectEditNode(ref) {
+  // Accept either a canvas uid or a library id (the library calls it with a lib id).
+  const node = ecNodes.find(n => n.uid === ref) || ecNodes.find(n => n.libId === ref);
+  const libId = node ? node.libId : ref;
+  ecSel = node ? node.uid : null;
+  document.querySelectorAll('#bldrEditCanvas .bn').forEach(el =>
+    el.classList.toggle('sel', el.dataset.uid === ecSel));
+  showNodeComposition(libId, node);
+}
+
+/** Library item click — inspect without touching the canvas. */
+function inspectLibNode(libId) {
+  ecSel = null;
+  document.querySelectorAll('#bldrEditCanvas .bn').forEach(el => el.classList.remove('sel'));
+  showNodeComposition(libId, null);
+}
+
+const TYPE_LABEL = {
+  trigger:'Trigger', condition:'Condition', action:'Action', wait:'Wait',
+  output:'Output', workflow:'Workflow', agent:'Agent', rag:'Knowledge',
+};
+
+function showNodeComposition(libId, node) {
+  // On the canvas the pin decides which contract we are looking at.
+  const lib = node ? nodeLib(node) : libEntry(libId);
+  if (!lib) return;
+  const label = (node && node.label) || lib.label;
+  const c = lib.comp;
+
+  document.getElementById('inspTitle').textContent = label;
+  document.getElementById('inspSub').textContent = `${TYPE_LABEL[lib.t] || 'Node'} composition`;
+  document.getElementById('inspNodeNm').textContent = label;
+  const st = document.querySelector('.insp-node-st');
+  if (st) st.textContent = `${TYPE_LABEL[lib.t] || 'Node'} · ${node ? 'On canvas' : 'In library'}`;
+  const ico = document.querySelector('.insp-node-ico');
+  if (ico) ico.innerHTML = (NODE_ICO[lib.ico] || NODE_ICO.workflow)();
+
+  // Only a native node sitting on the canvas is owned by this network, so only
+  // that combination gets an editable form.
+  const editable   = !!node && c.kind === 'config';
+  const overridable = !!node && !!OVERRIDE_SCHEMA[lib.t];
+  ecDraft = editable
+    ? { uid: node.uid, mode: 'config', name: node.label || lib.label, values: { ...nodeConfig(node) }, dirty: false }
+    : overridable
+      ? { uid: node.uid, mode: 'override', name: node.label || lib.label, values: { ...(node.overrides || {}) }, dirty: false }
+      : null;
+
+  const body = document.getElementById('inspBody');
+  const head = `<div class="insp-sec">
+      <div class="insp-sec-lbl">What it does</div>
+      <p class="nc-summary">${c.summary}</p>
+      ${node ? '' : '<div class="nc-hint">Drag it onto the canvas to add it to this network.</div>'}
+    </div>`;
+
+  const tail = node
+    ? (lib.comp.kind === 'worker' ? updateBanner(lib, node) : '')
+      + ownedElsewhere(lib) + (overridable ? compOverrides(lib, node) : '')
+    : '';
+  body.innerHTML = head + (editable ? compConfigEditable(node) : ({
+    // A Worker renders like a workflow: internal steps, contract, provenance.
+    worker:   () => compWorkflow(c) + tail,
+    workflow: () => compWorkflow(c) + tail,
+    agent:    () => compAgent(c)    + tail,
+    rag:      () => compRag(c)      + tail,
+    config:   () => compConfig(c),
+  }[c.kind] || (() => ''))());
+
+  syncInspFooter();
+}
+
+function compWorkflow(c) {
+  return `<div class="insp-sec">
+      <div class="insp-sec-lbl">Internal steps <span class="nc-count">${c.steps.length}</span></div>
+      <div class="nc-steps">${c.steps.map((s, i) => `
+        <div class="nc-step">
+          <span class="nc-step-i">${i + 1}</span>
+          <span class="nc-step-nm">${s.n}</span>
+          <span class="nc-step-t nc-t-${s.t}">${TYPE_LABEL[s.t] || s.t}</span>
+        </div>`).join('')}</div>
+    </div>
+    <div class="insp-sec">
+      <div class="insp-sec-lbl">Contract</div>
+      <div class="nc-io-lbl">Inputs</div>
+      ${c.inputs.map(f => `<div class="nc-io"><span class="nc-io-n">${f.n}</span><span class="nc-io-t">${f.t}</span></div>`).join('')}
+      <div class="nc-io-lbl" style="margin-top:8px">Outputs</div>
+      ${c.outputs.map(f => `<div class="nc-io"><span class="nc-io-n">${f.n}</span><span class="nc-io-t nc-io-out">${f.t}</span></div>`).join('')}
+    </div>
+    <div class="insp-sec">
+      <div class="insp-sec-lbl">Source</div>
+      <div class="nc-kv"><span>Version</span><b>${c.version}</b></div>
+      <div class="nc-kv"><span>Owner</span><b>${c.owner}</b></div>
+    </div>`;
+}
+
+function compAgent(c) {
+  const list = (title, items, cls) => `<div class="insp-sec">
+      <div class="insp-sec-lbl">${title} <span class="nc-count">${items.length}</span></div>
+      <div class="nc-tags">${items.map(x => `<span class="nc-tag ${cls}">${x}</span>`).join('')}</div>
+    </div>`;
+  return `<div class="insp-sec">
+      <div class="insp-sec-lbl">Model</div>
+      <div class="nc-kv"><span>Model</span><b>${c.model}</b></div>
+      <div class="nc-kv"><span>Temperature</span><b>${c.temperature}</b></div>
+      <div class="nc-kv"><span>Max tokens</span><b>${c.maxTokens}</b></div>
+    </div>
+    <div class="insp-sec">
+      <div class="insp-sec-lbl">Instructions</div>
+      <p class="nc-instr">${c.instructions}</p>
+    </div>
+    ${list('Tools', c.tools, 'nc-tag-tool')}
+    ${list('Knowledge', c.knowledge, 'nc-tag-kn')}
+    ${list('Guardrails', c.guardrails, 'nc-tag-gr')}
+    <div class="insp-sec">
+      <div class="insp-sec-lbl">Wiring</div>
+      <div class="nc-kv"><span>Reads</span><b>${c.io.in}</b></div>
+      <div class="nc-kv"><span>Emits</span><b>${c.io.out}</b></div>
+    </div>`;
+}
+
+function compRag(c) {
+  return `<div class="insp-sec">
+      <div class="insp-sec-lbl">Retrieval</div>
+      <div class="nc-kv"><span>Plane</span><b>${c.plane}</b></div>
+      <div class="nc-kv"><span>Strategy</span><b>${c.retrieval}</b></div>
+      <div class="nc-kv"><span>Top K</span><b>${c.topK}</b></div>
+    </div>
+    <div class="insp-sec">
+      <div class="insp-sec-lbl">Knowledge packs <span class="nc-count">${c.packs.length}</span></div>
+      ${c.packs.map(p => `<div class="nc-io"><span class="nc-io-n">${p.n}</span><span class="nc-io-t nc-io-out">${p.docs} docs</span></div>`).join('')}
+    </div>
+    <div class="insp-sec">
+      <div class="insp-sec-lbl">Planes</div>
+      <div class="nc-tags">${c.planes.map(p => `<span class="nc-tag ${p.on ? 'nc-tag-kn' : 'nc-tag-off'}">${p.n}${p.on ? '' : ' · off'}</span>`).join('')}</div>
+    </div>`;
+}
+
+/**
+ * Per-network overrides. Agents and Workflows are shared resources owned by
+ * their own studio; a network may only change how *it* invokes them. Anything
+ * not overridden stays inherited, so upstream edits keep flowing through.
+ * `inherit` names the key on the composition that supplies the baseline.
+ */
+const OVERRIDE_SCHEMA = {
+  agent: [
+    {k:'input',       l:'Input mapping', kind:'source'},
+    {k:'model',       l:'Model',         kind:'select', opts:['claude-opus-5','claude-sonnet-5','claude-haiku-4-5'], inherit:'model'},
+    {k:'temperature', l:'Temperature',   kind:'text',   inherit:'temperature'},
+    {k:'maxTokens',   l:'Max tokens',    kind:'number', inherit:'maxTokens'},
+    {k:'prompt',      l:'System prompt', kind:'textarea', inherit:'instructions'},
+    {k:'onError',     l:'On error',      kind:'select', opts:['Fail the run','Skip this node','Retry once'], base:'Fail the run'},
+  ],
+  workflow: [
+    {k:'input',   l:'Input mapping', kind:'source'},
+    {k:'timeout', l:'Timeout',       kind:'text',   base:'5 minutes'},
+    {k:'retries', l:'Retries',       kind:'select', opts:['None','1','2 with backoff'], base:'None'},
+    {k:'onError', l:'On error',      kind:'select', opts:['Fail the run','Skip this node','Route to fallback'], base:'Fail the run'},
+  ],
+};
+
+/** Options for an input-mapping field — whatever the other nodes on the canvas emit. */
+function sourceOptions(uid) {
+  return ['Auto — previous node output'].concat(
+    ecNodes.filter(n => n.uid !== uid).map(n => {
+      const l = nodeLib(n);
+      return `${n.label || l.label} → output`;
+    }));
+}
+
+/** The inherited value behind an override field. */
+function overrideBaseline(field, comp) {
+  if (field.kind === 'source') return 'Auto — previous node output';
+  if (field.inherit) return String(comp[field.inherit]);
+  return field.base;
+}
+
+/** A node's saved configuration, seeded from the library defaults on first use. */
+function nodeConfig(node) {
+  const lib = nodeLib(node);
+  if (!node.config) {
+    node.config = Object.fromEntries(lib.comp.fields.map(f => [f.k, f.v]));
+  }
+  return node.config;
+}
+
+/** Read-only view — used for a native node seen in the library, with no instance. */
+function compConfig(c) {
+  return `<div class="insp-sec">
+      <div class="insp-sec-lbl">Default configuration</div>
+      ${c.fields.map(f => `<div class="nc-kv"><span>${f.l}</span><b class="${f.mono ? 'nc-mono' : ''}">${f.v}</b></div>`).join('')}
+    </div>`;
+}
+
+function fieldControl(f, value) {
+  const id = `cfg_${f.k}`;
+  const mono = f.mono ? ' nc-mono-input' : '';
+  const common = `id="${id}" class="nc-input${mono}" oninput="draftSet('${f.k}',this.value)"`;
+  let control;
+  if (f.kind === 'select') {
+    control = `<select id="${id}" class="nc-input" onchange="draftSet('${f.k}',this.value)">
+      ${f.opts.map(o => `<option${o === value ? ' selected' : ''}>${o}</option>`).join('')}
+    </select>`;
+  } else if (f.kind === 'textarea') {
+    control = `<textarea ${common} rows="2">${value}</textarea>`;
+  } else if (f.kind === 'number') {
+    control = `<input ${common} type="number" value="${value}"/>`;
+  } else {
+    control = `<input ${common} type="text" value="${value}"/>`;
+  }
+  return `<div class="nc-field"><label for="${id}">${f.l}</label>${control}</div>`;
+}
+
+/** Editable form — a native node placed on the canvas belongs to this network. */
+function compConfigEditable(node) {
+  const lib = nodeLib(node);
+  const v = ecDraft.values;
+  return `<div class="insp-sec">
+      <div class="nc-field">
+        <label for="cfg_name">Node name</label>
+        <input id="cfg_name" class="nc-input" type="text" value="${ecDraft.name}"
+               oninput="draftSetName(this.value)"/>
+      </div>
+    </div>
+    <div class="insp-sec">
+      <div class="insp-sec-lbl">Configuration</div>
+      ${lib.comp.fields.map(f => fieldControl(f, v[f.k])).join('')}
+    </div>`;
+}
+
+/** Renders one override row: inherited by default, marked when it is not. */
+function overrideControl(field, baseline, current, uid) {
+  const on = current !== undefined;
+  const value = on ? current : baseline;
+  const id = `ovr_${field.k}`;
+  const opts = field.kind === 'source' ? sourceOptions(uid) : field.opts;
+  let control;
+  if (field.kind === 'select' || field.kind === 'source') {
+    const list = opts.includes(value) ? opts : [value].concat(opts);
+    control = `<select id="${id}" class="nc-input" onchange="draftSet('${field.k}',this.value)">
+      ${list.map(o => `<option${o === value ? ' selected' : ''}>${o}</option>`).join('')}
+    </select>`;
+  } else if (field.kind === 'textarea') {
+    control = `<textarea id="${id}" class="nc-input" rows="3"
+      oninput="draftSet('${field.k}',this.value)">${value}</textarea>`;
+  } else {
+    control = `<input id="${id}" class="nc-input" type="${field.kind === 'number' ? 'number' : 'text'}"
+      value="${value}" oninput="draftSet('${field.k}',this.value)"/>`;
+  }
+  return `<div class="nc-field nc-ovr${on ? ' is-on' : ''}">
+    <label for="${id}">
+      ${field.l}
+      ${on
+        ? `<span class="nc-ovr-chip">Overridden</span>
+           <button class="nc-ovr-revert" onclick="draftRevert('${field.k}')"
+                   title="Revert to the inherited value">Revert</button>`
+        : '<span class="nc-ovr-inherit">Inherited</span>'}
+    </label>
+    ${control}
+    ${on ? `<div class="nc-ovr-base">Shared value: <code>${baseline}</code></div>` : ''}
+  </div>`;
+}
+
+/** The "Override in this network" block under a shared resource's composition. */
+function compOverrides(lib, node) {
+  const schema = OVERRIDE_SCHEMA[lib.t];
+  if (!schema) return '';
+  const cur = ecDraft.values;
+  const count = Object.keys(cur).length;
+  return `<div class="insp-sec">
+      <div class="insp-sec-lbl">
+        Override in this network
+        <span id="ovrCount" class="${count ? 'nc-ovr-count' : 'nc-count'}">${count || 'none'}</span>
+      </div>
+      <p class="nc-ovr-help" id="ovrHelp">${count
+        ? `${count} setting${count === 1 ? '' : 's'} changed here only. Every other network keeps the shared value.`
+        : 'Using the shared values. Change anything below and it applies to this network alone.'}</p>
+      ${schema.map(f => overrideControl(f, overrideBaseline(f, lib.comp), cur[f.k], node.uid)).join('')}
+    </div>`;
+}
+
+/** The "a newer version is published" banner, with what would actually change. */
+function updateBanner(lib, node) {
+  if (!lib.outdated) {
+    return `<div class="insp-sec">
+      <div class="nc-pin"><span class="nc-pin-dot"></span>
+        Pinned to <b>${node.pin ? node.pin.version : lib.comp.version}</b> — the version this network is wired against.</div>
+    </div>`;
+  }
+  const d = contractDiff(node.pin, lib.comp.worker);
+  const rows = []
+    .concat(d.added.map(x   => `<div class="nc-chg"><span class="nc-chg-k add">+</span><code>${x.f.n}</code> <span>${x.side.slice(0, -1)} · ${x.f.t}</span></div>`))
+    .concat(d.removed.map(x => `<div class="nc-chg"><span class="nc-chg-k rem">−</span><code>${x.f.n}</code> <span>${x.side.slice(0, -1)} · removed</span></div>`))
+    .concat(d.changed.map(x => `<div class="nc-chg"><span class="nc-chg-k mod">→</span><code>${x.f.n}</code> <span>${x.from} → ${x.to}</span></div>`));
+  const breaking = d.removed.length + d.changed.length;
+  return `<div class="insp-sec">
+      <div class="nc-upd ${breaking ? 'is-breaking' : ''}">
+        <div class="nc-upd-hd">
+          <b>${lib.liveVersion} is published</b>
+          <span>this network runs ${node.pin.version}</span>
+        </div>
+        ${rows.length
+          ? `<div class="nc-upd-diff">${rows.join('')}</div>`
+          : '<div class="nc-upd-diff"><span class="nc-fdesc">The contract is unchanged — only the internals moved.</span></div>'}
+        ${breaking
+          ? `<div class="nc-upd-warn">${breaking} breaking change${breaking === 1 ? '' : 's'}. Updating drops any wiring that used the removed fields.</div>`
+          : ''}
+        <button class="nc-upd-btn" onclick="updateWorkerPin('${node.uid}')">Update to ${lib.liveVersion}</button>
+      </div>
+    </div>`;
+}
+
+/** Re-pins the node to the current version, dropping wiring that no longer fits. */
+function updateWorkerPin(uid) {
+  const node = ecNodes.find(n => n.uid === uid);
+  if (!node || !node.pin) return;
+  const lib = nodeLib(node);
+  const w = lib.comp.worker;
+  node.pin = pinContract(w);
+  // Any cable on a port the new contract no longer exposes has to go.
+  const valid = new Set(nodePorts(node).map(p => p.id));
+  const before = ecEdges.length;
+  ecEdges = ecEdges.filter(e =>
+    !((e.from === uid && !valid.has(e.fromPort)) || (e.to === uid && !valid.has(e.toPort))));
+  const dropped = before - ecEdges.length;
+  renderEditCanvas();
+  selectEditNode(uid);
+  toast(dropped
+    ? `Updated to ${w.version} · ${dropped} connection${dropped === 1 ? '' : 's'} removed`
+    : `Updated to ${w.version}`, dropped ? 'error' : 'success');
+}
+
+/** Opens the Worker's own builder, with a way back to this network. */
+function drillIntoWorker(uid) {
+  const node = ecNodes.find(n => n.uid === uid);
+  const lib = node && nodeLib(node);
+  if (!lib || !lib.workerId) return;
+  const netName = (bldrNet && bldrNet.name) || 'Network';
+  wkDrillInto(lib.workerId, {
+    label: netName,
+    onBack: () => {
+      // The Workers module owns that view, so clear it before reclaiming ours.
+      document.getElementById('vWorkerBuilder')?.classList.remove('active');
+      showView('vBuilder');
+      document.body.classList.add('builder-mode');
+      renderWorkerLibrary();
+      renderEditCanvas();
+      selectEditNode(uid);
+      requestAnimationFrame(fitEditView);
+    },
+  });
+}
+
+/** Everything an Agent, Workflow or Knowledge node owns lives in its own studio. */
+function ownedElsewhere(lib) {
+  const where = { agent:'Agents', workflow:'Agentic Workflows', rag:'Knowledge' }[lib.t] || 'its studio';
+  return `<div class="insp-sec">
+      <div class="nc-owned">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <rect x="2.5" y="5.5" width="7" height="5" rx="1.3" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M4 5.5V4a2 2 0 014 0v1.5" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <span>This ${TYPE_LABEL[lib.t].toLowerCase()} is a shared resource defined in <b>${where}</b>.
+        What you see above is the shared definition${OVERRIDE_SCHEMA[lib.t] ? ' — override it for this network below' : ''}.</span>
+      </div>
+      <button class="nc-open-btn" onclick="toast('Opening ${lib.label} in ${where}…','info')">
+        Open in ${where}
+      </button>
+    </div>`;
+}
+
+/** Writes a field into the draft and lights up the footer. */
+function draftSet(key, value) {
+  if (!ecDraft) return;
+  const wasOn = ecDraft.values[key] !== undefined;
+  ecDraft.values[key] = value;
+  if (ecDraft.mode === 'override' && !wasOn) syncOverrideRow(key);
+  markDraftDirty();
+}
+/** Drops one override so the field goes back to inheriting. */
+function draftRevert(key) {
+  if (!ecDraft) return;
+  delete ecDraft.values[key];
+  ecDraft.dirty = true;
+  syncOverrideRow(key);
+  syncInspFooter();
+}
+
+/**
+ * Repaints a single override row in place. Doing it in place rather than
+ * re-rendering the section keeps the caret where the user left it.
+ */
+function syncOverrideRow(key) {
+  if (!ecDraft) return;
+  const node = ecNodes.find(n => n.uid === ecDraft.uid);
+  if (!node) return;
+  const lib = nodeLib(node);
+  const field = (OVERRIDE_SCHEMA[lib.t] || []).find(f => f.k === key);
+  const el = document.getElementById(`ovr_${key}`);
+  if (!field || !el) return;
+
+  const row = el.closest('.nc-ovr');
+  const on = ecDraft.values[key] !== undefined;
+  const baseline = overrideBaseline(field, lib.comp);
+  row.classList.toggle('is-on', on);
+
+  const label = row.querySelector('label');
+  const badge = label.querySelector('.nc-ovr-inherit, .nc-ovr-chip');
+  if (on) {
+    badge.className = 'nc-ovr-chip';
+    badge.textContent = 'Overridden';
+    if (!label.querySelector('.nc-ovr-revert')) {
+      label.insertAdjacentHTML('beforeend',
+        `<button class="nc-ovr-revert" onclick="draftRevert('${key}')" title="Revert to the inherited value">Revert</button>`);
+    }
+    if (!row.querySelector('.nc-ovr-base')) {
+      row.insertAdjacentHTML('beforeend', `<div class="nc-ovr-base">Shared value: <code>${baseline}</code></div>`);
+    }
+  } else {
+    badge.className = 'nc-ovr-inherit';
+    badge.textContent = 'Inherited';
+    label.querySelector('.nc-ovr-revert')?.remove();
+    row.querySelector('.nc-ovr-base')?.remove();
+    el.value = baseline;
+  }
+  syncOverrideSummary();
+}
+
+/** Keeps the section's counter and helper sentence honest. */
+function syncOverrideSummary() {
+  if (!ecDraft) return;
+  const n = Object.keys(ecDraft.values).length;
+  const chip = document.getElementById('ovrCount');
+  const help = document.getElementById('ovrHelp');
+  if (chip) { chip.className = n ? 'nc-ovr-count' : 'nc-count'; chip.textContent = n || 'none'; }
+  if (help) {
+    help.textContent = n
+      ? `${n} setting${n === 1 ? '' : 's'} changed here only. Every other network keeps the shared value.`
+      : 'Using the shared values. Change anything below and it applies to this network alone.';
+  }
+}
+
+function draftSetName(value) {
+  if (!ecDraft) return;
+  ecDraft.name = value;
+  markDraftDirty();
+}
+function markDraftDirty() {
+  if (!ecDraft) return;
+  ecDraft.dirty = true;
+  syncInspFooter();
+}
+
+/** Commits the draft onto the node and repaints the canvas. */
+function applyNodeConfig() {
+  if (!ecDraft) return;
+  const node = ecNodes.find(n => n.uid === ecDraft.uid);
+  if (!node) return;
+  if (ecDraft.mode === 'override') {
+    node.overrides = { ...ecDraft.values };
+    if (!Object.keys(node.overrides).length) delete node.overrides;
+  } else {
+    node.config = { ...ecDraft.values };
+    const name = (ecDraft.name || '').trim();
+    if (name) node.label = name;
+  }
+  ecDraft.dirty = false;
+  renderEditCanvas();
+  syncInspFooter();
+  toast(`${node.label || nodeLib(node).label} updated`, 'success');
+}
+
+/** Throws the draft away and re-reads what is actually saved on the node. */
+function resetNodeConfig() {
+  if (!ecDraft) return;
+  const node = ecNodes.find(n => n.uid === ecDraft.uid);
+  if (!node) return;
+  selectEditNode(node.uid);
+  toast('Reverted to the saved configuration', 'info');
+}
+
+/** The footer only means something for a node this network owns. */
+function syncInspFooter() {
+  const ft = document.getElementById('inspFooter');
+  const reset = document.getElementById('inspResetBtn');
+  const apply = document.getElementById('inspApplyBtn');
+  if (!ft) return;
+  if (!ecDraft) { ft.style.display = 'none'; return; }
+  ft.style.display = '';
+  const dirty = !!ecDraft.dirty;
+  reset.disabled = !dirty;
+  apply.disabled = !dirty;
+  apply.textContent = dirty ? 'Apply' : 'Saved';
+}
+
+/* ── Drag from the library, drag on the canvas ───────────────────────────── */
+
+function initEditCanvasDnD() {
+  const area = document.getElementById('bldrEditCanvas');
+  if (!area || area.dataset.dnd) return;
+  area.dataset.dnd = '1';
+
+  // Library → canvas
+  /** Pointer position in canvas units, undoing scroll and zoom. */
+  const atCanvas = e => {
+    const r = area.getBoundingClientRect();
+    return {
+      x: (e.clientX - r.left + area.scrollLeft) / ecScale,
+      y: (e.clientY - r.top  + area.scrollTop)  / ecScale,
+    };
   };
-  const info = nodeMap[nodeId]||{name:nodeId,sub:'Node configuration',type:'Node'};
-  document.getElementById('inspTitle').textContent = info.name;
-  document.getElementById('inspSub').textContent = info.sub;
-  document.getElementById('inspNodeNm').textContent = info.name;
-  document.querySelectorAll('#bldrEditCanvas .bn').forEach(el=>{
-    el.classList.toggle('sel', el.onclick&&el.onclick.toString().includes(`'${nodeId}'`));
+
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('ec-dropping'); });
+  area.addEventListener('dragleave', e => { if (e.target === area) area.classList.remove('ec-dropping'); });
+  area.addEventListener('drop', e => {
+    e.preventDefault();
+    area.classList.remove('ec-dropping');
+    const libId = e.dataTransfer.getData('text/plain');
+    if (!libEntry(libId)) return;
+    const p = atCanvas(e);
+    const node = {
+      uid: 'n' + (++ecSeq),
+      libId,
+      x: Math.max(8, Math.round((p.x - 96) / 4) * 4),
+      y: Math.max(8, Math.round((p.y - 46) / 4) * 4),
+    };
+    // Bind to the contract as published today, not to whatever it becomes.
+    if (libId.startsWith('wk:')) {
+      const w = (typeof wkGetWorkers === 'function' ? wkGetWorkers() : [])
+        .find(x => x.id === libId.slice(3));
+      if (w) node.pin = pinContract(w);
+    }
+    ecNodes.push(node);
+    renderEditCanvas();
+    selectEditNode(node.uid);
+    toast(`${libEntry(libId).label} added to the canvas`, 'info');
+  });
+
+  // Double-click a Worker to open it where it actually lives.
+  area.addEventListener('dblclick', e => {
+    const el = e.target.closest('.bn-worker');
+    if (!el) return;
+    const node = ecNodes.find(n => n.uid === el.dataset.uid);
+    if (node) drillIntoWorker(node.uid);
+  });
+
+  // Canvas node → reposition, or click to inspect
+  area.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+
+    // A port starts a connection; anywhere else on the card starts a move.
+    const port = e.target.closest('.bn-port');
+    if (port) {
+      ecLink = {
+        from: port.dataset.uid,
+        fromPort: port.dataset.port,
+        cur: atCanvas(e),
+        over: null,
+      };
+      area.classList.add('ec-linking');
+      try { area.setPointerCapture(e.pointerId); } catch (_) {}
+      renderEditEdges();
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    const el = e.target.closest('.bn');
+    if (!el) return;
+    const node = ecNodes.find(n => n.uid === el.dataset.uid);
+    if (!node) return;
+    const p = atCanvas(e);
+    ecDrag = {
+      node, el, moved: false, pid: e.pointerId,
+      ox: p.x - node.x,
+      oy: p.y - node.y,
+    };
+    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+  });
+
+  area.addEventListener('pointermove', e => {
+    if (ecLink) {
+      ecLink.cur = atCanvas(e);
+      const hit = document.elementFromPoint(e.clientX, e.clientY);
+      const overPort = hit && hit.closest('.bn-port');
+      const overNode = hit && hit.closest('.bn');
+      document.querySelectorAll('.bn-port.hot').forEach(p => p.classList.remove('hot'));
+      if (overPort && overPort.dataset.uid !== ecLink.from) {
+        overPort.classList.add('hot');
+        ecLink.over = { uid: overPort.dataset.uid, port: overPort.dataset.port };
+      } else if (overNode && overNode.dataset.uid !== ecLink.from) {
+        const a = ecNodes.find(n => n.uid === ecLink.from);
+        const b = ecNodes.find(n => n.uid === overNode.dataset.uid);
+        ecLink.over = { uid: b.uid, port: bestSides(a, b)[1] };
+      } else {
+        ecLink.over = null;
+      }
+      renderEditEdges();
+      return;
+    }
+    if (!ecDrag) return;
+    const p = atCanvas(e);
+    const nx = Math.max(8, Math.round((p.x - ecDrag.ox) / 4) * 4);
+    const ny = Math.max(8, Math.round((p.y - ecDrag.oy) / 4) * 4);
+    // Ignore sub-pixel jitter so a plain click still counts as a click.
+    if (!ecDrag.moved && Math.abs(nx - ecDrag.node.x) < 3 && Math.abs(ny - ecDrag.node.y) < 3) return;
+    ecDrag.moved = true;
+    ecDrag.node.x = nx;
+    ecDrag.node.y = ny;
+    ecDrag.el.style.left = nx + 'px';
+    ecDrag.el.style.top  = ny + 'px';
+    ecDrag.el.classList.add('bn-dragging');
+    renderEditEdges();
+  });
+
+  const endDrag = () => {
+    if (ecLink) {
+      const link = ecLink;
+      ecLink = null;
+      area.classList.remove('ec-linking');
+      document.querySelectorAll('.bn-port.hot').forEach(p => p.classList.remove('hot'));
+      if (link.over && link.over.uid !== link.from) {
+        const dupe = ecEdges.some(x => x.from === link.from && x.to === link.over.uid);
+        if (dupe) {
+          toast('Those nodes are already connected', 'error');
+        } else {
+          ecEdges.push({ from: link.from, fromPort: link.fromPort,
+                         to: link.over.uid, toPort: link.over.port, label: '' });
+          const a = ecNodes.find(n => n.uid === link.from);
+          const b = ecNodes.find(n => n.uid === link.over.uid);
+          toast(`${(a.label || nodeLib(a).label)} → ${(b.label || nodeLib(b).label)}`, 'info');
+        }
+      }
+      renderEditCanvas();
+      return;
+    }
+    if (!ecDrag) return;
+    const { node, moved, el } = ecDrag;
+    el.classList.remove('bn-dragging');
+    try { el.releasePointerCapture(ecDrag.pid); } catch (_) {}
+    ecDrag = null;
+    if (moved) renderEditCanvas(); else selectEditNode(node.uid);
+  };
+  area.addEventListener('pointerup', endDrag);
+  area.addEventListener('pointercancel', endDrag);
+}
+
+/** Renders the Workers section from the Workers module, then wires it. */
+function renderWorkerLibrary() {
+  const host = document.getElementById('nlWorkers');
+  if (!host) return;
+  const list = callableWorkers();
+  host.innerHTML = `<div class="nl-sechd" style="margin-top:8px">
+      <span class="nl-seclbl">Workers</span>
+      <span class="nl-secbadge">${list.length} active</span>
+    </div>` + (list.length ? list.map(w => `
+    <div class="nl-item" data-lib="wk:${w.id}" draggable="true"
+         title="Drag onto the canvas, or click to see its contract">
+      <div class="nl-ico" style="background:rgba(0,194,194,0.12)">${NODE_ICO.workflow()}</div>
+      <div class="nl-info">
+        <div class="nl-nm">${w.name}<span class="nl-badge bn-bw" style="margin-left:4px">W</span>
+          <span class="nl-ver">${w.version}</span></div>
+        <div class="nl-sub">In: ${w.inputs.map(i => i.name).join(', ') || '—'} → Out: ${w.outputs.map(o => o.name).join(', ') || '—'}</div>
+      </div>
+    </div>`).join('')
+    : '<div class="nl-sub" style="padding:8px 16px">No published Workers yet.</div>');
+  initNodeLibrary();
+}
+
+/** Wires draggable + click on every library row. Idempotent. */
+function initNodeLibrary() {
+  document.querySelectorAll('#nodesPanel .nl-item[data-lib]').forEach(el => {
+    if (el.dataset.wired) return;
+    el.dataset.wired = '1';
+    el.setAttribute('draggable', 'true');
+    el.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', el.dataset.lib);
+      e.dataTransfer.effectAllowed = 'copy';
+      el.classList.add('nl-dragging');
+    });
+    el.addEventListener('dragend', () => el.classList.remove('nl-dragging'));
+    el.addEventListener('click', () => inspectLibNode(el.dataset.lib));
   });
 }
 
@@ -8807,7 +10030,7 @@ function selectTraceStep(idx) {
 }
 function renderTestCanvas(net) {
   const canvas = document.getElementById('tmCanvas');
-  const flow = EDIT_FLOW;
+  const flow = editFlowView();
   const NW=192, NH=82, GX=68, SX=52, topY=80, canH=260;
   const totalW = SX + flow.length*(NW+GX) + 60;
   let svg = `<svg width="${totalW}" height="${canH}" style="position:absolute;top:0;left:0;z-index:1;pointer-events:none">`;
@@ -8819,12 +10042,12 @@ function renderTestCanvas(net) {
       svg+=`<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" stroke="rgba(0,194,194,0.22)" stroke-width="1.5" fill="none" stroke-dasharray="5 4"/>`;
       const lx=(x1+x2)/2, ly=y1-13;
       svg+=`<rect x="${lx-22}" y="${ly-8}" width="44" height="15" rx="3" fill="rgba(0,0,0,0.6)" stroke="rgba(255,255,255,0.06)"/>`;
-      svg+=`<text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.35)" font-family="Inter,sans-serif">${EDGE_LABELS[i]||''}</text>`;
+      svg+=`<text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.35)" font-family="Inter,sans-serif">${(ecEdges[i]&&ecEdges[i].label)||''}</text>`;
     }
   });
   svg+='</svg>';
   const nodes = flow.map((node,i)=>{
-    const cfg={trigger:{icoCls:'bn-icon-trig',ico:trigIco()},agent:{icoCls:'bn-icon-ag',ico:agIco()},workflow:{icoCls:'bn-icon-wf',ico:wfIco()},rag:{icoCls:'bn-icon-rag',ico:ragIco()},output:{icoCls:'bn-icon-out',ico:outIco()}};
+    const cfg={trigger:{icoCls:'bn-icon-trig',ico:trigIco()},agent:{icoCls:'bn-icon-ag',ico:agIco()},workflow:{icoCls:'bn-icon-wf',ico:wfIco()},rag:{icoCls:'bn-icon-rag',ico:ragIco()},output:{icoCls:'bn-icon-out',ico:outIco()},condition:{icoCls:'bn-icon-rag',ico:NODE_ICO.condition()},action:{icoCls:'bn-icon-out',ico:NODE_ICO.action()},wait:{icoCls:'bn-icon-trig',ico:NODE_ICO.wait()}};
     const t=cfg[node.t]||cfg.workflow;
     const bdgMap={W:'bn-bw',A:'bn-ba',Ag:'bn-bag',K:'bn-bk',OUT:'bn-bout'};
     const bdg=node.badge?`<span class="bn-badge ${bdgMap[node.badge]||''}">${node.badge}</span>`:'';
@@ -12229,6 +13452,7 @@ let inter = {kind:'idle'};
 let qaCases = {};                   // workerId → cases[]
 let testInputs = {}, nodeStatus = {}, activeEdges = new Set();
 let focusNode = null;
+let wkReturn = null;   // where the drill-down came from
 let contractDirty = false;
 let qaSel = null, qaRunnerTab = 'output', qaLeftCollapsed = false, qaRunState = {}, qaLastOutput = {};
 let traceFull = false;
@@ -13779,6 +15003,13 @@ function enterBuilder(){
   document.body.classList.add('wk-builder-mode');
   syncUrl();
   $('wkBldName').textContent = W.name;
+  const crumb = $('wkBldCrumb');
+  if(crumb){
+    crumb.style.display = wkReturn ? '' : 'none';
+    crumb.textContent = wkReturn ? wkReturn.label + '  /' : '';
+  }
+  const back = document.querySelector('#vWorkerBuilder .wk-back');
+  if(back) back.lastChild.textContent = wkReturn ? ' ' + wkReturn.label : ' Back';
   const s = $('wkBldStatus'); s.className='sc '+(W.status==='archived'?'inactive':W.status);
   s.textContent = W.status[0].toUpperCase()+W.status.slice(1);
   $('wkBldGlobCount').textContent = GLOBALS.length;
@@ -13800,6 +15031,7 @@ function exitBuilder(force){
   if(dirty && !force){ openUnsavedModal(); return; }
   document.body.classList.remove('wk-builder-mode');
   dirty = false;
+  if(wkReturn){ const back = wkReturn; wkReturn = null; back.onBack(); return; }
   go('vWorkerDetail');
   paintShell();
   tabTo('flow');
@@ -14793,6 +16025,17 @@ Object.assign(window, {
     document.getElementById('sbWorkersBtn')?.setAttribute('aria-current','page');
     document.getElementById('sbNetworksBtn')?.classList.remove('active');
     document.getElementById('sbNetworksBtn')?.removeAttribute('aria-current');
+  },
+  /** The network builder reads the real Workers instead of its own copy. */
+  wkGetWorkers: () => WORKERS,
+  /** Opens a worker's builder from inside a network, remembering the way back. */
+  wkDrillInto(workerId, ctx){
+    const w = WORKERS.find(x => x.id === workerId);
+    if(!w){ notify('Worker not found','error'); return; }
+    wkReturn = ctx || null;
+    document.body.classList.remove('builder-mode');
+    openWorker(workerId);
+    enterBuilder();
   },
   wkNavNetworks(){
     document.body.classList.remove('builder-mode','wk-builder-mode');
