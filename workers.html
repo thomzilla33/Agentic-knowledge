@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AIMS OS — Workers</title>
+<!--
+  Workers · ARP-531
+
+  Workers is its own prototype, but not its own engine. It ships inside the
+  Agentic Studio shell because the two are deliberately coupled: a network's
+  node library reads the published Workers, and double-clicking a Worker node
+  drills into that Worker's builder and back. Splitting the file would
+  duplicate the shell and sever that path, so this entry point opens the same
+  app with the Workers module in front.
+-->
+<style>
+  html,body{margin:0;height:100%;background:#0A0E1A;color:rgba(255,255,255,.6);
+    font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center}
+  .w{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+  .d{width:7px;height:7px;border-radius:50%;background:#2B7FFF;animation:p 1s ease-in-out infinite}
+  @keyframes p{0%,100%{opacity:.35}50%{opacity:1}}
+  a{color:#2B7FFF}
+</style>
+</head>
+<body>
+  <div class="w"><span class="d"></span><span>Opening Workers…</span></div>
+  <noscript><p>Open <a href="agentic-studio.html?view=workers">Workers</a>.</p></noscript>
+  <script>
+    // Carry any deep link through, so workers.html?worker=w1&tab=qa still works.
+    const q = new URLSearchParams(location.search);
+    if (!q.has('worker')) q.set('view', 'workers');
+    location.replace('agentic-studio.html?' + q.toString());
+  </script>
+</body>
+</html>

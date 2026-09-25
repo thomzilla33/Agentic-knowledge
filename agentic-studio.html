@@ -6214,7 +6214,8 @@ window.CURRENT_APP_ID = 'agentic-studio';
 const CTX_APPS = [
   { id:'work-surface',   name:'Work Surface',   desc:'Unified workspace',    href:'voice-channel-ux.html',  gradient:'linear-gradient(135deg,#0EA5E9 0%,#06B6D4 100%)', initials:'WS' },
   { id:'governance',     name:'Governance',     desc:'Policies & knowledge', href:'governance-studio.html', gradient:'linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%)', initials:'GS' },
-  { id:'agentic-studio', name:'Agentic Studio', desc:'Agents & workflows',   href:'agentic-studio.html',    gradient:'var(--gradient-brand)', initials:'AS' }
+  { id:'agentic-studio', name:'Agentic Studio', desc:'Agents & workflows',   href:'agentic-studio.html',    gradient:'var(--gradient-brand)', initials:'AS' },
+  { id:'workers',        name:'Workers',        desc:'Contract-typed units', href:'workers.html',           gradient:'linear-gradient(135deg,#00C2C2 0%,#155DFC 100%)', initials:'WK' }
 ];
 const _ctxState = { search: '' };
 function _ctxTrunc(s, max){ max = max || 50; return s && s.length > max ? s.slice(0, max - 1) + '…' : s; }
@@ -15026,6 +15027,11 @@ function syncUrl(){
 }
 function restoreFromUrl(){
   const u = new URL(location.href);
+  // workers.html lands here; open the module with no worker selected.
+  if(u.searchParams.get('view') === 'workers' && !u.searchParams.get('worker')){
+    window.wkNavWorkers();
+    return true;
+  }
   const id = u.searchParams.get('worker');
   if(!id || !WORKERS.some(w=>w.id===id)) return false;
   window.wkNavWorkers();
